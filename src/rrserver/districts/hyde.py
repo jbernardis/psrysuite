@@ -1,9 +1,9 @@
 import logging
 
-from district import District, HYDE, formatIText, formatOText
-from rrobjects import SignalOutput, TurnoutOutput, RelayOutput, IndicatorOutput, RouteInput, BlockInput, \
+from rrserver.district import District, HYDE, formatIText, formatOText
+from rrserver.rrobjects import SignalOutput, TurnoutOutput, RelayOutput, IndicatorOutput, RouteInput, BlockInput, \
 	FleetLeverInput, TurnoutInput
-from bus import setBit, getBit
+from rrserver.bus import setBit, getBit
 
 class Hyde(District):
 	def __init__(self, parent, name, settings):

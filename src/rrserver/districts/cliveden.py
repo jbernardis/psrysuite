@@ -1,8 +1,8 @@
 import logging
 
-from district import District, CLIVEDEN, formatIText, formatOText
-from rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, SignalLeverInput, BreakerInput, BlockInput, TurnoutInput
-from bus import setBit, getBit
+from rrserver.district import District, CLIVEDEN, formatIText, formatOText
+from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, SignalLeverInput, BreakerInput, BlockInput, TurnoutInput
+from rrserver.bus import setBit, getBit
 
 
 class Cliveden(District):
@@ -105,13 +105,13 @@ class Cliveden(District):
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
-			self.rr.GetInput("CSw13").SetState(nb, rb)
+			self.rr.GetInput("CSw13").SetTOState(nb, rb)
 			nb = getBit(inb[0], 2) 
 			rb = getBit(inb[0], 3)
-			self.rr.GetInput("CSw11").SetState(nb, rb)
+			self.rr.GetInput("CSw11").SetTOState(nb, rb)
 			nb = getBit(inb[0], 4) 
 			rb = getBit(inb[0], 5)
-			self.rr.GetInput("CSw9").SetState(nb, rb)
+			self.rr.GetInput("CSw9").SetTOState(nb, rb)
 
 			self.rr.GetInput("C13.W").SetValue(getBit(inb[1], 0))  # Detection
 			self.rr.GetInput("C13").SetValue(getBit(inb[1], 1))

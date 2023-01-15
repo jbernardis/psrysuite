@@ -1,9 +1,9 @@
 import logging
 
-from district import District, leverState, formatIText, formatOText, GREENMTN, CLIFF, SHEFFIELD
-from rrobjects import SignalOutput, NXButtonOutput, HandSwitchOutput, BlockInput, TurnoutInput, RouteInput, \
+from rrserver.district import District, leverState, formatIText, formatOText, GREENMTN, CLIFF, SHEFFIELD
+from rrserver.rrobjects import SignalOutput, NXButtonOutput, HandSwitchOutput, BlockInput, TurnoutInput, RouteInput, \
 	FleetLeverInput, SignalLeverInput, HandswitchLeverInput, ToggleInput
-from bus import setBit, getBit
+from rrserver.bus import setBit, getBit
 
 
 class Cliff(District):
@@ -185,7 +185,7 @@ class Cliff(District):
 
 			nb = getBit(inb[1], 0)  # Switch positions
 			rb = getBit(inb[1], 1)
-			self.rr.GetInput("CSw3").SetState(nb, rb)
+			self.rr.GetInput("CSw3").SetTOState(nb, rb)
 			self.rr.GetInput("C11").SetValue(getBit(inb[1], 2))  # Detection
 			self.rr.GetInput("COSGMW").SetValue(getBit(inb[1], 3))  # COS1
 			self.rr.GetInput("C10").SetValue(getBit(inb[1], 4))

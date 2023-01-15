@@ -1,9 +1,9 @@
 import logging
 
-from district import District, leverState,  NASSAUE, NASSAUW, NASSAUNX, formatIText, formatOText
-from rrobjects import SignalOutput, TurnoutOutput, NXButtonOutput, RelayOutput, BreakerInput, BlockInput, \
+from rrserver.district import District, leverState,  NASSAUE, NASSAUW, NASSAUNX, formatIText, formatOText
+from rrserver.rrobjects import SignalOutput, TurnoutOutput, NXButtonOutput, RelayOutput, BreakerInput, BlockInput, \
 	TurnoutInput, SignalLeverInput, ToggleInput
-from bus import setBit, getBit
+from rrserver.bus import setBit, getBit
 
 
 class Nassau(District):
@@ -272,36 +272,36 @@ class Nassau(District):
 			ip = self.rr.GetInput("NSw19")  #Switch positions
 			nb = getBit(inb[0], 0)
 			rb = getBit(inb[0], 1)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("NSw21") 
 			nb = getBit(inb[0], 2)
 			rb = getBit(inb[0], 3)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("NSw23") 
 			nb = getBit(inb[0], 4)
 			rb = getBit(inb[0], 5)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("NSw25")
 			nb = getBit(inb[0], 6)
 			rb = getBit(inb[0], 7)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 
 			ip = self.rr.GetInput("NSw27") 
 			nb = getBit(inb[1], 0)
 			rb = getBit(inb[1], 1)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("NSw29") 
 			nb = getBit(inb[1], 2)
 			rb = getBit(inb[1], 3)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("NSw31") 
 			nb = getBit(inb[1], 4)
 			rb = getBit(inb[1], 5)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("NSw33")
 			nb = getBit(inb[1], 6)
 			rb = getBit(inb[1], 7)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 
 			ip = self.rr.GetInput("N21.W") 
 			ip.SetValue(getBit(inb[2], 0))   #detection
@@ -380,26 +380,26 @@ class Nassau(District):
 			ip15 = self.rr.GetInput("NSw15") 
 			ip17 = self.rr.GetInput("NSw17") 
 			if NSw60A != 0:
-				ip13.SetState(0, 1)
-				ip15.SetState(0, 1)
-				ip17.SetState(0, 1)
+				ip13.SetTOState(0, 1)
+				ip15.SetTOState(0, 1)
+				ip17.SetTOState(0, 1)
 			elif NSw60B != 0:
-				ip13.SetState(1, 0)
-				ip15.SetState(1, 0)
-				ip17.SetState(0, 1)
+				ip13.SetTOState(1, 0)
+				ip15.SetTOState(1, 0)
+				ip17.SetTOState(0, 1)
 			elif NSw60C != 0:
-				ip13.SetState(0, 1)
-				ip15.SetState(0, 1)
-				ip17.SetState(1, 0)
+				ip13.SetTOState(0, 1)
+				ip15.SetTOState(0, 1)
+				ip17.SetTOState(1, 0)
 			elif NSw60D != 0:
-				ip13.SetState(1, 0)
-				ip15.SetState(1, 0)
-				ip17.SetState(1, 0)
+				ip13.SetTOState(1, 0)
+				ip15.SetTOState(1, 0)
+				ip17.SetTOState(1, 0)
 
 			ip = self.rr.GetInput("NSw35")
 			nb = getBit(inb[7], 5)
 			rb = getBit(inb[7], 6)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 
 		# Nassau East
 		outb = [0 for _ in range(4)]
@@ -474,29 +474,29 @@ class Nassau(District):
 		
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
-			self.rr.GetInput("NSw41").SetState(nb, rb)
+			self.rr.GetInput("NSw41").SetTOState(nb, rb)
 			nb = getBit(inb[0], 2) 
 			rb = getBit(inb[0], 3)
-			self.rr.GetInput("NSw43").SetState(nb, rb)
+			self.rr.GetInput("NSw43").SetTOState(nb, rb)
 			nb = getBit(inb[0], 4) 
 			rb = getBit(inb[0], 5)
-			self.rr.GetInput("NSw5").SetState(nb, rb)
+			self.rr.GetInput("NSw5").SetTOState(nb, rb)
 			nb = getBit(inb[0], 6) 
 			rb = getBit(inb[0], 7)
-			self.rr.GetInput("NSw47").SetState(nb, rb)
+			self.rr.GetInput("NSw47").SetTOState(nb, rb)
 
 			nb = getBit(inb[1], 0) 
 			rb = getBit(inb[1], 1)
-			self.rr.GetInput("NSw51").SetState(nb, rb)
+			self.rr.GetInput("NSw51").SetTOState(nb, rb)
 			nb = getBit(inb[1], 2) 
 			rb = getBit(inb[1], 3)
-			self.rr.GetInput("NSw53").SetState(nb, rb)
+			self.rr.GetInput("NSw53").SetTOState(nb, rb)
 			nb = getBit(inb[1], 4) 
 			rb = getBit(inb[1], 5)
-			self.rr.GetInput("NSw55").SetState(nb, rb)
+			self.rr.GetInput("NSw55").SetTOState(nb, rb)
 			nb = getBit(inb[1], 6) 
 			rb = getBit(inb[1], 7)
-			self.rr.GetInput("NSw57").SetState(nb, rb)
+			self.rr.GetInput("NSw57").SetTOState(nb, rb)
 
 			self.rr.GetInput("N22").SetValue(getBit(inb[2], 0))  # Detection
 			self.rr.GetInput("N41").SetValue(getBit(inb[2], 1))  
@@ -509,7 +509,7 @@ class Nassau(District):
 
 			nb = getBit(inb[3], 0) 
 			rb = getBit(inb[3], 1)
-			self.rr.GetInput("NSw39").SetState(nb, rb)
+			self.rr.GetInput("NSw39").SetTOState(nb, rb)
 
 		# NX Buttons Output only
 		outb = [0 for _ in range(3)]

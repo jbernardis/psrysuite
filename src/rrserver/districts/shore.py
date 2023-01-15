@@ -1,8 +1,8 @@
 import logging
 
-from district import District, SHORE, HYDEJCT, formatIText, formatOText
-from rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, BlockInput, TurnoutInput
-from bus import setBit, getBit
+from rrserver.district import District, SHORE, HYDEJCT, formatIText, formatOText
+from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, BlockInput, TurnoutInput
+from rrserver.bus import setBit, getBit
 
 
 class Shore(District):
@@ -173,26 +173,26 @@ class Shore(District):
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
-			self.rr.GetInput("SSw1").SetState(nb, rb)
+			self.rr.GetInput("SSw1").SetTOState(nb, rb)
 			nb = getBit(inb[0], 2) 
 			rb = getBit(inb[0], 3)
-			self.rr.GetInput("SSw3").SetState(nb, rb)
+			self.rr.GetInput("SSw3").SetTOState(nb, rb)
 			nb = getBit(inb[0], 4) 
 			rb = getBit(inb[0], 5)
-			self.rr.GetInput("SSw5").SetState(nb, rb)
+			self.rr.GetInput("SSw5").SetTOState(nb, rb)
 			nb = getBit(inb[0], 6) 
 			rb = getBit(inb[0], 7)
-			self.rr.GetInput("SSw7").SetState(nb, rb)
+			self.rr.GetInput("SSw7").SetTOState(nb, rb)
 
 			nb = getBit(inb[1], 0)
 			rb = getBit(inb[1], 1)
-			self.rr.GetInput("SSw9").SetState(nb, rb)
+			self.rr.GetInput("SSw9").SetTOState(nb, rb)
 			nb = getBit(inb[1], 2)
 			rb = getBit(inb[1], 3)
-			self.rr.GetInput("SSw11").SetState(nb, rb)
+			self.rr.GetInput("SSw11").SetTOState(nb, rb)
 			nb = getBit(inb[1], 4)
 			rb = getBit(inb[1], 5)
-			self.rr.GetInput("SSw13").SetState(nb, rb)
+			self.rr.GetInput("SSw13").SetTOState(nb, rb)
 			self.rr.GetInput("S20.W").SetValue(getBit(inb[1], 6))  # Shore Detection
 			self.rr.GetInput("S20A").SetValue(getBit(inb[1], 7))
 
@@ -218,7 +218,7 @@ class Shore(District):
 			# 		SXON  = SIn[4].bit.b1;	//Crossing gate off normal - no londer needed
 			nb = getBit(inb[4], 2) 
 			rb = getBit(inb[4], 3)
-			self.rr.GetInput("CSw15").SetState(nb, rb)
+			self.rr.GetInput("CSw15").SetTOState(nb, rb)
 			self.rr.GetInput("S11A").SetValue(getBit(inb[4], 4))
 			self.rr.GetInput("H30A").SetValue(getBit(inb[4], 5))
 			self.rr.GetInput("H10A").SetValue(getBit(inb[4], 6))
@@ -282,13 +282,13 @@ class Shore(District):
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
-			self.rr.GetInput("SSw15").SetState(nb, rb)
+			self.rr.GetInput("SSw15").SetTOState(nb, rb)
 			nb = getBit(inb[0], 2) 
 			rb = getBit(inb[0], 3)
-			self.rr.GetInput("SSw17").SetState(nb, rb)
+			self.rr.GetInput("SSw17").SetTOState(nb, rb)
 			nb = getBit(inb[0], 4) 
 			rb = getBit(inb[0], 5)
-			self.rr.GetInput("SSw19").SetState(nb, rb)
+			self.rr.GetInput("SSw19").SetTOState(nb, rb)
 			self.rr.GetInput("H20").SetValue(getBit(inb[0], 6))  # Detection
 			self.rr.GetInput("H20.E").SetValue(getBit(inb[0], 7)) 
 

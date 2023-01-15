@@ -1,8 +1,8 @@
 import logging
 
-from district import District, KRULISH, formatIText, formatOText
-from rrobjects import SignalOutput, TurnoutOutput, RelayOutput, IndicatorOutput, BlockInput, TurnoutInput
-from bus import setBit, getBit
+from rrserver.district import District, KRULISH, formatIText, formatOText
+from rrserver.rrobjects import SignalOutput, TurnoutOutput, RelayOutput, IndicatorOutput, BlockInput, TurnoutInput
+from rrserver.bus import setBit, getBit
 
 class Krulish(District):
 	def __init__(self, parent, name, settings):
@@ -79,16 +79,16 @@ class Krulish(District):
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
-			self.rr.GetInput("KSw1").SetState(nb, rb)
+			self.rr.GetInput("KSw1").SetTOState(nb, rb)
 			nb = getBit(inb[0], 2)
 			rb = getBit(inb[0], 3)
-			self.rr.GetInput("KSw3").SetState(nb, rb)
+			self.rr.GetInput("KSw3").SetTOState(nb, rb)
 			nb = getBit(inb[0], 4)
 			rb = getBit(inb[0], 5)
-			self.rr.GetInput("KSw5").SetState(nb, rb)
+			self.rr.GetInput("KSw5").SetTOState(nb, rb)
 			nb = getBit(inb[0], 6)
 			rb = getBit(inb[0], 7)
-			self.rr.GetInput("KSw7").SetState(nb, rb)
+			self.rr.GetInput("KSw7").SetTOState(nb, rb)
 
 			self.rr.GetInput("N10.W").SetValue(getBit(inb[1], 2))  # Detection
 			self.rr.GetInput("N10").SetValue(getBit(inb[1], 3))

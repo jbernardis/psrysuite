@@ -1,4 +1,4 @@
-from constants import NORMAL, REVERSE, EMPTY, TURNOUT, SLIPSWITCH
+from dispatcher.constants import NORMAL, REVERSE, EMPTY, TURNOUT, SLIPSWITCH
 
 
 class Turnout:

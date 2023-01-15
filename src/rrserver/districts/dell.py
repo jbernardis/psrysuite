@@ -1,8 +1,8 @@
 import logging
 
-from district import District, DELL, FOSS, formatIText, formatOText
-from rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, BlockInput, TurnoutInput
-from bus import setBit, getBit
+from rrserver.district import District, DELL, FOSS, formatIText, formatOText
+from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, BlockInput, TurnoutInput
+from rrserver.bus import setBit, getBit
 
 class Dell(District):
 	def __init__(self, parent, name, settings):
@@ -150,23 +150,23 @@ class Dell(District):
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
-			self.rr.GetInput("DSw1").SetState(nb, rb)
+			self.rr.GetInput("DSw1").SetTOState(nb, rb)
 			nb = getBit(inb[0], 2) 
 			rb = getBit(inb[0], 3)
-			self.rr.GetInput("DSw3").SetState(nb, rb)
+			self.rr.GetInput("DSw3").SetTOState(nb, rb)
 			nb = getBit(inb[0], 4) 
 			rb = getBit(inb[0], 5)
-			self.rr.GetInput("DSw5").SetState(nb, rb)
+			self.rr.GetInput("DSw5").SetTOState(nb, rb)
 			nb = getBit(inb[0], 6) 
 			rb = getBit(inb[0], 7)
-			self.rr.GetInput("DSw7").SetState(nb, rb)
+			self.rr.GetInput("DSw7").SetTOState(nb, rb)
 
 			nb = getBit(inb[1], 0)  
 			rb = getBit(inb[1], 1)
-			self.rr.GetInput("DSw9").SetState(nb, rb)
+			self.rr.GetInput("DSw9").SetTOState(nb, rb)
 			nb = getBit(inb[1], 2)  
 			rb = getBit(inb[1], 3)
-			self.rr.GetInput("DSw11").SetState(nb, rb)
+			self.rr.GetInput("DSw11").SetTOState(nb, rb)
 			self.rr.GetInput("D20").SetValue(getBit(inb[1], 4))  # Detection
 			self.rr.GetInput("D20.E").SetValue(getBit(inb[1], 5))
 			self.rr.GetInput("H23").SetValue(getBit(inb[1], 6)) 

@@ -5,34 +5,33 @@ import os
 import json
 import logging
 
-from settings import Settings
-from bitmaps import BitMaps
-from district import Districts
-from trackdiagram import TrackDiagram
-from tile import loadTiles
-from block import Block
-from train import Train
+from dispatcher.settings import Settings
+from dispatcher.bitmaps import BitMaps
+from dispatcher.district import Districts
+from dispatcher.trackdiagram import TrackDiagram
+from dispatcher.tile import loadTiles
+from dispatcher.train import Train
 
-from breaker import BreakerDisplay, BreakerName
-from toaster import Toaster, TB_CENTER
+from dispatcher.breaker import BreakerDisplay, BreakerName
+from dispatcher.toaster import Toaster, TB_CENTER
 
-from districts.hyde import Hyde
-from districts.yard import Yard
-from districts.latham import Latham
-from districts.dell import Dell
-from districts.shore import Shore
-from districts.krulish import Krulish
-from districts.nassau import Nassau
-from districts.bank import Bank
-from districts.cliveden import Cliveden
-from districts.cliff import Cliff
-from districts.port import Port
+from dispatcher.districts.hyde import Hyde
+from dispatcher.districts.yard import Yard
+from dispatcher.districts.latham import Latham
+from dispatcher.districts.dell import Dell
+from dispatcher.districts.shore import Shore
+from dispatcher.districts.krulish import Krulish
+from dispatcher.districts.nassau import Nassau
+from dispatcher.districts.bank import Bank
+from dispatcher.districts.cliveden import Cliveden
+from dispatcher.districts.cliff import Cliff
+from dispatcher.districts.port import Port
 
-from constants import HyYdPt, LaKr, NaCl, screensList, EMPTY, OCCUPIED, NORMAL, REVERSE, OVERSWITCH
-from listener import Listener
-from rrserver import RRServer
+from dispatcher.constants import HyYdPt, LaKr, NaCl, screensList, EMPTY, OCCUPIED, NORMAL, REVERSE, OVERSWITCH
+from dispatcher.listener import Listener
+from dispatcher.rrserver import RRServer
 
-from edittraindlg import EditTrainDlg
+from dispatcher.edittraindlg import EditTrainDlg
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 

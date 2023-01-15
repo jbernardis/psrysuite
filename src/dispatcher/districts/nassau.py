@@ -1,11 +1,11 @@
-from district import District
+from dispatcher.district import District
 
-from block import Block, OverSwitch, Route
-from turnout import Turnout, SlipSwitch
-from signal import Signal
-from button import Button
+from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.turnout import Turnout, SlipSwitch
+from dispatcher.signal import Signal
+from dispatcher.button import Button
 
-from constants import LaKr, SloAspects, SLOW, RESTRICTING, SLIPSWITCH, NORMAL, REVERSE, RegAspects, EMPTY
+from dispatcher.constants import LaKr, SloAspects, SLOW, RESTRICTING, SLIPSWITCH, NORMAL, REVERSE, RegAspects, EMPTY
 
 
 class Nassau (District):

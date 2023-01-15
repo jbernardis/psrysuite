@@ -1,12 +1,12 @@
-from district import District
+from dispatcher.district import District
 
-from block import Block, OverSwitch, Route
-from turnout import Turnout, SlipSwitch
-from signal import Signal
-from button import Button
-from indicator import Indicator
+from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.turnout import Turnout, SlipSwitch
+from dispatcher.signal import Signal
+from dispatcher.button import Button
+from dispatcher.indicator import Indicator
 
-from constants import HyYdPt, RESTRICTING, MAIN, DIVERGING, SLOW, NORMAL, REVERSE, EMPTY, SLIPSWITCH, RegAspects, AdvAspects, RegSloAspects
+from dispatcher.constants import RESTRICTING, MAIN, DIVERGING, SLOW, NORMAL, REVERSE, EMPTY, SLIPSWITCH, RegAspects, AdvAspects, RegSloAspects
 
 CJBlocks = ["YOSCJE", "YOSCJW"]
 EEBlocks = ["YOSEJE", "YOSEJW"]

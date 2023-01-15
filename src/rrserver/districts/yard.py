@@ -1,9 +1,9 @@
 import logging
 
-from district import District, leverState, CORNELL, EASTJCT, KALE, YARD, YARDSW, formatIText, formatOText
-from rrobjects import TurnoutInput, BlockInput, RouteInput, SignalOutput, TurnoutOutput, RelayOutput, \
+from rrserver.district import District, leverState, CORNELL, EASTJCT, KALE, YARD, YARDSW, formatIText, formatOText
+from rrserver.rrobjects import TurnoutInput, BlockInput, RouteInput, SignalOutput, TurnoutOutput, RelayOutput, \
 	FleetLeverInput, IndicatorOutput, SignalLeverInput, ToggleInput, NXButtonOutput
-from bus import setBit, getBit
+from rrserver.bus import setBit, getBit
 
 
 class Yard(District):
@@ -132,11 +132,11 @@ class Yard(District):
 			ip = self.rr.GetInput("YSw1")  #Switches
 			nb = getBit(inb[0], 0)
 			rb = getBit(inb[0], 1)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("YSw3")
 			nb = getBit(inb[0], 2)
 			rb = getBit(inb[0], 3)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("Y21.W")  # Block detection
 			ip.SetValue(getBit(inb[0], 4))
 			ip = self.rr.GetInput("Y21")
@@ -196,15 +196,15 @@ class Yard(District):
 			ip = self.rr.GetInput("YSw7")  #Switch positions
 			nb = getBit(inb[0], 0)
 			rb = getBit(inb[0], 1)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("YSw9") 
 			nb = getBit(inb[0], 2)
 			rb = getBit(inb[0], 3)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("YSw11")  
 			nb = getBit(inb[0], 4)
 			rb = getBit(inb[0], 5)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("Y20")  # Detection
 			ip.SetValue(getBit(inb[0], 6))
 			ip = self.rr.GetInput("Y20.E") 
@@ -265,32 +265,32 @@ class Yard(District):
 			ip = self.rr.GetInput("YSw17")  #Switch positions
 			nb = getBit(inb[0], 0)
 			rb = getBit(inb[0], 1)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("YSw19") 
 			nb = getBit(inb[0], 2)
 			rb = getBit(inb[0], 3)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("YSw21") 
 			nb = getBit(inb[0], 4)
 			rb = getBit(inb[0], 5)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("YSw23") 
 			nb = getBit(inb[0], 6)
 			rb = getBit(inb[0], 7)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 
 			ip = self.rr.GetInput("YSw25") 
 			nb = getBit(inb[1], 0)
 			rb = getBit(inb[1], 1)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("YSw27") 
 			nb = getBit(inb[1], 2)
 			rb = getBit(inb[1], 3)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("YSw29") 
 			nb = getBit(inb[1], 4)
 			rb = getBit(inb[1], 5)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 			ip = self.rr.GetInput("Y30") 
 			ip.SetValue(getBit(inb[1], 6))   #detection
 			ip = self.rr.GetInput("YOSKL4")  # KAOS1
@@ -399,7 +399,7 @@ class Yard(District):
 			ip = self.rr.GetInput("YSw33")  # Switch positions
 			nb = getBit(inb[0], 0)
 			rb = getBit(inb[0], 1)
-			ip.SetState(nb, rb)
+			ip.SetTOState(nb, rb)
 
 			if optControl == 0:  # Control by yard
 				lvrR = getBit(inb[0], 2)       # signal levers

@@ -184,7 +184,7 @@ class TurnoutInput(Input):
 		Input.__init__(self, name, district)
 		self.state = "N"  # assume normal switch position to start
 
-	def SetState(self, nb, rb):
+	def SetTOState(self, nb, rb):
 		if nb != 0 and rb == 0:
 			ns = 'N'
 		elif rb != 0 and nb == 0:

@@ -1,9 +1,9 @@
 import logging
 
-from district import District, BANK, formatIText, formatOText
-from rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, IndicatorOutput, BreakerInput, \
+from rrserver.district import District, BANK, formatIText, formatOText
+from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, IndicatorOutput, BreakerInput, \
 	SignalLeverInput, BlockInput, TurnoutInput
-from bus import setBit, getBit
+from rrserver.bus import setBit, getBit
 
 
 class Bank(District):
@@ -106,20 +106,20 @@ class Bank(District):
 			
 			nb = getBit(inb[0], 0)  # Switch Positions
 			rb = getBit(inb[0], 1)
-			self.rr.GetInput("CSw23").SetState(nb, rb)
+			self.rr.GetInput("CSw23").SetTOState(nb, rb)
 			nb = getBit(inb[0], 2)
 			rb = getBit(inb[0], 3)
-			self.rr.GetInput("CSw21a").SetState(nb, rb)
+			self.rr.GetInput("CSw21a").SetTOState(nb, rb)
 			nb = getBit(inb[0], 4)
 			rb = getBit(inb[0], 5)
-			self.rr.GetInput("CSw21b").SetState(nb, rb)
+			self.rr.GetInput("CSw21b").SetTOState(nb, rb)
 			nb = getBit(inb[0], 6)
 			rb = getBit(inb[0], 7)
-			self.rr.GetInput("CSw19").SetState(nb, rb)
+			self.rr.GetInput("CSw19").SetTOState(nb, rb)
 
 			nb = getBit(inb[1], 0)
 			rb = getBit(inb[1], 1)
-			self.rr.GetInput("CSw17").SetState(nb, rb)
+			self.rr.GetInput("CSw17").SetTOState(nb, rb)
 			ip = self.rr.GetInput("B20")    # block detection
 			ip.SetValue(getBit(inb[1], 2))
 			ip = self.rr.GetInput("B20.E") 

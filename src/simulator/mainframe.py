@@ -4,13 +4,13 @@ import wx.lib.newevent
 import os
 import json
 
-from settings import Settings
+from simulator.settings import Settings
 
 
-from listener import Listener
-from rrserver import RRServer
-from script import Script
-from scrlist import ScriptListCtrl
+from simulator.listener import Listener
+from simulator.rrserver import RRServer
+from simulator.script import Script
+from simulator.scrlist import ScriptListCtrl
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
@@ -77,7 +77,7 @@ class MainFrame(wx.Frame):
 		vsz.Add(hsz)
 		vsz.AddSpacer(20)
 
-		self.scriptList = ScriptListCtrl(self, cmdFolder)
+		self.scriptList = ScriptListCtrl(self, os.path.join(cmdFolder, "simulator"))
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20)
 		btnsz = wx.BoxSizer(wx.VERTICAL)

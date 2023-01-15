@@ -2,12 +2,12 @@ import wx
 import json
 import os
 
-from traindlg import TrainDlg
-from train import Trains
-from blocksequence import BlockSequenceListCtrl
-from layoutdata import LayoutData
-from simscriptdlg import SimScriptDlg
-from arscriptdlg import ARScriptDlg
+from traineditor.traindlg import TrainDlg
+from traineditor.train import Trains
+from traineditor.blocksequence import BlockSequenceListCtrl
+from traineditor.layoutdata import LayoutData
+from traineditor.simscriptdlg import SimScriptDlg
+from traineditor.arscriptdlg import ARScriptDlg
 
 SIMSCRIPTFN = "simscripts.json"
 ARSCRIPTFN =  "arscripts.json"

@@ -1,5 +1,5 @@
-import os, inspect, sys
-cmdFolder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
+import os, sys
+cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
@@ -12,16 +12,16 @@ import wx.lib.newevent
 import json
 import socket
 
-from settings import Settings
-from bus import RailroadMonitor
-from railroad import Railroad
-from httpserver import HTTPServer
-from sktserver import SktServer
-from routedef import RouteDef
+from rrserver.settings import Settings
+from rrserver.bus import RailroadMonitor
+from rrserver.railroad import Railroad
+from rrserver.httpserver import HTTPServer
+from rrserver.sktserver import SktServer
+from rrserver.routedef import RouteDef
 
-from clientlist import ClientList
-from trainlist import TrainList
-from iodisplay import IODisplay
+from rrserver.clientlist import ClientList
+from rrserver.trainlist import TrainList
+from rrserver.iodisplay import IODisplay
 
 logging.basicConfig(filename='rrserver.log', filemode='w', format='%(asctime)s %(message)s', level=logging.INFO)
 

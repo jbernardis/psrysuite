@@ -1,12 +1,10 @@
-from district import District
+from dispatcher.district import District
 
-from block import Block, OverSwitch, Route
-from turnout import Turnout, SlipSwitch
-from signal import Signal
-from button import Button
-from handswitch import HandSwitch
+from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.turnout import Turnout
+from dispatcher.signal import Signal
 
-from constants import NaCl, RegAspects, RESTRICTING, DIVERGING, MAIN
+from dispatcher.constants import NaCl, RegAspects, RESTRICTING, DIVERGING, MAIN
 
 
 class Krulish (District):

@@ -1,12 +1,11 @@
-from district import District
+from dispatcher.district import District
 
-from block import Block, OverSwitch, Route
-from turnout import Turnout, SlipSwitch
-from signal import Signal
-from button import Button
-from handswitch import HandSwitch
+from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.turnout import Turnout, SlipSwitch
+from dispatcher.signal import Signal
+from dispatcher.handswitch import HandSwitch
 
-from constants import HyYdPt, LaKr, RESTRICTING, MAIN, DIVERGING, SLOW, NORMAL, REVERSE, EMPTY, SLIPSWITCH, RegAspects
+from dispatcher.constants import RESTRICTING, MAIN, DIVERGING, NORMAL, REVERSE, SLIPSWITCH, RegAspects
 
 class Dell (District):
 	def __init__(self, name, frame, screen):

@@ -1,6 +1,10 @@
 import wx
+import os, sys
+cmdFolder = os.getcwd()
+if cmdFolder not in sys.path:
+	sys.path.insert(0, cmdFolder)
 
-from mainframe import MainFrame 
+from traineditor.mainframe import MainFrame 
 
 
 class App(wx.App):

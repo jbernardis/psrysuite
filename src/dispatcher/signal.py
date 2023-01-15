@@ -1,4 +1,4 @@
-from constants import STOP
+from dispatcher.constants import STOP
 
 
 class Signal:

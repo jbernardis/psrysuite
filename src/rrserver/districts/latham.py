@@ -1,8 +1,8 @@
 import logging
 
-from district import District, LATHAM, CARLTON, formatIText, formatOText
-from rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, BreakerInput, BlockInput, TurnoutInput
-from bus import setBit, getBit
+from rrserver.district import District, LATHAM, CARLTON, formatIText, formatOText
+from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, BreakerInput, BlockInput, TurnoutInput
+from rrserver.bus import setBit, getBit
 
 
 class Latham(District):
@@ -118,20 +118,20 @@ class Latham(District):
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
-			self.rr.GetInput("LSw1").SetState(nb, rb)
+			self.rr.GetInput("LSw1").SetTOState(nb, rb)
 			nb = getBit(inb[0], 2) 
 			rb = getBit(inb[0], 3)
-			self.rr.GetInput("LSw3").SetState(nb, rb)
+			self.rr.GetInput("LSw3").SetTOState(nb, rb)
 			nb = getBit(inb[0], 4) 
 			rb = getBit(inb[0], 5)
-			self.rr.GetInput("LSw5").SetState(nb, rb)
+			self.rr.GetInput("LSw5").SetTOState(nb, rb)
 			nb = getBit(inb[0], 6) 
 			rb = getBit(inb[0], 7)
-			self.rr.GetInput("LSw7").SetState(nb, rb)
+			self.rr.GetInput("LSw7").SetTOState(nb, rb)
 
 			nb = getBit(inb[1], 0) 
 			rb = getBit(inb[1], 1)
-			self.rr.GetInput("LSw9").SetState(nb, rb)
+			self.rr.GetInput("LSw9").SetTOState(nb, rb)
 			self.rr.GetInput("L20").SetValue(getBit(inb[1], 2))  # Detection
 			self.rr.GetInput("L20.E").SetValue(getBit(inb[1], 3))
 			self.rr.GetInput("P21").SetValue(getBit(inb[1], 4))
@@ -233,16 +233,16 @@ class Latham(District):
 
 			nb = getBit(inb[0], 0)  # Carlton switch positions
 			rb = getBit(inb[0], 1)
-			self.rr.GetInput("LSw11").SetState(nb, rb)
+			self.rr.GetInput("LSw11").SetTOState(nb, rb)
 			nb = getBit(inb[0], 2) 
 			rb = getBit(inb[0], 3)
-			self.rr.GetInput("LSw13").SetState(nb, rb)
+			self.rr.GetInput("LSw13").SetTOState(nb, rb)
 			nb = getBit(inb[0], 4) 
 			rb = getBit(inb[0], 5)
-			self.rr.GetInput("LSw15").SetState(nb, rb)
+			self.rr.GetInput("LSw15").SetTOState(nb, rb)
 			nb = getBit(inb[0], 6) 
 			rb = getBit(inb[0], 7)
-			self.rr.GetInput("LSw17").SetState(nb, rb)
+			self.rr.GetInput("LSw17").SetTOState(nb, rb)
 
 			self.rr.GetInput("L31").SetValue(getBit(inb[1], 0))  # Carlton Detection
 			self.rr.GetInput("L31.E").SetValue(getBit(inb[1], 1)) 

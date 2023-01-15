@@ -3,22 +3,22 @@ import wx.lib.newevent
 
 import json
 
-from fifo import Fifo
+from autorouter.fifo import Fifo
 
-from settings import Settings
+from autorouter.settings import Settings
 
-from triggers import Triggers, TriggerPointFront, TriggerPointRear
-from routerequest import RouteRequest
-from requestqueue import RequestQueue
-from turnout import Turnout
-from signal import Signal
-from block import Block
-from overswitch import OverSwitch
-from train import Train
-from route import Route
+from autorouter.triggers import Triggers, TriggerPointFront, TriggerPointRear
+from autorouter.routerequest import RouteRequest
+from autorouter.requestqueue import RequestQueue
+from autorouter.turnout import Turnout
+from autorouter.signal import Signal
+from autorouter.block import Block
+from autorouter.overswitch import OverSwitch
+from autorouter.train import Train
+from autorouter.route import Route
 
-from listener import Listener
-from rrserver import RRServer
+from autorouter.listener import Listener
+from autorouter.rrserver import RRServer
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent()
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 

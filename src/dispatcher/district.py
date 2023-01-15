@@ -2,7 +2,7 @@ import logging
 import json
 import os
 
-from constants import RegAspects, RegSloAspects, AdvAspects, SloAspects, \
+from dispatcher.constants import RegAspects, RegSloAspects, AdvAspects, SloAspects, \
 	MAIN, SLOW, DIVERGING, RESTRICTING, \
 	CLEARED, OCCUPIED, STOP, NORMAL, OVERSWITCH
 

@@ -1,12 +1,12 @@
-from district import District
+from dispatcher.district import District
 
-from block import Block, OverSwitch, Route
-from turnout import Turnout
-from signal import Signal
-from button import Button
-from handswitch import HandSwitch
+from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.turnout import Turnout
+from dispatcher.signal import Signal
+from dispatcher.button import Button
+from dispatcher.handswitch import HandSwitch
 
-from constants import RESTRICTING, MAIN, DIVERGING, SLOW, RegAspects, RegSloAspects, SloAspects
+from dispatcher.constants import RESTRICTING, MAIN, DIVERGING, SLOW, RegAspects, RegSloAspects, SloAspects
 
 
 class Cliff (District):

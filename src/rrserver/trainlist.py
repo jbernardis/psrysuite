@@ -1,5 +1,4 @@
 import wx
-import json
 
 class TrainList(wx.ListCtrl):
 	def __init__(self, parent):

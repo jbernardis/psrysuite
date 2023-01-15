@@ -1,12 +1,12 @@
-from district import District
+from dispatcher.district import District
 
-from block import Block, OverSwitch, Route
-from turnout import Turnout
-from signal import Signal
-from button import Button
-from indicator import Indicator
+from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.turnout import Turnout
+from dispatcher.signal import Signal
+from dispatcher.button import Button
+from dispatcher.indicator import Indicator
 
-from constants import LaKr, RESTRICTING, MAIN, DIVERGING, RegAspects
+from dispatcher.constants import LaKr, RESTRICTING, MAIN, DIVERGING, RegAspects
 
 
 class Hyde (District):

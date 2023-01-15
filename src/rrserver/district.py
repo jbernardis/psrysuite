@@ -1,6 +1,6 @@
 import wx
 import logging
-from rrobjects import BlockInput, SubBlockInput
+from rrserver.rrobjects import BlockInput, SubBlockInput
 
 
 class RadioDlg (wx.Dialog):
