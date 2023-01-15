@@ -1,0 +1,90 @@
+{
+  "HEX": {
+    "eastbound": true,
+    "startblock": "H40",
+    "startsubblock": null,
+    "steps": [
+      {
+        "block": "H23",
+        "os": "HOSEE",
+        "route": "HRtH23H40",
+        "signal": "H10RE",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "D21",
+        "os": "DOSVJE",
+        "route": "DRtH23D21",
+        "signal": "D4RB",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "S20",
+        "os": "DOSFOE",
+        "route": "DRtD21S20",
+        "signal": "D10R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "H20",
+        "os": "SOSE",
+        "route": "SRtS20H20",
+        "signal": "S4R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "H40",
+        "os": "SOSHJM",
+        "route": "SRtH20H40",
+        "signal": "S18R",
+        "time": 5000,
+        "trigger": "Front"
+      }
+    ],
+    "time": 5000
+  },
+  "HWX": {
+    "eastbound": false,
+    "startblock": "D11",
+    "startsubblock": "D11B",
+    "steps": [
+      {
+        "block": "D10",
+        "os": "DOSVJW",
+        "route": "DRtD10D11",
+        "signal": "D6L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "D11",
+        "os": "DOSVJW",
+        "route": "DRtD10D11",
+        "signal": "D6RB",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "D20",
+        "os": "DOSVJW",
+        "route": "DRtD20D11",
+        "signal": "D6L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "L31",
+        "os": "LOSCAE",
+        "route": "LRtL31D20",
+        "signal": "L14L",
+        "time": 5000,
+        "trigger": "Front"
+      }
+    ],
+    "time": 7500
+  }
+}
