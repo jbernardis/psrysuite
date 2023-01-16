@@ -408,6 +408,21 @@ class TurnoutOutput(PulsedOutput):
 
 	def GetLock(self):
 		return self.locked
+	
+	def SetOutPulse(self, op):
+		if op > 0:
+			self.normalPulses = self.pulseLen
+			self.reversePulses = 0
+			self.status = "N"
+		elif op < 0:
+			self.normalPulses = 0
+			self.reversePulses = self.pulseLen
+			self.status = "R"
+		else:
+			self.normalPulses = 0
+			self.reversePulses = 0
+			self.status = None
+		self.rr.RailroadEvent({"refreshoutput": [self.name]})
 
 	def SetOutPulseTo(self, status):
 		if status == "N":

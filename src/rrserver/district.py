@@ -101,10 +101,14 @@ def formatIText(ibuf, nibuf):
 		s.append("{0:08b}".format(int(ibuf[i].hex(), 16)))
 	return " ".join(s)
 
+def swapbyte(b):
+	return int("0b"+"{0:08b}".format(b)[::-1], 2)
+
 def formatOText(obuf, nobuf):
 	s = []
 	for i in range(nobuf):
-		s.append("{0:08b}".format(obuf[i]))
+		s.append("{0:08b}".format(swapbyte(obuf[i])))
+
 	return " ".join(s)
 
 
@@ -154,15 +158,70 @@ class District(wx.Panel):
 
 		if self.settings.simulation:
 			self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.inputDClick, self.ilist)
+		if self.settings.simulation or self.settings.diagnostic:
+			self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.outputDClick, self.olist)
 
 	def SendIO(self, flag):
 		self.sendIO = flag
 		if not flag:
 			self.rr.ClearIO()
 
+	def outputDClick(self, evt):
+		index = evt.Index
+		logging.debug("Double click output %d" % index)
+		if index == wx.NOT_FOUND:
+			return
+
+		oname = self.olist.GetItemText(index, 0)
+		otype = self.outputMap[oname][2]
+		if otype == District.turnout:
+			dlg = RadioDlg(self, "Turnout Position", ["N", "R"], "N")
+			rc = dlg.ShowModal()
+			if rc == wx.ID_OK:
+				pos = dlg.GetResults()
+			dlg.Destroy()
+			if rc != wx.ID_OK:
+				return
+			
+			nval = -1 if pos == "R" else 1
+			
+		elif otype == District.signal:
+			cval = int(self.olist.GetItemText(index, 1).split(",")[0])
+			cvalStr = "%d" % cval
+			dlg = RadioDlg(self, "Signal Aspect", ["0", "1", "2", "3", "4", "5", "6", "7"], cvalStr)
+			rc = dlg.ShowModal()
+			if rc == wx.ID_OK:
+				asp = dlg.GetResults()
+			dlg.Destroy()
+			if rc != wx.ID_OK:
+				return
+			nval = int(asp)
+		else:
+			cval = int(self.olist.GetItemText(index, 1))
+			nval = 1 - cval
+			
+		# update the display with the new value
+		self.olist.SetItem(index, 1, "%s" % str(nval))
+		op = self.rr.GetOutput(oname)
+		if op is None:
+			logging.warning("Unable to identify output by name: %s" % oname)
+			return
+		# apply change to output objects
+		if otype == District.turnout:
+			op.SetOutPulse(nval)
+			
+		elif otype == District.nxbutton:
+			op.SetOutPulseNXB()
+
+		elif otype == District.signal:
+			op.SetAspect(nval)
+
+		else:
+			op.SetStatus(nval == 1)
+		
 	def inputDClick(self, evt):
 		index = evt.Index
-		logging.debug("Double click item %d" % index)
+		logging.debug("Double click input %d" % index)
 		if index == wx.NOT_FOUND:
 			return
 
@@ -302,6 +361,7 @@ class District(wx.Panel):
 		try:
 			ix, oc, dtype = self.outputMap[oname]
 		except KeyError:
+			print("not in the map")
 			logging.warning("Output for %s in district %s not found" % (oname, self.name))
 			return
 		

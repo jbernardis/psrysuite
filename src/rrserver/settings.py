@@ -24,6 +24,7 @@ class Settings:
 		
 		self.echoTurnout = True
 		self.simulation = True
+		self.diagnostic = True
 		self.serverport = 9000
 		self.socketport = 9001
 		self.tty = "COM4"
@@ -44,6 +45,9 @@ class Settings:
 
 				elif opt == 'simulation':
 					self.simulation = parseBoolean(value, False)
+
+				elif opt == 'diagnostic':
+					self.diagnostic = parseBoolean(value, False)
 
 				elif opt == "tty":
 					self.tty = value
