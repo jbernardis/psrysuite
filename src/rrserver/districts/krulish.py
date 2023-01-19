@@ -66,7 +66,7 @@ class Krulish(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rrbus.sendRecv(KRULISH, outb, 3, swap=False)
+			inb, inbc = self.rr.sendRecv(KRULISH, outb, 3, swap=False)
 
 		if inbc != 3:
 			if self.sendIO:

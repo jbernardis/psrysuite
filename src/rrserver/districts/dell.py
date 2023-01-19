@@ -137,7 +137,7 @@ class Dell(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rrbus.sendRecv(DELL, outb, 4, swap=False)
+			inb, inbc = self.rr.sendRecv(DELL, outb, 4, swap=False)
 
 		if inbc != 4:
 			if self.sendIO:
@@ -216,7 +216,7 @@ class Dell(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rrbus.sendRecv(FOSS, outb, 3, swap=False)
+			inb, inbc = self.rr.sendRecv(FOSS, outb, 3, swap=False)
 
 		if inbc != 3:
 			if self.sendIO:

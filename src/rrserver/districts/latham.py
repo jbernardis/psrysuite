@@ -105,7 +105,7 @@ class Latham(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rrbus.sendRecv(LATHAM, outb, 5, swap=False)
+			inb, inbc = self.rr.sendRecv(LATHAM, outb, 5, swap=False)
 
 		if inbc != 5:
 			if self.sendIO:
@@ -220,7 +220,7 @@ class Latham(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rrbus.sendRecv(CARLTON, outb, 5, swap=False)
+			inb, inbc = self.rr.sendRecv(CARLTON, outb, 5, swap=False)
 
 		if inbc != 5:
 			if self.sendIO:

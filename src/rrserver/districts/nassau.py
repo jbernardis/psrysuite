@@ -258,7 +258,7 @@ class Nassau(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rrbus.sendRecv(NASSAUW, outb, 8, swap=False)
+			inb, inbc = self.rr.sendRecv(NASSAUW, outb, 8, swap=False)
 
 		if inbc != 8:
 			if self.sendIO:
@@ -461,7 +461,7 @@ class Nassau(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rrbus.sendRecv(NASSAUE, outb, 4, swap=False)
+			inb, inbc = self.rr.sendRecv(NASSAUE, outb, 4, swap=False)
 
 		if inbc != 4:
 			if self.sendIO:
@@ -570,7 +570,7 @@ class Nassau(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rrbus.sendRecv(NASSAUNX, outb, 3, swap=False)
+			inb, inbc = self.rr.sendRecv(NASSAUNX, outb, 3, swap=False)
 		if self.sendIO:
 			self.rr.ShowText(otext, "", 2, 3)
 
