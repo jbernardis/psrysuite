@@ -30,29 +30,29 @@ class Krulish(District):
 
 	def OutIn(self):
 		outb = [0 for _ in range(3)]
-		asp = self.rr.GetOutput("K8R").GetAspect()
-		outb[0] = setBit(outb[0], 0, 1 if asp in [1, 3, 5, 7] else 0)  # eastbound signals
-		outb[0] = setBit(outb[0], 1, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[0] = setBit(outb[0], 2, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("K4R").GetAspect()
-		outb[0] = setBit(outb[0], 3, 1 if asp in [1, 3, 5, 7] else 0) 
-		outb[0] = setBit(outb[0], 4, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[0] = setBit(outb[0], 5, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("K2R").GetAspect()
-		outb[0] = setBit(outb[0], 6, 1 if asp in [1, 3, 5, 7] else 0) 
-		outb[0] = setBit(outb[0], 7, 1 if asp in [2, 3, 6, 7] else 0)
+		asp = self.rr.GetOutput("K8R").GetAspectBits(3)
+		outb[0] = setBit(outb[0], 0, asp[0])  # eastbound signals
+		outb[0] = setBit(outb[0], 1, asp[1])
+		outb[0] = setBit(outb[0], 2, asp[2])
+		asp = self.rr.GetOutput("K4R").GetAspectBits(3)
+		outb[0] = setBit(outb[0], 3, asp[0]) 
+		outb[0] = setBit(outb[0], 4, asp[1])
+		outb[0] = setBit(outb[0], 5, asp[2])
+		asp = self.rr.GetOutput("K2R").GetAspectBits(3)
+		outb[0] = setBit(outb[0], 6, asp[0]) 
+		outb[0] = setBit(outb[0], 7, asp[1])
 
-		outb[1] = setBit(outb[1], 0, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("K2L").GetAspect()
-		outb[1] = setBit(outb[1], 1, 1 if asp in [1, 3, 5, 7] else 0)  # westbound signals
-		outb[1] = setBit(outb[1], 2, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[1] = setBit(outb[1], 3, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("K8LA").GetAspect()
-		outb[1] = setBit(outb[1], 4, 1 if asp != 0 else 0) 
-		asp = self.rr.GetOutput("K8LB").GetAspect()
-		outb[1] = setBit(outb[1], 5, 1 if asp in [1, 3, 5, 7] else 0)
-		outb[1] = setBit(outb[1], 6, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[1] = setBit(outb[1], 7, 1 if asp in [4, 5, 6, 7] else 0)
+		outb[1] = setBit(outb[1], 0, asp[2])
+		asp = self.rr.GetOutput("K2L").GetAspectBits(3)
+		outb[1] = setBit(outb[1], 1, asp[0])  # westbound signals
+		outb[1] = setBit(outb[1], 2, asp[1])
+		outb[1] = setBit(outb[1], 3, asp[2])
+		asp = self.rr.GetOutput("K8LA").GetAspectBits(1)
+		outb[1] = setBit(outb[1], 4, asp[0]) 
+		asp = self.rr.GetOutput("K8LB").GetAspectBits(3)
+		outb[1] = setBit(outb[1], 5, asp[0])
+		outb[1] = setBit(outb[1], 6, asp[1])
+		outb[1] = setBit(outb[1], 7, asp[2])
 
 		outb[2] = setBit(outb[2], 4, self.rr.GetInput("CBKrulishYd").GetValue())
 		outb[2] = setBit(outb[2], 5, self.rr.GetOutput("N10.srel").GetStatus())	# Stop relays

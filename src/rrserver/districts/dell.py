@@ -83,27 +83,27 @@ class Dell(District):
 
 		#Dell
 		outb = [0 for _ in range(4)]
-		asp = self.rr.GetOutput("D4RA").GetAspect()
-		outb[0] = setBit(outb[0], 0, 1 if asp in [1, 3, 5, 7] else 0)  # eastbound signals
-		outb[0] = setBit(outb[0], 1, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[0] = setBit(outb[0], 2, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("D4RB").GetAspect()
-		outb[0] = setBit(outb[0], 3, 1 if asp in [1, 3, 5, 7] else 0) 
-		outb[0] = setBit(outb[0], 4, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[0] = setBit(outb[0], 5, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("D6RA").GetAspect()
-		outb[0] = setBit(outb[0], 6, 1 if asp != 0 else 0)
-		asp = self.rr.GetOutput("D6RB").GetAspect()
-		outb[0] = setBit(outb[0], 7, 1 if asp != 0 else 0)
+		asp = self.rr.GetOutput("D4RA").GetAspectBits(3)
+		outb[0] = setBit(outb[0], 0, asp[0])  # eastbound signals
+		outb[0] = setBit(outb[0], 1, asp[1])
+		outb[0] = setBit(outb[0], 2, asp[2])
+		asp = self.rr.GetOutput("D4RB").GetAspectBits(3)
+		outb[0] = setBit(outb[0], 3, asp[0]) 
+		outb[0] = setBit(outb[0], 4, asp[1])
+		outb[0] = setBit(outb[0], 5, asp[2])
+		asp = self.rr.GetOutput("D6RA").GetAspectBits(1)
+		outb[0] = setBit(outb[0], 6, asp[0])
+		asp = self.rr.GetOutput("D6RB").GetAspectBits(1)
+		outb[0] = setBit(outb[0], 7, asp[0])
 
-		asp = self.rr.GetOutput("D4L").GetAspect()
-		outb[1] = setBit(outb[1], 0, 1 if asp in [1, 3, 5, 7] else 0)  # westbound signals
-		outb[1] = setBit(outb[1], 1, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[1] = setBit(outb[1], 2, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("D6L").GetAspect()
-		outb[1] = setBit(outb[1], 3, 1 if asp in [1, 3, 5, 7] else 0) 
-		outb[1] = setBit(outb[1], 4, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[1] = setBit(outb[1], 5, 1 if asp in [4, 5, 6, 7] else 0)
+		asp = self.rr.GetOutput("D4L").GetAspectBits(3)
+		outb[1] = setBit(outb[1], 0, asp[0])  # westbound signals
+		outb[1] = setBit(outb[1], 1, asp[1])
+		outb[1] = setBit(outb[1], 2, asp[2])
+		asp = self.rr.GetOutput("D6L").GetAspectBits(3)
+		outb[1] = setBit(outb[1], 3, asp[0]) 
+		outb[1] = setBit(outb[1], 4, asp[1])
+		outb[1] = setBit(outb[1], 5, asp[2])
 		outb[1] = setBit(outb[1], 6, 1 if DXO else 0) # laporte crossing signal
 		outb[1] = setBit(outb[1], 7, self.rr.GetInput("H13").GetValue())  #block indicators
 
@@ -181,33 +181,33 @@ class Dell(District):
 
 		# Foss
 		outb = [0 for _ in range(3)]
-		asp = self.rr.GetOutput("D10R").GetAspect()
-		outb[0] = setBit(outb[0], 0, 1 if asp in [1, 3, 5, 7] else 0)  # eastbound signals
-		outb[0] = setBit(outb[0], 1, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[0] = setBit(outb[0], 2, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("D12R").GetAspect()
-		outb[0] = setBit(outb[0], 3, 1 if asp in [1, 3, 5, 7] else 0) 
-		outb[0] = setBit(outb[0], 4, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[0] = setBit(outb[0], 5, 1 if asp in [4, 5, 6, 7] else 0)
+		asp = self.rr.GetOutput("D10R").GetAspectBits(3)
+		outb[0] = setBit(outb[0], 0, asp[0])  # eastbound signals
+		outb[0] = setBit(outb[0], 1, asp[1])
+		outb[0] = setBit(outb[0], 2, asp[2])
+		asp = self.rr.GetOutput("D12R").GetAspectBits(3)
+		outb[0] = setBit(outb[0], 3, asp[0]) 
+		outb[0] = setBit(outb[0], 4, asp[1])
+		outb[0] = setBit(outb[0], 5, asp[2])
 
-		asp = self.rr.GetOutput("D10L").GetAspect()
-		outb[1] = setBit(outb[1], 0, 1 if asp in [1, 3, 5, 7] else 0)  # westbound signals
-		outb[1] = setBit(outb[1], 1, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[1] = setBit(outb[1], 2, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("D12L").GetAspect()
-		outb[1] = setBit(outb[1], 3, 1 if asp in [1, 3, 5, 7] else 0) 
-		outb[1] = setBit(outb[1], 4, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[1] = setBit(outb[1], 5, 1 if asp in [4, 5, 6, 7] else 0)
+		asp = self.rr.GetOutput("D10L").GetAspectBits(3)
+		outb[1] = setBit(outb[1], 0, asp[0])  # westbound signals
+		outb[1] = setBit(outb[1], 1, asp[1])
+		outb[1] = setBit(outb[1], 2, asp[2])
+		asp = self.rr.GetOutput("D12L").GetAspectBits(3)
+		outb[1] = setBit(outb[1], 3, asp[0]) 
+		outb[1] = setBit(outb[1], 4, asp[1])
+		outb[1] = setBit(outb[1], 5, asp[2])
 		outb[1] = setBit(outb[1], 6, self.rr.GetOutput("D21.srel").GetStatus())	# Stop relays
 		outb[1] = setBit(outb[1], 7, self.rr.GetOutput("S10.srel").GetStatus())
 
 		# bit 2:0 is bad
 		outb[2] = setBit(outb[2], 1, self.rr.GetOutput("R10.srel").GetStatus())
 		outb[2] = setBit(outb[2], 2, 1 if RXO else 0)  # rocky hill crossing signal
-		asp = self.rr.GetOutput("R10W").GetAspect()
-		outb[2] = setBit(outb[2], 3, 1 if asp in [1, 3, 5, 7] else 0)  # rocky hill distant for nassau
-		outb[2] = setBit(outb[2], 4, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[2] = setBit(outb[2], 5, 1 if asp in [4, 5, 6, 7] else 0)
+		asp = self.rr.GetOutput("R10W").GetAspectBits(3)
+		outb[2] = setBit(outb[2], 3, asp[0])  # rocky hill distant for nassau
+		outb[2] = setBit(outb[2], 4, asp[1])
+		outb[2] = setBit(outb[2], 5, asp[2])
 
 		otext = formatOText(outb, 3)
 		logging.debug("Foss: Output bytes: %s" % otext)

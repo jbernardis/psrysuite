@@ -333,6 +333,7 @@ class MainFrame(wx.Frame):
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)
 				self.ShowTitle()
+				self.rrServer.SendRequest({"identify": {"SID": self.sessionid, "function": "SIM"}})
 
 			elif cmd == "end":
 				if parms["type"] == "layout":

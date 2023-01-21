@@ -136,7 +136,7 @@ class MainFrame(wx.Frame):
 				self.socketServer.sendToOne(skt, addr, {"sessionID": sid})
 				self.clients[addr] = [skt, sid]
 				self.refreshClient(addr, skt)
-				self.clientList.AddClient(addr, sid)
+				self.clientList.AddClient(addr, sid, None)
 
 			elif cmd == "delclient":
 				addr = parms["addr"]
@@ -189,7 +189,7 @@ class MainFrame(wx.Frame):
 
 	def onHTTPMessageEvent(self, evt):
 		logging.info("HTTP Request: %s" % json.dumps(evt.data))
-		print("Incoming HTTP Request: %s" % json.dumps(evt.data))
+		#print("Incoming HTTP Request: %s" % json.dumps(evt.data))
 		verb = evt.data["cmd"][0]
 
 		if verb == "signal":
@@ -448,6 +448,11 @@ class MainFrame(wx.Frame):
 				turnouts = []
 
 			self.routeDefs[name] = (RouteDef(name, evt.data["os"][0], evt.data["ends"], signals, turnouts))
+			
+		elif verb == "identify":
+			sid = int(evt.data["SID"][0])
+			function = evt.data["function"][0]
+			self.clientList.SetSessionFunction(sid, function)
 
 		elif verb == "quit":
 			logging.info("HTTP 'quit' command received - terminating")

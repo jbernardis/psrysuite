@@ -62,32 +62,32 @@ class Latham(District):
 		op = self.rr.GetOutput("LSw9").GetOutPulse()
 		outb[1] = setBit(outb[1], 0, 1 if op > 0 else 0) 
 		outb[1] = setBit(outb[1], 1, 1 if op < 0 else 0)
-		asp = self.rr.GetOutput("L4R").GetAspect()
-		outb[1] = setBit(outb[1], 2, 1 if asp in [1, 3, 5, 7] else 0)  # signals
-		outb[1] = setBit(outb[1], 3, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[1] = setBit(outb[1], 4, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("L6RB").GetAspect()
-		outb[1] = setBit(outb[1], 5, 1 if asp != 0 else 0) 
-		asp = self.rr.GetOutput("L6RA").GetAspect()
-		outb[1] = setBit(outb[1], 6, 1 if asp in [1, 3, 5, 7] else 0)  # signals
-		outb[1] = setBit(outb[1], 7, 1 if asp in [2, 3, 6, 7] else 0)
+		asp = self.rr.GetOutput("L4R").GetAspectBits(3)
+		outb[1] = setBit(outb[1], 2, asp[0])  # signals
+		outb[1] = setBit(outb[1], 3, asp[1])
+		outb[1] = setBit(outb[1], 4, asp[2])
+		asp = self.rr.GetOutput("L6RB").GetAspectBits(1)
+		outb[1] = setBit(outb[1], 5, asp[0]) 
+		asp = self.rr.GetOutput("L6RA").GetAspectBits(3)
+		outb[1] = setBit(outb[1], 6, asp[0])  # signals
+		outb[1] = setBit(outb[1], 7, asp[1])
 
-		outb[2] = setBit(outb[2], 0, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("L8R").GetAspect()
-		outb[2] = setBit(outb[2], 1, 1 if asp != 0 else 0) 
+		outb[2] = setBit(outb[2], 0, asp[2])
+		asp = self.rr.GetOutput("L8R").GetAspectBits(1)
+		outb[2] = setBit(outb[2], 1, asp[0]) 
 		# bit 2:2 is used above for LSw3
 		# bit 2:3 is unused
-		asp = self.rr.GetOutput("L4L").GetAspect()
-		outb[2] = setBit(outb[2], 4, 1 if asp != 0 else 0) 
-		asp = self.rr.GetOutput("L6L").GetAspect()
-		outb[2] = setBit(outb[2], 5, 1 if asp in [1, 3, 5, 7] else 0)  # signals
-		outb[2] = setBit(outb[2], 6, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[2] = setBit(outb[2], 7, 1 if asp in [4, 5, 6, 7] else 0)
+		asp = self.rr.GetOutput("L4L").GetAspectBits(1)
+		outb[2] = setBit(outb[2], 4, asp[0]) 
+		asp = self.rr.GetOutput("L6L").GetAspectBits(3)
+		outb[2] = setBit(outb[2], 5, asp[0])  # signals
+		outb[2] = setBit(outb[2], 6, asp[1])
+		outb[2] = setBit(outb[2], 7, asp[2])
 
-		asp = self.rr.GetOutput("L8L").GetAspect()
-		outb[3] = setBit(outb[3], 0, 1 if asp in [1, 3, 5, 7] else 0)  # signals
-		outb[3] = setBit(outb[3], 1, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[3] = setBit(outb[3], 2, 1 if asp in [4, 5, 6, 7] else 0)
+		asp = self.rr.GetOutput("L8L").GetAspectBits(3)
+		outb[3] = setBit(outb[3], 0, asp[0])  # signals
+		outb[3] = setBit(outb[3], 1, asp[1])
+		outb[3] = setBit(outb[3], 2, asp[2])
 		outb[3] = setBit(outb[3], 3, self.rr.GetInput("L10").GetValue())  #block indicators
 		outb[3] = setBit(outb[3], 4, self.rr.GetInput("L31").GetValue()) 
 		outb[3] = setBit(outb[3], 5, self.rr.GetInput("P11").GetValue())
@@ -163,23 +163,23 @@ class Latham(District):
 
 		# Carlton (includes Krulish West tracks and signals
 		outb = [0 for _ in range(5)]
-		asp = self.rr.GetOutput("L16R").GetAspect()
-		outb[0] = setBit(outb[0], 0, 1 if asp in [1, 3, 5, 7] else 0)  # signals
-		outb[0] = setBit(outb[0], 1, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[0] = setBit(outb[0], 2, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("L18R").GetAspect()
-		outb[0] = setBit(outb[0], 3, 1 if asp != 0 else 0)  
-		asp = self.rr.GetOutput("L14R").GetAspect()
-		outb[0] = setBit(outb[0], 4, 1 if asp in [1, 3, 5, 7] else 0) 
-		outb[0] = setBit(outb[0], 5, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[0] = setBit(outb[0], 6, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("L14L").GetAspect()
-		outb[0] = setBit(outb[0], 7, 1 if asp != 0 else 0)  
+		asp = self.rr.GetOutput("L16R").GetAspectBits(3)
+		outb[0] = setBit(outb[0], 0, asp[0])  # signals
+		outb[0] = setBit(outb[0], 1, asp[1])
+		outb[0] = setBit(outb[0], 2, asp[2])
+		asp = self.rr.GetOutput("L18R").GetAspectBits(1)
+		outb[0] = setBit(outb[0], 3, asp[0])  
+		asp = self.rr.GetOutput("L14R").GetAspectBits(3)
+		outb[0] = setBit(outb[0], 4, asp[0]) 
+		outb[0] = setBit(outb[0], 5, asp[1])
+		outb[0] = setBit(outb[0], 6, asp[2])
+		asp = self.rr.GetOutput("L14L").GetAspectBits(1)
+		outb[0] = setBit(outb[0], 7, asp[0])  
 
-		asp = self.rr.GetOutput("L18R").GetAspect()
-		outb[1] = setBit(outb[1], 0, 1 if asp in [1, 3, 5, 7] else 0) 
-		outb[1] = setBit(outb[1], 1, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[1] = setBit(outb[1], 2, 1 if asp in [4, 5, 6, 7] else 0)
+		asp = self.rr.GetOutput("L18R").GetAspectBits(3)
+		outb[1] = setBit(outb[1], 0, asp[0]) 
+		outb[1] = setBit(outb[1], 1, asp[1])
+		outb[1] = setBit(outb[1], 2, asp[2])
 		outb[1] = setBit(outb[1], 3, 0 if self.rr.GetOutput("LSw11.hand").GetStatus() != 0 else 1) # hand switch unlocks
 		outb[1] = setBit(outb[1], 4, 0 if self.rr.GetOutput("LSw13.hand").GetStatus() != 0 else 1) 
 		op = self.rr.GetOutput("LSw15").GetOutPulse()
@@ -191,25 +191,25 @@ class Latham(District):
 		outb[2] = setBit(outb[2], 0, 1 if op < 0 else 0)
 		outb[2] = setBit(outb[2], 1, self.rr.GetOutput("L31.srel").GetStatus())	# Stop relays
 		outb[2] = setBit(outb[2], 2, self.rr.GetOutput("D10.srel").GetStatus())	
-		asp = self.rr.GetOutput("S21E").GetAspect()
-		outb[2] = setBit(outb[2], 3, 1 if asp in [1, 3, 5, 7] else 0)  # S21/N20 block signals
-		outb[2] = setBit(outb[2], 4, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[2] = setBit(outb[2], 5, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("N20W").GetAspect()
-		outb[2] = setBit(outb[2], 6, 1 if asp in [1, 3, 5, 7] else 0)
-		outb[2] = setBit(outb[2], 7, 1 if asp in [2, 3, 6, 7] else 0)
+		asp = self.rr.GetOutput("S21E").GetAspectBits(3)
+		outb[2] = setBit(outb[2], 3, asp[0])  # S21/N20 block signals
+		outb[2] = setBit(outb[2], 4, asp[1])
+		outb[2] = setBit(outb[2], 5, asp[2])
+		asp = self.rr.GetOutput("N20W").GetAspectBits(3)
+		outb[2] = setBit(outb[2], 6, asp[0])
+		outb[2] = setBit(outb[2], 7, asp[1])
 
-		outb[3] = setBit(outb[3], 0, 1 if asp in [4, 5, 6, 7] else 0)
+		outb[3] = setBit(outb[3], 0, asp[2])
 		# bits 1, 2, 3 unused
-		asp = self.rr.GetOutput("S11E").GetAspect()
-		outb[3] = setBit(outb[3], 4, 1 if asp in [1, 3, 5, 7] else 0)  # S11/N10 block signals
-		outb[3] = setBit(outb[3], 5, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[3] = setBit(outb[3], 6, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("N10W").GetAspect()
-		outb[3] = setBit(outb[3], 7, 1 if asp in [1, 3, 5, 7] else 0)
+		asp = self.rr.GetOutput("S11E").GetAspectBits(3)
+		outb[3] = setBit(outb[3], 4, asp[0])  # S11/N10 block signals
+		outb[3] = setBit(outb[3], 5, asp[1])
+		outb[3] = setBit(outb[3], 6, asp[2])
+		asp = self.rr.GetOutput("N10W").GetAspectBits(3)
+		outb[3] = setBit(outb[3], 7, asp[0])
 
-		outb[4] = setBit(outb[4], 0, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[4] = setBit(outb[4], 1, 1 if asp in [4, 5, 6, 7] else 0)
+		outb[4] = setBit(outb[4], 0, asp[1])
+		outb[4] = setBit(outb[4], 1, asp[2])
 		outb[4] = setBit(outb[4], 2, self.rr.GetOutput("S21.srel").GetStatus())	# Krulish West stopping relays
 		outb[4] = setBit(outb[4], 3, self.rr.GetOutput("N25.srel").GetStatus())	
 

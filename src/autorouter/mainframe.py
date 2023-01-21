@@ -243,6 +243,7 @@ class MainFrame(wx.Frame):
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)
 				self.ShowTitle()
+				self.rrServer.SendRequest({"identify": {"SID": self.sessionid, "function": "AR"}})
 
 			elif cmd == "end":
 				if parms["type"] == "layout":
@@ -316,7 +317,7 @@ class MainFrame(wx.Frame):
 	def TrainRemoveBlock(self, train, block, blocks):
 		print("================= train %s has left block %s and is now in %s" % (train, block, ",".join(blocks)), flush = True)
 		pass
- 
+
 	def CheckTrainInBlock(self, train, block, triggerPoint):
 		rtName = self.triggers.GetRoute(train, block)
 		if rtName is None:

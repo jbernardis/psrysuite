@@ -42,32 +42,32 @@ class Bank(District):
 
 	def OutIn(self):
 		outb = [0 for _ in range(4)]
-		asp = self.rr.GetOutput("C22R").GetAspect()
-		outb[0] = setBit(outb[0], 0, 1 if asp != 0 else 0)   # Bank West eastbound signals
-		asp = self.rr.GetOutput("C24R").GetAspect()
-		outb[0] = setBit(outb[0], 1, 1 if asp in [1, 3, 5, 7] else 0)  
-		outb[0] = setBit(outb[0], 2, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[0] = setBit(outb[0], 3, 1 if asp in [4, 5, 6, 7] else 0)
-		asp24l = self.rr.GetOutput("C24L").GetAspect()          # westbound signals
-		outb[0] = setBit(outb[0], 4, 1 if asp24l in [1, 3, 5, 7] else 0) 
-		outb[0] = setBit(outb[0], 5, 1 if asp24l in [2, 3, 6, 7] else 0)
-		outb[0] = setBit(outb[0], 6, 1 if asp24l in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("C22L").GetAspect() 
-		outb[0] = setBit(outb[0], 7, 1 if asp in [1, 3, 5, 7] else 0) 
+		asp = self.rr.GetOutput("C22R").GetAspectBits(1)
+		outb[0] = setBit(outb[0], 0, asp[0])   # Bank West eastbound signals
+		asp = self.rr.GetOutput("C24R").GetAspectBits(3)
+		outb[0] = setBit(outb[0], 1, asp[0])  
+		outb[0] = setBit(outb[0], 2, asp[1])
+		outb[0] = setBit(outb[0], 3, asp[2])
+		asp = self.rr.GetOutput("C24L").GetAspectBits(3)          # westbound signals
+		outb[0] = setBit(outb[0], 4, asp[0]) 
+		outb[0] = setBit(outb[0], 5, asp[1])
+		outb[0] = setBit(outb[0], 6, asp[2])
+		asp = self.rr.GetOutput("C22L").GetAspectBits(3) 
+		outb[0] = setBit(outb[0], 7, asp[0]) 
 
-		outb[1] = setBit(outb[1], 0, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[1] = setBit(outb[1], 1, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("C18RA").GetAspect()
-		outb[1] = setBit(outb[1], 2, 1 if asp != 0 else 0)   # Bank East eastbound signals
-		asp = self.rr.GetOutput("C18RB").GetAspect() 
-		outb[1] = setBit(outb[1], 3, 1 if asp in [1, 3, 5, 7] else 0) 
-		outb[1] = setBit(outb[1], 4, 1 if asp in [2, 3, 6, 7] else 0)
-		outb[1] = setBit(outb[1], 5, 1 if asp in [4, 5, 6, 7] else 0)
-		asp = self.rr.GetOutput("C18L").GetAspect()         #@ westbound signal
-		outb[1] = setBit(outb[1], 6, 1 if asp in [1, 3, 5, 7] else 0) 
-		outb[1] = setBit(outb[1], 7, 1 if asp in [2, 3, 6, 7] else 0)
+		outb[1] = setBit(outb[1], 0, asp[1])
+		outb[1] = setBit(outb[1], 1, asp[2])
+		asp = self.rr.GetOutput("C18RA").GetAspectBits(1)
+		outb[1] = setBit(outb[1], 2, asp[0])   # Bank East eastbound signals
+		asp = self.rr.GetOutput("C18RB").GetAspectBits(3) 
+		outb[1] = setBit(outb[1], 3, asp[0]) 
+		outb[1] = setBit(outb[1], 4, asp[1])
+		outb[1] = setBit(outb[1], 5, asp[2])
+		asp = self.rr.GetOutput("C18L").GetAspectBits(3)         #@ westbound signal
+		outb[1] = setBit(outb[1], 6, asp[0]) 
+		outb[1] = setBit(outb[1], 7, asp[1])
 
-		outb[2] = setBit(outb[2], 0, 1 if asp in [4, 5, 6, 7] else 0)
+		outb[2] = setBit(outb[2], 0, asp[2])
 		outb[2] = setBit(outb[2], 1, self.rr.GetInput("B10").GetValue())  #block indicators
 		outb[2] = setBit(outb[2], 2, self.rr.GetInput("C13").GetValue())
 		csw21 = self.rr.GetOutput("CSw21a.hand").GetStatus() + self.rr.GetOutput("CSw21b.hand").GetStatus()
@@ -84,7 +84,8 @@ class Bank(District):
 		outb[3] = setBit(outb[3], 2, self.rr.GetOutput("B11.srel").GetStatus())
 		outb[3] = setBit(outb[3], 3, self.rr.GetOutput("B21.srel").GetStatus())
 		outb[3] = setBit(outb[3], 4, self.rr.GetInput("CBBank").GetValue())  #Circuit breaker
-		outb[3] = setBit(outb[3], 5, 1 if asp24l != 0 else 0)  #Signal 24L indicator
+		asp = self.rr.GetOutput("C24L").GetAspectBits(1)
+		outb[3] = setBit(outb[3], 5, asp[0])  #Signal 24L indicator
 
 		otext = formatOText(outb, 4)
 		logging.debug("Bank: Output bytes: %s" % otext)
@@ -97,7 +98,7 @@ class Bank(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 0, 1)
+				self.rr.ShowText(otext, "", 1)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Bank: Input Bytes: %s" % itext)

@@ -147,6 +147,10 @@ class MainFrame(wx.Frame):
 
 		h = 1080
 		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 50), size=(400, 40))
+		
+		if self.IsDispatcher():
+			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(totalw - 200, 25))
+			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
 
 		self.SetMaxSize((totalw, h))
 		self.SetSize((totalw, h))
@@ -322,6 +326,9 @@ class MainFrame(wx.Frame):
 		elif name == "valleyjct.fleet":
 			self.cbValleyJctFleet.SetValue(value != 0)
 
+	def OnCBAutoRouter(self, evt):
+		print("auto router")
+		
 	def OnRBNassau(self, evt):
 		self.Request({"control": { "name": "nassau", "value": evt.GetInt()}})
 
@@ -1085,6 +1092,7 @@ class MainFrame(wx.Frame):
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)
 				logging.info("connected to railroad server with session ID %d" % self.sessionid)
+				self.rrServer.SendRequest({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatch else "DISPLAY"}})
 				self.districts.OnConnect()
 				self.ShowTitle()
 
@@ -1099,7 +1107,8 @@ class MainFrame(wx.Frame):
 				
 			elif cmd == "subblocks":
 				# parms contains subblocks information
-				self.districts.GenerateLayoutInformation(parms)  # only do for dispatcher
+				if self.settings.dispatch:
+					self.districts.GenerateLayoutInformation(parms)
 
 	def raiseDisconnectEvent(self): # thread context
 		evt = DisconnectEvent()
@@ -1110,7 +1119,7 @@ class MainFrame(wx.Frame):
 		if self.settings.dispatch or command in allowedCommands:
 			if self.subscribed:
 				logging.debug(json.dumps(req))
-				print("Outgoing HTTP request: %s" % json.dumps(req))
+				#print("Outgoing HTTP request: %s" % json.dumps(req))
 				self.rrServer.SendRequest(req)
 
 	def SendBlockDirRequests(self):
