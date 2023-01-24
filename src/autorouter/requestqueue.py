@@ -1,4 +1,3 @@
-import json
 
 class RequestQueue:
 	def __init__(self, parent):
@@ -8,18 +7,14 @@ class RequestQueue:
 		self.waitingForTurnout = None
 		
 	def Append(self, msg):
-		msgStr = json.dumps(msg)
-		print("request queue got msg: %s" % msgStr, flush=True)
 		if self.waitingForTurnout is None:
 			if list(msg.keys())[0] == "turnout":
 				self.waitingForTurnout = msg["turnout"]["name"]
-				print("waiting for turnout %s" % msg["turnout"]["name"])
 			self.parent.Request(msg)
 		else:  # cant send anything until we get a response for outstanding turnout
 			self.queue.append(msg)
 			
 	def Resume(self, toName):
-		print("request queue result for turnout %s" % toName)
 		if self.waitingForTurnout is not None:
 			if self.waitingForTurnout == toName:
 				self.waitingForTurnout = None

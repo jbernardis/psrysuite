@@ -151,6 +151,7 @@ class MainFrame(wx.Frame):
 		if self.IsDispatcher():
 			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(totalw - 200, 25))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
+			self.cbAutoRouter.Enable(False)
 
 		self.SetMaxSize((totalw, h))
 		self.SetSize((totalw, h))
@@ -327,7 +328,11 @@ class MainFrame(wx.Frame):
 			self.cbValleyJctFleet.SetValue(value != 0)
 
 	def OnCBAutoRouter(self, evt):
-		print("auto router")
+		if self.cbAutoRouter.IsChecked():
+			rqStatus = "on"
+		else:
+			rqStatus = "off"
+		self.Request({"autorouter": { "status": rqStatus}})
 		
 	def OnRBNassau(self, evt):
 		self.Request({"control": { "name": "nassau", "value": evt.GetInt()}})
@@ -830,6 +835,9 @@ class MainFrame(wx.Frame):
 			self.bConfig.Enable(False)
 			self.bLoadTrains.Enable(False)
 			self.bLoadLocos.Enable(False)
+			if self.IsDispatcher():
+				self.cbAutoRouter.Enable(False)
+			
 		else:
 			self.listener = Listener(self, self.settings.ipaddr, self.settings.socketport)
 			if not self.listener.connect():
@@ -844,6 +852,8 @@ class MainFrame(wx.Frame):
 			self.bConfig.Enable(True)
 			self.bLoadTrains.Enable(True)
 			self.bLoadLocos.Enable(True)
+			if self.IsDispatcher():
+				self.cbAutoRouter.Enable(True)
 
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()
@@ -1144,6 +1154,8 @@ class MainFrame(wx.Frame):
 		self.bConfig.Enable(False)
 		self.bLoadTrains.Enable(False)
 		self.bLoadLocos.Enable(False)
+		if self.IsDispatcher():
+			self.cbAutoRouter.Enable(False)
 		logging.info("Server socket closed")
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()

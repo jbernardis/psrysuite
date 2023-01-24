@@ -384,9 +384,9 @@ class SignalOutput(Output):
 		if nbits == 1:
 			return [1 if self.aspect != 0 else 0]
 		elif nbits == 2:
-			return [1 if self.aspect in [1, 3] else 0, 1 if self.aspect in [2, 3] else 0]
+			return [1 if self.aspect in [2, 3] else 0, 1 if self.aspect in [1, 3] else 0]
 		elif nbits == 3:
-			return [1 if self.aspect in [1, 3, 5, 7] else 0, 1 if self.aspect in [2, 3, 6, 7] else 0, 1 if self.aspect in [4, 5, 6, 7] else 0]
+			return [1 if self.aspect in [4, 5, 6, 7] else 0, 1 if self.aspect in [2, 3, 6, 7] else 0, 1 if self.aspect in [1, 3, 5, 7] else 0]
 
 	def GetEventMessage(self):
 		return {"signal": [{ "name": self.name, "aspect": self.aspect}]}

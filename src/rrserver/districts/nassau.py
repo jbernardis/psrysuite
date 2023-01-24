@@ -262,12 +262,12 @@ class Nassau(District):
 
 		if inbc != 8:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 0, 3)
+				self.rr.ShowText("NasW", NASSAUW, otext, "", 0, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Nassau West: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 0, 3)
+				self.rr.ShowText("NasW", NASSAUW, otext, itext, 0, 3)
 
 			ip = self.rr.GetInput("NSw19")  #Switch positions
 			nb = getBit(inb[0], 0)
@@ -465,12 +465,12 @@ class Nassau(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 1, 3)
+				self.rr.ShowText("NasE", NASSAUE, otext, "", 1, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Nassau East: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 1, 3)
+				self.rr.ShowText("NasE", NASSAUE, otext, itext, 1, 3)
 		
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
@@ -572,6 +572,6 @@ class Nassau(District):
 		else:
 			inb, inbc = self.rr.sendRecv(NASSAUNX, outb, 3, swap=False)
 		if self.sendIO:
-			self.rr.ShowText(otext, "", 2, 3)
+			self.rr.ShowText("NsNX", NASSAUNX, otext, "", 2, 3)
 
 # 	No inputs here

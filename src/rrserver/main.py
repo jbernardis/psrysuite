@@ -12,6 +12,8 @@ import wx.lib.newevent
 import json
 import socket
 
+from subprocess import Popen
+
 from rrserver.settings import Settings
 from rrserver.bus import RailroadMonitor
 from rrserver.railroad import Railroad
@@ -115,12 +117,12 @@ class MainFrame(wx.Frame):
 	def onClearIOEvent(self, _):
 		self.ioDisplay.ClearIO()
 
-	def ShowText(self, otext, itext, line, lines):
-		evt = IOTextEvent(otext=otext, itext=itext, line=line, lines=lines)
+	def ShowText(self, name, addr, otext, itext, line, lines):
+		evt = IOTextEvent(name=name, addr=addr, otext=otext, itext=itext, line=line, lines=lines)
 		wx.QueueEvent(self, evt)
 
 	def onTextIOEvent(self, evt):
-		self.ioDisplay.ShowText(evt.otext, evt.itext, evt.line, evt.lines)
+		self.ioDisplay.ShowText(evt.name, evt.addr, evt.otext, evt.itext, evt.line, evt.lines)
 
 	def socketEventReceipt(self, cmd):
 		evt = SocketEvent(data=cmd)
@@ -453,6 +455,19 @@ class MainFrame(wx.Frame):
 			sid = int(evt.data["SID"][0])
 			function = evt.data["function"][0]
 			self.clientList.SetSessionFunction(sid, function)
+			
+		elif verb == "autorouter":
+			stat = evt.data["status"][0]
+			if stat == "on":
+				if not self.clientList.HasFunction("AR"):
+					arExec = os.path.join(os.getcwd(), "autorouter", "main.py")
+					pid = Popen([sys.executable, arExec]).pid
+			else:
+				addr = self.clientList.GetFunctionAddress("AR")
+				if addr is None:
+					return 
+				
+				self.socketServer.deleteSocket(addr)
 
 		elif verb == "quit":
 			logging.info("HTTP 'quit' command received - terminating")

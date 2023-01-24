@@ -795,7 +795,7 @@ class Cliff (District):
 		block = self.blocks["COSGME"]
 		self.routes["CRtG12C20"] = Route(self.screen, block, "CRtG12C20", "G12", [ (146, 26), (147, 27), (148, 28), (149, 29), (150, 30), (151, 30) ], "C20", [RESTRICTING, RESTRICTING], ["CSw31:R", "CSw35:N"], ["C2RD", "C2L"])
 		self.routes["CRtG10C20"] = Route(self.screen, block, "CRtG10C20", "G10", [ (146, 28), (147, 28), (148, 28), (149, 29), (150, 30), (151, 30) ], "C20", [RESTRICTING, RESTRICTING], ["CSw31:R", "CSw35:R"], ["C2RC", "C2L"])
-		self.routes["CRtC10C20"] = Route(self.screen, block, "CRtC10C20", "C10", [ (146, 30), (147, 30), (148, 30), (149, 30), (150, 30), (151, 30) ], "C20", [SLOW, SLOW], ["CSw31:N", "CSw33:N"], ["C2RB", "C2L"])
+		self.routes["CRtC10C20"] = Route(self.screen, block, "CRtC10C20", "C10", [ (146, 30), (147, 30), (148, 30), (149, 30), (150, 30), (151, 30) ], "C20", [MAIN, MAIN], ["CSw31:N", "CSw33:N"], ["C2RB", "C2L"])
 		self.routes["CRtC30C20"] = Route(self.screen, block, "CRtC30C20", "C30", [ (146, 32), (147, 32), (148, 31), (149, 30), (150, 30), (151, 30) ], "C20", [SLOW, SLOW], ["CSw31:N", "CSw33:R"], ["C2RA", "C2L"])
 
 		self.signals["C2RD"].AddPossibleRoutes("COSGME", [ "CRtG12C20" ])

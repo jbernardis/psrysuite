@@ -97,8 +97,8 @@ class Railroad(wx.Notebook):
 	def ClearIO(self):
 		self.frame.ClearIO()
 
-	def ShowText(self, otext, itext, line, lines):
-		self.frame.ShowText(otext, itext, line, lines)
+	def ShowText(self, name, addr, otext, itext, line, lines):
+		self.frame.ShowText(name, addr, otext, itext, line, lines)
 
 	def AddOutput(self, output, district, otype):
 		output.SetRailRoad(self)

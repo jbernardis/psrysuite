@@ -167,12 +167,12 @@ class Cliff(District):
 
 		if inbc != 3:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 0, 3)
+				self.rr.ShowText("GMtn", GREENMTN, otext, "", 0, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Green Mountain: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 0, 3)
+				self.rr.ShowText("GMtn", GREENMTN, otext, itext, 0, 3)
 
 			self.rr.GetInput("CC30E").SetValue(getBit(inb[0], 0))   # Routes
 			self.rr.GetInput("CC10E").SetValue(getBit(inb[0], 1))
@@ -296,12 +296,12 @@ class Cliff(District):
 
 		if inbc != 8:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 1, 3)
+				self.rr.ShowText("Clff", CLIFF, otext, "", 1, 3)
 		else:
 			itext = formatIText(inb, 7)
 			logging.debug("Cliff: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 1, 3)
+				self.rr.ShowText("Clff", CLIFF, otext, itext, 1, 3)
 
 			self.rr.GetInput("CC21W").SetValue(getBit(inb[0], 0))  # Routes
 			self.rr.GetInput("CC40W").SetValue(getBit(inb[0], 1))
@@ -461,12 +461,12 @@ class Cliff(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 2, 3)
+				self.rr.ShowText("Shfd", SHEFFIELD, otext, "", 2, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Sheffield: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 2, 3)
+				self.rr.ShowText("Shfd", SHEFFIELD, otext, itext, 2, 3)
 
 			self.rr.GetInput("CC50W").SetValue(getBit(inb[0], 0))  # Routes
 			self.rr.GetInput("CC51W").SetValue(getBit(inb[0], 1))

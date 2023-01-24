@@ -35,6 +35,23 @@ class ClientList(wx.ListCtrl):
 			return
 		
 		self.SetItem(index, 0, function)
+		
+	def HasFunction(self, function):
+		for i in range(len(self.clientList)):
+			f = self.GetItemText(i, 0)
+			if f == function:
+				return True
+			
+		return False
+
+	
+	def GetFunctionAddress(self, function):
+		for i in range(len(self.clientList)):
+			f = self.GetItemText(i, 0)
+			if f == function:
+				return self.clientList[i]
+			
+		return None
 
 	def DelClient(self, addr):
 		logging.info("Removing client with address %s:%s" % (addr[0], addr[1]))

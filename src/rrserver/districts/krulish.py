@@ -70,12 +70,12 @@ class Krulish(District):
 
 		if inbc != 3:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 0, 1)
+				self.rr.ShowText("Krul", KRULISH, otext, "", 0, 1)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Krulish: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 0, 1)
+				self.rr.ShowText("Krul", KRULISH, otext, itext, 0, 1)
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)

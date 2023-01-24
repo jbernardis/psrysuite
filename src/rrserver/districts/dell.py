@@ -141,12 +141,12 @@ class Dell(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 0, 2)
+				self.rr.ShowText("Dell", DELL, otext, "", 0, 2)
 		else:
 			itext = formatIText(inb, 3)
 			logging.debug("Dell: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 0, 2)
+				self.rr.ShowText("Dell", DELL, otext, itext, 0, 2)
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
@@ -220,12 +220,12 @@ class Dell(District):
 
 		if inbc != 3:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 1, 2)
+				self.rr.ShowText("Foss", FOSS, otext, "", 1, 2)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("FOSS: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 1, 2)
+				self.rr.ShowText("Foss", FOSS, otext, itext, 1, 2)
 
 			self.rr.GetInput("D21.W").SetValue(getBit(inb[0], 0))  # Detection
 			self.rr.GetInput("D21A").SetValue(getBit(inb[0], 1))

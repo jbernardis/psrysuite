@@ -491,9 +491,20 @@ class StoppingBlock (Block):
 	def Activate(self, flag=True):
 		if flag == self.active:
 			return
+		
+		tr = self.block.GetTrain()
+		if tr is None:
+			tname = "??"
+		else:
+			tname = tr.GetName()
+			
+		bname = self.block.GetName()
+		direction = "East" if self.eastend else "West"
 
 		self.active = flag
-		logging.debug("Block %s stopping relay %s by %s end" % (self.block.GetName(), "activated" if flag else "cleared", "east" if self.eastend else "west"))
+		if flag:
+			self.frame.Popup("Stop Relay: %s %s by %s" % (bname, direction, tname))
+		logging.debug("Block %s stopping relay %s %s end by train %s" % (bname, "activated" if flag else "cleared", direction, tname))
 		self.frame.Request({"relay": { "block": self.block.GetName(), "status": 1 if flag else 0}})
 
 		self.block.DrawTrain()

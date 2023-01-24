@@ -122,12 +122,12 @@ class Yard(District):
 
 		if inbc != 2:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 0, 5)
+				self.rr.ShowText("Crnl", CORNELL, otext, "", 0, 5)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Cornell: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 0, 5)
+				self.rr.ShowText("Crnl", CORNELL, otext, itext, 0, 5)
 
 			ip = self.rr.GetInput("YSw1")  #Switches
 			nb = getBit(inb[0], 0)
@@ -186,12 +186,12 @@ class Yard(District):
 
 		if inbc != 2:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 1, 5)
+				self.rr.ShowText("EJct", EASTJCT, otext, "", 1, 5)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("East Jct: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 1, 5)
+				self.rr.ShowText("EJct", EASTJCT, otext, itext, 1, 5)
 
 			ip = self.rr.GetInput("YSw7")  #Switch positions
 			nb = getBit(inb[0], 0)
@@ -255,12 +255,12 @@ class Yard(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 2, 5)
+				self.rr.ShowText("Kale", KALE, otext, "", 2, 5)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Kale: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 2, 5)
+				self.rr.ShowText("Kale", KALE, otext, itext, 2, 5)
 
 			ip = self.rr.GetInput("YSw17")  #Switch positions
 			nb = getBit(inb[0], 0)
@@ -389,12 +389,12 @@ class Yard(District):
 
 		if inbc != 6:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 3, 5)
+				self.rr.ShowText("Yard", YARD, otext, "", 3, 5)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Yard: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 3, 5)
+				self.rr.ShowText("Yard", YARD, otext, itext, 3, 5)
 
 			ip = self.rr.GetInput("YSw33")  # Switch positions
 			nb = getBit(inb[0], 0)
@@ -535,6 +535,6 @@ class Yard(District):
 			inb, inbc = self.rr.sendRecv(YARDSW, outb, 5, swap=False)
 
 		if self.sendIO:
-				self.rr.ShowText(otext, "", 4, 5)
+				self.rr.ShowText("YdSw", YARDSW, otext, "", 4, 5)
 
 		# No inputs from this node

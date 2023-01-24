@@ -189,12 +189,12 @@ class Port(District):
 
 		if inbc != 9:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 0, 3)
+				self.rr.ShowText("PrtA", PORTA, otext, "", 0, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Port A: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 0, 3)
+				self.rr.ShowText("PrtA", PORTA, otext, itext, 0, 3)
 
 			ip = self.rr.GetInput("PASw1")  # Switch positions
 			nb = getBit(inb[0], 0)
@@ -359,12 +359,12 @@ class Port(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 1, 3)
+				self.rr.ShowText("PJct", PARSONS, otext, "", 1, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Parsons: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 1, 3)
+				self.rr.ShowText("PJct", PARSONS, otext, itext, 1, 3)
 
 			ip = self.rr.GetInput("PASw27")  # Switch positions
 			nb = getBit(inb[0], 0)
@@ -513,12 +513,12 @@ class Port(District):
 
 		if inbc != 7:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 2, 3)
+				self.rr.ShowText("PrtB", PORTB, otext, "", 2, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Port B: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 2, 3)
+				self.rr.ShowText("PrtB", PORTB, otext, itext, 2, 3)
 
 			nb = getBit(inb[0], 0)  # Switch Positions
 			rb = getBit(inb[0], 1)

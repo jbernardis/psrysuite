@@ -77,7 +77,7 @@ class Shore(District):
 		outb[0] = setBit(outb[0], 0, asp[0])  # Main Signals
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("S12R").GetAspectBit(3)
+		asp = self.rr.GetOutput("S12R").GetAspectBits(3)
 		outb[0] = setBit(outb[0], 3, asp[0])
 		outb[0] = setBit(outb[0], 4, asp[1])
 		outb[0] = setBit(outb[0], 5, asp[2])
@@ -164,12 +164,12 @@ class Shore(District):
 
 		if inbc != 7:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 0, 2)
+				self.rr.ShowText("Shor", SHORE, otext, "", 0, 2)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Shore: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 0, 2)
+				self.rr.ShowText("Shor", SHORE, otext, itext, 0, 2)
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
@@ -273,12 +273,12 @@ class Shore(District):
 
 		if inbc != 3:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 1, 2)
+				self.rr.ShowText("HJct", HYDEJCT, otext, "", 1, 2)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Hyde Jct: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 1, 2)
+				self.rr.ShowText("HJct", HYDEJCT, otext, itext, 1, 2)
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)

@@ -109,12 +109,12 @@ class Latham(District):
 
 		if inbc != 5:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 0, 2)
+				self.rr.ShowText("Lath", LATHAM, otext, "", 0, 2)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Latham: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 0, 2)
+				self.rr.ShowText("Lath", LATHAM, otext, itext, 0, 2)
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)
@@ -224,12 +224,12 @@ class Latham(District):
 
 		if inbc != 5:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 1, 2)
+				self.rr.ShowText("Carl", CARLTON, otext, "", 1, 2)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Carlton: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 1, 2)
+				self.rr.ShowText("Carl", CARLTON, otext, itext, 1, 2)
 
 			nb = getBit(inb[0], 0)  # Carlton switch positions
 			rb = getBit(inb[0], 1)

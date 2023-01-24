@@ -21,10 +21,10 @@ class IODisplay(wx.ListCtrl):
 	def OnGetItemText(self, item, col):
 		if item % 2 == 0:
 			ox = int(item/2)
-			return ("%d: " % ox) + self.olines[ox]
+			return self.olines[ox]
 		else:
 			ix = int((item-1)/2)
-			return "   " + self.ilines[ix]
+			return self.ilines[ix]
 
 	def OnGetItemAttr(self, item):
 		if item % 2 == 0:
@@ -38,13 +38,13 @@ class IODisplay(wx.ListCtrl):
 		self.SetItemCount(0)
 		self.RefreshItems(0, 0)
 
-	def ShowText(self, otext, itext, line, lines):
+	def ShowText(self, name, addr, otext, itext, line, lines):
 		if self.GetItemCount() == 0:
 			self.olines = ["" for i in range(lines)]
 			self.ilines = ["" for i in range(lines)]
 			self.SetItemCount(lines*2)
 
-		self.olines[line] = otext
-		self.ilines[line] = itext
+		self.olines[line] = "%4.4s  %2x  %s" % (name, addr, otext)
+		self.ilines[line] = "          " + itext
 		self.RefreshItem(line*2)
 		self.RefreshItem(line*2+1)

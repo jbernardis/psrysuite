@@ -19,8 +19,6 @@ class Train:
 		if block in self.blocks:
 			self.blocks.remove(block)
 			self.parent.TrainRemoveBlock(self.name, block, self.blocks)
-		else:
-			print("block %s not found for train %s" % (block, self.name))
 			
 		if len(self.blocks) > 0:
 			self.parent.TrainTailInBlock(self.name, self.blocks[0])

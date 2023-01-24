@@ -96,12 +96,12 @@ class Cliveden(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 0, 1)
+				self.rr.ShowText("Cliv", CLIVEDEN, otext, "", 0, 1)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("CLIVEDEN: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 0, 1)
+				self.rr.ShowText("Cliv", CLIVEDEN, otext, itext, 0, 1)
 
 			nb = getBit(inb[0], 0)  # Switch positions
 			rb = getBit(inb[0], 1)

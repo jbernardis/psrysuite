@@ -98,12 +98,12 @@ class Bank(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText(otext, "", 1)
+				self.rr.ShowText("Bank", BANK, otext, "", 0, 1)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Bank: Input Bytes: %s" % itext)
 			if self.sendIO:
-				self.rr.ShowText(otext, itext, 0, 1)
+				self.rr.ShowText("Bank", BANK, otext, itext, 0, 1)
 			
 			nb = getBit(inb[0], 0)  # Switch Positions
 			rb = getBit(inb[0], 1)
