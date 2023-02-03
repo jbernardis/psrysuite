@@ -54,18 +54,5 @@
       {"movetrain":  {"block": "HOSWW2", "time": 5000}},
       {"movetrain":  {"block": "H30B", "time": 5000}},
       {"movetrain":  {"block": "H30A", "time": 5000}}
-    ],
-    "T1": [
-      {"placetrain": {"block": "D10", "name": "T1", "loco": "100", "time": 1000, "length": 3, "dir": "W"}},
-      {"movetrain":  {"block": "D10.W", "time": 5000}},
-      {"waitfor":    {"signal": "L18L", "route": "LRtL21D10", "os": "LOSCAM", "block": "L21.W,L21,L21.E"}},
-      {"movetrain":  {"block": "LOSCAM", "time": 5000}},
-      {"movetrain":  {"block": "L21.E", "time": 5000}},
-      {"movetrain":  {"block": "L21", "time": 5000}},
-      {"movetrain":  {"block": "L21.W", "time": 5000}},
-      {"waitfor":    {"signal": "L6L", "route": "LRtP11L21", "os": "LOSLAM", "block": "P11.E,P11"}},
-      {"movetrain":  {"block": "LOSLAM", "time": 5000}},
-      {"movetrain":  {"block": "P11.E", "time": 5000}},
-      {"movetrain":  {"block": "P11", "time": 5000}}
    ]
 }

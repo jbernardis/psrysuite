@@ -11,10 +11,10 @@ class Port(District):
 		self.PBE = False
 		self.PBW = False
 
-		sigNames = [ "PA12R", "PA12LA", "PA12LB", "PA12LC", "PA10RA", "PA10RB", "PA10L",
-					"PA8R", "PA8L", "PA6R", "PA6LA", "PA6LB", "PA6LC", "PA4RA", "PA4RB", "PA4L",
-					"PA34RA", "PA34RB", "PA34RC", "PA34RD", "PA34LA", "PA34LB", "PA32RA", "PA32RB", "PA32L",
-					"PB2R", "PB2L", "PB4R", "PB4L", "PB12R", "PB12L", "PB14R", "PB14L" ]
+		sigNames = [ ["PA12R", 2], ["PA12LA", 1], ["PA12LB", 1], ["PA12LC", 1], ["PA10RA", 2], ["PA10RB", 2], ["PA10L", 1],
+					["PA8R", 2], ["PA8L", 1], ["PA6R", 2], ["PA6LA", 1], ["PA6LB", 1], ["PA6LC", 1], ["PA4RA", 2], ["PA4RB", 2], ["PA4L", 1],
+					["PA34RA", 1], ["PA34RB", 1], ["PA34RC", 1], ["PA34RD", 3], ["PA34LA", 3], ["PA34LB", 3], ["PA32RA", 3], ["PA32RB", 3], ["PA32L", 1],
+					["PB2R", 3], ["PB2L", 3], ["PB4R", 3], ["PB4L", 3], ["PB12R", 3], ["PB12L", 3], ["PB14R", 3], ["PB14L", 3] ]
 		toNames = [ "PBSw1", "PBSw3", "PBSw11", "PBSw13",
 					"PASw1", "PASw3", "PASw5", "PASw7", "PASw9", "PASw11", "PASw13",
 					"PASw15", "PASw17", "PASw19", "PASw21", "PASw23",
@@ -25,7 +25,9 @@ class Port(District):
 					"P30.srel", "P31.srel", "P32.srel", "P40.srel", "P41.srel", "P42.srel" ]
 
 		ix = 0
-		ix = self.AddOutputs(sigNames, SignalOutput, District.signal, ix)
+		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
+		for sig, bits in sigNames:
+			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)

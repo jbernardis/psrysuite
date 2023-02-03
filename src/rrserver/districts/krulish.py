@@ -8,13 +8,15 @@ class Krulish(District):
 	def __init__(self, parent, name, settings):
 		District.__init__(self, parent, name, settings)
 
-		sigNames =  [ "K8R", "K4R", "K2R", "K8LA", "K8LB", "K2L" ]
+		sigNames =  [ ["K8R", 3], ["K4R", 3], ["K2R", 3], ["K8LA", 1], ["K8LB", 3], ["K2L", 3] ]
 		toNames = [ "KSw1", "KSw3", "KSw5", "KSw7" ]
 		relayNames = [ "N10.srel", "N11.srel", "N20.srel" ]
 		indNames = [ "CBKrulishYd" ]
 
 		ix = 0
-		ix = self.AddOutputs(sigNames, SignalOutput, District.signal, ix)
+		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
+		for sig, bits in sigNames:
+			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
 		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
@@ -30,26 +32,26 @@ class Krulish(District):
 
 	def OutIn(self):
 		outb = [0 for _ in range(3)]
-		asp = self.rr.GetOutput("K8R").GetAspectBits(3)
+		asp = self.rr.GetOutput("K8R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # eastbound signals
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("K4R").GetAspectBits(3)
+		asp = self.rr.GetOutput("K4R").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0]) 
 		outb[0] = setBit(outb[0], 4, asp[1])
 		outb[0] = setBit(outb[0], 5, asp[2])
-		asp = self.rr.GetOutput("K2R").GetAspectBits(3)
+		asp = self.rr.GetOutput("K2R").GetAspectBits()
 		outb[0] = setBit(outb[0], 6, asp[0]) 
 		outb[0] = setBit(outb[0], 7, asp[1])
 
 		outb[1] = setBit(outb[1], 0, asp[2])
-		asp = self.rr.GetOutput("K2L").GetAspectBits(3)
+		asp = self.rr.GetOutput("K2L").GetAspectBits()
 		outb[1] = setBit(outb[1], 1, asp[0])  # westbound signals
 		outb[1] = setBit(outb[1], 2, asp[1])
 		outb[1] = setBit(outb[1], 3, asp[2])
-		asp = self.rr.GetOutput("K8LA").GetAspectBits(1)
+		asp = self.rr.GetOutput("K8LA").GetAspectBits()
 		outb[1] = setBit(outb[1], 4, asp[0]) 
-		asp = self.rr.GetOutput("K8LB").GetAspectBits(3)
+		asp = self.rr.GetOutput("K8LB").GetAspectBits()
 		outb[1] = setBit(outb[1], 5, asp[0])
 		outb[1] = setBit(outb[1], 6, asp[1])
 		outb[1] = setBit(outb[1], 7, asp[2])

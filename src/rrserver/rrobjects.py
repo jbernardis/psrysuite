@@ -316,7 +316,7 @@ class IndicatorOutput(Output):
 			return
 
 		self.status = flag
-		# self.rr.RailroadEvent({"refreshinput": [self.name]})
+		self.rr.RailroadEvent({"refreshoutput": [self.name]})
 
 	def GetEventMessage(self):
 		pass
@@ -346,9 +346,20 @@ class SignalOutput(Output):
 		Output.__init__(self, name, district)
 		self.aspect = 0
 		self.locked = False
+		self.bits = 1
+		
+	def SetBits(self, bits):
+		if self.bits < 0 or self.bits > 3:
+			return
+		
+		self.bits = bits
+		
+	def GetBits(self):
+		return self.bits
 
 	def SetAspect(self, aspect):
 		if aspect == self.aspect:
+			print("returning because theyre equal")
 			return
 
 		self.aspect = aspect
@@ -377,15 +388,12 @@ class SignalOutput(Output):
 		rv = mask & self.aspect
 		return 1 if rv != 0 else 0
 
-	def GetAspectBits(self, nbits):
-		if nbits <= 0 or nbits > 3:
-			return None
-
-		if nbits == 1:
+	def GetAspectBits(self, nbits=None):
+		if self.bits == 1:
 			return [1 if self.aspect != 0 else 0]
-		elif nbits == 2:
+		elif self.bits == 2:
 			return [1 if self.aspect in [2, 3] else 0, 1 if self.aspect in [1, 3] else 0]
-		elif nbits == 3:
+		elif self.bits == 3:
 			return [1 if self.aspect in [4, 5, 6, 7] else 0, 1 if self.aspect in [2, 3, 6, 7] else 0, 1 if self.aspect in [1, 3, 5, 7] else 0]
 
 	def GetEventMessage(self):

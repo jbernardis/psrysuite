@@ -12,19 +12,21 @@ class Shore(District):
 		self.S1E = self.S1W = False
 		self.S2E = self.S2W = False
 
-		sigNames =  [ "S4LA", "S4LB", "S4LC", "S4R",
-						"S8L", "S8R",
-						"S12LA", "S12LB", "S12LC", "S12R",
-						"S16L", "S16R",
-						"S18LA", "S18LB", "S18R",
-						"S20L", "S20R" ]
+		sigNames =  [ ["S4LA", 1], ["S4LB", 3], ["S4LC", 3], ["S4R", 3],
+						["S8L", 1], ["S8R", 1],
+						["S12LA", 3], ["S12LB", 1], ["S12LC", 3], ["S12R", 3],
+						["S16L", 3], ["S16R", 3],
+						["S18LA", 1], ["S18LB", 1], ["S18R", 3],
+						["S20L", 3], ["S20R", 1] ]
 		toNames = [ "SSw3", "SSw5", "SSw7", "SSw9", "SSw11", "SSw13", "SSw15", "SSw17", "SSw19" ]
 		hsNames = [ "SSw1" ]
 		handswitchNames = [ "SSw1.hand" ]
 		relayNames = [ "S20.srel", "S11.srel", "H30.srel", "H10.srel", "F10.srel", "F11.srel", "H20.srel", "H11.srel" ]
 
 		ix = 0
-		ix = self.AddOutputs(sigNames, SignalOutput, District.signal, ix)
+		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
+		for sig, bits in sigNames:
+			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
@@ -73,33 +75,33 @@ class Shore(District):
 		F10D = F10H and (asp8r != 0)
 
 		outb = [0 for _ in range(7)]
-		asp = self.rr.GetOutput("S4R").GetAspectBits(3)
+		asp = self.rr.GetOutput("S4R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # Main Signals
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("S12R").GetAspectBits(3)
+		asp = self.rr.GetOutput("S12R").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0])
 		outb[0] = setBit(outb[0], 4, asp[1])
 		outb[0] = setBit(outb[0], 5, asp[2])
-		asp = self.rr.GetOutput("S4LA").GetAspectBits(1)
+		asp = self.rr.GetOutput("S4LA").GetAspectBits()
 		outb[0] = setBit(outb[0], 6, asp[0])
-		asp = self.rr.GetOutput("S4LB").GetAspectBits(3)
+		asp = self.rr.GetOutput("S4LB").GetAspectBits()
 		outb[0] = setBit(outb[0], 7, asp[0])
 
 		outb[1] = setBit(outb[1], 0, asp[1])
 		outb[1] = setBit(outb[1], 1, asp[2])
-		asp = self.rr.GetOutput("S4LC").GetAspectBits(3)
+		asp = self.rr.GetOutput("S4LC").GetAspectBits()
 		outb[1] = setBit(outb[1], 2, asp[0])
 		outb[1] = setBit(outb[1], 3, asp[1])
 		outb[1] = setBit(outb[1], 4, asp[2])
-		asp = self.rr.GetOutput("S12LA").GetAspectBits(3)
+		asp = self.rr.GetOutput("S12LA").GetAspectBits()
 		outb[1] = setBit(outb[1], 5, asp[0])
 		outb[1] = setBit(outb[1], 6, asp[1])
 		outb[1] = setBit(outb[1], 7, asp[2])
 
-		asp = self.rr.GetOutput("S12LB").GetAspectBits(1)
+		asp = self.rr.GetOutput("S12LB").GetAspectBits()
 		outb[2] = setBit(outb[2], 0, asp[0])
-		asp = self.rr.GetOutput("S12LC").GetAspectBits(3)
+		asp = self.rr.GetOutput("S12LC").GetAspectBits()
 		outb[2] = setBit(outb[2], 1, asp[0])
 		outb[2] = setBit(outb[2], 2, asp[1])
 		outb[2] = setBit(outb[2], 3, asp[2])
@@ -225,26 +227,26 @@ class Shore(District):
 
 		#  Hyde Junction
 		outb = [0 for _ in range(3)]
-		asp = self.rr.GetOutput("S16R").GetAspectBits(3)
+		asp = self.rr.GetOutput("S16R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # signals
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("S18R").GetAspectBits(3)
+		asp = self.rr.GetOutput("S18R").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0])
 		outb[0] = setBit(outb[0], 4, asp[1])
 		outb[0] = setBit(outb[0], 5, asp[2])
-		asp = self.rr.GetOutput("S20R").GetAspectBits(1)
+		asp = self.rr.GetOutput("S20R").GetAspectBits()
 		outb[0] = setBit(outb[0], 6, asp[0])
-		asp = self.rr.GetOutput("S16L").GetAspectBits(3)
+		asp = self.rr.GetOutput("S16L").GetAspectBits()
 		outb[0] = setBit(outb[0], 7, asp[0])
 
 		outb[1] = setBit(outb[1], 0, asp[1])
 		outb[1] = setBit(outb[1], 1, asp[2])
-		asp = self.rr.GetOutput("S18LB").GetAspectBits(1)
+		asp = self.rr.GetOutput("S18LB").GetAspectBits()
 		outb[1] = setBit(outb[1], 2, asp[0])
-		asp = self.rr.GetOutput("S18LA").GetAspectBits(1)
+		asp = self.rr.GetOutput("S18LA").GetAspectBits()
 		outb[1] = setBit(outb[1], 3, asp[0])
-		asp = self.rr.GetOutput("S20L").GetAspectBits(3)
+		asp = self.rr.GetOutput("S20L").GetAspectBits()
 		outb[1] = setBit(outb[1], 4, asp[0])
 		outb[1] = setBit(outb[1], 5, asp[1])
 		outb[1] = setBit(outb[1], 6, asp[2])

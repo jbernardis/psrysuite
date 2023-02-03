@@ -11,12 +11,12 @@ class Dell(District):
 		self.D1W = self.D1E = self.D2W = self.D2E = False
 		self.RXW = self.RXE = False
 
-		sigNames =  [ "D4RA", "D4RB", "D4L",
-						"D6RA", "D6RB", "D6L",
-						"DXO", 
-						"D10R", "D10L",
-						"D12R", "D12L",
-						"RXO", "R10W"
+		sigNames =  [ ["D4RA", 3], ["D4RB", 3], ["D4L", 3],
+						["D6RA", 1], ["D6RB", 1], ["D6L", 3],
+						["DXO", 1], 
+						["D10R", 3], ["D10L", 3],
+						["D12R", 3], ["D12L", 3],
+						["RXO", 1], ["R10W", 3]
 						]
 		toNames = [ "DSw1", "DSw3", "DSw5", "DSw7", "DSw11" ]
 		hsNames = [ "DSw9" ]
@@ -24,7 +24,9 @@ class Dell(District):
 		relayNames = [ "H23.srel", "D11.srel", "D20.srel", "D21.srel", "S10.srel", "R10.srel" ]
 
 		ix = 0
-		ix = self.AddOutputs(sigNames, SignalOutput, District.signal, ix)
+		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
+		for sig, bits in sigNames:
+			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
@@ -83,24 +85,24 @@ class Dell(District):
 
 		#Dell
 		outb = [0 for _ in range(4)]
-		asp = self.rr.GetOutput("D4RA").GetAspectBits(3)
+		asp = self.rr.GetOutput("D4RA").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # eastbound signals
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("D4RB").GetAspectBits(3)
+		asp = self.rr.GetOutput("D4RB").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0]) 
 		outb[0] = setBit(outb[0], 4, asp[1])
 		outb[0] = setBit(outb[0], 5, asp[2])
-		asp = self.rr.GetOutput("D6RA").GetAspectBits(1)
+		asp = self.rr.GetOutput("D6RA").GetAspectBits()
 		outb[0] = setBit(outb[0], 6, asp[0])
-		asp = self.rr.GetOutput("D6RB").GetAspectBits(1)
+		asp = self.rr.GetOutput("D6RB").GetAspectBits()
 		outb[0] = setBit(outb[0], 7, asp[0])
 
-		asp = self.rr.GetOutput("D4L").GetAspectBits(3)
+		asp = self.rr.GetOutput("D4L").GetAspectBits()
 		outb[1] = setBit(outb[1], 0, asp[0])  # westbound signals
 		outb[1] = setBit(outb[1], 1, asp[1])
 		outb[1] = setBit(outb[1], 2, asp[2])
-		asp = self.rr.GetOutput("D6L").GetAspectBits(3)
+		asp = self.rr.GetOutput("D6L").GetAspectBits()
 		outb[1] = setBit(outb[1], 3, asp[0]) 
 		outb[1] = setBit(outb[1], 4, asp[1])
 		outb[1] = setBit(outb[1], 5, asp[2])
@@ -181,20 +183,20 @@ class Dell(District):
 
 		# Foss
 		outb = [0 for _ in range(3)]
-		asp = self.rr.GetOutput("D10R").GetAspectBits(3)
+		asp = self.rr.GetOutput("D10R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # eastbound signals
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("D12R").GetAspectBits(3)
+		asp = self.rr.GetOutput("D12R").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0]) 
 		outb[0] = setBit(outb[0], 4, asp[1])
 		outb[0] = setBit(outb[0], 5, asp[2])
 
-		asp = self.rr.GetOutput("D10L").GetAspectBits(3)
+		asp = self.rr.GetOutput("D10L").GetAspectBits()
 		outb[1] = setBit(outb[1], 0, asp[0])  # westbound signals
 		outb[1] = setBit(outb[1], 1, asp[1])
 		outb[1] = setBit(outb[1], 2, asp[2])
-		asp = self.rr.GetOutput("D12L").GetAspectBits(3)
+		asp = self.rr.GetOutput("D12L").GetAspectBits()
 		outb[1] = setBit(outb[1], 3, asp[0]) 
 		outb[1] = setBit(outb[1], 4, asp[1])
 		outb[1] = setBit(outb[1], 5, asp[2])
@@ -204,7 +206,7 @@ class Dell(District):
 		# bit 2:0 is bad
 		outb[2] = setBit(outb[2], 1, self.rr.GetOutput("R10.srel").GetStatus())
 		outb[2] = setBit(outb[2], 2, 1 if RXO else 0)  # rocky hill crossing signal
-		asp = self.rr.GetOutput("R10W").GetAspectBits(3)
+		asp = self.rr.GetOutput("R10W").GetAspectBits()
 		outb[2] = setBit(outb[2], 3, asp[0])  # rocky hill distant for nassau
 		outb[2] = setBit(outb[2], 4, asp[1])
 		outb[2] = setBit(outb[2], 5, asp[2])

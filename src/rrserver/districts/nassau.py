@@ -11,14 +11,14 @@ class Nassau(District):
 		District.__init__(self, parent, name, settings)
 
 		sigNames =  [
-			"N20R", "N20L",
-			"N18R", "N18LA", "N18LB",
-			"N16R", "N16L",
-			"N14R", "N14LA", "N14LB", "N14LC", "N14LD",
-			"N28R", "N28L",
-			"N26RA", "N26RB", "N26RC", "N26L",
-			"N24RA", "N24RB", "N24RC", "N24RD", "N24L",
-			"N11W", "N21W", "B20E"
+			["N20R", 1], ["N20L", 1],
+			["N18R", 1], ["N18LA", 2], ["N18LB", 2],
+			["N16R", 2], ["N16L", 2],
+			["N14R", 2], ["N14LA", 2], ["N14LB", 1], ["N14LC", 1], ["N14LD", 1],
+			["N28R", 1], ["N28L", 2],
+			["N26RA", 1], ["N26RB", 1], ["N26RC", 2], ["N26L", 2],
+			["N24RA", 2], ["N24RB", 2], ["N24RC", 2], ["N24RD", 1], ["N24L", 1],
+			["N11W", 3], ["N21W", 3], ["B20E", 3]
 		]
 		toONames = ["NSw13", "NSw15", "NSw17"]
 		toNames = [ "NSw19", "NSw21", "NSw23", "NSw25", "NSw27", "NSw29", "NSw31", "NSw33", "NSw35",
@@ -103,7 +103,9 @@ class Nassau(District):
 			"NNXBtnR10", "NNXBtnB10", "NNXBtnB20",
 			"NNXBtnW11", "NNXBtnN32E", "NNXBtnN31E", "NNXBtnN12E", "NNXBtnN22E", "NNXBtnN41E", "NNXBtnN42E", "NNXBtnW20E"
 		]
-		ix = self.AddOutputs(sigNames, SignalOutput, District.signal, ix)
+		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
+		for sig, bits in sigNames:
+			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(toONames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(nxButtons, NXButtonOutput, District.nxbutton, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
@@ -157,41 +159,41 @@ class Nassau(District):
 		# Nassau West
 		outb = [0 for _ in range(8)]
 
-		asp = self.rr.GetOutput("N14LC").GetAspectBits(1)     # signals
+		asp = self.rr.GetOutput("N14LC").GetAspectBits()     # signals
 		outb[0] = setBit(outb[0], 0, asp[0])
-		asp = self.rr.GetOutput("N14LB").GetAspectBits(1)    
+		asp = self.rr.GetOutput("N14LB").GetAspectBits()    
 		outb[0] = setBit(outb[0], 1, asp[0])
-		asp = self.rr.GetOutput("N20R").GetAspectBits(1)    
+		asp = self.rr.GetOutput("N20R").GetAspectBits()    
 		outb[0] = setBit(outb[0], 2, asp[0])
-		asp = self.rr.GetOutput("N20L").GetAspectBits(1)    
+		asp = self.rr.GetOutput("N20L").GetAspectBits()    
 		outb[0] = setBit(outb[0], 3, asp[0])
-		asp = self.rr.GetOutput("N14LA").GetAspectBits(2)    
+		asp = self.rr.GetOutput("N14LA").GetAspectBits()    
 		outb[0] = setBit(outb[0], 4, asp[0])
 		outb[0] = setBit(outb[0], 5, asp[1])
-		asp = self.rr.GetOutput("N16L").GetAspectBits(2)    
+		asp = self.rr.GetOutput("N16L").GetAspectBits()    
 		outb[0] = setBit(outb[0], 6, asp[0])
 		outb[0] = setBit(outb[0], 7, asp[1])
 
-		asp = self.rr.GetOutput("N18LB").GetAspectBits(2)    
+		asp = self.rr.GetOutput("N18LB").GetAspectBits()    
 		outb[1] = setBit(outb[1], 0, asp[0])
 		outb[1] = setBit(outb[1], 1, asp[1])
-		asp = self.rr.GetOutput("N18LA").GetAspectBits(2)    
+		asp = self.rr.GetOutput("N18LA").GetAspectBits()    
 		outb[1] = setBit(outb[1], 2, asp[0])
 		outb[1] = setBit(outb[1], 3, asp[1])
-		asp = self.rr.GetOutput("N16R").GetAspectBits(2)    
+		asp = self.rr.GetOutput("N16R").GetAspectBits()    
 		outb[1] = setBit(outb[1], 4, asp[0])
 		outb[1] = setBit(outb[1], 5, asp[1])
-		asp = self.rr.GetOutput("N14R").GetAspectBits(2)    
+		asp = self.rr.GetOutput("N14R").GetAspectBits()    
 		outb[1] = setBit(outb[1], 6, asp[0])
 		outb[7] = setBit(outb[7], 3, asp[1])  # Transferred to byte 7:3 because of 1:7 being a Bad output?
 
-		asp = self.rr.GetOutput("N18R").GetAspectBits(1)    
+		asp = self.rr.GetOutput("N18R").GetAspectBits()    
 		outb[2] = setBit(outb[2], 0, asp[0])
-		asp = self.rr.GetOutput("N11W").GetAspectBits(3)
+		asp = self.rr.GetOutput("N11W").GetAspectBits()
 		outb[2] = setBit(outb[2], 1, asp[0])  # Block signals
 		outb[2] = setBit(outb[2], 2, asp[1])
 		outb[2] = setBit(outb[2], 3, asp[2])
-		asp = self.rr.GetOutput("N21W").GetAspectBits(3)
+		asp = self.rr.GetOutput("N21W").GetAspectBits()
 		outb[2] = setBit(outb[2], 4, asp[0]) 
 		outb[2] = setBit(outb[2], 5, asp[1])
 		outb[2] = setBit(outb[2], 6, asp[2])
@@ -246,9 +248,9 @@ class Nassau(District):
 		outb[7] = setBit(outb[7], 1, NWSL[3])
 		outb[7] = setBit(outb[7], 2, self.rr.GetOutput("N21.srel").GetStatus())	      # Stop relays
 																					# Bit 3 used for signal N14R above
-		asp = self.rr.GetOutput("N14LD").GetAspectBits(1)    							# dwarf signals for W20
+		asp = self.rr.GetOutput("N14LD").GetAspectBits()    							# dwarf signals for W20
 		outb[7] = setBit(outb[7], 4, asp[0])
-		asp = self.rr.GetOutput("N24RD").GetAspectBits(1)   
+		asp = self.rr.GetOutput("N24RD").GetAspectBits()   
 		outb[7] = setBit(outb[7], 5, asp[0])
 
 		otext = formatOText(outb, 8)
@@ -404,36 +406,36 @@ class Nassau(District):
 		# Nassau East
 		outb = [0 for _ in range(4)]
 
-		asp = self.rr.GetOutput("N24RB").GetAspectBits(2)             # Signals
+		asp = self.rr.GetOutput("N24RB").GetAspectBits()             # Signals
 		outb[0] = setBit(outb[0], 0, asp[0])
 		outb[0] = setBit(outb[0], 1, asp[1])
-		asp = self.rr.GetOutput("N24RC").GetAspectBits(2)    
+		asp = self.rr.GetOutput("N24RC").GetAspectBits()    
 		outb[0] = setBit(outb[0], 2, asp[0])
 		outb[0] = setBit(outb[0], 3, asp[1])
-		asp = self.rr.GetOutput("N26RC").GetAspectBits(2)    
+		asp = self.rr.GetOutput("N26RC").GetAspectBits()   
 		outb[0] = setBit(outb[0], 4, asp[0])
 		outb[0] = setBit(outb[0], 5, asp[1])
-		asp = self.rr.GetOutput("N24RA").GetAspectBits(2)    
+		asp = self.rr.GetOutput("N24RA").GetAspectBits()    
 		outb[0] = setBit(outb[0], 6, asp[0])
 		outb[0] = setBit(outb[0], 7, asp[1])
 
-		asp = self.rr.GetOutput("N26RA").GetAspectBits(1)       
+		asp = self.rr.GetOutput("N26RA").GetAspectBits()       
 		outb[1] = setBit(outb[1], 0, asp[0])
-		asp = self.rr.GetOutput("N26RB").GetAspectBits(1)       
+		asp = self.rr.GetOutput("N26RB").GetAspectBits()       
 		outb[1] = setBit(outb[1], 1, asp[0])
-		asp = self.rr.GetOutput("N28R").GetAspectBits(1)       
+		asp = self.rr.GetOutput("N28R").GetAspectBits()       
 		outb[1] = setBit(outb[1], 2, asp[0])
-		asp = self.rr.GetOutput("B20E").GetAspectBits(3)
+		asp = self.rr.GetOutput("B20E").GetAspectBits()
 		outb[1] = setBit(outb[1], 3, asp[0])  # block signal
 		outb[1] = setBit(outb[1], 4, asp[1])
 		outb[1] = setBit(outb[1], 5, asp[2])
-		asp = self.rr.GetOutput("N24L").GetAspectBits(1)       
+		asp = self.rr.GetOutput("N24L").GetAspectBits()       
 		outb[1] = setBit(outb[1], 6, asp[0])
-		asp = self.rr.GetOutput("N26L").GetAspectBits(2)       
+		asp = self.rr.GetOutput("N26L").GetAspectBits()       
 		outb[1] = setBit(outb[1], 7, asp[0])
 
 		outb[2] = setBit(outb[2], 0, asp[1])
-		asp = self.rr.GetOutput("N28L").GetAspectBits(2)       
+		asp = self.rr.GetOutput("N28L").GetAspectBits()       
 		outb[2] = setBit(outb[2], 1, asp[0])
 		outb[2] = setBit(outb[2], 2, asp[1])
 		outb[2] = setBit(outb[2], 3, NESL[0])  # switch locks east

@@ -9,9 +9,9 @@ class Cliveden(District):
 	def __init__(self, parent, name, settings):
 		District.__init__(self, parent, name, settings)
 
-		sigNames = [ "C14R", "C14LA", "C14LB",
-						"C12R", "C12L",
-						"C10R", "C10L" ]
+		sigNames = [ ["C14R", 3], ["C14LA", 3], ["C14LB", 3],
+						["C12R", 3], ["C12L", 3],
+						["C10R", 3], ["C10L", 3] ]
 		toNames = [ "CSw9", "CSw13" ]
 		handswitchNames = [ "CSw15.hand", "CSw11.hand" ]
 		hsNames = [ "CSw15", "CSw11" ]
@@ -19,7 +19,9 @@ class Cliveden(District):
 		# indNames = [ "CBBank" ]
 
 		ix = 0
-		ix = self.AddOutputs(sigNames, SignalOutput, District.signal, ix)
+		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
+		for sig, bits in sigNames:
+			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
@@ -42,34 +44,34 @@ class Cliveden(District):
 	def OutIn(self):
 		outb = [0 for _ in range(4)]
 
-		asp = self.rr.GetOutput("C14R").GetAspectBits(3)
+		asp = self.rr.GetOutput("C14R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # signals
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("C14LA").GetAspectBits(3)
+		asp = self.rr.GetOutput("C14LA").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0]) 
 		outb[0] = setBit(outb[0], 4, asp[1])
 		outb[0] = setBit(outb[0], 5, asp[2])
-		asp = self.rr.GetOutput("C14LB").GetAspectBits(3)
+		asp = self.rr.GetOutput("C14LB").GetAspectBits()
 		outb[0] = setBit(outb[0], 6, asp[0]) 
 		outb[0] = setBit(outb[0], 7, asp[1])
 
 		outb[1] = setBit(outb[1], 0, asp[2])
-		asp = self.rr.GetOutput("C12R").GetAspectBits(3)
+		asp = self.rr.GetOutput("C12R").GetAspectBits()
 		outb[1] = setBit(outb[1], 1, asp[0]) 
 		outb[1] = setBit(outb[1], 2, asp[1])
 		outb[1] = setBit(outb[1], 3, asp[2])
-		asp = self.rr.GetOutput("C10R").GetAspectBits(3)
+		asp = self.rr.GetOutput("C10R").GetAspectBits()
 		outb[1] = setBit(outb[1], 4, asp[0]) 
 		outb[1] = setBit(outb[1], 5, asp[1])
 		outb[1] = setBit(outb[1], 6, asp[2])
 		# bit 7 unused
 
-		asp = self.rr.GetOutput("C12L").GetAspectBits(3)
+		asp = self.rr.GetOutput("C12L").GetAspectBits()
 		outb[2] = setBit(outb[2], 0, asp[0])
 		outb[2] = setBit(outb[2], 1, asp[1])
 		outb[2] = setBit(outb[2], 2, asp[2])
-		asp = self.rr.GetOutput("C10L").GetAspectBits(3)
+		asp = self.rr.GetOutput("C10L").GetAspectBits()
 		outb[2] = setBit(outb[2], 3, asp[0]) 
 		outb[2] = setBit(outb[2], 4, asp[1])
 		outb[2] = setBit(outb[2], 5, asp[2])

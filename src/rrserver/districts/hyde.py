@@ -11,17 +11,19 @@ class Hyde(District):
 
 		# OUTPUTS
 		sigNames = [
-				"H4LA", "H4LB", "H4LC",  "H4LD",  "H4R", 
-				"H6LA", "H6LB", "H6LC", "H6LD", "H6R",  
-				"H8L", "H8R",  
-				"H10L","H10RA", "H10RB", "H10RC", "H10RD", "H10RE", 
-				"H12RA", "H12RB", "H12RC", "H12RD", "H12RE", "H12L"]
+				["H4LA", 1], ["H4LB", 1], ["H4LC", 1], ["H4LD", 1], ["H4R", 1], 
+				["H6LA", 1], ["H6LB", 1], ["H6LC", 1], ["H6LD", 1], ["H6R", 1],  
+				["H8L", 1], ["H8R", 1],  
+				["H10L", 1], ["H10RA", 1], ["H10RB", 1], ["H10RC", 1], ["H10RD", 1], ["H10RE", 1], 
+				["H12RA", 1], ["H12RB", 1], ["H12RC", 1], ["H12RD", 1], ["H12RE", 1], ["H12L", 1] ]
 		toNames =[ "HSw1", "HSw3", "HSw5", "HSw7", "HSw9", "HSw11", "HSw13", "HSw15", "HSw17", "HSw19", "HSw21", "HSw23", "HSw25", "HSw27", "HSw29" ]
 		indNames = [ "CBHydeJct", "CBHydeEast", "CBHydeWest", "HydeEastPower", "HydeWestPower", ]
 		relayNames = [ "H13.srel", "H21.srel" ]
 
 		ix = 0
-		ix = self.AddOutputs(sigNames, SignalOutput, District.signal, ix)
+		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
+		for sig, bits in sigNames:
+			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)

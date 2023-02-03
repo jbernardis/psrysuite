@@ -16,9 +16,4 @@ Auto routing
 Train Edit
   change time/trigger via ??
   work train length into interface
-  
-invoke AR from dispatcher program, allow turn on/off
-
-in server 
-	-show location/address in outtext
-
+ 

@@ -11,14 +11,14 @@ class Yard(District):
 		District.__init__(self, parent, name, settings)
 
 		sigNames = [
-				"Y2R", "Y2L",
-				"Y4R", "Y4LA", "Y4LB",
-				"Y8RA", "Y8RB", "Y8RC", "Y8L",
-				"Y10R", "Y10L",
-				"Y22R", "Y22L",
-				"Y24RA", "Y24RB",
-				"Y26RA", "Y26RB", "Y26RC", "Y26L",
-				"Y34R", "Y34LA", "Y34LB" ]
+				["Y2R", 1], ["Y2L", 3],
+				["Y4R", 3], ["Y4LA", 3], ["Y4LB", 1],
+				["Y8RA", 1], ["Y8RB", 1], ["Y8RC", 1], ["Y8L", 3],
+				["Y10R", 3], ["Y10L", 1],
+				["Y22R", 1], ["Y22L", 3],
+				["Y24RA", 1], ["Y24RB", 1],
+				["Y26RA", 1], ["Y26RB", 1], ["Y26RC", 1], ["Y26L", 1],
+				["Y34R", 3], ["Y34LA", 1], ["Y34LB", 1] ]
 		toNames = [ "YSw1", "YSw3",
 				"YSw7", "YSw9", "YSw11",
 				"YSw17", "YSw19", "YSw21", "YSw23", "YSw25", "YSw27", "YSw29", "YSw33"]
@@ -27,7 +27,9 @@ class Yard(District):
 		nxButtons = ["YWEB1", "YWEB2", "YWEB3", "YWEB4", "YWWB1", "YWWB2", "YWWB3", "YWWB4", "YY50W", "YY51W"]
 
 		ix = 0
-		ix = self.AddOutputs(sigNames, SignalOutput, District.signal, ix)
+		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
+		for sig, bits in sigNames:
+			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(nxButtons, NXButtonOutput, District.nxbutton, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
@@ -91,22 +93,22 @@ class Yard(District):
 		optFleet = self.rr.GetControlOption("yard.fleet")  # 0 => no fleeting, 1 => fleeting
 		#Cornell Jct
 		outb = [0 for _ in range(2)]
-		asp = self.rr.GetOutput("Y4R").GetAspectBits(3)
+		asp = self.rr.GetOutput("Y4R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("Y2R").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y2R").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0])
-		asp = self.rr.GetOutput("Y2L").GetAspectBits(3)
+		asp = self.rr.GetOutput("Y2L").GetAspectBits()
 		outb[0] = setBit(outb[0], 4, asp[0])
 		outb[0] = setBit(outb[0], 5, asp[1])
 		outb[0] = setBit(outb[0], 6, asp[2])
-		asp = self.rr.GetOutput("Y4LA").GetAspectBits(3)
+		asp = self.rr.GetOutput("Y4LA").GetAspectBits()
 		outb[0] = setBit(outb[0], 7, asp[0])
 
 		outb[1] = setBit(outb[1], 0, asp[1])
 		outb[1] = setBit(outb[1], 1, asp[2])
-		asp = self.rr.GetOutput("Y4LB").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y4LB").GetAspectBits()
 		outb[1] = setBit(outb[1], 2, asp[0])
 		outb[1] = setBit(outb[1], 3, self.rr.GetOutput("Y21.srel").GetStatus())	      # Stop relays
 		outb[1] = setBit(outb[1], 4, self.rr.GetOutput("L10.srel").GetStatus())
@@ -155,22 +157,22 @@ class Yard(District):
 
 		# East Junction-----------------------------------------------------------------
 		outb = [0 for _ in range(2)]
-		asp = self.rr.GetOutput("Y10R").GetAspectBits(3)
+		asp = self.rr.GetOutput("Y10R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("Y8RA").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y8RA").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0])
-		asp = self.rr.GetOutput("Y8RB").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y8RB").GetAspectBits()
 		outb[0] = setBit(outb[0], 4, asp[0])
-		asp = self.rr.GetOutput("Y8RC").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y8RC").GetAspectBits()
 		outb[0] = setBit(outb[0], 5, asp[0])
-		asp = self.rr.GetOutput("Y8L").GetAspectBits(3)
+		asp = self.rr.GetOutput("Y8L").GetAspectBits()
 		outb[0] = setBit(outb[0], 6, asp[0])
 		outb[0] = setBit(outb[0], 7, asp[1])
 
 		outb[1] = setBit(outb[1], 0, asp[2])
-		asp = self.rr.GetOutput("Y10L").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y10L").GetAspectBits()
 		outb[1] = setBit(outb[1], 1, asp[0])
 		outb[1] = setBit(outb[1], 2, self.rr.GetOutput("Y20.srel").GetStatus())	      # Stop relays
 		outb[1] = setBit(outb[1], 3, self.rr.GetOutput("Y11.srel").GetStatus())
@@ -221,24 +223,24 @@ class Yard(District):
 
 		# Kale-----------------------------------------------------------------------
 		outb = [0 for _ in range(4)]
-		asp = self.rr.GetOutput("Y22R").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y22R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])
-		asp = self.rr.GetOutput("Y26RA").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y26RA").GetAspectBits()
 		outb[0] = setBit(outb[0], 1, asp[0])
-		asp = self.rr.GetOutput("Y26RB").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y26RB").GetAspectBits()
 		outb[0] = setBit(outb[0], 2, asp[0])
-		asp = self.rr.GetOutput("Y26RC").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y26RC").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0])
-		asp = self.rr.GetOutput("Y24RA").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y24RA").GetAspectBits()
 		outb[0] = setBit(outb[0], 4, asp[0])
-		asp = self.rr.GetOutput("Y24RB").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y24RB").GetAspectBits()
 		outb[0] = setBit(outb[0], 5, asp[0])
 		ind = self.rr.GetOutput("Y20H").GetStatus()
 		outb[0] = setBit(outb[0], 6, 1 if ind != 0 else 0)
 		ind = self.rr.GetOutput("Y20D").GetStatus()
 		outb[0] = setBit(outb[0], 7, 1 if ind != 0 else 0)
 
-		asp = self.rr.GetOutput("Y26L").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y26L").GetAspectBits()
 		outb[1] = setBit(outb[1], 0, asp[0])
 		asp = self.rr.GetOutput("Y22L").GetAspect()
 		outb[1] = setBit(outb[1], 1, 1 if asp == 0b101 else 0)  # Approach
@@ -348,12 +350,12 @@ class Yard(District):
 		outb[2] = setBit(outb[2], 4, 1 if sigL34== "L" else 0)    
 		outb[2] = setBit(outb[2], 5, 1 if sigL34 == "N" else 0)
 		outb[2] = setBit(outb[2], 6, 1 if sigL34 == "R" else 0)
-		asp = self.rr.GetOutput("Y34LA").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y34LA").GetAspectBits()
 		outb[2] = setBit(outb[2], 7, asp[0])
 
-		asp = self.rr.GetOutput("Y34LB").GetAspectBits(1)
+		asp = self.rr.GetOutput("Y34LB").GetAspectBits()
 		outb[3] = setBit(outb[3], 0, asp[0])
-		asp = self.rr.GetOutput("Y34R").GetAspectBits(3)
+		asp = self.rr.GetOutput("Y34R").GetAspectBits()
 		outb[3] = setBit(outb[3], 1, asp[0])
 		outb[3] = setBit(outb[3], 2, asp[1])
 		outb[3] = setBit(outb[3], 3, asp[2])

@@ -9,20 +9,22 @@ class Latham(District):
 	def __init__(self, parent, name, settings):
 		District.__init__(self, parent, name, settings)
 
-		sigNames =  [ "L4R", "L4L",
-						"L6RA", "L6RB", "L6L",
-						"L8R", "L8L",
-						"L14R", "L14L",
-						"L16R",
-						"L18R", "L18L",
-						"S21E", "N20W", "S11E", "N10W" ]
+		sigNames =  [ ["L4R", 3], ["L4L", 1],
+						["L6RA", 3], ["L6RB", 1], ["L6L", 3],
+						["L8R", 1], ["L8L", 3],
+						["L14R", 3], ["L14L", 1],
+						["L16R", 3],
+						["L18R", 1], ["L18L", 3],
+						["S21E", 3], ["N20W", 3], ["S11E", 3], ["N10W", 3] ]
 		toNames = [ "LSw1", "LSw3", "LSw5", "LSw7", "LSw9", "LSw15", "LSw17" ]
 		hsNames = [ "LSw11", "LSw13" ]
 		handswitchNames = [ "LSw11.hand", "LSw13.hand" ]
 		relayNames = [ "L11.srel", "L20.srel", "L21.srel", "P21.srel", "P50.srel", "L31.srel", "D10.srel", "S21.srel", "N25.srel" ]
 
 		ix = 0
-		ix = self.AddOutputs(sigNames, SignalOutput, District.signal, ix)
+		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
+		for sig, bits in sigNames:
+			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
@@ -62,29 +64,29 @@ class Latham(District):
 		op = self.rr.GetOutput("LSw9").GetOutPulse()
 		outb[1] = setBit(outb[1], 0, 1 if op > 0 else 0) 
 		outb[1] = setBit(outb[1], 1, 1 if op < 0 else 0)
-		asp = self.rr.GetOutput("L4R").GetAspectBits(3)
+		asp = self.rr.GetOutput("L4R").GetAspectBits()
 		outb[1] = setBit(outb[1], 2, asp[0])  # signals
 		outb[1] = setBit(outb[1], 3, asp[1])
 		outb[1] = setBit(outb[1], 4, asp[2])
-		asp = self.rr.GetOutput("L6RB").GetAspectBits(1)
+		asp = self.rr.GetOutput("L6RB").GetAspectBits()
 		outb[1] = setBit(outb[1], 5, asp[0]) 
-		asp = self.rr.GetOutput("L6RA").GetAspectBits(3)
+		asp = self.rr.GetOutput("L6RA").GetAspectBits()
 		outb[1] = setBit(outb[1], 6, asp[0])  # signals
 		outb[1] = setBit(outb[1], 7, asp[1])
 
 		outb[2] = setBit(outb[2], 0, asp[2])
-		asp = self.rr.GetOutput("L8R").GetAspectBits(1)
+		asp = self.rr.GetOutput("L8R").GetAspectBits()
 		outb[2] = setBit(outb[2], 1, asp[0]) 
 		# bit 2:2 is used above for LSw3
 		# bit 2:3 is unused
-		asp = self.rr.GetOutput("L4L").GetAspectBits(1)
+		asp = self.rr.GetOutput("L4L").GetAspectBits()
 		outb[2] = setBit(outb[2], 4, asp[0]) 
-		asp = self.rr.GetOutput("L6L").GetAspectBits(3)
+		asp = self.rr.GetOutput("L6L").GetAspectBits()
 		outb[2] = setBit(outb[2], 5, asp[0])  # signals
 		outb[2] = setBit(outb[2], 6, asp[1])
 		outb[2] = setBit(outb[2], 7, asp[2])
 
-		asp = self.rr.GetOutput("L8L").GetAspectBits(3)
+		asp = self.rr.GetOutput("L8L").GetAspectBits()
 		outb[3] = setBit(outb[3], 0, asp[0])  # signals
 		outb[3] = setBit(outb[3], 1, asp[1])
 		outb[3] = setBit(outb[3], 2, asp[2])
@@ -163,20 +165,20 @@ class Latham(District):
 
 		# Carlton (includes Krulish West tracks and signals
 		outb = [0 for _ in range(5)]
-		asp = self.rr.GetOutput("L16R").GetAspectBits(3)
+		asp = self.rr.GetOutput("L16R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # signals
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("L18R").GetAspectBits(1)
+		asp = self.rr.GetOutput("L18R").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0])  
-		asp = self.rr.GetOutput("L14R").GetAspectBits(3)
+		asp = self.rr.GetOutput("L14R").GetAspectBits()
 		outb[0] = setBit(outb[0], 4, asp[0]) 
 		outb[0] = setBit(outb[0], 5, asp[1])
 		outb[0] = setBit(outb[0], 6, asp[2])
-		asp = self.rr.GetOutput("L14L").GetAspectBits(1)
+		asp = self.rr.GetOutput("L14L").GetAspectBits()
 		outb[0] = setBit(outb[0], 7, asp[0])  
 
-		asp = self.rr.GetOutput("L18R").GetAspectBits(3)
+		asp = self.rr.GetOutput("L18L").GetAspectBits()
 		outb[1] = setBit(outb[1], 0, asp[0]) 
 		outb[1] = setBit(outb[1], 1, asp[1])
 		outb[1] = setBit(outb[1], 2, asp[2])
@@ -191,21 +193,21 @@ class Latham(District):
 		outb[2] = setBit(outb[2], 0, 1 if op < 0 else 0)
 		outb[2] = setBit(outb[2], 1, self.rr.GetOutput("L31.srel").GetStatus())	# Stop relays
 		outb[2] = setBit(outb[2], 2, self.rr.GetOutput("D10.srel").GetStatus())	
-		asp = self.rr.GetOutput("S21E").GetAspectBits(3)
+		asp = self.rr.GetOutput("S21E").GetAspectBits()
 		outb[2] = setBit(outb[2], 3, asp[0])  # S21/N20 block signals
 		outb[2] = setBit(outb[2], 4, asp[1])
 		outb[2] = setBit(outb[2], 5, asp[2])
-		asp = self.rr.GetOutput("N20W").GetAspectBits(3)
+		asp = self.rr.GetOutput("N20W").GetAspectBits()
 		outb[2] = setBit(outb[2], 6, asp[0])
 		outb[2] = setBit(outb[2], 7, asp[1])
 
 		outb[3] = setBit(outb[3], 0, asp[2])
 		# bits 1, 2, 3 unused
-		asp = self.rr.GetOutput("S11E").GetAspectBits(3)
+		asp = self.rr.GetOutput("S11E").GetAspectBits()
 		outb[3] = setBit(outb[3], 4, asp[0])  # S11/N10 block signals
 		outb[3] = setBit(outb[3], 5, asp[1])
 		outb[3] = setBit(outb[3], 6, asp[2])
-		asp = self.rr.GetOutput("N10W").GetAspectBits(3)
+		asp = self.rr.GetOutput("N10W").GetAspectBits()
 		outb[3] = setBit(outb[3], 7, asp[0])
 
 		outb[4] = setBit(outb[4], 0, asp[1])

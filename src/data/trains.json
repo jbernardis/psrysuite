@@ -1,4 +1,60 @@
 {
+  "22": {
+    "eastbound": true,
+    "startblock": "N41",
+    "startsubblock": null,
+    "steps": [
+      {
+        "block": "B20",
+        "os": "NEOSE",
+        "route": "NRtB20N41",
+        "signal": "N24RB",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "B21",
+        "os": "BOSWE",
+        "route": "BRtB20B21",
+        "signal": "C24R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C13",
+        "os": "BOSE",
+        "route": "BRtB21C13",
+        "signal": "C18RA",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C12",
+        "os": "COSCLW",
+        "route": "CRtC13C12",
+        "signal": "C14R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C11",
+        "os": "COSCLEE",
+        "route": "CRtC12C11",
+        "signal": "C12R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C31",
+        "os": "COSGMW",
+        "route": "CRtC11C31",
+        "signal": "C4R",
+        "time": 5000,
+        "trigger": "Front"
+      }
+    ],
+    "time": 5000
+  },
   "HEX": {
     "eastbound": true,
     "startblock": "H40",

@@ -174,6 +174,11 @@ class District(wx.Panel):
 
 		oname = self.olist.GetItemText(index, 0)
 		otype = self.outputMap[oname][2]
+		op = self.rr.GetOutput(oname)
+		if op is None:
+			logging.warning("Unable to identify output by name: %s" % oname)
+			return
+		
 		if otype == District.turnout:
 			dlg = RadioDlg(self, "Turnout Position", ["N", "R"], "N")
 			rc = dlg.ShowModal()
@@ -187,8 +192,10 @@ class District(wx.Panel):
 			
 		elif otype == District.signal:
 			cval = int(self.olist.GetItemText(index, 1).split(",")[0])
+			bits = op.GetBits()
 			cvalStr = "%d" % cval
-			dlg = RadioDlg(self, "Signal Aspect", ["0", "1", "2", "3", "4", "5", "6", "7"], cvalStr)
+			choices = ["%d" % sv for sv in range(2**bits)]
+			dlg = RadioDlg(self, "Signal Aspect", choices, cvalStr)
 			rc = dlg.ShowModal()
 			if rc == wx.ID_OK:
 				asp = dlg.GetResults()
@@ -201,11 +208,7 @@ class District(wx.Panel):
 			nval = 1 - cval
 			
 		# update the display with the new value
-		self.olist.SetItem(index, 1, "%s" % str(nval))
-		op = self.rr.GetOutput(oname)
-		if op is None:
-			logging.warning("Unable to identify output by name: %s" % oname)
-			return
+		#self.olist.SetItem(index, 1, "%s" % str(nval))
 		# apply change to output objects
 		if otype == District.turnout:
 			op.SetOutPulse(nval)
@@ -382,6 +385,9 @@ class District(wx.Panel):
 		elif otype == District.nxbutton:
 			pulseval = oc.GetOutPulseValue()
 			self.olist.SetItem(ix, 1, "%d" % pulseval)
+		elif otype in [ District.indicator, District.relay, District.handswitch ]:
+			stat = oc.GetStatus()
+			self.olist.SetItem(ix, 1, "1" if stat else "0")
 		else:
 			logging.warning("Refresh output: no handling of type %s" % otype)
 

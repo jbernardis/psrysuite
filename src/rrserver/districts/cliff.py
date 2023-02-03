@@ -11,10 +11,10 @@ class Cliff(District):
 		District.__init__(self, parent, name, settings)
 
 		sigNames =  [
-			"C2RA", "C2RB", "C2RC", "C2RD", "C2L",
-			"C4R", "C4LA", "C4LB", "C4LC", "C4LD",
-			"C6RA", "C6RB", "C6RC", "C6RD", "C6RE", "C6RF", "C6RG", "C6RH", "C6GJ", "C6RK", "C6RL", "C6L",
-			"C8R", "C8LA", "C8LB", "C8LC", "C8LD", "C8LE", "C8LF", "C8LG", "C8LH", "C8LJ", "C8LK", "C8LL",
+			["C2RA", 2], ["C2RB", 3], ["C2RC", 1], ["C2RD", 1], ["C2L", 3],
+			["C4R", 3], ["C4LA", 2], ["C4LB", 2], ["C4LC", 3], ["C4LD", 1],
+			["C6RA", 1], ["C6RB", 1], ["C6RC", 1], ["C6RD", 1], ["C6RE", 1], ["C6RF", 1], ["C6RG", 1], ["C6RH", 1], ["C6GJ", 1], ["C6RK", 1], ["C6RL", 1], ["C6L", 1],
+			["C8R", 1], ["C8LA", 1], ["C8LB", 1], ["C8LC", 1], ["C8LD", 1], ["C8LE", 1], ["C8LF", 1], ["C8LG", 1], ["C8LH", 1], ["C8LJ", 1], ["C8LK", 1], ["C8LL", 1],
 		]
 		toNames = [ "CSw31", "CSw33", "CSw35", "CSw37", "CSw39",
 					"CSw41", "CSw43", "CSw45", "CSw47", "CSw49",
@@ -73,7 +73,9 @@ class Cliff(District):
 		hsLeverNames = [ "CSw3.lvr", "CSw11.lvr", "CSw15.lvr", "CSw19.lvr", "CSw21.lvr", "CSw21a.lvr", "CSw21b.lvr"]
 		toggleNames = [ "crelease" ]
 
-		ix = self.AddOutputs(sigNames, SignalOutput, District.signal, ix)
+		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
+		for sig, bits in sigNames:
+			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(nxButtons, NXButtonOutput, District.nxbutton, ix)
 		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
 
@@ -121,36 +123,36 @@ class Cliff(District):
 		optFleet = optBank or optCliveden
 		# Green Mountain
 		outb = [0 for _ in range(3)]
-		asp = self.rr.GetOutput("C2RB").GetAspectBits(3)
+		asp = self.rr.GetOutput("C2RB").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # east end signals
 		outb[0] = setBit(outb[0], 1, asp[1])
 		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("C2RD").GetAspectBits(1)
+		asp = self.rr.GetOutput("C2RD").GetAspectBits()
 		outb[0] = setBit(outb[0], 3, asp[0])
 		asp = self.rr.GetOutput("C2L").GetAspectBits(3)
 		outb[0] = setBit(outb[0], 4, asp[0])
 		outb[0] = setBit(outb[0], 5, asp[1])
 		outb[0] = setBit(outb[0], 6, asp[2])
-		asp = self.rr.GetOutput("C2RA").GetAspectBits(2)
+		asp = self.rr.GetOutput("C2RA").GetAspectBits()
 		outb[0] = setBit(outb[0], 7, asp[0])
 
 		outb[1] = setBit(outb[1], 0, asp[1])
-		asp = self.rr.GetOutput("C2RC").GetAspectBits(1)
+		asp = self.rr.GetOutput("C2RC").GetAspectBits()
 		outb[1] = setBit(outb[1], 1, asp[0])
-		asp = self.rr.GetOutput("C4LA").GetAspectBits(2)
+		asp = self.rr.GetOutput("C4LA").GetAspectBits()
 		outb[1] = setBit(outb[1], 2, asp[0])	  # west end signals
 		outb[1] = setBit(outb[1], 3, asp[1])
-		asp = self.rr.GetOutput("C4LB").GetAspectBits(2)
+		asp = self.rr.GetOutput("C4LB").GetAspectBits()
 		outb[1] = setBit(outb[1], 4, asp[0])
 		outb[1] = setBit(outb[1], 5, asp[1])
-		asp = self.rr.GetOutput("C4LC").GetAspectBits(3)
+		asp = self.rr.GetOutput("C4LC").GetAspectBits()
 		outb[1] = setBit(outb[1], 6, asp[0])
 		outb[1] = setBit(outb[1], 7, asp[1])
 
 		outb[2] = setBit(outb[2], 0, asp[2])
-		asp = self.rr.GetOutput("C4LD").GetAspectBits(1)
+		asp = self.rr.GetOutput("C4LD").GetAspectBits()
 		outb[2] = setBit(outb[2], 1, asp[0])
-		asp = self.rr.GetOutput("C4R").GetAspectBits(3)
+		asp = self.rr.GetOutput("C4R").GetAspectBits()
 		outb[2] = setBit(outb[2], 2, asp[0])
 		outb[2] = setBit(outb[2], 3, asp[1])
 		outb[2] = setBit(outb[2], 4, asp[2])
