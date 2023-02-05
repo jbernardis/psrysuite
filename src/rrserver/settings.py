@@ -25,6 +25,7 @@ class Settings:
 		self.echoTurnout = True
 		self.simulation = True
 		self.diagnostic = True
+		self.ipaddr = None
 		self.serverport = 9000
 		self.socketport = 9001
 		self.tty = "COM4"
@@ -81,5 +82,8 @@ class Settings:
 						logging.warning("invalid value in ini file for server port: (%s)" % value)
 						s = 9000
 					self.serverport = s
+					
+				elif opt == 'ipaddr':
+					self.ipaddr = value
 		else:
 			logging.warning("Missing global section - assuming defaults")

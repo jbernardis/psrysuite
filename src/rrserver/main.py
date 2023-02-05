@@ -51,6 +51,14 @@ class MainFrame(wx.Frame):
 		self.clients = {}
 
 		self.settings = Settings()
+		
+		if self.settings.ipaddr is not None:
+			print("configured IP Address: %s" % self.settings.ipaddr)
+			print("retrieved  IP Address: %s" % self.ip)
+			if self.ip != self.settings.ipaddr:
+				print("using configured IP Address")
+				self.ip = self.settings.ipaddr
+				
 		self.SetTitle("PSRY Railroad Server    IP:  %s   Listening on port:  %d    Broadcasting on port:  %d" % 
 				(self.ip, self.settings.serverport, self.settings.socketport))
 
@@ -99,7 +107,12 @@ class MainFrame(wx.Frame):
 			exit(1)
 		self.rrMonitor.start()
 
-		self.dispServer = HTTPServer(self.ip, self.settings.serverport, self.dispCommandReceipt)
+		try:
+			self.dispServer = HTTPServer(self.ip, self.settings.serverport, self.dispCommandReceipt)
+		except Exception as e:
+			print("Unable to Create HTTP server for IP address %s (%s)" % (self.ip, str(e)))
+			self.Shutdown()
+			
 		self.Bind(EVT_HTTPMESSAGE, self.onHTTPMessageEvent)
 		self.Bind(EVT_RAILROAD, self.onRailroadEvent)
 		self.Bind(EVT_SOCKET, self.onSocketEvent)
@@ -478,17 +491,22 @@ class MainFrame(wx.Frame):
 
 	def Shutdown(self):
 		logging.info("Killing socket server...")
-		self.socketServer.kill()
+		try:
+			self.socketServer.kill()
+		except:
+			pass
 
 		logging.info("killing HTTP server...")
-		self.dispServer.close()
+		try:
+			self.dispServer.close()
+		except:
+			pass
 
 		logging.info("closing bus to railroad...")
-		self.rrMonitor.kill()
-		# try:
-		# 	self.rrMonitor.kill()
-		# except:
-		# 	pass
+		try:
+			self.rrMonitor.kill()
+		except:
+			pass
 
 		logging.info("exiting...")
 		self.Destroy()

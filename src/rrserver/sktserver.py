@@ -59,9 +59,15 @@ class SktServer (threading.Thread):
 	def run(self):
 		self.isRunning = True
 		addr = (self.ip, self.port)
-		s = socket.create_server(addr)
-		s.listen()
-		slist = [s]
+		try:
+			s = socket.create_server(addr)
+		except Exception as e:
+			s = None
+			print("Unable to create socket server on address %s: (%s)" % (addr, str(e)))
+			self.isRunning = False
+		else:
+			s.listen()
+			slist = [s]
 
 		while self.isRunning:
 			readable, _, _ = select.select(slist, [], [], 1)
