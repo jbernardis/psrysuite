@@ -53,10 +53,8 @@ class MainFrame(wx.Frame):
 		self.settings = Settings()
 		
 		if self.settings.ipaddr is not None:
-			print("configured IP Address: %s" % self.settings.ipaddr)
-			print("retrieved  IP Address: %s" % self.ip)
 			if self.ip != self.settings.ipaddr:
-				print("using configured IP Address")
+				logging.info("Using configured IP Address (%s) instead of retrieved IP Address: (%s)" % (self.settings.ipaddr, self.ip))
 				self.ip = self.settings.ipaddr
 				
 		self.SetTitle("PSRY Railroad Server    IP:  %s   Listening on port:  %d    Broadcasting on port:  %d" % 

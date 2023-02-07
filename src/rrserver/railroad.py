@@ -76,11 +76,16 @@ class Railroad(wx.Notebook):
 		self.SetControlOption("valleyjct.fleet", 0)
 		self.SetControlOption("yard.fleet", 0)
 
-		for dname, dobj in self.districts.items():
+		for _, dobj in self.districts.items():
 			dobj.SendIO(False)
 			dobj.DetermineSignalLevers()
 
 		self.districts["Yard"].SendIO(True)
+
+	def setBus(self, bus):
+		self.rrBus = bus
+		for _, dobj in self.districts.items():
+			dobj.setBus(bus)
 
 	def pageChanged(self, evt):
 		opx = evt.GetOldSelection()

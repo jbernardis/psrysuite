@@ -144,7 +144,7 @@ class Hyde(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(HYDE, outb, 5, swap=False)
+			inb, inbc = self.rrBus.sendRecv(HYDE, outb, 5, swap=False)
 
 		if inbc != 5:
 			if self.sendIO:

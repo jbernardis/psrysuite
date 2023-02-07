@@ -1011,7 +1011,7 @@ class MainFrame(wx.Frame):
 					name = p["name"]
 					val = p["value"]
 					logging.debug("Set Breaker %s to %s" % (name, "TRIPPED" if val != 0 else "CLEAR"))
-					if val == 1:
+					if val == 0:
 						self.Popup("Breaker: %s" % BreakerName(name))
 						self.breakerDisplay.AddBreaker(name)
 					else:

@@ -165,7 +165,7 @@ class Cliff(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(GREENMTN, outb, 3, swap=False)
+			inb, inbc = self.rrBus.sendRecv(GREENMTN, outb, 3, swap=False)
 
 		if inbc != 3:
 			if self.sendIO:
@@ -294,7 +294,7 @@ class Cliff(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(CLIFF, outb, 8, swap=False)
+			inb, inbc = self.rrBus.sendRecv(CLIFF, outb, 8, swap=False)
 
 		if inbc != 8:
 			if self.sendIO:
@@ -459,7 +459,7 @@ class Cliff(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(SHEFFIELD, outb, 4, swap=False)
+			inb, inbc = self.rrBus.sendRecv(SHEFFIELD, outb, 4, swap=False)
 
 		if inbc != 4:
 			if self.sendIO:

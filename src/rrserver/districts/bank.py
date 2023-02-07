@@ -96,7 +96,7 @@ class Bank(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(BANK, outb, 4, swap=False)
+			inb, inbc = self.rrBus.sendRecv(BANK, outb, 4, swap=False)
 
 		if inbc != 4:
 			if self.sendIO:

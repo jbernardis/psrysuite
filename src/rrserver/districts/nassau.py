@@ -260,7 +260,7 @@ class Nassau(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(NASSAUW, outb, 8, swap=False)
+			inb, inbc = self.rrBus.sendRecv(NASSAUW, outb, 8, swap=False)
 
 		if inbc != 8:
 			if self.sendIO:
@@ -463,7 +463,7 @@ class Nassau(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(NASSAUE, outb, 4, swap=False)
+			inb, inbc = self.rrBus.sendRecv(NASSAUE, outb, 4, swap=False)
 
 		if inbc != 4:
 			if self.sendIO:
@@ -482,7 +482,7 @@ class Nassau(District):
 			self.rr.GetInput("NSw43").SetTOState(nb, rb)
 			nb = getBit(inb[0], 4) 
 			rb = getBit(inb[0], 5)
-			self.rr.GetInput("NSw5").SetTOState(nb, rb)
+			self.rr.GetInput("NSw45").SetTOState(nb, rb)
 			nb = getBit(inb[0], 6) 
 			rb = getBit(inb[0], 7)
 			self.rr.GetInput("NSw47").SetTOState(nb, rb)
@@ -572,7 +572,7 @@ class Nassau(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(NASSAUNX, outb, 3, swap=False)
+			inb, inbc = self.rrBus.sendRecv(NASSAUNX, outb, 3, swap=False)
 		if self.sendIO:
 			self.rr.ShowText("NsNX", NASSAUNX, otext, "", 2, 3)
 

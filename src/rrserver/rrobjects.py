@@ -28,6 +28,7 @@ class Input:
 class BreakerInput(Input):
 	def __init__(self, name, district):
 		Input.__init__(self, name, district)
+		self.value = 1
 
 	def SetValue(self, nv):
 		if nv == self.value:

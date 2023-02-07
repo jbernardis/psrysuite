@@ -87,12 +87,16 @@ class RailroadMonitor(threading.Thread):
 		self.initialized = False
 		self.tty = ttyDevice
 		self.rr = rr
-		if not self.simulation:
+		if self.simulation:
+			self.rrBus = None
+		else:
 			self.rrbus = Bus(self.tty)
 			if not self.rrbus.initialized:
 				return
+			self.rr.setBus(self.rrbus)
 
 		self.pollInterval = settings.busInterval * 1000000000  # convert s to ns
+
 		self.isRunning = False
 		self.initialized = True
 

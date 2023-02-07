@@ -134,6 +134,7 @@ class District(wx.Panel):
 		self.routeMap = {}
 		self.name = name
 		self.rr = parent
+		self.rrBus = None
 		self.settings = settings
 		self.outputMap = {}
 		self.inputMap = {}
@@ -165,6 +166,9 @@ class District(wx.Panel):
 		self.sendIO = flag
 		if not flag:
 			self.rr.ClearIO()
+			
+	def setBus(self, bus):
+		self.rrBus = bus
 
 	def outputDClick(self, evt):
 		index = evt.Index
@@ -321,6 +325,8 @@ class District(wx.Panel):
 				self.ilist.SetItem(ix, 1, "N")
 			elif itype == District.block:
 				self.ilist.SetItem(ix, 1, "0,N,E")
+			elif itype == District.breaker:
+				self.ilist.SetItem(ix, 1, "1")
 			else:
 				self.ilist.SetItem(ix, 1, "0")
 			self.ilist.SetItem(ix, 2, District.typeLabels[itype])

@@ -63,7 +63,7 @@ class Yard(District):
 		fleetlLeverNames = [ "yard.fleet" ]
 		signalLeverNames = [ "Y2.lvr", "Y4.lvr", "Y8.lvr", "Y10.lvr",
 							"Y22.lvr", "Y24.lvr", "Y26.lvr", "Y34.lvr"]
-		toggleNames = ["yrelease", "wos2norm"]
+		toggleNames = ["yrelease", "wos1norm"]
 
 		ix = 0
 		ix = self.AddInputs(routeNames, RouteInput, District.route, ix)
@@ -120,7 +120,7 @@ class Yard(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(CORNELL, outb, 2, swap=False)
+			inb, inbc = self.rrBus.sendRecv(CORNELL, outb, 2, swap=False)
 
 		if inbc != 2:
 			if self.sendIO:
@@ -184,7 +184,7 @@ class Yard(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(EASTJCT, outb, 2, swap=False)
+			inb, inbc = self.rrBus.sendRecv(EASTJCT, outb, 2, swap=False)
 
 		if inbc != 2:
 			if self.sendIO:
@@ -253,7 +253,7 @@ class Yard(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(KALE, outb, 4, swap=False)
+			inb, inbc = self.rrBus.sendRecv(KALE, outb, 4, swap=False)
 
 		if inbc != 4:
 			if self.sendIO:
@@ -387,7 +387,7 @@ class Yard(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(YARD, outb, 6, swap=False)
+			inb, inbc = self.rrBus.sendRecv(YARD, outb, 6, swap=False)
 
 		if inbc != 6:
 			if self.sendIO:
@@ -534,7 +534,7 @@ class Yard(District):
 		logging.debug("YardSW: Output bytes: %s" % otext)
 			
 		if not self.settings.simulation:
-			inb, inbc = self.rr.sendRecv(YARDSW, outb, 5, swap=False)
+			inb, inbc = self.rrBus.sendRecv(YARDSW, outb, 5, swap=False)
 
 		if self.sendIO:
 				self.rr.ShowText("YdSw", YARDSW, otext, "", 4, 5)

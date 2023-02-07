@@ -162,7 +162,7 @@ class Shore(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(SHORE, outb, 7, swap=False)
+			inb, inbc = self.rrBus.sendRecv(SHORE, outb, 7, swap=False)
 
 		if inbc != 7:
 			if self.sendIO:
@@ -271,7 +271,7 @@ class Shore(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(HYDEJCT, outb, 3, swap=False)
+			inb, inbc = self.rrBus.sendRecv(HYDEJCT, outb, 3, swap=False)
 
 		if inbc != 3:
 			if self.sendIO:

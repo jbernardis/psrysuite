@@ -94,7 +94,7 @@ class Cliveden(District):
 			inb = []
 			inbc = 0
 		else:
-			inb, inbc = self.rr.sendRecv(CLIVEDEN, outb, 4, swap=False)
+			inb, inbc = self.rrBus.sendRecv(CLIVEDEN, outb, 4, swap=False)
 
 		if inbc != 4:
 			if self.sendIO:
