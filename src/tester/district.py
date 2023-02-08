@@ -1,0 +1,28 @@
+import wx
+
+# district node addresses
+YARD      = 0x11
+KALE      = 0x12
+EASTJCT   = 0x13
+CORNELL   = 0x14
+YARDSW    = 0x15
+PARSONS   = 0x21
+PORTA     = 0x22
+PORTB     = 0x23
+LATHAM    = 0x31
+CARLTON   = 0x32
+DELL      = 0x41
+FOSS      = 0x42
+HYDEJCT   = 0x51
+HYDE      = 0x52
+SHORE     = 0x61
+KRULISH   = 0x71
+NASSAUW   = 0x72
+NASSAUE   = 0x73
+NASSAUNX  = 0x74
+BANK      = 0x81
+CLIVEDEN  = 0x91
+GREENMTN  = 0x92
+CLIFF     = 0x93
+SHEFFIELD = 0x95
+
