@@ -1,5 +1,3 @@
-import pprint
-
 import os
 import json
 
@@ -71,16 +69,3 @@ class LayoutData:
 			return self.stopblocks[blk]
 		except KeyError:
 			return [None, None]
-
-	def Dump(self):
-		#pprint.pprint(self.block2route)
-		#print("====================")
-		print(str(self.blocks))
-		#print(str(self.osblocks))
-		#print(str(self.subblocks))
-		pprint.pprint(self.routes)
-		#pprint.pprint(self.blockdir)
-		pprint.pprint(self.layout["blocks"])
-		print(str(self.stopblocks))
-		print("============================")
-

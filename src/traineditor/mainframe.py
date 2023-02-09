@@ -8,6 +8,7 @@ from traineditor.blocksequence import BlockSequenceListCtrl
 from traineditor.layoutdata import LayoutData
 from traineditor.simscriptdlg import SimScriptDlg
 from traineditor.arscriptdlg import ARScriptDlg
+from traineditor.arblockdlg import ARBlockDlg
 
 SIMSCRIPTFN = "simscripts.json"
 ARSCRIPTFN =  "arscripts.json"
@@ -171,9 +172,11 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 		
 		if rc != wx.ID_YES:
+			self.SetTrainChoices()
 			return False
 		
 		self.trainChoices.append(newtid)
+		self.selectedTrain = newtid
 		self.trainChoices = sorted(self.trainChoices)
 		self.trains.AddTrain(newtid, self.chbEast.IsChecked())
 		self.SetTrainChoices()
@@ -202,7 +205,6 @@ class MainFrame(wx.Frame):
 		self.UpdateTrainSelection(tid)
 		
 	def UpdateTrainSelection(self, tid):
-		self.selectedTrain = tid
 		if tid is None:
 			self.EnableButtons(False)
 			self.currentTrain = None
@@ -210,14 +212,21 @@ class MainFrame(wx.Frame):
 			return
 		if tid not in self.trainChoices:
 			if not self.AddTrainChoice(tid):
-				self.EnableButtons(False)
-				self.currentTrain = None
-				self.blockSeq.SetItems([])
-				return
+				if self.currentTrain is None:
+					self.EnableButtons(False)
+					self.currentTrain = None
+					self.blockSeq.SetItems([])
+					return
+
+				self.selectedTrain = self.currentTrain.GetTrainID()
+			else:
+				self.selectedTrain = tid
+		else:
+			self.selectedTrain = tid
 			
 		self.EnableButtons(True)
-		
-		tr = self.trains.GetTrainById(tid)
+
+		tr = self.trains.GetTrainById(self.selectedTrain)
 		self.currentTrain = tr
 		
 		self.chbEast.SetValue(tr.IsEast())
@@ -388,12 +397,26 @@ class MainFrame(wx.Frame):
 
 	def OnBGenAR(self, _):
 		# TODO: we may not want to autproute at every OS - need a way to check the ones we do want
+		lb = self.startBlock
+		blist = []
+		for b in self.blockSeq.GetBlocks():
+			blist.append("%s => %s" % (lb, b["block"]))
+			lb = b["block"]
+
+		dlg = ARBlockDlg(self, blist)
+		dlg.ShowModal()
+		blist = dlg.GetResults()
+		dlg.Destroy()
+		
+		blks = [self.blockSeq.GetBlocks()[b]["block"] for b in blist]
+		
 		trainid = self.currentTrain.GetTrainID()
 		lastBlock = self.startBlock
 		script = {}
 		for b in self.blockSeq.GetBlocks():
-			trigger = 'F' if b["trigger"] == "Front" else 'B'			
-			script[lastBlock] = {"route": b["route"], "trigger": trigger}
+			if b["block"] in blks:
+				trigger = 'F' if b["trigger"] == "Front" else 'B'			
+				script[lastBlock] = {"route": b["route"], "trigger": trigger}
 			lastBlock = b["block"]
 
 		scr = {"%s" % trainid: script}

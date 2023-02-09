@@ -4,6 +4,7 @@ import json
 
 from traineditor.nextblocklist import NextBlockListCtrl
 from traineditor.blocksequence import BlockSequenceListCtrl
+from traineditor.editblockdlg import EditBlockDlg
 		
 class TrainDlg(wx.Dialog):
 	def __init__(self, parent, train, layout):
@@ -223,16 +224,22 @@ class TrainDlg(wx.Dialog):
 		self.bGenAR.Enable(seqNotEmpty)
 		
 	def reportItemActivated(self, idx):
-		print("edit item %d" % idx)
 		rv = self.blockSequence.GetBlock(idx)
 		if rv is None:
-			print("None returned")
+			return
+
+		dlg = EditBlockDlg(self, rv["time"], rv["trigger"])
+		rc = dlg.ShowModal()
+		
+		if rc == wx.ID_OK:
+			ttime, trigger = dlg.GetResults()
+			
+		dlg.Destroy()
+		if rc != wx.ID_OK:
 			return
 		
-		print(json.dumps(rv))
-		rv["trigger"] = "Rear"
-		rv["time"] = 6987
-		print(json.dumps(rv))
+		rv["trigger"] = trigger
+		rv["time"] = ttime
 		self.SetModified(True)
 		self.blockSequence.SetBlock(idx, rv)
 
@@ -278,7 +285,7 @@ class TrainDlg(wx.Dialog):
 			self.GetAvailableBlocks(self.startBlock)
 			self.nextBlockList.SetBlocks(self.availableBlocks)
 		else:
-			self.GetAvailableBlocks(r[0])
+			self.GetAvailableBlocks(r["block"])
 			self.nextBlockList.SetBlocks(self.availableBlocks)
 
 	def GetAvailableBlocks(self, blk):
