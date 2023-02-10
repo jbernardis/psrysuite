@@ -67,6 +67,9 @@ class MainFrame(wx.Frame):
 		self.title = "PSRY Tester"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		
+		self.sendZeroTimer = wx.Timer()
+		self.Bind(wx.EVT_TIMER, self.SendZeros)
+		
 		self.dataDir = os.path.join(os.getcwd(), "data")
 		
 		vszr = wx.BoxSizer(wx.VERTICAL)
@@ -83,20 +86,33 @@ class MainFrame(wx.Frame):
 						 style=wx.CB_DROPDOWN | wx.CB_READONLY)
 		self.Bind(wx.EVT_COMBOBOX, self.EvtComboBox, self.cbNode)
 
-		vszr.Add(wx.StaticText(self, wx.ID_ANY, "Node Address:"))		
-		vszr.Add(self.cbNode)
+		vszr.Add(wx.StaticText(self, wx.ID_ANY, "Node Address:"), 0, wx.ALIGN_CENTER_HORIZONTAL)		
+		vszr.Add(self.cbNode, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
 		vszr.AddSpacer(20)
 		
-		vszr.Add(wx.StaticText(self, wx.ID_ANY, "Data to send:"))		
+		vszr.Add(wx.StaticText(self, wx.ID_ANY, "Data to send:"), 0, wx.ALIGN_CENTER_HORIZONTAL)		
 		self.tcSend = HexCtrl(self, wx.ID_ANY, "", size=(100, -1))
-		vszr.Add(self.tcSend)
+		vszr.Add(self.tcSend, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
 		vszr.AddSpacer(20)
 		
-		vszr.Add(wx.StaticText(self, wx.ID_ANY, "Data received:"))		
+		vszr.Add(wx.StaticText(self, wx.ID_ANY, "Data received:"), 0, wx.ALIGN_CENTER_HORIZONTAL)		
 		self.tcRecv = wx.TextCtrl(self, wx.ID_ANY, "", size=(100, -1), style=wx.CB_READONLY)
-		vszr.Add(self.tcRecv)
+		vszr.Add(self.tcRecv, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		self.cbSendZero = wx.CheckBox(self, wx.ID_ANY, "Send zeros after ")
+		self.scMillis = wx.SpinCtrl(self, wx.ID_ANY, "")
+		self.scMillis.SetRange(1,5000)
+		self.scMillis.SetValue(500)
+
+		hsz.Add(self.cbSendZero)
+		hsz.Add(self.scMillis)
+		hsz.Add(wx.StaticText(self, wx.ID_ANY, "milliseconds"))
+		
+		vszr.AddSpacer(20)
+		vszr.Add(hsz)
 
 		vszr.AddSpacer(20)
 		self.bSend = wx.Button(self, wx.ID_ANY, "Send")
@@ -147,7 +163,23 @@ class MainFrame(wx.Frame):
 				inbstr.append("%02x" % b)
 				
 			self.tcRecv.SetValue("".join(inbstr))
-
+			
+			if self.cbSendZero.IsChecked():
+				self.zeroCount = nbytes
+				msec = self.scMillis.GetValue()
+				self.sendZeroTimer.StartOnce(msec)
+			
+	def SendZeros(self, _):
+		outb = [0 for _ in range(self.zeroCount)]
+		inb, inbc = self.bus.sendRecv(self.selectedAddress, outb, self.zeroCount, swap=False)
+		inbstr = []			
+		for b in inb:
+			inbstr.append("%02x" % b)
+			
+		dlg = wx.MessageDialog(self, "Response = (%s)" % "".join(inbstr),
+							'Zeros sent', wx.OK | wx.ICON_INFORMATION)
+		dlg.ShowModal()
+		dlg.Destroy()
 		
 	def OnBExit(self, _):
 		self.doExit()

@@ -25,8 +25,8 @@
         "os": "DOSFOE",
         "route": "DRtD21S20",
         "signal": "D10R",
-        "time": 5000,
-        "trigger": "Front"
+        "time": 4000,
+        "trigger": "front"
       },
       {
         "block": "H20",
