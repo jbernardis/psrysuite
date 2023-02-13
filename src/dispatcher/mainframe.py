@@ -86,6 +86,7 @@ class MainFrame(wx.Frame):
 			diagramw, diagramh = dp.GetSize()
 			self.panels = {self.diagrams[sn].screen : dp for sn in screensList}  # all 3 screens just point to the same diagram
 			totalw = 2560*3
+			centeroffset = 2560
 
 		else:  # set up three separate screens for a single monitor
 			self.panels = {}
@@ -106,6 +107,7 @@ class MainFrame(wx.Frame):
 			b = wx.Button(self, wx.ID_ANY, "Nassau/Cliff",   pos=(1790, voffset), size=(200, 50))
 			self.Bind(wx.EVT_BUTTON, lambda event: self.SwapToScreen(NaCl), b)
 			totalw = 2560+20
+			centeroffset = 0
 
 		if self.settings.showcameras:
 			self.DrawCameras()
@@ -120,41 +122,56 @@ class MainFrame(wx.Frame):
 		else:
 			self.PlaceWidgets()
 
-		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(100, 15))
+		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(centeroffset+100, 15))
 		self.Bind(wx.EVT_BUTTON, self.OnSubscribe, self.bSubscribe)
 
-		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", pos=(100, 45))
+		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", pos=(centeroffset+100, 45))
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, self.bRefresh)
 		self.bRefresh.Enable(False)
 
-		self.bConfig = wx.Button(self, wx.ID_ANY, "Config", pos=(100, 75))
+		self.bConfig = wx.Button(self, wx.ID_ANY, "Config", pos=(centeroffset+100, 75))
 		self.Bind(wx.EVT_BUTTON, self.OnConfig, self.bConfig)
 		self.bConfig.Enable(False)
 		
-		if not self.IsDispatcher():
+		if not self.IsDispatcher() or self.settings.hideconfigbutton:
 			self.bConfig.Hide()
 
-		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Trains", pos=(250, 25))
+		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Trains", pos=(centeroffset+250, 25))
 		self.bLoadTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadTrains, self.bLoadTrains)
-		self.bLoadLocos = wx.Button(self, wx.ID_ANY, "Load Locos", pos=(250, 65))
+		self.bLoadLocos = wx.Button(self, wx.ID_ANY, "Load Locos", pos=(centeroffset+250, 65))
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadLocos, self.bLoadLocos)
 		self.bLoadLocos.Enable(False)
+		
+		if not self.IsDispatcher():
+			self.bLoadTrains.Hide()
+			self.bLoadLocos.Hide()
 
-		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(400, 25), style=wx.TE_READONLY)
-		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(500, 25), style=wx.TE_READONLY)
-		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(560, 25), style=wx.TE_READONLY)
+		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(centeroffset+2200, 25), style=wx.TE_READONLY)
+		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(centeroffset+2300, 25), style=wx.TE_READONLY)
+		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(centeroffset+2360, 25), style=wx.TE_READONLY)
+		
+		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(centeroffset+2200, 75))
+		self.Bind(wx.EVT_BUTTON, self.OnResetScreen, self.bResetScreen)
 
 		h = 1080
 		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 50), size=(400, 40))
 		
 		if self.IsDispatcher():
-			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(totalw - 200, 25))
+			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(centeroffset+600, 25))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
 			self.cbAutoRouter.Enable(False)
-
-		self.SetMaxSize((totalw, h))
-		self.SetSize((totalw, h))
+			
+		self.totalw = totalw
+		self.totalh = h
+		self.ResetScreen()
+		
+	def OnResetScreen(self, _):
+		self.ResetScreen()
+		
+	def ResetScreen(self):
+		self.SetMaxSize((self.totalw, self.totalh))
+		self.SetSize((self.totalw, self.totalh))
 		self.SetPosition((0, 0))
 
 		wx.CallAfter(self.Initialize)

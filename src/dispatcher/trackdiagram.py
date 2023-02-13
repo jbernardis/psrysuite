@@ -24,6 +24,7 @@ class TrackDiagram(wx.Panel):
 		self.SetCursor(wx.Cursor(wx.CURSOR_ARROW))
 
 		w = 0;
+			
 		for b in self.bgbmps:
 			w += b.GetWidth()
 		h = self.bgbmps[0].GetHeight()  # assume all the same height
