@@ -168,8 +168,10 @@ class Block:
 		if self.train is None:
 			trainID = "??"
 			locoID = "??"
+			atc = False
 		else:
 			trainID, locoID = self.train.GetNameAndLoco()
+			atc = self.train.IsOnATC()
 
 		anyOccupied = self.occupied
 		if self.sbEast and self.sbEast.IsOccupied():
@@ -181,7 +183,7 @@ class Block:
 
 		for screen, loc in self.trainLoc:
 			if anyOccupied:
-				self.frame.DrawTrain(screen, loc, trainID, locoID, stopRelay)
+				self.frame.DrawTrain(screen, loc, trainID, locoID, stopRelay, atc)
 			else:
 				self.frame.ClearTrain(screen, loc)
 

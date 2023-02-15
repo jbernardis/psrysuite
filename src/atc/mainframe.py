@@ -150,7 +150,7 @@ class MainFrame(wx.Frame):
 
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
-			#print("Dispatch: %s: %s" % (cmd, parms))
+			print("Dispatch: %s: %s" % (cmd, parms), flush=True)
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]
@@ -229,7 +229,7 @@ class MainFrame(wx.Frame):
 
 	def Request(self, req):
 		if self.subscribed:
-			# print("Outgoing request: %s" % json.dumps(req))
+			print("Outgoing request: %s" % json.dumps(req), flush=True)
 			self.rrServer.SendRequest(req)
 
 	def onDisconnectEvent(self, _):

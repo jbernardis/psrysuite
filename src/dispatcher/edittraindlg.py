@@ -1,21 +1,30 @@
 import wx
 
 class EditTrainDlg(wx.Dialog):
-	def __init__(self, parent, train):
+	def __init__(self, parent, train, dispatcher):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details")
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
+		
+		self.dispatcher = dispatcher
 
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(20)
 
 		name, loco = train.GetNameAndLoco()
+		atc = train.IsOnATC()
 
 		self.teTrainID = wx.TextCtrl(self, wx.ID_ANY, name, size=(125, -1))
 		self.teLocoID = wx.TextCtrl(self, wx.ID_ANY, loco, size=(125, -1))
+		self.cbATC = wx.CheckBox(self, wx.ID_ANY, "ATC")
+		self.cbATC.SetValue(atc)
 
 		vsz.Add(self.teTrainID)
 		vsz.AddSpacer(10)
 		vsz.Add(self.teLocoID)
+		if dispatcher:
+			vsz.AddSpacer(10)
+			vsz.Add(self.cbATC, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
 
 		vsz.AddSpacer(30)
 
@@ -53,4 +62,5 @@ class EditTrainDlg(wx.Dialog):
 	def GetResults(self):
 		t = self.teTrainID.GetValue()
 		l = self.teLocoID.GetValue()
-		return t, l
+		atc = None if not self.dispatcher else self.cbATC.GetValue()
+		return t, l, atc

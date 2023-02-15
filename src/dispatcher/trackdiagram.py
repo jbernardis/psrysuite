@@ -89,8 +89,8 @@ class TrackDiagram(wx.Panel):
 		del(self.text[textKey])
 		self.Refresh()
 
-	def DrawTrain(self, x, y, offset, trainID, locoID, stopRelay):
-		self.trains[(x*16+offset, y*16)] = [trainID, locoID, stopRelay];
+	def DrawTrain(self, x, y, offset, trainID, locoID, stopRelay, atc):
+		self.trains[(x*16+offset, y*16)] = [trainID, locoID, stopRelay, atc];
 		self.Refresh()
 
 	def ClearTrain(self, x, y, offset):
@@ -116,13 +116,22 @@ class TrackDiagram(wx.Panel):
 		for bx, tinfo in self.trains.items():
 			x = bx[0]
 			y = bx[1]
-			dc.SetTextForeground(wx.Colour(255, 0, 0))
-			dc.SetTextBackground(wx.Colour(255, 255, 255))
 			if tinfo[2]:
+				dc.SetTextForeground(wx.Colour(255, 255, 255))
+				dc.SetTextBackground(wx.Colour(255, 0, 0))
 				txt = "* "
 				dc.DrawText(txt, x, y)
 				x += dc.GetTextExtent(txt)[0]
+				
+			if tinfo[3]:
+				dc.SetTextForeground(wx.Colour(0, 192, 0))
+				dc.SetTextBackground(wx.Colour(0, 0, 0))
+				txt = "A "
+				dc.DrawText(txt, x, y)
+				x += dc.GetTextExtent(txt)[0]
 
+			dc.SetTextForeground(wx.Colour(255, 0, 0))
+			dc.SetTextBackground(wx.Colour(255, 255, 255))
 			dc.DrawText(tinfo[0]+" ", x, y)
 			x += dc.GetTextExtent(tinfo[0])[0]+2
 

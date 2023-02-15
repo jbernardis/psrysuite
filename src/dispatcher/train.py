@@ -8,6 +8,7 @@ class Train:
 		else:
 			self.name = "??%d" % self.index
 		self.loco = "??"
+		self.atc = False
 		self.blocks = {}
 
 	def tstring(self):
@@ -15,6 +16,12 @@ class Train:
 
 	def SetName(self, name):
 		self.name = name
+		
+	def SetATC(self, flag=True):
+		self.atc = flag
+		
+	def IsOnATC(self):
+		return self.atc
 
 	def SetLoco(self, loco):
 		self.loco = loco
@@ -35,9 +42,10 @@ class Train:
 		return self.name, self.loco
 
 	def GetIDString(self):
+		a = "A-" if self.atc else ""
 		n = self.name if self.name else "??"
 		l = self.loco if self.loco else "??"
-		return n+"/"+l
+		return a+n+"/"+l
 
 	def Draw(self):
 		for blk in self.blocks.values():

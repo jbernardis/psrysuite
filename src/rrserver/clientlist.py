@@ -14,8 +14,9 @@ class ClientList(wx.ListCtrl):
 		self.SetColumnWidth(3, 50)
 		self.clientList = []
 		self.sids = []
+		self.skts = []
 
-	def AddClient(self, addr, sid, function):
+	def AddClient(self, addr, skt, sid, function):
 		if addr in self.clientList:
 			return
 
@@ -23,6 +24,7 @@ class ClientList(wx.ListCtrl):
 		index = len(self.clientList)
 		self.clientList.append(addr)
 		self.sids.append(sid)
+		self.skts.append(skt)
 		self.InsertItem(index, "??" if function is None else function)
 		self.SetItem(index, 1, addr[0])
 		self.SetItem(index, 2, "%d" % addr[1])
@@ -46,12 +48,13 @@ class ClientList(wx.ListCtrl):
 
 	
 	def GetFunctionAddress(self, function):
+		cl = []
 		for i in range(len(self.clientList)):
 			f = self.GetItemText(i, 0)
 			if f == function:
-				return self.clientList[i]
+				cl.append((self.clientList[i], self.skts[i]))
 			
-		return None
+		return cl
 
 	def DelClient(self, addr):
 		logging.info("Removing client with address %s:%s" % (addr[0], addr[1]))
@@ -63,3 +66,4 @@ class ClientList(wx.ListCtrl):
 		self.DeleteItem(index)
 		del(self.clientList[index])
 		del(self.sids[index])
+		del(self.skts[index])

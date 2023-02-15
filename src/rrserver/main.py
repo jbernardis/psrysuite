@@ -2,6 +2,8 @@ import os, sys
 cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
+	
+import pprint
 
 import logging
 logging.basicConfig(filename=os.path.join("logs", "server.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
@@ -149,7 +151,7 @@ class MainFrame(wx.Frame):
 				self.socketServer.sendToOne(skt, addr, {"sessionID": sid})
 				self.clients[addr] = [skt, sid]
 				self.refreshClient(addr, skt)
-				self.clientList.AddClient(addr, sid, None)
+				self.clientList.AddClient(addr, skt, sid, None)
 
 			elif cmd == "delclient":
 				addr = parms["addr"]
@@ -474,11 +476,17 @@ class MainFrame(wx.Frame):
 					arExec = os.path.join(os.getcwd(), "autorouter", "main.py")
 					pid = Popen([sys.executable, arExec]).pid
 			else:
-				addr = self.clientList.GetFunctionAddress("AR")
-				if addr is None:
-					return 
+				addrList = self.clientList.GetFunctionAddress("AR")
+				for addr, _ in addrList:
+					self.socketServer.deleteSocket(addr)
 				
-				self.socketServer.deleteSocket(addr)
+		elif verb == "atc":
+			print("ATC request")
+			pprint.pprint(evt.data)
+			addrList = self.clientList.GetFunctionAddress("ATC")
+			print("addrlist has %d entry" % len(addrList), flush=True)
+			for addr, skt in addrList:
+				self.socketServer.sendToOne(skt, addr, {"atc": evt.data})
 
 		elif verb == "quit":
 			logging.info("HTTP 'quit' command received - terminating")

@@ -30,6 +30,7 @@ from dispatcher.districts.port import Port
 from dispatcher.constants import HyYdPt, LaKr, NaCl, screensList, EMPTY, OCCUPIED, NORMAL, REVERSE, OVERSWITCH
 from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
+from dispatcher.atclist import ATCListCtrl
 
 from dispatcher.edittraindlg import EditTrainDlg
 
@@ -154,16 +155,20 @@ class MainFrame(wx.Frame):
 		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(centeroffset+2200, 75))
 		self.Bind(wx.EVT_BUTTON, self.OnResetScreen, self.bResetScreen)
 
-		h = 1080
 		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 50), size=(400, 40))
 		
 		if self.IsDispatcher():
+			f = wx.Font(wx.Font(14, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial"))
+			self.lblATC = wx.StaticText(self, wx.ID_ANY, "ATC:", pos=(centeroffset+1700, 2))
+			self.lblATC.SetFont(f)
+			self.atcList = ATCListCtrl(self, (centeroffset+1580, 25))
+			
 			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(centeroffset+600, 25))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
 			self.cbAutoRouter.Enable(False)
 			
 		self.totalw = totalw
-		self.totalh = h
+		self.totalh = 1080
 		self.ResetScreen()
 		
 	def OnResetScreen(self, _):
@@ -737,15 +742,25 @@ class MainFrame(wx.Frame):
 				if blk.IsOccupied():
 					tr = blk.GetTrain()
 					oldName, oldLoco = tr.GetNameAndLoco()
-					dlg = EditTrainDlg(self, tr)
+					oldATC = tr.IsOnATC() if self.IsDispatcher() else None
+					dlg = EditTrainDlg(self, tr, self.IsDispatcher())
 					rc = dlg.ShowModal()
 					if rc == wx.ID_OK:
-						trainid, locoid = dlg.GetResults()
+						trainid, locoid, atc = dlg.GetResults()
 					dlg.Destroy()
 					if rc != wx.ID_OK:
 						return
 
 					self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid}})
+					if self.IsDispatcher() and atc != oldATC:
+						tr.SetATC(atc)
+						if atc:
+							self.atcList.AddTrain(tr)
+							self.Request({"atc": {"action": "add", "train": trainid, "loco": locoid}})
+						else:
+							self.atcList.DelTrain(tr)
+							self.Request({"atc": {"action": "delete", "train": trainid, "loco": locoid}})					
+					tr.Draw()
 
 	def DrawTile(self, screen, pos, bmp):
 		offset = self.diagrams[screen].offset
@@ -759,9 +774,9 @@ class MainFrame(wx.Frame):
 		offset = self.diagrams[screen].offset
 		self.panels[screen].ClearText(pos[0], pos[1], offset)
 
-	def DrawTrain(self, screen, pos, trainID, locoID, stopRelay):
+	def DrawTrain(self, screen, pos, trainID, locoID, stopRelay, atc):
 		offset = self.diagrams[screen].offset
-		self.panels[screen].DrawTrain(pos[0], pos[1], offset, trainID, locoID, stopRelay)
+		self.panels[screen].DrawTrain(pos[0], pos[1], offset, trainID, locoID, stopRelay, atc)
 
 	def ClearTrain(self, screen, pos):
 		offset = self.diagrams[screen].offset
@@ -1067,6 +1082,7 @@ class MainFrame(wx.Frame):
 							for trid in delList:
 								try:
 									del(self.trains[trid])
+									self.atcList.DelTrainByName(trid)
 								except:
 									logging.warning("can't delete train %s from train list" % trid)
 
@@ -1090,9 +1106,12 @@ class MainFrame(wx.Frame):
 								else:
 									tr.SetName(name)
 									self.trains[name] = tr
+									if tr.IsOnATC():
+										self.atcList.UpdateTrainName(tr, oldName)
 
 								try:
 									del(self.trains[oldName])
+									self.atcList.DelTrainByName(oldName)
 								except:
 									logging.warning("can't delete train %s from train list" % oldName)
 						try:
@@ -1146,7 +1165,7 @@ class MainFrame(wx.Frame):
 		if self.settings.dispatch or command in allowedCommands:
 			if self.subscribed:
 				logging.debug(json.dumps(req))
-				#print("Outgoing HTTP request: %s" % json.dumps(req))
+				print("Outgoing HTTP request: %s" % json.dumps(req))
 				self.rrServer.SendRequest(req)
 
 	def SendBlockDirRequests(self):
