@@ -404,10 +404,10 @@ class SignalOutput(Output):
 class PulsedOutput(Output):
 	def __init__(self, name, district, pulseLen=1):
 		Output.__init__(self, name, district)
-		self.pulseLen = pulseLen
+		self.pulseLen = pulseLen * 2
 
 	def SetPulseLen(self, pulseLen):
-		self.pulseLen = pulseLen
+		self.pulseLen = pulseLen * 2
 
 
 class TurnoutOutput(PulsedOutput):
@@ -470,18 +470,17 @@ class TurnoutOutput(PulsedOutput):
 	def GetOutPulse(self):
 		if self.normalPulses > 0:
 			self.normalPulses -= 1
-			rv = 1
+			rv = 1 if self.normalPulses % 2 != 0 else 0
 		elif self.reversePulses > 0:
 			self.reversePulses -= 1
-			rv = -1
+			rv = -1 if self.reversePulses % 2 != 0 else 0
+
 		else:
 			return 0
 
-		if rv != 0:
-			self.rr.RailroadEvent({"refreshoutput": [self.name]})
+		self.rr.RailroadEvent({"refreshoutput": [self.name]})
 
 		return rv
-
 
 class NXButtonOutput(PulsedOutput):
 	def __init__(self, name, district, pulseLen=1):
