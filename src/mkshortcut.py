@@ -3,7 +3,7 @@ import os, winshell, sys
 modules = {
 	"server": {
 		"name": "PSRY Server",
-		"dir":  "server",
+		"dir":  "rrserver",
 		"main": "main.py",
 		"desc": "Railroad Server",
 		"icon": "server.ico"
@@ -13,28 +13,28 @@ modules = {
 		"dir":  "dispatcher",
 		"main": "main.py",
 		"desc": "Dispatcher",
-		"icon": "server.ico"
+		"icon": "dispatch.ico"
 	},
 	"simulator": {
 		"name": "PSRY Simulator",
 		"dir":  "simulator",
 		"main": "main.py",
 		"desc": "Simulator",
-		"icon": "server.ico"
-	},
-	"autorouter": {
-		"name": "PSRY Automatic Router",
-		"dir":  "autorouter",
-		"main": "main.py",
-		"desc": "Automatic Router",
-		"icon": "server.ico"
+		"icon": "simulator.ico"
 	},
 	"trainedit": {
 		"name": "PSRY Train Editor",
 		"dir":  "traineditor",
 		"main": "main.py",
 		"desc": "Train Editor",
-		"icon": "server.ico"
+		"icon": "editor.ico"
+	},
+	"tester": {
+		"name": "PSRY Tester Utility",
+		"dir":  "tester",
+		"main": "main.py",
+		"desc": "Tester",
+		"icon": "tester.ico"
 	}
 }
 

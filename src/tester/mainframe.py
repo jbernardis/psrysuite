@@ -1,10 +1,16 @@
 import wx
-import os
-
-from tester.hexctrl import HexCtrl
+import time
 
 from tester.settings import Settings
 from tester.bus import Bus
+
+from tester.nodes.dell import Dell
+from tester.nodes.foss import Foss
+from tester.nodes.cornell import Cornell
+from tester.nodes.eastjct import EastJct
+from tester.nodes.kale import Kale
+from tester.nodes.yard import Yard
+from tester.nodes.yardsw import YardSw
 
 # district node addresses
 YARD      = 0x11
@@ -33,44 +39,46 @@ CLIFF     = 0x93
 SHEFFIELD = 0x95
 
 nodes = {
-	"Yard" : YARD,
-	"Kale" : KALE,
-	"East Jct" : EASTJCT,
-	"Cornell" : CORNELL,
-	"Yard SW" : YARDSW,
-	"Parsons Jct" : PARSONS,
-	"Port A" : PORTA,
-	"Port B" : PORTB,
-	"Latham" : LATHAM,
-	"Carlton" : CARLTON,
-	"Dell" : DELL,
-	"Foss" : FOSS,
-	"Hyde Jct" : HYDEJCT,
-	"Hyde" : HYDE,
-	"Shore" : SHORE,
-	"Krulish" : KRULISH,
-	"Nassau W" : NASSAUW,
-	"Nassau E" : NASSAUE,
-	"Nassau NX" : NASSAUNX,
-	"Bank" : BANK,
-	"Cliveden" : CLIVEDEN,
-	"Green Mtn" : GREENMTN,
-	"Cliff" : CLIFF,
-	"Sheffield" : SHEFFIELD	
+	"Yard" : ( YARD, Yard ),
+	"Kale" : ( KALE, Kale ),
+	"East Jct" : ( EASTJCT, EastJct ),
+	"Cornell" : ( CORNELL, Cornell ),
+	"Yard SW" : ( YARDSW, YardSw ),
+	"Parsons Jct" : ( PARSONS, None ),
+	"Port A" : ( PORTA, None ),
+	"Port B" : ( PORTB, None ),
+	"Latham" : ( LATHAM, None ),
+	"Carlton" : ( CARLTON, None ),
+	"Dell" : ( DELL, Dell ),
+	"Foss" : ( FOSS, Foss ),
+	"Hyde Jct" : ( HYDEJCT, None ),
+	"Hyde" : ( HYDE, None ),
+	"Shore" : ( SHORE, None ),
+	"Krulish" : ( KRULISH, None ),
+	"Nassau W" : ( NASSAUW, None ),
+	"Nassau E" : ( NASSAUE, None ),
+	"Nassau NX" : ( NASSAUNX, None ),
+	"Bank" : ( BANK, None ),
+	"Cliveden" : ( CLIVEDEN, None ),
+	"Green Mtn" : ( GREENMTN, None ),
+	"Cliff" : ( CLIFF, None ),
+	"Sheffield" : ( SHEFFIELD, None )	
 }
+
+def formatInputBytes(inb):
+	if inb is None or len(inb) == 0:
+		return "No response"
+	
+	return " ".join(["%02x" % b for b in inb])
+
 
 class MainFrame(wx.Frame):
 	def __init__(self):
 		wx.Frame.__init__(self, None, style=wx.DEFAULT_FRAME_STYLE)
 		self.bus = None
 		
-		self.title = "PSRY Tester"
+		self.SetTitle("PSRY Tester")
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
-		
-		self.sendZeroTimer = wx.Timer()
-		self.Bind(wx.EVT_TIMER, self.SendZeros)
-		
-		self.dataDir = os.path.join(os.getcwd(), "data")
 		
 		vszr = wx.BoxSizer(wx.VERTICAL)
 		vszr.AddSpacer(20)
@@ -79,45 +87,44 @@ class MainFrame(wx.Frame):
 		
 		self.selectedName = self.nodeNames[0]
 		self.selectedAddress = nodes[self.selectedName]
-		self.nodeList = ["0x%x - %s" % (nodes[n], n) for n in self.nodeNames]
+		self.nodeList = ["%s - 0x%x" % (n, nodes[n][0]) for n in self.nodeNames]
 		
-		self.cbNode = wx.ComboBox(self, wx.ID_ANY, self.nodeList[0],
-						 size=(100, -1), choices=self.nodeList,
-						 style=wx.CB_DROPDOWN | wx.CB_READONLY)
-		self.Bind(wx.EVT_COMBOBOX, self.EvtComboBox, self.cbNode)
-
-		vszr.Add(wx.StaticText(self, wx.ID_ANY, "Node Address:"), 0, wx.ALIGN_CENTER_HORIZONTAL)		
-		vszr.Add(self.cbNode, 0, wx.ALIGN_CENTER_HORIZONTAL)
-
-		vszr.AddSpacer(20)
+		self.cbNodes = wx.Choicebook(self, wx.ID_ANY)
+		self.Bind(wx.EVT_CHOICEBOOK_PAGE_CHANGED, self.OnPageChanged)
+	
+		for node in self.nodeNames:
+			if nodes[node][1] is None:
+				win = wx.Panel(self.cbNodes, size=(300, 300))
+				wx.StaticText(win, wx.ID_ANY, "%s not yet implemented" % node, (10,10))
+			else:
+				win = nodes[node][1](self.cbNodes, nodes[node][0])
+			
+			text = "%s - 0x%x" % (node, nodes[node][0])
+			self.cbNodes.AddPage(win, text)
 		
-		vszr.Add(wx.StaticText(self, wx.ID_ANY, "Data to send:"), 0, wx.ALIGN_CENTER_HORIZONTAL)		
-		self.tcSend = HexCtrl(self, wx.ID_ANY, "", size=(100, -1))
-		vszr.Add(self.tcSend, 0, wx.ALIGN_CENTER_HORIZONTAL)
-
-		vszr.AddSpacer(20)
+		vszr.Add(self.cbNodes, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
-		vszr.Add(wx.StaticText(self, wx.ID_ANY, "Data received:"), 0, wx.ALIGN_CENTER_HORIZONTAL)		
-		self.tcRecv = wx.TextCtrl(self, wx.ID_ANY, "", size=(100, -1), style=wx.CB_READONLY)
-		vszr.Add(self.tcRecv, 0, wx.ALIGN_CENTER_HORIZONTAL)
-		
-		hsz = wx.BoxSizer(wx.HORIZONTAL)
-		self.cbSendZero = wx.CheckBox(self, wx.ID_ANY, "Send zeros after ")
-		self.scMillis = wx.SpinCtrl(self, wx.ID_ANY, "")
-		self.scMillis.SetRange(1,5000)
-		self.scMillis.SetValue(500)
-
-		hsz.Add(self.cbSendZero)
-		hsz.Add(self.scMillis)
-		hsz.Add(wx.StaticText(self, wx.ID_ANY, "milliseconds"))
-		
-		vszr.AddSpacer(20)
-		vszr.Add(hsz)
-
-		vszr.AddSpacer(20)
 		self.bSend = wx.Button(self, wx.ID_ANY, "Send")
 		self.Bind(wx.EVT_BUTTON, self.OnBSend, self.bSend)
-		vszr.Add(self.bSend, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		self.scReps = wx.SpinCtrl(self, wx.ID_ANY, "1")
+		self.scReps.SetRange(1,10)
+		self.scReps.SetValue(1)
+		
+		self.bClear = wx.Button(self, wx.ID_ANY, "Clear")
+		self.Bind(wx.EVT_BUTTON, self.OnBClear, self.bClear)
+		
+		vszr.AddSpacer(20)
+		
+		btnszr = wx.BoxSizer(wx.HORIZONTAL)
+		btnszr.AddSpacer(20)
+		btnszr.Add(self.bSend)
+		btnszr.AddSpacer(5)
+		btnszr.Add(self.scReps)
+		btnszr.AddSpacer(10)
+		btnszr.Add(self.bClear)
+		btnszr.AddSpacer(20)
+		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
 		vszr.AddSpacer(20)
 		
@@ -134,52 +141,43 @@ class MainFrame(wx.Frame):
 		
 	def Initialize(self):
 		self.settings = Settings()
+		self.cbNodes.SetSelection(0)
+		self.currentNode = self.cbNodes.GetPage(0)
 		self.bus = Bus(self.settings.tty)
 		if not self.bus.isOpen():
 			self.bSend.Enable(False)
-		
-	def EvtComboBox(self, _):
-		nx = self.cbNode.GetSelection()
-		if nx == wx.NOT_FOUND:
-			return
-		
-		self.selectedName = self.nodeNames[nx]
-		self.selectedAddress = nodes[self.selectedName]
+			
+	def OnPageChanged(self, event):
+		sel = self.cbNodes.GetSelection()
+		self.currentNode = self.cbNodes.GetPage(sel)
+		event.Skip()
 		
 	def OnBSend(self, _):
-		if self.Validate() and self.TransferDataFromWindow():
-			dstr = self.tcSend.GetValue()
+		addr = self.currentNode.GetAddress()
+		outb, hasPulsed = self.currentNode.GetOBytes()
+		outStr = " ".join(["%02x" % b for b in outb])
+		if hasPulsed:
+			outb2 = self.currentNode.GetOBytes(pulseZero=True)[0]
+			outStr2 = " ".join(["%02x" % b for b in outb2])
 			
-			nbytes = int(len(dstr)/2)
-			outb = []
-			for b in range(nbytes):
-				byteStr = dstr[b*2:b*2+2]
-				outb.append(int(byteStr, 16))
+		reps = self.scReps.GetValue()
+
+		for _ in range(reps):
+			print("sending (%s)" % outStr)
+			inb, _ = self.bus.sendRecv(addr, outb, len(outb), swap=False)
+			print(formatInputBytes(inb))
+			time.sleep(0.4)
+			if hasPulsed:
+				print("sending (%s)" % outStr2)
+				inb, _ = self.bus.sendRecv(addr, outb2, len(outb2), swap=False)
+				print(formatInputBytes(inb))
+				time.sleep(0.4)
 				
-			inb, inbc = self.bus.sendRecv(self.selectedAddress, outb, nbytes, swap=False)
-	
-			inbstr = []			
-			for b in inb:
-				inbstr.append("%02x" % b)
-				
-			self.tcRecv.SetValue("".join(inbstr))
-			
-			if self.cbSendZero.IsChecked():
-				self.zeroCount = nbytes
-				msec = self.scMillis.GetValue()
-				self.sendZeroTimer.StartOnce(msec)
-			
-	def SendZeros(self, _):
-		outb = [0 for _ in range(self.zeroCount)]
-		inb, inbc = self.bus.sendRecv(self.selectedAddress, outb, self.zeroCount, swap=False)
-		inbstr = []			
-		for b in inb:
-			inbstr.append("%02x" % b)
-			
-		dlg = wx.MessageDialog(self, "Response = (%s)" % "".join(inbstr),
-							'Zeros sent', wx.OK | wx.ICON_INFORMATION)
-		dlg.ShowModal()
-		dlg.Destroy()
+		#inb = [b'\xaa', b'\xa0', b'\x0a']
+		self.currentNode.PutIBytes(inb)
+		
+	def OnBClear(self, _):
+		self.currentNode.ClearBits()
 		
 	def OnBExit(self, _):
 		self.doExit()

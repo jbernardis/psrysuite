@@ -76,7 +76,7 @@ class Bus:
 				inbuf.append(b)
 				
 		if len(inbuf) != nbytes:
-			# print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
-			return None, 0
+			print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
+			return [], 0
 
 		return inbuf, nbytes
