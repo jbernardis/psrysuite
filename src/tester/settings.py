@@ -7,7 +7,7 @@ class Settings:
 	def __init__(self):
 		self.datafolder = os.path.join(os.getcwd(), "data")
 		self.inifile = os.path.join(self.datafolder, INIFILE)
-		self.section = "server"	
+		self.section = "rrserver"	
 		
 		self.tty = "COM4"
 

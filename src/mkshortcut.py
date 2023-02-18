@@ -1,7 +1,7 @@
 import os, winshell, sys
 
 modules = {
-	"server": {
+	"rrserver": {
 		"name": "PSRY Server",
 		"dir":  "rrserver",
 		"main": "main.py",
