@@ -331,7 +331,8 @@ class Railroad(wx.Notebook):
 		district.EvaluateNXButton(btn)
 
 	def allIO(self):
-		for d in self.districts.values():
+		for dname, d in self.districts.items():
+			logging.debug("starting io for district %s" % dname)
 			d.OutIn()
 
 	def RailroadEvent(self, event):

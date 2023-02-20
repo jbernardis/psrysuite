@@ -98,7 +98,7 @@ class Cliveden(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText("Cliv", CLIVEDEN, otext, "", 0, 1)
+				self.rr.ShowText("Cliv", CLIVEDEN, otext, "incomplete read", 0, 1)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("CLIVEDEN: Input Bytes: %s" % itext)

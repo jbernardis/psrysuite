@@ -16,4 +16,6 @@ Auto routing
 Train Edit
   change time/trigger via ??
   work train length into interface
+  
+dispatcher in dispatch mode automatically starts rrserver (and rrserver automatically starts dcc server??)
  

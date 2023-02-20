@@ -72,7 +72,7 @@ class Krulish(District):
 
 		if inbc != 3:
 			if self.sendIO:
-				self.rr.ShowText("Krul", KRULISH, otext, "", 0, 1)
+				self.rr.ShowText("Krul", KRULISH, otext, "incomplete read", 0, 1)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Krulish: Input Bytes: %s" % itext)

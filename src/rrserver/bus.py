@@ -1,6 +1,7 @@
 import threading
 import serial
 import time
+import logging
 
 MAXTRIES = 3
 
@@ -29,6 +30,7 @@ class Bus:
 	def __init__(self, tty):
 		self.initialized = False
 		self.tty = tty
+		logging.info("Attempting to connect to serial port %s" % tty)
 		try:
 			self.port = serial.Serial(port=self.tty,
 					baudrate=19200,
@@ -39,10 +41,11 @@ class Bus:
 
 		except serial.SerialException:
 			self.port = None
-			print("Unable to Connect to serial port %s" % tty)
+			logging.error("Unable to Connect to serial port %s" % tty)
 			return
 
 		self.initialized = True
+		logging.info("successfully connected")
 
 	def close(self):
 		self.port.close()
@@ -53,14 +56,14 @@ class Bus:
 
 		nb = self.port.write(bytes([address]))
 		if nb != 1:
-			print("expected 1 byte written, got %d" % nb)
+			logging.error("expected 1 byte written, got %d" % nb)
 
 		if swap:
 			outbuf = [swapbyte(x) for x in outbuf]
 
 		nb = self.port.write(bytes(outbuf))
 		if nb != nbytes:
-			print("expected %d byte(s) written, got %d" % (nbytes, nb))
+			logging.error("expected %d byte(s) written, got %d" % (nbytes, nb))
 
 		tries = 0
 		inbuf = []
@@ -74,7 +77,7 @@ class Bus:
 				inbuf.append(b)
 				
 		if len(inbuf) != nbytes:
-			# print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
+			logging.error("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
 			return None, 0
 
 		return inbuf, nbytes
@@ -110,7 +113,9 @@ class RailroadMonitor(threading.Thread):
 			current = time.monotonic_ns()
 			elapsed = current - lastPoll
 			if self.isRunning and elapsed > self.pollInterval:
+				logging.debug("Starting all io")
 				self.rr.allIO()
+				logging.debug("all io finished")
 				lastPoll = current
 			else:
 				time.sleep(0.001)

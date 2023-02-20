@@ -124,7 +124,7 @@ class Yard(District):
 
 		if inbc != 2:
 			if self.sendIO:
-				self.rr.ShowText("Crnl", CORNELL, otext, "", 0, 5)
+				self.rr.ShowText("Crnl", CORNELL, otext, "incomplete read", 0, 5)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Cornell: Input Bytes: %s" % itext)
@@ -188,7 +188,7 @@ class Yard(District):
 
 		if inbc != 2:
 			if self.sendIO:
-				self.rr.ShowText("EJct", EASTJCT, otext, "", 1, 5)
+				self.rr.ShowText("EJct", EASTJCT, otext, "incomplete read", 1, 5)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("East Jct: Input Bytes: %s" % itext)
@@ -257,7 +257,7 @@ class Yard(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText("Kale", KALE, otext, "", 2, 5)
+				self.rr.ShowText("Kale", KALE, otext, "incomplete read", 2, 5)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Kale: Input Bytes: %s" % itext)
@@ -391,7 +391,7 @@ class Yard(District):
 
 		if inbc != 6:
 			if self.sendIO:
-				self.rr.ShowText("Yard", YARD, otext, "", 3, 5)
+				self.rr.ShowText("Yard", YARD, otext, "incomplete read", 3, 5)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Yard: Input Bytes: %s" % itext)
@@ -537,6 +537,6 @@ class Yard(District):
 			inb, inbc = self.rrBus.sendRecv(YARDSW, outb, 5, swap=False)
 
 		if self.sendIO:
-				self.rr.ShowText("YdSw", YARDSW, otext, "", 4, 5)
+				self.rr.ShowText("YdSw", YARDSW, otext, "- no inputs from this node -", 4, 5)
 
 		# No inputs from this node

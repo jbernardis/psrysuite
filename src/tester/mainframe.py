@@ -69,7 +69,7 @@ def formatInputBytes(inb):
 	if inb is None or len(inb) == 0:
 		return "No response"
 	
-	return " ".join(["%02x" % b for b in inb])
+	return " ".join(["%02x" % int.from_bytes(b, "little") for b in inb])
 
 
 class MainFrame(wx.Frame):
@@ -161,19 +161,23 @@ class MainFrame(wx.Frame):
 			outStr2 = " ".join(["%02x" % b for b in outb2])
 			
 		reps = self.scReps.GetValue()
+		
 
 		for _ in range(reps):
-			print("sending (%s)" % outStr)
+			t = round(time.time()*1000)
+			print("%d: sending (%s)" % (t, outStr))
 			inb, _ = self.bus.sendRecv(addr, outb, len(outb), swap=False)
-			print(formatInputBytes(inb))
-			time.sleep(0.4)
+			t = round(time.time()*1000)
+			print("%d: %s" % (t, formatInputBytes(inb)))
+			time.sleep(0.8)
 			if hasPulsed:
-				print("sending (%s)" % outStr2)
+				t = round(time.time()*1000)
+				print("%d: sending (%s)" % (t, outStr2))
 				inb, _ = self.bus.sendRecv(addr, outb2, len(outb2), swap=False)
-				print(formatInputBytes(inb))
+				t = round(time.time()*1000)
+				print("%d: %s" % (t, formatInputBytes(inb)))
 				time.sleep(0.4)
 				
-		#inb = [b'\xaa', b'\xa0', b'\x0a']
 		self.currentNode.PutIBytes(inb)
 		
 	def OnBClear(self, _):

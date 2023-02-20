@@ -148,7 +148,7 @@ class Hyde(District):
 
 		if inbc != 5:
 			if self.sendIO:
-				self.rr.ShowText("Hyde", HYDE, otext, "", 0, 1)
+				self.rr.ShowText("Hyde", HYDE, otext, "incomplete read", 0, 1)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Hyde: Input Bytes: %s" % itext)

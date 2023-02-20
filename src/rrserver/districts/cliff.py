@@ -169,7 +169,7 @@ class Cliff(District):
 
 		if inbc != 3:
 			if self.sendIO:
-				self.rr.ShowText("GMtn", GREENMTN, otext, "", 0, 3)
+				self.rr.ShowText("GMtn", GREENMTN, otext, "incomplete read", 0, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Green Mountain: Input Bytes: %s" % itext)
@@ -298,7 +298,7 @@ class Cliff(District):
 
 		if inbc != 8:
 			if self.sendIO:
-				self.rr.ShowText("Clff", CLIFF, otext, "", 1, 3)
+				self.rr.ShowText("Clff", CLIFF, otext, "incomplete read", 1, 3)
 		else:
 			itext = formatIText(inb, 7)
 			logging.debug("Cliff: Input Bytes: %s" % itext)
@@ -463,7 +463,7 @@ class Cliff(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText("Shfd", SHEFFIELD, otext, "", 2, 3)
+				self.rr.ShowText("Shfd", SHEFFIELD, otext, "incomplete read", 2, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Sheffield: Input Bytes: %s" % itext)

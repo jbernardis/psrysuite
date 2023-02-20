@@ -191,7 +191,7 @@ class Port(District):
 
 		if inbc != 9:
 			if self.sendIO:
-				self.rr.ShowText("PrtA", PORTA, otext, "", 0, 3)
+				self.rr.ShowText("PrtA", PORTA, otext, "incomplete read", 0, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Port A: Input Bytes: %s" % itext)
@@ -361,7 +361,7 @@ class Port(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText("PJct", PARSONS, otext, "", 1, 3)
+				self.rr.ShowText("PJct", PARSONS, otext, "incomplete read", 1, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Parsons: Input Bytes: %s" % itext)
@@ -515,7 +515,7 @@ class Port(District):
 
 		if inbc != 7:
 			if self.sendIO:
-				self.rr.ShowText("PrtB", PORTB, otext, "", 2, 3)
+				self.rr.ShowText("PrtB", PORTB, otext, "incomplete read", 2, 3)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Port B: Input Bytes: %s" % itext)

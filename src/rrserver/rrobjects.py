@@ -501,10 +501,10 @@ class NXButtonOutput(PulsedOutput):
 	def GetOutPulse(self):
 		if self.pulses > 0:
 			self.pulses -= 1
-			rv = 1
+			rv = 1 if self.pulses % 2 != 0 else 0
 		else:
-			rv = 0
+			return 0
 
-		if rv != 0:
-			self.rr.RailroadEvent({"refreshoutput": [self.name]})
+		self.rr.RailroadEvent({"refreshoutput": [self.name]})
+		
 		return rv

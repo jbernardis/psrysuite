@@ -111,7 +111,7 @@ class Latham(District):
 
 		if inbc != 5:
 			if self.sendIO:
-				self.rr.ShowText("Lath", LATHAM, otext, "", 0, 2)
+				self.rr.ShowText("Lath", LATHAM, otext, "incomplete read", 0, 2)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Latham: Input Bytes: %s" % itext)
@@ -226,7 +226,7 @@ class Latham(District):
 
 		if inbc != 5:
 			if self.sendIO:
-				self.rr.ShowText("Carl", CARLTON, otext, "", 1, 2)
+				self.rr.ShowText("Carl", CARLTON, otext, "incom plete read", 1, 2)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Carlton: Input Bytes: %s" % itext)

@@ -143,7 +143,7 @@ class Dell(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText("Dell", DELL, otext, "", 0, 2)
+				self.rr.ShowText("Dell", DELL, otext, "incomplete read", 0, 2)
 		else:
 			itext = formatIText(inb, 3)
 			logging.debug("Dell: Input Bytes: %s" % itext)
@@ -222,7 +222,7 @@ class Dell(District):
 
 		if inbc != 3:
 			if self.sendIO:
-				self.rr.ShowText("Foss", FOSS, otext, "", 1, 2)
+				self.rr.ShowText("Foss", FOSS, otext, "incomplete read", 1, 2)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("FOSS: Input Bytes: %s" % itext)

@@ -2,13 +2,21 @@ import os, sys
 cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
+
+DEVELOPMODE = True
 	
 import pprint
 
 import logging
 logging.basicConfig(filename=os.path.join("logs", "server.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
-#import wx
+ofp = open("rrserver.out", "w")
+efp = open("rrserver.err", "w")
+
+if not DEVELOPMODE:
+	sys.stdout = ofp
+	sys.stderr = efp
+
 import wx.lib.newevent
 
 import json
@@ -26,8 +34,6 @@ from rrserver.routedef import RouteDef
 from rrserver.clientlist import ClientList
 from rrserver.trainlist import TrainList
 from rrserver.iodisplay import IODisplay
-
-logging.basicConfig(filename='rrserver.log', filemode='w', format='%(asctime)s %(message)s', level=logging.INFO)
 
 (HTTPMessageEvent, EVT_HTTPMESSAGE) = wx.lib.newevent.NewEvent()  
 (RailroadEvent, EVT_RAILROAD) = wx.lib.newevent.NewEvent()  
@@ -475,6 +481,7 @@ class MainFrame(wx.Frame):
 				if not self.clientList.HasFunction("AR"):
 					arExec = os.path.join(os.getcwd(), "autorouter", "main.py")
 					pid = Popen([sys.executable, arExec]).pid
+					logging.debug("autorouter started as PID %d" % pid)
 			else:
 				addrList = self.clientList.GetFunctionAddress("AR")
 				for addr, _ in addrList:

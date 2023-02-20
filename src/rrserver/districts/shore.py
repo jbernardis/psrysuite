@@ -166,7 +166,7 @@ class Shore(District):
 
 		if inbc != 7:
 			if self.sendIO:
-				self.rr.ShowText("Shor", SHORE, otext, "", 0, 2)
+				self.rr.ShowText("Shor", SHORE, otext, "incomplete read", 0, 2)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Shore: Input Bytes: %s" % itext)
@@ -275,7 +275,7 @@ class Shore(District):
 
 		if inbc != 3:
 			if self.sendIO:
-				self.rr.ShowText("HJct", HYDEJCT, otext, "", 1, 2)
+				self.rr.ShowText("HJct", HYDEJCT, otext, "incomplete read", 1, 2)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Hyde Jct: Input Bytes: %s" % itext)

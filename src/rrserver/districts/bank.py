@@ -100,7 +100,7 @@ class Bank(District):
 
 		if inbc != 4:
 			if self.sendIO:
-				self.rr.ShowText("Bank", BANK, otext, "", 0, 1)
+				self.rr.ShowText("Bank", BANK, otext, "incomplete read", 0, 1)
 		else:
 			itext = formatIText(inb, inbc)
 			logging.debug("Bank: Input Bytes: %s" % itext)
