@@ -24,7 +24,7 @@ class Yard(District):
 				"YSw17", "YSw19", "YSw21", "YSw23", "YSw25", "YSw27", "YSw29", "YSw33"]
 		relayNames = [ "Y11.srel", "Y20.srel", "Y21.srel", "L10.srel" ]
 		indNames = [ "Y20H", "Y20D" ]
-		nxButtons = ["YWEB1", "YWEB2", "YWEB3", "YWEB4", "YWWB1", "YWWB2", "YWWB3", "YWWB4", "YY50W", "YY51W"]
+		nxButtons = ["YWEB1", "YWEB2", "YWEB3", "YWEB4", "YWWB1", "YWWB2", "YWWB3", "YWWB4"]
 
 		ix = 0
 		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
@@ -407,37 +407,37 @@ class Yard(District):
 				lvrR = getBit(inb[0], 2)       # signal levers
 				lvrCallOn = getBit(inb[0], 3)
 				lvrL = getBit(inb[0], 4)
-				self.rr.GetInput("L2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				self.rr.GetInput("Y2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				lvrR = getBit(inb[0], 5)
 				lvrCallOn = getBit(inb[0], 6)
 				lvrL = getBit(inb[0], 7)
-				self.rr.GetInput("L4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				self.rr.GetInput("Y4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 
 				lvrR = getBit(inb[1], 0)
 				lvrCallOn = getBit(inb[1], 1)
 				lvrL = getBit(inb[1], 2)
-				self.rr.GetInput("L8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				self.rr.GetInput("Y8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				lvrR = getBit(inb[1], 3)
 				lvrCallOn = getBit(inb[1], 4)
 				lvrL = getBit(inb[1], 5)
-				self.rr.GetInput("L10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				self.rr.GetInput("Y10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				lvrR = getBit(inb[1], 6)
 				lvrCallOn = getBit(inb[1], 7)
 
 				lvrL = getBit(inb[2], 0)
-				self.rr.GetInput("L22.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				self.rr.GetInput("Y22.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				lvrCallOn = getBit(inb[2], 1)
 				lvrL = getBit(inb[2], 2)
-				self.rr.GetInput("L24.lvr").SetState(leverState(lvrL, lvrCallOn, 0))
+				self.rr.GetInput("Y24.lvr").SetState(leverState(lvrL, lvrCallOn, 0))
 				lvrR = getBit(inb[2], 3)
 				lvrCallOn = getBit(inb[2], 4)
 				lvrL = getBit(inb[2], 5)
-				self.rr.GetInput("L26.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				self.rr.GetInput("Y26.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				lvrR = getBit(inb[2], 6)
 				lvrCallOn = getBit(inb[2], 7)
 
 				lvrL = getBit(inb[3], 0)
-				self.rr.GetInput("L34.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				self.rr.GetInput("Y34.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				self.rr.GetInput("yrelease").SetState(getBit(inb[3], 1))  # Y Release switch
 				self.rr.GetInput("wos1norm").SetState(getBit(inb[3], 2))  # WOS1 Norm
 
@@ -502,10 +502,9 @@ class Yard(District):
 		outb[2] = setBit(outb[2], 6, 1 if op > 0 else 0)
 		outb[2] = setBit(outb[2], 7, 1 if op < 0 else 0)
 
-		op = self.rr.GetOutput("YY51W").GetOutPulse()
+		op = self.rr.GetOutput("YSw33").GetOutPulse()
 		outb[3] = setBit(outb[3], 0, 1 if op > 0 else 0)
-		op = self.rr.GetOutput("YY50W").GetOutPulse()
-		outb[3] = setBit(outb[3], 1, 1 if op > 0 else 0)
+		outb[3] = setBit(outb[3], 1, 1 if op < 0 else 0)
 		# 	YSWOut[3].bit.b2 = ;
 		# 	YSWOut[3].bit.b3 = ;
 		# 	YSWOut[3].bit.b4 = ;

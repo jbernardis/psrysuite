@@ -1,5 +1,6 @@
 import select
 from threading import Thread
+import time
 from socketserver import ThreadingMixIn 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
@@ -37,9 +38,11 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 	def serve_railroad(self):
 		self.haltServer = False
 		while self.haltServer == False:
-			r = select.select([self.socket], [], [], 1)[0]
-			if r:
+			r = select.select([self.socket], [], [], 0)[0]
+			if r and len(r) > 0:
 				self.handle_request()
+			else:
+				time.sleep(0.0001) # yield to other threads
 
 	def setApp(self, app):
 		self.app = app

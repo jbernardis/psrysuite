@@ -147,7 +147,7 @@ class Latham(District):
 			self.rr.GetInput("L21.W").SetValue(getBit(inb[2], 3)) 
 			self.rr.GetInput("L21").SetValue(getBit(inb[2], 4)) 
 			self.rr.GetInput("L21.E").SetValue(getBit(inb[2], 5)) 
-			self.rr.GetInput("CBClivedon").SetValue(getBit(inb[2], 6)) # Breakers
+			self.rr.GetInput("CBCliveden").SetValue(getBit(inb[2], 6)) # Breakers
 			self.rr.GetInput("CBLatham").SetValue(getBit(inb[2], 7))
 
 			self.rr.GetInput("CBCornellJct").SetValue(getBit(inb[3], 0))

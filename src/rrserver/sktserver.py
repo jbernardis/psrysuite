@@ -2,6 +2,7 @@ import threading
 import socket
 import select
 import json
+import time
 
 
 class SktServer (threading.Thread):
@@ -70,14 +71,16 @@ class SktServer (threading.Thread):
 			slist = [s]
 
 		while self.isRunning:
-			readable, _, _ = select.select(slist, [], [], 1)
-			if s in readable:
+			readable, _, _ = select.select(slist, [], [], 0)
+			if readable and s in readable:
 				skt, addr = s.accept()
 				with self.socketLock:
 					self.sockets.append((skt, addr))
 					self.cbEvent({"newclient": {"socket": skt, "addr": addr, "SID": self.sessionID}})
 				self.sessionID += 1
-
+			else:
+				time.sleep(0.0001) # yield to other threads
+ 
 		for skt in self.sockets:
 			skt[0].close()
 
