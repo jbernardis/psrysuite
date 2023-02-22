@@ -21,6 +21,7 @@ class Railroad(wx.Notebook):
 		self.frame = frame
 		self.cbEvent = cbEvent
 		self.settings = settings
+		self.pendingEvents = []
 
 		self.districtList = [
 			[ "Yard", Yard ],
@@ -334,9 +335,17 @@ class Railroad(wx.Notebook):
 		for dname, d in self.districts.items():
 			logging.debug("starting io for district %s" % dname)
 			d.OutIn()
+		logging.debug("releasing events from IO loop")
+		self.ReleasePendingEvents()
 
 	def RailroadEvent(self, event):
-		self.cbEvent(event)
+		self.pendingEvents.append(event)
+
+	def ReleasePendingEvents(self):
+		for event in self.pendingEvents:
+			self.cbEvent(event)
+		
+		self.pendingEvents = []
 
 	def GetSubBlockInfo(self):
 		subblocks = {}

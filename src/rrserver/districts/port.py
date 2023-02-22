@@ -21,7 +21,8 @@ class Port(District):
 					"PASw27", "PASw29", "PASw31", "PASw33", "PASw35", "PASw37"]
 		hsNames = [ "PBSw5", "PBSw15a", "PBSw15b" ]
 		handswitchNames = [ "PBSw5.hand", "PBSw15a.hand", "PBSw15b.hand" ]
-		relayNames = [ "P10.srel", "P11.srel", "P20.srel", "P21.srel",
+		#relayNames = [ "P10.srel", "P11.srel", "P20.srel", "P21.srel",
+		relayNames = [ "P10.srel", "P11.srel", "P20.srel",
 					"P30.srel", "P31.srel", "P32.srel", "P40.srel", "P41.srel", "P42.srel" ]
 
 		ix = 0
@@ -35,8 +36,9 @@ class Port(District):
 		for n in toNames:
 			self.SetTurnoutPulseLen(n, settings.topulselen)
 
+		#				"P10", "P10.E", "P11.W", "P11", "P11.E", "P20", "P20.E", "P21", "P21.E",
 		blockNames = [ "P1", "P2", "P3", "P4", "P5", "P6", "P7",
-						"P10", "P10.E", "P11.W", "P11", "P11.E", "P20", "P20.E", "P21", "P21.E",
+						"P10", "P10.E", "P11.W", "P11", "P11.E", "P20", "P20.E",
 						"P30.W", "P30", "P30.E", "P31.W", "P31", "P31.E", "P32.W", "P32", "P32.E",
 						"P40", "P40.E", "P41.W", "P41", "P41.E", "P42.W", "P42", "P42.E", "P50.W", "P50", "P50.E",
 						"P60", "P61", "P62", "P63", "P64", "V10", "V11",
