@@ -402,12 +402,14 @@ class SignalOutput(Output):
 
 
 class PulsedOutput(Output):
-	def __init__(self, name, district, pulseLen=1):
+	def __init__(self, name, district, pulseLen=1, pulseCt=1):
 		Output.__init__(self, name, district)
-		self.pulseLen = pulseLen * 2
+		self.pulseLen = pulseLen
+		self.pulseCt = pulseCt
 
-	def SetPulseLen(self, pulseLen):
-		self.pulseLen = pulseLen * 2
+	def SetPulseLen(self, pulseLen, pulseCt):
+		self.pulseLen = pulseLen
+		self.pulkseCt = pulseCt
 
 
 class TurnoutOutput(PulsedOutput):
@@ -431,31 +433,37 @@ class TurnoutOutput(PulsedOutput):
 	
 	def SetOutPulse(self, op):
 		if op > 0:
-			self.normalPulses = self.pulseLen
+			self.normalPulses = self.pulseCt
 			self.reversePulses = 0
+			self.pulseCycle = self.pulseLen
 			self.status = "N"
 		elif op < 0:
 			self.normalPulses = 0
-			self.reversePulses = self.pulseLen
+			self.reversePulses = self.pulseCt
+			self.pulseCycle = self.pulseLen
 			self.status = "R"
 		else:
 			self.normalPulses = 0
 			self.reversePulses = 0
+			self.pulseCycle = 0
 			self.status = None
 		self.rr.RailroadEvent({"refreshoutput": [self.name]})
 
 	def SetOutPulseTo(self, status):
 		if status == "N":
-			self.normalPulses = self.pulseLen
+			self.normalPulses = self.pulseCt
 			self.reversePulses = 0
+			self.pulseCycle = self.pulseLen
 			self.status = status
 		elif status == "R":
 			self.normalPulses = 0
-			self.reversePulses = self.pulseLen
+			self.reversePulses = self.pulseCt
+			self.pulseCycle = self.pulseLen
 			self.status = status
 		else:
 			self.normalPulses = 0
 			self.reversePulses = 0
+			self.pulseCycle = 0
 			self.status = None
 		self.rr.RailroadEvent({"refreshoutput": [self.name]})
 
@@ -469,11 +477,20 @@ class TurnoutOutput(PulsedOutput):
 
 	def GetOutPulse(self):
 		if self.normalPulses > 0:
-			self.normalPulses -= 1
-			rv = 1 if self.normalPulses % 2 != 0 else 0
+			rv = 1 if self.pulseCycle != 0 else 0
+			if self.pulseCycle == 0:
+				self.normalPulses -= 1
+				self.pulseCycle = self.pulseLen
+			else:
+				self.pulseCycle -= 1
+			
 		elif self.reversePulses > 0:
-			self.reversePulses -= 1
-			rv = -1 if self.reversePulses % 2 != 0 else 0
+			rv = -1 if self.pulseCycle != 0 else 0
+			if self.pulseCycle == 0:
+				self.reversePulses -= 1
+				self.pulseCycle = self.pulseLen
+			else:
+				self.pulseCycle -= 1
 
 		else:
 			return 0

@@ -30,8 +30,10 @@ class Settings:
 		self.socketport = 9001
 		self.tty = "COM4"
 		self.busInterval = 0.4
-		self.topulselen = 4
+		self.topulselen = 2
+		self.topulsect = 3
 		self.nxbpulselen = 4
+		self.nxbpulsect = 2
 
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -59,8 +61,14 @@ class Settings:
 				elif opt == "topulselen":
 					self.topulselen = int(value)
 
+				elif opt == "topulsect":
+					self.topulsect = int(value)
+
 				elif opt == "nxbpulselen":
 					self.nxbpulselen = int(value)
+
+				elif opt == "nxbpulsect":
+					self.nxbpulsect = int(value)
 
 		else:
 			logging.warning("Missing %s section - assuming defaults" % self.section)

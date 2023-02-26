@@ -53,27 +53,30 @@ class Bus:
 		if not self.initialized:
 			return None, 0
 
-		nb = self.port.write(bytes([address]))
-		if nb != 1:
-			print("expected 1 byte written, got %d" % nb)
+		sendBuffer = []
+		sendBuffer.append(bytes([address]))
 
 		if swap:
 			outbuf = [swapbyte(x) for x in outbuf]
 
-		nb = self.port.write(bytes(outbuf))
-		if nb != nbytes:
-			print("expected %d byte(s) written, got %d" % (nbytes, nb))
+		sendBuffer.extend([bytes(b) for b in outbuf])
+		
+		nb = self.port.write(sendBuffer)
+		if nb != (nbytes+1):
+			print("expected %d byte(s) written, got %d" % (nbytes+1, nb))
 
 		tries = 0
 		inbuf = []
-		while tries < MAXTRIES and len(inbuf) < nbytes:
-			b = self.port.read(1)
+		remaining = nbytes
+		while tries < MAXTRIES and remaining > 0:
+			b = self.port.read(remaining)
 			if len(b) == 0:
 				tries += 1
 				time.sleep(0.001)
 			else:
 				tries = 0
-				inbuf.append(b)
+				inbuf.extend([bytes([b[i]]) for i in range(len(b))])
+				remaining = nbytes-len(inbuf)
 				
 		if len(inbuf) != nbytes:
 			print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))

@@ -8,7 +8,7 @@ do we really need a separate cliff fleet checkbox?  And what is port fleeting if
 checking train for non-contiguous Blocks
 
 ATC
- need dcc interface
+ need dcc interface - dcc server that will be used for both atc and throttle
 
 Auto routing
   interface needs work
@@ -18,4 +18,21 @@ Train Edit
   work train length into interface
   
 dispatcher in dispatch mode automatically starts rrserver (and rrserver automatically starts dcc server??)
+
+
+tester remaining nodes:
+	Krulish
+	NassauW
+	NassauE
+	NassauNX
+	Bank
+	Cliveden
+	Green Mtn
+	Cliff
+	Sheffield
+	HydeJct
+	Hyde
+	PortA
+	PortB
+	Parsons
  

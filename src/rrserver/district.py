@@ -418,21 +418,21 @@ class District(wx.Panel):
 	def EvaluateNXButton(self, btn):
 		pass
 
-	def SetTurnoutPulseLen(self, to, pl):
+	def SetTurnoutPulseLen(self, to, pl, pct):
 		if to not in self.outputMap:
 			logging.warning("Turnout %s not found - unable to change pulse length" % to)
 			return False
 
 		oc = self.outputMap[to][1]
-		oc.SetPulseLen(pl)
+		oc.SetPulseLen(pl, pct)
 
-	def SetNXButtonPulseLen(self, nxb, pl):
+	def SetNXButtonPulseLen(self, nxb, pl, pct):
 		if nxb not in self.outputMap:
 			logging.warning("NX Button %s not found - unable to change pulse length" % nxb)
 			return False
 
 		oc = self.outputMap[nxb][1]
-		oc.SetPulseLen(pl)
+		oc.SetPulseLen(pl, pct)
 
 	def UpdateSignal(self, signame):
 		try:

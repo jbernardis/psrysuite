@@ -29,7 +29,7 @@ class Hyde(District):
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
 
 		for n in toNames:
-			self.SetTurnoutPulseLen(n, settings.topulselen)
+			self.SetTurnoutPulseLen(n, settings.topulselen, settings.topulsect)
 
 		# INPUTS
 		routeNames = [ "H30E",

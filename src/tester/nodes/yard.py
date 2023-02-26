@@ -42,13 +42,13 @@ class Yard(Node):
 				["Y34R 0", "", 0],
 				["Y34R 1", "", 0],
 				["Y34R 2", "", 0],
-				["CBKale", "Breaker Ind", 0],
-				["CBEastJct", "", 0],
-				["CBCornell", "", 0],
-				["CBEngYard", "", 0]
+				["Kale", "Breaker Ind", 0],
+				["EastJct", "", 0],
+				["Cornell", "", 0],
+				["EngYard", "", 0]
 			],
 			[
-				["CBWaterman", "Breaker Ind", 0],
+				["Waterman", "Breaker Ind", 0],
 				["L20", "Block Ind", 0],
 				["P50", "", 0],
 				["YSw1", "Switch Lock", 0],

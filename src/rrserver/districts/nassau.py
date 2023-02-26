@@ -111,7 +111,7 @@ class Nassau(District):
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
 
 		for n in nxButtons:
-			self.SetNXButtonPulseLen(n, settings.nxbpulselen)
+			self.SetNXButtonPulseLen(n, settings.nxbpulselen, settings.nxbpulsect)
 
 		brkrNames = [ "CBKrulish", "CBKrulishYd", "CBNassauW", "CBNassauE", "CBSptJct", "CBWilson", "CBThomas", "CBFoss", "CBDell" ]
 		blockNames = [ "N21.W", "N21", "N21.E", "NWOSTY", "NWOSCY", "NWOSW", "NWOSE",

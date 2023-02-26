@@ -4,13 +4,16 @@ import time
 from tester.settings import Settings
 from tester.bus import Bus
 
+from tester.nodes.yard import Yard
+from tester.nodes.kale import Kale
+from tester.nodes.eastjct import EastJct
+from tester.nodes.cornell import Cornell
+from tester.nodes.yardsw import YardSw
+from tester.nodes.latham import Latham
+from tester.nodes.carlton import Carlton
 from tester.nodes.dell import Dell
 from tester.nodes.foss import Foss
-from tester.nodes.cornell import Cornell
-from tester.nodes.eastjct import EastJct
-from tester.nodes.kale import Kale
-from tester.nodes.yard import Yard
-from tester.nodes.yardsw import YardSw
+from tester.nodes.shore import Shore
 
 # district node addresses
 YARD      = 0x11
@@ -47,13 +50,13 @@ nodes = {
 	"Parsons Jct" : ( PARSONS, None ),
 	"Port A" : ( PORTA, None ),
 	"Port B" : ( PORTB, None ),
-	"Latham" : ( LATHAM, None ),
-	"Carlton" : ( CARLTON, None ),
+	"Latham" : ( LATHAM, Latham ),
+	"Carlton" : ( CARLTON, Carlton ),
 	"Dell" : ( DELL, Dell ),
 	"Foss" : ( FOSS, Foss ),
 	"Hyde Jct" : ( HYDEJCT, None ),
 	"Hyde" : ( HYDE, None ),
-	"Shore" : ( SHORE, None ),
+	"Shore" : ( SHORE, Shore ),
 	"Krulish" : ( KRULISH, None ),
 	"Nassau W" : ( NASSAUW, None ),
 	"Nassau E" : ( NASSAUE, None ),

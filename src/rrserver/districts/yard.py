@@ -36,10 +36,10 @@ class Yard(District):
 		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
 
 		for n in nxButtons:
-			self.SetNXButtonPulseLen(n, settings.nxbpulselen)
+			self.SetNXButtonPulseLen(n, settings.nxbpulselen, settings.nxbpulsect)
 
 		for n in toNames:
-			self.SetTurnoutPulseLen(n, settings.topulselen)
+			self.SetTurnoutPulseLen(n, settings.topulselen, settings.topulsect)
 
 		# INPUTS (also using toNames from above)
 		blockNames = [

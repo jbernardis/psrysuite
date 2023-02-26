@@ -48,7 +48,7 @@ class Dell(Node):
 				["DSw11 R", "", Node.pulsed],
 				["D20.Rel", "Stop Relay", 0],
 				["H23.Rel", "", 0],
-				["D11.rel", "", 0]
+				["D11.Rel", "", 0]
 			]
 		]
 		

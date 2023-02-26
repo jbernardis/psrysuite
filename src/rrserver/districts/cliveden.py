@@ -28,7 +28,7 @@ class Cliveden(District):
 		# ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
 
 		for n in toNames:
-			self.SetTurnoutPulseLen(n, settings.topulselen)
+			self.SetTurnoutPulseLen(n, settings.topulselen, settings.topulsect)
 
 		brkrNames = sorted(["CBGreenMtnStn", "CBSheffieldA", "CBGreenMtnYd", "CBHydeJct",
 					"CBHydeWest", "CBHydeEast", "CBSouthportJct", "CBCarlton", "CBSheffieldB" ])

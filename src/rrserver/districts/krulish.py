@@ -22,7 +22,7 @@ class Krulish(District):
 		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
 
 		for n in toNames:
-			self.SetTurnoutPulseLen(n, settings.topulselen)
+			self.SetTurnoutPulseLen(n, settings.topulselen, settings.topulsect)
 
 		blockNames = ["N10.W", "N10", "N10.E", "N20.W", "N20", "N20.E", "KOSW", "KOSM", "KOSE", "N11.W", "N11", "N11.E"]
 

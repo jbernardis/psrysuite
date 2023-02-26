@@ -81,7 +81,7 @@ class Bus:
 				
 		if len(inbuf) != nbytes:
 			logging.error("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
-			return None, 0
+			return [], 0
 
 		return inbuf, nbytes
 
