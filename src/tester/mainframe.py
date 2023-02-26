@@ -114,6 +114,14 @@ class MainFrame(wx.Frame):
 		self.scReps.SetRange(1,10)
 		self.scReps.SetValue(1)
 		
+		self.scPulseLen = wx.SpinCtrl(self, wx.ID_ANY, "1")
+		self.scPulseLen.SetRange(1,5)
+		self.scPulseLen.SetValue(1)
+		
+		self.scPulseCt = wx.SpinCtrl(self, wx.ID_ANY, "1")
+		self.scPulseCt.SetRange(1,10)
+		self.scPulseCt.SetValue(1)
+		
 		self.bClear = wx.Button(self, wx.ID_ANY, "Clear")
 		self.Bind(wx.EVT_BUTTON, self.OnBClear, self.bClear)
 		
@@ -128,6 +136,19 @@ class MainFrame(wx.Frame):
 		btnszr.Add(self.bClear)
 		btnszr.AddSpacer(20)
 		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vszr.AddSpacer(20)
+		
+		scszr = wx.BoxSizer(wx.HORIZONTAL)
+		scszr.AddSpacer(20)
+		scszr.Add(wx.StaticText(self, wx.ID_ANY, "Pulse Len:"))
+		scszr.Add(self.scPulseLen)
+		scszr.AddSpacer(5)
+		scszr.Add(wx.StaticText(self, wx.ID_ANY, "Count:"))
+		scszr.Add(self.scPulseCt)
+		scszr.AddSpacer(20)
+		
+		vszr.Add(scszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
 		vszr.AddSpacer(20)
 		
@@ -158,27 +179,43 @@ class MainFrame(wx.Frame):
 	def OnBSend(self, _):
 		addr = self.currentNode.GetAddress()
 		outb, hasPulsed = self.currentNode.GetOBytes()
-		outStr = " ".join(["%02x" % b for b in outb])
+		outStr = ("%02x: " % addr) + " ".join(["%02x" % b for b in outb])
 		if hasPulsed:
 			outb2 = self.currentNode.GetOBytes(pulseZero=True)[0]
-			outStr2 = " ".join(["%02x" % b for b in outb2])
+			outStr2 = ("%02x: " % addr) + " ".join(["%02x" % b for b in outb2])
 			
 		reps = self.scReps.GetValue()
+		pulselen = self.scPulseLen.GetValue()
+		pulsect = self.scPulseCt.GetValue()
 		
 
-		for _ in range(reps):
-			t = round(time.time()*1000)
-			print("%d: sending (%s)" % (t, outStr))
-			inb, _ = self.bus.sendRecv(addr, outb, len(outb), swap=False)
-			t = round(time.time()*1000)
-			print("%d: %s" % (t, formatInputBytes(inb)))
-			time.sleep(0.8)
+		for rep in range(reps):
+			print("Repetition %d" % (rep+1))
 			if hasPulsed:
+				for pulse in range(pulsect):
+					print("  pulse %d" % (pulse+1))
+					for _ in range(pulselen):
+						t = round(time.time()*1000)
+						print("    %d: sending (%s)" % (t, outStr))
+						inb, _ = self.bus.sendRecv(addr, outb, len(outb), swap=False)
+						t = round(time.time()*1000)
+						print("    %d: %s" % (t, formatInputBytes(inb)))
+						time.sleep(0.4)
+						
+					t = round(time.time()*1000)
+					print("  End pulse")
+					print("    %d: sending (%s)" % (t, outStr2))
+					inb, _ = self.bus.sendRecv(addr, outb2, len(outb2), swap=False)
+					t = round(time.time()*1000)
+					print("    %d: %s" % (t, formatInputBytes(inb)))
+					time.sleep(0.4)
+						
+			else:
 				t = round(time.time()*1000)
-				print("%d: sending (%s)" % (t, outStr2))
-				inb, _ = self.bus.sendRecv(addr, outb2, len(outb2), swap=False)
+				print("  %d: sending (%s)" % (t, outStr))
+				inb, _ = self.bus.sendRecv(addr, outb, len(outb), swap=False)
 				t = round(time.time()*1000)
-				print("%d: %s" % (t, formatInputBytes(inb)))
+				print("  %d: %s" % (t, formatInputBytes(inb)))
 				time.sleep(0.4)
 				
 		self.currentNode.PutIBytes(inb)

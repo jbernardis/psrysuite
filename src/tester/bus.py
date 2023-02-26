@@ -54,16 +54,16 @@ class Bus:
 			return None, 0
 
 		sendBuffer = []
-		sendBuffer.append(bytes([address]))
+		sendBuffer.append(address)
 
 		if swap:
 			outbuf = [swapbyte(x) for x in outbuf]
 
-		sendBuffer.extend([bytes(b) for b in outbuf])
+		sendBuffer.extend(outbuf)
 		
 		nb = self.port.write(sendBuffer)
 		if nb != (nbytes+1):
-			print("expected %d byte(s) written, got %d" % (nbytes+1, nb))
+			pass #print("expected %d byte(s) written, got %d" % (nbytes+1, nb))
 
 		tries = 0
 		inbuf = []
@@ -79,7 +79,7 @@ class Bus:
 				remaining = nbytes-len(inbuf)
 				
 		if len(inbuf) != nbytes:
-			print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
+			# print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
 			return [], 0
 
 		return inbuf, nbytes

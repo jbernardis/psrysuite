@@ -55,12 +55,12 @@ class Bus:
 			return None, 0
 
 		sendBuffer = []
-		sendBuffer.append(bytes([address]))
+		sendBuffer.append(address)
 
 		if swap:
 			outbuf = [swapbyte(x) for x in outbuf]
 
-		sendBuffer.extend([bytes(b) for b in outbuf])
+		sendBuffer.extend(outbuf)
 		
 		nb = self.port.write(sendBuffer)
 		if nb != (nbytes+1):
