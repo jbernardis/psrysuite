@@ -585,32 +585,33 @@ class Hyde (District):
 		self.turnouts = {}
 
 		toList = [
-			[ "HSw7b", "toleftleft",    "HOSWW2", (30, 5) ],
+			[ "HSw7b", "toleftleft",    ["HOSWW", "HOSWW2"], (30, 5) ],
 
-			[ "HSw1",  "toleftright",   "HOSWW", (22, 13) ],
-			[ "HSw3",  "toleftright",   "HOSWW", (25, 13) ],
-			[ "HSw5",  "torightupinv",  "HOSWW", (26, 9) ],
-			[ "HSw7",  "torightupinv",  "HOSWW", (28, 7) ],
+			[ "HSw1",  "toleftright",   ["HOSWW"], (22, 13) ],
+			[ "HSw3",  "toleftright",   ["HOSWW"], (25, 13) ],
+			[ "HSw5",  "torightupinv",  ["HOSWW"], (26, 9) ],
+			[ "HSw7",  "torightupinv",  ["HOSWW"], (28, 7) ],
 
-			[ "HSw9",  "torightright",  "HOSWE", (22, 15) ],
-			[ "HSw11", "torightright",  "HOSWE", (25, 15) ],
-			[ "HSw13", "toleftdowninv", "HOSWE", (26, 19) ],
+			[ "HSw9",  "torightright",  ["HOSWE"], (22, 15) ],
+			[ "HSw11", "torightright",  ["HOSWE"], (25, 15) ],
+			[ "HSw13", "toleftdowninv", ["HOSWE"], (26, 19) ],
 
-			[ "HSw15", "torightleft",   "HOSEW", (45, 13) ],
-			[ "HSw17", "torightleft",   "HOSEW", (48, 13) ],
-			[ "HSw19", "torightleft",   "HOSEW", (51, 13) ],
-			[ "HSw21", "torightleft",   "HOSEW", (54, 13) ],
+			[ "HSw15", "torightleft",   ["HOSEW"], (45, 13) ],
+			[ "HSw17", "torightleft",   ["HOSEW"], (48, 13) ],
+			[ "HSw19", "torightleft",   ["HOSEW"], (51, 13) ],
+			[ "HSw21", "torightleft",   ["HOSEW"], (54, 13) ],
 
-			[ "HSw23", "torightdown",   "HOSEE", (46, 19) ],
-			[ "HSw25", "torightdown",   "HOSEE", (48, 17) ],
-			[ "HSw27", "toleftleft",    "HOSEE", (50, 15) ],
-			[ "HSw29", "toleftleft",    "HOSEE", (53, 15) ],
+			[ "HSw23", "torightdown",   ["HOSEE"], (46, 19) ],
+			[ "HSw25", "torightdown",   ["HOSEE"], (48, 17) ],
+			[ "HSw27", "toleftleft",    ["HOSEE"], (50, 15) ],
+			[ "HSw29", "toleftleft",    ["HOSEE"], (53, 15) ],
 		]
 
-		for tonm, tileSet, blknm, pos in toList:
+		for tonm, tileSet, blklist, pos in toList:
 			trnout = Turnout(self, self.frame, tonm, self.screen, self.totiles[tileSet], pos)
-			blocks[blknm].AddTurnout(trnout)
-			trnout.AddBlock(blknm)
+			for blknm in blklist:
+				blocks[blknm].AddTurnout(trnout)
+				trnout.AddBlock(blknm)
 			self.turnouts[tonm] = trnout
 		
 		for tonm in [ to[0] for to in toList ]:

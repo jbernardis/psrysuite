@@ -101,6 +101,7 @@ class MainFrame(wx.Frame):
 				wx.StaticText(win, wx.ID_ANY, "%s not yet implemented" % node, (10,10))
 			else:
 				win = nodes[node][1](self.cbNodes, nodes[node][0])
+				#win.SetSize((1000, 500))
 			
 			text = "%s - 0x%x" % (node, nodes[node][0])
 			self.cbNodes.AddPage(win, text)
@@ -134,21 +135,15 @@ class MainFrame(wx.Frame):
 		btnszr.Add(self.scReps)
 		btnszr.AddSpacer(10)
 		btnszr.Add(self.bClear)
+		btnszr.AddSpacer(20)		
+		btnszr.Add(wx.StaticText(self, wx.ID_ANY, "Pulse Len:"))
+		btnszr.Add(self.scPulseLen)
+		btnszr.AddSpacer(5)
+		btnszr.Add(wx.StaticText(self, wx.ID_ANY, "Count:"))
+		btnszr.Add(self.scPulseCt)
 		btnszr.AddSpacer(20)
+		
 		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
-		
-		vszr.AddSpacer(20)
-		
-		scszr = wx.BoxSizer(wx.HORIZONTAL)
-		scszr.AddSpacer(20)
-		scszr.Add(wx.StaticText(self, wx.ID_ANY, "Pulse Len:"))
-		scszr.Add(self.scPulseLen)
-		scszr.AddSpacer(5)
-		scszr.Add(wx.StaticText(self, wx.ID_ANY, "Count:"))
-		scszr.Add(self.scPulseCt)
-		scszr.AddSpacer(20)
-		
-		vszr.Add(scszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
 		vszr.AddSpacer(20)
 		
@@ -197,7 +192,7 @@ class MainFrame(wx.Frame):
 					for _ in range(pulselen):
 						t = round(time.time()*1000)
 						print("    %d: sending (%s)" % (t, outStr))
-						inb, _ = self.bus.sendRecv(addr, outb, len(outb), swap=False)
+						inb, _ = self.bus.sendRecv(addr, outb, len(outb))
 						t = round(time.time()*1000)
 						print("    %d: %s" % (t, formatInputBytes(inb)))
 						time.sleep(0.4)
@@ -205,7 +200,7 @@ class MainFrame(wx.Frame):
 					t = round(time.time()*1000)
 					print("  End pulse")
 					print("    %d: sending (%s)" % (t, outStr2))
-					inb, _ = self.bus.sendRecv(addr, outb2, len(outb2), swap=False)
+					inb, _ = self.bus.sendRecv(addr, outb2, len(outb2))
 					t = round(time.time()*1000)
 					print("    %d: %s" % (t, formatInputBytes(inb)))
 					time.sleep(0.4)
@@ -213,7 +208,7 @@ class MainFrame(wx.Frame):
 			else:
 				t = round(time.time()*1000)
 				print("  %d: sending (%s)" % (t, outStr))
-				inb, _ = self.bus.sendRecv(addr, outb, len(outb), swap=False)
+				inb, _ = self.bus.sendRecv(addr, outb, len(outb))
 				t = round(time.time()*1000)
 				print("  %d: %s" % (t, formatInputBytes(inb)))
 				time.sleep(0.4)

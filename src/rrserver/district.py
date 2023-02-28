@@ -85,6 +85,7 @@ GREENMTN  = 0x92
 CLIFF     = 0x93
 SHEFFIELD = 0x95
 
+THRESHOLD = 3
 
 def leverState(lvrL, _, lvrR):  # parameter 2 is callon lever - not yet used
 	if lvrL == 1 and lvrR == 0:
@@ -140,6 +141,8 @@ class District(wx.Panel):
 		self.inputMap = {}
 		self.sigLever = {}  # outbound representation of signal levers
 		self.sendIO = False
+		
+		self.nullResponseCount = {}
 
 		self.olist = wx.ListCtrl(self, wx.ID_ANY, pos=(0, 0), size=(260, 300), style=wx.LC_REPORT)
 		self.olist.InsertColumn(0, "Output")
@@ -162,6 +165,25 @@ class District(wx.Panel):
 		if self.settings.simulation or self.settings.diagnostic:
 			self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.outputDClick, self.olist)
 
+	def AcceptResponse(self, inb, inbc, addr):
+		if inb != [b'\x00'] * inbc:
+			self.nullResponseCount[addr] = 0	
+			return True     # accept a non-zero response
+
+		# ignore NULL responses until we see at least THRESHOLD of them		
+		try:
+			self.nullResponseCount[addr] += 1
+		except KeyError:
+			self.nullResponseCount[addr] = 1
+			
+		if self.nullResponseCount[addr] < THRESHOLD and not self.settings.simulation:
+			print("ignoring null response from node address %x, count=%d" % (addr, self.nullResponseCount[addr]))
+			logging.warning("ignoring null response from node address %x, count=%d" % (addr, self.nullResponseCount[addr]))
+			return False
+	
+		self.nullResponseCount[addr] = 0	
+		return True
+	
 	def SendIO(self, flag):
 		self.sendIO = flag
 		if not flag:

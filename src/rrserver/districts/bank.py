@@ -43,7 +43,8 @@ class Bank(District):
 		ix = self.AddInputs(brkrNames, BreakerInput, District.breaker, ix)
 
 	def OutIn(self):
-		outb = [0 for _ in range(4)]
+		outbc = 4
+		outb = [0 for _ in range(outbc)]
 		asp = self.rr.GetOutput("C22R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])   # Bank West eastbound signals
 		asp = self.rr.GetOutput("C24R").GetAspectBits()
@@ -91,67 +92,70 @@ class Bank(District):
 
 		otext = formatOText(outb, 4)
 		logging.debug("Bank: Output bytes: %s" % otext)
-			
+	
+		inbc = outbc		
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(BANK, outb, 4, swap=False)
+			inb = self.rrBus.sendRecv(BANK, outb, outbc)
 
-		if inbc != 4:
-			if self.sendIO:
-				self.rr.ShowText("Bank", BANK, otext, "incomplete read", 0, 1)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("Bank: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("Bank", BANK, otext, itext, 0, 1)
+			if self.AcceptResponse(inb, inbc, BANK):
+				itext = formatIText(inb, inbc)
+				logging.debug("Bank: Input Bytes: %s" % itext)
+				
+				nb = getBit(inb[0], 0)  # Switch Positions
+				rb = getBit(inb[0], 1)
+				self.rr.GetInput("CSw23").SetTOState(nb, rb)
+				nb = getBit(inb[0], 2)
+				rb = getBit(inb[0], 3)
+				self.rr.GetInput("CSw21a").SetTOState(nb, rb)
+				nb = getBit(inb[0], 4)
+				rb = getBit(inb[0], 5)
+				self.rr.GetInput("CSw21b").SetTOState(nb, rb)
+				nb = getBit(inb[0], 6)
+				rb = getBit(inb[0], 7)
+				self.rr.GetInput("CSw19").SetTOState(nb, rb)
+	
+				nb = getBit(inb[1], 0)
+				rb = getBit(inb[1], 1)
+				self.rr.GetInput("CSw17").SetTOState(nb, rb)
+				ip = self.rr.GetInput("B20")    # block detection
+				ip.SetValue(getBit(inb[1], 2))
+				ip = self.rr.GetInput("B20.E") 
+				ip.SetValue(getBit(inb[1], 3))
+				ip = self.rr.GetInput("BOSWW")  # BKOS1
+				ip.SetValue(getBit(inb[1], 4))
+				ip = self.rr.GetInput("BOSWE")  #BKOS2
+				ip.SetValue(getBit(inb[1], 5))
+				ip = self.rr.GetInput("B11.W") 
+				ip.SetValue(getBit(inb[1], 6))
+				ip = self.rr.GetInput("B11") 
+				ip.SetValue(getBit(inb[1], 7))
+	
+				ip = self.rr.GetInput("B21.W") 
+				ip.SetValue(getBit(inb[2], 0))
+				ip = self.rr.GetInput("B21") 
+				ip.SetValue(getBit(inb[2], 1))
+				ip = self.rr.GetInput("B21.E") 
+				ip.SetValue(getBit(inb[2], 2))
+				ip = self.rr.GetInput("BOSE")  #BKOS3
+				ip.SetValue(getBit(inb[2], 3))
+				self.rr.GetInput("CBBank").SetValue(getBit(inb[2], 4)) # Breakers
+				self.rr.GetInput("CBKale").SetValue(getBit(inb[2], 5))
+				self.rr.GetInput("CBWaterman").SetValue(getBit(inb[2], 6))
+				self.rr.GetInput("CBEngineYard").SetValue(getBit(inb[2], 7))
+	
+				self.rr.GetInput("CBEastEndJct").SetValue(getBit(inb[3], 0))
+				self.rr.GetInput("CBShore").SetValue(getBit(inb[3], 1))
+				self.rr.GetInput("CBRockyHill").SetValue(getBit(inb[3], 2))
+				self.rr.GetInput("CBHarpersFerry").SetValue(getBit(inb[3], 3))
+				self.rr.GetInput("CBBlockY30").SetValue(getBit(inb[3], 4))
+				self.rr.GetInput("CBBlockY81").SetValue(getBit(inb[3], 5))
+				
+			else:
+				logging.error("Bank: Failed read")
+				itext = None
 			
-			nb = getBit(inb[0], 0)  # Switch Positions
-			rb = getBit(inb[0], 1)
-			self.rr.GetInput("CSw23").SetTOState(nb, rb)
-			nb = getBit(inb[0], 2)
-			rb = getBit(inb[0], 3)
-			self.rr.GetInput("CSw21a").SetTOState(nb, rb)
-			nb = getBit(inb[0], 4)
-			rb = getBit(inb[0], 5)
-			self.rr.GetInput("CSw21b").SetTOState(nb, rb)
-			nb = getBit(inb[0], 6)
-			rb = getBit(inb[0], 7)
-			self.rr.GetInput("CSw19").SetTOState(nb, rb)
+		if self.sendIO:
+			self.rr.ShowText("Bank", BANK, otext, itext, 0, 1)
 
-			nb = getBit(inb[1], 0)
-			rb = getBit(inb[1], 1)
-			self.rr.GetInput("CSw17").SetTOState(nb, rb)
-			ip = self.rr.GetInput("B20")    # block detection
-			ip.SetValue(getBit(inb[1], 2))
-			ip = self.rr.GetInput("B20.E") 
-			ip.SetValue(getBit(inb[1], 3))
-			ip = self.rr.GetInput("BOSWW")  # BKOS1
-			ip.SetValue(getBit(inb[1], 4))
-			ip = self.rr.GetInput("BOSWE")  #BKOS2
-			ip.SetValue(getBit(inb[1], 5))
-			ip = self.rr.GetInput("B11.W") 
-			ip.SetValue(getBit(inb[1], 6))
-			ip = self.rr.GetInput("B11") 
-			ip.SetValue(getBit(inb[1], 7))
-
-			ip = self.rr.GetInput("B21.W") 
-			ip.SetValue(getBit(inb[2], 0))
-			ip = self.rr.GetInput("B21") 
-			ip.SetValue(getBit(inb[2], 1))
-			ip = self.rr.GetInput("B21.E") 
-			ip.SetValue(getBit(inb[2], 2))
-			ip = self.rr.GetInput("BOSE")  #BKOS3
-			ip.SetValue(getBit(inb[2], 3))
-			self.rr.GetInput("CBBank").SetValue(getBit(inb[2], 4)) # Breakers
-			self.rr.GetInput("CBKale").SetValue(getBit(inb[2], 5))
-			self.rr.GetInput("CBWaterman").SetValue(getBit(inb[2], 6))
-			self.rr.GetInput("CBEngineYard").SetValue(getBit(inb[2], 7))
-
-			self.rr.GetInput("CBEastEndJct").SetValue(getBit(inb[3], 0))
-			self.rr.GetInput("CBShore").SetValue(getBit(inb[3], 1))
-			self.rr.GetInput("CBRockyHill").SetValue(getBit(inb[3], 2))
-			self.rr.GetInput("CBHarpersFerry").SetValue(getBit(inb[3], 3))
-			self.rr.GetInput("CBBlockY30").SetValue(getBit(inb[3], 4))
-			self.rr.GetInput("CBBlockY81").SetValue(getBit(inb[3], 5))

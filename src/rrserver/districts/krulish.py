@@ -31,7 +31,8 @@ class Krulish(District):
 		ix = self.AddInputs(toNames, TurnoutInput, District.turnout, ix)
 
 	def OutIn(self):
-		outb = [0 for _ in range(3)]
+		outbc = 3
+		outb = [0 for _ in range(outbc)]
 		asp = self.rr.GetOutput("K8R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # eastbound signals
 		outb[0] = setBit(outb[0], 1, asp[1])
@@ -61,47 +62,50 @@ class Krulish(District):
 		outb[2] = setBit(outb[2], 6, self.rr.GetOutput("N20.srel").GetStatus())	# Stop relays
 		outb[2] = setBit(outb[2], 7, self.rr.GetOutput("N11.srel").GetStatus())	# Stop relays
 
-		otext = formatOText(outb, 3)
+		otext = formatOText(outb, outbc)
 		logging.debug("Krulish: Output bytes: %s" % otext)
-			
+
+		inbc = outbc			
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(KRULISH, outb, 3, swap=False)
+			inb, inbc = self.rrBus.sendRecv(KRULISH, outb, outbc)
 
-		if inbc != 3:
-			if self.sendIO:
-				self.rr.ShowText("Krul", KRULISH, otext, "incomplete read", 0, 1)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("Krulish: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("Krul", KRULISH, otext, itext, 0, 1)
+			if self.AcceptResponse(inb, inbc, KRULISH):
+				itext = formatIText(inb, inbc)
+				logging.debug("Krulish: Input Bytes: %s" % itext)
+	
+				nb = getBit(inb[0], 0)  # Switch positions
+				rb = getBit(inb[0], 1)
+				self.rr.GetInput("KSw1").SetTOState(nb, rb)
+				nb = getBit(inb[0], 2)
+				rb = getBit(inb[0], 3)
+				self.rr.GetInput("KSw3").SetTOState(nb, rb)
+				nb = getBit(inb[0], 4)
+				rb = getBit(inb[0], 5)
+				self.rr.GetInput("KSw5").SetTOState(nb, rb)
+				nb = getBit(inb[0], 6)
+				rb = getBit(inb[0], 7)
+				self.rr.GetInput("KSw7").SetTOState(nb, rb)
+	
+				self.rr.GetInput("N10.W").SetValue(getBit(inb[1], 2))  # Detection
+				self.rr.GetInput("N10").SetValue(getBit(inb[1], 3))
+				self.rr.GetInput("N10.E").SetValue(getBit(inb[1], 4)) 
+				self.rr.GetInput("N20.W").SetValue(getBit(inb[1], 5))
+				self.rr.GetInput("N20").SetValue(getBit(inb[1], 6))
+				self.rr.GetInput("N20.E").SetValue(getBit(inb[1], 7)) 
+	
+				self.rr.GetInput("KOSW").SetValue(getBit(inb[2], 0))  #KOS1
+				self.rr.GetInput("KOSM").SetValue(getBit(inb[2], 1))  #KOS2
+				self.rr.GetInput("KOSE").SetValue(getBit(inb[2], 2))  #KOS3
+				self.rr.GetInput("N11.W").SetValue(getBit(inb[2], 3))
+				self.rr.GetInput("N11").SetValue(getBit(inb[2], 4))
+				self.rr.GetInput("N11.E").SetValue(getBit(inb[2], 5)) 
+	
+			else:
+				logging.error("Krulish: Failed read")
+				itext = None
+			
+		if self.sendIO:
+			self.rr.ShowText("Krul", KRULISH, otext, itext, 0, 1)
 
-			nb = getBit(inb[0], 0)  # Switch positions
-			rb = getBit(inb[0], 1)
-			self.rr.GetInput("KSw1").SetTOState(nb, rb)
-			nb = getBit(inb[0], 2)
-			rb = getBit(inb[0], 3)
-			self.rr.GetInput("KSw3").SetTOState(nb, rb)
-			nb = getBit(inb[0], 4)
-			rb = getBit(inb[0], 5)
-			self.rr.GetInput("KSw5").SetTOState(nb, rb)
-			nb = getBit(inb[0], 6)
-			rb = getBit(inb[0], 7)
-			self.rr.GetInput("KSw7").SetTOState(nb, rb)
-
-			self.rr.GetInput("N10.W").SetValue(getBit(inb[1], 2))  # Detection
-			self.rr.GetInput("N10").SetValue(getBit(inb[1], 3))
-			self.rr.GetInput("N10.E").SetValue(getBit(inb[1], 4)) 
-			self.rr.GetInput("N20.W").SetValue(getBit(inb[1], 5))
-			self.rr.GetInput("N20").SetValue(getBit(inb[1], 6))
-			self.rr.GetInput("N20.E").SetValue(getBit(inb[1], 7)) 
-
-			self.rr.GetInput("KOSW").SetValue(getBit(inb[2], 0))  #KOS1
-			self.rr.GetInput("KOSM").SetValue(getBit(inb[2], 1))  #KOS2
-			self.rr.GetInput("KOSE").SetValue(getBit(inb[2], 2))  #KOS3
-			self.rr.GetInput("N11.W").SetValue(getBit(inb[2], 3))
-			self.rr.GetInput("N11").SetValue(getBit(inb[2], 4))
-			self.rr.GetInput("N11.E").SetValue(getBit(inb[2], 5)) 

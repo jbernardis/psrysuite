@@ -6,10 +6,6 @@ import logging
 MAXTRIES = 3
 
 
-def swapbyte(b):
-	return int("0b"+"{0:08b}".format(b)[::-1], 2)
-
-
 def setBit(obyte, obit, val):
 	if val != 0:
 		return (obyte | (1 << obit)) & 0xff
@@ -50,15 +46,14 @@ class Bus:
 	def close(self):
 		self.port.close()
 
-	def sendRecv(self, address, outbuf, nbytes, swap=False):
+	def sendRecv(self, address, outbuf, nbytes):
 		if not self.initialized:
-			return None, 0
+			return None
 
 		sendBuffer = []
 		sendBuffer.append(address)
 
-		if swap:
-			outbuf = [swapbyte(x) for x in outbuf]
+		outbuf = list(reversed(outbuf))
 
 		sendBuffer.extend(outbuf)
 		
@@ -81,9 +76,9 @@ class Bus:
 				
 		if len(inbuf) != nbytes:
 			logging.error("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
-			return [], 0
-
-		return inbuf, nbytes
+			return [b'\x00']*nbytes
+		else:
+			return inbuf
 
 
 class RailroadMonitor(threading.Thread):

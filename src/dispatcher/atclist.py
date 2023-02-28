@@ -81,6 +81,16 @@ class ATCListCtrl(wx.ListCtrl):
 		del(self.trains[oldName])
 		self.trains[tr.GetName()] = tr
 		self.RefreshItem(idx)
+		
+	def RefreshTrain(self, tr):
+		nm = tr.GetName()
+		if nm not in self.trainNames:
+			return False
+		try:
+			idx = self.trainNames.index(nm)
+		except ValueError:
+			return 
+		self.RefreshItem(idx)
 	
 	def ClearAll(self):
 		self.SetItemCount = 0

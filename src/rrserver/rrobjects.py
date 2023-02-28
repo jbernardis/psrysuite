@@ -406,10 +406,11 @@ class PulsedOutput(Output):
 		Output.__init__(self, name, district)
 		self.pulseLen = pulseLen
 		self.pulseCt = pulseCt
+		self.pulseCycle = 0
 
 	def SetPulseLen(self, pulseLen, pulseCt):
 		self.pulseLen = pulseLen
-		self.pulkseCt = pulseCt
+		self.pulseCt = pulseCt
 
 
 class TurnoutOutput(PulsedOutput):
@@ -509,7 +510,8 @@ class NXButtonOutput(PulsedOutput):
 		return self.status
 
 	def SetOutPulseNXB(self):
-		self.pulses = self.pulseLen
+		self.pulses = self.pulseCt
+		self.pulseCycle = self.pulseLen
 		self.rr.RailroadEvent({"refreshoutput": [self.name]})
 
 	def GetOutPulseValue(self):
@@ -517,8 +519,12 @@ class NXButtonOutput(PulsedOutput):
 
 	def GetOutPulse(self):
 		if self.pulses > 0:
-			self.pulses -= 1
-			rv = 1 if self.pulses % 2 != 0 else 0
+			rv = 1 if self.pulseCycle != 0 else 0
+			if self.pulseCycle == 0:
+				self.pulses -= 1
+				self.pulseCycle = self.pulseLen
+			else:
+				self.pulseCycle -= 1
 		else:
 			return 0
 

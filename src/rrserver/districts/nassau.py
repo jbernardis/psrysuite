@@ -157,7 +157,8 @@ class Nassau(District):
 		NESL = self.rr.GetDistrictLock("NESL")
 		NWSL = self.rr.GetDistrictLock("NWSL")
 		# Nassau West
-		outb = [0 for _ in range(8)]
+		outbc = 8
+		outb = [0 for _ in range(outbc)]
 
 		asp = self.rr.GetOutput("N14LC").GetAspectBits()     # signals
 		outb[0] = setBit(outb[0], 0, asp[0])
@@ -253,158 +254,161 @@ class Nassau(District):
 		asp = self.rr.GetOutput("N24RD").GetAspectBits()   
 		outb[7] = setBit(outb[7], 5, asp[0])
 
-		otext = formatOText(outb, 8)
+		otext = formatOText(outb, outbc)
 		logging.debug("Nassau West: Output bytes: %s" % otext)
-			
+
+		inbc = outbc			
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(NASSAUW, outb, 8, swap=False)
+			inb = self.rrBus.sendRecv(NASSAUW, outb, outbc)
 
-		if inbc != 8:
-			if self.sendIO:
-				self.rr.ShowText("NasW", NASSAUW, otext, "incomplete read", 0, 3)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("Nassau West: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("NasW", NASSAUW, otext, itext, 0, 3)
+			if self.AcceptResponse(inb, inbc, NASSAUW):
+				itext = formatIText(inb, inbc)
+				logging.debug("Nassau West: Input Bytes: %s" % itext)
+	
+				ip = self.rr.GetInput("NSw19")  #Switch positions
+				nb = getBit(inb[0], 0)
+				rb = getBit(inb[0], 1)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("NSw21") 
+				nb = getBit(inb[0], 2)
+				rb = getBit(inb[0], 3)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("NSw23") 
+				nb = getBit(inb[0], 4)
+				rb = getBit(inb[0], 5)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("NSw25")
+				nb = getBit(inb[0], 6)
+				rb = getBit(inb[0], 7)
+				ip.SetTOState(nb, rb)
+	
+				ip = self.rr.GetInput("NSw27") 
+				nb = getBit(inb[1], 0)
+				rb = getBit(inb[1], 1)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("NSw29") 
+				nb = getBit(inb[1], 2)
+				rb = getBit(inb[1], 3)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("NSw31") 
+				nb = getBit(inb[1], 4)
+				rb = getBit(inb[1], 5)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("NSw33")
+				nb = getBit(inb[1], 6)
+				rb = getBit(inb[1], 7)
+				ip.SetTOState(nb, rb)
+	
+				ip = self.rr.GetInput("N21.W") 
+				ip.SetValue(getBit(inb[2], 0))   #detection
+				ip = self.rr.GetInput("N21") 
+				ip.SetValue(getBit(inb[2], 1)) 
+				ip = self.rr.GetInput("N21.E") 
+				ip.SetValue(getBit(inb[2], 2)) 
+				ip = self.rr.GetInput("NWOSTY")  # NWOS1
+				ip.SetValue(getBit(inb[2], 3)) 
+				ip = self.rr.GetInput("NWOSCY")  # NWOS2
+				ip.SetValue(getBit(inb[2], 4)) 
+				ip = self.rr.GetInput("NWOSW")  # NWOS3
+				ip.SetValue(getBit(inb[2], 5)) 
+				ip = self.rr.GetInput("NWOSE")  # NWOS4
+				ip.SetValue(getBit(inb[2], 6)) 
+				ip = self.rr.GetInput("N32") 
+				ip.SetValue(getBit(inb[2], 7)) 
+	
+				ip = self.rr.GetInput("N31") 
+				ip.SetValue(getBit(inb[3], 0)) 
+				ip = self.rr.GetInput("N12") 
+				ip.SetValue(getBit(inb[3], 1)) 
+	
+				if optControl == 0:  # Nassau local control
+					release = getBit(inb[3], 2)
+					self.rr.GetInput("nrelease").SetState(release)  # C Release switch
+					fleet = getBit(inb[3], 3)
+					self.rr.GetInput("nassau.fleet").SetState(fleet)  # fleet
+					lvrL = getBit(inb[3], 4)  # signal levers
+					lvrCallOn = getBit(inb[3], 5)
+					lvrR = getBit(inb[3], 6)
+					self.rr.GetInput("N14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+					lvrL = getBit(inb[3], 7)
+	
+					lvrCallOn = getBit(inb[4], 0)
+					lvrR = getBit(inb[4], 1)
+					self.rr.GetInput("N16.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+					lvrL = getBit(inb[4], 2)
+					lvrCallOn = getBit(inb[4], 3)
+					lvrR = getBit(inb[4], 4)
+					self.rr.GetInput("N18.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+	
+					lvrL = getBit(inb[5], 0)
+					lvrCallOn = getBit(inb[5], 1)
+					lvrR = getBit(inb[5], 2)
+					self.rr.GetInput("N24.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+					lvrL = getBit(inb[5], 3)
+					lvrCallOn = getBit(inb[5], 4)
+					lvrR = getBit(inb[5], 5)
+					self.rr.GetInput("N26.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+	
+				if optControl != 2:  # NOT dispatcher ALL
+					lvrL = getBit(inb[4], 5)
+					lvrCallOn = getBit(inb[4], 6)
+					lvrR = getBit(inb[4], 7)
+					self.rr.GetInput("N20.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+					lvrL = getBit(inb[5], 6)
+					lvrCallOn = getBit(inb[5], 7)
+					lvrR = getBit(inb[6], 0)
+					self.rr.GetInput("N28.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+	
+				self.rr.GetInput("CBKrulishYd").SetValue(getBit(inb[6], 1)) # Breakers
+				self.rr.GetInput("CBThomas").SetValue(getBit(inb[6], 2))
+				self.rr.GetInput("CBWilson").SetValue(getBit(inb[6], 3))
+				self.rr.GetInput("CBKrulish").SetValue(getBit(inb[6], 4))
+				self.rr.GetInput("CBNassauW").SetValue(getBit(inb[6], 5))
+				self.rr.GetInput("CBNassauE").SetValue(getBit(inb[6], 6))
+				self.rr.GetInput("CBFoss").SetValue(getBit(inb[6], 7))
+	
+				self.rr.GetInput("CBDell").SetValue(getBit(inb[7], 0))
+				NSw60A = getBit(inb[7], 1)  # Switches in coach yard
+				NSw60B = getBit(inb[7], 2)
+				NSw60C = getBit(inb[7], 3)
+				NSw60D = getBit(inb[7], 4)
+				ip13 = self.rr.GetInput("NSw13") 
+				ip15 = self.rr.GetInput("NSw15") 
+				ip17 = self.rr.GetInput("NSw17") 
+				if NSw60A != 0:
+					ip13.SetTOState(0, 1)
+					ip15.SetTOState(0, 1)
+					ip17.SetTOState(0, 1)
+				elif NSw60B != 0:
+					ip13.SetTOState(1, 0)
+					ip15.SetTOState(1, 0)
+					ip17.SetTOState(0, 1)
+				elif NSw60C != 0:
+					ip13.SetTOState(0, 1)
+					ip15.SetTOState(0, 1)
+					ip17.SetTOState(1, 0)
+				elif NSw60D != 0:
+					ip13.SetTOState(1, 0)
+					ip15.SetTOState(1, 0)
+					ip17.SetTOState(1, 0)
+	
+				ip = self.rr.GetInput("NSw35")
+				nb = getBit(inb[7], 5)
+				rb = getBit(inb[7], 6)
+				ip.SetTOState(nb, rb)
+				
+			else:
+				logging.error("Nassau West: Failed read")
+				itext = None
 
-			ip = self.rr.GetInput("NSw19")  #Switch positions
-			nb = getBit(inb[0], 0)
-			rb = getBit(inb[0], 1)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("NSw21") 
-			nb = getBit(inb[0], 2)
-			rb = getBit(inb[0], 3)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("NSw23") 
-			nb = getBit(inb[0], 4)
-			rb = getBit(inb[0], 5)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("NSw25")
-			nb = getBit(inb[0], 6)
-			rb = getBit(inb[0], 7)
-			ip.SetTOState(nb, rb)
-
-			ip = self.rr.GetInput("NSw27") 
-			nb = getBit(inb[1], 0)
-			rb = getBit(inb[1], 1)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("NSw29") 
-			nb = getBit(inb[1], 2)
-			rb = getBit(inb[1], 3)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("NSw31") 
-			nb = getBit(inb[1], 4)
-			rb = getBit(inb[1], 5)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("NSw33")
-			nb = getBit(inb[1], 6)
-			rb = getBit(inb[1], 7)
-			ip.SetTOState(nb, rb)
-
-			ip = self.rr.GetInput("N21.W") 
-			ip.SetValue(getBit(inb[2], 0))   #detection
-			ip = self.rr.GetInput("N21") 
-			ip.SetValue(getBit(inb[2], 1)) 
-			ip = self.rr.GetInput("N21.E") 
-			ip.SetValue(getBit(inb[2], 2)) 
-			ip = self.rr.GetInput("NWOSTY")  # NWOS1
-			ip.SetValue(getBit(inb[2], 3)) 
-			ip = self.rr.GetInput("NWOSCY")  # NWOS2
-			ip.SetValue(getBit(inb[2], 4)) 
-			ip = self.rr.GetInput("NWOSW")  # NWOS3
-			ip.SetValue(getBit(inb[2], 5)) 
-			ip = self.rr.GetInput("NWOSE")  # NWOS4
-			ip.SetValue(getBit(inb[2], 6)) 
-			ip = self.rr.GetInput("N32") 
-			ip.SetValue(getBit(inb[2], 7)) 
-
-			ip = self.rr.GetInput("N31") 
-			ip.SetValue(getBit(inb[3], 0)) 
-			ip = self.rr.GetInput("N12") 
-			ip.SetValue(getBit(inb[3], 1)) 
-
-			if optControl == 0:  # Nassau local control
-				release = getBit(inb[3], 2)
-				self.rr.GetInput("nrelease").SetState(release)  # C Release switch
-				fleet = getBit(inb[3], 3)
-				self.rr.GetInput("nassau.fleet").SetState(fleet)  # fleet
-				lvrL = getBit(inb[3], 4)  # signal levers
-				lvrCallOn = getBit(inb[3], 5)
-				lvrR = getBit(inb[3], 6)
-				self.rr.GetInput("N14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[3], 7)
-
-				lvrCallOn = getBit(inb[4], 0)
-				lvrR = getBit(inb[4], 1)
-				self.rr.GetInput("N16.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[4], 2)
-				lvrCallOn = getBit(inb[4], 3)
-				lvrR = getBit(inb[4], 4)
-				self.rr.GetInput("N18.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-
-				lvrL = getBit(inb[5], 0)
-				lvrCallOn = getBit(inb[5], 1)
-				lvrR = getBit(inb[5], 2)
-				self.rr.GetInput("N24.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[5], 3)
-				lvrCallOn = getBit(inb[5], 4)
-				lvrR = getBit(inb[5], 5)
-				self.rr.GetInput("N26.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-
-			if optControl != 2:  # NOT dispatcher ALL
-				lvrL = getBit(inb[4], 5)
-				lvrCallOn = getBit(inb[4], 6)
-				lvrR = getBit(inb[4], 7)
-				self.rr.GetInput("N20.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[5], 6)
-				lvrCallOn = getBit(inb[5], 7)
-				lvrR = getBit(inb[6], 0)
-				self.rr.GetInput("N28.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-
-			self.rr.GetInput("CBKrulishYd").SetValue(getBit(inb[6], 1)) # Breakers
-			self.rr.GetInput("CBThomas").SetValue(getBit(inb[6], 2))
-			self.rr.GetInput("CBWilson").SetValue(getBit(inb[6], 3))
-			self.rr.GetInput("CBKrulish").SetValue(getBit(inb[6], 4))
-			self.rr.GetInput("CBNassauW").SetValue(getBit(inb[6], 5))
-			self.rr.GetInput("CBNassauE").SetValue(getBit(inb[6], 6))
-			self.rr.GetInput("CBFoss").SetValue(getBit(inb[6], 7))
-
-			self.rr.GetInput("CBDell").SetValue(getBit(inb[7], 0))
-			NSw60A = getBit(inb[7], 1)  # Switches in coach yard
-			NSw60B = getBit(inb[7], 2)
-			NSw60C = getBit(inb[7], 3)
-			NSw60D = getBit(inb[7], 4)
-			ip13 = self.rr.GetInput("NSw13") 
-			ip15 = self.rr.GetInput("NSw15") 
-			ip17 = self.rr.GetInput("NSw17") 
-			if NSw60A != 0:
-				ip13.SetTOState(0, 1)
-				ip15.SetTOState(0, 1)
-				ip17.SetTOState(0, 1)
-			elif NSw60B != 0:
-				ip13.SetTOState(1, 0)
-				ip15.SetTOState(1, 0)
-				ip17.SetTOState(0, 1)
-			elif NSw60C != 0:
-				ip13.SetTOState(0, 1)
-				ip15.SetTOState(0, 1)
-				ip17.SetTOState(1, 0)
-			elif NSw60D != 0:
-				ip13.SetTOState(1, 0)
-				ip15.SetTOState(1, 0)
-				ip17.SetTOState(1, 0)
-
-			ip = self.rr.GetInput("NSw35")
-			nb = getBit(inb[7], 5)
-			rb = getBit(inb[7], 6)
-			ip.SetTOState(nb, rb)
+		if self.sendIO:
+			self.rr.ShowText("NasW", NASSAUW, otext, itext, 0, 3)
 
 		# Nassau East
-		outb = [0 for _ in range(4)]
+		outbc = 4
+		outb = [0 for _ in range(outbc)]
 
 		asp = self.rr.GetOutput("N24RB").GetAspectBits()             # Signals
 		outb[0] = setBit(outb[0], 0, asp[0])
@@ -456,65 +460,68 @@ class Nassau(District):
 		outb[3] = setBit(outb[3], 6, 1 if sigL == "N" else 0)
 		outb[3] = setBit(outb[3], 7, 1 if sigL == "R" else 0)
 
-		otext = formatOText(outb, 4)
+		otext = formatOText(outb, outbc)
 		logging.debug("Nassau East: Output bytes: %s" % otext)
-			
+
+		inbc = outbc			
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(NASSAUE, outb, 4, swap=False)
+			inb = self.rrBus.sendRecv(NASSAUE, outb, outbc)
 
-		if inbc != 4:
-			if self.sendIO:
-				self.rr.ShowText("NasE", NASSAUE, otext, "incomplete read", 1, 3)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("Nassau East: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("NasE", NASSAUE, otext, itext, 1, 3)
-		
-			nb = getBit(inb[0], 0)  # Switch positions
-			rb = getBit(inb[0], 1)
-			self.rr.GetInput("NSw41").SetTOState(nb, rb)
-			nb = getBit(inb[0], 2) 
-			rb = getBit(inb[0], 3)
-			self.rr.GetInput("NSw43").SetTOState(nb, rb)
-			nb = getBit(inb[0], 4) 
-			rb = getBit(inb[0], 5)
-			self.rr.GetInput("NSw45").SetTOState(nb, rb)
-			nb = getBit(inb[0], 6) 
-			rb = getBit(inb[0], 7)
-			self.rr.GetInput("NSw47").SetTOState(nb, rb)
-
-			nb = getBit(inb[1], 0) 
-			rb = getBit(inb[1], 1)
-			self.rr.GetInput("NSw51").SetTOState(nb, rb)
-			nb = getBit(inb[1], 2) 
-			rb = getBit(inb[1], 3)
-			self.rr.GetInput("NSw53").SetTOState(nb, rb)
-			nb = getBit(inb[1], 4) 
-			rb = getBit(inb[1], 5)
-			self.rr.GetInput("NSw55").SetTOState(nb, rb)
-			nb = getBit(inb[1], 6) 
-			rb = getBit(inb[1], 7)
-			self.rr.GetInput("NSw57").SetTOState(nb, rb)
-
-			self.rr.GetInput("N22").SetValue(getBit(inb[2], 0))  # Detection
-			self.rr.GetInput("N41").SetValue(getBit(inb[2], 1))  
-			self.rr.GetInput("N42").SetValue(getBit(inb[2], 2)) 
-			self.rr.GetInput("NEOSRH").SetValue(getBit(inb[2], 3)) # NEOS1 
-			self.rr.GetInput("NEOSW").SetValue(getBit(inb[2], 4))  # NEOS2
-			self.rr.GetInput("NEOSE").SetValue(getBit(inb[2], 5))  # NEOS3 
-			self.rr.GetInput("B10.W").SetValue(getBit(inb[2], 6))  
-			self.rr.GetInput("B10").SetValue(getBit(inb[2], 7))  
-
-			nb = getBit(inb[3], 0) 
-			rb = getBit(inb[3], 1)
-			self.rr.GetInput("NSw39").SetTOState(nb, rb)
+			if self.AcceptResponse(inb, inbc, NASSAUE):
+				itext = formatIText(inb, inbc)
+				logging.debug("Nassau East: Input Bytes: %s" % itext)
+			
+				nb = getBit(inb[0], 0)  # Switch positions
+				rb = getBit(inb[0], 1)
+				self.rr.GetInput("NSw41").SetTOState(nb, rb)
+				nb = getBit(inb[0], 2) 
+				rb = getBit(inb[0], 3)
+				self.rr.GetInput("NSw43").SetTOState(nb, rb)
+				nb = getBit(inb[0], 4) 
+				rb = getBit(inb[0], 5)
+				self.rr.GetInput("NSw45").SetTOState(nb, rb)
+				nb = getBit(inb[0], 6) 
+				rb = getBit(inb[0], 7)
+				self.rr.GetInput("NSw47").SetTOState(nb, rb)
+	
+				nb = getBit(inb[1], 0) 
+				rb = getBit(inb[1], 1)
+				self.rr.GetInput("NSw51").SetTOState(nb, rb)
+				nb = getBit(inb[1], 2) 
+				rb = getBit(inb[1], 3)
+				self.rr.GetInput("NSw53").SetTOState(nb, rb)
+				nb = getBit(inb[1], 4) 
+				rb = getBit(inb[1], 5)
+				self.rr.GetInput("NSw55").SetTOState(nb, rb)
+				nb = getBit(inb[1], 6) 
+				rb = getBit(inb[1], 7)
+				self.rr.GetInput("NSw57").SetTOState(nb, rb)
+	
+				self.rr.GetInput("N22").SetValue(getBit(inb[2], 0))  # Detection
+				self.rr.GetInput("N41").SetValue(getBit(inb[2], 1))  
+				self.rr.GetInput("N42").SetValue(getBit(inb[2], 2)) 
+				self.rr.GetInput("NEOSRH").SetValue(getBit(inb[2], 3)) # NEOS1 
+				self.rr.GetInput("NEOSW").SetValue(getBit(inb[2], 4))  # NEOS2
+				self.rr.GetInput("NEOSE").SetValue(getBit(inb[2], 5))  # NEOS3 
+				self.rr.GetInput("B10.W").SetValue(getBit(inb[2], 6))  
+				self.rr.GetInput("B10").SetValue(getBit(inb[2], 7))  
+	
+				nb = getBit(inb[3], 0) 
+				rb = getBit(inb[3], 1)
+				self.rr.GetInput("NSw39").SetTOState(nb, rb)
+				
+			else:
+				logging.error("Nassau East: Failed read")
+				itext = None
+			
+		if self.sendIO:
+			self.rr.ShowText("NasE", NASSAUE, otext, itext, 1, 3)
 
 		# NX Buttons Output only
-		outb = [0 for _ in range(3)]
+		outbc = 3
+		outb = [0 for _ in range(outbc)]
 
 		op = self.rr.GetOutput("NNXBtnT12").GetOutPulse() # Nassau West
 		outb[0] = setBit(outb[0], 0, 1 if op != 0 else 0)
@@ -565,14 +572,12 @@ class Nassau(District):
 		op = self.rr.GetOutput("NNXBtnB20").GetOutPulse()
 		outb[2] = setBit(outb[2], 6, 1 if op != 0 else 0)
 
-		otext = formatOText(outb, 3)
+		otext = formatOText(outb, outbc)
 		logging.debug("Nassau NX: Output bytes: %s" % otext)
+
+		if not self.settings.simulation:
+			inb = self.rrBus.sendRecv(NASSAUNX, outb, outbc)
 			
-		if self.settings.simulation:
-			inb = []
-			inbc = 0
-		else:
-			inb, inbc = self.rrBus.sendRecv(NASSAUNX, outb, 3, swap=False)
 		if self.sendIO:
 			self.rr.ShowText("NsNX", NASSAUNX, otext, "- no inputs from this node -", 2, 3)
 

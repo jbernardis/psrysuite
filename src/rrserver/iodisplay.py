@@ -45,6 +45,7 @@ class IODisplay(wx.ListCtrl):
 			self.SetItemCount(lines*2)
 
 		self.olines[line] = "%4.4s  %2x  %s" % (name, addr, otext)
-		self.ilines[line] = "          " + itext
+		if itext is not None:
+			self.ilines[line] = "          " + itext
 		self.RefreshItem(line*2)
 		self.RefreshItem(line*2+1)

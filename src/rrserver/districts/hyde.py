@@ -78,7 +78,8 @@ class Hyde(District):
 			self.rr.AddInput(TurnoutInput(t, self), self, District.turnout)
 
 	def OutIn(self):
-		outb = [0 for _ in range(5)]
+		outbc = 5
+		outb = [0 for _ in range(outbc)]
 		op = self.rr.GetOutput("HSw1").GetOutPulse()
 		outb[0] = setBit(outb[0], 0, 1 if op > 0 else 0)                   # switches
 		outb[0] = setBit(outb[0], 1, 1 if op < 0 else 0)
@@ -136,65 +137,67 @@ class Hyde(District):
 		outb[4] = setBit(outb[4], 3, self.rr.GetOutput("HydeWestPower").GetStatus())  # Power Control
 		outb[4] = setBit(outb[4], 4, self.rr.GetOutput("HydeEastPower").GetStatus()) 
 
-
-		otext = formatOText(outb, 5)
+		otext = formatOText(outb, outbc)
 		logging.debug("Hyde: Output bytes: %s" % otext)
-			
+	
+		inbc = outbc		
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(HYDE, outb, 5, swap=False)
+			inb = self.rrBus.sendRecv(HYDE, outb, outbc)
 
-		if inbc != 5:
-			if self.sendIO:
-				self.rr.ShowText("Hyde", HYDE, otext, "incomplete read", 0, 1)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("Hyde: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("Hyde", HYDE, otext, itext, 0, 1)
+			if self.AcceptResponse(inb, inbc, HYDE):
+				itext = formatIText(inb, inbc)
+				logging.debug("Hyde: Input Bytes: %s" % itext)
+	
+				self.rr.GetInput("H12W").SetValue(getBit(inb[0], 0))   # Routes
+				self.rr.GetInput("H34W").SetValue(getBit(inb[0], 1))
+				self.rr.GetInput("H33W").SetValue(getBit(inb[0], 2))
+				self.rr.GetInput("H30E").SetValue(getBit(inb[0], 3))
+				self.rr.GetInput("H31W").SetValue(getBit(inb[0], 4))
+				self.rr.GetInput("H32W").SetValue(getBit(inb[0], 5))
+				self.rr.GetInput("H22W").SetValue(getBit(inb[0], 6))
+				self.rr.GetInput("H43W").SetValue(getBit(inb[0], 7))
+	
+				self.rr.GetInput("H42W").SetValue(getBit(inb[1], 0))  
+				self.rr.GetInput("H41W").SetValue(getBit(inb[1], 1))
+				self.rr.GetInput("H41E").SetValue(getBit(inb[1], 2))
+				self.rr.GetInput("H42E").SetValue(getBit(inb[1], 3))
+				self.rr.GetInput("H43E").SetValue(getBit(inb[1], 4))
+				self.rr.GetInput("H22E").SetValue(getBit(inb[1], 5))
+				self.rr.GetInput("H40E").SetValue(getBit(inb[1], 6))
+				self.rr.GetInput("H12E").SetValue(getBit(inb[1], 7))
+	
+				self.rr.GetInput("H34E").SetValue(getBit(inb[2], 0))  
+				self.rr.GetInput("H33E").SetValue(getBit(inb[2], 1))
+				self.rr.GetInput("H32E").SetValue(getBit(inb[2], 2))
+				self.rr.GetInput("H31E").SetValue(getBit(inb[2], 3))
+				self.rr.GetInput("H21").SetValue(getBit(inb[2], 4))   # detection
+				self.rr.GetInput("H21.E").SetValue(getBit(inb[2], 5))
+				self.rr.GetInput("HOSWW2").SetValue(getBit(inb[2], 6)) # HOS4
+				self.rr.GetInput("HOSWW").SetValue(getBit(inb[2], 7)) # HOS5
+	
+				self.rr.GetInput("HOSWE").SetValue(getBit(inb[3], 0))  # HOS6
+				self.rr.GetInput("H31").SetValue(getBit(inb[3], 1))
+				self.rr.GetInput("H32").SetValue(getBit(inb[3], 2))
+				self.rr.GetInput("H33").SetValue(getBit(inb[3], 3))
+				self.rr.GetInput("H34").SetValue(getBit(inb[3], 4))  
+				self.rr.GetInput("H12").SetValue(getBit(inb[3], 5))
+				self.rr.GetInput("H22").SetValue(getBit(inb[3], 6))
+				self.rr.GetInput("H43").SetValue(getBit(inb[3], 7))
+	
+				self.rr.GetInput("H42").SetValue(getBit(inb[4], 0))
+				self.rr.GetInput("H41").SetValue(getBit(inb[4], 1))
+				self.rr.GetInput("H40").SetValue(getBit(inb[4], 2))
+				self.rr.GetInput("HOSEW").SetValue(getBit(inb[4], 3))  # HOS7
+				self.rr.GetInput("HOSEE").SetValue(getBit(inb[4], 4))  # HOS8
+				self.rr.GetInput("H13.W").SetValue(getBit(inb[4], 5))
+				self.rr.GetInput("H13").SetValue(getBit(inb[4], 6))
+				
+			else:
+				logging.error("Hyde: Failed read")
+				itext = None
+			
+		if self.sendIO:
+			self.rr.ShowText("Hyde", HYDE, otext, itext, 0, 1)
 
-			self.rr.GetInput("H12W").SetValue(getBit(inb[0], 0))   # Routes
-			self.rr.GetInput("H34W").SetValue(getBit(inb[0], 1))
-			self.rr.GetInput("H33W").SetValue(getBit(inb[0], 2))
-			self.rr.GetInput("H30E").SetValue(getBit(inb[0], 3))
-			self.rr.GetInput("H31W").SetValue(getBit(inb[0], 4))
-			self.rr.GetInput("H32W").SetValue(getBit(inb[0], 5))
-			self.rr.GetInput("H22W").SetValue(getBit(inb[0], 6))
-			self.rr.GetInput("H43W").SetValue(getBit(inb[0], 7))
-
-			self.rr.GetInput("H42W").SetValue(getBit(inb[1], 0))  
-			self.rr.GetInput("H41W").SetValue(getBit(inb[1], 1))
-			self.rr.GetInput("H41E").SetValue(getBit(inb[1], 2))
-			self.rr.GetInput("H42E").SetValue(getBit(inb[1], 3))
-			self.rr.GetInput("H43E").SetValue(getBit(inb[1], 4))
-			self.rr.GetInput("H22E").SetValue(getBit(inb[1], 5))
-			self.rr.GetInput("H40E").SetValue(getBit(inb[1], 6))
-			self.rr.GetInput("H12E").SetValue(getBit(inb[1], 7))
-
-			self.rr.GetInput("H34E").SetValue(getBit(inb[2], 0))  
-			self.rr.GetInput("H33E").SetValue(getBit(inb[2], 1))
-			self.rr.GetInput("H32E").SetValue(getBit(inb[2], 2))
-			self.rr.GetInput("H31E").SetValue(getBit(inb[2], 3))
-			self.rr.GetInput("H21").SetValue(getBit(inb[2], 4))   # detection
-			self.rr.GetInput("H21.E").SetValue(getBit(inb[2], 5))
-			self.rr.GetInput("HOSWW2").SetValue(getBit(inb[2], 6)) # HOS4
-			self.rr.GetInput("HOSWW").SetValue(getBit(inb[2], 7)) # HOS5
-
-			self.rr.GetInput("HOSWE").SetValue(getBit(inb[3], 0))  # HOS6
-			self.rr.GetInput("H31").SetValue(getBit(inb[3], 1))
-			self.rr.GetInput("H32").SetValue(getBit(inb[3], 2))
-			self.rr.GetInput("H33").SetValue(getBit(inb[3], 3))
-			self.rr.GetInput("H34").SetValue(getBit(inb[3], 4))  
-			self.rr.GetInput("H12").SetValue(getBit(inb[3], 5))
-			self.rr.GetInput("H22").SetValue(getBit(inb[3], 6))
-			self.rr.GetInput("H43").SetValue(getBit(inb[3], 7))
-
-			self.rr.GetInput("H42").SetValue(getBit(inb[4], 0))
-			self.rr.GetInput("H41").SetValue(getBit(inb[4], 1))
-			self.rr.GetInput("H40").SetValue(getBit(inb[4], 2))
-			self.rr.GetInput("HOSEW").SetValue(getBit(inb[4], 3))  # HOS7
-			self.rr.GetInput("HOSEE").SetValue(getBit(inb[4], 4))  # HOS8
-			self.rr.GetInput("H13.W").SetValue(getBit(inb[4], 5))
-			self.rr.GetInput("H13").SetValue(getBit(inb[4], 6))

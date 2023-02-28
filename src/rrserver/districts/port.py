@@ -70,7 +70,8 @@ class Port(District):
 		# Port A
 		#
 		# Southport
-		outb = [0 for _ in range(9)]
+		outbc = 9
+		outb = [0 for _ in range(outbc)]
 		asp = self.rr.GetOutput("PA12R").GetAspectBits(2)
 		outb[0] = setBit(outb[0], 0, asp[0])  # signals
 		outb[0] = setBit(outb[0], 1, asp[1])
@@ -182,141 +183,144 @@ class Port(District):
 		outb[8] = setBit(outb[2], 5, 1 if clr40w else 0)  # semaphore signal
 		outb[8] = setBit(outb[2], 6, 1 if clr40w else 0)  # should be using RstrW
 
-		otext = formatOText(outb, 9)
+		otext = formatOText(outb, outbc)
 		logging.debug("Port A: Output bytes: %s" % otext)
-			
+
+		inbc = outbc			
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(PORTA, outb, 9, swap=False)
+			inb = self.rrBus.sendRecv(PORTA, outb, outbc)
 
-		if inbc != 9:
-			if self.sendIO:
-				self.rr.ShowText("PrtA", PORTA, otext, "incomplete read", 0, 3)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("Port A: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("PrtA", PORTA, otext, itext, 0, 3)
-
-			ip = self.rr.GetInput("PASw1")  # Switch positions
-			nb = getBit(inb[0], 0)
-			rb = getBit(inb[0], 1)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw3")
-			nb = getBit(inb[0], 2)
-			rb = getBit(inb[0], 3)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw5")
-			nb = getBit(inb[0], 4)
-			rb = getBit(inb[0], 5)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw7")
-			nb = getBit(inb[0], 6)
-			rb = getBit(inb[0], 7)
-			ip.SetTOState(nb, rb)
-
-			ip = self.rr.GetInput("PASw9")
-			nb = getBit(inb[1], 0)
-			rb = getBit(inb[1], 1)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw11")
-			nb = getBit(inb[1], 2)
-			rb = getBit(inb[1], 3)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw13")
-			nb = getBit(inb[1], 4)
-			rb = getBit(inb[1], 5)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw15")
-			nb = getBit(inb[1], 6)
-			rb = getBit(inb[1], 7)
-			ip.SetTOState(nb, rb)
-
-			ip = self.rr.GetInput("PASw17")
-			nb = getBit(inb[2], 0)
-			rb = getBit(inb[2], 1)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw19")
-			nb = getBit(inb[2], 2)
-			rb = getBit(inb[2], 3)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw21")
-			nb = getBit(inb[2], 4)
-			rb = getBit(inb[2], 5)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw23")
-			nb = getBit(inb[2], 6)
-			rb = getBit(inb[2], 7)
-			ip.SetTOState(nb, rb)
-
-			ip = self.rr.GetInput("P1")
-			ip.SetValue(getBit(inb[3], 0))   # detection
-			ip = self.rr.GetInput("P2")
-			ip.SetValue(getBit(inb[3], 1))
-			ip = self.rr.GetInput("P3")
-			ip.SetValue(getBit(inb[3], 2))
-			ip = self.rr.GetInput("P4")
-			ip.SetValue(getBit(inb[3], 3))
-			ip = self.rr.GetInput("P5")
-			ip.SetValue(getBit(inb[3], 4))
-			ip = self.rr.GetInput("P6")
-			ip.SetValue(getBit(inb[3], 5))
-			ip = self.rr.GetInput("P7")
-			ip.SetValue(getBit(inb[3], 6))
-			ip = self.rr.GetInput("POSSP1")
-			ip.SetValue(getBit(inb[3], 7))  # PAOS1
-
-			ip = self.rr.GetInput("POSSP2")
-			ip.SetValue(getBit(inb[4], 0))  # PAOS2
-			ip = self.rr.GetInput("POSSP3")
-			ip.SetValue(getBit(inb[4], 1))  # PAOS3
-			ip = self.rr.GetInput("POSSP4")
-			ip.SetValue(getBit(inb[4], 2))  # PAOS4
-			ip = self.rr.GetInput("POSSP5")
-			ip.SetValue(getBit(inb[4], 3))  # PAOS5
-			ip = self.rr.GetInput("P10")
-			ip.SetValue(getBit(inb[4], 4))
-			ip = self.rr.GetInput("P10.E")
-			ip.SetValue(getBit(inb[4], 5))
-
-			lvrL = getBit(inb[4], 6)       # signal levers
-			lvrCallOn = getBit(inb[4], 7)
-
-			lvrR = getBit(inb[5], 0)
-			self.rr.GetInput("PA4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-			lvrL = getBit(inb[5], 1)
-			lvrCallOn = getBit(inb[5], 2)
-			lvrR = getBit(inb[5], 3)
-			self.rr.GetInput("PA6.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-			lvrL = getBit(inb[5], 4)
-			lvrCallOn = getBit(inb[5], 5)
-			lvrR = getBit(inb[5], 6)
-			self.rr.GetInput("PA8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-			lvrL = getBit(inb[5], 7)
-
-			lvrCallOn = getBit(inb[6], 0)
-			lvrR = getBit(inb[6], 1)
-			self.rr.GetInput("PA10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-			lvrL = getBit(inb[6], 2)
-			lvrCallOn = getBit(inb[6], 3)
-			lvrR = getBit(inb[6], 4)
-			self.rr.GetInput("PA12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-			lvrL = getBit(inb[6], 5)
-			lvrCallOn = getBit(inb[6], 6)
-			lvrR = getBit(inb[6], 7)
-			self.rr.GetInput("PA32.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-
-			lvrL = getBit(inb[7], 0)
-			lvrCallOn = getBit(inb[7], 1)
-			lvrR = getBit(inb[7], 2)
-			self.rr.GetInput("PA34.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-			release = getBit(inb[7], 3)
-			self.rr.GetInput("parelease").SetState(release)  # Port A Release switch
+			if self.AcceptResponse(inb, inbc, PORTA):
+				itext = formatIText(inb, inbc)
+				logging.debug("Port A: Input Bytes: %s" % itext)
+	
+				ip = self.rr.GetInput("PASw1")  # Switch positions
+				nb = getBit(inb[0], 0)
+				rb = getBit(inb[0], 1)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw3")
+				nb = getBit(inb[0], 2)
+				rb = getBit(inb[0], 3)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw5")
+				nb = getBit(inb[0], 4)
+				rb = getBit(inb[0], 5)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw7")
+				nb = getBit(inb[0], 6)
+				rb = getBit(inb[0], 7)
+				ip.SetTOState(nb, rb)
+	
+				ip = self.rr.GetInput("PASw9")
+				nb = getBit(inb[1], 0)
+				rb = getBit(inb[1], 1)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw11")
+				nb = getBit(inb[1], 2)
+				rb = getBit(inb[1], 3)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw13")
+				nb = getBit(inb[1], 4)
+				rb = getBit(inb[1], 5)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw15")
+				nb = getBit(inb[1], 6)
+				rb = getBit(inb[1], 7)
+				ip.SetTOState(nb, rb)
+	
+				ip = self.rr.GetInput("PASw17")
+				nb = getBit(inb[2], 0)
+				rb = getBit(inb[2], 1)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw19")
+				nb = getBit(inb[2], 2)
+				rb = getBit(inb[2], 3)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw21")
+				nb = getBit(inb[2], 4)
+				rb = getBit(inb[2], 5)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw23")
+				nb = getBit(inb[2], 6)
+				rb = getBit(inb[2], 7)
+				ip.SetTOState(nb, rb)
+	
+				ip = self.rr.GetInput("P1")
+				ip.SetValue(getBit(inb[3], 0))   # detection
+				ip = self.rr.GetInput("P2")
+				ip.SetValue(getBit(inb[3], 1))
+				ip = self.rr.GetInput("P3")
+				ip.SetValue(getBit(inb[3], 2))
+				ip = self.rr.GetInput("P4")
+				ip.SetValue(getBit(inb[3], 3))
+				ip = self.rr.GetInput("P5")
+				ip.SetValue(getBit(inb[3], 4))
+				ip = self.rr.GetInput("P6")
+				ip.SetValue(getBit(inb[3], 5))
+				ip = self.rr.GetInput("P7")
+				ip.SetValue(getBit(inb[3], 6))
+				ip = self.rr.GetInput("POSSP1")
+				ip.SetValue(getBit(inb[3], 7))  # PAOS1
+	
+				ip = self.rr.GetInput("POSSP2")
+				ip.SetValue(getBit(inb[4], 0))  # PAOS2
+				ip = self.rr.GetInput("POSSP3")
+				ip.SetValue(getBit(inb[4], 1))  # PAOS3
+				ip = self.rr.GetInput("POSSP4")
+				ip.SetValue(getBit(inb[4], 2))  # PAOS4
+				ip = self.rr.GetInput("POSSP5")
+				ip.SetValue(getBit(inb[4], 3))  # PAOS5
+				ip = self.rr.GetInput("P10")
+				ip.SetValue(getBit(inb[4], 4))
+				ip = self.rr.GetInput("P10.E")
+				ip.SetValue(getBit(inb[4], 5))
+	
+				lvrL = getBit(inb[4], 6)       # signal levers
+				lvrCallOn = getBit(inb[4], 7)
+	
+				lvrR = getBit(inb[5], 0)
+				self.rr.GetInput("PA4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[5], 1)
+				lvrCallOn = getBit(inb[5], 2)
+				lvrR = getBit(inb[5], 3)
+				self.rr.GetInput("PA6.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[5], 4)
+				lvrCallOn = getBit(inb[5], 5)
+				lvrR = getBit(inb[5], 6)
+				self.rr.GetInput("PA8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[5], 7)
+	
+				lvrCallOn = getBit(inb[6], 0)
+				lvrR = getBit(inb[6], 1)
+				self.rr.GetInput("PA10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[6], 2)
+				lvrCallOn = getBit(inb[6], 3)
+				lvrR = getBit(inb[6], 4)
+				self.rr.GetInput("PA12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[6], 5)
+				lvrCallOn = getBit(inb[6], 6)
+				lvrR = getBit(inb[6], 7)
+				self.rr.GetInput("PA32.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+	
+				lvrL = getBit(inb[7], 0)
+				lvrCallOn = getBit(inb[7], 1)
+				lvrR = getBit(inb[7], 2)
+				self.rr.GetInput("PA34.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				release = getBit(inb[7], 3)
+				self.rr.GetInput("parelease").SetState(release)  # Port A Release switch
+				
+			else:
+				logging.error("Port A: Failed read")
+				itext = None
+	
+		if self.sendIO:
+			self.rr.ShowText("PrtA", PORTA, otext, itext, 0, 3)
 
 		# Parsons Junction
-		outb = [0 for _ in range(4)]
+		outbc = 4
+		outb = [0 for _ in range(outbc)]
 		asp = self.rr.GetOutput("PA34LB").GetAspectBits(3)
 		outb[0] = setBit(outb[0], 0, asp[0])  # westward signals
 		outb[0] = setBit(outb[0], 1, asp[1])
@@ -352,80 +356,84 @@ class Port(District):
 		outb[2] = setBit(outb[2], 5, self.rr.GetOutput("P50.srel").GetStatus())
 		outb[2] = setBit(outb[2], 6, self.rr.GetOutput("P11.srel").GetStatus())
 
-		otext = formatOText(outb, 4)
+		otext = formatOText(outb, outbc)
 		logging.debug("Parsons: Output bytes: %s" % otext)
-			
+
+		inbc = outbc			
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(PARSONS, outb, 4, swap=False)
+			inb = self.rrBus.sendRecv(PARSONS, outb, outbc)
 
-		if inbc != 4:
-			if self.sendIO:
-				self.rr.ShowText("PJct", PARSONS, otext, "incomplete read", 1, 3)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("Parsons: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("PJct", PARSONS, otext, itext, 1, 3)
+			if self.AcceptResponse(inb, inbc, PARSONS):
+				itext = formatIText(inb, inbc)
+				logging.debug("Parsons: Input Bytes: %s" % itext)
+	
+				ip = self.rr.GetInput("PASw27")  # Switch positions
+				nb = getBit(inb[0], 0)
+				rb = getBit(inb[0], 1)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw29")
+				nb = getBit(inb[0], 2)
+				rb = getBit(inb[0], 3)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw31")
+				nb = getBit(inb[0], 4)
+				rb = getBit(inb[0], 5)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw33")
+				nb = getBit(inb[0], 6)
+				rb = getBit(inb[0], 7)
+				ip.SetTOState(nb, rb)
+	
+				ip = self.rr.GetInput("PASw35")
+				nb = getBit(inb[1], 0)
+				rb = getBit(inb[1], 1)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("PASw37")
+				nb = getBit(inb[1], 2)
+				rb = getBit(inb[1], 3)
+				ip.SetTOState(nb, rb)
+				ip = self.rr.GetInput("P20")
+				ip.SetValue(getBit(inb[1], 4))   # detection
+				ip = self.rr.GetInput("P20.E")
+				ip.SetValue(getBit(inb[1], 5))
+				ip = self.rr.GetInput("P30.W")
+				ip.SetValue(getBit(inb[1], 6))
+				ip = self.rr.GetInput("P30")
+				ip.SetValue(getBit(inb[1], 7))
+	
+				ip = self.rr.GetInput("P30.E")
+				ip.SetValue(getBit(inb[2], 0))
+				ip = self.rr.GetInput("POSPJ1")  # PJOS1
+				ip.SetValue(getBit(inb[2], 1))
+				ip = self.rr.GetInput("POSPJ2")  # PJOS2
+				ip.SetValue(getBit(inb[2], 2))
+				ip = self.rr.GetInput("P50.W")
+				ip.SetValue(getBit(inb[2], 3))
+				ip = self.rr.GetInput("P50")
+				ip.SetValue(getBit(inb[2], 4))
+				ip = self.rr.GetInput("P50.E")
+				ip.SetValue(getBit(inb[2], 5))
+				ip = self.rr.GetInput("P11.W")
+				ip.SetValue(getBit(inb[2], 6))
+				ip = self.rr.GetInput("P11")
+				ip.SetValue(getBit(inb[2], 7))
+	
+				ip = self.rr.GetInput("P11.E")
+				ip.SetValue(getBit(inb[3], 0))
+	
+			else:
+				logging.error("Parsons: Failed read")
+				itext = None
+				
+		if self.sendIO:
+			self.rr.ShowText("PJct", PARSONS, otext, itext, 1, 3)
 
-			ip = self.rr.GetInput("PASw27")  # Switch positions
-			nb = getBit(inb[0], 0)
-			rb = getBit(inb[0], 1)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw29")
-			nb = getBit(inb[0], 2)
-			rb = getBit(inb[0], 3)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw31")
-			nb = getBit(inb[0], 4)
-			rb = getBit(inb[0], 5)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw33")
-			nb = getBit(inb[0], 6)
-			rb = getBit(inb[0], 7)
-			ip.SetTOState(nb, rb)
-
-			ip = self.rr.GetInput("PASw35")
-			nb = getBit(inb[1], 0)
-			rb = getBit(inb[1], 1)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("PASw37")
-			nb = getBit(inb[1], 2)
-			rb = getBit(inb[1], 3)
-			ip.SetTOState(nb, rb)
-			ip = self.rr.GetInput("P20")
-			ip.SetValue(getBit(inb[1], 4))   # detection
-			ip = self.rr.GetInput("P20.E")
-			ip.SetValue(getBit(inb[1], 5))
-			ip = self.rr.GetInput("P30.W")
-			ip.SetValue(getBit(inb[1], 6))
-			ip = self.rr.GetInput("P30")
-			ip.SetValue(getBit(inb[1], 7))
-
-			ip = self.rr.GetInput("P30.E")
-			ip.SetValue(getBit(inb[2], 0))
-			ip = self.rr.GetInput("POSPJ1")  # PJOS1
-			ip.SetValue(getBit(inb[2], 1))
-			ip = self.rr.GetInput("POSPJ2")  # PJOS2
-			ip.SetValue(getBit(inb[2], 2))
-			ip = self.rr.GetInput("P50.W")
-			ip.SetValue(getBit(inb[2], 3))
-			ip = self.rr.GetInput("P50")
-			ip.SetValue(getBit(inb[2], 4))
-			ip = self.rr.GetInput("P50.E")
-			ip.SetValue(getBit(inb[2], 5))
-			ip = self.rr.GetInput("P11.W")
-			ip.SetValue(getBit(inb[2], 6))
-			ip = self.rr.GetInput("P11")
-			ip.SetValue(getBit(inb[2], 7))
-
-			ip = self.rr.GetInput("P11.E")
-			ip.SetValue(getBit(inb[3], 0))
 
 		#  Port B
-		outb = [0 for _ in range(7)]
+		outbc = 7
+		outb = [0 for _ in range(outbc)]
 		asp = self.rr.GetOutput("PB2R").GetAspectBits(3)
 		outb[0] = setBit(outb[0], 0, asp[0])  # South Jct Eastward signals
 		outb[0] = setBit(outb[0], 1, asp[1])
@@ -506,99 +514,103 @@ class Port(District):
 		outb[6] = setBit(outb[6], 5, self.rr.GetOutput("P41.srel").GetStatus())
 		outb[6] = setBit(outb[6], 6, 1 if PBXO else 0)  # Crossing signal
 
-		otext = formatOText(outb, 7)
+		otext = formatOText(outb, outbc)
 		logging.debug("Port  B: Output bytes: %s" % otext)
-			
+	
+		inbc = outbc		
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(PORTB, outb, 7, swap=False)
+			inb = self.rrBus.sendRecv(PORTB, outb, outbc)
 
-		if inbc != 7:
-			if self.sendIO:
-				self.rr.ShowText("PrtB", PORTB, otext, "incomplete read", 2, 3)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("Port B: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("PrtB", PORTB, otext, itext, 2, 3)
+			if self.AcceptResponse(inb, inbc, PORTB):
+				itext = formatIText(inb, inbc)
+				logging.debug("Port B: Input Bytes: %s" % itext)
+	
+				nb = getBit(inb[0], 0)  # Switch Positions
+				rb = getBit(inb[0], 1)
+				self.rr.GetInput("PBSw1").SetTOState(nb, rb)
+				nb = getBit(inb[0], 2)
+				rb = getBit(inb[0], 3)
+				self.rr.GetInput("PBSw3").SetTOState(nb, rb)
+				nb = getBit(inb[0], 4)
+				rb = getBit(inb[0], 5)
+				self.rr.GetInput("PBSw11").SetTOState(nb, rb)
+				nb = getBit(inb[0], 6)
+				rb = getBit(inb[0], 7)
+				self.rr.GetInput("PBSw13").SetTOState(nb, rb)
+	
+				nb = getBit(inb[1], 0)
+				rb = getBit(inb[1], 1)
+				self.rr.GetInput("PBSw5").SetTOState(nb, rb)
+				nb = getBit(inb[1], 2)
+				rb = getBit(inb[1], 3)
+				self.rr.GetInput("PBSw15a").SetTOState(nb, rb)
+				nb = getBit(inb[1], 4)
+				rb = getBit(inb[1], 5)
+				self.rr.GetInput("PBSw15b").SetTOState(nb, rb)
+				ip = self.rr.GetInput("P40")    # South Jct Detection
+				ip.SetValue(getBit(inb[1], 6))
+				ip = self.rr.GetInput("P40.E")
+				ip.SetValue(getBit(inb[1], 7))
+	
+				ip = self.rr.GetInput("POSSJ2")  # PBOS1
+				ip.SetValue(getBit(inb[2], 0))
+				ip = self.rr.GetInput("POSSJ1")  # PBOS2
+				ip.SetValue(getBit(inb[2], 1))
+				ip = self.rr.GetInput("P31.W")
+				ip.SetValue(getBit(inb[2], 2))
+				ip = self.rr.GetInput("P31")
+				ip.SetValue(getBit(inb[2], 3))
+				ip = self.rr.GetInput("P31.E")
+				ip.SetValue(getBit(inb[2], 4))
+				ip = self.rr.GetInput("P32.W")  # Circus Jct Detection
+				ip.SetValue(getBit(inb[2], 5))
+				ip = self.rr.GetInput("P32")
+				ip.SetValue(getBit(inb[2], 6))
+				ip = self.rr.GetInput("P32.E")
+				ip.SetValue(getBit(inb[2], 7))
+	
+				ip = self.rr.GetInput("POSCJ2")  # PBOS3
+				ip.SetValue(getBit(inb[3], 0))
+				ip = self.rr.GetInput("POSCJ1")  # PBOS4
+				ip.SetValue(getBit(inb[3], 1))
+				ip = self.rr.GetInput("P41.W")
+				ip.SetValue(getBit(inb[3], 2))
+				ip = self.rr.GetInput("P41")
+				ip.SetValue(getBit(inb[3], 3))
+				ip = self.rr.GetInput("P41.E")
+				ip.SetValue(getBit(inb[3], 4))
+				lvrL = getBit(inb[3], 5)       # signal levers
+				lvrCallOn = getBit(inb[3], 6)
+				lvrR = getBit(inb[3], 7)
+				self.rr.GetInput("PB2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+	
+				lvrL = getBit(inb[4], 0)
+				lvrCallOn = getBit(inb[4], 1)
+				lvrR = getBit(inb[4], 2)
+				self.rr.GetInput("PB4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				self.rr.GetInput("PBSw5.lvr").SetState(getBit(inb[4], 3))  # handswitch unlocking
+				lvrL = getBit(inb[4], 4)
+				lvrCallOn = getBit(inb[4], 5)
+				lvrR = getBit(inb[4], 6)
+				self.rr.GetInput("PB12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[4], 7)
+	
+				lvrCallOn = getBit(inb[5], 0)
+				lvrR = getBit(inb[5], 1)
+				self.rr.GetInput("PB14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				st = getBit(inb[5], 2)
+				self.rr.GetInput("PBSw15a.lvr").SetState(st)
+				self.rr.GetInput("PBSw15b.lvr").SetState(st)
+				release = getBit(inb[5], 3)
+				self.rr.GetInput("pbrelease").SetState(release)  # Port B Release switch
+						
+			else:
+				logging.error("Post B: Failed read")
+				itext = None
+				
+		if self.sendIO:
+			self.rr.ShowText("PrtB", PORTB, otext, itext, 2, 3)
 
-			nb = getBit(inb[0], 0)  # Switch Positions
-			rb = getBit(inb[0], 1)
-			self.rr.GetInput("PBSw1").SetTOState(nb, rb)
-			nb = getBit(inb[0], 2)
-			rb = getBit(inb[0], 3)
-			self.rr.GetInput("PBSw3").SetTOState(nb, rb)
-			nb = getBit(inb[0], 4)
-			rb = getBit(inb[0], 5)
-			self.rr.GetInput("PBSw11").SetTOState(nb, rb)
-			nb = getBit(inb[0], 6)
-			rb = getBit(inb[0], 7)
-			self.rr.GetInput("PBSw13").SetTOState(nb, rb)
 
-			nb = getBit(inb[1], 0)
-			rb = getBit(inb[1], 1)
-			self.rr.GetInput("PBSw5").SetTOState(nb, rb)
-			nb = getBit(inb[1], 2)
-			rb = getBit(inb[1], 3)
-			self.rr.GetInput("PBSw15a").SetTOState(nb, rb)
-			nb = getBit(inb[1], 4)
-			rb = getBit(inb[1], 5)
-			self.rr.GetInput("PBSw15b").SetTOState(nb, rb)
-			ip = self.rr.GetInput("P40")    # South Jct Detection
-			ip.SetValue(getBit(inb[1], 6))
-			ip = self.rr.GetInput("P40.E")
-			ip.SetValue(getBit(inb[1], 7))
-
-			ip = self.rr.GetInput("POSSJ2")  # PBOS1
-			ip.SetValue(getBit(inb[2], 0))
-			ip = self.rr.GetInput("POSSJ1")  # PBOS2
-			ip.SetValue(getBit(inb[2], 1))
-			ip = self.rr.GetInput("P31.W")
-			ip.SetValue(getBit(inb[2], 2))
-			ip = self.rr.GetInput("P31")
-			ip.SetValue(getBit(inb[2], 3))
-			ip = self.rr.GetInput("P31.E")
-			ip.SetValue(getBit(inb[2], 4))
-			ip = self.rr.GetInput("P32.W")  # Circus Jct Detection
-			ip.SetValue(getBit(inb[2], 5))
-			ip = self.rr.GetInput("P32")
-			ip.SetValue(getBit(inb[2], 6))
-			ip = self.rr.GetInput("P32.E")
-			ip.SetValue(getBit(inb[2], 7))
-
-			ip = self.rr.GetInput("POSCJ2")  # PBOS3
-			ip.SetValue(getBit(inb[3], 0))
-			ip = self.rr.GetInput("POSCJ1")  # PBOS4
-			ip.SetValue(getBit(inb[3], 1))
-			ip = self.rr.GetInput("P41.W")
-			ip.SetValue(getBit(inb[3], 2))
-			ip = self.rr.GetInput("P41")
-			ip.SetValue(getBit(inb[3], 3))
-			ip = self.rr.GetInput("P41.E")
-			ip.SetValue(getBit(inb[3], 4))
-			lvrL = getBit(inb[3], 5)       # signal levers
-			lvrCallOn = getBit(inb[3], 6)
-			lvrR = getBit(inb[3], 7)
-			self.rr.GetInput("PB2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-
-			lvrL = getBit(inb[4], 0)
-			lvrCallOn = getBit(inb[4], 1)
-			lvrR = getBit(inb[4], 2)
-			self.rr.GetInput("PB4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-			self.rr.GetInput("PBSw5.lvr").SetState(getBit(inb[4], 3))  # handswitch unlocking
-			lvrL = getBit(inb[4], 4)
-			lvrCallOn = getBit(inb[4], 5)
-			lvrR = getBit(inb[4], 6)
-			self.rr.GetInput("PB12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-			lvrL = getBit(inb[4], 7)
-
-			lvrCallOn = getBit(inb[5], 0)
-			lvrR = getBit(inb[5], 1)
-			self.rr.GetInput("PB14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-			st = getBit(inb[5], 2)
-			self.rr.GetInput("PBSw15a.lvr").SetState(st)
-			self.rr.GetInput("PBSw15b.lvr").SetState(st)
-			release = getBit(inb[5], 3)
-			self.rr.GetInput("pbrelease").SetState(release)  # Port B Release switch

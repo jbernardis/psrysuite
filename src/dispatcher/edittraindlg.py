@@ -13,15 +13,28 @@ class EditTrainDlg(wx.Dialog):
 		name, loco = train.GetNameAndLoco()
 		atc = train.IsOnATC()
 
+		lblTrain = wx.StaticText(self, wx.ID_ANY, "Train:", size=(50, -1))
 		self.teTrainID = wx.TextCtrl(self, wx.ID_ANY, name, size=(125, -1))
+		lblLoco  = wx.StaticText(self, wx.ID_ANY, "Loco:", size=(50, -1))
 		self.teLocoID = wx.TextCtrl(self, wx.ID_ANY, loco, size=(125, -1))
-		self.cbATC = wx.CheckBox(self, wx.ID_ANY, "ATC")
-		self.cbATC.SetValue(atc)
 
-		vsz.Add(self.teTrainID)
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(lblTrain)
+		hsz.AddSpacer(10)
+		hsz.Add(self.teTrainID)
+		vsz.Add(hsz)
+		
 		vsz.AddSpacer(10)
-		vsz.Add(self.teLocoID)
+		
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(lblLoco)
+		hsz.AddSpacer(10)
+		hsz.Add(self.teLocoID)
+		vsz.Add(hsz)
+
 		if dispatcher:
+			self.cbATC = wx.CheckBox(self, wx.ID_ANY, "ATC")
+			self.cbATC.SetValue(atc)
 			vsz.AddSpacer(10)
 			vsz.Add(self.cbATC, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		

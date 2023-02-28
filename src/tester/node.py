@@ -1,4 +1,5 @@
 import wx
+import wx.lib.scrolledpanel as scrolled
 
 def getBit(ibyte, ibit):
 	if ibit < 0 or ibit > 7:
@@ -8,13 +9,13 @@ def getBit(ibyte, ibit):
 	b = int(ibyte.hex(), 16)
 	return 1 if b & mask != 0 else 0
 
-class Node (wx.Panel):
+class Node (scrolled.ScrolledPanel):
 	pulsed = 1
 	unused = 8
 	disabled = 9
 	
 	def __init__(self, parent):
-		wx.Panel.__init__(self, parent)
+		scrolled.ScrolledPanel.__init__(self, parent, wx.ID_ANY, size=(600, 600))
 		self.parent = parent
 
 		self.cboMap = []
@@ -24,7 +25,13 @@ class Node (wx.Panel):
 		self.cbiMap = []
 		self.stiMap = []
 		self.nibytes = 0
-		
+
+	def getWidth(self):
+		return self.maxWidth
+
+	def getHeight(self):
+		return self.maxHeight
+
 	def AddWidgets(self):
 		self.nobytes = len(self.outputs)
 		
@@ -137,9 +144,8 @@ class Node (wx.Panel):
 		hsz.AddSpacer(20)
 			
 		self.SetSizer(hsz)
-		self.Layout()
-		self.Fit()
-		
+		self.SetupScrolling(scroll_x=False)
+
 	def ClearBits(self):
 		for byte in range(self.nobytes):
 			for bit in range(8):

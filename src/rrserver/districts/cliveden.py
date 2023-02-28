@@ -42,7 +42,8 @@ class Cliveden(District):
 		ix = self.AddInputs(brkrNames, BreakerInput, District.breaker, ix)
 
 	def OutIn(self):
-		outb = [0 for _ in range(4)]
+		outbc = 4
+		outb = [0 for _ in range(outbc)]
 
 		asp = self.rr.GetOutput("C14R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # signals
@@ -87,53 +88,56 @@ class Cliveden(District):
 		outb[3] = setBit(outb[3], 4, self.rr.GetOutput("C23.srel").GetStatus())
 		outb[3] = setBit(outb[3], 5, self.rr.GetOutput("C12.srel").GetStatus())
 
-		otext = formatOText(outb, 4)
+		otext = formatOText(outb, outbc)
 		logging.debug("Cliveden: Output bytes: %s" % otext)
-			
+
+		inbc = outbc			
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(CLIVEDEN, outb, 4, swap=False)
+			inb = self.rrBus.sendRecv(CLIVEDEN, outb, outbc)
 
-		if inbc != 4:
-			if self.sendIO:
-				self.rr.ShowText("Cliv", CLIVEDEN, otext, "incomplete read", 0, 1)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("CLIVEDEN: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("Cliv", CLIVEDEN, otext, itext, 0, 1)
+			if self.AcceptResponse(inb, inbc, CLIVEDEN):
+				itext = formatIText(inb, inbc)
+				logging.debug("CLIVEDEN: Input Bytes: %s" % itext)
+	
+				nb = getBit(inb[0], 0)  # Switch positions
+				rb = getBit(inb[0], 1)
+				self.rr.GetInput("CSw13").SetTOState(nb, rb)
+				nb = getBit(inb[0], 2) 
+				rb = getBit(inb[0], 3)
+				self.rr.GetInput("CSw11").SetTOState(nb, rb)
+				nb = getBit(inb[0], 4) 
+				rb = getBit(inb[0], 5)
+				self.rr.GetInput("CSw9").SetTOState(nb, rb)
+	
+				self.rr.GetInput("C13.W").SetValue(getBit(inb[1], 0))  # Detection
+				self.rr.GetInput("C13").SetValue(getBit(inb[1], 1))
+				self.rr.GetInput("C13.E").SetValue(getBit(inb[1], 2))
+				self.rr.GetInput("COSCLW").SetValue(getBit(inb[1], 3))
+				self.rr.GetInput("C12.W").SetValue(getBit(inb[1], 4)) 
+				self.rr.GetInput("C12").SetValue(getBit(inb[1], 5))
+				self.rr.GetInput("C23.W").SetValue(getBit(inb[1], 6)) 
+				self.rr.GetInput("C23").SetValue(getBit(inb[1], 7))
+	
+				self.rr.GetInput("COSCLEW").SetValue(getBit(inb[2], 0)) 
+				self.rr.GetInput("COSCLEE").SetValue(getBit(inb[2], 1))
+				self.rr.GetInput("C22").SetValue(getBit(inb[2], 2))
+				self.rr.GetInput("CBGreenMtnStn").SetValue(getBit(inb[2], 4))  # Breakers
+				self.rr.GetInput("CBSheffieldA").SetValue(getBit(inb[2], 5))
+				self.rr.GetInput("CBGreenMtnYd").SetValue(getBit(inb[2], 6))
+				self.rr.GetInput("CBHydeJct").SetValue(getBit(inb[2], 7))
+	
+				self.rr.GetInput("CBHydeWest").SetValue(getBit(inb[3], 0))
+				self.rr.GetInput("CBHydeEast").SetValue(getBit(inb[3], 1))
+				self.rr.GetInput("CBSouthportJct").SetValue(getBit(inb[3], 2))
+				self.rr.GetInput("CBCarlton").SetValue(getBit(inb[3], 3))
+				self.rr.GetInput("CBSheffieldB").SetValue(getBit(inb[3], 4))
+				
+			else:
+				logging.error("Cliveden: Failed read")
+				itext = None
+			
+		if self.sendIO:
+			self.rr.ShowText("Cliv", CLIVEDEN, otext, itext, 0, 1)
 
-			nb = getBit(inb[0], 0)  # Switch positions
-			rb = getBit(inb[0], 1)
-			self.rr.GetInput("CSw13").SetTOState(nb, rb)
-			nb = getBit(inb[0], 2) 
-			rb = getBit(inb[0], 3)
-			self.rr.GetInput("CSw11").SetTOState(nb, rb)
-			nb = getBit(inb[0], 4) 
-			rb = getBit(inb[0], 5)
-			self.rr.GetInput("CSw9").SetTOState(nb, rb)
-
-			self.rr.GetInput("C13.W").SetValue(getBit(inb[1], 0))  # Detection
-			self.rr.GetInput("C13").SetValue(getBit(inb[1], 1))
-			self.rr.GetInput("C13.E").SetValue(getBit(inb[1], 2))
-			self.rr.GetInput("COSCLW").SetValue(getBit(inb[1], 3))
-			self.rr.GetInput("C12.W").SetValue(getBit(inb[1], 4)) 
-			self.rr.GetInput("C12").SetValue(getBit(inb[1], 5))
-			self.rr.GetInput("C23.W").SetValue(getBit(inb[1], 6)) 
-			self.rr.GetInput("C23").SetValue(getBit(inb[1], 7))
-
-			self.rr.GetInput("COSCLEW").SetValue(getBit(inb[2], 0)) 
-			self.rr.GetInput("COSCLEE").SetValue(getBit(inb[2], 1))
-			self.rr.GetInput("C22").SetValue(getBit(inb[2], 2))
-			self.rr.GetInput("CBGreenMtnStn").SetValue(getBit(inb[2], 4))  # Breakers
-			self.rr.GetInput("CBSheffieldA").SetValue(getBit(inb[2], 5))
-			self.rr.GetInput("CBGreenMtnYd").SetValue(getBit(inb[2], 6))
-			self.rr.GetInput("CBHydeJct").SetValue(getBit(inb[2], 7))
-
-			self.rr.GetInput("CBHydeWest").SetValue(getBit(inb[3], 0))
-			self.rr.GetInput("CBHydeEast").SetValue(getBit(inb[3], 1))
-			self.rr.GetInput("CBSouthportJct").SetValue(getBit(inb[3], 2))
-			self.rr.GetInput("CBCarlton").SetValue(getBit(inb[3], 3))
-			self.rr.GetInput("CBSheffieldB").SetValue(getBit(inb[3], 4))

@@ -1122,6 +1122,8 @@ class MainFrame(wx.Frame):
 						tr.AddToBlock(blk)
 						if loco:
 							tr.SetLoco(loco)
+							if tr.IsOnATC():
+								self.atcList.RefreshTrain(tr)
 
 						blk.SetTrain(tr)
 						if tr:

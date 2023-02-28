@@ -75,7 +75,8 @@ class Shore(District):
 		F10H = asp8l == 0 and f10occ == 0
 		F10D = F10H and (asp8r != 0)
 
-		outb = [0 for _ in range(7)]
+		outbc = 7
+		outb = [0 for _ in range(outbc)]
 		asp = self.rr.GetOutput("S4R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # Main Signals
 		outb[0] = setBit(outb[0], 1, asp[1])
@@ -156,78 +157,82 @@ class Shore(District):
 		outb[6] = setBit(outb[6], 4, 0 if self.rr.GetOutput("CSw15.hand").GetStatus() != 0 else 1) # spikes peak hand switch
 		outb[6] = setBit(outb[6], 5, 1 if SXG else 0)  # Bortell crossing gates
 
-		otext = formatOText(outb, 7)
+		otext = formatOText(outb, outbc)
 		logging.debug("Shore: Output bytes: %s" % otext)
-			
+	
+		inbc = outbc		
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(SHORE, outb, 7, swap=False)
+			inb = self.rrBus.sendRecv(SHORE, outb, outbc)
 
-		if inbc != 7:
-			if self.sendIO:
-				self.rr.ShowText("Shor", SHORE, otext, "incomplete read", 0, 2)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("Shore: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("Shor", SHORE, otext, itext, 0, 2)
+			if self.AcceptResponse(inb, inbc, SHORE):
+				itext = formatIText(inb, inbc)
+				logging.debug("Shore: Input Bytes: %s" % itext)
+	
+				nb = getBit(inb[0], 0)  # Switch positions
+				rb = getBit(inb[0], 1)
+				self.rr.GetInput("SSw1").SetTOState(nb, rb)
+				nb = getBit(inb[0], 2) 
+				rb = getBit(inb[0], 3)
+				self.rr.GetInput("SSw3").SetTOState(nb, rb)
+				nb = getBit(inb[0], 4) 
+				rb = getBit(inb[0], 5)
+				self.rr.GetInput("SSw5").SetTOState(nb, rb)
+				nb = getBit(inb[0], 6) 
+				rb = getBit(inb[0], 7)
+				self.rr.GetInput("SSw7").SetTOState(nb, rb)
+	
+				nb = getBit(inb[1], 0)
+				rb = getBit(inb[1], 1)
+				self.rr.GetInput("SSw9").SetTOState(nb, rb)
+				nb = getBit(inb[1], 2)
+				rb = getBit(inb[1], 3)
+				self.rr.GetInput("SSw11").SetTOState(nb, rb)
+				nb = getBit(inb[1], 4)
+				rb = getBit(inb[1], 5)
+				self.rr.GetInput("SSw13").SetTOState(nb, rb)
+				self.rr.GetInput("S20.W").SetValue(getBit(inb[1], 6))  # Shore Detection
+				self.rr.GetInput("S20A").SetValue(getBit(inb[1], 7))
+	
+				self.rr.GetInput("S20B").SetValue(getBit(inb[2], 0))
+				self.rr.GetInput("S20C").SetValue(getBit(inb[2], 1))
+				self.rr.GetInput("S20.E").SetValue(getBit(inb[2], 2))
+				self.rr.GetInput("SOSW").SetValue(getBit(inb[2], 3))
+				self.rr.GetInput("SOSE").SetValue(getBit(inb[2], 4))
+				self.rr.GetInput("S11.W").SetValue(getBit(inb[2], 5))
+				self.rr.GetInput("S11B").SetValue(getBit(inb[2], 6))
+				self.rr.GetInput("S11.E").SetValue(getBit(inb[2], 7))
+	
+				self.rr.GetInput("H30.W").SetValue(getBit(inb[3], 0))
+				self.rr.GetInput("H30B").SetValue(getBit(inb[3], 1))
+				self.rr.GetInput("H10.W").SetValue(getBit(inb[3], 2))
+				self.rr.GetInput("H10B").SetValue(getBit(inb[3], 3))
+				self.rr.GetInput("F10").SetValue(getBit(inb[3], 4))  # Harpers detection
+				self.rr.GetInput("F10.E").SetValue(getBit(inb[3], 5))
+				self.rr.GetInput("SOSHF").SetValue(getBit(inb[3], 6))
+				self.rr.GetInput("F11.W").SetValue(getBit(inb[3], 7))
+	
+				self.rr.GetInput("F11").SetValue(getBit(inb[4], 0))
+				# 		SXON  = SIn[4].bit.b1;	//Crossing gate off normal - no londer needed
+				nb = getBit(inb[4], 2) 
+				rb = getBit(inb[4], 3)
+				self.rr.GetInput("CSw15").SetTOState(nb, rb)
+				self.rr.GetInput("S11A").SetValue(getBit(inb[4], 4))
+				self.rr.GetInput("H30A").SetValue(getBit(inb[4], 5))
+				self.rr.GetInput("H10A").SetValue(getBit(inb[4], 6))
+	
+			else:
+				logging.error("Shore: Failed read")
+				itext = None
+				
+		if self.sendIO:
+			self.rr.ShowText("Shor", SHORE, otext, itext, 0, 2)
 
-			nb = getBit(inb[0], 0)  # Switch positions
-			rb = getBit(inb[0], 1)
-			self.rr.GetInput("SSw1").SetTOState(nb, rb)
-			nb = getBit(inb[0], 2) 
-			rb = getBit(inb[0], 3)
-			self.rr.GetInput("SSw3").SetTOState(nb, rb)
-			nb = getBit(inb[0], 4) 
-			rb = getBit(inb[0], 5)
-			self.rr.GetInput("SSw5").SetTOState(nb, rb)
-			nb = getBit(inb[0], 6) 
-			rb = getBit(inb[0], 7)
-			self.rr.GetInput("SSw7").SetTOState(nb, rb)
-
-			nb = getBit(inb[1], 0)
-			rb = getBit(inb[1], 1)
-			self.rr.GetInput("SSw9").SetTOState(nb, rb)
-			nb = getBit(inb[1], 2)
-			rb = getBit(inb[1], 3)
-			self.rr.GetInput("SSw11").SetTOState(nb, rb)
-			nb = getBit(inb[1], 4)
-			rb = getBit(inb[1], 5)
-			self.rr.GetInput("SSw13").SetTOState(nb, rb)
-			self.rr.GetInput("S20.W").SetValue(getBit(inb[1], 6))  # Shore Detection
-			self.rr.GetInput("S20A").SetValue(getBit(inb[1], 7))
-
-			self.rr.GetInput("S20B").SetValue(getBit(inb[2], 0))
-			self.rr.GetInput("S20C").SetValue(getBit(inb[2], 1))
-			self.rr.GetInput("S20.E").SetValue(getBit(inb[2], 2))
-			self.rr.GetInput("SOSW").SetValue(getBit(inb[2], 3))
-			self.rr.GetInput("SOSE").SetValue(getBit(inb[2], 4))
-			self.rr.GetInput("S11.W").SetValue(getBit(inb[2], 5))
-			self.rr.GetInput("S11B").SetValue(getBit(inb[2], 6))
-			self.rr.GetInput("S11.E").SetValue(getBit(inb[2], 7))
-
-			self.rr.GetInput("H30.W").SetValue(getBit(inb[3], 0))
-			self.rr.GetInput("H30B").SetValue(getBit(inb[3], 1))
-			self.rr.GetInput("H10.W").SetValue(getBit(inb[3], 2))
-			self.rr.GetInput("H10B").SetValue(getBit(inb[3], 3))
-			self.rr.GetInput("F10").SetValue(getBit(inb[3], 4))  # Harpers detection
-			self.rr.GetInput("F10.E").SetValue(getBit(inb[3], 5))
-			self.rr.GetInput("SOSHF").SetValue(getBit(inb[3], 6))
-			self.rr.GetInput("F11.W").SetValue(getBit(inb[3], 7))
-
-			self.rr.GetInput("F11").SetValue(getBit(inb[4], 0))
-			# 		SXON  = SIn[4].bit.b1;	//Crossing gate off normal - no londer needed
-			nb = getBit(inb[4], 2) 
-			rb = getBit(inb[4], 3)
-			self.rr.GetInput("CSw15").SetTOState(nb, rb)
-			self.rr.GetInput("S11A").SetValue(getBit(inb[4], 4))
-			self.rr.GetInput("H30A").SetValue(getBit(inb[4], 5))
-			self.rr.GetInput("H10A").SetValue(getBit(inb[4], 6))
 
 		#  Hyde Junction
-		outb = [0 for _ in range(3)]
+		outbc = 3
+		outb = [0 for _ in range(outbc)]
 		asp = self.rr.GetOutput("S16R").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # signals
 		outb[0] = setBit(outb[0], 1, asp[1])
@@ -265,41 +270,44 @@ class Shore(District):
 		outb[2] = setBit(outb[2], 6, self.rr.GetOutput("P42.srel").GetStatus())
 		outb[2] = setBit(outb[2], 7, self.rr.GetOutput("H11.srel").GetStatus())	
 
-		otext = formatOText(outb, 3)
+		otext = formatOText(outb, outbc)
 		logging.debug("Hyde Jct: Output bytes: %s" % otext)
-			
+
+		inbc = outbc			
 		if self.settings.simulation:
-			inb = []
-			inbc = 0
+			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(HYDEJCT, outb, 3, swap=False)
+			inb = self.rrBus.sendRecv(HYDEJCT, outb, outbc)
 
-		if inbc != 3:
-			if self.sendIO:
-				self.rr.ShowText("HJct", HYDEJCT, otext, "incomplete read", 1, 2)
-		else:
-			itext = formatIText(inb, inbc)
-			logging.debug("Hyde Jct: Input Bytes: %s" % itext)
-			if self.sendIO:
-				self.rr.ShowText("HJct", HYDEJCT, otext, itext, 1, 2)
+			if self.AcceptResponse(inb, inbc, HYDEJCT):
+				itext = formatIText(inb, inbc)
+				logging.debug("Hyde Jct: Input Bytes: %s" % itext)
+	
+				nb = getBit(inb[0], 0)  # Switch positions
+				rb = getBit(inb[0], 1)
+				self.rr.GetInput("SSw15").SetTOState(nb, rb)
+				nb = getBit(inb[0], 2) 
+				rb = getBit(inb[0], 3)
+				self.rr.GetInput("SSw17").SetTOState(nb, rb)
+				nb = getBit(inb[0], 4) 
+				rb = getBit(inb[0], 5)
+				self.rr.GetInput("SSw19").SetTOState(nb, rb)
+				self.rr.GetInput("H20").SetValue(getBit(inb[0], 6))  # Detection
+				self.rr.GetInput("H20.E").SetValue(getBit(inb[0], 7)) 
+	
+				self.rr.GetInput("P42.W").SetValue(getBit(inb[1], 0)) 
+				self.rr.GetInput("P42").SetValue(getBit(inb[1], 1)) 
+				self.rr.GetInput("P42.E").SetValue(getBit(inb[1], 2)) 
+				self.rr.GetInput("SOSHJW").SetValue(getBit(inb[1], 3)) # HOS1
+				self.rr.GetInput("SOSHJM").SetValue(getBit(inb[1], 4)) # HOS2
+				self.rr.GetInput("SOSHJE").SetValue(getBit(inb[1], 5)) # HOS3
+				self.rr.GetInput("H11.W").SetValue(getBit(inb[1], 6)) 
+				self.rr.GetInput("H11").SetValue(getBit(inb[1], 7)) 
+						
+			else:
+				logging.error("Hyde Jct: Failed read")
+				itext = None
 
-			nb = getBit(inb[0], 0)  # Switch positions
-			rb = getBit(inb[0], 1)
-			self.rr.GetInput("SSw15").SetTOState(nb, rb)
-			nb = getBit(inb[0], 2) 
-			rb = getBit(inb[0], 3)
-			self.rr.GetInput("SSw17").SetTOState(nb, rb)
-			nb = getBit(inb[0], 4) 
-			rb = getBit(inb[0], 5)
-			self.rr.GetInput("SSw19").SetTOState(nb, rb)
-			self.rr.GetInput("H20").SetValue(getBit(inb[0], 6))  # Detection
-			self.rr.GetInput("H20.E").SetValue(getBit(inb[0], 7)) 
+		if self.sendIO:
+			self.rr.ShowText("HJct", HYDEJCT, otext, itext, 1, 2)
 
-			self.rr.GetInput("P42.W").SetValue(getBit(inb[1], 0)) 
-			self.rr.GetInput("P42").SetValue(getBit(inb[1], 1)) 
-			self.rr.GetInput("P42.E").SetValue(getBit(inb[1], 2)) 
-			self.rr.GetInput("SOSHJW").SetValue(getBit(inb[1], 3)) # HOS1
-			self.rr.GetInput("SOSHJM").SetValue(getBit(inb[1], 4)) # HOS2
-			self.rr.GetInput("SOSHJE").SetValue(getBit(inb[1], 5)) # HOS3
-			self.rr.GetInput("H11.W").SetValue(getBit(inb[1], 6)) 
-			self.rr.GetInput("H11").SetValue(getBit(inb[1], 7)) 

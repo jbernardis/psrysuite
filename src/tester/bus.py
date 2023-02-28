@@ -4,10 +4,6 @@ import time
 MAXTRIES = 3
 
 
-def swapbyte(b):
-	return int("0b"+"{0:08b}".format(b)[::-1], 2)
-
-
 def setBit(obyte, obit, val):
 	if val != 0:
 		return (obyte | (1 << obit)) & 0xff
@@ -49,15 +45,14 @@ class Bus:
 	def close(self):
 		self.port.close()
 
-	def sendRecv(self, address, outbuf, nbytes, swap=False):
+	def sendRecv(self, address, outbuf, nbytes):
 		if not self.initialized:
 			return None, 0
 
 		sendBuffer = []
 		sendBuffer.append(address)
 
-		if swap:
-			outbuf = [swapbyte(x) for x in outbuf]
+		outbuf = list(reversed(outbuf))
 
 		sendBuffer.extend(outbuf)
 		
