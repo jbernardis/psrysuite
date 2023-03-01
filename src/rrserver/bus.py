@@ -21,6 +21,14 @@ def getBit(ibyte, ibit):
 	b = int(ibyte.hex(), 16)
 	return 1 if b & mask != 0 else 0
 
+def getBitInverted(ibyte, ibit):
+	if ibit < 0 or ibit > 7:
+		# bit index is out of range
+		return 0
+	mask = 1 << (7-ibit)
+	b = int(ibyte.hex(), 16)
+	return 0 if b & mask != 0 else 1
+
 
 class Bus:
 	def __init__(self, tty):
@@ -68,7 +76,7 @@ class Bus:
 			b = self.port.read(remaining)
 			if len(b) == 0:
 				tries += 1
-				time.sleep(0.001)
+				time.sleep(0.0001)
 			else:
 				tries = 0
 				inbuf.extend([bytes([b[i]]) for i in range(len(b))])

@@ -1,7 +1,7 @@
 import logging
 
 from rrserver.district import District, SHORE, HYDEJCT, formatIText, formatOText
-from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, BlockInput, TurnoutInput
+from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, BlockInput, TurnoutInput, IndicatorOutput
 from rrserver.bus import setBit, getBit
 
 
@@ -22,6 +22,7 @@ class Shore(District):
 		hsNames = [ "SSw1" ]
 		handswitchNames = [ "SSw1.hand" ]
 		relayNames = [ "S20.srel", "S11.srel", "H30.srel", "H10.srel", "F10.srel", "F11.srel", "H20.srel", "H11.srel" ]
+		indNames = [ "CBShore", "CNHarpersFerry" ]
 
 		ix = 0
 		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
@@ -30,6 +31,7 @@ class Shore(District):
 		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
+		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
 
 		for n in toNames:
 			self.SetTurnoutPulseLen(n, settings.topulselen, settings.topulsect)
@@ -123,8 +125,8 @@ class Shore(District):
 		outb[3] = setBit(outb[3], 3, self.rr.GetInput("H20").GetValue())
 		outb[3] = setBit(outb[3], 4, self.rr.GetInput("S21").GetValue())
 		outb[3] = setBit(outb[3], 5, self.rr.GetInput("P32").GetValue())
-		outb[3] = setBit(outb[3], 6, self.rr.GetInput("CBShore").GetValue())
-		outb[3] = setBit(outb[3], 7, self.rr.GetInput("CBHarpersFerry").GetValue())
+		outb[3] = setBit(outb[3], 6, self.rr.GetInput("CBShore").GetInvertedValue())
+		outb[3] = setBit(outb[3], 7, self.rr.GetInput("CBHarpersFerry").GetInvertedValue())
 
 		outb[4] = setBit(outb[4], 0, 0 if self.rr.GetOutput("SSw1.hand").GetStatus() != 0 else 1) # hand switch unlocks
 		op = self.rr.GetOutput("SSw3").GetOutPulse()

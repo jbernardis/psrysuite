@@ -14,8 +14,8 @@ class Latham(Node):
 				["LSw3 R", "", Node.pulsed],
 				["LSw5 N", "", Node.pulsed],
 				["LSw5 R", "", Node.pulsed],
-				["LSw7 N", "", Node.pulsed],
-				["LSw7 R", "", Node.pulsed]
+				["LSw7 R", "", Node.pulsed],
+				["LSw7 N", "", Node.pulsed]
 			],
 		
 			[

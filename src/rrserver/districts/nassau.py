@@ -2,7 +2,7 @@ import logging
 
 from rrserver.district import District, leverState,  NASSAUE, NASSAUW, NASSAUNX, formatIText, formatOText
 from rrserver.rrobjects import SignalOutput, TurnoutOutput, NXButtonOutput, RelayOutput, BreakerInput, BlockInput, \
-	TurnoutInput, SignalLeverInput, ToggleInput
+	TurnoutInput, SignalLeverInput, ToggleInput, IndicatorOutput
 from rrserver.bus import setBit, getBit
 
 
@@ -24,6 +24,7 @@ class Nassau(District):
 		toNames = [ "NSw19", "NSw21", "NSw23", "NSw25", "NSw27", "NSw29", "NSw31", "NSw33", "NSw35",
 					"NSw39", "NSw41", "NSw43", "NSw45", "NSw47", "NSw51", "NSw53", "NSw55", "NSw57"]
 		relayNames = [ "N21.srel", "B10.srel" ]
+		indNames =  [ "CBKrulish", "CBNassauW", "CBNassauE", "CBSptJct", "CBWilson", "CBThomas" ]
 
 		self.NXMap = {
 			"NNXBtnT12": {
@@ -109,6 +110,7 @@ class Nassau(District):
 		ix = self.AddOutputs(toONames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(nxButtons, NXButtonOutput, District.nxbutton, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
+		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
 
 		for n in nxButtons:
 			self.SetNXButtonPulseLen(n, settings.nxbpulselen, settings.nxbpulsect)
@@ -236,12 +238,12 @@ class Nassau(District):
 		outb[5] = setBit(outb[5], 6, 1 if op > 0 else 0)  
 		outb[5] = setBit(outb[5], 7, 1 if op < 0 else 0)
 
-		outb[6] = setBit(outb[6], 0, self.rr.GetInput("CBKrulish").GetValue())   # Circuit breakers
-		outb[6] = setBit(outb[6], 1, self.rr.GetInput("CBNassauW").GetValue()) 
-		outb[6] = setBit(outb[6], 2, self.rr.GetInput("CBNassauE").GetValue())  
-		outb[6] = setBit(outb[6], 3, self.rr.GetInput("CBSptJct").GetValue())  
-		outb[6] = setBit(outb[6], 4, self.rr.GetInput("CBWilson").GetValue())   
-		outb[6] = setBit(outb[6], 5, self.rr.GetInput("CBThomas").GetValue())
+		outb[6] = setBit(outb[6], 0, self.rr.GetInput("CBKrulish").GetInvertedValue())   # Circuit breakers
+		outb[6] = setBit(outb[6], 1, self.rr.GetInput("CBNassauW").GetInvertedValue()) 
+		outb[6] = setBit(outb[6], 2, self.rr.GetInput("CBNassauE").GetInvertedValue())  
+		outb[6] = setBit(outb[6], 3, self.rr.GetInput("CBSptJct").GetInvertedValue())  
+		outb[6] = setBit(outb[6], 4, self.rr.GetInput("CBWilson").GetInvertedValue())   
+		outb[6] = setBit(outb[6], 5, self.rr.GetInput("CBThomas").GetInvertedValue())
 		outb[6] = setBit(outb[6], 6, NWSL[0])  # switch locks west
 		outb[6] = setBit(outb[6], 7, NWSL[1])
 

@@ -86,7 +86,7 @@ class Bank(District):
 		outb[3] = setBit(outb[3], 1, self.rr.GetOutput("B20.srel").GetStatus())	 # stop relays
 		outb[3] = setBit(outb[3], 2, self.rr.GetOutput("B11.srel").GetStatus())
 		outb[3] = setBit(outb[3], 3, self.rr.GetOutput("B21.srel").GetStatus())
-		outb[3] = setBit(outb[3], 4, self.rr.GetInput("CBBank").GetValue())  #Circuit breaker
+		outb[3] = setBit(outb[3], 4, self.rr.GetInput("CBBank").GetInvertedValue())  #Circuit breaker
 		asp = self.rr.GetOutput("C24L").GetAspectBits()
 		outb[3] = setBit(outb[3], 5, asp[0])  #Signal 24L indicator
 

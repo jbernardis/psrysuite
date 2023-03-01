@@ -42,7 +42,7 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 			if r and len(r) > 0:
 				self.handle_request()
 			else:
-				time.sleep(0.0001) # yield to other threads
+				pass #time.sleep(0.0001) # yield to other threads
 
 	def setApp(self, app):
 		self.app = app

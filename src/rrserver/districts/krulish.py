@@ -57,7 +57,7 @@ class Krulish(District):
 		outb[1] = setBit(outb[1], 6, asp[1])
 		outb[1] = setBit(outb[1], 7, asp[2])
 
-		outb[2] = setBit(outb[2], 4, self.rr.GetInput("CBKrulishYd").GetValue())
+		outb[2] = setBit(outb[2], 4, self.rr.GetInput("CBKrulishYd").GetInvertedValue())
 		outb[2] = setBit(outb[2], 5, self.rr.GetOutput("N10.srel").GetStatus())	# Stop relays
 		outb[2] = setBit(outb[2], 6, self.rr.GetOutput("N20.srel").GetStatus())	# Stop relays
 		outb[2] = setBit(outb[2], 7, self.rr.GetOutput("N11.srel").GetStatus())	# Stop relays
@@ -69,7 +69,7 @@ class Krulish(District):
 		if self.settings.simulation:
 			itext = None
 		else:
-			inb, inbc = self.rrBus.sendRecv(KRULISH, outb, outbc)
+			inb = self.rrBus.sendRecv(KRULISH, outb, outbc)
 
 			if self.AcceptResponse(inb, inbc, KRULISH):
 				itext = formatIText(inb, inbc)

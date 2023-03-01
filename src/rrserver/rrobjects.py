@@ -20,6 +20,9 @@ class Input:
 
 	def GetValue(self):
 		return self.value
+	
+	def GetInvertedValue(self):
+		return 1 if self.value == 0 else 0
 
 	def GetEventMessage(self):
 		return None

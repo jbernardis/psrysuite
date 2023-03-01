@@ -1,7 +1,8 @@
 import logging
 
 from rrserver.district import District, leverState, PORTA, PORTB, PARSONS, formatIText, formatOText
-from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, ToggleInput, SignalLeverInput, BlockInput, TurnoutInput, HandswitchLeverInput
+from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, ToggleInput, SignalLeverInput, BlockInput, TurnoutInput, \
+		IndicatorOutput, HandswitchLeverInput
 from rrserver.bus import setBit, getBit
 
 
@@ -24,6 +25,7 @@ class Port(District):
 		#relayNames = [ "P10.srel", "P11.srel", "P20.srel", "P21.srel",
 		relayNames = [ "P10.srel", "P11.srel", "P20.srel",
 					"P30.srel", "P31.srel", "P32.srel", "P40.srel", "P41.srel", "P42.srel" ]
+		indNames = [ "CBParsonsJct", "CBSouthport", "CBLavinYard", "CBSouthJct", "CBCircusJct" ]
 
 		ix = 0
 		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
@@ -32,6 +34,7 @@ class Port(District):
 		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
+		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
 
 		for n in toNames:
 			self.SetTurnoutPulseLen(n, settings.topulselen, settings.topulsect)
@@ -156,9 +159,9 @@ class Port(District):
 		inp = self.rr.GetInput("P21")
 		clr21e = inp.GetClear() and inp.GetEast()
 		outb[6] = setBit(outb[6], 0, 1 if clr21e else 0)
-		outb[6] = setBit(outb[6], 1, self.rr.GetInput("CBParsonsJct").GetValue())  # Circuit breakers
-		outb[6] = setBit(outb[6], 2, self.rr.GetInput("CBSouthport").GetValue())
-		outb[6] = setBit(outb[6], 3, self.rr.GetInput("CBLavinYard").GetValue())
+		outb[6] = setBit(outb[6], 1, self.rr.GetInput("CBParsonsJct").GetInvertedValue())  # Circuit breakers
+		outb[6] = setBit(outb[6], 2, self.rr.GetInput("CBSouthport").GetInvertedValue())
+		outb[6] = setBit(outb[6], 3, self.rr.GetInput("CBLavinYard").GetInvertedValue())
 		outb[6] = setBit(outb[6], 4, 1 if self.rr.GetSwitchLock("PASw1") else 0)  # Switch Locks
 		outb[6] = setBit(outb[6], 5, 1 if self.rr.GetSwitchLock("PASw3") else 0)
 		outb[6] = setBit(outb[6], 6, 1 if self.rr.GetSwitchLock("PASw5") else 0)
@@ -501,8 +504,8 @@ class Port(District):
 		inp = self.rr.GetInput("P42")
 		clr42e = inp.GetClear() and inp.GetEast()
 		outb[5] = setBit(outb[5], 3, 1 if clr42e else 0)  # Hyde Jct signal
-		outb[5] = setBit(outb[5], 4, self.rr.GetInput("CBSouthJct").GetValue())  # Circuit breakers
-		outb[5] = setBit(outb[5], 5, self.rr.GetInput("CBCircusJct").GetValue())
+		outb[5] = setBit(outb[5], 4, self.rr.GetInput("CBSouthJct").GetInvertedValue())  # Circuit breakers
+		outb[5] = setBit(outb[5], 5, self.rr.GetInput("CBCircusJct").GetInvertedValue())
 		outb[5] = setBit(outb[5], 6, 1 if self.rr.GetSwitchLock("PBSw1") else 0)  # Switch Locks
 		outb[5] = setBit(outb[5], 7, 1 if self.rr.GetSwitchLock("PBSw3") else 0)
 

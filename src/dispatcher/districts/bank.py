@@ -224,7 +224,7 @@ class Bank (District):
 		self.handswitches["CSw21a.hand"] = hs
 
 		hs = HandSwitch(self, self.screen, self.frame, self.blocks["B21"], "CSw19.hand", (63, 14), self.misctiles["handup"])
-		self.blocks["B11"].AddHandSwitch(hs)
+		self.blocks["B21"].AddHandSwitch(hs)
 		self.handswitches["CSw19.hand"] = hs
 
 		return self.handswitches

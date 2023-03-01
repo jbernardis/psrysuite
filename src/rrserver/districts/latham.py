@@ -59,8 +59,8 @@ class Latham(District):
 		outb[0] = setBit(outb[0], 4, 1 if op > 0 else 0) 
 		outb[0] = setBit(outb[0], 5, 1 if op < 0 else 0)
 		op = self.rr.GetOutput("LSw7").GetOutPulse()
-		outb[0] = setBit(outb[0], 6, 1 if op > 0 else 0) 
-		outb[0] = setBit(outb[0], 7, 1 if op < 0 else 0)
+		outb[0] = setBit(outb[0], 7, 1 if op > 0 else 0)  # yes - for LSw7 for some reason, N and R are reversed
+		outb[0] = setBit(outb[0], 6, 1 if op < 0 else 0)
 
 		op = self.rr.GetOutput("LSw9").GetOutPulse()
 		outb[1] = setBit(outb[1], 0, 1 if op > 0 else 0) 

@@ -219,7 +219,6 @@ class District:
 			self.frame.Popup("No available route")
 			return False
 
-		# osblknm = osblk.GetName()
 		if osblk.AreHandSwitchesSet():
 			self.frame.Popup("Block is locked")
 			return False
@@ -227,6 +226,8 @@ class District:
 		# this is a valid signal for the current route	
 		if not currentMovement:  # we are trying to change the signal to allow movement
 			aspect = self.CalculateAspect(sig, osblk, rt)
+			if aspect is None:
+				return False
 
 		else:  # we are trying to change the signal to stop the train
 			esig = osblk.GetEntrySignal()
@@ -237,6 +238,7 @@ class District:
 
 		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "dbg": 1}})
 		sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
+			
 		return True
 
 	def CalculateAspect(self, sig, osblk, rt):

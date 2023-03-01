@@ -2,7 +2,7 @@ import logging
 
 from rrserver.district import District, leverState, formatIText, formatOText, GREENMTN, CLIFF, SHEFFIELD
 from rrserver.rrobjects import SignalOutput, NXButtonOutput, HandSwitchOutput, BlockInput, TurnoutInput, RouteInput, \
-	FleetLeverInput, SignalLeverInput, HandswitchLeverInput, ToggleInput
+	FleetLeverInput, SignalLeverInput, HandswitchLeverInput, ToggleInput, IndicatorOutput
 from rrserver.bus import setBit, getBit
 
 
@@ -72,12 +72,14 @@ class Cliff(District):
 		fleetlLeverNames = [ "cliff.fleet" ]
 		hsLeverNames = [ "CSw3.lvr", "CSw11.lvr", "CSw15.lvr", "CSw19.lvr", "CSw21.lvr", "CSw21a.lvr", "CSw21b.lvr"]
 		toggleNames = [ "crelease" ]
+		indNames = ["CBGreenMtnStn", "CBSheffield", "CBCliveden", "CBReverserC22C23", "CBBank"]
 
 		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
 		for sig, bits in sigNames:
 			self.rr.GetOutput(sig).SetBits(bits)
 		ix = self.AddOutputs(nxButtons, NXButtonOutput, District.nxbutton, ix)
 		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
+		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
 
 		for n in nxButtons:
 			self.SetNXButtonPulseLen(n, settings.nxbpulselen, settings.nxbpulsect)
@@ -269,13 +271,13 @@ class Cliff(District):
 		outb[5] = setBit(outb[5], 0, 0 if locked else 1)
 		outb[5] = setBit(outb[5], 1, 1 if locked else 0)
 		outb[5] = setBit(outb[5], 2, self.rr.GetInput("B10").GetValue())    # block indicators
-		CBGM = self.rr.GetInput("CBGreenMtnStn").GetValue() + self.rr.GetInput("CBGreenMtnYd").GetValue()  # Circuit Breakers
+		CBGM = self.rr.GetInput("CBGreenMtnStn").GetInvertedValue() + self.rr.GetInput("CBGreenMtnYd").GetInvertedValue()  # Circuit Breakers
 		outb[5] = setBit(outb[5], 3, 1 if CBGM != 0 else 0)
-		CBSheffield = self.rr.GetInput("CBSheffieldA").GetValue() + self.rr.GetInput("CBSheffieldB").GetValue()  # Circuit Breakers
+		CBSheffield = self.rr.GetInput("CBSheffieldA").GetInvertedValue() + self.rr.GetInput("CBSheffieldB").GetInvertedValue()  # Circuit Breakers
 		outb[5] = setBit(outb[5], 4, 1 if CBSheffield != 0 else 0)
-		outb[5] = setBit(outb[5], 5, self.rr.GetInput("CBCliveden").GetValue())
-		outb[5] = setBit(outb[5], 6, self.rr.GetInput("CBReverserC22C23").GetValue())
-		outb[5] = setBit(outb[5], 6, self.rr.GetInput("CBBank").GetValue())
+		outb[5] = setBit(outb[5], 5, self.rr.GetInput("CBCliveden").GetInvertedValue())
+		outb[5] = setBit(outb[5], 6, self.rr.GetInput("CBReverserC22C23").GetInvertedValue())
+		outb[5] = setBit(outb[5], 6, self.rr.GetInput("CBBank").GetInvertedValue())
 
 		outb[6] = setBit(outb[6], 0, 1 if self.rr.GetSwitchLock("CSw31") else 0)
 		outb[6] = setBit(outb[6], 1, 1 if self.rr.GetSwitchLock("CSw41") else 0)

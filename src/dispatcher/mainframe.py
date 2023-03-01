@@ -724,6 +724,9 @@ class MainFrame(wx.Frame):
 			hs = None
 
 		if hs:
+			if hs.IsDisabled():
+				return
+			
 			hs.GetDistrict().PerformHandSwitchAction(hs)
 
 		try:

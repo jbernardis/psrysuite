@@ -23,7 +23,7 @@ class Yard(District):
 				"YSw7", "YSw9", "YSw11",
 				"YSw17", "YSw19", "YSw21", "YSw23", "YSw25", "YSw27", "YSw29", "YSw33"]
 		relayNames = [ "Y11.srel", "Y20.srel", "Y21.srel", "L10.srel" ]
-		indNames = [ "Y20H", "Y20D" ]
+		indNames = [ "Y20H", "Y20D","CBKale", "CBEastEndJct", "CBCornellJct", "CBEngineYard", "CBWaterman" ]
 		nxButtons = ["YWEB1", "YWEB2", "YWEB3", "YWEB4", "YWWB1", "YWWB2", "YWWB3", "YWWB4"]
 
 		ix = 0
@@ -369,12 +369,12 @@ class Yard(District):
 		outb[3] = setBit(outb[3], 1, asp[0])
 		outb[3] = setBit(outb[3], 2, asp[1])
 		outb[3] = setBit(outb[3], 3, asp[2])
-		outb[3] = setBit(outb[3], 4, self.rr.GetInput("CBKale").GetValue())     #Circuit breakers
-		outb[3] = setBit(outb[3], 5, self.rr.GetInput("CBEastEndJct").GetValue())
-		outb[3] = setBit(outb[3], 6, self.rr.GetInput("CBCornellJct").GetValue())
-		outb[3] = setBit(outb[3], 7, self.rr.GetInput("CBEngineYard").GetValue())
+		outb[3] = setBit(outb[3], 4, self.rr.GetInput("CBKale").GetInvertedValue())     #Circuit breakers
+		outb[3] = setBit(outb[3], 5, self.rr.GetInput("CBEastEndJct").GetInvertedValue())
+		outb[3] = setBit(outb[3], 6, self.rr.GetInput("CBCornellJct").GetInvertedValue())
+		outb[3] = setBit(outb[3], 7, self.rr.GetInput("CBEngineYard").GetInvertedValue())
 
-		outb[4] = setBit(outb[4], 0, self.rr.GetInput("CBWaterman").GetValue())
+		outb[4] = setBit(outb[4], 0, self.rr.GetInput("CBWaterman").GetInvertedValue())
 		outb[4] = setBit(outb[4], 1, self.rr.GetInput("L20").GetValue())  # adjacent block indicators
 		outb[4] = setBit(outb[4], 2, self.rr.GetInput("P50").GetValue())
 		outb[4] = setBit(outb[4], 3, self.rr.GetOutput("YSw1").GetLock())  # Switch Locks

@@ -1461,14 +1461,17 @@ class Port (District):
 		self.handswitches = {}
 
 		hs = HandSwitch(self, self.screen, self.frame, self.blocks["P42"], "PBSw15a.hand", (145, 34), self.misctiles["handdown"])
+		hs.SetDisabled(True)
 		self.blocks["P42"].AddHandSwitch(hs)
 		self.handswitches["PBSw15a.hand"] = hs
 
 		hs = HandSwitch(self, self.screen, self.frame, self.blocks["P42"], "PBSw15b.hand", (149, 36), self.misctiles["handup"])
+		hs.SetDisabled(True)
 		self.blocks["P42"].AddHandSwitch(hs)
 		self.handswitches["PBSw15b.hand"] = hs
 
 		hs = HandSwitch(self, self.screen, self.frame, self.blocks["P41"], "PBSw5.hand", (129, 36), self.misctiles["handup"])
+		hs.SetDisabled(True)
 		self.blocks["P41"].AddHandSwitch(hs)
 		self.handswitches["PBSw5.hand"] = hs
 		return self.handswitches

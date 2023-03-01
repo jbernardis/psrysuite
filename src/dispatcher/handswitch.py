@@ -9,6 +9,13 @@ class HandSwitch:
 		self.pos = pos
 		self.locked = False
 		self.possibleRoutes = {}
+		self.disabled = False
+
+	def SetDisabled(self, flag=True):
+		self.disabled = flag
+
+	def IsDisabled(self):
+		return self.disabled
 
 	def GetDistrict(self):
 		return self.district

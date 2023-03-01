@@ -79,7 +79,7 @@ class SktServer (threading.Thread):
 					self.cbEvent({"newclient": {"socket": skt, "addr": addr, "SID": self.sessionID}})
 				self.sessionID += 1
 			else:
-				time.sleep(0.0001) # yield to other threads
+				pass #time.sleep(0.0001) # yield to other threads
  
 		for skt in self.sockets:
 			skt[0].close()
