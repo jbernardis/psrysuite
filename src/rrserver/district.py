@@ -185,8 +185,11 @@ class District(wx.Panel):
 		return True
 	
 	def SendIO(self, flag):
-		self.sendIO = flag
-		if not flag:
+		if not self.rr.SendIOEnabled():
+			self.sendIO = False
+		else:
+			self.sendIO = flag
+		if not self.sendIO:
 			self.rr.ClearIO()
 			
 	def setBus(self, bus):

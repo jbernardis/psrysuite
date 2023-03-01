@@ -14,6 +14,7 @@ from tester.nodes.carlton import Carlton
 from tester.nodes.dell import Dell
 from tester.nodes.foss import Foss
 from tester.nodes.shore import Shore
+from tester.nodes.krulish import Krulish
 
 # district node addresses
 YARD      = 0x11
@@ -57,7 +58,7 @@ nodes = {
 	"Hyde Jct" : ( HYDEJCT, None ),
 	"Hyde" : ( HYDE, None ),
 	"Shore" : ( SHORE, Shore ),
-	"Krulish" : ( KRULISH, None ),
+	"Krulish" : ( KRULISH, Krulish ),
 	"Nassau W" : ( NASSAUW, None ),
 	"Nassau E" : ( NASSAUE, None ),
 	"Nassau NX" : ( NASSAUNX, None ),

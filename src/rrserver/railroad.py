@@ -47,6 +47,7 @@ class Railroad(wx.Notebook):
 		self.switchLock = {}
 		self.fleetedSignals = {}
 		self.districtLock = {"NWSL": [0, 0, 0, 0], "NESL": [0, 0, 0]}
+		self.enableSendIO = True
 
 		for dname, dclass in self.districtList:
 			logging.debug("Creating district %s" % dname)
@@ -81,7 +82,15 @@ class Railroad(wx.Notebook):
 			dobj.SendIO(False)
 			dobj.DetermineSignalLevers()
 
-		self.districts["Yard"].SendIO(True)
+		self.currentDistrict = self.districts["Yard"]
+		self.currentDistrict.SendIO(True)
+
+	def EnableSendIO(self, flag):
+		self.enableSendIO = flag
+		self.currentDistrict.SendIO(flag)
+				
+	def SendIOEnabled(self):
+		return self.enableSendIO
 
 	def setBus(self, bus):
 		self.rrBus = bus
@@ -99,6 +108,7 @@ class Railroad(wx.Notebook):
 			self.SetPageText(px, "* " + self.districtList[px][0] + " *")
 			district = self.districts[self.districtList[px][0]]
 			district.SendIO(True)
+			self.currentDistrict = district
 
 	def ClearIO(self):
 		self.frame.ClearIO()

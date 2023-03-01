@@ -21,7 +21,6 @@ dispatcher in dispatch mode automatically starts rrserver (and rrserver automati
 
 
 tester remaining nodes:
-	Krulish
 	NassauW
 	NassauE
 	NassauNX

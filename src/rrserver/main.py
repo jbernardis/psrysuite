@@ -89,7 +89,14 @@ class MainFrame(wx.Frame):
 
 		vsz.AddSpacer(20)
 		vsz.Add(hsz)
-		vsz.AddSpacer(20)
+		vsz.AddSpacer(10)
+		
+		self.cbEnableSendIO = wx.CheckBox(self, wx.ID_ANY, "Enable IO Bits display")
+		self.cbEnableSendIO.SetValue(True)		
+		vsz.Add(self.cbEnableSendIO, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		self.Bind(wx.EVT_CHECKBOX, self.OnCbEnableIO, self.cbEnableSendIO)
+		vsz.AddSpacer(10)
+		
 		hsz2 = wx.BoxSizer(wx.HORIZONTAL)
 		hsz2.AddSpacer(20)
 		hsz2.Add(self.ioDisplay)
@@ -128,7 +135,10 @@ class MainFrame(wx.Frame):
 		logging.info("Starting Socket server at address: %s:%d" % (self.ip, self.settings.socketport))
 		self.socketServer = SktServer(self.ip, self.settings.socketport, self.socketEventReceipt)
 		self.socketServer.start()
-
+		
+	def OnCbEnableIO(self, _):
+		self.rr.EnableSendIO(self.cbEnableSendIO.IsChecked())
+		
 	def ClearIO(self):
 		evt = IOClearEvent()
 		wx.QueueEvent(self, evt)
