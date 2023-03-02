@@ -9,12 +9,11 @@ class Settings:
 	def __init__(self):
 		self.datafolder = os.path.join(os.getcwd(), "data")
 		self.inifile = os.path.join(self.datafolder, INIFILE)
-		self.section = "simulator"	
+		self.section = "dccserver"	
 
 		self.ipaddr = "192.168.1.144"
-		self.serverport = 9000
-		self.socketport = 9001
 		self.dccserverport = 9002
+		self.tty = "COM5"
 
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -24,27 +23,11 @@ class Settings:
 			
 		if self.cfg.has_section(GLOBAL):
 			for opt, value in self.cfg.items(GLOBAL):
-				if opt == 'socketport':
+				if opt == 'dccserverport':
 					try:
 						s = int(value)
 					except:
-						logging.warning("invalid value in ini file for socket port: (%s)" % value)
-						s = 9001
-					self.socketport = s
-						
-				elif opt == 'serverport':
-					try:
-						s = int(value)
-					except:
-						logging.warning("invalid value in ini file for server port: (%s)" % value)
-						s = 9000
-					self.serverport = s
-						
-				elif opt == 'dccserverport':
-					try:
-						s = int(value)
-					except:
-						logging.warning("invalid value in ini file for dcc server port: (%s)" % value)
+						logging.warning("invalid value in ini file for DCC server port: (%s)" % value)
 						s = 9002
 					self.dccserverport = s
 						
@@ -53,3 +36,11 @@ class Settings:
 
 		else:
 			logging.warning("Missing global section - assuming defaults")
+			
+		if self.cfg.has_section(self.section):
+			for opt, value in self.cfg.items(GLOBAL):
+				if opt == 'tty':
+					self.tty = s
+
+		else:
+			logging.warning("Missing %s section - assuming defaults" % self.section)

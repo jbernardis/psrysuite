@@ -144,9 +144,18 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadLocos, self.bLoadLocos)
 		self.bLoadLocos.Enable(False)
 		
+		self.bSaveTrains = wx.Button(self, wx.ID_ANY, "Save Trains", pos=(centeroffset+350, 25))
+		self.bSaveTrains.Enable(False)
+		self.Bind(wx.EVT_BUTTON, self.OnBSaveTrains, self.bSaveTrains)
+		self.bSaveLocos = wx.Button(self, wx.ID_ANY, "Save Locos", pos=(centeroffset+350, 65))
+		self.Bind(wx.EVT_BUTTON, self.OnBSaveLocos, self.bSaveLocos)
+		self.bSaveLocos.Enable(False)
+		
 		if not self.IsDispatcher():
 			self.bLoadTrains.Hide()
 			self.bLoadLocos.Hide()
+			self.bSaveTrains.Hide()
+			self.bSaveLocos.Hide()
 
 		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(centeroffset+2200, 25), style=wx.TE_READONLY)
 		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(centeroffset+2300, 25), style=wx.TE_READONLY)
@@ -870,6 +879,8 @@ class MainFrame(wx.Frame):
 			self.bConfig.Enable(False)
 			self.bLoadTrains.Enable(False)
 			self.bLoadLocos.Enable(False)
+			self.bSaveTrains.Enable(False)
+			self.bSaveLocos.Enable(False)
 			if self.IsDispatcher():
 				self.cbAutoRouter.Enable(False)
 			
@@ -887,6 +898,8 @@ class MainFrame(wx.Frame):
 			self.bConfig.Enable(True)
 			self.bLoadTrains.Enable(True)
 			self.bLoadLocos.Enable(True)
+			self.bSaveTrains.Enable(True)
+			self.bSaveLocos.Enable(True)
 			if self.IsDispatcher():
 				self.cbAutoRouter.Enable(True)
 
@@ -911,7 +924,7 @@ class MainFrame(wx.Frame):
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
 			logging.info("Dispatch: %s: %s" % (cmd, parms))
-			print("Incoming socket message: %s: %s" % (cmd, parms))
+			# print("Incoming socket message: %s: %s" % (cmd, parms))
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]
@@ -1129,6 +1142,7 @@ class MainFrame(wx.Frame):
 								self.atcList.RefreshTrain(tr)
 
 						blk.SetTrain(tr)
+						blk.EvaluateStoppingSections()
 						if tr:
 							tr.Draw()
 						else:
@@ -1170,7 +1184,7 @@ class MainFrame(wx.Frame):
 		if self.settings.dispatch or command in allowedCommands:
 			if self.subscribed:
 				logging.debug(json.dumps(req))
-				print("Outgoing HTTP request: %s" % json.dumps(req))
+				# print("Outgoing HTTP request: %s" % json.dumps(req))
 				self.rrServer.SendRequest(req)
 
 	def SendBlockDirRequests(self):
@@ -1195,13 +1209,15 @@ class MainFrame(wx.Frame):
 		self.bConfig.Enable(False)
 		self.bLoadTrains.Enable(False)
 		self.bLoadLocos.Enable(False)
+		self.bSaveTrains.Enable(False)
+		self.bSaveLocos.Enable(False)
 		if self.IsDispatcher():
 			self.cbAutoRouter.Enable(False)
 		logging.info("Server socket closed")
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()
 
-	def SaveTrains(self):
+	def OnBSaveTrains(self, _):
 		dlg = wx.FileDialog(self, message="Save Trains", defaultDir=self.settings.traindir,
 			defaultFile="", wildcard=wildcardTrain, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 		if dlg.ShowModal() != wx.ID_OK:
@@ -1249,7 +1265,7 @@ class MainFrame(wx.Frame):
 					else:
 						print("block %s not occupied or not known - ignoring" % bname)
 
-	def SaveLocos(self):
+	def OnBSaveLocos(self, _):
 		dlg = wx.FileDialog(self, message="Save Locomotives", defaultDir=self.settings.locodir,
 			defaultFile="", wildcard=wildcardLoco, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 		if dlg.ShowModal() != wx.ID_OK:
@@ -1299,12 +1315,6 @@ class MainFrame(wx.Frame):
 						print("block %s not occupied or not known - ignoring" % bname)
 
 	def OnClose(self, _):
-		if self.IsDispatcher():
-			dlg = ExitDlg(self)
-			rc = dlg.ShowModal()
-			dlg.Destroy()
-			if rc != wx.ID_OK:
-				return
 		self.KillWindow()
 		
 	def KillWindow(self):
@@ -1316,68 +1326,4 @@ class MainFrame(wx.Frame):
 			pass
 		self.Destroy()
 		logging.info("Display process ending")
-
-
-class ExitDlg (wx.Dialog):
-	def __init__(self, parent):
-		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Save Trains/Locomotives")
-		self.parent = parent
-		self.Bind(wx.EVT_CLOSE, self.onCancel)
-
-		dw, dh = wx.GetDisplaySize()
-		sw, sh = self.GetSize()
-		px = (dw-sw)/2
-		py = (dh-sh)/2
-		self.SetPosition(wx.Point(int(px), int(py)))
-
-		vsz = wx.BoxSizer(wx.VERTICAL)
-		vsz.AddSpacer(20)
-
-		self.bTrains = wx.Button(self, wx.ID_ANY, "Save Trains")
-		self.bLocos  = wx.Button(self, wx.ID_ANY, "Save Locos")
-
-		vsz.Add(self.bTrains, 0, wx.ALIGN_CENTER)
-		vsz.AddSpacer(10)
-		vsz.Add(self.bLocos, 0, wx.ALIGN_CENTER)
-		vsz.AddSpacer(20)
-
-		bsz = wx.BoxSizer(wx.HORIZONTAL)
-
-		self.bOK = wx.Button(self, wx.ID_ANY, "OK")
-		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
-
-		bsz.Add(self.bOK)
-		bsz.AddSpacer(10)
-		bsz.Add(self.bCancel)
-
-		self.Bind(wx.EVT_BUTTON, self.onSaveTrains, self.bTrains)
-		self.Bind(wx.EVT_BUTTON, self.onSaveLocos, self.bLocos)
-		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
-		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
-
-		vsz.Add(bsz, 0, wx.ALIGN_CENTER)
-
-		vsz.AddSpacer(20)
-
-		hsz = wx.BoxSizer(wx.HORIZONTAL)
-		hsz.AddSpacer(10)
-		hsz.Add(vsz)
-		hsz.AddSpacer(10)
-
-		self.SetSizer(hsz)
-		self.Layout()
-		self.Fit()
-
-	def onSaveTrains(self, _):
-		self.parent.SaveTrains()
-
-	def onSaveLocos(self, _):
-		self.parent.SaveLocos()
-
-	def onCancel(self, _):
-		self.EndModal(wx.ID_CANCEL)
-
-	def onOK(self, _):
-		self.EndModal(wx.ID_OK)
-
 

@@ -467,32 +467,39 @@ class StoppingBlock (Block):
 			return
 
 		if self.block.east and self.eastend:
-			if self.block.sigEast:
-				if self.block.blkEast:
-					blkOccupied = self.block.blkEast.IsOccupied()
-				else:
-					blkOccupied = True
-				sv = self.frame.GetSignalByName(self.block.sigEast).GetAspect()
-				# do not rearm the stopping relay if we transition from Green Light/Empty OS to Red Light/Occupied OS
-				if not(self.lastSignalGreen and self.lastBlockEmpty and sv == 0 and blkOccupied):
-					self.Activate(sv == 0)
-				self.lastSignalGreen = sv != 0
-				self.lastBlockEmpty = not blkOccupied
+			signm = self.block.sigEast
+			blk = self.block.blkEast
 		elif (not self.block.east) and (not self.eastend):
-			if self.block.sigWest:
-				if self.block.blkWest:
-					blkOccupied = self.block.blkWest.IsOccupied()
-				else:
-					blkOccupied = True
-				sv = self.frame.GetSignalByName(self.block.sigWest).GetAspect()
-				if not(self.lastSignalGreen and self.lastBlockEmpty and sv == 0 and blkOccupied):
-					self.Activate(sv == 0)
-				self.lastSignalGreen = sv != 0
-				self.lastBlockEmpty = not blkOccupied
+			signm = self.block.sigWest
+			blk = self.block.blkWest
+		else:
+			return
+		
+		if signm:
+			if blk:
+				tr = self.block.GetTrain()
+				if tr is None:
+					return
+				blkOccupied = blk.IsOccupied()
+				if blkOccupied:
+					trnext = blk.GetTrain()
+					if trnext is None:
+						return
+					if tr.GetName() == trnext.GetName():
+						return
+			else:
+				blkOccupied = True
+
+			sv = self.frame.GetSignalByName(signm).GetAspect()
+			if not(self.lastSignalGreen and self.lastBlockEmpty and sv == 0 and blkOccupied):
+				self.Activate(sv == 0)
+			self.lastSignalGreen = sv != 0
+			self.lastBlockEmpty = not blkOccupied
 
 	def Activate(self, flag=True):
 		if flag == self.active:
 			return
+		print("********************************************* In activate %s %s" % (self.GetName(), str(flag)))
 		
 		tr = self.block.GetTrain()
 		if tr is None:
@@ -650,6 +657,10 @@ class OverSwitch (Block):
 				exitBlk.SetNextBlockEast(self)
 			self.SetNextBlockWest(exitBlk)
 		self.Draw()
+		
+	def EvaluateStoppingSections(self):
+		print("OS %s evaluate stopping sections" % self.GetName())
+		return
 
 	def SendRouteRequest(self):
 		msg = {
@@ -741,7 +752,27 @@ class OverSwitch (Block):
 				t.Draw(stat, self.east)
 
 		self.district.DrawOthers(self)
+		self.DrawTrain()
 
 	def DrawTurnouts(self):
 		for t in self.turnouts:
 			t.Draw(EMPTY, self.east)
+
+	def DrawTrain(self):
+		if len(self.trainLoc) == 0:
+			return
+
+		if self.train is None:
+			trainID = "??"
+			locoID = "??"
+			atc = False
+		else:
+			trainID, locoID = self.train.GetNameAndLoco()
+			atc = self.train.IsOnATC()
+
+		for screen, loc in self.trainLoc:
+			if self.occupied:
+				self.frame.DrawTrain(screen, loc, trainID, locoID, False, atc)
+			else:
+				self.frame.ClearTrain(screen, loc)
+

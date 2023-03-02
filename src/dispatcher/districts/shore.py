@@ -274,6 +274,7 @@ class Shore (District):
 				(self.tiles["eobright"],  self.screen, (109, 19), False),
 			],
 			False)
+		self.blocks["SOSW"].AddTrainLoc(self.screen, (94, 11))
 
 		self.blocks["SOSE"] = OverSwitch(self, self.frame, "SOSE", 
 			[
@@ -342,6 +343,7 @@ class Shore (District):
 				(self.tiles["eobright"],  self.screen, (109, 19), False),
 			],
 			True)
+		self.blocks["SOSE"].AddTrainLoc(self.screen, (94, 13))
 
 		self.blocks["F10"] = Block(self, self.frame, "F10",
 			[

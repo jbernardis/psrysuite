@@ -276,7 +276,6 @@ class District:
 
 		nb = exitBlk.NextBlock(reverse=doReverseExit)
 		if nb:
-			print("next block = %s" % nb.GetName())
 			nbStatus = nb.GetStatus()
 			nbRType = nb.GetRouteType()
 			# try to go one more block, skipping past an OS block
@@ -295,7 +294,6 @@ class District:
 				nxb = self.frame.blocks[nxbNm]
 				if nxb:
 					nnb = nxb.NextBlock(reverse=doReverseNext)
-					print("next next block = %s" % nnb.GetName())
 				else:
 					nnb = None
 

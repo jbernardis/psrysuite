@@ -343,7 +343,7 @@ class Latham (District):
 
 		blockSigs = {
 			# which signals govern stopping sections, west and east
-			"L10": ("Y2R",  None),
+			"L10": ("Y2L",  None),
 			"L11": ("L8L",  None),
 			"L20": (None, "L6RA"),
 			"L21": ("L6L",  "L16R"),

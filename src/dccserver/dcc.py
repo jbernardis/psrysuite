@@ -99,10 +99,9 @@ class DCC:
 			
 		else:
 			l = DCCLoco(loco)
-			self.locos.append(l)
-			self.selectedLoco = l
-
-		l = self.selectedLoco			
+			
+		self.locos.append(l)
+		self.selectedLoco = l
 		self.SetSpeedAndDirection(nspeed=l.GetSpeed(), ndir=l.GetDirection())
 		self.SetFunction(headlight=l.GetHeadlight(), horn=l.GetHorn(), bell=l.GetBell())
 		return l.GetSpeed(), l.GetDirection(), l.GetHeadlight(), l.GetHorn(), l.GetBell()
