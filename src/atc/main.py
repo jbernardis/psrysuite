@@ -26,17 +26,18 @@ from atc.overswitch import OverSwitch
 from atc.train import Train
 from atc.route import Route
 
+from atc.dccremote import DCCRemote
+
 from atc.listener import Listener
 from atc.rrserver import RRServer
 from atc.dccserver import DCCServer
+from atc.ticker import Ticker
 
 class MainUnit:
 	def __init__(self):
-		logging.info("PSRY AutoRouter starting...")
+		logging.info("PSRY ATC Server starting...")
 		self.sessionid = None
 		self.settings = Settings()
-
-#		self.triggers = Triggers()
 
 		self.blocks = {}
 		self.turnouts = {}
@@ -44,8 +45,6 @@ class MainUnit:
 		self.routes = {}
 		self.osList = {}
 		self.trains = {}
-		self.OSQueue = {}
-#		self.ReqQueue= RequestQueue(self)
 		self.listener = None
 		self.rrServer = None
 		self.commandQ = Queue()
@@ -60,8 +59,12 @@ class MainUnit:
 			logging.error("Unable to establish connection with railroad server")
 			self.listener = None
 			return
+		
+		self.dccRemote = DCCRemote(self.dccServer)
 
 		self.listener.start()
+		
+		self.ticker = Ticker(0.4, self.tickerEvent)
 
 		logging.info("finished initialize")
 
@@ -70,6 +73,10 @@ class MainUnit:
 		
 	def raiseDisconnectEvent(self): # thread context
 		self.commandQ.put("{\"disconnect\": []}")
+		
+	def tickerEvent(self):  # thread context
+		if self.dccRemote.LocoCount() > 0:
+			self.commandQ.put("{\"ticker\": []}")
 
 	def run(self):
 		if self.listener is None:
@@ -81,7 +88,11 @@ class MainUnit:
 			jdata = json.loads(data)
 			logging.info("Received (%s)" % data)
 			for cmd, parms in jdata.items():
-				if cmd == "turnout":
+				if cmd == "ticker":
+					for t in self.dccRemote.GetLocos():
+						print("What to do with train %s" % t)
+						
+				elif cmd == "turnout":
 					for p in parms:
 						turnout = p["name"]
 						state = p["state"]
@@ -202,26 +213,29 @@ class MainUnit:
 					if action == "add":
 						train = parms["train"][0]
 						loco = parms["loco"][0]
-						if train in self.trains:
-							print("add: we know about this train")
-						else:
-							print("add: we don't know about this train")
+						self.dccRemote.SelectLoco(loco)
+						self.dccRemote.PrintList()
 							
 					elif action == "delete":
 						train = parms["train"][0]
 						loco = parms["loco"][0]
-						if train in self.trains:
-							print("delete: we know about this train")
-						else:
-							print("delete: we don't know about this train")
+						self.dccRemote.DropLoco(loco)
+						self.dccRemote.PrintList()
 	
 				else:
 					if cmd not in ["control", "relay", "handswitch", "siglever", "breaker", "fleet"]:
 						logging.info("unknown command ignored: %s: %s" % (cmd, parms))
 
+		logging.info("terminating socket listener")
 		try:
 			self.listener.kill()
 			self.listener.join()
+		except:
+			pass
+
+		logging.info("terminating timer thread")		
+		try:
+			self.ticker.stop()
 		except:
 			pass
 
@@ -382,3 +396,4 @@ class MainUnit:
 
 main = MainUnit()
 main.run()
+print("ATC server exiting...")

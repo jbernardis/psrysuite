@@ -85,7 +85,8 @@ class ATCListCtrl(wx.ListCtrl):
 	def RefreshTrain(self, tr):
 		nm = tr.GetName()
 		if nm not in self.trainNames:
-			return False
+			self.AddTrain(tr)
+			return 
 		try:
 			idx = self.trainNames.index(nm)
 		except ValueError:

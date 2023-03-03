@@ -257,30 +257,41 @@ class MainFrame(wx.Frame):
 				loco = evt.data["loco"][0]
 			except (IndexError, KeyError):
 				loco = None
+			try:
+				atc = evt.data["atc"][0]
+			except (IndexError, KeyError):
+				atc = False
 			block = evt.data["block"][0]
 			# train information is always echoed back to all listeners
 
 			if trn and trn.startswith("??"):
 				# this is an unknown train - see if we have a known train in the same block
-				ntrn, nloco = self.trainList.FindTrainInBlock(block)
+				ntrn, nloco, natc = self.trainList.FindTrainInBlock(block)
 				if ntrn:
 					trn = ntrn
 				if nloco:
 					loco = nloco
+				if natc is not None:
+					atc = natc
+					
 			elif trn:
 				# this is a known train - see if we have an existing train (known or unknown)
 				# in the block, and just replace it
 				etrn, eloco = self.trainList.FindTrainInBlock(block)
 				if etrn:
 					if self.trainList.RenameTrain(etrn, trn, eloco, loco):
+						print("***********************************setatc safter rename %s %s" % (trn, str(atc)))
+						self.trainList.SetAtc(trn, atc)
 						for cmd in self.trainList.GetSetTrainCmds(trn):
 							self.socketServer.sendToAll(cmd)
 					return
 
-			resp = {"settrain": [{"name": trn, "loco": loco, "block": block}]}
+			resp = {"settrain": [{"name": trn, "loco": loco, "block": block, "atc": atc}]}
 			self.socketServer.sendToAll(resp)
 
 			self.trainList.Update(trn, loco, block)
+			print("******************************************setatc at end of settrain %s %s" % (trn, str(atc)))
+			self.trainList.SetAtc(trn, atc)
 
 		elif verb == "renametrain":
 			try:
@@ -299,8 +310,13 @@ class MainFrame(wx.Frame):
 				nloco = evt.data["newloco"][0]
 			except (IndexError, KeyError):
 				nloco = None
+			try:
+				atc = evt.data["atc"][0]
+			except (IndexError, KeyError):
+				atc = False
 
 			if self.trainList.RenameTrain(oname, nname, oloco, nloco):
+				self.trainList.SetAtc(nname, atc)
 				for cmd in self.trainList.GetSetTrainCmds(nname):
 					self.socketServer.sendToAll(cmd)
 
@@ -500,6 +516,10 @@ class MainFrame(wx.Frame):
 		elif verb == "atc":
 			print("ATC request")
 			pprint.pprint(evt.data)
+			action = evt.data["action"][0]
+			train = evt.data["train"][0]
+			print("************************************setatc after atc command %s %s" % (train, action))
+			self.trainList.SetAtc(train, action == "add")
 			addrList = self.clientList.GetFunctionAddress("ATC")
 			print("addrlist has %d entry" % len(addrList), flush=True)
 			for addr, skt in addrList:

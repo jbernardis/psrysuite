@@ -18,11 +18,22 @@ class TrainList(wx.ListCtrl):
 	def OnGetItemText(self, item, col):
 		train = self.order[item]
 		if col == 0:
-			return train
+			if self.trains[train]["atc"]:
+				return "* " + train	
+			else:
+				return train
 		elif col == 1:
 			return self.trains[train]["loco"]
 		elif col == 2:
 			return ", ".join(self.trains[train]["blocks"])
+		
+	def SetAtc(self, train, atcflag):
+		if train not in self.trains:
+			return 
+		
+		self.trains[train]["atc"] = atcflag
+		tx = self.order.index(train)
+		self.RefreshItem(tx)
 
 	def Update(self, train, loco, block):
 		if block is None:
@@ -49,7 +60,7 @@ class TrainList(wx.ListCtrl):
 				if loco:
 					self.trains[train]["loco"] = loco
 			else:
-				self.trains[train] = {"blocks": [block], "loco": loco}
+				self.trains[train] = {"blocks": [block], "loco": loco, "atc": False}
 				self.order.append(train)
 				self.SetItemCount(len(self.order))
 				
@@ -59,9 +70,9 @@ class TrainList(wx.ListCtrl):
 	def FindTrainInBlock(self, block):
 		for tr, trinfo in self.trains.items():
 			if block in trinfo["blocks"]:
-				return tr, trinfo["loco"]
+				return tr, trinfo["loco"], trinfo["atc"]
 
-		return None, None
+		return None, None, None
 
 	def RenameTrain(self, oname, nname, oloco, nloco):
 		if oname == nname and oloco == nloco:
@@ -95,7 +106,8 @@ class TrainList(wx.ListCtrl):
 			if train is None or train == tr:
 				loco = trinfo["loco"]
 				blocks = trinfo["blocks"]
+				atc = trinfo["atc"]
 				clist = []
 				for b in blocks:
-					clist.append({"block": b, "name": tr, "loco": loco})
+					clist.append({"block": b, "name": tr, "loco": loco, "atc": atc})
 				yield({"settrain": clist})

@@ -763,7 +763,7 @@ class MainFrame(wx.Frame):
 					if rc != wx.ID_OK:
 						return
 
-					self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid}})
+					self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid, "atc": atc}})
 					if self.IsDispatcher() and atc != oldATC:
 						tr.SetATC(atc)
 						if atc:
@@ -772,6 +772,7 @@ class MainFrame(wx.Frame):
 						else:
 							self.atcList.DelTrain(tr)
 							self.Request({"atc": {"action": "delete", "train": trainid, "loco": locoid}})					
+
 					tr.Draw()
 
 	def DrawTile(self, screen, pos, bmp):
@@ -924,7 +925,7 @@ class MainFrame(wx.Frame):
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
 			logging.info("Dispatch: %s: %s" % (cmd, parms))
-			# print("Incoming socket message: %s: %s" % (cmd, parms))
+			# print("Incoming socket message: %s: %s" % (cmd, parms), flush=True)
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]
@@ -1075,6 +1076,8 @@ class MainFrame(wx.Frame):
 					block = p["block"]
 					name = p["name"]
 					loco = p["loco"]
+					atc = p["atc"]
+					print(str(parms))
 
 					try:
 						blk = self.blocks[block]
@@ -1083,6 +1086,7 @@ class MainFrame(wx.Frame):
 						blk = None
 
 					if blk:
+						print("has block")
 						tr = blk.GetTrain()
 						if name is None:
 							if tr:
@@ -1110,6 +1114,7 @@ class MainFrame(wx.Frame):
 
 						if tr:
 							oldName = tr.GetName()
+							print("block has train %s"  % oldName)
 							if oldName and oldName != name:
 								if name in self.trains:
 									# merge the two trains under the new "name"
@@ -1121,6 +1126,7 @@ class MainFrame(wx.Frame):
 										self.trains[name].AddToBlock(blk)
 								else:
 									tr.SetName(name)
+									tr.SetATC(atc)
 									self.trains[name] = tr
 									if tr.IsOnATC():
 										self.atcList.UpdateTrainName(tr, oldName)
@@ -1130,16 +1136,22 @@ class MainFrame(wx.Frame):
 									self.atcList.DelTrainByName(oldName)
 								except:
 									logging.warning("can't delete train %s from train list" % oldName)
+						
 						try:
+							print("trying to find train in existing list")
 							tr = self.trains[name]
 						except:
+							print("nopt - createing a new one")
 							tr = Train(name)
 							self.trains[name] = tr
+							
+						print("set ATC to %s" % str(atc))
+						tr.SetATC(atc)
 						tr.AddToBlock(blk)
 						if loco:
 							tr.SetLoco(loco)
-							if tr.IsOnATC():
-								self.atcList.RefreshTrain(tr)
+
+						self.atcList.RefreshTrain(tr)
 
 						blk.SetTrain(tr)
 						blk.EvaluateStoppingSections()
