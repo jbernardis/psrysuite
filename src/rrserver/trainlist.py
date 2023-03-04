@@ -74,6 +74,13 @@ class TrainList(wx.ListCtrl):
 
 		return None, None, None
 
+	def FindTrain(self, trn):
+		for tr, trinfo in self.trains.items():
+			if tr == trn:
+				return trinfo["loco"], trinfo["atc"]
+
+		return None, None
+
 	def RenameTrain(self, oname, nname, oloco, nloco):
 		if oname == nname and oloco == nloco:
 			return False

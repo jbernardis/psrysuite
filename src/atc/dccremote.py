@@ -2,13 +2,17 @@ FORWARD = 'F'
 REVERSE = 'R'
 
 class DCCLoco:
-	def __init__(self, loco):
+	def __init__(self, loco, train):
 		self.loco = loco
+		self.train = train
 		self.direction = FORWARD;
 		self.speed = 0;
 		self.light = False;
 		self.horn = False
 		self.bell = False
+		
+	def GetTrain(self):
+		return self.train
 		
 	def GetLoco(self):
 		return self.loco
@@ -56,15 +60,22 @@ class DCCRemote:
 		
 	def LocoCount(self):
 		return len(self.locos)
+	
+	def HasTrain(self, trn):
+		for l in self.locos:
+			if l.GetTrain() == trn:
+				return True
+			
+		return False
 		
-	def SelectLoco(self, loco):
+	def SelectLoco(self, train, loco):
 		for l in self.locos:
 			if l.GetLoco() == loco:
 				self.selectedLoco = l
 				break
 			
 		else:
-			l = DCCLoco(loco)
+			l = DCCLoco(loco, train)
 			self.locos.append(l)
 			self.selectedLoco = l
 

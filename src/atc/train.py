@@ -4,6 +4,8 @@ class Train:
 		self.name = name
 		self.loco = loco
 		self.blocks = []
+		self.governingSignal = {"signal": None, "os": None, "route": None}
+		
 
 	def AddBlock(self, block):
 		if block in self.blocks:
@@ -14,6 +16,19 @@ class Train:
 		
 	def GetBlocks(self):
 		return self.blocks
+	
+	def GetFirstBlock(self):
+		if len(self.blocks) == 0:
+			return None
+		return self.blocks[0]
+	
+	def GetGoverningSignal(self):
+		return self.governingSignal
+	
+	def SetGoverningSignal(self, sig):
+		print("setting governing signal for train %s to %s" % (self.name, str(sig)))
+		self.governingSignal = sig
+	
 
 	def DelBlock(self, block):
 		if block in self.blocks:

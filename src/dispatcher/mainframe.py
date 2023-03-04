@@ -1151,7 +1151,8 @@ class MainFrame(wx.Frame):
 						if loco:
 							tr.SetLoco(loco)
 
-						self.atcList.RefreshTrain(tr)
+						if atc:
+							self.atcList.RefreshTrain(tr)
 
 						blk.SetTrain(tr)
 						blk.EvaluateStoppingSections()

@@ -249,6 +249,7 @@ class MainFrame(wx.Frame):
 			self.socketServer.sendToAll(resp)
 
 		elif verb == "settrain":
+			print("Incoming HTTP Request: %s" % json.dumps(evt.data), flush=True)
 			try:
 				trn = evt.data["name"][0]
 			except (IndexError, KeyError):
@@ -275,25 +276,40 @@ class MainFrame(wx.Frame):
 					atc = natc
 					
 			elif trn:
+				print("we have train %s" % trn)
 				# this is a known train - see if we have an existing train (known or unknown)
 				# in the block, and just replace it
-				etrn, eloco = self.trainList.FindTrainInBlock(block)
+				etrn, eloco, eatc = self.trainList.FindTrainInBlock(block)
+				print("find in block %s: %s %s %s" % (block, str(etrn), str(eloco), str(eatc)))
 				if etrn:
 					if self.trainList.RenameTrain(etrn, trn, eloco, loco):
 						print("***********************************setatc safter rename %s %s" % (trn, str(atc)))
-						self.trainList.SetAtc(trn, atc)
+						#self.trainList.SetAtc(trn, eatc)
 						for cmd in self.trainList.GetSetTrainCmds(trn):
+							print("sending: %s" % str(cmd), flush=True)
 							self.socketServer.sendToAll(cmd)
 					return
+				else: # see if we have it anywhere, and preserve the atc and loco values if we do
+					eloco, eatc = self.trainList.FindTrain(trn)
+					if eatc is not None:
+						atc = eatc
+						
+					if eloco is not None:
+						if eloco != loco:
+							print("loco numbera are different - using the new one")
+							loco = eloco
 
 			resp = {"settrain": [{"name": trn, "loco": loco, "block": block, "atc": atc}]}
+			print("sending: %s" % str(resp), flush=True)
 			self.socketServer.sendToAll(resp)
 
 			self.trainList.Update(trn, loco, block)
 			print("******************************************setatc at end of settrain %s %s" % (trn, str(atc)))
 			self.trainList.SetAtc(trn, atc)
+			print("set======================================================================", flush=True)
 
 		elif verb == "renametrain":
+			print("Incoming HTTP Request: %s" % json.dumps(evt.data), flush=True)
 			try:
 				oname = evt.data["oldname"][0]
 			except (IndexError, KeyError):
@@ -318,7 +334,9 @@ class MainFrame(wx.Frame):
 			if self.trainList.RenameTrain(oname, nname, oloco, nloco):
 				self.trainList.SetAtc(nname, atc)
 				for cmd in self.trainList.GetSetTrainCmds(nname):
+					print("sending: %s" % str(cmd), flush=True)
 					self.socketServer.sendToAll(cmd)
+			print("rename======================================================================", flush=True)
 
 		elif verb == "blockdir":
 			block = evt.data["block"][0]

@@ -9,6 +9,8 @@ checking train for non-contiguous Blocks
 
 ATC
  need dcc interface - dcc server that will be used for both atc and throttle
+ need to resolve starting and stopping in the same block - this requires 2 entries in the script, but that can't be
+ after train reaches its terminus, we should be able to clear out the far stopping section - this is not necessarily an ATC issue, it was just discovered here
 
 Auto routing
   interface needs work

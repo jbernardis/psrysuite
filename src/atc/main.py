@@ -11,6 +11,7 @@ logging.basicConfig(filename=os.path.join("logs", "atc.log"), filemode='w', form
 from queue import Queue
 
 import json
+import pprint
 
 #from atc.fifo import Fifo
 
@@ -38,6 +39,7 @@ class MainUnit:
 		logging.info("PSRY ATC Server starting...")
 		self.sessionid = None
 		self.settings = Settings()
+		self.initialized = False
 
 		self.blocks = {}
 		self.turnouts = {}
@@ -48,6 +50,9 @@ class MainUnit:
 		self.listener = None
 		self.rrServer = None
 		self.commandQ = Queue()
+
+		if not self.ProcessScripts():
+			return
 
 		self.dccServer = DCCServer()
 		self.dccServer.SetServerAddress(self.settings.ipaddr, self.settings.dccserverport)
@@ -61,12 +66,95 @@ class MainUnit:
 			return
 		
 		self.dccRemote = DCCRemote(self.dccServer)
-
-		self.listener.start()
+		
+		if self.listener:
+			self.listener.start()
 		
 		self.ticker = Ticker(0.4, self.tickerEvent)
 
 		logging.info("finished initialize")
+		self.initialized = True
+		
+	def ProcessScripts(self):
+		try:
+			with open(os.path.join(os.getcwd(), "data", "layout.json"), "r") as jfp:
+				layout = json.load(jfp)
+		except:
+			logging.error("Unable to load layout file")
+			return False
+		
+		subblocks = layout["subblocks"]
+		submap = {}
+		for blk, sublist in subblocks.items():
+			for sub in sublist:
+				submap[sub] = blk
+				
+		print(str(submap))
+		
+		try:
+			with open(os.path.join(os.getcwd(), "data", "simscripts.json"), "r") as jfp:
+				scripts = json.load(jfp)
+		except:
+			logging.error("Unable to load scripts")
+			return False
+		
+		self.scripts = {}
+		
+		for train, script in scripts.items():
+			print("Train: %s" % train)
+			sigList = [[None, None, None]]
+			for step in script:
+				cmd = list(step.keys())[0]
+				if cmd == "waitfor":
+					sig = step[cmd]["signal"]
+					osb = step[cmd]["os"]
+					rte = step[cmd]["route"]
+					sigList.append([sig, osb, rte])
+
+			sigList.append([None, None, None])					
+			sigx = 0
+
+			steps = {}			
+			for step in script:
+				cmd = list(step.keys())[0]
+				if cmd in ["placetrain", "movetrain"]:
+					blk = step[cmd]["block"]
+					if blk in submap:
+						blk = submap[blk]
+						
+					steps[blk] = {
+							"sigbehind": sigList[sigx][0],
+							"sigahead": {
+								   "signal": str(sigList[sigx+1][0]),
+								   "os": str(sigList[sigx+1][1]),
+								   "route": str(sigList[sigx+1][2])
+							}
+					}
+
+				elif cmd == "waitfor":
+					sigx += 1
+			self.scripts[train] = steps
+			
+		pprint.pprint(self.scripts)
+		return True
+	
+	def GetSignalBehind(self, train, block):
+		if train not in self.scripts:
+			return None
+		
+		if block not in self.scripts[train]:
+			return None
+		
+		return {"signal": self.scripts[train][block]["sigbehind"], "os": None, "route": None}
+	
+	def GetSignalAhead(self, train, block):
+		if train not in self.scripts:
+			return None
+		
+		if block not in self.scripts[train]:
+			return None
+		
+		return self.scripts[train][block]["sigahead"]
 
 	def raiseDeliveryEvent(self, data):  # thread context
 		self.commandQ.put(data)
@@ -79,7 +167,8 @@ class MainUnit:
 			self.commandQ.put("{\"ticker\": []}")
 
 	def run(self):
-		if self.listener is None:
+		if not self.initialized:
+			logging.error("Not properly initialized - exiting...")
 			return 
 		
 		self.running = True
@@ -90,7 +179,7 @@ class MainUnit:
 			for cmd, parms in jdata.items():
 				if cmd == "ticker":
 					for t in self.dccRemote.GetLocos():
-						print("What to do with train %s" % t)
+						pass #print("What to do with train %s" % t, flush=True)
 						
 				elif cmd == "turnout":
 					for p in parms:
@@ -110,6 +199,7 @@ class MainUnit:
 	
 				elif cmd == "block":
 					for p in parms:
+						print("Block %s" % str(p))
 						block = p["name"]
 						state = p["state"]
 						if block not in self.blocks:
@@ -178,6 +268,7 @@ class MainUnit:
 	
 				elif cmd == "settrain":
 					for p in parms:
+						print("set train: %s" % str(p), flush=True)
 						block = p["block"]
 						name = p["name"]
 						loco = p["loco"]
@@ -213,7 +304,10 @@ class MainUnit:
 					if action == "add":
 						train = parms["train"][0]
 						loco = parms["loco"][0]
-						self.dccRemote.SelectLoco(loco)
+						tr = self.trains[train]
+						blk = tr.GetFirstBlock()
+						tr.SetGoverningSignal(self.GetSignalAhead(train, blk))
+						self.dccRemote.SelectLoco(train, loco)
 						self.dccRemote.PrintList()
 							
 					elif action == "delete":
@@ -263,7 +357,7 @@ class MainUnit:
 	def TurnoutStateChange(self, toName, nState):
 		logging.info("turnout %s state has changed %s" % (toName, nState))
 		self.EvaluateQueuedRequests()
-		self.ReqQueue.Resume(toName)
+		#self.ReqQueue.Resume(toName)
 
 	def BlockDirectionChange(self, blkName, nDirection):
 		logging.info("block %s has changed direction: %s" % (blkName, nDirection))
@@ -286,7 +380,23 @@ class MainUnit:
 				pass
 
 	def TrainAddBlock(self, train, block):
+		if not self.dccRemote.HasTrain(train):
+			logging.info("TrainAddBlock ignoring train %s because it is not on ATC" % train)
+			return
+		
 		logging.info("Train %s has moved into block %s" % (train, block))
+		print("Train %s has moved into block %s" % (train, block), flush=True)
+		
+		tr = self.trains[train]
+		
+		# set governing signal to the signal behind us UNLESS we have already switched to the signal ahead of us
+		gs = tr.GetGoverningSignal()
+		sig = self.GetSignalAhead(train, block)
+		if gs != sig:
+			gs = self.GetSignalBehind(train, block)
+			tr.SetGoverningSignal(gs)
+			
+		print("Governing signal is %s" % str(gs))
   # routeRequest = self.CheckTrainInBlock(train, block, TriggerPointFront)
   # if routeRequest is None:
   # 	return
@@ -297,7 +407,18 @@ class MainUnit:
   # 	self.EnqueueRouteRequest(routeRequest)
 			
 	def TrainTailInBlock(self, train, block):
+		if not self.dccRemote.HasTrain(train):
+			logging.info("TrainTailInBlock ignoring train %s because it is not on ATC" % train)
+			return
 		logging.info("Train %s tail in block %s" % (train, block))
+		
+		print("Train %s tail in block %s" % (train, block), flush=True)
+		gs = self.GetSignalAhead(train, block)
+		print("Governing signal is %s" % str(gs))
+
+		tr = self.trains[train]
+		tr.SetGoverningSignal(gs)
+
   # routeRequest = self.CheckTrainInBlock(train, block, TriggerPointRear)
   # if routeRequest is None:
   # 	return
@@ -309,6 +430,7 @@ class MainUnit:
 
 	def TrainRemoveBlock(self, train, block, blocks):
 		logging.info("Train %s has left block %s and is now in %s" % (train, block, ",".join(blocks)))
+		print("Train %s has left block %s and is now in %s" % (train, block, ",".join(blocks)))
 		pass
 
 	def CheckTrainInBlock(self, train, block, triggerPoint):
