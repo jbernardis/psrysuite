@@ -38,6 +38,9 @@ class Block:
 		self.train = train
 		self.loco = loco
 		self.parent.BlockTrainChange(self.name, oldTrain, oldLoco, self.train, self.loco)
+		
+	def GetTrain(self):
+		return self.train
 
 	def GetName(self):
 		return self.name

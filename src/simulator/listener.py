@@ -70,6 +70,8 @@ class Listener(threading.Thread):
 			except:
 				print("Unable to determine message length: (", szBuf, ")")
 				msgSize = None
+				
+			logging.info("expecting a message of %d bytes"  % msgSize)
 
 			if msgSize:		
 				totalRead = 0
@@ -93,9 +95,12 @@ class Listener(threading.Thread):
 					else:
 						msgBuf += b
 						totalRead += len(b)
+						
+				logging.info("in message loop, read = %d" % totalRead)
 			
 				if self.isRunning:
 					if totalRead == msgSize:
+						logging.info("giving the data to parent")
 						self.parent.raiseDeliveryEvent(msgBuf)
 	
 		self.endOfLife = True

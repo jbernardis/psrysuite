@@ -1,62 +1,11 @@
-FORWARD = 'F'
-REVERSE = 'R'
+from atc.dccloco import FORWARD, REVERSE
 
-class DCCLoco:
-	def __init__(self, loco, train):
-		self.loco = loco
-		self.train = train
-		self.direction = FORWARD;
-		self.speed = 0;
-		self.light = False;
-		self.horn = False
-		self.bell = False
-		
-	def GetTrain(self):
-		return self.train
-		
-	def GetLoco(self):
-		return self.loco
-	
-	def SetDirection(self, direction):
-		self.direction = direction
-		
-	def GetDirection(self):
-		return self.direction
-	
-	def SetSpeed(self, speed):
-		self.speed = speed
-		
-	def GetSpeed(self):
-		return self.speed
-	
-	def SetHeadlight(self, onoff):
-		self.light = onoff
-		
-	def GetHeadlight(self):
-		return self.light
-	
-	def SetHorn(self, onoff):
-		self.horn = onoff
-		
-	def GetHorn(self):
-		return self.horn
-	
-	def SetBell(self, onoff):
-		self.bell = onoff
-		
-	def GetBell(self):
-		return self.bell
-	
 
 class DCCRemote:
 	def __init__(self, server):
 		self.server = server
 		self.initialized = False
 		self.locos = []
-		
-	def PrintList(self):
-		for l in self.locos:
-			print("%s" % l.GetLoco(), flush=True)
 		
 	def LocoCount(self):
 		return len(self.locos)
@@ -67,16 +16,26 @@ class DCCRemote:
 				return True
 			
 		return False
+	
+	def Profiler(self, aspect, loco, speed):
+		if aspect == 0:
+			return 0, -5
 		
-	def SelectLoco(self, train, loco):
+		if aspect == 1:
+			return 100, 5
+			
+		return 50, 5
+		
+	def SelectLoco(self, loco):
 		for l in self.locos:
-			if l.GetLoco() == loco:
+			if l.GetLoco() == loco.GetLoco():
 				self.selectedLoco = l
 				break
 			
 		else:
-			l = DCCLoco(loco, train)
+			l = loco
 			self.locos.append(l)
+			l.SetProfiler(self.Profiler)
 			self.selectedLoco = l
 
 		l = self.selectedLoco			
@@ -89,6 +48,13 @@ class DCCRemote:
 		
 	def DropLoco(self, loco):
 		self.locos = [l for l in self.locos if l.GetLoco() != loco]
+		
+	def ApplySpeedStep(self, step):
+		if self.selectedLoco is None:
+			return 
+		
+		nspeed = self.selectedLoco.GetSpeed() + step
+		self.SetSpeedAndDirection(nspeed)
 		
 	def SetSpeed(self, nspeed):
 		self.SetSpeedAndDirection(nspeed=nspeed)
@@ -139,13 +105,22 @@ class DCCRemote:
 
 		self.server.SendRequest("function", {"loco": loco, "bell": bell, "horn": horn, "light": light})
 		
-	def GetLoco(self, loco):
+	def GetDCCLoco(self, loco):
 		for l in self.locos:
 			if l.GetLoco() == loco:
-				return {l.GetLoco(): [l.GetSpeed(), l.GetDirection(), l.GetHeadlight(), l.GetHorn(), l.GetBell()]}
+				return l
 	
-		return {}
+		return None
+	
+	def GetDCCLocoByTrain(self, train):
+		for l in self.locos:
+			if l.GetTrain() == train:
+				return l
+			
+		return None
+
 		
-	def GetLocos(self):
-		return {l.GetLoco(): [l.GetSpeed(), l.GetDirection(), l.GetHeadlight(), l.GetHorn(), l.GetBell()] for l in self.locos}
+	def GetDCCLocos(self):
+		return self.locos
+		#return {l.GetLoco(): [l.GetSpeed(), l.GetDirection(), l.GetHeadlight(), l.GetHorn(), l.GetBell()] for l in self.locos}
 

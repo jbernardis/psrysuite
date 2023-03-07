@@ -50,6 +50,10 @@ class MainFrame(wx.Frame):
 		self.rrMonitor = None
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		logging.info("pydispatch starting")
+		
+		self.pidATC = None
+		self.pidAR = None
+		self.pendingATCShowCmd = None
 
 		self.routeDefs = {}
 
@@ -135,6 +139,7 @@ class MainFrame(wx.Frame):
 		logging.info("Starting Socket server at address: %s:%d" % (self.ip, self.settings.socketport))
 		self.socketServer = SktServer(self.ip, self.settings.socketport, self.socketEventReceipt)
 		self.socketServer.start()
+
 		
 	def OnCbEnableIO(self, _):
 		self.rr.EnableSendIO(self.cbEnableSendIO.IsChecked())
@@ -258,55 +263,41 @@ class MainFrame(wx.Frame):
 				loco = evt.data["loco"][0]
 			except (IndexError, KeyError):
 				loco = None
-			try:
-				atc = evt.data["atc"][0]
-			except (IndexError, KeyError):
-				atc = False
 			block = evt.data["block"][0]
 			# train information is always echoed back to all listeners
 
 			if trn and trn.startswith("??"):
 				# this is an unknown train - see if we have a known train in the same block
-				ntrn, nloco, natc = self.trainList.FindTrainInBlock(block)
+				ntrn, nloco = self.trainList.FindTrainInBlock(block)
 				if ntrn:
 					trn = ntrn
 				if nloco:
 					loco = nloco
-				if natc is not None:
-					atc = natc
 					
 			elif trn:
 				print("we have train %s" % trn)
 				# this is a known train - see if we have an existing train (known or unknown)
 				# in the block, and just replace it
-				etrn, eloco, eatc = self.trainList.FindTrainInBlock(block)
-				print("find in block %s: %s %s %s" % (block, str(etrn), str(eloco), str(eatc)))
+				etrn, eloco = self.trainList.FindTrainInBlock(block)
+				print("find in block %s: %s %s" % (block, str(etrn), str(eloco)))
 				if etrn:
 					if self.trainList.RenameTrain(etrn, trn, eloco, loco):
-						print("***********************************setatc safter rename %s %s" % (trn, str(atc)))
-						#self.trainList.SetAtc(trn, eatc)
 						for cmd in self.trainList.GetSetTrainCmds(trn):
 							print("sending: %s" % str(cmd), flush=True)
 							self.socketServer.sendToAll(cmd)
 					return
-				else: # see if we have it anywhere, and preserve the atc and loco values if we do
-					eloco, eatc = self.trainList.FindTrain(trn)
-					if eatc is not None:
-						atc = eatc
-						
+				else: # see if we have it anywhere, and preserve the loco value if we do
+					eloco = self.trainList.FindTrain(trn)
 					if eloco is not None:
 						if eloco != loco:
 							print("loco numbera are different - using the new one")
 							loco = eloco
 
-			resp = {"settrain": [{"name": trn, "loco": loco, "block": block, "atc": atc}]}
+			resp = {"settrain": [{"name": trn, "loco": loco, "block": block}]}
 			print("sending: %s" % str(resp), flush=True)
 			self.socketServer.sendToAll(resp)
 
 			self.trainList.Update(trn, loco, block)
-			print("******************************************setatc at end of settrain %s %s" % (trn, str(atc)))
-			self.trainList.SetAtc(trn, atc)
-			print("set======================================================================", flush=True)
 
 		elif verb == "renametrain":
 			print("Incoming HTTP Request: %s" % json.dumps(evt.data), flush=True)
@@ -326,13 +317,8 @@ class MainFrame(wx.Frame):
 				nloco = evt.data["newloco"][0]
 			except (IndexError, KeyError):
 				nloco = None
-			try:
-				atc = evt.data["atc"][0]
-			except (IndexError, KeyError):
-				atc = False
 
 			if self.trainList.RenameTrain(oname, nname, oloco, nloco):
-				self.trainList.SetAtc(nname, atc)
 				for cmd in self.trainList.GetSetTrainCmds(nname):
 					print("sending: %s" % str(cmd), flush=True)
 					self.socketServer.sendToAll(cmd)
@@ -518,6 +504,11 @@ class MainFrame(wx.Frame):
 			sid = int(evt.data["SID"][0])
 			function = evt.data["function"][0]
 			self.clientList.SetSessionFunction(sid, function)
+			if function == "ATC" and self.pendingATCShowCmd is not None:
+				addrList = self.clientList.GetFunctionAddress("ATC")
+				for addr, skt in addrList:
+					self.socketServer.sendToOne(skt, addr, self.pendingATCShowCmd)
+				self.pendingATCShowCmd = None
 			
 		elif verb == "autorouter":
 			stat = evt.data["status"][0]
@@ -532,16 +523,32 @@ class MainFrame(wx.Frame):
 					self.socketServer.deleteSocket(addr)
 				
 		elif verb == "atc":
-			print("ATC request")
-			pprint.pprint(evt.data)
-			action = evt.data["action"][0]
-			train = evt.data["train"][0]
-			print("************************************setatc after atc command %s %s" % (train, action))
-			self.trainList.SetAtc(train, action == "add")
 			addrList = self.clientList.GetFunctionAddress("ATC")
-			print("addrlist has %d entry" % len(addrList), flush=True)
-			for addr, skt in addrList:
-				self.socketServer.sendToOne(skt, addr, {"atc": evt.data})
+			action = evt.data["action"][0]
+			if action == "on":	
+				x = evt.data["x"][0]
+				y = evt.data["y"][0]
+				if self.pidATC is None:			
+					atcExec = os.path.join(os.getcwd(), "atc", "main.py")
+					self.pidATC = Popen([sys.executable, atcExec]).pid
+					logging.debug("atc server started as PID %d" % self.pidATC)
+					self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": [x], "y": [y]}}
+				else:
+					for addr, skt in addrList:
+						self.socketServer.sendToOne(skt, addr, {"atc": {"action": ["show"], "x": [x], "y": [y]}})
+						
+			elif action == "off":
+				x = evt.data["x"][0]
+				y = evt.data["y"][0]
+				for addr, skt in addrList:
+					self.socketServer.sendToOne(skt, addr, {"atc": {"action": ["hide"], "x": [x], "y": [y]}})
+								
+			else:
+				for addr, skt in addrList:
+					self.socketServer.sendToOne(skt, addr, {"atc": evt.data})
+					
+		elif verb == "atcstatus":
+			self.socketServer.sendToAll({"atcstatus": evt.data})
 
 		elif verb == "quit":
 			logging.info("HTTP 'quit' command received - terminating")

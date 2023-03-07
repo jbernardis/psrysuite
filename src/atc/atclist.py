@@ -1,35 +1,49 @@
 import wx
+import os
+
+ONVAL = "1"
+OFFVAL = "0"
 
 class ATCListCtrl(wx.ListCtrl):
-	def __init__(self, parent, pos):
+	def __init__(self, parent, cmdFolder):
 		self.parent = parent
 		
 		wx.ListCtrl.__init__(
-			self, parent, wx.ID_ANY, size=(280, 80), pos=pos,
-			style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_VRULES|wx.LC_SINGLE_SEL|wx.LC_NO_HEADER
-			)
+			self, parent, wx.ID_ANY, size=(310, 80),
+			style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_VRULES|wx.LC_SINGLE_SEL) #|wx.LC_NO_HEADER)
 
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected)
 		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated)
 		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnItemDeselected)
 		self.Bind(wx.EVT_LIST_CACHE_HINT, self.OnItemHint)
+		
 
 #		self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.onRightClick, self)
 
-		self.InsertColumn(0, "Train")
-		self.InsertColumn(1, "Loco")
-		self.InsertColumn(2, "Spd")
-		self.InsertColumn(3, "Dir")
-		self.InsertColumn(4, "L")
-		self.InsertColumn(5, "H")
-		self.InsertColumn(6, "B")
-		self.SetColumnWidth(0, 80)
-		self.SetColumnWidth(1, 80)
-		self.SetColumnWidth(2, 40)
-		self.SetColumnWidth(3, 20)
-		self.SetColumnWidth(4, 20)
+		self.InsertColumn(0, "")
+		self.InsertColumn(1, "Train")
+		self.InsertColumn(2, "Loco")
+		self.InsertColumn(3, "Spd")
+		self.InsertColumn(4, "Dir")
+		self.InsertColumn(5, "L")
+		self.InsertColumn(6, "H")
+		self.InsertColumn(7, "B")
+		self.SetColumnWidth(0, 30)
+		self.SetColumnWidth(1, 60)
+		self.SetColumnWidth(2, 60)
+		self.SetColumnWidth(3, 40)
+		self.SetColumnWidth(4, 40)
 		self.SetColumnWidth(5, 20)
 		self.SetColumnWidth(6, 20)
+		self.SetColumnWidth(7, 20)
+		
+		self.loadImages(os.path.join(cmdFolder, "atc"))
+		self.il = wx.ImageList(24, 24)
+		self.idxRed = self.il.Add(self.pngSigRed)
+		self.idxRedYel = self.il.Add(self.pngSigRedYel)
+		self.idxGrn = self.il.Add(self.pngSigGrn)
+		self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+
 
 		self.SetItemCount(0)
 		self.trains = {}
@@ -39,26 +53,47 @@ class ATCListCtrl(wx.ListCtrl):
 		self.normalB = wx.ItemAttr()
 		self.normalA.SetBackgroundColour(wx.Colour(225, 255, 240))
 		self.normalB.SetBackgroundColour(wx.Colour(138, 255, 197))
+
+
+	def loadImages(self, imgFolder):
+		png = wx.Image(os.path.join(imgFolder, "sigred.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.pngSigRed = png
+		
+		png = wx.Image(os.path.join(imgFolder, "siggrn.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.pngSigGrn = png
+		
+		png = wx.Image(os.path.join(imgFolder, "sigredyel.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.pngSigRedYel = png
 		
 	def AddTrain(self, tr):
-		print("ATC Add train")
 		nm = tr.GetName()
-		print("name = %s" % nm)
 		if nm in self.trainNames:
 			return 
 		
 		self.trainNames.append(nm)
 		self.trains[nm] = tr
 		ct = len(self.trainNames)
-		print("train list now has %d" % ct)
 		self.SetItemCount(ct)
-		print("after set item count")
 		self.RefreshItem(ct-1)
-		print("after refresh item")
 		
 	def DelTrain(self, tr):
 		nm = tr.GetName()
 		return self.DelTrainByName(nm)
+	
+	def HasTrain(self, trnm):
+		return trnm in self.trainNames
+	
+	def FindTrain(self, trnm):
+		try:
+			return self.trainNames.index(trnm)
+		except ValueError:
+			return None
 	
 	def DelTrainByName(self, nm):
 		if nm not in self.trainNames:
@@ -85,7 +120,6 @@ class ATCListCtrl(wx.ListCtrl):
 	def RefreshTrain(self, tr):
 		nm = tr.GetName()
 		if nm not in self.trainNames:
-			self.AddTrain(tr)
 			return 
 		try:
 			idx = self.trainNames.index(nm)
@@ -108,7 +142,8 @@ class ATCListCtrl(wx.ListCtrl):
 			print("report double click %s" % str(tx))
 			#self.parent.reportDoubleClick(tx)
 		else:
-			print("report select %s" % str(tx))
+			pass
+			#print("report select %s" % str(tx))
 			#self.parent.reportSelection(tx)
 
 	def OnItemSelected(self, event):
@@ -124,22 +159,37 @@ class ATCListCtrl(wx.ListCtrl):
 		if self.GetFirstSelected() == -1:
 			self.setSelection(None)
 
+	def OnGetItemImage(self, item):
+		nm = self.trainNames[item]
+		dccl = self.trains[nm]
+		aspect = dccl.GetGoverningAspect()
+		
+		if aspect == 0:
+			return self.idxRed
+		elif aspect == 5:
+			return self.idxGrn
+		else:
+			return self.idxRedYel
+
 	def OnGetItemText(self, item, col):
 		nm = self.trainNames[item]
+		dccl = self.trains[nm]
 		if col == 0:
-			return nm
+			return "AA"
 		elif col == 1:
-			return self.trains[nm].GetLoco()
+			return nm
 		elif col == 2:
-			return "128"
+			return dccl.GetLoco()
 		elif col == 3:
-			return "F"
+			return "%3d" % dccl.GetSpeed()
 		elif col == 4:
-			return "l"
+			return "Rev" if dccl.GetDirection() == "R" else "Fwd"
 		elif col == 5:
-			return "h"
+			return ONVAL if dccl.GetHeadlight() else OFFVAL
 		elif col == 6:
-			return "b"
+			return ONVAL if dccl.GetHorn() else OFFVAL
+		elif col == 7:
+			return ONVAL if dccl.GetBell() else OFFVAL
 		else:
 			return "?"
 

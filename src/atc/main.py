@@ -1,5 +1,6 @@
-#import wx
-#import wx.lib.newevent
+import wx
+import wx.lib.newevent
+
 import os, sys
 cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
@@ -7,8 +8,6 @@ if cmdFolder not in sys.path:
 
 import logging
 logging.basicConfig(filename=os.path.join("logs", "atc.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
-
-from queue import Queue
 
 import json
 import pprint
@@ -28,18 +27,28 @@ from atc.train import Train
 from atc.route import Route
 
 from atc.dccremote import DCCRemote
-
+from atc.dccloco import DCCLoco
+from atc.atclist import ATCListCtrl
 from atc.listener import Listener
 from atc.rrserver import RRServer
 from atc.dccserver import DCCServer
 from atc.ticker import Ticker
 
-class MainUnit:
+(DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
+(DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
+(TickerEvent, EVT_TICKER) = wx.lib.newevent.NewEvent() 
+
+class MainFrame(wx.Frame):
 	def __init__(self):
-		logging.info("PSRY ATC Server starting...")
+		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
+		self.Bind(wx.EVT_CLOSE, self.OnClose)
+		
 		self.sessionid = None
 		self.settings = Settings()
 		self.initialized = False
+		
+		self.posx = 0
+		self.posy = 0
 
 		self.blocks = {}
 		self.turnouts = {}
@@ -49,8 +58,38 @@ class MainUnit:
 		self.trains = {}
 		self.listener = None
 		self.rrServer = None
-		self.commandQ = Queue()
+		
+		logging.info("psry atc server starting")
 
+		self.SetTitle("PSRY ATC Server")
+		
+		self.atcList = ATCListCtrl(self, os.getcwd())
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(20)
+		hsz.Add(self.atcList)
+		hsz.AddSpacer(20)
+		
+		vsz = wx.BoxSizer(wx.VERTICAL)
+		vsz.AddSpacer(20)
+		vsz.Add(hsz)
+		vsz.AddSpacer(20)
+
+		self.SetSizer(vsz)
+		self.Layout()
+		self.Fit()
+		
+		wx.CallAfter(self.Initialize)
+		
+	def SetPos(self):
+		self.SetPosition((self.posx, self.posy))
+
+	def Initialize(self):
+		logging.info("enter initialize")
+		self.Bind(EVT_DELIVERY, self.OnDeliveryEvent)
+		self.Bind(EVT_DISCONNECT, self.OnDisconnectEvent)
+		self.Bind(EVT_TICKER, self.OnTickerEvent)
+		
 		if not self.ProcessScripts():
 			return
 
@@ -59,23 +98,26 @@ class MainUnit:
 		
 		self.rrServer = RRServer()
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
+		
 		self.listener = Listener(self, self.settings.ipaddr, self.settings.socketport)
 		if not self.listener.connect():
 			logging.error("Unable to establish connection with railroad server")
 			self.listener = None
 			return
+		self.listener.start()
+		
+		logging.info("socket connection created")
 		
 		self.dccRemote = DCCRemote(self.dccServer)
 		
-		if self.listener:
-			self.listener.start()
-		
-		self.ticker = Ticker(0.4, self.tickerEvent)
+		self.ticker = Ticker(0.4, self.raiseTickerEvent)
 
-		logging.info("finished initialize")
 		self.initialized = True
-		
+		self.SetPos()
+		logging.info("exit initialize")
+
 	def ProcessScripts(self):
+		logging.info(os.path.join(os.getcwd(), "data", "layout.json"))
 		try:
 			with open(os.path.join(os.getcwd(), "data", "layout.json"), "r") as jfp:
 				layout = json.load(jfp)
@@ -88,8 +130,6 @@ class MainUnit:
 		for blk, sublist in subblocks.items():
 			for sub in sublist:
 				submap[sub] = blk
-				
-		print(str(submap))
 		
 		try:
 			with open(os.path.join(os.getcwd(), "data", "simscripts.json"), "r") as jfp:
@@ -101,7 +141,6 @@ class MainUnit:
 		self.scripts = {}
 		
 		for train, script in scripts.items():
-			print("Train: %s" % train)
 			sigList = [[None, None, None]]
 			for step in script:
 				cmd = list(step.keys())[0]
@@ -135,11 +174,13 @@ class MainUnit:
 					sigx += 1
 			self.scripts[train] = steps
 			
-		pprint.pprint(self.scripts)
 		return True
 	
+	def HaveScript(self, train):
+		return train in self.scripts
+	
 	def GetSignalBehind(self, train, block):
-		if train not in self.scripts:
+		if not self.HaveScript(train):
 			return None
 		
 		if block not in self.scripts[train]:
@@ -148,7 +189,7 @@ class MainUnit:
 		return {"signal": self.scripts[train][block]["sigbehind"], "os": None, "route": None}
 	
 	def GetSignalAhead(self, train, block):
-		if train not in self.scripts:
+		if not self.HaveScript(train):
 			return None
 		
 		if block not in self.scripts[train]:
@@ -156,191 +197,230 @@ class MainUnit:
 		
 		return self.scripts[train][block]["sigahead"]
 
-	def raiseDeliveryEvent(self, data):  # thread context
-		self.commandQ.put(data)
-		
-	def raiseDisconnectEvent(self): # thread context
-		self.commandQ.put("{\"disconnect\": []}")
-		
 	def tickerEvent(self):  # thread context
 		if self.dccRemote.LocoCount() > 0:
 			self.commandQ.put("{\"ticker\": []}")
-
-	def run(self):
-		if not self.initialized:
-			logging.error("Not properly initialized - exiting...")
-			return 
+			
+	def raiseTickerEvent(self):
+		evt = TickerEvent()
+		wx.QueueEvent(self, evt)
 		
-		self.running = True
-		while self.running:
-			data = self.commandQ.get()
-			jdata = json.loads(data)
-			logging.info("Received (%s)" % data)
-			for cmd, parms in jdata.items():
-				if cmd == "ticker":
-					for t in self.dccRemote.GetLocos():
-						pass #print("What to do with train %s" % t, flush=True)
-						
-				elif cmd == "turnout":
-					for p in parms:
-						turnout = p["name"]
-						state = p["state"]
-						if turnout not in self.turnouts:
-							self.turnouts[turnout] = Turnout(self, turnout, state)
-						else:
-							self.turnouts[turnout].SetState(state)
-	
-				elif cmd == "turnoutlock":
-					for p in parms:
-						toName = p["name"]
-						lock = int(p["state"])
-						if toName in self.turnouts:
-							self.turnouts[toName].Lock(lock != 0)
-	
-				elif cmd == "block":
-					for p in parms:
-						print("Block %s" % str(p))
-						block = p["name"]
-						state = p["state"]
-						if block not in self.blocks:
-							self.blocks[block] = Block(self, block, state, 'E', False)
-						else:
-							b = self.blocks[block]
-							b.SetState(state)
-	
-				elif cmd == "blockdir":
-					for p in parms:
-						block = p["block"]
-						direction = p["dir"]
-						if block not in self.blocks:
-							self.blocks[block] = Block(self, block, 0, direction, False)
-						else:
-							b = self.blocks[block]
-							b.SetDirection(direction)
-	
-				elif cmd == "blockclear":
-					for p in parms:
-						block = p["block"]
-						clear = p["clear"]
-						if block not in self.blocks:
-							self.blocks[block] = Block(self, block, 0, 'E', clear != 0)
-						else:
-							b = self.blocks[block]
-							b.SetClear(clear)
-	
-				elif cmd == "signal":
-					for p in parms:
-						sigName = p["name"]
-						aspect = int(p["aspect"])
-						if sigName not in self.signals:
-							self.signals[sigName] = Signal(self, sigName, aspect)
-						else:
-							self.signals[sigName].SetAspect(aspect)
-	
-				elif cmd == "signallock":
-					for p in parms:
-						sigName = p["name"]
-						lock = int(p["state"])
-						if sigName in self.signals:
-							self.signals[sigName].Lock(lock != 0)
-	
-				elif cmd == "routedef":
-					name = parms["name"]
-					os = parms["os"]
-					ends = parms["ends"]
-					signals = parms["signals"]
-					turnouts = parms["turnouts"]
-					if os not in self.osList:
-						self.osList[os] = OverSwitch(os)
-	
-					rte = Route(self, name, os, ends, signals, turnouts)
-					self.routes[name] = rte
-					self.osList[os].AddRoute(rte)
-	
-				elif cmd == "setroute":
-					for p in parms:
-						blknm = p["block"]
-						rtnm = p["route"]
-						if blknm not in self.osList:
-							self.osList[blknm] = OverSwitch(blknm)
-	
-						self.osList[blknm].SetActiveRoute(rtnm)
-	
-				elif cmd == "settrain":
-					for p in parms:
-						print("set train: %s" % str(p), flush=True)
-						block = p["block"]
-						name = p["name"]
-						loco = p["loco"]
-	
-						if name is None:
-							self.blocks[block].SetTrain(None, None)
-						else:
-							if name not in self.trains:
-								self.trains[name] = Train(self, name, loco)
-	
-							self.trains[name].AddBlock(block)
-	
-							self.blocks[block].SetTrain(name, loco)
-	
-				elif cmd == "sessionID":
-					self.sessionid = int(parms)
-					logging.info("session ID %d" % self.sessionid)
-					self.rrServer.SendRequest({"identify": {"SID": self.sessionid, "function": "ATC"}})
-	
-				elif cmd == "end":
-					if parms["type"] == "layout":
-						self.requestRoutes()
-					elif parms["type"] == "routes":
-						self.requestTrains()
-						
-				elif cmd in ["disconnect", "exit"]:
-					self.running = False
-					
-				elif cmd == "atc":
-					print("ATC command: %s" % str(parms))
-					action = parms["action"][0]
-					
-					if action == "add":
-						train = parms["train"][0]
-						loco = parms["loco"][0]
-						tr = self.trains[train]
-						blk = tr.GetFirstBlock()
-						tr.SetGoverningSignal(self.GetSignalAhead(train, blk))
-						self.dccRemote.SelectLoco(train, loco)
-						self.dccRemote.PrintList()
+	def OnTickerEvent(self, _):
+		for dccl in self.dccRemote.GetDCCLocos():
+			trnm = dccl.GetTrain()
+			gs, ga = dccl.GetGoverningSignal()
+			aspect = 0  # assume STOP
+
+			if "os" in gs and gs["os"] is None:
+				# if we are already in the OS, dont pay attention to the aspect as it is now red - just keep using
+				# the old value
+				aspect = ga
 							
-					elif action == "delete":
-						train = parms["train"][0]
-						loco = parms["loco"][0]
-						self.dccRemote.DropLoco(loco)
-						self.dccRemote.PrintList()
+			elif "signal" in gs:
+				signame = gs["signal"]
+				if signame in self.signals:
+					aspect = self.signals[signame].GetAspect()
+					
+				if "os" in gs and "route" in gs and aspect != 0:
+					overswitch = gs["os"]
+					route = gs["route"]
+					if overswitch in self.osList and self.osList[overswitch].GetActiveRouteName() != route:
+						# either we don't know that OS or its not set to the needed route
+						aspect = 0
 	
-				else:
-					if cmd not in ["control", "relay", "handswitch", "siglever", "breaker", "fleet"]:
-						logging.info("unknown command ignored: %s: %s" % (cmd, parms))
+			dccl.SetGoverningAspect(aspect)
+			self.dccRemote.SelectLoco(dccl)	
+			
+			step = dccl.GetSpeedStep()				
+			self.dccRemote.ApplySpeedStep(step)
+			
+			self.atcList.RefreshTrain(dccl)
 
-		logging.info("terminating socket listener")
+	def raiseDeliveryEvent(self, data): # thread context
 		try:
-			self.listener.kill()
-			self.listener.join()
-		except:
-			pass
+			jdata = json.loads(data)
+		except json.decoder.JSONDecodeError:
+			print("Unable to parse (%s)" % data)
+			return
+		evt = DeliveryEvent(data=jdata)
+		wx.QueueEvent(self, evt)
+			
+	def OnDeliveryEvent(self, evt):  # thread context
+		for cmd, parms in evt.data.items():
+			#print("Received: %s: %s" % (cmd, parms))
+			if cmd == "turnout":
+				for p in parms:
+					turnout = p["name"]
+					state = p["state"]
+					if turnout not in self.turnouts:
+						self.turnouts[turnout] = Turnout(self, turnout, state)
+					else:
+						self.turnouts[turnout].SetState(state)
 
-		logging.info("terminating timer thread")		
-		try:
-			self.ticker.stop()
-		except:
-			pass
+			elif cmd == "turnoutlock":
+				for p in parms:
+					toName = p["name"]
+					lock = int(p["state"])
+					if toName in self.turnouts:
+						self.turnouts[toName].Lock(lock != 0)
+
+			elif cmd == "block":
+				for p in parms:
+					block = p["name"]
+					state = p["state"]
+					if block not in self.blocks:
+						self.blocks[block] = Block(self, block, state, 'E', False)
+					else:
+						b = self.blocks[block]
+						b.SetState(state)
+
+			elif cmd == "blockdir":
+				for p in parms:
+					block = p["block"]
+					direction = p["dir"]
+					if block not in self.blocks:
+						self.blocks[block] = Block(self, block, 0, direction, False)
+					else:
+						b = self.blocks[block]
+						b.SetDirection(direction)
+
+			elif cmd == "blockclear":
+				for p in parms:
+					block = p["block"]
+					clear = p["clear"]
+					if block not in self.blocks:
+						self.blocks[block] = Block(self, block, 0, 'E', clear != 0)
+					else:
+						b = self.blocks[block]
+						b.SetClear(clear)
+
+			elif cmd == "signal":
+				for p in parms:
+					sigName = p["name"]
+					aspect = int(p["aspect"])
+					if sigName not in self.signals:
+						self.signals[sigName] = Signal(self, sigName, aspect)
+					else:
+						self.signals[sigName].SetAspect(aspect)
+
+			elif cmd == "signallock":
+				for p in parms:
+					sigName = p["name"]
+					lock = int(p["state"])
+					if sigName in self.signals:
+						self.signals[sigName].Lock(lock != 0)
+
+			elif cmd == "routedef":
+				name = parms["name"]
+				os = parms["os"]
+				ends = parms["ends"]
+				signals = parms["signals"]
+				turnouts = parms["turnouts"]
+				if os not in self.osList:
+					self.osList[os] = OverSwitch(os)
+
+				rte = Route(self, name, os, ends, signals, turnouts)
+				self.routes[name] = rte
+				self.osList[os].AddRoute(rte)
+
+			elif cmd == "setroute":
+				for p in parms:
+					blknm = p["block"]
+					rtnm = p["route"]
+					if blknm not in self.osList:
+						self.osList[blknm] = OverSwitch(blknm)
+
+					self.osList[blknm].SetActiveRoute(rtnm)
+
+			elif cmd == "settrain":
+				for p in parms:
+					block = p["block"]
+					name = p["name"]
+					loco = p["loco"]
+
+					if name is None:
+						self.blocks[block].SetTrain(None, None)
+					else:
+						if name not in self.trains:
+							self.trains[name] = Train(self, name, loco)
+
+						self.trains[name].AddBlock(block)
+
+						self.blocks[block].SetTrain(name, loco)
+
+			elif cmd == "sessionID":
+				self.sessionid = int(parms)
+				logging.info("session ID %d" % self.sessionid)
+				self.rrServer.SendRequest({"identify": {"SID": self.sessionid, "function": "ATC"}})
+
+			elif cmd == "end":
+				if parms["type"] == "layout":
+					self.requestRoutes()
+				elif parms["type"] == "routes":
+					self.requestTrains()
+					
+			elif cmd in ["disconnect", "exit"]:
+				self.running = False
+				
+			elif cmd == "atc":
+				print("ATC command: %s" % str(parms))
+				action = parms["action"][0]
+				print("action = (%s)" % action)
+				
+				if action == "add":
+					trnm = parms["train"][0]
+					if not self.HaveScript(trnm):
+						# we do not have a script for this train - reject the request
+						self.RRRequest({"atcstatus": {"action": "reject", "train": trnm}})
+						return
+					
+					tr = self.atcList.FindTrain(trnm)
+					if tr is not None:
+						return #ignore if we already have the train
+					
+					loco = parms["loco"][0]
+					dccl = DCCLoco(trnm, loco)
+					self.atcList.AddTrain(dccl)
+					
+					tr = self.trains[trnm]
+					blk = tr.GetFirstBlock()
+					dccl.SetGoverningSignal(self.GetSignalAhead(trnm, blk))
+					self.dccRemote.SelectLoco(dccl)
+						
+				elif action == "delete":
+					train = parms["train"][0]
+					loco = parms["loco"][0]
+					self.dccRemote.DropLoco(loco)
+					
+				elif action == "hide":
+					if "x" in parms:
+						self.posx = int(parms["x"][0])
+					if "y" in parms:
+						self.posy = int(parms["y"][0])
+					print("show/reset, %s %s" % (self.posx, self.posy))
+					self.Hide()
+				
+				elif action in ["show", "reset" ]:
+					if "x" in parms:
+						self.posx = int(parms["x"][0])
+					if "y" in parms:
+						self.posy = int(parms["y"][0])
+					print("show/reset, %s %s" % (self.posx, self.posy))
+					self.Show()
+					self.SetPos()
+
+			else:
+				if cmd not in ["control", "relay", "handswitch", "siglever", "breaker", "fleet"]:
+					logging.info("unknown command ignored: %s: %s" % (cmd, parms))
 
 
 	def requestRoutes(self):
 		if self.sessionid is not None:
-			self.rrServer.SendRequest({"refresh": {"SID": self.sessionid, "type": "routes"}})
+			self.RRRequest({"refresh": {"SID": self.sessionid, "type": "routes"}})
 
 	def requestTrains(self):
 		if self.sessionid is not None:
-			self.rrServer.SendRequest({"refresh": {"SID": self.sessionid, "type": "trains"}})
+			self.RRRequest({"refresh": {"SID": self.sessionid, "type": "trains"}})
 
 	def SignalLockChange(self, sigName, nLock):
 		logging.info("signal %s lock has changed %s" % (sigName, str(nLock)))
@@ -380,23 +460,20 @@ class MainUnit:
 				pass
 
 	def TrainAddBlock(self, train, block):
-		if not self.dccRemote.HasTrain(train):
+		dccl = self.dccRemote.GetDCCLocoByTrain(train)
+		if dccl is None:
 			logging.info("TrainAddBlock ignoring train %s because it is not on ATC" % train)
 			return
 		
 		logging.info("Train %s has moved into block %s" % (train, block))
-		print("Train %s has moved into block %s" % (train, block), flush=True)
-		
-		tr = self.trains[train]
 		
 		# set governing signal to the signal behind us UNLESS we have already switched to the signal ahead of us
-		gs = tr.GetGoverningSignal()
+		gs = dccl.GetGoverningSignal()
 		sig = self.GetSignalAhead(train, block)
 		if gs != sig:
 			gs = self.GetSignalBehind(train, block)
-			tr.SetGoverningSignal(gs)
+			dccl.SetGoverningSignal(gs)
 			
-		print("Governing signal is %s" % str(gs))
   # routeRequest = self.CheckTrainInBlock(train, block, TriggerPointFront)
   # if routeRequest is None:
   # 	return
@@ -407,17 +484,15 @@ class MainUnit:
   # 	self.EnqueueRouteRequest(routeRequest)
 			
 	def TrainTailInBlock(self, train, block):
-		if not self.dccRemote.HasTrain(train):
+		dccl = self.dccRemote.GetDCCLocoByTrain(train)
+		if dccl is None:
 			logging.info("TrainTailInBlock ignoring train %s because it is not on ATC" % train)
 			return
+		
 		logging.info("Train %s tail in block %s" % (train, block))
 		
-		print("Train %s tail in block %s" % (train, block), flush=True)
 		gs = self.GetSignalAhead(train, block)
-		print("Governing signal is %s" % str(gs))
-
-		tr = self.trains[train]
-		tr.SetGoverningSignal(gs)
+		dccl.SetGoverningSignal(gs)
 
   # routeRequest = self.CheckTrainInBlock(train, block, TriggerPointRear)
   # if routeRequest is None:
@@ -511,11 +586,54 @@ class MainUnit:
   # logging.info("end of queued requests")
 
 
-	def Request(self, req):
+	def RRRequest(self, req):
 		logging.info("Outgoing request: %s" % json.dumps(req))
 		self.rrServer.SendRequest(req)
 
+	def raiseDisconnectEvent(self): # thread context
+		evt = DisconnectEvent()
+		wx.PostEvent(self, evt)
 
-main = MainUnit()
-main.run()
-print("ATC server exiting...")
+	def OnDisconnectEvent(self, _):
+		self.kill()
+		
+	def OnClose(self, evt):
+		#self.kill()
+		return
+		
+	def kill(self):
+		try:
+			self.listener.kill()
+			self.listener.join()
+		except:
+			pass
+		
+		try:
+			self.ticker.stop()
+		except:
+			pass
+		
+		self.Destroy()
+
+class App(wx.App):
+	def __init__(self, redirect=False, filename=None, useBestVisual=False, clearSigInt=True):
+		super().__init__(redirect, filename, useBestVisual, clearSigInt)
+		self.frame = None
+
+	def OnInit(self):
+		self.frame = MainFrame()
+		self.frame.Show()
+		return True
+
+
+ofp = open("atc.out", "w")
+efp = open("atc.err", "w")
+
+sys.stdout = ofp
+sys.stderr = efp
+
+
+app = App(False)
+app.MainLoop()
+
+logging.info("exiting program")

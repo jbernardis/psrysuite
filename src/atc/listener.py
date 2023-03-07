@@ -33,6 +33,7 @@ class Listener(threading.Thread):
 		return self.endOfLife
 
 	def run(self):
+		logging.info("entering listener run")
 		if not self.connected:
 			logging.error("Unable to start thread: socket listener does not exist")
 			self.endOfLife = True

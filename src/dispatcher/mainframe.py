@@ -30,7 +30,6 @@ from dispatcher.districts.port import Port
 from dispatcher.constants import HyYdPt, LaKr, NaCl, screensList, EMPTY, OCCUPIED, NORMAL, REVERSE, OVERSWITCH
 from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
-from dispatcher.atclist import ATCListCtrl
 
 from dispatcher.edittraindlg import EditTrainDlg
 
@@ -58,6 +57,9 @@ class MainFrame(wx.Frame):
 		self.listener = None
 		self.sessionid = None
 		self.subscribed = False
+		self.ATCEnabled = False
+		self.AREnabled = False
+		
 		logging.info("Display process starting")
 		self.settings = Settings()
 
@@ -87,7 +89,7 @@ class MainFrame(wx.Frame):
 			diagramw, diagramh = dp.GetSize()
 			self.panels = {self.diagrams[sn].screen : dp for sn in screensList}  # all 3 screens just point to the same diagram
 			totalw = 2560*3
-			centeroffset = 2560
+			self.centerOffset = 2560
 
 		else:  # set up three separate screens for a single monitor
 			self.panels = {}
@@ -108,7 +110,7 @@ class MainFrame(wx.Frame):
 			b = wx.Button(self, wx.ID_ANY, "Nassau/Cliff",   pos=(1790, voffset), size=(200, 50))
 			self.Bind(wx.EVT_BUTTON, lambda event: self.SwapToScreen(NaCl), b)
 			totalw = 2560+20
-			centeroffset = 0
+			self.centerOffset = 0
 
 		if self.settings.showcameras:
 			self.DrawCameras()
@@ -123,31 +125,31 @@ class MainFrame(wx.Frame):
 		else:
 			self.PlaceWidgets()
 
-		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(centeroffset+100, 15))
+		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(self.centerOffset+100, 15))
 		self.Bind(wx.EVT_BUTTON, self.OnSubscribe, self.bSubscribe)
 
-		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", pos=(centeroffset+100, 45))
+		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", pos=(self.centerOffset+100, 45))
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, self.bRefresh)
 		self.bRefresh.Enable(False)
 
-		self.bConfig = wx.Button(self, wx.ID_ANY, "Config", pos=(centeroffset+100, 75))
+		self.bConfig = wx.Button(self, wx.ID_ANY, "Config", pos=(self.centerOffset+100, 75))
 		self.Bind(wx.EVT_BUTTON, self.OnConfig, self.bConfig)
 		self.bConfig.Enable(False)
 		
 		if not self.IsDispatcher() or self.settings.hideconfigbutton:
 			self.bConfig.Hide()
 
-		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Trains", pos=(centeroffset+250, 25))
+		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Trains", pos=(self.centerOffset+250, 25))
 		self.bLoadTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadTrains, self.bLoadTrains)
-		self.bLoadLocos = wx.Button(self, wx.ID_ANY, "Load Locos", pos=(centeroffset+250, 65))
+		self.bLoadLocos = wx.Button(self, wx.ID_ANY, "Load Locos", pos=(self.centerOffset+250, 65))
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadLocos, self.bLoadLocos)
 		self.bLoadLocos.Enable(False)
 		
-		self.bSaveTrains = wx.Button(self, wx.ID_ANY, "Save Trains", pos=(centeroffset+350, 25))
+		self.bSaveTrains = wx.Button(self, wx.ID_ANY, "Save Trains", pos=(self.centerOffset+350, 25))
 		self.bSaveTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBSaveTrains, self.bSaveTrains)
-		self.bSaveLocos = wx.Button(self, wx.ID_ANY, "Save Locos", pos=(centeroffset+350, 65))
+		self.bSaveLocos = wx.Button(self, wx.ID_ANY, "Save Locos", pos=(self.centerOffset+350, 65))
 		self.Bind(wx.EVT_BUTTON, self.OnBSaveLocos, self.bSaveLocos)
 		self.bSaveLocos.Enable(False)
 		
@@ -157,24 +159,22 @@ class MainFrame(wx.Frame):
 			self.bSaveTrains.Hide()
 			self.bSaveLocos.Hide()
 
-		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(centeroffset+2200, 25), style=wx.TE_READONLY)
-		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(centeroffset+2300, 25), style=wx.TE_READONLY)
-		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(centeroffset+2360, 25), style=wx.TE_READONLY)
+		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(self.centerOffset+2200, 25), style=wx.TE_READONLY)
+		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(self.centerOffset+2300, 25), style=wx.TE_READONLY)
+		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(self.centerOffset+2360, 25), style=wx.TE_READONLY)
 		
-		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(centeroffset+2200, 75))
+		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(self.centerOffset+2200, 75))
 		self.Bind(wx.EVT_BUTTON, self.OnResetScreen, self.bResetScreen)
 
 		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 50), size=(400, 40))
 		
 		if self.IsDispatcher():
-			f = wx.Font(wx.Font(14, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial"))
-			self.lblATC = wx.StaticText(self, wx.ID_ANY, "ATC:", pos=(centeroffset+1700, 2))
-			self.lblATC.SetFont(f)
-			self.atcList = ATCListCtrl(self, (centeroffset+1580, 25))
-			
-			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(centeroffset+600, 25))
+			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(self.centerOffset+600, 25))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
 			self.cbAutoRouter.Enable(False)
+			self.cbATC = wx.CheckBox(self, wx.ID_ANY, "Automatic Train Control", pos=(self.centerOffset+600, 55))
+			self.Bind(wx.EVT_CHECKBOX, self.OnCBATC, self.cbATC)
+			self.cbATC.Enable(False)
 			
 		self.totalw = totalw
 		self.totalh = 1080
@@ -187,6 +187,9 @@ class MainFrame(wx.Frame):
 		self.SetMaxSize((self.totalw, self.totalh))
 		self.SetSize((self.totalw, self.totalh))
 		self.SetPosition((0, 0))
+		
+		if self.ATCEnabled:
+			self.Request({"atc": { "action": "reset"}})
 
 		wx.CallAfter(self.Initialize)
 
@@ -359,11 +362,20 @@ class MainFrame(wx.Frame):
 			self.cbValleyJctFleet.SetValue(value != 0)
 
 	def OnCBAutoRouter(self, evt):
-		if self.cbAutoRouter.IsChecked():
+		self.AREnabled = self.cbAutoRouter.IsChecked()
+		if self.AREnabled:
 			rqStatus = "on"
 		else:
 			rqStatus = "off"
 		self.Request({"autorouter": { "status": rqStatus}})
+
+	def OnCBATC(self, evt):
+		self.ATCEnabled = self.cbATC.IsChecked()
+		if self.ATCEnabled:
+			rqStatus = "on"
+		else:
+			rqStatus = "off"
+		self.Request({"atc": { "action": rqStatus, "x": self.centerOffset+1600, "y": 0}})
 		
 	def OnRBNassau(self, evt):
 		self.Request({"control": { "name": "nassau", "value": evt.GetInt()}})
@@ -694,6 +706,10 @@ class MainFrame(wx.Frame):
 				self.buttonsToClear[bx][0] = secs
 
 	def ProcessClick(self, screen, pos):
+		# ignore screen clicks if not connected
+		if not self.subscribed:
+			return
+		
 		logging.debug("click %s %d, %d" % (screen, pos[0], pos[1]))
 		try:
 			to = self.turnoutMap[(screen, pos)]
@@ -755,7 +771,7 @@ class MainFrame(wx.Frame):
 					tr = blk.GetTrain()
 					oldName, oldLoco = tr.GetNameAndLoco()
 					oldATC = tr.IsOnATC() if self.IsDispatcher() else None
-					dlg = EditTrainDlg(self, tr, self.IsDispatcher())
+					dlg = EditTrainDlg(self, tr, self.IsDispatcher() and self.ATCEnabled)
 					rc = dlg.ShowModal()
 					if rc == wx.ID_OK:
 						trainid, locoid, atc = dlg.GetResults()
@@ -763,15 +779,10 @@ class MainFrame(wx.Frame):
 					if rc != wx.ID_OK:
 						return
 
-					self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid, "atc": atc}})
+					self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid}})
 					if self.IsDispatcher() and atc != oldATC:
 						tr.SetATC(atc)
-						if atc:
-							self.atcList.AddTrain(tr)
-							self.Request({"atc": {"action": "add", "train": trainid, "loco": locoid}})
-						else:
-							self.atcList.DelTrain(tr)
-							self.Request({"atc": {"action": "delete", "train": trainid, "loco": locoid}})					
+						self.Request({"atc": {"action": "add" if atc else "delete", "train": trainid, "loco": locoid}})
 
 					tr.Draw()
 
@@ -884,6 +895,7 @@ class MainFrame(wx.Frame):
 			self.bSaveLocos.Enable(False)
 			if self.IsDispatcher():
 				self.cbAutoRouter.Enable(False)
+				self.cbATC.Enable(False)
 			
 		else:
 			self.listener = Listener(self, self.settings.ipaddr, self.settings.socketport)
@@ -903,6 +915,7 @@ class MainFrame(wx.Frame):
 			self.bSaveLocos.Enable(True)
 			if self.IsDispatcher():
 				self.cbAutoRouter.Enable(True)
+				self.cbATC.Enable(True)
 
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()
@@ -1076,7 +1089,6 @@ class MainFrame(wx.Frame):
 					block = p["block"]
 					name = p["name"]
 					loco = p["loco"]
-					atc = p["atc"]
 					print(str(parms))
 
 					try:
@@ -1102,7 +1114,6 @@ class MainFrame(wx.Frame):
 							for trid in delList:
 								try:
 									del(self.trains[trid])
-									self.atcList.DelTrainByName(trid)
 								except:
 									logging.warning("can't delete train %s from train list" % trid)
 
@@ -1126,14 +1137,10 @@ class MainFrame(wx.Frame):
 										self.trains[name].AddToBlock(blk)
 								else:
 									tr.SetName(name)
-									tr.SetATC(atc)
 									self.trains[name] = tr
-									if tr.IsOnATC():
-										self.atcList.UpdateTrainName(tr, oldName)
 
 								try:
 									del(self.trains[oldName])
-									self.atcList.DelTrainByName(oldName)
 								except:
 									logging.warning("can't delete train %s from train list" % oldName)
 						
@@ -1145,14 +1152,9 @@ class MainFrame(wx.Frame):
 							tr = Train(name)
 							self.trains[name] = tr
 							
-						print("set ATC to %s" % str(atc))
-						tr.SetATC(atc)
 						tr.AddToBlock(blk)
 						if loco:
 							tr.SetLoco(loco)
-
-						if atc:
-							self.atcList.RefreshTrain(tr)
 
 						blk.SetTrain(tr)
 						blk.EvaluateStoppingSections()
@@ -1187,6 +1189,20 @@ class MainFrame(wx.Frame):
 				# parms contains subblocks information
 				if self.settings.dispatch:
 					self.districts.GenerateLayoutInformation(parms)
+					
+			elif cmd == "atcstatus":
+				print("atcstatus message: %s" % str(parms))
+				trnm = parms["train"][0]
+				try:
+					tr = self.trains[trnm]
+				except KeyError:
+					logging.warning("ATC rejected train %s does not exist" % trnm)
+					return
+
+				self.Popup("Rejected ATC train %s - no script" % trnm)				
+				tr.SetATC(False)
+				tr.Draw()
+
 
 	def raiseDisconnectEvent(self): # thread context
 		evt = DisconnectEvent()
@@ -1226,6 +1242,7 @@ class MainFrame(wx.Frame):
 		self.bSaveLocos.Enable(False)
 		if self.IsDispatcher():
 			self.cbAutoRouter.Enable(False)
+			self.cbATC.Enable(False)
 		logging.info("Server socket closed")
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()

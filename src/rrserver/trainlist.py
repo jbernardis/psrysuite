@@ -70,16 +70,16 @@ class TrainList(wx.ListCtrl):
 	def FindTrainInBlock(self, block):
 		for tr, trinfo in self.trains.items():
 			if block in trinfo["blocks"]:
-				return tr, trinfo["loco"], trinfo["atc"]
+				return tr, trinfo["loco"]
 
-		return None, None, None
+		return None, None
 
 	def FindTrain(self, trn):
 		for tr, trinfo in self.trains.items():
 			if tr == trn:
-				return trinfo["loco"], trinfo["atc"]
+				return trinfo["loco"]
 
-		return None, None
+		return None
 
 	def RenameTrain(self, oname, nname, oloco, nloco):
 		if oname == nname and oloco == nloco:

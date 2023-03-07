@@ -26,3 +26,9 @@ class OverSwitch:
 
 	def GetActiveRoute(self):
 		return self.activeRoute
+
+	def GetActiveRouteName(self):
+		if self.activeRoute is None:
+			return None
+		else:
+			return self.activeRoute.GetName()
