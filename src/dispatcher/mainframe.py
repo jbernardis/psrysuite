@@ -2,8 +2,11 @@
 import wx.lib.newevent
 
 import os
+import sys
 import json
 import logging
+from subprocess import Popen
+
 
 from dispatcher.settings import Settings
 from dispatcher.bitmaps import BitMaps
@@ -59,7 +62,8 @@ class MainFrame(wx.Frame):
 		self.subscribed = False
 		self.ATCEnabled = False
 		self.AREnabled = False
-		
+		self.pidATC	= None
+			
 		logging.info("Display process starting")
 		self.settings = Settings()
 
@@ -372,10 +376,21 @@ class MainFrame(wx.Frame):
 	def OnCBATC(self, evt):
 		self.ATCEnabled = self.cbATC.IsChecked()
 		if self.ATCEnabled:
-			rqStatus = "on"
+			#self.pidATC = 1
+			if self.pidATC is None:			
+				atcExec = os.path.join(os.getcwd(), "atc", "main.py")
+				self.pidATC = Popen([sys.executable, atcExec]).pid
+				logging.debug("atc server started as PID %d" % self.pidATC)
+				self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": self.centerOffset+1600, "y": 31}}
+				wx.CallLater(500, self.sendPendingATCShow)
+			else:
+				self.Request( {"atc": {"action": ["show"], "x": self.centerOffset+1600, "y": 31}})
+
 		else:
-			rqStatus = "off"
-		self.Request({"atc": { "action": rqStatus, "x": self.centerOffset+1600, "y": 0}})
+			self.Request({"atc": { "action": "hide", "x": self.centerOffset+1600, "y": 31}})
+		
+	def sendPendingATCShow(self):
+		self.Request(self.pendingATCShowCmd)
 		
 	def OnRBNassau(self, evt):
 		self.Request({"control": { "name": "nassau", "value": evt.GetInt()}})
@@ -1192,16 +1207,29 @@ class MainFrame(wx.Frame):
 					
 			elif cmd == "atcstatus":
 				print("atcstatus message: %s" % str(parms))
-				trnm = parms["train"][0]
-				try:
-					tr = self.trains[trnm]
-				except KeyError:
-					logging.warning("ATC rejected train %s does not exist" % trnm)
-					return
-
-				self.Popup("Rejected ATC train %s - no script" % trnm)				
-				tr.SetATC(False)
-				tr.Draw()
+				action = parms["action"][0]
+				if action == "reject":
+					trnm = parms["train"][0]
+					try:
+						tr = self.trains[trnm]
+					except KeyError:
+						logging.warning("ATC rejected train %s does not exist" % trnm)
+						return
+	
+					self.Popup("Rejected ATC train %s - no script" % trnm)				
+					tr.SetATC(False)
+					tr.Draw()
+				elif action == "complete":
+					trnm = parms["train"][0]
+					try:
+						tr = self.trains[trnm]
+					except KeyError:
+						logging.warning("ATC completed train %s does not exist" % trnm)
+						return
+	
+					self.Popup("ATC train %s has completed" % trnm)				
+					tr.SetATC(False)
+					tr.Draw()
 
 
 	def raiseDisconnectEvent(self): # thread context

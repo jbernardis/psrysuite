@@ -38,9 +38,9 @@ class Settings:
 			logging.warning("Missing global section - assuming defaults")
 			
 		if self.cfg.has_section(self.section):
-			for opt, value in self.cfg.items(GLOBAL):
+			for opt, value in self.cfg.items(self.section):
 				if opt == 'tty':
-					self.tty = s
+					self.tty = value
 
 		else:
 			logging.warning("Missing %s section - assuming defaults" % self.section)

@@ -10,15 +10,8 @@ import logging
 logging.basicConfig(filename=os.path.join("logs", "atc.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 import json
-import pprint
-
-#from atc.fifo import Fifo
 
 from atc.settings import Settings
-#
-# from autorouter.triggers import Triggers, TriggerPointFront, TriggerPointRear
-# from autorouter.routerequest import RouteRequest
-# from autorouter.requestqueue import RequestQueue
 from atc.turnout import Turnout
 from atc.signal import Signal
 from atc.block import Block
@@ -40,7 +33,7 @@ from atc.ticker import Ticker
 
 class MainFrame(wx.Frame):
 	def __init__(self):
-		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
+		wx.Frame.__init__(self, None, size=(900, 800), style=(wx.FRAME_NO_TASKBAR | wx.STAY_ON_TOP) & ~(wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.MAXIMIZE_BOX))  #wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		
 		self.sessionid = None
@@ -66,14 +59,14 @@ class MainFrame(wx.Frame):
 		self.atcList = ATCListCtrl(self, os.getcwd())
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
-		hsz.AddSpacer(20)
+		hsz.AddSpacer(5)
 		hsz.Add(self.atcList)
-		hsz.AddSpacer(20)
+		hsz.AddSpacer(5)
 		
 		vsz = wx.BoxSizer(wx.VERTICAL)
-		vsz.AddSpacer(20)
+		vsz.AddSpacer(5)
 		vsz.Add(hsz)
-		vsz.AddSpacer(20)
+		vsz.AddSpacer(5)
 
 		self.SetSizer(vsz)
 		self.Layout()
@@ -153,13 +146,16 @@ class MainFrame(wx.Frame):
 			sigList.append([None, None, None])					
 			sigx = 0
 
-			steps = {}			
+			steps = {}	
+			lastblk = None		
 			for step in script:
 				cmd = list(step.keys())[0]
 				if cmd in ["placetrain", "movetrain"]:
 					blk = step[cmd]["block"]
 					if blk in submap:
 						blk = submap[blk]
+					if cmd == "placetrain":
+						steps["origin"] = blk
 						
 					steps[blk] = {
 							"sigbehind": sigList[sigx][0],
@@ -169,15 +165,24 @@ class MainFrame(wx.Frame):
 								   "route": str(sigList[sigx+1][2])
 							}
 					}
+					lastblk = blk
 
 				elif cmd == "waitfor":
 					sigx += 1
+			if lastblk is not None:
+				steps["terminus"] = lastblk
 			self.scripts[train] = steps
 			
 		return True
 	
 	def HaveScript(self, train):
 		return train in self.scripts
+	
+	def SetOriginTerminus(self, dccl):
+		trnm = dccl.GetTrain()
+		origin = self.scripts[trnm]["origin"]
+		terminus = self.scripts[trnm]["terminus"]
+		dccl.SetOriginTerminus(origin, terminus)		
 	
 	def GetSignalBehind(self, train, block):
 		if not self.HaveScript(train):
@@ -207,11 +212,16 @@ class MainFrame(wx.Frame):
 		
 	def OnTickerEvent(self, _):
 		for dccl in self.dccRemote.GetDCCLocos():
-			trnm = dccl.GetTrain()
+			if dccl.HasCompleted():
+				continue
+				
 			gs, ga = dccl.GetGoverningSignal()
 			aspect = 0  # assume STOP
+			
+			if gs is None:
+				aspect = 4 # restricting
 
-			if "os" in gs and gs["os"] is None:
+			elif "os" in gs and gs["os"] is None:
 				# if we are already in the OS, dont pay attention to the aspect as it is now red - just keep using
 				# the old value
 				aspect = ga
@@ -363,9 +373,7 @@ class MainFrame(wx.Frame):
 				self.running = False
 				
 			elif cmd == "atc":
-				print("ATC command: %s" % str(parms))
 				action = parms["action"][0]
-				print("action = (%s)" % action)
 				
 				if action == "add":
 					trnm = parms["train"][0]
@@ -380,6 +388,7 @@ class MainFrame(wx.Frame):
 					
 					loco = parms["loco"][0]
 					dccl = DCCLoco(trnm, loco)
+					self.SetOriginTerminus(dccl)
 					self.atcList.AddTrain(dccl)
 					
 					tr = self.trains[trnm]
@@ -390,14 +399,16 @@ class MainFrame(wx.Frame):
 				elif action == "delete":
 					train = parms["train"][0]
 					loco = parms["loco"][0]
-					self.dccRemote.DropLoco(loco)
+					dccl = self.dccRemote.GetDCCLocoByTrain(train)
+					if dccl is not None:
+						self.atcList.DelTrain(dccl)
+						self.dccRemote.DropLoco(loco)
 					
 				elif action == "hide":
 					if "x" in parms:
 						self.posx = int(parms["x"][0])
 					if "y" in parms:
 						self.posy = int(parms["y"][0])
-					print("show/reset, %s %s" % (self.posx, self.posy))
 					self.Hide()
 				
 				elif action in ["show", "reset" ]:
@@ -405,9 +416,8 @@ class MainFrame(wx.Frame):
 						self.posx = int(parms["x"][0])
 					if "y" in parms:
 						self.posy = int(parms["y"][0])
-					print("show/reset, %s %s" % (self.posx, self.posy))
-					self.Show()
 					self.SetPos()
+					self.Show()
 
 			else:
 				if cmd not in ["control", "relay", "handswitch", "siglever", "breaker", "fleet"]:
@@ -424,32 +434,24 @@ class MainFrame(wx.Frame):
 
 	def SignalLockChange(self, sigName, nLock):
 		logging.info("signal %s lock has changed %s" % (sigName, str(nLock)))
-		self.EvaluateQueuedRequests()
 
 	def SignalAspectChange(self, sigName, nAspect):
 		logging.info("signal %s aspect has changed %d" % (sigName, nAspect))
-		self.EvaluateQueuedRequests()
 
 	def TurnoutLockChange(self, toName, nLock):
 		logging.info("turnout %s lock has changed %s" % (toName, str(nLock)))
-		self.EvaluateQueuedRequests()
 
 	def TurnoutStateChange(self, toName, nState):
 		logging.info("turnout %s state has changed %s" % (toName, nState))
-		self.EvaluateQueuedRequests()
-		#self.ReqQueue.Resume(toName)
 
 	def BlockDirectionChange(self, blkName, nDirection):
 		logging.info("block %s has changed direction: %s" % (blkName, nDirection))
-		self.EvaluateQueuedRequests()
 
 	def BlockStateChange(self, blkName, nState):
 		logging.info("block %s has changed state: %d" % (blkName, nState))
-		self.EvaluateQueuedRequests()
 
 	def BlockClearChange(self, blkName, nClear):
 		logging.info("block %s has changed clear: %s" % (blkName, str(nClear)))
-		self.EvaluateQueuedRequests()
 
 	def BlockTrainChange(self, blkName, oldTrain, oldLoco, newTrain, newLoco):
 		if oldTrain is not None:
@@ -466,22 +468,18 @@ class MainFrame(wx.Frame):
 			return
 		
 		logging.info("Train %s has moved into block %s" % (train, block))
+		dccl.CheckHasMoved(block)
 		
 		# set governing signal to the signal behind us UNLESS we have already switched to the signal ahead of us
-		gs = dccl.GetGoverningSignal()
-		sig = self.GetSignalAhead(train, block)
-		if gs != sig:
-			gs = self.GetSignalBehind(train, block)
-			dccl.SetGoverningSignal(gs)
-			
-  # routeRequest = self.CheckTrainInBlock(train, block, TriggerPointFront)
-  # if routeRequest is None:
-  # 	return
-  #
-  # if self.EvaluateRouteRequest(routeRequest):
-  # 	self.SetupRoute(routeRequest)
-  # else:
-  # 	self.EnqueueRouteRequest(routeRequest)
+		if dccl.AtTerminus(block):
+			dccl.HeadAtTerminus(True)
+			dccl.SetGoverningSignal(None)
+		else:
+			gs = dccl.GetGoverningSignal()
+			sig = self.GetSignalAhead(train, block)
+			if gs != sig:
+				gs = self.GetSignalBehind(train, block)
+				dccl.SetGoverningSignal(gs)
 			
 	def TrainTailInBlock(self, train, block):
 		dccl = self.dccRemote.GetDCCLocoByTrain(train)
@@ -491,100 +489,22 @@ class MainFrame(wx.Frame):
 		
 		logging.info("Train %s tail in block %s" % (train, block))
 		
-		gs = self.GetSignalAhead(train, block)
-		dccl.SetGoverningSignal(gs)
-
-  # routeRequest = self.CheckTrainInBlock(train, block, TriggerPointRear)
-  # if routeRequest is None:
-  # 	return
-  #
-  # if self.EvaluateRouteRequest(routeRequest):
-  # 	self.SetupRoute(routeRequest)
-  # else:
-  # 	self.EnqueueRouteRequest(routeRequest)
+		if dccl.AtTerminus(block):
+			dccl.MarkCompleted()
+			self.atcList.DelTrain(dccl)
+			loco = dccl.GetLoco()
+			self.dccRemote.DropLoco(loco)
+			self.RRRequest({"atcstatus": {"action": "complete", "train": train}})
+							
+		elif dccl.HeadAtTerminus():
+			#change nothing here
+			pass
+		else:
+			gs = self.GetSignalAhead(train, block)
+			dccl.SetGoverningSignal(gs)
 
 	def TrainRemoveBlock(self, train, block, blocks):
 		logging.info("Train %s has left block %s and is now in %s" % (train, block, ",".join(blocks)))
-		print("Train %s has left block %s and is now in %s" % (train, block, ",".join(blocks)))
-		pass
-
-	def CheckTrainInBlock(self, train, block, triggerPoint):
-		rtName = self.triggers.GetRoute(train, block)
-		if rtName is None:
-			logging.info("train/block combination %s/%s not found" % (train, block))
-			return None
-
-		blockTriggerPoint = self.triggers.GetTriggerPoint(train, block)
-		if blockTriggerPoint != triggerPoint:
-			logging.info("trigger point mismatch, wanted %s, got %s" % (triggerPoint, blockTriggerPoint))
-			return None
-		
-		return None #outeRequest(train, self.routes[rtName], block)
-
-	def EvaluateRouteRequest(self, rteRq):
-		rname = rteRq.GetName()
-		blkName = rteRq.GetEntryBlock()
-		logging.info("evaluate route %s" % rname)
-		rte = self.routes[rname]
-		os = self.osList[rte.GetOS()]
-		activeRte = os.GetActiveRoute()
-		tolock = []
-		siglock = []
-		if activeRte is None or activeRte.GetName() != rname:
-			for t in rte.GetTurnouts():
-				toname, state = t.split(":")
-				if self.turnouts[toname].IsLocked() and self.turnouts[toname].GetState() != state:
-					#  turnout is locked AND we need to change it
-					tolock.append(toname)
-		#  else we are already on this route - no turnout evauation needed
-
-		sigNm = rte.GetSignalForEnd(blkName)
-		if sigNm is not None:
-			if self.signals[sigNm].IsLocked():
-				siglock.append(sigNm)
-
-		if len(tolock) + len(siglock) == 0:
-			logging.info("eval true")
-			return True  # OK to proceed with this route
-		else:
-			#  TODO - do something with the tolock and siglock arrays
-			logging.info("Eval false %s %s" % (str(tolock), str(siglock)))
-			return False  # this route is unavailable right now
-
-	def SetupRoute(self, rteRq):
-		rname = rteRq.GetName()
-		blkName = rteRq.GetEntryBlock()
-		logging.info("set up route %s" % rname)
-		rte = self.routes[rname]
-		for t in rte.GetTurnouts():
-			toname, state = t.split(":")
-			if self.turnouts[toname].GetState() != state:
-				self.ReqQueue.Append({"turnout": {"name": toname, "status": state}})
-
-		sigNm = rte.GetSignalForEnd(blkName)
-		if sigNm is not None:
-			self.ReqQueue.Append({"signal": {"name": sigNm, "aspect": -1}})
-
- # def EnqueueRouteRequest(self, rteRq):
- # 	osNm = rteRq.GetOS()
- # 	if osNm not in self.OSQueue:
- # 		self.OSQueue[osNm] = Fifo()
- #
- # 	self.OSQueue[osNm].Append(rteRq)
-
-	def EvaluateQueuedRequests(self):
-		logging.info("evaluating queued requests")
-  # for osNm in self.OSQueue:
-  # 	logging.info("OS: %s" % osNm)
-  # 	req = self.OSQueue[osNm].Peek()
-  # 	if req is not None:
-  # 		logging.info("Request for block %s" % req.GetName())
-  # 		if self.EvaluateRouteRequest(req):
-  # 			logging.info("OK to proceed")
-  # 			self.OSQueue[osNm].Pop()
-  # 			self.SetupRoute(req)
-  # logging.info("end of queued requests")
-
 
 	def RRRequest(self, req):
 		logging.info("Outgoing request: %s" % json.dumps(req))
@@ -622,15 +542,15 @@ class App(wx.App):
 
 	def OnInit(self):
 		self.frame = MainFrame()
-		self.frame.Show()
+		self.frame.Hide()
 		return True
 
 
 ofp = open("atc.out", "w")
 efp = open("atc.err", "w")
 
-sys.stdout = ofp
-sys.stderr = efp
+#sys.stdout = ofp
+#sys.stderr = efp
 
 
 app = App(False)

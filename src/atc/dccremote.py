@@ -17,16 +17,16 @@ class DCCRemote:
 			
 		return False
 	
-	def Profiler(self, aspect, loco, speed):
+	def Profiler(self, loco, aspect, speed):
 		if aspect == 0:
 			return 0, -5
 		
-		if aspect == 1:
+		if aspect == 51:
 			return 100, 5
 			
 		return 50, 5
 		
-	def SelectLoco(self, loco):
+	def SelectLoco(self, loco, assertValues=False):
 		for l in self.locos:
 			if l.GetLoco() == loco.GetLoco():
 				self.selectedLoco = l
@@ -38,9 +38,10 @@ class DCCRemote:
 			l.SetProfiler(self.Profiler)
 			self.selectedLoco = l
 
-		l = self.selectedLoco			
-		self.SetSpeedAndDirection(nspeed=l.GetSpeed(), ndir=l.GetDirection())
-		self.SetFunction(headlight=l.GetHeadlight(), horn=l.GetHorn(), bell=l.GetBell())
+		l = self.selectedLoco
+		if assertValues:			
+			self.SetSpeedAndDirection(nspeed=l.GetSpeed(), ndir=l.GetDirection(), assertValues=True)
+			self.SetFunction(headlight=l.GetHeadlight(), horn=l.GetHorn(), bell=l.GetBell(), assertValues=True)
 		return l.GetSpeed(), l.GetDirection(), l.GetHeadlight(), l.GetHorn(), l.GetBell()
 		
 	def ClearSelection(self):
@@ -56,23 +57,25 @@ class DCCRemote:
 		nspeed = self.selectedLoco.GetSpeed() + step
 		self.SetSpeedAndDirection(nspeed)
 		
-	def SetSpeed(self, nspeed):
-		self.SetSpeedAndDirection(nspeed=nspeed)
+	def SetSpeed(self, nspeed, assertValues=False):
+		self.SetSpeedAndDirection(nspeed=nspeed, assertValues=assertValues)
 		
-	def SetDirection(self, ndir):
-		self.SetSpeedAndDirection(ndir=ndir)
+	def SetDirection(self, ndir, assertValues = False):
+		self.SetSpeedAndDirection(ndir=ndir, assertValues=assertValues)
 						
-	def SetSpeedAndDirection(self, nspeed=None, ndir=None):
+	def SetSpeedAndDirection(self, nspeed=None, ndir=None, assertValues=False):
 		if self.selectedLoco is None:
 			return 
-		
+
+		ospeed = self.selectedLoco.GetSpeed()		
 		if nspeed is not None:
 			if nspeed < 0 or nspeed > 128:
 				print("speed value is out of range: %d" % nspeed)
 				return
 			
 			self.selectedLoco.SetSpeed(nspeed)
-			
+
+		odirection = self.selectedLoco.GetDirection()			
 		if ndir is not None:
 			if ndir not in [FORWARD, REVERSE]:
 				print("invalid value for direction: %s" % ndir)
@@ -84,16 +87,22 @@ class DCCRemote:
 		speed = self.selectedLoco.GetSpeed()
 		direction = self.selectedLoco.GetDirection()
 		
-		self.server.SendRequest("move", {"loco": loco, "speed": speed, "direction": direction})
+		if (speed != ospeed or direction != odirection) or assertValues:
+			self.server.SendRequest({"throttle": {"loco": loco, "speed": speed, "direction": direction}})
 		
-	def SetFunction(self, headlight=None, horn=None, bell=None):
+	def SetFunction(self, headlight=None, horn=None, bell=None, assertValues=False):
 		if self.selectedLoco is None:
 			return 
-		
+
+		oheadlight = self.selectedLoco.GetHeadlight()		
 		if headlight is not None:
 			self.selectedLoco.SetHeadlight(headlight)
+		
+		ohorn = self.selectedLoco.GetHorn()
 		if horn is not None:
 			self.selectedLoco.SetHorn(horn)
+			
+		obell = self.selectedLoco.GetBell()
 		if bell is not None:
 			self.selectedLoco.SetBell(bell)
 			
@@ -103,7 +112,8 @@ class DCCRemote:
 		
 		loco = self.selectedLoco.GetLoco()
 
-		self.server.SendRequest("function", {"loco": loco, "bell": bell, "horn": horn, "light": light})
+		if (oheadlight != headlight or ohorn != horn or obell != bell) or assertValues:
+			self.server.SendRequest({"function": {"loco": loco, "bell": bell, "horn": horn, "light": light}})
 		
 	def GetDCCLoco(self, loco):
 		for l in self.locos:
@@ -122,5 +132,4 @@ class DCCRemote:
 		
 	def GetDCCLocos(self):
 		return self.locos
-		#return {l.GetLoco(): [l.GetSpeed(), l.GetDirection(), l.GetHeadlight(), l.GetHorn(), l.GetBell()] for l in self.locos}
 

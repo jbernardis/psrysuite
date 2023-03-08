@@ -18,10 +18,58 @@ REVERSE = 0x03
 
 MAXTRIES = 3
 
+class Loco:
+	def __init__(self, lid):
+		self.locoid = lid
+		self.dpeed = 0
+		self.direction = FORWARD
+		self.headlight = False
+		self.horn = False
+		self.bell = False
+		
+	def GetID(self):
+		return self.locoid
+		
+	def SetSpeed(self, speed):
+		self.speed = speed
+		
+	def GetSpeed(self):
+		return self.speed
+	
+	def SetDirection(self, dval):
+		self.direction = dval
+		
+	def GetDirection(self):
+		return self.direction
+	
+	def SetBell(self, bell):
+		print("set bell to %s" % bell)
+		self.bell = bell
+		
+	def GetBell(self):
+		return self.bell
+	
+	def SetHorn(self, horn):
+		print("set horn to %s" % horn)
+		self.horn = horn
+		
+	def GetHorn(self):
+		return self.horn
+		
+	def SetHeadlight(self, headlight):
+		print("set headlight to %s" % headlight)
+		self.headlight = headlight
+		
+	def GetHeadlight(self):
+		return self.headlight
 
+		
+		
 class MainUnit:
 	def __init__(self):
 		logging.info("PSRY DCC Server starting...")
+		
+		self.locos = {}
 
 		hostname = socket.gethostname()
 		self.ip = socket.gethostbyname(hostname)
@@ -33,7 +81,7 @@ class MainUnit:
 				logging.info("Using configured IP Address (%s) instead of retrieved IP Address: (%s)" % (self.settings.ipaddr, self.ip))
 				self.ip = self.settings.ipaddr
 				
-		logging.info("Opening serial port to DCC Command Station")
+		logging.info("Opening serial port %s to DCC Command Station" % self.settings.tty)
 
 		try:
 			self.port = serial.Serial(port=self.settings.tty,
@@ -59,78 +107,132 @@ class MainUnit:
 			
 		logging.info("HTTP Server created.  Awaiting commands...")
 			
-	def dccCommandReceipt(self, cmd):
-		print("DCC Command receipt: (%s)" % str(cmd))
-		logging.info("Command Receipt: %s" % str(cmd))
+	def dccCommandReceipt(self, cmdString):
+		print("DCC Command receipt: (%s)" % str(cmdString))
+		logging.info("Command Receipt: %s" % str(cmdString))
 		
-		if cmd["cmd"][0].lower() == "exit":
+		cmd = cmdString["cmd"][0].lower()
+
+		if cmd == "throttle":
+			try:
+				locoid = int(cmdString["loco"][0])
+			except:
+				locoid = None
+				
+			if locoid is None:
+				print("unable to parse locomotive ID: %s" % cmdString["loco"][0])
+				return
+				
+			try:
+				speed = int(cmdString["speed"][0])
+			except:
+				speed = None
+				
+			try:
+				direction = cmdString["direction"][0]
+			except:
+				direction = None
+				
+			self.SetSpeedAndDirection(locoid, speed, direction)
+		
+		elif cmd == "function":
+			try:
+				locoid = int(cmdString["loco"][0])
+			except:
+				locoid = None
+				
+			if locoid is None:
+				print("unable to parse locomotive ID: %s" % cmdString["loco"][0])
+				return
+				
+			try:
+				headlight = int(cmdString["light"][0])
+			except:
+				headlight = None
+				
+			try:
+				horn = int(cmdString["horn"][0])
+			except:
+				horn = None
+				
+			try:
+				bell = int(cmdString["bell"][0])
+			except:
+				bell = None
+				
+			self.SetFunction(locoid, headlight, horn, bell)
+				
+		elif cmd == "exit":
 			logging.info("terminating DCC server normally")
 			self.dccServer.close()
 			
-	def SetSpeedAndDirection(self, nspeed=None, ndir=None):
-		if not self.IsInitialized():
-			return
-		
-		if self.selectedLoco is None:
-			return 
-		
-		if nspeed is not None:
-			if nspeed < 0 or nspeed > 128:
-				print("speed value is out of range: %d" % nspeed)
-				return
+	def SetSpeedAndDirection(self, lid, speed=None, direction=None):
+		try:
+			loco = self.locos[lid]
+		except KeyError:
+			loco = Loco(lid)
+			self.locos[lid] = loco
 			
-			self.selectedLoco.SetSpeed(nspeed)
+		if speed is not None:
+			loco.SetSpeed(speed)
 			
-		if ndir is not None:
-			if ndir not in [FORWARD, REVERSE]:
-				print("invalid value for direction: %s" % ndir)
-				return 
-			
-			self.selectedLoco.SetDirection(ndir)
+		if direction is not None:
+			loco.SetDirection(REVERSE if direction == "R" else FORWARD)
+	
+		speed = loco.GetSpeed()
+		direction = loco.GetDirection()
 		
-		loco = self.selectedLoco.GetLoco()
-		speed = self.selectedLoco.GetSpeed()
-		direction = self.selectedLoco.GetDirection()
+		lidh = lid >> 8
 		
 		outb = [
 			0xa2,
-			loco >> 8,
-			loco % 256,
+			lidh,
+			lid % 256,
 			direction,
 			speed if speed > 4 else 0]
 		
 		self.SendDCC(outb)
 		
-	def SetFunction(self, headlight=None, horn=None, bell=None):
-		if not self.IsInitialized():
-			return
-		
-		if self.selectedLoco is None:
-			return 
-		
+	def SetFunction(self, lid, headlight=None, horn=None, bell=None):
+		print("set func %s %s %s %s" % (lid, headlight, horn, bell))
+		try:
+			loco = self.locos[lid]
+		except KeyError:
+			loco = Loco(lid)
+			self.locos[lid] = loco
+			
 		if headlight is not None:
-			self.selectedLoco.SetHeadlight(headlight)
+			loco.SetHeadlight(headlight == 1)
+			
 		if horn is not None:
-			self.selectedLoco.SetHorn(horn)
+			loco.SetHorn(horn == 1)
+			
 		if bell is not None:
-			self.selectedLoco.SetBell(bell)
+			loco.SetBell(bell == 1)
 			
 		function = 0
-		if self.selectedLoco.GetBell():
+		if loco.GetBell():
 			function += 0x80
+			print("getbell is true)")
+		else:
+			print("getbell is false")
 			
-		if self.selectedLoco.GetHorn():
+		if loco.GetHorn():
 			function += 0x40
+			print("gethorn is true)")
+		else:
+			print("gethorn is false")
 			
-		if self.selectedLoco.GetHeadlight():
+		if loco.GetHeadlight():
 			function += 0x08
-		
-		loco = self.selectedLoco.GetLoco()
+			print("getheadlight is true)")
+		else:
+			print("getheadlight is false")
 
 		outb = [
 			0xa2,
-			loco >> 8,
-			loco % 256,
+			lid >> 8,
+			lid % 256,
 			0x07,
 			function & 0xff]
 

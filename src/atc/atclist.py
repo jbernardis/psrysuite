@@ -9,7 +9,7 @@ class ATCListCtrl(wx.ListCtrl):
 		self.parent = parent
 		
 		wx.ListCtrl.__init__(
-			self, parent, wx.ID_ANY, size=(310, 80),
+			self, parent, wx.ID_ANY, size=(310, 110),
 			style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_VRULES|wx.LC_SINGLE_SEL) #|wx.LC_NO_HEADER)
 
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected)
@@ -43,7 +43,6 @@ class ATCListCtrl(wx.ListCtrl):
 		self.idxRedYel = self.il.Add(self.pngSigRedYel)
 		self.idxGrn = self.il.Add(self.pngSigGrn)
 		self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-
 
 		self.SetItemCount(0)
 		self.trains = {}
@@ -166,7 +165,7 @@ class ATCListCtrl(wx.ListCtrl):
 		
 		if aspect == 0:
 			return self.idxRed
-		elif aspect == 5:
+		elif aspect == 3:
 			return self.idxGrn
 		else:
 			return self.idxRedYel

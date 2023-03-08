@@ -14,6 +14,40 @@ class DCCLoco:
 		self.governingSignal = {"signal": None, "os": None, "route": None}
 		self.governingAspect = 0
 		self.profiler = None
+		self.movedBeyondOrigin = False
+		self.headAtTerminus = False
+		self.origin = None
+		self.terminus = None
+		self.completed = False
+		
+	def SetOriginTerminus(self, origin, terminus):
+		self.origin = origin
+		self.terminus = terminus		
+		
+	def HasMoved(self, moved=None):
+		if moved is not None:
+			self.movedBeyondOrigin = moved
+			
+		return self.movedBeyondOrigin
+	
+	def CheckHasMoved(self, blknm):
+		if blknm != self.origin:
+			self.movedBeyondOrigin = True
+			
+	def AtTerminus(self, blknm):
+		return blknm == self.terminus
+	
+	def HeadAtTerminus(self, flag=None):
+		if flag is not None:
+			self.headAtTerminus = flag
+			
+		return self.headAtTerminus
+	
+	def MarkCompleted(self):
+		self.completed = True
+		
+	def HasCompleted(self):
+		return self.completed
 		
 	def SetProfiler(self, prof):
 		self.profiler = prof
@@ -89,20 +123,23 @@ class DCCLoco:
 		return self.governingSignal, self.governingAspect
 	
 	def SetGoverningSignal(self, sig):
-		print("set governing signal of %s to %s" % (self.train, str(sig)))
 		self.governingSignal = sig
 		
 	def SetGoverningAspect(self, aspect):
-		print("set governing aspect of %s to %d" % (self.train, aspect))
+		if self.completed:
+			self.targetSpeed = 0
+			self.step = 0
+			return
 		self.governingAspect = aspect	
 		if self.profiler is None:
-			print("unable to determine acceleration profile for train/loco %s/%d" % (self.train, self.loco))
 			self.targetSpeed = 0
 			self.step = 0
 		else:
-			self.targetSpeed, self.step = self.profiler(aspect, self.loco, self.speed)
-			print("based on aspect %d and loco %s, setting target speed/step to %d, %d" % (aspect, self.loco, self.targetSpeed, self.step))
+			self.targetSpeed, self.step = self.profiler(self.loco, aspect, self.speed)
 		
 	def GetGoverningAspect(self):
+		if self.completed:
+			self.governingAspect = 0
+			
 		return self.governingAspect	
 	

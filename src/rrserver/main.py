@@ -4,11 +4,9 @@ if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
 DEVELOPMODE = True
-	
-import pprint
 
 import logging
-logging.basicConfig(filename=os.path.join("logs", "server.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename=os.path.join("logs", "rrserver.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 ofp = open("rrserver.out", "w")
 efp = open("rrserver.err", "w")
@@ -504,11 +502,12 @@ class MainFrame(wx.Frame):
 			sid = int(evt.data["SID"][0])
 			function = evt.data["function"][0]
 			self.clientList.SetSessionFunction(sid, function)
-			if function == "ATC" and self.pendingATCShowCmd is not None:
-				addrList = self.clientList.GetFunctionAddress("ATC")
-				for addr, skt in addrList:
-					self.socketServer.sendToOne(skt, addr, self.pendingATCShowCmd)
-				self.pendingATCShowCmd = None
+			print("socket connectioln from function %s" % function)
+   # if function == "ATC" and self.pendingATCShowCmd is not None:
+   # 	addrList = self.clientList.GetFunctionAddress("ATC")
+   # 	for addr, skt in addrList:
+   # 		self.socketServer.sendToOne(skt, addr, self.pendingATCShowCmd)
+   # 	self.pendingATCShowCmd = None
 			
 		elif verb == "autorouter":
 			stat = evt.data["status"][0]
@@ -523,29 +522,11 @@ class MainFrame(wx.Frame):
 					self.socketServer.deleteSocket(addr)
 				
 		elif verb == "atc":
+			print("atc command: %s" % str(evt.data))
 			addrList = self.clientList.GetFunctionAddress("ATC")
-			action = evt.data["action"][0]
-			if action == "on":	
-				x = evt.data["x"][0]
-				y = evt.data["y"][0]
-				if self.pidATC is None:			
-					atcExec = os.path.join(os.getcwd(), "atc", "main.py")
-					self.pidATC = Popen([sys.executable, atcExec]).pid
-					logging.debug("atc server started as PID %d" % self.pidATC)
-					self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": [x], "y": [y]}}
-				else:
-					for addr, skt in addrList:
-						self.socketServer.sendToOne(skt, addr, {"atc": {"action": ["show"], "x": [x], "y": [y]}})
-						
-			elif action == "off":
-				x = evt.data["x"][0]
-				y = evt.data["y"][0]
-				for addr, skt in addrList:
-					self.socketServer.sendToOne(skt, addr, {"atc": {"action": ["hide"], "x": [x], "y": [y]}})
-								
-			else:
-				for addr, skt in addrList:
-					self.socketServer.sendToOne(skt, addr, {"atc": evt.data})
+			print("sending to %d clienbts" % len(addrList))
+			for addr, skt in addrList:
+				self.socketServer.sendToOne(skt, addr, {"atc": evt.data})
 					
 		elif verb == "atcstatus":
 			self.socketServer.sendToAll({"atcstatus": evt.data})
