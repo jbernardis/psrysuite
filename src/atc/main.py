@@ -2,6 +2,7 @@ import wx
 import wx.lib.newevent
 
 import os, sys
+from pickle import NONE, FALSE, TRUE
 cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
@@ -53,6 +54,10 @@ class MainFrame(wx.Frame):
 		self.listener = None
 		self.rrServer = None
 		
+		self.selectedTrain = None
+		
+		self.LoadImages(os.path.join(cmdFolder, "images"))
+		
 		logging.info("psry atc server starting")
 
 		self.SetTitle("PSRY ATC Server")
@@ -62,6 +67,42 @@ class MainFrame(wx.Frame):
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(5)
 		hsz.Add(self.atcList)
+		hsz.AddSpacer(5)
+		
+		btnszr = wx.BoxSizer(wx.VERTICAL)
+		self.bLight = wx.BitmapButton(self, wx.ID_ANY, self.imageLight, size=(32, 32))
+		self.bLight.SetToolTip("Headlight On/Off")
+		self.Bind(wx.EVT_BUTTON, self.OnBLight, self.bLight)
+		btnszr.Add(self.bLight)
+		btnszr.AddSpacer(5)
+		
+		self.bHorn = wx.BitmapButton(self, wx.ID_ANY, self.imageHorn, size=(32, 32))
+		self.bHorn.SetToolTip("Horn On/Off")
+		self.Bind(wx.EVT_BUTTON, self.OnBHorn, self.bHorn)
+		btnszr.Add(self.bHorn)
+		btnszr.AddSpacer(5)
+		
+		self.bBell = wx.BitmapButton(self, wx.ID_ANY, self.imageBell, size=(32, 32))
+		self.bBell.SetToolTip("Bell On/Off")
+		self.Bind(wx.EVT_BUTTON, self.OnBBell, self.bBell)
+		btnszr.Add(self.bBell)
+		
+		hsz.Add(btnszr)
+		hsz.AddSpacer(5)
+		
+		btnszr = wx.BoxSizer(wx.VERTICAL)
+		self.bStop = wx.BitmapButton(self, wx.ID_ANY, self.imageStop, size=(32, 32))
+		self.bStop.SetToolTip("Force stop")
+		self.Bind(wx.EVT_BUTTON, self.OnBStop, self.bStop)
+		btnszr.Add(self.bStop)
+		btnszr.AddSpacer(5)
+		
+		self.bAtcOff = wx.BitmapButton(self, wx.ID_ANY, self.imageAtcOff, size=(32, 32))
+		self.bAtcOff.SetToolTip("Remove From ATC")
+		self.Bind(wx.EVT_BUTTON, self.OnBAtcOff, self.bAtcOff)
+		btnszr.Add(self.bAtcOff)
+		
+		hsz.Add(btnszr)
 		hsz.AddSpacer(5)
 		
 		vsz = wx.BoxSizer(wx.VERTICAL)
@@ -74,6 +115,32 @@ class MainFrame(wx.Frame):
 		self.Fit()
 		
 		wx.CallAfter(self.Initialize)
+		
+	def LoadImages(self, imgFolder):
+		png = wx.Image(os.path.join(imgFolder, "headlight.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.imageLight = png
+		
+		png = wx.Image(os.path.join(imgFolder, "horn.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.imageHorn = png
+		
+		png = wx.Image(os.path.join(imgFolder, "bell.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.imageBell = png
+		
+		png = wx.Image(os.path.join(imgFolder, "stop.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.imageStop = png
+		
+		png = wx.Image(os.path.join(imgFolder, "atcoff.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.imageAtcOff = png
 		
 	def SetPos(self):
 		self.SetPosition((self.posx, self.posy))
@@ -111,6 +178,8 @@ class MainFrame(wx.Frame):
 
 		self.initialized = True
 		self.SetPos()
+		
+		self.ReportSelection(None)
 		logging.info("exit initialize")
 
 	def ProcessScripts(self):
@@ -237,12 +306,14 @@ class MainFrame(wx.Frame):
 					if overswitch in self.osList and self.osList[overswitch].GetActiveRouteName() != route:
 						# either we don't know that OS or its not set to the needed route
 						aspect = 0
+						
+			print("calculated aspect: %d" % aspect)
 	
 			dccl.SetGoverningAspect(aspect)
 			self.dccRemote.SelectLoco(dccl)	
 			
-			step = dccl.GetSpeedStep()				
-			speed = self.dccRemote.ApplySpeedStep(step)
+#			step = dccl.GetSpeedStep()				
+			speed = self.dccRemote.ApplySpeedStep() #step)
 			if speed == 0 and dccl.HasCompleted():
 				self.atcList.DelTrain(dccl)
 				loco = dccl.GetLoco()
@@ -488,7 +559,7 @@ class MainFrame(wx.Frame):
 			dccl.SetGoverningSignal(None)
 		else:
 			sig = self.GetSignal(train, block)
-			print("block %s, gs=%s, sigahead=%s" % (block, str(gs), str(sig)))
+			#print("block %s, gs=%s, sigahead=%s" % (block, str(gs), str(sig)))
 			# see if we've passed our signal.  If so, we need to freeze our aspect
 			# until the tail of the train also passes the signal
 			dccl.SetInBlock(gs != sig)
@@ -529,6 +600,89 @@ class MainFrame(wx.Frame):
 
 	def OnDisconnectEvent(self, _):
 		self.kill()
+		
+	def ReportSelection(self, trnm):
+		flag = trnm is not None
+		self.selectedTrain = trnm
+		self.EnableButtons(flag)			
+		if trnm is None:
+			self.selectedDCCL = None
+		else:
+			self.selectedDCCL = self.dccRemote.GetDCCLocoByTrain(trnm)
+			
+	def EnableButtons(self, flag):
+		self.bLight.Enable(flag)
+		self.bHorn.Enable(flag)
+		self.bBell.Enable(flag)
+		self.bStop.Enable(flag)
+		self.bAtcOff.Enable(flag)
+		
+	def OnBLight(self, _):
+		dccl = self.selectedDCCL
+		if dccl is None:
+			return
+		
+		light = dccl.GetHeadlight()
+		
+		self.dccRemote.SelectLoco(dccl)
+		self.dccRemote.SetFunction(headlight=not light)
+		self.atcList.RefreshTrain(dccl)
+		
+	def OnBHorn(self, _):
+		dccl = self.selectedDCCL
+		if dccl is None:
+			return
+		
+		horn = dccl.GetHorn()
+		
+		self.dccRemote.SelectLoco(dccl)
+		self.dccRemote.SetFunction(horn=not horn)
+		self.atcList.RefreshTrain(dccl)
+		
+	def OnBBell(self, _):
+		dccl = self.selectedDCCL
+		if dccl is None:
+			return
+		
+		bell = dccl.GetBell()
+		
+		self.dccRemote.SelectLoco(dccl)
+		self.dccRemote.SetFunction(bell=not bell)
+		self.atcList.RefreshTrain(dccl)
+		
+	def OnBStop(self, _):
+		dccl = self.selectedDCCL
+		if dccl is None:
+			return
+		
+		self.dccRemote.SelectLoco(dccl)
+		dccl.SetForcedStop(not dccl.GetForcedStop())
+		self.atcList.RefreshTrain(dccl)
+		
+	def OnBAtcOff(self, _):
+		dccl = self.selectedDCCL
+		if dccl is None:
+			return
+		
+		train = dccl.GetTrain()
+				
+		dlg = wx.MessageDialog(None, "Are you sure you want to remove Train %s from ATC?" % train,
+							   'Remove Train from ATC?',
+							   wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+		dlg.Centre()
+		rc = dlg.ShowModal()
+		dlg.Destroy()
+		
+		if rc == wx.ID_NO:
+			return
+		
+		self.atcList.DelTrain(dccl)
+		loco = dccl.GetLoco()
+		self.dccRemote.DropLoco(loco)
+		if self.dccRemote.LocoCount() == 0:
+			self.EnableButtons(False)
+			
+		self.RRRequest({"atcstatus": {"action": "remove", "train": train}})
 		
 	def OnClose(self, evt):
 		#self.kill()

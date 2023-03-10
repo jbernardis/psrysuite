@@ -20,6 +20,7 @@ class DCCLoco:
 		self.terminus = None
 		self.completed = False
 		self.inBlock = False
+		self.forcedStop = False
 		
 	def SetOriginTerminus(self, origin, terminus):
 		self.origin = origin
@@ -28,6 +29,12 @@ class DCCLoco:
 	def SetInBlock(self, flag):
 		print("inblock set to %s" % str(flag))
 		self.inBlock = flag		
+		
+	def SetForcedStop(self, flag=True):
+		self.forcedStop = flag
+		
+	def GetForcedStop(self):
+		return self.forcedStop
 		
 	def HasMoved(self, moved=None):
 		if moved is not None:
@@ -84,16 +91,29 @@ class DCCLoco:
 	def GetSpeed(self):
 		return self.speed
 	
-	def GetSpeedStep(self):
+	def GetSpeedStep(self):		
 		print("get speed step")
+		# if the train has completed, cut its speed down to zero rapidly
 		if self.HasCompleted() and self.speed > 0:
 			print("return -10")
-			return -10
-		
+			return -10 if self.speed > 10 else -self.speed
+
+		# if the train is being stopped forcibly, come down to 0 immediately
+		if self.forcedStop:
+			print("return -speed")
+			return -self.speed
+
+		# step == 0 implies we are stopped - so we stay that way		
 		if self.step == 0:
 			print("return 0 A")
 			return 0
+
+		# jump to the start speed if we are just starting out
+		if self.targetSpeed > self.speed and self.speed < self.startSpeed:
+			print("returning START %d" % (self.startSpeed-self.speed))
+			return self.startSpeed - self.speed
 		
+		# otherwise, we consider the current speed, the target speed, and the step value	
 		if self.step > 0:
 			if self.speed < self.targetSpeed:
 				step = self.targetSpeed - self.speed
@@ -144,12 +164,12 @@ class DCCLoco:
 		return self.bell
 
 	def GetGoverningSignal(self):
-		print("returning %s %d as governing signal, aspect" % (self.governingSignal, self.governingAspect))
+		#print("returning %s %d as governing signal, aspect" % (self.governingSignal, self.governingAspect))
 		return self.governingSignal, self.governingAspect
 	
 	def SetGoverningSignal(self, sig):
 		self.governingSignal = sig
-		print("governing signal set to %s" % str(sig))
+		#print("governing signal set to %s" % str(sig))
 		
 	def SetGoverningAspect(self, aspect):
 		print("set governing aspect to %d" % aspect)
@@ -167,11 +187,12 @@ class DCCLoco:
 		
 		self.governingAspect = aspect	
 		if self.profiler is None:
+			self.startSpeed = 0
 			self.targetSpeed = 0
 			self.step = 0
 		else:
-			self.targetSpeed, self.step = self.profiler(self.loco, aspect, self.speed)
-		print("aspect changed, target, step = %d %d" % (self.targetSpeed, self.step))
+			self.startSpeed, self.targetSpeed, self.step = self.profiler(self.loco, aspect, self.speed)
+		print("aspect changed, start, target, step = %d %d %d" % (self.startSpeed, self.targetSpeed, self.step))
 		
 	def GetGoverningAspect(self):
 		if self.completed:

@@ -1219,7 +1219,7 @@ class MainFrame(wx.Frame):
 					self.Popup("Rejected ATC train %s - no script" % trnm)				
 					tr.SetATC(False)
 					tr.Draw()
-				elif action == "complete":
+				elif action in [ "complete", "remove" ]:
 					trnm = parms["train"][0]
 					try:
 						tr = self.trains[trnm]
@@ -1227,7 +1227,10 @@ class MainFrame(wx.Frame):
 						logging.warning("ATC completed train %s does not exist" % trnm)
 						return
 	
-					self.Popup("ATC train %s has completed" % trnm)				
+					if action == "complete":
+						self.Popup("ATC train %s has completed" % trnm)	
+					else:			
+						self.Popup("Train %s removed from ATC" % trnm)				
 					tr.SetATC(False)
 					tr.Draw()
 

@@ -37,10 +37,12 @@ class ATCListCtrl(wx.ListCtrl):
 		self.SetColumnWidth(6, 20)
 		self.SetColumnWidth(7, 20)
 		
-		self.loadImages(os.path.join(cmdFolder, "atc"))
+		self.loadImages(os.path.join(cmdFolder, "images"))
 		self.il = wx.ImageList(24, 24)
 		self.idxRed = self.il.Add(self.pngSigRed)
+		self.idxRedRed = self.il.Add(self.pngSigRedRed)
 		self.idxRedYel = self.il.Add(self.pngSigRedYel)
+		self.idxGrnYel = self.il.Add(self.pngSigGrnYel)
 		self.idxGrn = self.il.Add(self.pngSigGrn)
 		self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
@@ -69,6 +71,16 @@ class ATCListCtrl(wx.ListCtrl):
 		mask = wx.Mask(png, wx.BLUE)
 		png.SetMask(mask)
 		self.pngSigRedYel = png
+		
+		png = wx.Image(os.path.join(imgFolder, "siggrnyel.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.pngSigGrnYel = png
+		
+		png = wx.Image(os.path.join(imgFolder, "sigredred.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.pngSigRedRed = png
 		
 	def AddTrain(self, tr):
 		nm = tr.GetName()
@@ -141,9 +153,8 @@ class ATCListCtrl(wx.ListCtrl):
 			print("report double click %s" % str(tx))
 			#self.parent.reportDoubleClick(tx)
 		else:
-			pass
-			#print("report select %s" % str(tx))
-			#self.parent.reportSelection(tx)
+			print("report select %s" % str(tx))
+			self.parent.ReportSelection(None if tx is None else self.trainNames[tx])
 
 	def OnItemSelected(self, event):
 		self.setSelection(event.Index)
@@ -151,7 +162,7 @@ class ATCListCtrl(wx.ListCtrl):
 	def OnItemActivated(self, event):
 		self.setSelection(event.Index, dclick=True)
 
-	def OnItemDeselected(self, evt):
+	def OnItemDeselected(self, _):
 		self.setSelection(None)
 
 	def OnItemHint(self, evt):
@@ -162,13 +173,21 @@ class ATCListCtrl(wx.ListCtrl):
 		nm = self.trainNames[item]
 		dccl = self.trains[nm]
 		aspect = dccl.GetGoverningAspect()
+		forced = dccl.GetForcedStop()
+		
+		if forced:
+			return self.idxRedRed
 		
 		if aspect == 0:
 			return self.idxRed
-		elif aspect == 3:
+		
+		if aspect == 0b011: # clear
 			return self.idxGrn
-		else:
+		
+		if aspect in [ 0b100, 0b110 ]: # Restricting or Approach Slow
 			return self.idxRedYel
+
+		return self.idxGrnYel
 
 	def OnGetItemText(self, item, col):
 		nm = self.trainNames[item]

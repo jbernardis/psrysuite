@@ -41,20 +41,22 @@ class DCCRemote:
 			profile = self.profiles["default"]
 			
 		if aspect == 0:
-			target = 0
+			return 0, 0, 0 if speed == 0 else -10
 		elif aspect == 0b011: #clear
 			target = profile["fast"]
 		elif aspect in [ 0b100, 0b110 ]: # Restricting or Approach Slow
 			target = profile["slow"]
 		else:
 			target = profile["medium"]
+			
+		start = profile["start"]
 		
-		if target < speed:
-			return target, profile["acc"]
-		elif target > speed:
-			return target, -profile["dec"]
+		if target > speed:
+			return start, target, profile["acc"]
+		elif target < speed:
+			return start, target, -profile["dec"]
 		else:
-			return target, 0
+			return start, target, 0
 		
 	def SelectLoco(self, loco, assertValues=False):
 		for l in self.locos:
@@ -80,9 +82,11 @@ class DCCRemote:
 	def DropLoco(self, loco):
 		self.locos = [l for l in self.locos if l.GetLoco() != loco]
 		
-	def ApplySpeedStep(self, step):
+	def ApplySpeedStep(self):
 		if self.selectedLoco is None:
 			return 
+		
+		step = self.selectedLoco.GetSpeedStep()
 		
 		nspeed = self.selectedLoco.GetSpeed() + step
 		if nspeed < 0:

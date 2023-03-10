@@ -14,10 +14,10 @@ train identification when moving in reverse
 
 operate turnout despite locks - ctrl-click or shift-click
 
+popup color and storing these messages in a file with the ability to call it up
+
 ATC
- need dcc interface - dcc server that will be used for both atc and throttle
- need to resolve starting and stopping in the same block - this requires 2 entries in the script, but that can't be
- after train reaches its terminus, we should be able to clear out the far stopping section - this is not necessarily an ATC issue, it was just discovered here
+  after train reaches its terminus, we should be able to clear out the far stopping section - this is not necessarily an ATC issue, it was just discovered here
 
 Auto routing
   interface needs work
