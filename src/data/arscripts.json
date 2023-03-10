@@ -18,6 +18,10 @@
     }
   },
   "HWX": {
+    "H30": {
+      "route": "SRtS10H30",
+      "trigger": "F"
+    },
     "S10": {
       "route": "DRtD11S10",
       "trigger": "F"
@@ -35,29 +39,17 @@
       "trigger": "F"
     }
   },
-  "22": {
-    "N41": {
-      "route": "NRtB20N41",
+  "CFHY": {
+    "C53": {
+      "route": "CRtC53C22",
       "trigger": "F"
     },
-    "B20": {
-      "route": "BRtB20B21",
+    "C22": {
+      "route": "CRtC23C22",
       "trigger": "F"
     },
-    "B21": {
-      "route": "BRtB21C13",
-      "trigger": "F"
-    },
-    "C13": {
-      "route": "CRtC13C12",
-      "trigger": "F"
-    },
-    "C12": {
-      "route": "CRtC12C11",
-      "trigger": "F"
-    },
-    "C11": {
-      "route": "CRtC11C31",
+    "C23": {
+      "route": "CRtC13C23",
       "trigger": "F"
     }
   }

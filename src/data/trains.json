@@ -1,4 +1,36 @@
 {
+  "CFHY": {
+    "eastbound": true,
+    "startblock": "C53",
+    "startsubblock": null,
+    "steps": [
+      {
+        "block": "C22",
+        "os": "COSSHW",
+        "route": "CRtC53C22",
+        "signal": "C8LK",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C23",
+        "os": "COSCLEW",
+        "route": "CRtC23C22",
+        "signal": "C10L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C13",
+        "os": "COSCLW",
+        "route": "CRtC13C23",
+        "signal": "C14LB",
+        "time": 5000,
+        "trigger": "Front"
+      }
+    ],
+    "time": 5000
+  },
   "HEX": {
     "eastbound": true,
     "startblock": "H40",
@@ -49,38 +81,46 @@
   },
   "HWX": {
     "eastbound": false,
-    "startblock": "D11",
-    "startsubblock": "D11B",
+    "startblock": "H30",
+    "startsubblock": null,
     "steps": [
       {
-        "block": "D10",
-        "os": "DOSVJW",
-        "route": "DRtD10D11",
-        "signal": "D6L",
+        "block": "S10",
+        "os": "SOSW",
+        "route": "SRtS10H30",
+        "signal": "S12LB",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "D11",
-        "os": "DOSVJW",
-        "route": "DRtD10D11",
-        "signal": "D6RB",
+        "os": "DOSFOW",
+        "route": "DRtD11S10",
+        "signal": "D12L",
         "time": 5000,
         "trigger": "Front"
       },
       {
-        "block": "D20",
+        "block": "H13",
         "os": "DOSVJW",
-        "route": "DRtD20D11",
+        "route": "DRtH13D11",
         "signal": "D6L",
         "time": 5000,
         "trigger": "Front"
       },
       {
-        "block": "L31",
-        "os": "LOSCAE",
-        "route": "LRtL31D20",
-        "signal": "L14L",
+        "block": "H31",
+        "os": "HOSEW",
+        "route": "HRtH13H31",
+        "signal": "H12L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "H30",
+        "os": "HOSWW2",
+        "route": "HRtH30H31",
+        "signal": "H8L",
         "time": 5000,
         "trigger": "Front"
       }

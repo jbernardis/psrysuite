@@ -18,6 +18,12 @@ REVERSE = 0x03
 
 MAXTRIES = 3
 
+def formatLocoID(lid):
+	lidhi = (lid >> 8) | 0xc0
+	lidlo = lid % 256
+	return [lidhi, lidlo]
+
+
 class Loco:
 	def __init__(self, lid):
 		self.locoid = lid
@@ -182,14 +188,7 @@ class MainUnit:
 		speed = loco.GetSpeed()
 		direction = loco.GetDirection()
 		
-		lidh = lid >> 8
-		
-		outb = [
-			0xa2,
-			lidh,
-			lid % 256,
-			direction,
-			speed if speed > 4 else 0]
+		outb = [ 0xa2 ] + formatLocoID(lid) + [ direction, speed if speed > 4 else 0 ]
 		
 		self.SendDCC(outb)
 		
@@ -229,19 +228,15 @@ class MainUnit:
 		else:
 			print("getheadlight is false")
 
-		outb = [
-			0xa2,
-			lid >> 8,
-			lid % 256,
-			0x07,
-			function & 0xff]
+		outb = [ 0xa2 ] + formatLocoID(lid) + [ 0x07, function & 0xff ]
 
 		self.SendDCC(outb)
 		
 	def SendDCC(self, outb):
+		print("Trying to output: %s" % str(outb))
 		if self.port is None:
-			print("Trying to output: %s" % str(outb))
-			return True
+			print("port not open")
+			return False
 		
 		n = self.port.write(bytes(outb))
 		if n != len(outb):

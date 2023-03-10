@@ -1,3 +1,7 @@
+import os
+import logging
+import json
+
 from atc.dccloco import FORWARD, REVERSE
 
 
@@ -6,6 +10,18 @@ class DCCRemote:
 		self.server = server
 		self.initialized = False
 		self.locos = []
+		self.profiles = {}
+		
+	def Initialize(self):
+		path = os.path.join(os.getcwd(), "data", "locoprofiles.json")
+		try:
+			with open(path, "r") as jfp:
+				self.profiles = json.load(jfp)
+		except:
+			logging.error("Unable to load loco profiles file: %s" % path)
+			return False
+		
+		return True
 		
 	def LocoCount(self):
 		return len(self.locos)
@@ -18,13 +34,27 @@ class DCCRemote:
 		return False
 	
 	def Profiler(self, loco, aspect, speed):
-		if aspect == 0:
-			return 0, -5
-		
-		if aspect == 51:
-			return 100, 5
+		if loco in self.profiles:
+			profile = self.profiles[loco]
+		else:
+			logging.info("loco %s not in profiles - using defaule profile %s" % (str(loco), type(loco)))
+			profile = self.profiles["default"]
 			
-		return 50, 5
+		if aspect == 0:
+			target = 0
+		elif aspect == 0b011: #clear
+			target = profile["fast"]
+		elif aspect in [ 0b100, 0b110 ]: # Restricting or Approach Slow
+			target = profile["slow"]
+		else:
+			target = profile["medium"]
+		
+		if target < speed:
+			return target, profile["acc"]
+		elif target > speed:
+			return target, -profile["dec"]
+		else:
+			return target, 0
 		
 	def SelectLoco(self, loco, assertValues=False):
 		for l in self.locos:
@@ -55,7 +85,10 @@ class DCCRemote:
 			return 
 		
 		nspeed = self.selectedLoco.GetSpeed() + step
+		if nspeed < 0:
+			nspeed = 0
 		self.SetSpeedAndDirection(nspeed)
+		return nspeed
 		
 	def SetSpeed(self, nspeed, assertValues=False):
 		self.SetSpeedAndDirection(nspeed=nspeed, assertValues=assertValues)

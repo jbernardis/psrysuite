@@ -20,6 +20,7 @@ class TrackDiagram(wx.Panel):
 		self.tx = 0
 		self.ty = 0
 		self.scr = -1
+		self.shift_down = False
 
 		self.SetCursor(wx.Cursor(wx.CURSOR_ARROW))
 
@@ -35,6 +36,9 @@ class TrackDiagram(wx.Panel):
 		self.Bind(wx.EVT_PAINT, self.OnPaint)
 		self.Bind(wx.EVT_MOTION, self.OnMotion)
 		self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
+		self.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
+		self.Bind(wx.EVT_ENTER_WINDOW, lambda event: self.SetFocus())
 
 	def DrawBackground(self, dc):
 		for i in range(len(self.bgbmps)):
@@ -67,8 +71,24 @@ class TrackDiagram(wx.Panel):
 
 		return None 
 
+	def OnKeyDown(self, event):
+		keycode = event.GetKeyCode()
+		if keycode == wx.WXK_SHIFT:
+			self.shift_down = True
+			print("shift down")
+
+		event.Skip()
+
+	def OnKeyUp(self, event):
+		keycode = event.GetKeyCode()
+		if keycode == wx.WXK_SHIFT:
+			self.shift_down = False
+			print("shift up")
+
+		event.Skip()
+
 	def OnLeftUp(self, evt):
-		self.frame.ProcessClick(self.scr, (self.tx, self.ty))
+		self.frame.ProcessClick(self.scr, (self.tx, self.ty), shift=self.shift_down)
 
 	def DrawTile(self, x, y, offset, bmp):
 		self.tiles[(x*16+offset, y*16)] = bmp;

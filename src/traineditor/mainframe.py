@@ -324,8 +324,14 @@ class MainFrame(wx.Frame):
 			script.append({"movetrain": {"block": segTimes[idx][0], "time": segTimes[idx][1]}})
 			idx += 1
 
-		for b in self.blockSeq.GetBlocks():
-			segTimes, segString = self.determineSegmentsAndTimes(b["block"], b["os"], east, b["time"])
+		blkSeq = self.blockSeq.GetBlocks()
+		nblocks = len(blkSeq)
+		bx = 0
+		for b in blkSeq:
+			bx += 1
+			terminus = bx == nblocks
+			print("block %s is terminus: %s" % (b, str(terminus)))
+			segTimes, segString = self.determineSegmentsAndTimes(b["block"], b["os"], east, b["time"], terminus=terminus)
 
 			script.append({"waitfor": {"signal": b["signal"], "route": b["route"], "os": segTimes[0][0], "block": segString}})
 			
@@ -352,7 +358,7 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 		
 		
-	def determineSegmentsAndTimes(self, block, os, east, blockTime):
+	def determineSegmentsAndTimes(self, block, os, east, blockTime, terminus=False):
 		subBlocks = self.layout.GetSubBlocks(block)
 		if len(subBlocks) == 0:
 			subBlocks = [block]  # no sub-blocks - just use the block name itself
@@ -369,7 +375,7 @@ class MainFrame(wx.Frame):
 				waitblks.append(stopBlocks[1])
 			blks.extend(subBlocks) # TODO: one of these will need to be reversed
 			waitblks.append(block)
-			if stopBlocks[0]:
+			if stopBlocks[0] and not terminus: # Don't include stop block in terminus'
 				stopCt += 1
 				blks.append(stopBlocks[0])
 				waitblks.append(stopBlocks[0])
@@ -380,7 +386,7 @@ class MainFrame(wx.Frame):
 				waitblks.append(stopBlocks[0])
 			blks.extend(subBlocks) # one of these will need to be reversed
 			waitblks.append(block)
-			if stopBlocks[1]:
+			if stopBlocks[1] and not terminus: # Don't include stop block in terminus:
 				stopCt += 1
 				blks.append(stopBlocks[1])
 				waitblks.append(stopBlocks[1])

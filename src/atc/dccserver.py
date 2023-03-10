@@ -12,7 +12,7 @@ class DCCServer(object):
 		for cmd, parms in req.items():
 			try:
 				logging.info("sending to dcc server: %s %s" % (cmd, str(parms)))
-				r = requests.get(self.ipAddr + "/" + cmd, params=parms)
-			except requests.exceptions.ConnectionError:
+				requests.get(self.ipAddr + "/" + cmd, params=parms, timeout=0.001)
+			except:
 				logging.error("Unable to send request  is dcc server running?")
 

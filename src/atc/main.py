@@ -10,6 +10,7 @@ import logging
 logging.basicConfig(filename=os.path.join("logs", "atc.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 import json
+import pprint
 
 from atc.settings import Settings
 from atc.turnout import Turnout
@@ -102,6 +103,9 @@ class MainFrame(wx.Frame):
 		logging.info("socket connection created")
 		
 		self.dccRemote = DCCRemote(self.dccServer)
+		if not self.dccRemote.Initialize():
+			logging.error("Unable to initialize DCC remote")
+			return
 		
 		self.ticker = Ticker(0.4, self.raiseTickerEvent)
 
@@ -110,12 +114,12 @@ class MainFrame(wx.Frame):
 		logging.info("exit initialize")
 
 	def ProcessScripts(self):
-		logging.info(os.path.join(os.getcwd(), "data", "layout.json"))
+		path = os.path.join(os.getcwd(), "data", "layout.json")
 		try:
-			with open(os.path.join(os.getcwd(), "data", "layout.json"), "r") as jfp:
+			with open(path, "r") as jfp:
 				layout = json.load(jfp)
 		except:
-			logging.error("Unable to load layout file")
+			logging.error("Unable to load layout file: %s" % path)
 			return False
 		
 		subblocks = layout["subblocks"]
@@ -123,56 +127,67 @@ class MainFrame(wx.Frame):
 		for blk, sublist in subblocks.items():
 			for sub in sublist:
 				submap[sub] = blk
-		
+
+		path = os.path.join(os.getcwd(), "data", "simscripts.json")		
 		try:
-			with open(os.path.join(os.getcwd(), "data", "simscripts.json"), "r") as jfp:
+			with open(path, "r") as jfp:
 				scripts = json.load(jfp)
 		except:
-			logging.error("Unable to load scripts")
+			logging.error("Unable to load scripts: %s" % path)
 			return False
 		
 		self.scripts = {}
 		
 		for train, script in scripts.items():
-			sigList = [[None, None, None]]
+			lastblk = None
+			sigList = []
 			for step in script:
 				cmd = list(step.keys())[0]
+				blk = step[cmd]["block"]
+				if blk in submap:
+					blk = submap[blk]
 				if cmd == "waitfor":
 					sig = step[cmd]["signal"]
 					osb = step[cmd]["os"]
 					rte = step[cmd]["route"]
 					sigList.append([sig, osb, rte])
-
+				elif cmd == "placetrain":
+					origin = blk
+					lastblk = blk
+				elif cmd == "movetrain":
+					lastblk = blk
+					
+			terminus = lastblk
 			sigList.append([None, None, None])					
 			sigx = 0
 
 			steps = {}	
-			lastblk = None		
+			steps["origin"] = origin
+			steps["terminus"] = terminus
 			for step in script:
 				cmd = list(step.keys())[0]
 				if cmd in ["placetrain", "movetrain"]:
 					blk = step[cmd]["block"]
 					if blk in submap:
 						blk = submap[blk]
-					if cmd == "placetrain":
-						steps["origin"] = blk
 						
-					steps[blk] = {
-							"sigbehind": sigList[sigx][0],
-							"sigahead": {
-								   "signal": str(sigList[sigx+1][0]),
-								   "os": str(sigList[sigx+1][1]),
-								   "route": str(sigList[sigx+1][2])
-							}
+					if blk in steps and origin == terminus and blk == terminus:
+						print("that condition, blk=%s" % blk)
+					else:
+						steps[blk] = {
+					   "signal": str(sigList[sigx][0]),
+					   "os": str(sigList[sigx][1]),
+					   "route": str(sigList[sigx][2])
 					}
 					lastblk = blk
 
 				elif cmd == "waitfor":
 					sigx += 1
-			if lastblk is not None:
-				steps["terminus"] = lastblk
+				
 			self.scripts[train] = steps
-			
+
+		pprint.pprint(self.scripts["HWX"])	
+		print("============================================================================================================")		
 		return True
 	
 	def HaveScript(self, train):
@@ -184,23 +199,14 @@ class MainFrame(wx.Frame):
 		terminus = self.scripts[trnm]["terminus"]
 		dccl.SetOriginTerminus(origin, terminus)		
 	
-	def GetSignalBehind(self, train, block):
+	def GetSignal(self, train, block):
 		if not self.HaveScript(train):
 			return None
 		
 		if block not in self.scripts[train]:
 			return None
 		
-		return {"signal": self.scripts[train][block]["sigbehind"], "os": None, "route": None}
-	
-	def GetSignalAhead(self, train, block):
-		if not self.HaveScript(train):
-			return None
-		
-		if block not in self.scripts[train]:
-			return None
-		
-		return self.scripts[train][block]["sigahead"]
+		return self.scripts[train][block]
 
 	def tickerEvent(self):  # thread context
 		if self.dccRemote.LocoCount() > 0:
@@ -211,21 +217,15 @@ class MainFrame(wx.Frame):
 		wx.QueueEvent(self, evt)
 		
 	def OnTickerEvent(self, _):
+		print("(((((((((((((((((((((((((((((((")
 		for dccl in self.dccRemote.GetDCCLocos():
-			if dccl.HasCompleted():
-				continue
-				
-			gs, ga = dccl.GetGoverningSignal()
+			gs, _ = dccl.GetGoverningSignal()
 			aspect = 0  # assume STOP
 			
 			if gs is None:
+				# we are moving into terminus block - move slowly
 				aspect = 4 # restricting
 
-			elif "os" in gs and gs["os"] is None:
-				# if we are already in the OS, dont pay attention to the aspect as it is now red - just keep using
-				# the old value
-				aspect = ga
-							
 			elif "signal" in gs:
 				signame = gs["signal"]
 				if signame in self.signals:
@@ -242,9 +242,16 @@ class MainFrame(wx.Frame):
 			self.dccRemote.SelectLoco(dccl)	
 			
 			step = dccl.GetSpeedStep()				
-			self.dccRemote.ApplySpeedStep(step)
-			
-			self.atcList.RefreshTrain(dccl)
+			speed = self.dccRemote.ApplySpeedStep(step)
+			if speed == 0 and dccl.HasCompleted():
+				self.atcList.DelTrain(dccl)
+				loco = dccl.GetLoco()
+				train = dccl.GetTrain()
+				self.dccRemote.DropLoco(loco)
+				self.RRRequest({"atcstatus": {"action": "complete", "train": train}})
+			else:
+				self.atcList.RefreshTrain(dccl)
+		print(")))))))))))))))))))))))))))))))))))))))")
 
 	def raiseDeliveryEvent(self, data): # thread context
 		try:
@@ -393,7 +400,7 @@ class MainFrame(wx.Frame):
 					
 					tr = self.trains[trnm]
 					blk = tr.GetFirstBlock()
-					dccl.SetGoverningSignal(self.GetSignalAhead(trnm, blk))
+					dccl.SetGoverningSignal(self.GetSignal(trnm, blk))
 					self.dccRemote.SelectLoco(dccl)
 						
 				elif action == "delete":
@@ -464,44 +471,50 @@ class MainFrame(wx.Frame):
 	def TrainAddBlock(self, train, block):
 		dccl = self.dccRemote.GetDCCLocoByTrain(train)
 		if dccl is None:
-			logging.info("TrainAddBlock ignoring train %s because it is not on ATC" % train)
+			# ignore non-ATC trains
 			return
 		
-		logging.info("Train %s has moved into block %s" % (train, block))
+		gs, _ = dccl.GetGoverningSignal()
+		if gs is None: # initial block - set first signal
+			gs = self.GetSignal(train, block)
+			dccl.SetGoverningSignal(gs)
+		
+		logging.info("Train %s has moved into block %s, signal = %s" % (train, block, str(gs)))
+		print("Train %s has moved into block %s, signal = %s" % (train, block, str(gs)))
 		dccl.CheckHasMoved(block)
 		
-		# set governing signal to the signal behind us UNLESS we have already switched to the signal ahead of us
 		if dccl.AtTerminus(block):
 			dccl.HeadAtTerminus(True)
 			dccl.SetGoverningSignal(None)
 		else:
-			gs = dccl.GetGoverningSignal()
-			sig = self.GetSignalAhead(train, block)
-			if gs != sig:
-				gs = self.GetSignalBehind(train, block)
-				dccl.SetGoverningSignal(gs)
+			sig = self.GetSignal(train, block)
+			print("block %s, gs=%s, sigahead=%s" % (block, str(gs), str(sig)))
+			# see if we've passed our signal.  If so, we need to freeze our aspect
+			# until the tail of the train also passes the signal
+			dccl.SetInBlock(gs != sig)
 			
 	def TrainTailInBlock(self, train, block):
 		dccl = self.dccRemote.GetDCCLocoByTrain(train)
 		if dccl is None:
-			logging.info("TrainTailInBlock ignoring train %s because it is not on ATC" % train)
+			# ignore non-ATC trains
 			return
 		
 		logging.info("Train %s tail in block %s" % (train, block))
+		print("Train %s tail in block %s" % (train, block))
+		gs, _ = dccl.GetGoverningSignal()
 		
 		if dccl.AtTerminus(block):
 			dccl.MarkCompleted()
-			self.atcList.DelTrain(dccl)
-			loco = dccl.GetLoco()
-			self.dccRemote.DropLoco(loco)
-			self.RRRequest({"atcstatus": {"action": "complete", "train": train}})
 							
 		elif dccl.HeadAtTerminus():
 			#change nothing here
 			pass
 		else:
-			gs = self.GetSignalAhead(train, block)
-			dccl.SetGoverningSignal(gs)
+			sig = self.GetSignal(train, block)
+			if sig != gs:
+				# we've passed our signal - adopt the new signal
+				dccl.SetInBlock(False)
+				dccl.SetGoverningSignal(sig)
 
 	def TrainRemoveBlock(self, train, block, blocks):
 		logging.info("Train %s has left block %s and is now in %s" % (train, block, ",".join(blocks)))
@@ -549,8 +562,8 @@ class App(wx.App):
 ofp = open("atc.out", "w")
 efp = open("atc.err", "w")
 
-#sys.stdout = ofp
-#sys.stderr = efp
+sys.stdout = ofp
+sys.stderr = efp
 
 
 app = App(False)

@@ -1,58 +1,433 @@
 {
-    "HEX": [
-      {"placetrain": {"block": "H40", "name": "HEX", "loco": "7600", "time": 1000, "length": 3}},
-      {"waitfor":    {"signal": "H10RE", "route": "HRtH23H40", "os": "HOSEE", "block": "H23,H23.E"}},
-      {"movetrain":  {"block": "HOSEE", "time": 5000}},
-      {"movetrain":  {"block": "H23", "time": 5000}},
-      {"movetrain":  {"block": "H23.E", "time": 5000}},
-      {"waitfor":    {"signal": "D4RB", "route": "DRtH23D21", "os": "DOSVJE", "block": "D21.W,D21,D21.E"}},
-      {"movetrain":  {"block": "DOSVJE", "time": 5000}},
-      {"movetrain":  {"block": "D21.W", "time": 5000}},
-      {"movetrain":  {"block": "D21B", "time": 5000}},
-      {"movetrain":  {"block": "D21A", "time": 5000}},
-      {"movetrain":  {"block": "D21.E", "time": 5000}},
-      {"waitfor":    {"signal": "D10R", "route": "DRtD21S20", "os": "DOSFOE", "block": "S20.W,S20,S20.E"}},
-      {"movetrain":  {"block": "DOSFOE", "time": 5000}},
-      {"movetrain":  {"block": "S20.W", "time": 5000}},
-      {"movetrain":  {"block": "S20C", "time": 5000}},
-      {"movetrain":  {"block": "S20B", "time": 5000}},
-      {"movetrain":  {"block": "S20A", "time": 5000}},
-      {"movetrain":  {"block": "S20.E", "time": 5000}},
-      {"waitfor":    {"signal": "S4R", "route": "SRtS20H20", "os": "SOSE", "block": "H20,H20.E"}},
-      {"movetrain":  {"block": "SOSE", "time": 5000}},
-      {"movetrain":  {"block": "H20", "time": 5000}},
-      {"movetrain":  {"block": "H20.E", "time": 5000}},
-      {"waitfor":    {"signal": "S18R", "route": "SRtH20H40", "os": "SOSHJM", "block": "H40"}},
-      {"movetrain":  {"block": "SOSHJM", "time": 5000}},
-      {"movetrain":  {"block": "H40", "time": 5000}}
-    ],
-    "HWX": [
-      {"placetrain": {"block": "H30", "subblock": "H30A", "dir": "W", "name": "HWX", "loco": "2468", "time": 1000, "length": 3}},
-      {"movetrain":  {"block": "H30B", "time": 5000}},
-      {"movetrain":  {"block": "H30.W", "time": 5000}},
-      {"waitfor":    {"signal": "S12LB", "route": "SRtS10H30", "os": "SOSW", "block": "S10,S10.E,S10.W"}},
-      {"movetrain":  {"block": "SOSW", "time": 5000}},
-      {"movetrain":  {"block": "S10.E", "time": 5000}},
-      {"movetrain":  {"block": "S10C", "time": 5000}},
-      {"movetrain":  {"block": "S10B", "time": 5000}},
-      {"movetrain":  {"block": "S10A", "time": 5000}},
-      {"movetrain":  {"block": "S10.W", "time": 5000}},
-      {"waitfor":    {"signal": "D12L", "route": "DRtD11S10", "os": "DOSFOW", "block": "D11,D11.E,D11.W"}},
-      {"movetrain":  {"block": "DOSFOW", "time": 5000}},
-      {"movetrain":  {"block": "D11.E", "time": 5000}},
-      {"movetrain":  {"block": "D11B", "time": 5000}},
-      {"movetrain":  {"block": "D11A", "time": 5000}},
-      {"movetrain":  {"block": "D11.W", "time": 5000}},
-      {"waitfor":    {"signal": "D6L", "route": "DRtH13D11", "os": "DOSVJW", "block": "H13,H13.W"}},
-      {"movetrain":  {"block": "DOSVJW", "time": 5000}},
-      {"movetrain":  {"block": "H13", "time": 5000}},
-      {"movetrain":  {"block": "H13.W", "time": 5000}},
-      {"waitfor":    {"signal": "H12L", "route": "HRtH13H31", "os": "HOSEW", "block": "H31"}},
-      {"movetrain":  {"block": "HOSEW", "time": 5000}},
-      {"movetrain":  {"block": "H31", "time": 5000}},
-      {"waitfor":    {"signal": "H8L", "route": "HRtH30H31", "os": "HOSWW2", "block": "H30,H30.W"}},
-      {"movetrain":  {"block": "HOSWW2", "time": 5000}},
-      {"movetrain":  {"block": "H30B", "time": 5000}},
-      {"movetrain":  {"block": "H30A", "time": 5000}}
-   ]
+  "HEX": [
+    {
+      "placetrain": {
+        "block": "H40",
+        "name": "HEX",
+        "loco": "7600",
+        "time": 1000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H10RE",
+        "route": "HRtH23H40",
+        "os": "HOSEE",
+        "block": "H23,H23.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEE",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H23",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H23.E",
+        "time": 5000
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RB",
+        "route": "DRtH23D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 5000
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 5000
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20H20",
+        "os": "SOSE",
+        "block": "H20,H20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H20",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H20.E",
+        "time": 5000
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S18R",
+        "route": "SRtH20H40",
+        "os": "SOSHJM",
+        "block": "H40"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSHJM",
+        "time": 5000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H40",
+        "time": 5000
+      }
+    }
+  ],
+  "HWX": [
+    {
+      "placetrain": {
+        "block": "H30",
+        "name": "HWX",
+        "loco": 7600,
+        "time": 3375,
+        "length": 3
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H30B",
+        "time": 3375
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H30.W",
+        "time": 750
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LB",
+        "route": "SRtS10H30",
+        "os": "SOSW",
+        "block": "S10.E,S10,S10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.E,D11,D11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtH13D11",
+        "os": "DOSVJW",
+        "block": "H13,H13.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H12L",
+        "route": "HRtH13H31",
+        "os": "HOSEW",
+        "block": "H31"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H31",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H8L",
+        "route": "HRtH30H31",
+        "os": "HOSWW2",
+        "block": "H30"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSWW2",
+        "time": 1666
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H30A",
+        "time": 1666
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H30B",
+        "time": 1666
+      }
+    }
+  ],
+  "CFHY": [
+    {
+      "placetrain": {
+        "block": "C53",
+        "name": "CFHY",
+        "loco": 7600,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C8LK",
+        "route": "CRtC53C22",
+        "os": "COSSHW",
+        "block": "C22"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSSHW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C22",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C10L",
+        "route": "CRtC23C22",
+        "os": "COSCLEW",
+        "block": "C23.W,C23"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14LB",
+        "route": "CRtC13C23",
+        "os": "COSCLW",
+        "block": "C13.W,C13,C13.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    }
+  ]
 }

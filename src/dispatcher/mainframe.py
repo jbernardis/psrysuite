@@ -720,12 +720,12 @@ class MainFrame(wx.Frame):
 			if self.buttonsToClear[bx][1].GetName() == bnm:
 				self.buttonsToClear[bx][0] = secs
 
-	def ProcessClick(self, screen, pos):
+	def ProcessClick(self, screen, pos, shift):
 		# ignore screen clicks if not connected
 		if not self.subscribed:
 			return
 		
-		logging.debug("click %s %d, %d" % (screen, pos[0], pos[1]))
+		logging.debug("click %s %d, %d %s" % (screen, pos[0], pos[1], "shift" if shift else ""))
 		try:
 			to = self.turnoutMap[(screen, pos)]
 		except KeyError:
