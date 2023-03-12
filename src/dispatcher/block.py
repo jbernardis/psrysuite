@@ -85,9 +85,6 @@ class Route:
 		for s in self.signals:
 			frame.signals[s].ClearLocks()
 
-	def rprint(self):
-		logging.debug("Block %s: set route to %s: %s => %s => %s %s" % (self.osblk.GetName(), self.name, self.blkin, str(self.pos), self.blkout, str(self.turnouts)))
-
 	def ToJson(self):
 		return {self.name: {"os": self.osblk.GetName(), "ends": [self.blkin, self.blkout], "signals": self.signals, "turnouts": self.turnouts}}
 
@@ -499,7 +496,6 @@ class StoppingBlock (Block):
 	def Activate(self, flag=True):
 		if flag == self.active:
 			return
-		print("********************************************* In activate %s %s" % (self.GetName(), str(flag)))
 		
 		tr = self.block.GetTrain()
 		if tr is None:
@@ -631,8 +627,6 @@ class OverSwitch (Block):
 		if route is None:
 			return
 
-		self.route.rprint()
-
 		entryBlkName = self.route.GetEntryBlock()
 		entryBlk = self.frame.GetBlockByName(entryBlkName)
 		exitBlkName = self.route.GetExitBlock()
@@ -659,7 +653,6 @@ class OverSwitch (Block):
 		self.Draw()
 		
 	def EvaluateStoppingSections(self):
-		print("OS %s evaluate stopping sections" % self.GetName())
 		return
 
 	def SendRouteRequest(self):

@@ -150,10 +150,9 @@ class ATCListCtrl(wx.ListCtrl):
 			self.Select(tx)
 			
 		if dclick:
-			print("report double click %s" % str(tx))
+			pass
 			#self.parent.reportDoubleClick(tx)
 		else:
-			print("report select %s" % str(tx))
 			self.parent.ReportSelection(None if tx is None else self.trainNames[tx])
 
 	def OnItemSelected(self, event):

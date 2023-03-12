@@ -49,21 +49,18 @@ class Loco:
 		return self.direction
 	
 	def SetBell(self, bell):
-		print("set bell to %s" % bell)
 		self.bell = bell
 		
 	def GetBell(self):
 		return self.bell
 	
 	def SetHorn(self, horn):
-		print("set horn to %s" % horn)
 		self.horn = horn
 		
 	def GetHorn(self):
 		return self.horn
 		
 	def SetHeadlight(self, headlight):
-		print("set headlight to %s" % headlight)
 		self.headlight = headlight
 		
 	def GetHeadlight(self):
@@ -212,21 +209,12 @@ class MainUnit:
 		function = 0
 		if loco.GetBell():
 			function += 0x80
-			print("getbell is true)")
-		else:
-			print("getbell is false")
 			
 		if loco.GetHorn():
 			function += 0x40
-			print("gethorn is true)")
-		else:
-			print("gethorn is false")
 			
 		if loco.GetHeadlight():
 			function += 0x08
-			print("getheadlight is true)")
-		else:
-			print("getheadlight is false")
 
 		outb = [ 0xa2 ] + formatLocoID(lid) + [ 0x07, function & 0xff ]
 

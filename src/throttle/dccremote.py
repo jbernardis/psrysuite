@@ -1,8 +1,4 @@
-import os
-import logging
-import json
-
-from atc.dccloco import FORWARD, REVERSE
+from throttle.dccloco import DCCLoco, FORWARD, REVERSE
 
 
 class DCCRemote:
@@ -11,17 +7,6 @@ class DCCRemote:
 		self.initialized = False
 		self.locos = []
 		self.profiles = {}
-		
-	def Initialize(self):
-		path = os.path.join(os.getcwd(), "data", "locoprofiles.json")
-		try:
-			with open(path, "r") as jfp:
-				self.profiles = json.load(jfp)
-		except:
-			logging.error("Unable to load loco profiles file: %s" % path)
-			return False
-		
-		return True
 		
 	def LocoCount(self):
 		return len(self.locos)
@@ -32,42 +17,16 @@ class DCCRemote:
 				return True
 			
 		return False
-	
-	def Profiler(self, loco, aspect, speed):
-		if loco in self.profiles:
-			profile = self.profiles[loco]
-		else:
-			logging.info("loco %s not in profiles - using defaule profile %s" % (str(loco), type(loco)))
-			profile = self.profiles["default"]
-			
-		if aspect == 0:
-			return 0, 0, 0 if speed == 0 else -10
-		elif aspect == 0b011: #clear
-			target = profile["fast"]
-		elif aspect in [ 0b100, 0b110 ]: # Restricting or Approach Slow
-			target = profile["slow"]
-		else:
-			target = profile["medium"]
-			
-		start = profile["start"]
-		
-		if target > speed:
-			return start, target, profile["acc"]
-		elif target < speed:
-			return start, target, -profile["dec"]
-		else:
-			return start, target, 0
 		
 	def SelectLoco(self, loco, assertValues=False):
 		for l in self.locos:
-			if l.GetLoco() == loco.GetLoco():
+			if l.GetLoco() == loco:
 				self.selectedLoco = l
 				break
 			
 		else:
-			l = loco
+			l = DCCLoco("", loco)
 			self.locos.append(l)
-			l.SetProfiler(self.Profiler)
 			self.selectedLoco = l
 
 		l = self.selectedLoco
@@ -82,18 +41,6 @@ class DCCRemote:
 	def DropLoco(self, loco):
 		self.locos = [l for l in self.locos if l.GetLoco() != loco]
 		
-	def ApplySpeedStep(self):
-		if self.selectedLoco is None:
-			return 
-		
-		step = self.selectedLoco.GetSpeedStep()
-		
-		nspeed = self.selectedLoco.GetSpeed() + step
-		if nspeed < 0:
-			nspeed = 0
-		self.SetSpeedAndDirection(nspeed)
-		return nspeed
-		
 	def SetSpeed(self, nspeed, assertValues=False):
 		self.SetSpeedAndDirection(nspeed=nspeed, assertValues=assertValues)
 		
@@ -107,7 +54,7 @@ class DCCRemote:
 		ospeed = self.selectedLoco.GetSpeed()		
 		if nspeed is not None:
 			if nspeed < 0 or nspeed > 128:
-				# speed value is out of range - ignore the request
+				# speed value is out of range - ignore
 				return
 			
 			self.selectedLoco.SetSpeed(nspeed)
@@ -131,7 +78,7 @@ class DCCRemote:
 		if self.selectedLoco is None:
 			return 
 
-		oheadlight = self.selectedLoco.GetHeadlight()		
+		oheadlight = self.selectedLoco.GetHeadlight()
 		if headlight is not None:
 			self.selectedLoco.SetHeadlight(headlight)
 		
@@ -149,7 +96,7 @@ class DCCRemote:
 		
 		loco = self.selectedLoco.GetLoco()
 
-		if (oheadlight != headlight or ohorn != horn or obell != bell) or assertValues:
+		if (oheadlight != headlight) or (ohorn != horn) or (obell != bell) or assertValues:
 			self.server.SendRequest({"function": {"loco": loco, "bell": 1 if bell else 0, "horn": 1 if horn else 0, "light": 1 if light else 0}})
 		
 	def GetDCCLoco(self, loco):
@@ -165,7 +112,6 @@ class DCCRemote:
 				return l
 			
 		return None
-
 		
 	def GetDCCLocos(self):
 		return self.locos

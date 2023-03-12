@@ -363,7 +363,6 @@ class SignalOutput(Output):
 
 	def SetAspect(self, aspect):
 		if aspect == self.aspect:
-			print("returning because theyre equal")
 			return
 
 		self.aspect = aspect

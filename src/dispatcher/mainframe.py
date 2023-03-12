@@ -607,8 +607,6 @@ class MainFrame(wx.Frame):
 		self.ticker = wx.Timer(self)
 		self.ticker.Start(1000)
 
-		print("finished initialize")
-
 	def AddSignalLever(self, slname, district):
 		self.signalLeverMap[slname] = district
 
@@ -849,7 +847,6 @@ class MainFrame(wx.Frame):
 			elif scr == NaCl:
 				offset = self.bmpw*2
 			else:
-				print("Unknown screen: %d in widgeMap" % scr)
 				offset = 0
 
 			for w in self.widgetMap[scr]:
@@ -1052,7 +1049,8 @@ class MainFrame(wx.Frame):
 
 						district = self.GetSignalLeverDistrict(signame)
 						if district is None:
-							print("unable to find district for signal lever %s" % signame)
+							# unable to find district for signal lever
+							return
 						district.DoSignalLeverAction(signame, state)
 						
 			elif cmd == "handswitch":
@@ -1104,7 +1102,6 @@ class MainFrame(wx.Frame):
 					block = p["block"]
 					name = p["name"]
 					loco = p["loco"]
-					print(str(parms))
 
 					try:
 						blk = self.blocks[block]
@@ -1113,7 +1110,6 @@ class MainFrame(wx.Frame):
 						blk = None
 
 					if blk:
-						print("has block")
 						tr = blk.GetTrain()
 						if name is None:
 							if tr:
@@ -1140,7 +1136,6 @@ class MainFrame(wx.Frame):
 
 						if tr:
 							oldName = tr.GetName()
-							print("block has train %s"  % oldName)
 							if oldName and oldName != name:
 								if name in self.trains:
 									# merge the two trains under the new "name"
@@ -1160,10 +1155,10 @@ class MainFrame(wx.Frame):
 									logging.warning("can't delete train %s from train list" % oldName)
 						
 						try:
-							print("trying to find train in existing list")
+							# trying to find train in existing list
 							tr = self.trains[name]
 						except:
-							print("nopt - createing a new one")
+							# not there - create a new one")
 							tr = Train(name)
 							self.trains[name] = tr
 							
@@ -1206,7 +1201,6 @@ class MainFrame(wx.Frame):
 					self.districts.GenerateLayoutInformation(parms)
 					
 			elif cmd == "atcstatus":
-				print("atcstatus message: %s" % str(parms))
 				action = parms["action"][0]
 				if action == "reject":
 					trnm = parms["train"][0]
@@ -1292,7 +1286,7 @@ class MainFrame(wx.Frame):
 		for trid, tr in self.trains.items():
 			if not trid.startswith("??"):
 				trDict[trid] = tr.GetBlockNameList()
-		print(path)
+
 		with open(path, "w") as fp:
 			json.dump(trDict, fp, indent=4, sort_keys=True)
 
@@ -1323,8 +1317,6 @@ class MainFrame(wx.Frame):
 						tr = blk.GetTrain()
 						oldName, oldLoco = tr.GetNameAndLoco()
 						self.Request({"renametrain": { "oldname": oldName, "newname": tid}})
-					else:
-						print("block %s not occupied or not known - ignoring" % bname)
 
 	def OnBSaveLocos(self, _):
 		dlg = wx.FileDialog(self, message="Save Locomotives", defaultDir=self.settings.locodir,
@@ -1341,7 +1333,7 @@ class MainFrame(wx.Frame):
 			loco = tr.GetLoco()
 			if loco is not None and not loco.startswith("??"):
 				locoDict[loco] = tr.GetBlockNameList()
-		print(path)
+
 		with open(path, "w") as fp:
 			json.dump(locoDict, fp, indent=4, sort_keys=True)
 
@@ -1372,8 +1364,6 @@ class MainFrame(wx.Frame):
 						tr = blk.GetTrain()
 						oldName, oldLoco = tr.GetNameAndLoco()
 						self.Request({"renametrain": { "oldname": oldName, "newname": oldName, "oldloco": oldLoco, "newloco": lid}})
-					else:
-						print("block %s not occupied or not known - ignoring" % bname)
 
 	def OnClose(self, _):
 		self.KillWindow()

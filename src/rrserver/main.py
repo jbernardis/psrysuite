@@ -252,7 +252,6 @@ class MainFrame(wx.Frame):
 			self.socketServer.sendToAll(resp)
 
 		elif verb == "settrain":
-			print("Incoming HTTP Request: %s" % json.dumps(evt.data), flush=True)
 			try:
 				trn = evt.data["name"][0]
 			except (IndexError, KeyError):
@@ -273,32 +272,27 @@ class MainFrame(wx.Frame):
 					loco = nloco
 					
 			elif trn:
-				print("we have train %s" % trn)
 				# this is a known train - see if we have an existing train (known or unknown)
 				# in the block, and just replace it
 				etrn, eloco = self.trainList.FindTrainInBlock(block)
-				print("find in block %s: %s %s" % (block, str(etrn), str(eloco)))
 				if etrn:
 					if self.trainList.RenameTrain(etrn, trn, eloco, loco):
 						for cmd in self.trainList.GetSetTrainCmds(trn):
-							print("sending: %s" % str(cmd), flush=True)
 							self.socketServer.sendToAll(cmd)
 					return
 				else: # see if we have it anywhere, and preserve the loco value if we do
 					eloco = self.trainList.FindTrain(trn)
 					if eloco is not None:
 						if eloco != loco:
-							print("loco numbera are different - using the new one")
 							loco = eloco
 
 			resp = {"settrain": [{"name": trn, "loco": loco, "block": block}]}
-			print("sending: %s" % str(resp), flush=True)
 			self.socketServer.sendToAll(resp)
 
 			self.trainList.Update(trn, loco, block)
 
 		elif verb == "renametrain":
-			print("Incoming HTTP Request: %s" % json.dumps(evt.data), flush=True)
+			#print("Incoming HTTP Request: %s" % json.dumps(evt.data), flush=True)
 			try:
 				oname = evt.data["oldname"][0]
 			except (IndexError, KeyError):
@@ -318,9 +312,7 @@ class MainFrame(wx.Frame):
 
 			if self.trainList.RenameTrain(oname, nname, oloco, nloco):
 				for cmd in self.trainList.GetSetTrainCmds(nname):
-					print("sending: %s" % str(cmd), flush=True)
 					self.socketServer.sendToAll(cmd)
-			print("rename======================================================================", flush=True)
 
 		elif verb == "blockdir":
 			block = evt.data["block"][0]
@@ -502,12 +494,6 @@ class MainFrame(wx.Frame):
 			sid = int(evt.data["SID"][0])
 			function = evt.data["function"][0]
 			self.clientList.SetSessionFunction(sid, function)
-			print("socket connectioln from function %s" % function)
-   # if function == "ATC" and self.pendingATCShowCmd is not None:
-   # 	addrList = self.clientList.GetFunctionAddress("ATC")
-   # 	for addr, skt in addrList:
-   # 		self.socketServer.sendToOne(skt, addr, self.pendingATCShowCmd)
-   # 	self.pendingATCShowCmd = None
 			
 		elif verb == "autorouter":
 			stat = evt.data["status"][0]
@@ -522,9 +508,7 @@ class MainFrame(wx.Frame):
 					self.socketServer.deleteSocket(addr)
 				
 		elif verb == "atc":
-			print("atc command: %s" % str(evt.data))
 			addrList = self.clientList.GetFunctionAddress("ATC")
-			print("sending to %d clienbts" % len(addrList))
 			for addr, skt in addrList:
 				self.socketServer.sendToOne(skt, addr, {"atc": evt.data})
 					

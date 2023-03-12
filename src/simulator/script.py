@@ -51,7 +51,6 @@ class Script (wx.Frame):
 
 	def Execute(self):
 		if self.script is None:
-			print("no script")
 			self.markCompleted(withError=True)
 			return
 
@@ -95,7 +94,6 @@ class Script (wx.Frame):
 					name = params["name"]
 					loco = params["loco"]
 				except KeyError:
-					print("missing block, name, or loco on placetrain")
 					self.markCompleted(withError=True)
 					return
 
@@ -132,7 +130,6 @@ class Script (wx.Frame):
 				try:
 					block = params["block"]
 				except KeyError:
-					print("missing block on movetrain")
 					self.markCompleted(withError=True)
 					return
 
@@ -188,7 +185,6 @@ class Script (wx.Frame):
 		w = []
 		if self.pauseSignal:
 			if self.parent.SignalAspect(self.pauseSignal) == 0:
-				print("signal aspect is 0")
 				w.append("Signal %s" % self.pauseSignal)
 				rv = True  # paused because signal is red
 

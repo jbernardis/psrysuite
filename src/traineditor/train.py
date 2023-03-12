@@ -48,7 +48,7 @@ class Train:
 	
 class Trains:
 	def __init__(self, ddir):
-		self.fn = os.path.join(ddir, "trains.json") 
+		self.fn = os.path.join(ddir, "trainseq.json") 
 		try:
 			with open(self.fn, "r") as jfp:
 				TrainsJson = json.load(jfp)

@@ -208,12 +208,12 @@ class District:
 		return None, None
 
 	def PerformSignalAction(self, sig):
-		print("perform signal action for sig %s" % sig.GetName(), flush=True)
+		#print("perform signal action for sig %s" % sig.GetName(), flush=True)
 		currentMovement = sig.GetAspect() != 0  # does the CURRENT signal status allow movement
 		signm = sig.GetName()
 		rt, osblk = self.FindRoute(sig)
-		print("current movement = %s" % str(currentMovement))
-		print("current aspect = %d" % sig.GetAspect(), flush=True)
+		#print("current movement = %s" % str(currentMovement))
+		#print("current aspect = %d" % sig.GetAspect(), flush=True)
 
 		if rt is None:
 			self.frame.Popup("No available route")
@@ -242,7 +242,7 @@ class District:
 		return True
 
 	def CalculateAspect(self, sig, osblk, rt):
-		print("calculate aspect for signal %s" % sig.GetName())
+		#print("calculate aspect for signal %s" % sig.GetName())
 		if osblk.IsBusy():
 			self.frame.Popup("Block is busy")
 			return None
@@ -307,7 +307,7 @@ class District:
 			nnbClear = False
 
 		aspect = self.GetAspect(sig.GetAspectType(), rType, nbStatus, nbRType, nnbClear)
-		print("calculated aspect = %d" % aspect)
+		#print("calculated aspect = %d" % aspect)
 
 		self.CheckBlockSignals(sig, aspect, exitBlk, doReverseExit, rType, nbStatus, nbRType, nnbClear)
 
@@ -331,8 +331,8 @@ class District:
 		pass
 
 	def GetAspect(self, atype, rtype, nbstatus, nbrtype, nnbclear):
-		print("Get aspect.  Aspect type = %s, route type %s nextblockstatus %s next block route type %s nextnextclear %s" %
-			(aspecttype(atype), routetype(rtype), statustype(nbstatus), routetype(nbrtype), str(nnbclear)))
+		#print("Get aspect.  Aspect type = %s, route type %s nextblockstatus %s next block route type %s nextnextclear %s" %
+		#	(aspecttype(atype), routetype(rtype), statustype(nbstatus), routetype(nbrtype), str(nnbclear)))
 		if atype == RegAspects:
 			if rtype == MAIN and nbstatus == CLEARED and nbrtype == MAIN:
 				return 0b011  # Clear

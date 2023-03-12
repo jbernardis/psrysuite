@@ -11,7 +11,6 @@ import logging
 logging.basicConfig(filename=os.path.join("logs", "atc.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 import json
-import pprint
 
 from atc.settings import Settings
 from atc.turnout import Turnout
@@ -22,7 +21,7 @@ from atc.train import Train
 from atc.route import Route
 
 from atc.dccremote import DCCRemote
-from atc.dccloco import DCCLoco
+#from atc.dccloco import DCCLoco
 from atc.atclist import ATCListCtrl
 from atc.listener import Listener
 from atc.rrserver import RRServer
@@ -117,7 +116,7 @@ class MainFrame(wx.Frame):
 		wx.CallAfter(self.Initialize)
 		
 	def LoadImages(self, imgFolder):
-		png = wx.Image(os.path.join(imgFolder, "headlight.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		png = wx.Image(os.path.join(imgFolder, "headlight_on.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
 		mask = wx.Mask(png, wx.BLUE)
 		png.SetMask(mask)
 		self.imageLight = png
@@ -241,7 +240,7 @@ class MainFrame(wx.Frame):
 						blk = submap[blk]
 						
 					if blk in steps and origin == terminus and blk == terminus:
-						print("that condition, blk=%s" % blk)
+						pass
 					else:
 						steps[blk] = {
 					   "signal": str(sigList[sigx][0]),
@@ -255,8 +254,6 @@ class MainFrame(wx.Frame):
 				
 			self.scripts[train] = steps
 
-		pprint.pprint(self.scripts["HWX"])	
-		print("============================================================================================================")		
 		return True
 	
 	def HaveScript(self, train):
@@ -286,7 +283,6 @@ class MainFrame(wx.Frame):
 		wx.QueueEvent(self, evt)
 		
 	def OnTickerEvent(self, _):
-		print("(((((((((((((((((((((((((((((((")
 		for dccl in self.dccRemote.GetDCCLocos():
 			gs, _ = dccl.GetGoverningSignal()
 			aspect = 0  # assume STOP
@@ -306,13 +302,10 @@ class MainFrame(wx.Frame):
 					if overswitch in self.osList and self.osList[overswitch].GetActiveRouteName() != route:
 						# either we don't know that OS or its not set to the needed route
 						aspect = 0
-						
-			print("calculated aspect: %d" % aspect)
 	
 			dccl.SetGoverningAspect(aspect)
-			self.dccRemote.SelectLoco(dccl)	
+			self.dccRemote.SelectLoco(dccl.GetLoco())	
 			
-#			step = dccl.GetSpeedStep()				
 			speed = self.dccRemote.ApplySpeedStep() #step)
 			if speed == 0 and dccl.HasCompleted():
 				self.atcList.DelTrain(dccl)
@@ -322,13 +315,12 @@ class MainFrame(wx.Frame):
 				self.RRRequest({"atcstatus": {"action": "complete", "train": train}})
 			else:
 				self.atcList.RefreshTrain(dccl)
-		print(")))))))))))))))))))))))))))))))))))))))")
 
 	def raiseDeliveryEvent(self, data): # thread context
 		try:
 			jdata = json.loads(data)
 		except json.decoder.JSONDecodeError:
-			print("Unable to parse (%s)" % data)
+			#print("Unable to parse (%s)" % data)
 			return
 		evt = DeliveryEvent(data=jdata)
 		wx.QueueEvent(self, evt)
@@ -465,14 +457,13 @@ class MainFrame(wx.Frame):
 						return #ignore if we already have the train
 					
 					loco = parms["loco"][0]
-					dccl = DCCLoco(trnm, loco)
+					dccl = self.dccRemote.SelectLoco(loco)
 					self.SetOriginTerminus(dccl)
 					self.atcList.AddTrain(dccl)
 					
 					tr = self.trains[trnm]
 					blk = tr.GetFirstBlock()
 					dccl.SetGoverningSignal(self.GetSignal(trnm, blk))
-					self.dccRemote.SelectLoco(dccl)
 						
 				elif action == "delete":
 					train = parms["train"][0]
@@ -551,7 +542,6 @@ class MainFrame(wx.Frame):
 			dccl.SetGoverningSignal(gs)
 		
 		logging.info("Train %s has moved into block %s, signal = %s" % (train, block, str(gs)))
-		print("Train %s has moved into block %s, signal = %s" % (train, block, str(gs)))
 		dccl.CheckHasMoved(block)
 		
 		if dccl.AtTerminus(block):
@@ -559,7 +549,6 @@ class MainFrame(wx.Frame):
 			dccl.SetGoverningSignal(None)
 		else:
 			sig = self.GetSignal(train, block)
-			#print("block %s, gs=%s, sigahead=%s" % (block, str(gs), str(sig)))
 			# see if we've passed our signal.  If so, we need to freeze our aspect
 			# until the tail of the train also passes the signal
 			dccl.SetInBlock(gs != sig)
@@ -571,7 +560,6 @@ class MainFrame(wx.Frame):
 			return
 		
 		logging.info("Train %s tail in block %s" % (train, block))
-		print("Train %s tail in block %s" % (train, block))
 		gs, _ = dccl.GetGoverningSignal()
 		
 		if dccl.AtTerminus(block):
@@ -624,7 +612,7 @@ class MainFrame(wx.Frame):
 		
 		light = dccl.GetHeadlight()
 		
-		self.dccRemote.SelectLoco(dccl)
+		self.dccRemote.SelectLoco(dccl.GetLoco())
 		self.dccRemote.SetFunction(headlight=not light)
 		self.atcList.RefreshTrain(dccl)
 		
@@ -635,7 +623,7 @@ class MainFrame(wx.Frame):
 		
 		horn = dccl.GetHorn()
 		
-		self.dccRemote.SelectLoco(dccl)
+		self.dccRemote.SelectLoco(dccl.GetLoco())
 		self.dccRemote.SetFunction(horn=not horn)
 		self.atcList.RefreshTrain(dccl)
 		
@@ -646,7 +634,7 @@ class MainFrame(wx.Frame):
 		
 		bell = dccl.GetBell()
 		
-		self.dccRemote.SelectLoco(dccl)
+		self.dccRemote.SelectLoco(dccl.GetLoco())
 		self.dccRemote.SetFunction(bell=not bell)
 		self.atcList.RefreshTrain(dccl)
 		
@@ -655,7 +643,7 @@ class MainFrame(wx.Frame):
 		if dccl is None:
 			return
 		
-		self.dccRemote.SelectLoco(dccl)
+		self.dccRemote.SelectLoco(dccl.GetLoco())
 		dccl.SetForcedStop(not dccl.GetForcedStop())
 		self.atcList.RefreshTrain(dccl)
 		

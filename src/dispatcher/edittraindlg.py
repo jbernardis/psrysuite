@@ -1,4 +1,6 @@
 import wx
+import os
+import json
 
 class EditTrainDlg(wx.Dialog):
 	def __init__(self, parent, train, dispatcher):
@@ -13,15 +15,46 @@ class EditTrainDlg(wx.Dialog):
 		name, loco = train.GetNameAndLoco()
 		atc = train.IsOnATC()
 
+		self.chosenTrain = name
+		path = os.path.join(os.getcwd(), "data", "trains.json")
+		try:
+			with open(path, "r") as jfp:
+				trains = json.load(jfp)
+		except:
+			print("Unable to load trains file: %s" % path)
+			trains = {}
+			
+		trainList = sorted(list(trains.keys()))
 		lblTrain = wx.StaticText(self, wx.ID_ANY, "Train:", size=(50, -1))
-		self.teTrainID = wx.TextCtrl(self, wx.ID_ANY, name, size=(125, -1))
+		self.cbTrainID = wx.ComboBox(self, wx.ID_ANY, name,
+					choices=trainList,
+					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
+		
+		self.Bind(wx.EVT_COMBOBOX, self.OnTrainChoice, self.cbTrainID)
+		self.Bind(wx.EVT_TEXT, self.OnTrainText, self.cbTrainID)
+		
+		self.chosenLoco = loco
+		path = os.path.join(os.getcwd(), "data", "locos.json")
+		try:
+			with open(path, "r") as jfp:
+				locos = json.load(jfp)
+		except:
+			print("Unable to load locomotives file: %s" % path)
+			locos = {}
+			
+		locoList = sorted(list(locos.keys()), key=self.BuildLocoKey)
 		lblLoco  = wx.StaticText(self, wx.ID_ANY, "Loco:", size=(50, -1))
-		self.teLocoID = wx.TextCtrl(self, wx.ID_ANY, loco, size=(125, -1))
+		self.cbLocoID = wx.ComboBox(self, wx.ID_ANY, loco,
+					choices=locoList,
+					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
+		
+		self.Bind(wx.EVT_COMBOBOX, self.OnLocoChoice, self.cbLocoID)
+		self.Bind(wx.EVT_TEXT, self.OnLocoText, self.cbLocoID)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.Add(lblTrain)
 		hsz.AddSpacer(10)
-		hsz.Add(self.teTrainID)
+		hsz.Add(self.cbTrainID)
 		vsz.Add(hsz)
 		
 		vsz.AddSpacer(10)
@@ -29,7 +62,7 @@ class EditTrainDlg(wx.Dialog):
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.Add(lblLoco)
 		hsz.AddSpacer(10)
-		hsz.Add(self.teLocoID)
+		hsz.Add(self.cbLocoID)
 		vsz.Add(hsz)
 
 		if dispatcher:
@@ -65,6 +98,23 @@ class EditTrainDlg(wx.Dialog):
 		self.SetSizer(hsz)
 		self.Layout()
 		self.Fit()
+		
+	def BuildLocoKey(self, lid):
+		return int(lid)
+		
+	def OnLocoChoice(self, evt):
+		self.chosenLoco = evt.GetString()
+
+	def OnLocoText(self, evt):
+		self.chosenLoco = evt.GetString()
+		evt.Skip()
+		
+	def OnTrainChoice(self, evt):
+		self.chosenTrain = evt.GetString()
+
+	def OnTrainText(self, evt):
+		self.chosenTrain = evt.GetString()
+		evt.Skip()
 
 	def onCancel(self, _):
 		self.EndModal(wx.ID_CANCEL)
@@ -73,7 +123,7 @@ class EditTrainDlg(wx.Dialog):
 		self.EndModal(wx.ID_OK)
 
 	def GetResults(self):
-		t = self.teTrainID.GetValue()
-		l = self.teLocoID.GetValue()
+		t = self.chosenTrain
+		l = self.chosenLoco
 		atc = None if not self.dispatcher else self.cbATC.GetValue()
 		return t, l, atc

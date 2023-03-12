@@ -177,7 +177,6 @@ class District(wx.Panel):
 			self.nullResponseCount[addr] = 1
 			
 		if self.nullResponseCount[addr] < THRESHOLD and not self.settings.simulation:
-			print("ignoring null response from node address %x, count=%d" % (addr, self.nullResponseCount[addr]))
 			logging.warning("ignoring null response from node address %x, count=%d" % (addr, self.nullResponseCount[addr]))
 			return False
 	
@@ -395,7 +394,6 @@ class District(wx.Panel):
 		try:
 			ix, oc, dtype = self.outputMap[oname]
 		except KeyError:
-			print("not in the map")
 			logging.warning("Output for %s in district %s not found" % (oname, self.name))
 			return
 		

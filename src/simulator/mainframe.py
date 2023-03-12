@@ -34,7 +34,6 @@ class MainFrame(wx.Frame):
 		self.selectedScripts = []
 		self.startable = []
 		self.stoppable = []
-		print(cmdFolder)
 
 		self.title = "PSRY Simulator"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
@@ -130,8 +129,6 @@ class MainFrame(wx.Frame):
 			s = Script(self, scripts[scr], scr, self.cbComplete)
 			self.scripts[scr] = s
 			self.scriptList.AddScript(s)
-
-		print("finished initialize")
 
 	def reportSelection(self):
 		selectedScripts = self.scriptList.GetChecked()
@@ -236,7 +233,7 @@ class MainFrame(wx.Frame):
 		try:
 			return self.signals[signal]
 		except KeyError:
-			print("signal %s unknown" % signal)
+			# signal %s unknown
 			return False
 
 	def BlockOccupied(self, block):

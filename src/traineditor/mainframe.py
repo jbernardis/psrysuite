@@ -330,7 +330,6 @@ class MainFrame(wx.Frame):
 		for b in blkSeq:
 			bx += 1
 			terminus = bx == nblocks
-			print("block %s is terminus: %s" % (b, str(terminus)))
 			segTimes, segString = self.determineSegmentsAndTimes(b["block"], b["os"], east, b["time"], terminus=terminus)
 
 			script.append({"waitfor": {"signal": b["signal"], "route": b["route"], "os": segTimes[0][0], "block": segString}})
