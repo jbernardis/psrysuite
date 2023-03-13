@@ -414,6 +414,25 @@ def loadTiles(bitmaps):
 		}
 	)
 	
+	turnouts["toleftrightinv"] = TurnoutTile("toleftrightinv", 
+		{
+			"white": b.toleftright.reversed.normal,
+			"green": b.toleftright.reversed.routed,
+			"red": b.toleftright.reversed.occupied,
+			"white-dis": b.toleftright.reversed.normaldis,
+			"green-dis": b.toleftright.reversed.routeddis,
+			"red-dis": b.toleftright.reversed.occupieddis
+		},
+		{
+			"white": b.toleftright.normal.normal,
+			"green": b.toleftright.normal.routed,
+			"red": b.toleftright.normal.occupied,
+			"white-dis": b.toleftright.normal.normaldis,
+			"green-dis": b.toleftright.normal.routeddis,
+			"red-dis": b.toleftright.normal.occupieddis
+		}
+	)
+	
 	turnouts["toleftdown"] = TurnoutTile("toleftdown", 
 		{
 			"white": b.toleftdown.normal.normal,

@@ -208,13 +208,13 @@ class MainUnit:
 			
 		function = 0
 		if loco.GetBell():
-			function += 0x80
+			function += 0x01
 			
 		if loco.GetHorn():
-			function += 0x40
+			function += 0x02
 			
 		if loco.GetHeadlight():
-			function += 0x08
+			function += 0x10
 
 		outb = [ 0xa2 ] + formatLocoID(lid) + [ 0x07, function & 0xff ]
 
