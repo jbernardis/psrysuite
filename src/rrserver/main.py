@@ -19,6 +19,7 @@ import wx.lib.newevent
 
 import json
 import socket
+import signal as sg
 
 from subprocess import Popen
 
@@ -49,9 +50,8 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		logging.info("pydispatch starting")
 		
-		self.pidATC = None
 		self.pidAR = None
-		self.pendingATCShowCmd = None
+		self.pidDCC = None
 
 		self.routeDefs = {}
 
@@ -137,6 +137,14 @@ class MainFrame(wx.Frame):
 		logging.info("Starting Socket server at address: %s:%d" % (self.ip, self.settings.socketport))
 		self.socketServer = SktServer(self.ip, self.settings.socketport, self.socketEventReceipt)
 		self.socketServer.start()
+		
+		self.StartDCCServer()
+
+	def StartDCCServer(self):
+		dccSvrExec = os.path.join(os.getcwd(), "dccserver", "main.py")
+		self.pidDCC = Popen([sys.executable, dccSvrExec]).pid
+		print("DCC Server started as PID %d" % self.pidDCC)
+		logging.info("DCC Server started as PID %d" % self.pidDCC)
 
 		
 	def OnCbEnableIO(self, _):
@@ -500,8 +508,8 @@ class MainFrame(wx.Frame):
 			if stat == "on":
 				if not self.clientList.HasFunction("AR"):
 					arExec = os.path.join(os.getcwd(), "autorouter", "main.py")
-					pid = Popen([sys.executable, arExec]).pid
-					logging.debug("autorouter started as PID %d" % pid)
+					self.pidAR = Popen([sys.executable, arExec]).pid
+					logging.debug("autorouter started as PID %d" % self.pidAR)
 			else:
 				addrList = self.clientList.GetFunctionAddress("AR")
 				for addr, _ in addrList:
@@ -551,6 +559,9 @@ class MainFrame(wx.Frame):
 			self.rrMonitor.kill()
 		except:
 			pass
+		
+		if self.pidDCC is not None:
+			os.kill(self.pidDCC, sg.SIGABRT)
 
 		logging.info("exiting...")
 		self.Destroy()

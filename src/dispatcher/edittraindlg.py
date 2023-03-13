@@ -131,5 +131,5 @@ class EditTrainDlg(wx.Dialog):
 	def GetResults(self):
 		t = self.chosenTrain
 		l = self.chosenLoco
-		atc = None if not self.dispatcher else self.cbATC.GetValue()
+		atc = False if not self.dispatcher else self.cbATC.GetValue()
 		return t, l, atc

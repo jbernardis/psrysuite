@@ -458,6 +458,7 @@ class MainFrame(wx.Frame):
 					
 					loco = parms["loco"][0]
 					dccl = self.dccRemote.SelectLoco(loco)
+					dccl.SetTrain(trnm)
 					self.SetOriginTerminus(dccl)
 					self.atcList.AddTrain(dccl)
 					

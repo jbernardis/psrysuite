@@ -2,7 +2,7 @@ import os
 import logging
 import json
 
-from atc.dccloco import FORWARD, REVERSE
+from atc.dccloco import DCCLoco, FORWARD, REVERSE
 
 
 class DCCRemote:
@@ -60,12 +60,12 @@ class DCCRemote:
 		
 	def SelectLoco(self, loco, assertValues=False):
 		for l in self.locos:
-			if l.GetLoco() == loco.GetLoco():
+			if l.GetLoco() == loco:
 				self.selectedLoco = l
 				break
 			
 		else:
-			l = loco
+			l = DCCLoco(None, loco)
 			self.locos.append(l)
 			l.SetProfiler(self.Profiler)
 			self.selectedLoco = l

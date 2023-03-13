@@ -63,6 +63,9 @@ class DCCLoco:
 	def SetProfiler(self, prof):
 		self.profiler = prof
 		
+	def SetTrain(self, train):
+		self.train = train
+		
 	def GetTrain(self):
 		return self.train
 	
