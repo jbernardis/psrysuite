@@ -24,11 +24,15 @@ class EditTrainDlg(wx.Dialog):
 			print("Unable to load trains file: %s" % path)
 			trains = {}
 			
+		font = wx.Font(wx.Font(16, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+
 		trainList = sorted(list(trains.keys()))
-		lblTrain = wx.StaticText(self, wx.ID_ANY, "Train:", size=(50, -1))
+		lblTrain = wx.StaticText(self, wx.ID_ANY, "Train:", size=(90, -1))
+		lblTrain.SetFont(font)
 		self.cbTrainID = wx.ComboBox(self, wx.ID_ANY, name,
 					choices=trainList,
 					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
+		self.cbTrainID.SetFont(font)
 		
 		self.Bind(wx.EVT_COMBOBOX, self.OnTrainChoice, self.cbTrainID)
 		self.Bind(wx.EVT_TEXT, self.OnTrainText, self.cbTrainID)
@@ -43,10 +47,12 @@ class EditTrainDlg(wx.Dialog):
 			locos = {}
 			
 		locoList = sorted(list(locos.keys()), key=self.BuildLocoKey)
-		lblLoco  = wx.StaticText(self, wx.ID_ANY, "Loco:", size=(50, -1))
+		lblLoco  = wx.StaticText(self, wx.ID_ANY, "Loco:", size=(90, -1))
+		lblLoco.SetFont(font)
 		self.cbLocoID = wx.ComboBox(self, wx.ID_ANY, loco,
 					choices=locoList,
 					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
+		self.cbLocoID.SetFont(font)
 		
 		self.Bind(wx.EVT_COMBOBOX, self.OnLocoChoice, self.cbLocoID)
 		self.Bind(wx.EVT_TEXT, self.OnLocoText, self.cbLocoID)

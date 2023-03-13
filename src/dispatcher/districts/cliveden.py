@@ -15,7 +15,7 @@ class Cliveden (District):
 	def PerformTurnoutAction(self, turnout):
 		controlOpt = self.frame.rbCliffControl.GetSelection()
 		if controlOpt == 0:  # Cliveden local control
-			self.frame.Popup("Cliveden control is local")
+			self.frame.PopupEvent("Cliveden control is local")
 			return
 
 		District.PerformTurnoutAction(self, turnout)
@@ -23,7 +23,7 @@ class Cliveden (District):
 	def PerformSignalAction(self, sig):
 		controlOpt = self.frame.rbCliffControl.GetSelection()
 		if controlOpt == 0:  # Cliveden local control
-			self.frame.Popup("Cliveden control is local")
+			self.frame.PopupEvent("Cliveden control is local")
 			return
 
 		District.PerformSignalAction(self, sig)

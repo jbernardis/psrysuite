@@ -34,7 +34,7 @@ class Signal:
 			self.fleetEnabled = not self.fleetEnabled
 		else:
 			self.fleetEnabled = flag
-		# self.frame.Popup("Fleet %s for signal %s" % ("enabled" if self.fleetEnabled else "disabled", self.name))
+		# self.frame.PopupEvent("Fleet %s for signal %s" % ("enabled" if self.fleetEnabled else "disabled", self.name))
 		self.Draw()
 
 	def IsFleeted(self):

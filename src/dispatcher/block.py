@@ -508,7 +508,7 @@ class StoppingBlock (Block):
 
 		self.active = flag
 		if flag:
-			self.frame.Popup("Stop Relay: %s %s by %s" % (bname, direction, tname))
+			self.frame.PopupEvent("Stop Relay: %s %s by %s" % (bname, direction, tname))
 		logging.debug("Block %s stopping relay %s %s end by train %s" % (bname, "activated" if flag else "cleared", direction, tname))
 		self.frame.Request({"relay": { "block": self.block.GetName(), "status": 1 if flag else 0}})
 

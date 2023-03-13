@@ -7,7 +7,6 @@ import json
 import logging
 from subprocess import Popen
 
-
 from dispatcher.settings import Settings
 from dispatcher.bitmaps import BitMaps
 from dispatcher.district import Districts
@@ -56,16 +55,18 @@ class Node:
 class MainFrame(wx.Frame):
 	def __init__(self):
 		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE)
-		self.toaster = None
+		self.events = None
+		self.advice = None
 		self.listener = None
 		self.sessionid = None
 		self.subscribed = False
 		self.ATCEnabled = False
 		self.AREnabled = False
 		self.pidATC	= None
+		self.pidAdvisor = None
 			
-		logging.info("Display process starting")
 		self.settings = Settings()
+		logging.info("%s process starting" % "dispatcher" if self.settings.dispatch else "display")
 
 		self.logCount = 6
 		
@@ -176,9 +177,12 @@ class MainFrame(wx.Frame):
 			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(self.centerOffset+600, 25))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
 			self.cbAutoRouter.Enable(False)
-			self.cbATC = wx.CheckBox(self, wx.ID_ANY, "Automatic Train Control", pos=(self.centerOffset+600, 55))
+			self.cbATC = wx.CheckBox(self, wx.ID_ANY, "Automatic Train Control", pos=(self.centerOffset+600, 50))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBATC, self.cbATC)
 			self.cbATC.Enable(False)
+			self.cbAdvisor = wx.CheckBox(self, wx.ID_ANY, "Advisor", pos=(self.centerOffset+600, 75))
+			self.Bind(wx.EVT_CHECKBOX, self.OnCBAdvisor, self.cbAdvisor)
+			self.cbAdvisor.Enable(False)
 			
 		self.totalw = totalw
 		self.totalh = 1080
@@ -388,6 +392,18 @@ class MainFrame(wx.Frame):
 
 		else:
 			self.Request({"atc": { "action": "hide", "x": self.centerOffset+1600, "y": 31}})
+
+	def OnCBAdvisor(self, evt):
+		self.AdvisorEnabled = self.cbAdvisor.IsChecked()
+		if self.AdvisorEnabled:
+			if self.pidAdvisor is None:			
+				advisorExec = os.path.join(os.getcwd(), "advisor", "main.py")
+				self.pidAdvisor = Popen([sys.executable, advisorExec]).pid
+				logging.debug("advisor server started as PID %d" % self.pidAdvisor)
+		else:
+			if self.pidAdvisor is not None:			
+				self.Request( {"close": {"function": "ADVISOR"}})
+				self.pidAdvisor = None
 		
 	def sendPendingATCShow(self):
 		self.Request(self.pendingATCShowCmd)
@@ -783,7 +799,7 @@ class MainFrame(wx.Frame):
 				if blk.IsOccupied():
 					tr = blk.GetTrain()
 					oldName, oldLoco = tr.GetNameAndLoco()
-					oldATC = tr.IsOnATC() if self.IsDispatcher() else None
+					oldATC = tr.IsOnATC() if self.IsDispatcher() else False
 					dlg = EditTrainDlg(self, tr, self.IsDispatcher() and self.ATCEnabled)
 					rc = dlg.ShowModal()
 					if rc == wx.ID_OK:
@@ -882,14 +898,23 @@ class MainFrame(wx.Frame):
 		return tr
 
 	def ToasterSetup(self):
-		self.toaster = Toaster()
-		self.toaster.SetPositionByCorner(TB_CENTER)
-		self.toaster.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
-		self.toaster.SetBackgroundColour(wx.Colour(255, 179, 154))
-		self.toaster.SetTextColour(wx.Colour(0, 0, 0))
+		self.events = Toaster()
+		self.events.SetPositionByCorner(TB_CENTER)
+		self.events.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
+		self.events.SetBackgroundColour(wx.Colour(255, 179, 154))
+		self.events.SetTextColour(wx.Colour(0, 0, 0))
+		
+		self.advice = Toaster()
+		self.advice.SetPositionByCorner(TB_CENTER)
+		self.advice.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
+		self.advice.SetBackgroundColour(wx.Colour(120, 255, 154))
+		self.advice.SetTextColour(wx.Colour(0, 0, 0))
 
-	def Popup(self, message):
-		self.toaster.Append(message)
+	def PopupEvent(self, message):
+		self.events.Append(message)
+
+	def PopupAdvice(self, message):
+		self.advice.Append(message)
 
 	def OnSubscribe(self, _):
 		if self.subscribed:
@@ -908,6 +933,7 @@ class MainFrame(wx.Frame):
 			if self.IsDispatcher():
 				self.cbAutoRouter.Enable(False)
 				self.cbATC.Enable(False)
+				self.cbAdvisor.Enable(False)
 			
 		else:
 			self.listener = Listener(self, self.settings.ipaddr, self.settings.socketport)
@@ -928,6 +954,7 @@ class MainFrame(wx.Frame):
 			if self.IsDispatcher():
 				self.cbAutoRouter.Enable(True)
 				self.cbATC.Enable(True)
+				self.cbAdvisor.Enable(True)
 
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()
@@ -1087,7 +1114,7 @@ class MainFrame(wx.Frame):
 					val = p["value"]
 					logging.debug("Set Breaker %s to %s" % (name, "TRIPPED" if val != 0 else "CLEAR"))
 					if val == 0:
-						self.Popup("Breaker: %s" % BreakerName(name))
+						self.PopupEvent("Breaker: %s" % BreakerName(name))
 						self.breakerDisplay.AddBreaker(name)
 					else:
 						self.breakerDisplay.DelBreaker(name)
@@ -1200,6 +1227,10 @@ class MainFrame(wx.Frame):
 				if self.settings.dispatch:
 					self.districts.GenerateLayoutInformation(parms)
 					
+			elif cmd == "advice":
+				print("advice: %s" % str(parms))
+				self.PopupAdvice(parms["msg"][0])
+					
 			elif cmd == "atcstatus":
 				action = parms["action"][0]
 				if action == "reject":
@@ -1210,7 +1241,7 @@ class MainFrame(wx.Frame):
 						logging.warning("ATC rejected train %s does not exist" % trnm)
 						return
 	
-					self.Popup("Rejected ATC train %s - no script" % trnm)				
+					self.PopupEvent("Rejected ATC train %s - no script" % trnm)				
 					tr.SetATC(False)
 					tr.Draw()
 				elif action in [ "complete", "remove" ]:
@@ -1222,9 +1253,9 @@ class MainFrame(wx.Frame):
 						return
 	
 					if action == "complete":
-						self.Popup("ATC train %s has completed" % trnm)	
+						self.PopupEvent("ATC train %s has completed" % trnm)	
 					else:			
-						self.Popup("Train %s removed from ATC" % trnm)				
+						self.PopupEvent("Train %s removed from ATC" % trnm)				
 					tr.SetATC(False)
 					tr.Draw()
 
@@ -1268,6 +1299,7 @@ class MainFrame(wx.Frame):
 		if self.IsDispatcher():
 			self.cbAutoRouter.Enable(False)
 			self.cbATC.Enable(False)
+			self.cbAdvisor.Enable(False)
 		logging.info("Server socket closed")
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()
@@ -1369,7 +1401,8 @@ class MainFrame(wx.Frame):
 		self.KillWindow()
 		
 	def KillWindow(self):
-		self.toaster.Close()
+		self.events.Close()
+		self.advice.Close()
 		try:
 			self.listener.kill()
 			self.listener.join()

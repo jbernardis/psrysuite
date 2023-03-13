@@ -54,6 +54,7 @@ class SktServer (threading.Thread):
 			for i in range(len(self.sockets)):
 				if self.sockets[i][1] == addr:
 					self.cbEvent({"delclient": {"addr": addr}})
+					self.sockets[i][0].close()
 					del(self.sockets[i])
 					return
 
@@ -80,7 +81,7 @@ class SktServer (threading.Thread):
 				self.sessionID += 1
 			else:
 				pass #time.sleep(0.0001) # yield to other threads
- 
+
 		for skt in self.sockets:
 			skt[0].close()
 

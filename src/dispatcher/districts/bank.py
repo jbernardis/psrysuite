@@ -15,7 +15,7 @@ class Bank (District):
 	def PerformTurnoutAction(self, turnout):
 		controlOpt = self.frame.rbCliffControl.GetSelection()
 		if controlOpt == 0:  # bank local control
-			self.frame.Popup("Bank control is local")
+			self.frame.PopupEvent("Bank control is local")
 			return
 
 		District.PerformTurnoutAction(self, turnout)
@@ -23,7 +23,7 @@ class Bank (District):
 	def PerformSignalAction(self, sig):
 		controlOpt = self.frame.rbCliffControl.GetSelection()
 		if controlOpt == 0:  # bank local control
-			self.frame.Popup("Bank control is local")
+			self.frame.PopupEvent("Bank control is local")
 			return
 
 		District.PerformSignalAction(self, sig)

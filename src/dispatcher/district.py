@@ -139,7 +139,7 @@ class District:
 			if toList is None or self.anyTurnoutLocked(toList):
 				wButton.Invalidate(refresh=True)
 				eButton.Invalidate(refresh=True)
-				self.frame.Popup("No available route")
+				self.frame.PopupEvent("No available route")
 
 			else:
 				wButton.Acknowledge(refresh=True)
@@ -216,11 +216,11 @@ class District:
 		#print("current aspect = %d" % sig.GetAspect(), flush=True)
 
 		if rt is None:
-			self.frame.Popup("No available route")
+			self.frame.PopupEvent("No available route")
 			return False
 
 		if osblk.AreHandSwitchesSet():
-			self.frame.Popup("Block is locked")
+			self.frame.PopupEvent("Block is locked")
 			return False
 
 		# this is a valid signal for the current route	
@@ -232,7 +232,7 @@ class District:
 		else:  # we are trying to change the signal to stop the train
 			esig = osblk.GetEntrySignal()
 			if esig is not None and esig.GetName() != signm:
-				self.frame.Popup("Incorrect signal for current route")
+				self.frame.PopupEvent("Incorrect signal for current route")
 				return False
 			aspect = 0
 
@@ -244,7 +244,7 @@ class District:
 	def CalculateAspect(self, sig, osblk, rt):
 		#print("calculate aspect for signal %s" % sig.GetName())
 		if osblk.IsBusy():
-			self.frame.Popup("Block is busy")
+			self.frame.PopupEvent("Block is busy")
 			return None
 
 		sigE = sig.GetEast()
@@ -260,18 +260,18 @@ class District:
 
 		exitBlk = self.frame.blocks[exitBlkNm]
 		if exitBlk.IsOccupied():
-			self.frame.Popup("Block is busy")
+			self.frame.PopupEvent("Block is busy")
 			return None
 
 		crossEW = self.CrossingEastWestBoundary(osblk, exitBlk)
 
 		if exitBlk.IsCleared():
 			if (sigE != exitBlk.GetEast() and not crossEW) or (sigE == exitBlk.GetEast() and crossEW):
-				self.frame.Popup("Block is cleared in opposite direction")
+				self.frame.PopupEvent("Block is cleared in opposite direction")
 				return None
 
 		if exitBlk.AreHandSwitchesSet():
-			self.frame.Popup("Block is locked")
+			self.frame.PopupEvent("Block is locked")
 			return None
 
 		nb = exitBlk.NextBlock(reverse=doReverseExit)
@@ -453,7 +453,7 @@ class District:
 			# currently unlocked - trying to lock
 
 			if hs.IsBlockCleared():
-				self.frame.Popup("Block is cleared")
+				self.frame.PopupEvent("Block is cleared")
 				return
 
 			stat = 1
@@ -638,13 +638,13 @@ class District:
 		return {}
 
 	def ReportBlockBusy(self, blknm):
-		self.frame.Popup("Block is busy")
+		self.frame.PopupEvent("Block is busy")
 
 	def ReportOSBusy(self):
-		self.frame.Popup("Block is busy")
+		self.frame.PopupEvent("Block is busy")
 
 	def ReportTurnoutLocked(self, tonm):
-		self.frame.Popup("Turnout is locked")
+		self.frame.PopupEvent("Turnout is locked")
 
 	def GenerateRouteInformation(self):
 		routes = {}

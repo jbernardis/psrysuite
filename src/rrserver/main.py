@@ -514,6 +514,17 @@ class MainFrame(wx.Frame):
 					
 		elif verb == "atcstatus":
 			self.socketServer.sendToAll({"atcstatus": evt.data})
+			
+		elif verb == "advice":
+			addrList = self.clientList.GetFunctionAddress("DISPATCH")
+			for addr, skt in addrList:
+				self.socketServer.sendToOne(skt, addr, {"advice": evt.data})
+
+		elif verb == "close":
+			function = evt.data["function"][0]
+			addrList = self.clientList.GetFunctionAddress(function)
+			for addr, skt in addrList:
+				self.socketServer.deleteSocket(addr)
 
 		elif verb == "quit":
 			logging.info("HTTP 'quit' command received - terminating")

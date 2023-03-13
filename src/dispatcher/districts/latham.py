@@ -17,7 +17,7 @@ class Latham (District):
 		if signm in [ "L4R", "L4L" ]:
 			controlOpt = self.frame.rbS4Control.GetSelection()
 			if controlOpt == 0:  # port controls this signal
-				self.frame.Popup("Signal 4 control is with Port")
+				self.frame.PopupEvent("Signal 4 control is with Port")
 				return
 
 		District.PerformSignalAction(self, sig)

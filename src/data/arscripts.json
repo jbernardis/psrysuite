@@ -1,23 +1,30 @@
 {
   "HEX": {
+    "origin": "H40",
+    "H40": {
+      "route": "HRtH23H40",
+      "trigger": "F"
+    },
     "H23": {
       "route": "DRtH23D21",
       "trigger": "F"
     },
     "D21": {
       "route": "DRtD21S20",
-      "trigger": "F"
+      "trigger": "B"
     },
     "S20": {
       "route": "SRtS20H20",
-      "trigger": "R"
+      "trigger": "F"
     },
     "H20": {
       "route": "SRtH20H40",
       "trigger": "F"
-    }
+    },
+    "terminus": "H40"
   },
   "HWX": {
+    "origin": "H30",
     "H30": {
       "route": "SRtS10H30",
       "trigger": "F"
@@ -37,20 +44,7 @@
     "H31": {
       "route": "HRtH30H31",
       "trigger": "F"
-    }
-  },
-  "CFHY": {
-    "C53": {
-      "route": "CRtC53C22",
-      "trigger": "F"
     },
-    "C22": {
-      "route": "CRtC23C22",
-      "trigger": "F"
-    },
-    "C23": {
-      "route": "CRtC13C23",
-      "trigger": "F"
-    }
+    "terminus": "H30"
   }
 }

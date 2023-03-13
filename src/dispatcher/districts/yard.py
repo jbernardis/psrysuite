@@ -90,7 +90,7 @@ class Yard (District):
 	def PerformSignalAction(self, sig):
 		controlOpt = self.frame.rbYardControl.GetSelection()
 		if controlOpt == 0:  # Yard local control
-			self.frame.Popup("Yard control is local")
+			self.frame.PopupEvent("Yard control is local")
 			return
 
 		District.PerformSignalAction(self, sig)
@@ -101,7 +101,7 @@ class Yard (District):
 			btn.Press(refresh=False)
 			btn.Invalidate(refresh=True)
 			self.frame.ClearButtonAfter(2, btn)
-			self.frame.Popup("Yard control is local")
+			self.frame.PopupEvent("Yard control is local")
 			return
 
 		District.PerformButtonAction(self, btn)

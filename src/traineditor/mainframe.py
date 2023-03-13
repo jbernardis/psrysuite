@@ -419,10 +419,15 @@ class MainFrame(wx.Frame):
 		lastBlock = self.startBlock
 		script = {}
 		for b in self.blockSeq.GetBlocks():
+			if len(script) == 0:
+				script["origin"] = lastBlock
+				
 			if b["block"] in blks:
 				trigger = 'F' if b["trigger"] == "Front" else 'B'			
 				script[lastBlock] = {"route": b["route"], "trigger": trigger}
 			lastBlock = b["block"]
+			
+		script["terminus"] = lastBlock
 
 		scr = {"%s" % trainid: script}
 		scrString = json.dumps(scr, indent=2)

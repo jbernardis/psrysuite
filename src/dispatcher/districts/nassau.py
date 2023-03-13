@@ -15,7 +15,7 @@ class Nassau (District):
 	def PerformSignalAction(self, sig):
 		controlOpt = self.frame.rbNassauControl.GetSelection()
 		if controlOpt == 0:  # nassau local control
-			self.frame.Popup("Nassau control is local")
+			self.frame.PopupEvent("Nassau control is local")
 			return
 
 		signm = sig.GetName()
@@ -43,7 +43,7 @@ class Nassau (District):
 				mainOnly = True
 
 			if mainOnly:
-				self.frame.Popup("Nassau control is main only")
+				self.frame.PopupEvent("Nassau control is main only")
 				return
 
 		if not District.PerformSignalAction(self, sig):
@@ -110,7 +110,7 @@ class Nassau (District):
 			btn.Press(refresh=False)
 			btn.Invalidate(refresh=True)
 			self.frame.ClearButtonAfter(2, btn)
-			self.frame.Popup("Nassau control is local")
+			self.frame.PopupEvent("Nassau control is local")
 			return
 
 		bname = btn.GetName()
@@ -120,7 +120,7 @@ class Nassau (District):
 			btn.Press(refresh=False)
 			btn.Invalidate(refresh=True)
 			self.frame.ClearButtonAfter(2, btn)
-			self.frame.Popup("Nassau control is main only")
+			self.frame.PopupEvent("Nassau control is main only")
 			return
 
 		District.PerformButtonAction(self, btn)

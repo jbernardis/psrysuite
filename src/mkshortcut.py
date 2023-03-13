@@ -15,6 +15,13 @@ modules = {
 		"desc": "Dispatcher",
 		"icon": "dispatch.ico"
 	},
+	"throttle": {
+		"name": "PSRY Throttle",
+		"dir":  "throttle",
+		"main": "main.py",
+		"desc": "Throttle",
+		"icon": "throttle.ico"
+	},
 	"simulator": {
 		"name": "PSRY Simulator",
 		"dir":  "simulator",

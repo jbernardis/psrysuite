@@ -20,7 +20,7 @@ class Cliff (District):
 				msg = "Cliff control is local"
 			else:
 				msg = "Cliff control is Bank/Cliveden only"
-			self.frame.Popup(msg)
+			self.frame.PopupEvent(msg)
 			return
 
 		District.PerformSignalAction(self, sig)
@@ -35,7 +35,7 @@ class Cliff (District):
 				msg = "Cliff control is local"
 			else:
 				msg = "Cliff control is Bank/Cliveden only"
-			self.frame.Popup(msg)
+			self.frame.PopupEvent(msg)
 			return
 
 		bname = btn.GetName()
