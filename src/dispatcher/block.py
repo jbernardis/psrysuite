@@ -79,6 +79,13 @@ class Route:
 
 	def GetSignals(self):
 		return self.signals
+	
+	def RemoveClearStatus(self):
+		if self.osblk.IsReversed():
+			b = self.blkin
+		else:
+			b = self.blkout
+		self.osblk.frame.blocks[b].RemoveClearStatus()
 
 	def ReleaseSignalLocks(self):
 		frame = self.osblk.frame
@@ -437,6 +444,14 @@ class Block:
 		for b in [self.sbEast, self.sbWest]:
 			if b is not None:
 				b.SetCleared(cleared, refresh)
+				
+	def RemoveClearStatus(self):
+		self.cleared = False
+		self.determineStatus()
+		for b in [self.sbEast, self.sbWest]:
+			if b is not None:
+				b.RemoveClearStatus()
+		self.Draw()
 
 	def ToJson(self):
 		return {self.name: {"east": 1 if self.defaultEast else 0,
@@ -569,6 +584,11 @@ class StoppingBlock (Block):
 		self.determineStatus()
 		if refresh:
 			self.Draw()
+			
+	def RemoveClearStatus(self):
+		self.cleared = False
+		self.determineStatus()
+		self.Draw()
 
 	def SetOccupied(self, occupied=True, refresh=False):
 		if self.occupied == occupied:
@@ -618,6 +638,7 @@ class OverSwitch (Block):
 
 		if self.route is not None:
 			self.route.ReleaseSignalLocks()  # release locks along the old route
+			self.route.RemoveClearStatus()
 
 		self.route = route
 		self.rtName = newName

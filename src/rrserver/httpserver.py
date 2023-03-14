@@ -1,6 +1,5 @@
 import select
 from threading import Thread
-import time
 from socketserver import ThreadingMixIn 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
@@ -8,7 +7,6 @@ from urllib.parse import urlparse, parse_qs
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		app = self.server.getApp()
-		req = "%s:%s - \"%s\"" % (self.client_address[0], self.client_address[1], self.requestline)
 
 		parsed_path = urlparse(self.path)
 		cmdDict = parse_qs(parsed_path.query)

@@ -52,7 +52,7 @@ class Toaster(wx.Frame):
 		if pos in [TB_UPPERLEFT, TB_UPPERCENTER, TB_UPPERRIGHT]:
 			py = 0
 		elif pos in [TB_CENTERLEFT, TB_CENTER, TB_CENTERRIGHT]:
-			py = (h-self.size[1])/2
+			py = (h-self.size[1])/2+150
 		else:
 			py = h-self.size[1]
 
