@@ -120,12 +120,16 @@ class Block:
 		self.sigEast = None
 		self.determineStatus()
 		self.entrySignal = None
+		self.entryAspect = 0
 
 	def SetTrain(self, train):
 		self.train = train
 
 	def SetEntrySignal(self, esig):
 		self.entrySignal = esig
+		
+	def SetEntryAspect(self, aspect):
+		self.entryAspect = aspect
 
 	def GetEntrySignal(self):
 		return self.entrySignal
@@ -620,6 +624,7 @@ class OverSwitch (Block):
 		self.route = None
 		self.rtName = ""
 		self.entrySignal = None
+		self.entryAspect = 0
 
 	def SetRoute(self, route):
 		if self.route is None:
@@ -711,6 +716,28 @@ class OverSwitch (Block):
 
 	def SetEntrySignal(self, sig):
 		self.entrySignal = sig
+		if self.occupied:
+			# do not change the aspect if the block is occupied
+			return 
+		
+		if sig is None:
+			asp = 0
+		else:
+			asp = sig.GetAspect()
+		self.SetEntryAspect(asp)
+		
+		exitBlkName = self.route.GetExitBlock()
+		if exitBlkName is None:
+			return
+		
+		exitBlk = self.frame.GetBlockByName(exitBlkName)
+		if exitBlk is None:
+			return 
+		
+		exitBlk.SetEntryAspect(asp)
+		
+	def SetEntryAspect(self, aspect):
+		self.entryAspect = aspect
 
 	def GetEntrySignal(self):
 		return self.entrySignal

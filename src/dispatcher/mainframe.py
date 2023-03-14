@@ -16,6 +16,7 @@ from dispatcher.train import Train
 
 from dispatcher.breaker import BreakerDisplay, BreakerName
 from dispatcher.toaster import Toaster, TB_CENTER
+from dispatcher.listdlg import ListDlg
 
 from dispatcher.districts.hyde import Hyde
 from dispatcher.districts.yard import Yard
@@ -51,6 +52,7 @@ class Node:
 		self.bitmap = bitmapName
 		self.offset = offset
 
+BTNDIM = (80, 23)
 
 class MainFrame(wx.Frame):
 	def __init__(self):
@@ -64,6 +66,9 @@ class MainFrame(wx.Frame):
 		self.AREnabled = False
 		self.pidATC	= None
 		self.pidAdvisor = None
+		
+		self.eventsList = []
+		self.adviceList = []
 			
 		self.settings = Settings()
 		logging.info("%s process starting" % "dispatcher" if self.settings.dispatch else "display")
@@ -110,9 +115,9 @@ class MainFrame(wx.Frame):
 			voffset = topSpace+diagramh+20
 			b = wx.Button(self, wx.ID_ANY, "Hyde/Yard/Port", pos=(500, voffset), size=(200, 50))
 			self.Bind(wx.EVT_BUTTON, lambda event: self.SwapToScreen(HyYdPt), b)
-			b = wx.Button(self, wx.ID_ANY, "Latham/Krulish", pos=(1145, voffset), size=(200, 50))
+			b = wx.Button(self, wx.ID_ANY, "Latham/Dell/Shore/Krulish", pos=(1145, voffset), size=(200, 50))
 			self.Bind(wx.EVT_BUTTON, lambda event: self.SwapToScreen(LaKr), b)
-			b = wx.Button(self, wx.ID_ANY, "Nassau/Cliff",   pos=(1790, voffset), size=(200, 50))
+			b = wx.Button(self, wx.ID_ANY, "Nassau/Bank/Cliff",   pos=(1790, voffset), size=(200, 50))
 			self.Bind(wx.EVT_BUTTON, lambda event: self.SwapToScreen(NaCl), b)
 			totalw = 2560+20
 			self.centerOffset = 0
@@ -130,31 +135,31 @@ class MainFrame(wx.Frame):
 		else:
 			self.PlaceWidgets()
 
-		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(self.centerOffset+100, 15))
+		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(self.centerOffset+100, 15), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnSubscribe, self.bSubscribe)
 
-		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", pos=(self.centerOffset+100, 45))
+		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", pos=(self.centerOffset+100, 45), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, self.bRefresh)
 		self.bRefresh.Enable(False)
 
-		self.bConfig = wx.Button(self, wx.ID_ANY, "Config", pos=(self.centerOffset+100, 75))
+		self.bConfig = wx.Button(self, wx.ID_ANY, "Config", pos=(self.centerOffset+100, 75), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnConfig, self.bConfig)
 		self.bConfig.Enable(False)
 		
 		if not self.IsDispatcher() or self.settings.hideconfigbutton:
 			self.bConfig.Hide()
 
-		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Trains", pos=(self.centerOffset+250, 25))
+		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Trains", pos=(self.centerOffset+250, 25), size=BTNDIM)
 		self.bLoadTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadTrains, self.bLoadTrains)
-		self.bLoadLocos = wx.Button(self, wx.ID_ANY, "Load Locos", pos=(self.centerOffset+250, 65))
+		self.bLoadLocos = wx.Button(self, wx.ID_ANY, "Load Locos", pos=(self.centerOffset+250, 65), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadLocos, self.bLoadLocos)
 		self.bLoadLocos.Enable(False)
 		
-		self.bSaveTrains = wx.Button(self, wx.ID_ANY, "Save Trains", pos=(self.centerOffset+350, 25))
+		self.bSaveTrains = wx.Button(self, wx.ID_ANY, "Save Trains", pos=(self.centerOffset+350, 25), size=BTNDIM)
 		self.bSaveTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBSaveTrains, self.bSaveTrains)
-		self.bSaveLocos = wx.Button(self, wx.ID_ANY, "Save Locos", pos=(self.centerOffset+350, 65))
+		self.bSaveLocos = wx.Button(self, wx.ID_ANY, "Save Locos", pos=(self.centerOffset+350, 65), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBSaveLocos, self.bSaveLocos)
 		self.bSaveLocos.Enable(False)
 		
@@ -168,7 +173,7 @@ class MainFrame(wx.Frame):
 		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(self.centerOffset+2300, 25), style=wx.TE_READONLY)
 		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(self.centerOffset+2360, 25), style=wx.TE_READONLY)
 		
-		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(self.centerOffset+2200, 75))
+		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(self.centerOffset+2200, 75), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnResetScreen, self.bResetScreen)
 
 		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 50), size=(400, 40))
@@ -183,6 +188,11 @@ class MainFrame(wx.Frame):
 			self.cbAdvisor = wx.CheckBox(self, wx.ID_ANY, "Advisor", pos=(self.centerOffset+600, 75))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAdvisor, self.cbAdvisor)
 			self.cbAdvisor.Enable(False)
+			
+			self.bEvents = wx.Button(self, wx.ID_ANY, "Events Log", pos=(self.centerOffset+800, 25), size=BTNDIM)
+			self.Bind(wx.EVT_BUTTON, self.OnBEventsLog, self.bEvents)
+			self.bAdvice = wx.Button(self, wx.ID_ANY, "Advice Log", pos=(self.centerOffset+800, 65), size=BTNDIM)
+			self.Bind(wx.EVT_BUTTON, self.OnBAdviceLog, self.bAdvice)
 			
 		self.totalw = totalw
 		self.totalh = 1080
@@ -386,7 +396,7 @@ class MainFrame(wx.Frame):
 				self.pidATC = Popen([sys.executable, atcExec]).pid
 				logging.debug("atc server started as PID %d" % self.pidATC)
 				self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": self.centerOffset+1600, "y": 31}}
-				wx.CallLater(500, self.sendPendingATCShow)
+				wx.CallLater(750, self.sendPendingATCShow)
 			else:
 				self.Request( {"atc": {"action": ["show"], "x": self.centerOffset+1600, "y": 31}})
 
@@ -912,10 +922,22 @@ class MainFrame(wx.Frame):
 
 	def PopupEvent(self, message):
 		self.events.Append(message)
+		self.eventsList.append(message)
+		
+	def OnBEventsLog(self, _):
+		dlg = ListDlg(self, "Events List", self.eventsList)
+		dlg.ShowModal()
+		dlg.Destroy()
 
 	def PopupAdvice(self, message):
 		self.advice.Append(message)
-
+		self.adviceList.append(message)
+		
+	def OnBAdviceLog(self, _):
+		dlg = ListDlg(self, "Advice List", self.adviceList)
+		dlg.ShowModal()
+		dlg.Destroy()
+		
 	def OnSubscribe(self, _):
 		if self.subscribed:
 			self.listener.kill()
