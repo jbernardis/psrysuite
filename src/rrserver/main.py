@@ -33,6 +33,7 @@ from rrserver.routedef import RouteDef
 from rrserver.clientlist import ClientList
 from rrserver.trainlist import TrainList
 from rrserver.iodisplay import IODisplay
+from rrserver.dccserver import DCCHTTPServer
 
 (HTTPMessageEvent, EVT_HTTPMESSAGE) = wx.lib.newevent.NewEvent()  
 (RailroadEvent, EVT_RAILROAD) = wx.lib.newevent.NewEvent()  
@@ -67,8 +68,8 @@ class MainFrame(wx.Frame):
 				logging.info("Using configured IP Address (%s) instead of retrieved IP Address: (%s)" % (self.settings.ipaddr, self.ip))
 				self.ip = self.settings.ipaddr
 				
-		self.SetTitle("PSRY Railroad Server    IP:  %s   Listening on port:  %d    Broadcasting on port:  %d" % 
-				(self.ip, self.settings.serverport, self.settings.socketport))
+		self.SetTitle("PSRY Railroad Server    IP:  %s   Listening on port:  %d    Broadcasting on port:  %d    DCC Requests served on port:  %d" % 
+				(self.ip, self.settings.serverport, self.settings.socketport, self.settings.dccserverport))
 
 		logging.info("Creating railroad object")
 		self.rr = Railroad(self, self.rrEventReceipt, self.settings)
@@ -115,10 +116,10 @@ class MainFrame(wx.Frame):
 	def Initialize(self):
 		self.rr.Initialize()
 
-		logging.info("Opening a railroad monitoring thread on device %s" % self.settings.tty)
-		self.rrMonitor = RailroadMonitor(self.settings.tty, self.rr, self.settings)
+		logging.info("Opening a railroad monitoring thread on device %s" % self.settings.rrtty)
+		self.rrMonitor = RailroadMonitor(self.settings.rrtty, self.rr, self.settings)
 		if not self.rrMonitor.initialized:
-			logging.error("Failed to open railroad bus on device %s.  Exiting..." % self.settings.tty)
+			logging.error("Failed to open railroad bus on device %s.  Exiting..." % self.settings.rrtty)
 			exit(1)
 		self.rrMonitor.start()
 
@@ -141,11 +142,7 @@ class MainFrame(wx.Frame):
 		self.StartDCCServer()
 
 	def StartDCCServer(self):
-		dccSvrExec = os.path.join(os.getcwd(), "dccserver", "main.py")
-		self.pidDCC = Popen([sys.executable, dccSvrExec]).pid
-		print("DCC Server started as PID %d" % self.pidDCC)
-		logging.info("DCC Server started as PID %d" % self.pidDCC)
-
+		self.DCCServer = DCCHTTPServer(self.settings.ipaddr, self.settings.dccserverport, self.settings.dcctty)
 		
 	def OnCbEnableIO(self, _):
 		self.rr.EnableSendIO(self.cbEnableSendIO.IsChecked())
@@ -554,14 +551,17 @@ class MainFrame(wx.Frame):
 		except:
 			pass
 
+		logging.info("killing DCC HTTP server...")
+		try:
+			self.DCCServer.close()
+		except:
+			pass
+
 		logging.info("closing bus to railroad...")
 		try:
 			self.rrMonitor.kill()
 		except:
 			pass
-		
-		if self.pidDCC is not None:
-			os.kill(self.pidDCC, sg.SIGABRT)
 
 		logging.info("exiting...")
 		self.Destroy()

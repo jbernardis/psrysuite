@@ -28,7 +28,9 @@ class Settings:
 		self.ipaddr = None
 		self.serverport = 9000
 		self.socketport = 9001
-		self.tty = "COM4"
+		self.dccserverport = 9002
+		self.rrtty = "COM5"
+		self.dcctty = "COM6"
 		self.busInterval = 0.4
 		self.topulselen = 2
 		self.topulsect = 3
@@ -52,8 +54,11 @@ class Settings:
 				elif opt == 'diagnostic':
 					self.diagnostic = parseBoolean(value, False)
 
-				elif opt == "tty":
-					self.tty = value
+				elif opt == "rrtty":
+					self.rrtty = value
+
+				elif opt == "dcctty":
+					self.dcctty = value
 
 				elif opt == "businterval":
 					self.businterval = float(value)
@@ -90,6 +95,14 @@ class Settings:
 						logging.warning("invalid value in ini file for server port: (%s)" % value)
 						s = 9000
 					self.serverport = s
+						
+				elif opt == 'dccserverport':
+					try:
+						s = int(value)
+					except:
+						logging.warning("invalid value in ini file for DCC server port: (%s)" % value)
+						s = 9002
+					self.dccserverport = s
 					
 				elif opt == 'ipaddr':
 					self.ipaddr = value

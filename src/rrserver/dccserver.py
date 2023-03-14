@@ -1,17 +1,11 @@
-import os, sys
-cmdFolder = os.getcwd()
-if cmdFolder not in sys.path:
-	sys.path.insert(0, cmdFolder)
-
-import logging
-logging.basicConfig(filename=os.path.join("logs", "dccserver.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
-
-from dccserver.settings import Settings
-from dccserver.httpserver import HTTPServer
-
 import serial
-import socket
+import select
 import time
+from threading import Thread
+from socketserver import ThreadingMixIn 
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
+
 
 FORWARD = 0x04
 REVERSE = 0x03
@@ -22,7 +16,6 @@ def formatLocoID(lid):
 	lidhi = (lid >> 8) | 0xc0
 	lidlo = lid % 256
 	return [lidhi, lidlo]
-
 
 class Loco:
 	def __init__(self, lid):
@@ -66,28 +59,60 @@ class Loco:
 	def GetHeadlight(self):
 		return self.headlight
 
-		
-		
-class MainUnit:
-	def __init__(self):
-		logging.info("PSRY DCC Server starting...")
-		
-		self.locos = {}
+class DCCHandler(BaseHTTPRequestHandler):
+	def do_GET(self):
+		app = self.server.getApp()
+		req = "%s:%s - \"%s\"" % (self.client_address[0], self.client_address[1], self.requestline)
 
-		hostname = socket.gethostname()
-		self.ip = socket.gethostbyname(hostname)
-
-		self.settings = Settings()
-		
-		if self.settings.ipaddr is not None:
-			if self.ip != self.settings.ipaddr:
-				logging.info("Using configured IP Address (%s) instead of retrieved IP Address: (%s)" % (self.settings.ipaddr, self.ip))
-				self.ip = self.settings.ipaddr
-				
-		logging.info("Opening serial port %s to DCC Command Station" % self.settings.tty)
-
+		parsed_path = urlparse(self.path)
+		cmdDict = parse_qs(parsed_path.query)
+		cmd = parsed_path.path
+		if cmd.startswith('/'):
+			cmd = cmd[1:]
+			
+		cmdDict['cmd'] = [cmd]
+		rc, b = app.dispatch(cmdDict)
 		try:
-			self.port = serial.Serial(port=self.settings.tty,
+			body = b.encode()
+		except:
+			body = b
+
+		if rc == 200:
+			self.send_response(200)
+			self.send_header("Content-type", "text/plain")
+			self.end_headers()
+			self.wfile.write(body)
+		else:
+			self.send_response(400)
+			self.send_header("Content-type", "text/plain")
+			self.end_headers()
+			self.wfile.write(body)
+
+class DCCThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+	def serve_dcc(self):
+		self.haltServer = False
+		while self.haltServer == False:
+			r = select.select([self.socket], [], [], 0)[0]
+			if r and len(r) > 0:
+				self.handle_request()
+			else:
+				pass #time.sleep(0.0001) # yield to other threads
+
+	def setApp(self, app):
+		self.app = app
+
+	def getApp(self):
+		return self.app
+
+	def shut_down(self):
+		self.haltServer = True
+
+class DCCHTTPServer:
+	def __init__(self, ip, port, tty):
+		self.locos = {}
+		self.tty = tty
+		try:
+			self.port = serial.Serial(port=self.tty,
 					baudrate=9600,
 					bytesize=serial.EIGHTBITS,
 					parity=serial.PARITY_NONE,
@@ -96,24 +121,36 @@ class MainUnit:
 
 		except serial.SerialException:
 			self.port = None
-			logging.error("Unable to Connect to serial port %s" % self.settings.tty)
+			print("Unable to Connect to serial port %s" % self.tty)
 			# sys.exit()
-			
-		logging.info("Serial connection to DCC command station successful")
-		logging.info("Creating HTTP server...")
 
-		try:
-			self.dccServer = HTTPServer(self.ip, self.settings.dccserverport, self.dccCommandReceipt)
-		except Exception as e:
-			logging.error("Unable to Create HTTP server for IP address %s (%s)" % (self.ip, str(e)))
-			sys.exit()
-			
-		logging.info("HTTP Server created.  Awaiting commands...")
-			
-	def dccCommandReceipt(self, cmdString):
-		print("DCC Command receipt: (%s)" % str(cmdString))
-		logging.info("Command Receipt: %s" % str(cmdString))
+		self.server = DCCThreadingHTTPServer((ip, port), DCCHandler)
+		self.server.setApp(self)
+		self.thread = Thread(target=self.server.serve_dcc)
+		self.thread.start()
+
+	def getThread(self):
+		return self.thread
+
+	def getServer(self):
+		return self.server
+
+	def dispatch(self, cmd):
+		self.ProcessDCCCommand(cmd)
 		
+		rc = 200
+		body = b'request received'
+		return rc, body
+
+	def close(self):
+		self.server.shut_down()
+		try:
+			self.port.close()
+		except:
+			pass
+		
+	def ProcessDCCCommand(self, cmdString):
+		print("DCC Command receipt: (%s)" % str(cmdString))
 		cmd = cmdString["cmd"][0].lower()
 
 		if cmd == "throttle":
@@ -164,11 +201,7 @@ class MainUnit:
 				bell = None
 				
 			self.SetFunction(locoid, headlight, horn, bell)
-				
-		elif cmd == "exit":
-			logging.info("terminating DCC server normally")
-			self.dccServer.close()
-			
+						
 	def SetSpeedAndDirection(self, lid, speed=None, direction=None):
 		try:
 			loco = self.locos[lid]
@@ -246,15 +279,5 @@ class MainUnit:
 
 		return True
 
-		
-	def run(self):
-		self.dccServer.waitForFinish()
-		logging.info("PSRY DCC Server exiting")
-		try:
-			self.port.close()
-		except:
-			pass
 
 
-main = MainUnit()
-main.run()

@@ -49,7 +49,7 @@ class MainUnit:
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
 		self.listener = Listener(self, self.settings.ipaddr, self.settings.socketport)
 		if not self.listener.connect():
-			logging.error("Unable to establish connection with server")
+			logging.error("Unable to establish connection with railroad server")
 			self.listener = None
 			return
 
