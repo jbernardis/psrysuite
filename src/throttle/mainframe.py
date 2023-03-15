@@ -37,6 +37,9 @@ class MainFrame(wx.Frame):
 		self.ledSpeed.SetDrawFaded(False)
 		self.ledSpeed.SetForegroundColour('yellow')
 		
+		self.bEStop = wx.BitmapButton(self, wx.ID_ANY, self.pngEStop, size=BTNDIM2)
+		self.Bind(wx.EVT_BUTTON, self.OnBEStop, self.bEStop)
+		
 		self.bUp = wx.BitmapButton(self, wx.ID_ANY, self.pngUp, size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBUp, self.bUp)
 		self.bDown = wx.BitmapButton(self, wx.ID_ANY, self.pngDown, size=BTNDIM)
@@ -76,7 +79,11 @@ class MainFrame(wx.Frame):
 		vszr.Add(hszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
 		vszr.AddSpacer(20)
-		vszr.Add(self.ledSpeed, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		hszr = wx.BoxSizer(wx.HORIZONTAL)
+		hszr.Add(self.ledSpeed)
+		hszr.AddSpacer(20)
+		hszr.Add(self.bEStop)
+		vszr.Add(hszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		vszr.AddSpacer(20)
 		
 		hszr = wx.BoxSizer(wx.HORIZONTAL)
@@ -143,6 +150,7 @@ class MainFrame(wx.Frame):
 		flag = self.selectedLoco is not None
 		
 		self.knbSpeed.Enable(flag)
+		self.bEStop.Enable(flag)
 		self.bUp.Enable(flag)
 		self.bUpFast.Enable(flag)
 		self.bDown.Enable(flag)
@@ -208,6 +216,11 @@ class MainFrame(wx.Frame):
 		png.SetMask(mask)
 		self.pngDirection = png
 
+		png = wx.Image(os.path.join(imgFolder, "stop.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.pngEStop = png
+
 
 	def UpdateSpeed(self, speed):
 		self.knbSpeed.SetValue(speed)
@@ -229,6 +242,9 @@ class MainFrame(wx.Frame):
 	def OnKnbSpeedChanged(self, event):
 		speed = event.GetValue()
 		self.UpdateSpeed(speed)
+		
+	def OnBEStop(self, _):
+		self.UpdateSpeed(0)
 		
 	def OnBUp(self, _):
 		speed = self.knbSpeed.GetValue() + 1

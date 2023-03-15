@@ -1284,7 +1284,10 @@ class MainFrame(wx.Frame):
 
 	def raiseDisconnectEvent(self): # thread context
 		evt = DisconnectEvent()
-		wx.PostEvent(self, evt)
+		try:
+			wx.PostEvent(self, evt)
+		except RuntimeError:
+			logging.info("Runtime error caught while trying to post disconnect event - not a problem if this is during shutdown")
 
 	def Request(self, req):
 		command = list(req.keys())[0]
