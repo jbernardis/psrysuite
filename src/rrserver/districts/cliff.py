@@ -162,7 +162,7 @@ class Cliff(District):
 		outb[2] = setBit(outb[2], 5, 0 if self.rr.GetOutput("CSw3.hand").GetStatus() != 0 else 1)  # hand switch 3
 
 		otext = formatOText(outb, outbc)
-		logging.debug("Green Mountain: Output bytes: %s" % otext)
+		#logging.debug("Green Mountain: Output bytes: %s" % otext)
 
 		inbc = outbc			
 		if self.settings.simulation:
@@ -170,34 +170,29 @@ class Cliff(District):
 		else:
 			inb = self.rrBus.sendRecv(GREENMTN, outb, outbc)
 
-			if self.AcceptResponse(inb, inbc, GREENMTN):
-				itext = formatIText(inb, inbc)
-				logging.debug("Green Mountain: Input Bytes: %s" % itext)
-	
-				self.rr.GetInput("CC30E").SetValue(getBit(inb[0], 0))   # Routes
-				self.rr.GetInput("CC10E").SetValue(getBit(inb[0], 1))
-				self.rr.GetInput("CG10E").SetValue(getBit(inb[0], 2))
-				self.rr.GetInput("CG12E").SetValue(getBit(inb[0], 3))
-				self.rr.GetInput("CC31W").SetValue(getBit(inb[0], 4))
-				self.rr.GetInput("CC30W").SetValue(getBit(inb[0], 5))
-				self.rr.GetInput("CC10W").SetValue(getBit(inb[0], 6))
-				self.rr.GetInput("CG21W").SetValue(getBit(inb[0], 7))
-	
-				nb = getBit(inb[1], 0)  # Switch positions
-				rb = getBit(inb[1], 1)
-				self.rr.GetInput("CSw3").SetTOState(nb, rb)
-				self.rr.GetInput("C11").SetValue(getBit(inb[1], 2))  # Detection
-				self.rr.GetInput("COSGMW").SetValue(getBit(inb[1], 3))  # COS1
-				self.rr.GetInput("C10").SetValue(getBit(inb[1], 4))
-				self.rr.GetInput("C30").SetValue(getBit(inb[1], 5))
-				self.rr.GetInput("C31").SetValue(getBit(inb[1], 6))
-				self.rr.GetInput("COSGME").SetValue(getBit(inb[1], 7))  # COS2
-	
-				self.rr.GetInput("C20").SetValue(getBit(inb[2], 0))
-				
-			else:
-				logging.error("Green Mountain: Failed read")
-				itext = None
+			itext = formatIText(inb, inbc)
+			#logging.debug("Green Mountain: Input Bytes: %s" % itext)
+
+			self.rr.GetInput("CC30E").SetValue(getBit(inb[0], 0))   # Routes
+			self.rr.GetInput("CC10E").SetValue(getBit(inb[0], 1))
+			self.rr.GetInput("CG10E").SetValue(getBit(inb[0], 2))
+			self.rr.GetInput("CG12E").SetValue(getBit(inb[0], 3))
+			self.rr.GetInput("CC31W").SetValue(getBit(inb[0], 4))
+			self.rr.GetInput("CC30W").SetValue(getBit(inb[0], 5))
+			self.rr.GetInput("CC10W").SetValue(getBit(inb[0], 6))
+			self.rr.GetInput("CG21W").SetValue(getBit(inb[0], 7))
+
+			nb = getBit(inb[1], 0)  # Switch positions
+			rb = getBit(inb[1], 1)
+			self.rr.GetInput("CSw3").SetTOState(nb, rb)
+			self.rr.GetInput("C11").SetValue(getBit(inb[1], 2))  # Detection
+			self.rr.GetInput("COSGMW").SetValue(getBit(inb[1], 3))  # COS1
+			self.rr.GetInput("C10").SetValue(getBit(inb[1], 4))
+			self.rr.GetInput("C30").SetValue(getBit(inb[1], 5))
+			self.rr.GetInput("C31").SetValue(getBit(inb[1], 6))
+			self.rr.GetInput("COSGME").SetValue(getBit(inb[1], 7))  # COS2
+
+			self.rr.GetInput("C20").SetValue(getBit(inb[2], 0))
 			
 		if self.sendIO:
 			self.rr.ShowText("GMtn", GREENMTN, otext, itext, 0, 3)
@@ -295,17 +290,20 @@ class Cliff(District):
 		outb[7] - setBit(outb[7], 4, 1 if self.rr.GetInput("CSw11").GetValue() == "R" else 0)
 
 		otext = formatOText(outb, outbc)
-		logging.debug("Cliff: Output bytes: %s" % otext)
+		#print("CLIFF output: %s" % otext)
+		#logging.debug("Cliff: Output bytes: %s" % otext)
 
 		inbc = outbc
 		if self.settings.simulation:
 			itext = None
 		else:
 			inb = self.rrBus.sendRecv(CLIFF, outb, outbc)
-
+			t = formatIText(inb, 7)
+			print("CLIFF Input:  %s" % t, flush=True)
 			if self.AcceptResponse(inb, inbc, CLIFF):
+
 				itext = formatIText(inb, 7)
-				logging.debug("Cliff: Input Bytes: %s" % itext)
+				#logging.debug("Cliff: Input Bytes: %s" % itext)
 	
 				self.rr.GetInput("CC21W").SetValue(getBit(inb[0], 0))  # Routes
 				self.rr.GetInput("CC40W").SetValue(getBit(inb[0], 1))
@@ -387,13 +385,13 @@ class Cliff(District):
 					st = getBit(inb[6], 7)
 					self.rr.GetInput("CSw21a.lvr").SetState(st)
 					self.rr.GetInput("CSw21b.lvr").SetState(st)
+				
 			else:
 				itext = None
 				logging.error("Cliff: Failed read")
-			
+				
 		if self.sendIO:
 			self.rr.ShowText("Clff", CLIFF, otext, itext, 1, 3)
-
 
 		# Sheffield
 		outbc = 4
@@ -463,7 +461,7 @@ class Cliff(District):
 		outb[3] = setBit(outb[3], 5, 1 if op != 0 else 0)
 
 		otext = formatOText(outb, outbc)
-		logging.debug("Sheffield: Output bytes: %s" % otext)
+		#logging.debug("Sheffield: Output bytes: %s" % otext)
 		
 		inbc = outbc
 		if self.settings.simulation:
@@ -473,7 +471,7 @@ class Cliff(District):
 
 			if self.AcceptResponse(inb, inbc, SHEFFIELD):
 				itext = formatIText(inb, inbc)
-				logging.debug("Sheffield: Input Bytes: %s" % itext)
+				#logging.debug("Sheffield: Input Bytes: %s" % itext)
 	
 				self.rr.GetInput("CC50W").SetValue(getBit(inb[0], 0))  # Routes
 				self.rr.GetInput("CC51W").SetValue(getBit(inb[0], 1))
@@ -497,6 +495,6 @@ class Cliff(District):
 				logging.error("Sheffield: Failed read")
 			
 		if self.sendIO:
-			self.rr.ShowText("Shfd", SHEFFIELD, otext, None, 2, 3)
+			self.rr.ShowText("Shfd", SHEFFIELD, otext, itext, 2, 3)
 
 

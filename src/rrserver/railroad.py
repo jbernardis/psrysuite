@@ -345,7 +345,7 @@ class Railroad(wx.Notebook):
 		for dname, d in self.districts.items():
 			logging.debug("starting io for district %s" % dname)
 			d.OutIn()
-		logging.debug("releasing events from IO loop")
+
 		self.ReleasePendingEvents()
 
 	def RailroadEvent(self, event):

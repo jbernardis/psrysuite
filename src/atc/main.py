@@ -116,7 +116,7 @@ class MainFrame(wx.Frame):
 		wx.CallAfter(self.Initialize)
 		
 	def LoadImages(self, imgFolder):
-		png = wx.Image(os.path.join(imgFolder, "headlight_on.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		png = wx.Image(os.path.join(imgFolder, "headlight.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
 		mask = wx.Mask(png, wx.BLUE)
 		png.SetMask(mask)
 		self.imageLight = png

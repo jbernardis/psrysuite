@@ -102,7 +102,7 @@ class Latham(District):
 		outb[4] = setBit(outb[4], 2, self.rr.GetOutput("P50.srel").GetStatus())
 
 		otext = formatOText(outb, outbc)
-		logging.debug("Latham: Output bytes: %s" % otext)
+		#logging.debug("Latham: Output bytes: %s" % otext)
 
 		inbc = outbc			
 		if self.settings.simulation:
@@ -110,57 +110,52 @@ class Latham(District):
 		else:
 			inb = self.rrBus.sendRecv(LATHAM, outb, outbc)
 
-			if self.AcceptResponse(inb, inbc, LATHAM):
-				itext = formatIText(inb, inbc)
-				logging.debug("Latham: Input Bytes: %s" % itext)
-	
-				nb = getBit(inb[0], 0)  # Switch positions
-				rb = getBit(inb[0], 1)
-				self.rr.GetInput("LSw1").SetTOState(nb, rb)
-				nb = getBit(inb[0], 2) 
-				rb = getBit(inb[0], 3)
-				self.rr.GetInput("LSw3").SetTOState(nb, rb)
-				nb = getBit(inb[0], 4) 
-				rb = getBit(inb[0], 5)
-				self.rr.GetInput("LSw5").SetTOState(nb, rb)
-				nb = getBit(inb[0], 6) 
-				rb = getBit(inb[0], 7)
-				self.rr.GetInput("LSw7").SetTOState(nb, rb)
-	
-				nb = getBit(inb[1], 0) 
-				rb = getBit(inb[1], 1)
-				self.rr.GetInput("LSw9").SetTOState(nb, rb)
-				self.rr.GetInput("L20").SetValue(getBit(inb[1], 2))  # Detection
-				self.rr.GetInput("L20.E").SetValue(getBit(inb[1], 3))
-				self.rr.GetInput("P21").SetValue(getBit(inb[1], 4))
-				self.rr.GetInput("P21.E").SetValue(getBit(inb[1], 5))
-				self.rr.GetInput("LOSLAW").SetValue(getBit(inb[1], 6)) #LOS1
-				self.rr.GetInput("LOSLAM").SetValue(getBit(inb[1], 7)) #LOS2
-	
-				self.rr.GetInput("LOSLAE").SetValue(getBit(inb[2], 0)) #LOS3
-				self.rr.GetInput("L11.W").SetValue(getBit(inb[2], 1)) 
-				self.rr.GetInput("L11").SetValue(getBit(inb[2], 2)) 
-				self.rr.GetInput("L21.W").SetValue(getBit(inb[2], 3)) 
-				self.rr.GetInput("L21").SetValue(getBit(inb[2], 4)) 
-				self.rr.GetInput("L21.E").SetValue(getBit(inb[2], 5)) 
-				self.rr.GetInput("CBCliveden").SetValue(getBit(inb[2], 6)) # Breakers
-				self.rr.GetInput("CBLatham").SetValue(getBit(inb[2], 7))
-	
-				self.rr.GetInput("CBCornellJct").SetValue(getBit(inb[3], 0))
-				self.rr.GetInput("CBParsonsJct").SetValue(getBit(inb[3], 1))
-				self.rr.GetInput("CBSouthJct").SetValue(getBit(inb[3], 2))
-				self.rr.GetInput("CBCircusJct").SetValue(getBit(inb[3], 3))
-				self.rr.GetInput("CBSouthport").SetValue(getBit(inb[3], 4))
-				self.rr.GetInput("CBLavinYard").SetValue(getBit(inb[3], 5))
-				self.rr.GetInput("CBReverserP31").SetValue(getBit(inb[3], 6))
-				self.rr.GetInput("CBReverserP41").SetValue(getBit(inb[3], 7))
-	
-				self.rr.GetInput("CBReverserP50").SetValue(getBit(inb[4], 0))
-				self.rr.GetInput("CBReverserC22C23").SetValue(getBit(inb[4], 1))
-				
-			else:
-				logging.error("Latham: Failed read")
-				itext = None
+			itext = formatIText(inb, inbc)
+			#logging.debug("Latham: Input Bytes: %s" % itext)
+
+			nb = getBit(inb[0], 0)  # Switch positions
+			rb = getBit(inb[0], 1)
+			self.rr.GetInput("LSw1").SetTOState(nb, rb)
+			nb = getBit(inb[0], 2) 
+			rb = getBit(inb[0], 3)
+			self.rr.GetInput("LSw3").SetTOState(nb, rb)
+			nb = getBit(inb[0], 4) 
+			rb = getBit(inb[0], 5)
+			self.rr.GetInput("LSw5").SetTOState(nb, rb)
+			nb = getBit(inb[0], 6) 
+			rb = getBit(inb[0], 7)
+			self.rr.GetInput("LSw7").SetTOState(nb, rb)
+
+			nb = getBit(inb[1], 0) 
+			rb = getBit(inb[1], 1)
+			self.rr.GetInput("LSw9").SetTOState(nb, rb)
+			self.rr.GetInput("L20").SetValue(getBit(inb[1], 2))  # Detection
+			self.rr.GetInput("L20.E").SetValue(getBit(inb[1], 3))
+			self.rr.GetInput("P21").SetValue(getBit(inb[1], 4))
+			self.rr.GetInput("P21.E").SetValue(getBit(inb[1], 5))
+			self.rr.GetInput("LOSLAW").SetValue(getBit(inb[1], 6)) #LOS1
+			self.rr.GetInput("LOSLAM").SetValue(getBit(inb[1], 7)) #LOS2
+
+			self.rr.GetInput("LOSLAE").SetValue(getBit(inb[2], 0)) #LOS3
+			self.rr.GetInput("L11.W").SetValue(getBit(inb[2], 1)) 
+			self.rr.GetInput("L11").SetValue(getBit(inb[2], 2)) 
+			self.rr.GetInput("L21.W").SetValue(getBit(inb[2], 3)) 
+			self.rr.GetInput("L21").SetValue(getBit(inb[2], 4)) 
+			self.rr.GetInput("L21.E").SetValue(getBit(inb[2], 5)) 
+			self.rr.GetInput("CBCliveden").SetValue(getBit(inb[2], 6)) # Breakers
+			self.rr.GetInput("CBLatham").SetValue(getBit(inb[2], 7))
+
+			self.rr.GetInput("CBCornellJct").SetValue(getBit(inb[3], 0))
+			self.rr.GetInput("CBParsonsJct").SetValue(getBit(inb[3], 1))
+			self.rr.GetInput("CBSouthJct").SetValue(getBit(inb[3], 2))
+			self.rr.GetInput("CBCircusJct").SetValue(getBit(inb[3], 3))
+			self.rr.GetInput("CBSouthport").SetValue(getBit(inb[3], 4))
+			self.rr.GetInput("CBLavinYard").SetValue(getBit(inb[3], 5))
+			self.rr.GetInput("CBReverserP31").SetValue(getBit(inb[3], 6))
+			self.rr.GetInput("CBReverserP41").SetValue(getBit(inb[3], 7))
+
+			self.rr.GetInput("CBReverserP50").SetValue(getBit(inb[4], 0))
+			self.rr.GetInput("CBReverserC22C23").SetValue(getBit(inb[4], 1))
 
 		if self.sendIO:
 			self.rr.ShowText("Lath", LATHAM, otext, itext, 0, 2)
@@ -219,7 +214,7 @@ class Latham(District):
 		outb[4] = setBit(outb[4], 3, self.rr.GetOutput("N25.srel").GetStatus())	
 
 		otext = formatOText(outb, outbc)
-		logging.debug("Carlton: Output bytes: %s" % otext)
+		#logging.debug("Carlton: Output bytes: %s" % otext)
 	
 		inbc = outbc		
 		if self.settings.simulation:
@@ -227,41 +222,36 @@ class Latham(District):
 		else:
 			inb = self.rrBus.sendRecv(CARLTON, outb, outbc)
 
-			if self.AcceptResponse(inb, inbc, CARLTON):
-				itext = formatIText(inb, inbc)
-				logging.debug("Carlton: Input Bytes: %s" % itext)
+			itext = formatIText(inb, inbc)
+			#logging.debug("Carlton: Input Bytes: %s" % itext)
 	
-				nb = getBit(inb[0], 0)  # Carlton switch positions
-				rb = getBit(inb[0], 1)
-				self.rr.GetInput("LSw11").SetTOState(nb, rb)
-				nb = getBit(inb[0], 2) 
-				rb = getBit(inb[0], 3)
-				self.rr.GetInput("LSw13").SetTOState(nb, rb)
-				nb = getBit(inb[0], 4) 
-				rb = getBit(inb[0], 5)
-				self.rr.GetInput("LSw15").SetTOState(nb, rb)
-				nb = getBit(inb[0], 6) 
-				rb = getBit(inb[0], 7)
-				self.rr.GetInput("LSw17").SetTOState(nb, rb)
-	
-				self.rr.GetInput("L31").SetValue(getBit(inb[1], 0))  # Carlton Detection
-				self.rr.GetInput("L31.E").SetValue(getBit(inb[1], 1)) 
-				self.rr.GetInput("LOSCAW").SetValue(getBit(inb[1], 2)) 
-				self.rr.GetInput("LOSCAM").SetValue(getBit(inb[1], 3)) 
-				self.rr.GetInput("LOSCAE").SetValue(getBit(inb[1], 4)) 
-				self.rr.GetInput("D10.W").SetValue(getBit(inb[1], 5)) 
-				self.rr.GetInput("D10").SetValue(getBit(inb[1], 6)) 
-	
-				self.rr.GetInput("S21.W").SetValue(getBit(inb[2], 0))  # Krulish west Detection
-				self.rr.GetInput("S21").SetValue(getBit(inb[2], 1)) 
-				self.rr.GetInput("S21.E").SetValue(getBit(inb[2], 2)) 
-				self.rr.GetInput("N25.W").SetValue(getBit(inb[2], 3)) 
-				self.rr.GetInput("N25").SetValue(getBit(inb[2], 4)) 
-				self.rr.GetInput("N25.E").SetValue(getBit(inb[2], 5)) 
-				
-			else:
-				logging.error("Carlton: Failed read")
-				itext = None
+			nb = getBit(inb[0], 0)  # Carlton switch positions
+			rb = getBit(inb[0], 1)
+			self.rr.GetInput("LSw11").SetTOState(nb, rb)
+			nb = getBit(inb[0], 2) 
+			rb = getBit(inb[0], 3)
+			self.rr.GetInput("LSw13").SetTOState(nb, rb)
+			nb = getBit(inb[0], 4) 
+			rb = getBit(inb[0], 5)
+			self.rr.GetInput("LSw15").SetTOState(nb, rb)
+			nb = getBit(inb[0], 6) 
+			rb = getBit(inb[0], 7)
+			self.rr.GetInput("LSw17").SetTOState(nb, rb)
+
+			self.rr.GetInput("L31").SetValue(getBit(inb[1], 0))  # Carlton Detection
+			self.rr.GetInput("L31.E").SetValue(getBit(inb[1], 1)) 
+			self.rr.GetInput("LOSCAW").SetValue(getBit(inb[1], 2)) 
+			self.rr.GetInput("LOSCAM").SetValue(getBit(inb[1], 3)) 
+			self.rr.GetInput("LOSCAE").SetValue(getBit(inb[1], 4)) 
+			self.rr.GetInput("D10.W").SetValue(getBit(inb[1], 5)) 
+			self.rr.GetInput("D10").SetValue(getBit(inb[1], 6)) 
+
+			self.rr.GetInput("S21.W").SetValue(getBit(inb[2], 0))  # Krulish west Detection
+			self.rr.GetInput("S21").SetValue(getBit(inb[2], 1)) 
+			self.rr.GetInput("S21.E").SetValue(getBit(inb[2], 2)) 
+			self.rr.GetInput("N25.W").SetValue(getBit(inb[2], 3)) 
+			self.rr.GetInput("N25").SetValue(getBit(inb[2], 4)) 
+			self.rr.GetInput("N25.E").SetValue(getBit(inb[2], 5)) 
 	
 		if self.sendIO:
 			self.rr.ShowText("Carl", CARLTON, otext, itext, 1, 2)

@@ -17,6 +17,7 @@ from dispatcher.train import Train
 from dispatcher.breaker import BreakerDisplay, BreakerName
 from dispatcher.toaster import Toaster, TB_CENTER
 from dispatcher.listdlg import ListDlg
+from dispatcher.delayedrequest import DelayedRequests
 
 from dispatcher.districts.hyde import Hyde
 from dispatcher.districts.yard import Yard
@@ -79,6 +80,8 @@ class MainFrame(wx.Frame):
 		self.buttonMap = {}
 		self.signalMap = {}
 		self.handswitchMap = {}
+		
+		self.delayedRequests = DelayedRequests()
 
 		self.title = "PSRY Dispatcher" if self.settings.dispatch else "PSRY Monitor"
 		self.ToasterSetup()
@@ -631,7 +634,8 @@ class MainFrame(wx.Frame):
 		
 		self.Bind(wx.EVT_TIMER, self.onTicker)
 		self.ticker = wx.Timer(self)
-		self.ticker.Start(1000)
+		self.tickerFlag = False
+		self.ticker.Start(500)
 
 	def AddSignalLever(self, slname, district):
 		self.signalLeverMap[slname] = district
@@ -709,6 +713,14 @@ class MainFrame(wx.Frame):
 		return blkMap
 
 	def onTicker(self, _):
+		self.tickerFlag = not self.tickerFlag
+		if self.tickerFlag:
+			# call 1sec every other time to simulate a 1 second timer
+			self.onTicker1Sec()
+			
+		self.delayedRequests.CheckForExpiry(self.Request)
+
+	def onTicker1Sec(self):
 		self.ClearExpiredButtons()
 		self.breakerDisplay.ticker()
 
@@ -999,7 +1011,7 @@ class MainFrame(wx.Frame):
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
 			logging.info("Dispatch: %s: %s" % (cmd, parms))
-			# print("Incoming socket message: %s: %s" % (cmd, parms), flush=True)
+			#print("Incoming socket message: %s: %s" % (cmd, parms), flush=True)
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]
@@ -1250,7 +1262,6 @@ class MainFrame(wx.Frame):
 					self.districts.GenerateLayoutInformation(parms)
 					
 			elif cmd == "advice":
-				print("advice: %s" % str(parms))
 				self.PopupAdvice(parms["msg"][0])
 					
 			elif cmd == "atcstatus":
@@ -1292,10 +1303,14 @@ class MainFrame(wx.Frame):
 	def Request(self, req):
 		command = list(req.keys())[0]
 		if self.settings.dispatch or command in allowedCommands:
+			
 			if self.subscribed:
-				logging.debug(json.dumps(req))
-				# print("Outgoing HTTP request: %s" % json.dumps(req))
-				self.rrServer.SendRequest(req)
+				if "delay" in req[command] and req[command]["delay"] > 0:
+					self.delayedRequests.Append(req)
+				else:
+					logging.debug(json.dumps(req))
+					# print("Outgoing HTTP request: %s" % json.dumps(req))
+					self.rrServer.SendRequest(req)
 
 	def SendBlockDirRequests(self):
 		for b in self.blocks.values():

@@ -183,6 +183,33 @@ class District(wx.Panel):
 		self.nullResponseCount[addr] = 0	
 		return True
 	
+	def VerifyTurnoutAction(self, toList):
+		# tolist is a list og [inputobject, outputobject] for all turnouts that need to be chesked
+		for toin, toout in toList:
+			outState = toout.GetStatus()
+			if outState is None:
+				continue
+			
+			swname = toin.GetName()
+			inState = toin.GetState()
+			outPulse = toout.GetOutPulseValue()
+			
+			if outPulse != 0:
+				continue
+			
+			if inState == outState:
+				# requested action has happened
+				toout.ClearStatus()
+				continue
+
+			# should have a short delay here			
+			if toout.ShouldRetry():
+				self.rr.SetOutPulseTo(swname, outState)
+			else:
+				logging.debug("retries exceeded trying to assert turnout %s position" % swname)
+				toout.ClearStatus()
+
+	
 	def SendIO(self, flag):
 		if not self.rr.SendIOEnabled():
 			self.sendIO = False

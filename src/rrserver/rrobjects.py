@@ -424,9 +424,18 @@ class TurnoutOutput(PulsedOutput):
 		self.reversePulses = 0;
 		self.locked = False
 		self.status = None
+		self.retries = 0
 
 	def GetStatus(self):
 		return self.status
+	
+	def ClearStatus(self):
+		self.status = None
+		self.retries = 0
+		
+	def ShouldRetry(self):
+		self.retries += 1
+		return self.retries <= 3
 
 	def SetLock(self, value):
 		self.locked = value != 0

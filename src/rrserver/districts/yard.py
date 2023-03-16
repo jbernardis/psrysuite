@@ -77,6 +77,8 @@ class Yard(District):
 		hiddenToNames = sorted([ "YSw113", "YSw115", "YSw116", "YSw131", "YSw132", "YSw134" ])
 		for t in hiddenToNames:
 			self.rr.AddInput(TurnoutInput(t, self), self, District.turnout)
+			
+		self.toList = [[self.rr.GetInput(tonm), self.rr.GetOutput(tonm)] for tonm in toNames]
 
 	def DetermineSignalLevers(self):
 		self.sigLever["Y2"] = self.DetermineSignalLever(["Y2L"], ["Y2R"])
@@ -89,6 +91,9 @@ class Yard(District):
 		self.sigLever["Y34"] = self.DetermineSignalLever(["Y34LA", "Y34LB"], ["Y34R"])
 
 	def OutIn(self):
+		# make sure the requested turnout action has taken place and re-request it if not
+		self.VerifyTurnoutAction(self.toList)
+				
 		optControl = self.rr.GetControlOption("yard")  # 0 => Yard, 1 => Dispatcher
 		optFleet = self.rr.GetControlOption("yard.fleet")  # 0 => no fleeting, 1 => fleeting
 		#Cornell Jct
@@ -115,7 +120,7 @@ class Yard(District):
 		outb[1] = setBit(outb[1], 4, self.rr.GetOutput("L10.srel").GetStatus())
 
 		otext = formatOText(outb, outbc)
-		logging.debug("Cornell: Output bytes: %s" % otext)
+		#logging.debug("Cornell: Output bytes: %s" % otext)
 
 		inbc = outbc			
 		if self.settings.simulation:
@@ -123,37 +128,32 @@ class Yard(District):
 		else:
 			inb = self.rrBus.sendRecv(CORNELL, outb, outbc)
 
-			if self.AcceptResponse(inb, inbc, CORNELL):
-				itext = formatIText(inb, inbc)
-				logging.debug("Cornell: Input Bytes: %s" % itext)
-	
-				ip = self.rr.GetInput("YSw1")  #Switches
-				nb = getBit(inb[0], 0)
-				rb = getBit(inb[0], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("YSw3")
-				nb = getBit(inb[0], 2)
-				rb = getBit(inb[0], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("Y21.W")  # Block detection
-				ip.SetValue(getBit(inb[0], 4))
-				ip = self.rr.GetInput("Y21")
-				ip.SetValue(getBit(inb[0], 5))
-				ip = self.rr.GetInput("Y21.E")
-				ip.SetValue(getBit(inb[0], 6))
-				ip = self.rr.GetInput("YOSCJW") # CJOS1
-				ip.SetValue(getBit(inb[0], 7))
-	
-				ip = self.rr.GetInput("YOSCJE") # CJOS2
-				ip.SetValue(getBit(inb[1], 0))
-				ip = self.rr.GetInput("L10.W")
-				ip.SetValue(getBit(inb[1], 1))
-				ip = self.rr.GetInput("L10")
-				ip.SetValue(getBit(inb[1], 2))
-				
-			else:
-				logging.error("Cornell: Failed read")
-				itext = None
+			itext = formatIText(inb, inbc)
+			#logging.debug("Cornell: Input Bytes: %s" % itext)
+
+			ip = self.rr.GetInput("YSw1")  #Switches
+			nb = getBit(inb[0], 0)
+			rb = getBit(inb[0], 1)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("YSw3")
+			nb = getBit(inb[0], 2)
+			rb = getBit(inb[0], 3)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("Y21.W")  # Block detection
+			ip.SetValue(getBit(inb[0], 4))
+			ip = self.rr.GetInput("Y21")
+			ip.SetValue(getBit(inb[0], 5))
+			ip = self.rr.GetInput("Y21.E")
+			ip.SetValue(getBit(inb[0], 6))
+			ip = self.rr.GetInput("YOSCJW") # CJOS1
+			ip.SetValue(getBit(inb[0], 7))
+
+			ip = self.rr.GetInput("YOSCJE") # CJOS2
+			ip.SetValue(getBit(inb[1], 0))
+			ip = self.rr.GetInput("L10.W")
+			ip.SetValue(getBit(inb[1], 1))
+			ip = self.rr.GetInput("L10")
+			ip.SetValue(getBit(inb[1], 2))
 				
 		if self.sendIO:
 			self.rr.ShowText("Crnl", CORNELL, otext, itext, 0, 5)
@@ -182,7 +182,7 @@ class Yard(District):
 		outb[1] = setBit(outb[1], 3, self.rr.GetOutput("Y11.srel").GetStatus())
 
 		otext = formatOText(outb, outbc)
-		logging.debug("East Jct: Output bytes: %s" % otext)
+		#logging.debug("East Jct: Output bytes: %s" % otext)
 
 		inbc = outbc			
 		if self.settings.simulation:
@@ -190,40 +190,35 @@ class Yard(District):
 		else:
 			inb = self.rrBus.sendRecv(EASTJCT, outb, outbc)
 
-			if self.AcceptResponse(inb, inbc, EASTJCT):
-				itext = formatIText(inb, inbc)
-				logging.debug("East Jct: Input Bytes: %s" % itext)
-	
-				ip = self.rr.GetInput("YSw7")  #Switch positions
-				nb = getBit(inb[0], 0)
-				rb = getBit(inb[0], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("YSw9") 
-				nb = getBit(inb[0], 2)
-				rb = getBit(inb[0], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("YSw11")  
-				nb = getBit(inb[0], 4)
-				rb = getBit(inb[0], 5)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("Y20")  # Detection
-				ip.SetValue(getBit(inb[0], 6))
-				ip = self.rr.GetInput("Y20.E") 
-				ip.SetValue(getBit(inb[0], 7))
-	
-				ip = self.rr.GetInput("YOSEJW")  # EJOS1
-				ip.SetValue(getBit(inb[1], 0))
-				ip = self.rr.GetInput("YOSEJE")  # EJOS2
-				ip.SetValue(getBit(inb[1], 1))
-				ip = self.rr.GetInput("Y11.W")
-				ip.SetValue(getBit(inb[1], 2))
-				ip = self.rr.GetInput("Y11") 
-				ip.SetValue(getBit(inb[1], 3))
-				
-			else:
-				logging.error("East Jct: Failed read")
-				itext = None
-				
+			itext = formatIText(inb, inbc)
+			#logging.debug("East Jct: Input Bytes: %s" % itext)
+
+			ip = self.rr.GetInput("YSw7")  #Switch positions
+			nb = getBit(inb[0], 0)
+			rb = getBit(inb[0], 1)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("YSw9") 
+			nb = getBit(inb[0], 2)
+			rb = getBit(inb[0], 3)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("YSw11")  
+			nb = getBit(inb[0], 4)
+			rb = getBit(inb[0], 5)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("Y20")  # Detection
+			ip.SetValue(getBit(inb[0], 6))
+			ip = self.rr.GetInput("Y20.E") 
+			ip.SetValue(getBit(inb[0], 7))
+
+			ip = self.rr.GetInput("YOSEJW")  # EJOS1
+			ip.SetValue(getBit(inb[1], 0))
+			ip = self.rr.GetInput("YOSEJE")  # EJOS2
+			ip.SetValue(getBit(inb[1], 1))
+			ip = self.rr.GetInput("Y11.W")
+			ip.SetValue(getBit(inb[1], 2))
+			ip = self.rr.GetInput("Y11") 
+			ip.SetValue(getBit(inb[1], 3))
+			
 		if self.sendIO:
 			self.rr.ShowText("EJct", EASTJCT, otext, itext, 1, 5)
 
@@ -254,7 +249,7 @@ class Yard(District):
 		outb[1] = setBit(outb[1], 2, 1 if asp == 0b001 else 0)  # Restricting
 
 		otext = formatOText(outb, outbc)
-		logging.debug("Kale: Output bytes: %s" % otext)
+		#logging.debug("Kale: Output bytes: %s" % otext)
 
 		inbc = outbc			
 		if self.settings.simulation:
@@ -262,65 +257,60 @@ class Yard(District):
 		else:
 			inb = self.rrBus.sendRecv(KALE, outb, outbc)
 
-			if self.AcceptResponse(inb, inbc, KALE):
-				itext = formatIText(inb, inbc)
-				logging.debug("Kale: Input Bytes: %s" % itext)
-	
-				ip = self.rr.GetInput("YSw17")  #Switch positions
-				nb = getBit(inb[0], 0)
-				rb = getBit(inb[0], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("YSw19") 
-				nb = getBit(inb[0], 2)
-				rb = getBit(inb[0], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("YSw21") 
-				nb = getBit(inb[0], 4)
-				rb = getBit(inb[0], 5)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("YSw23") 
-				nb = getBit(inb[0], 6)
-				rb = getBit(inb[0], 7)
-				ip.SetTOState(nb, rb)
-	
-				ip = self.rr.GetInput("YSw25") 
-				nb = getBit(inb[1], 0)
-				rb = getBit(inb[1], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("YSw27") 
-				nb = getBit(inb[1], 2)
-				rb = getBit(inb[1], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("YSw29") 
-				nb = getBit(inb[1], 4)
-				rb = getBit(inb[1], 5)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("Y30") 
-				ip.SetValue(getBit(inb[1], 6))   #detection
-				ip = self.rr.GetInput("YOSKL4")  # KAOS1
-				ip.SetValue(getBit(inb[1], 7)) 
-	
-				ip = self.rr.GetInput("Y53") 
-				ip.SetValue(getBit(inb[2], 0))
-				ip = self.rr.GetInput("Y52") 
-				ip.SetValue(getBit(inb[2], 1))
-				ip = self.rr.GetInput("Y51") 
-				ip.SetValue(getBit(inb[2], 2))
-				ip = self.rr.GetInput("Y50") 
-				ip.SetValue(getBit(inb[2], 3))
-				ip = self.rr.GetInput("YOSKL2")   #KAOS3
-				ip.SetValue(getBit(inb[2], 4))
-				ip = self.rr.GetInput("YOSKL1")   #KAOS4
-				ip.SetValue(getBit(inb[2], 5))
-				ip = self.rr.GetInput("YOSKL3")   #KAOS2
-				ip.SetValue(getBit(inb[2], 6))
-				ip = self.rr.GetInput("Y10") 
-				ip.SetValue(getBit(inb[2], 7))
-				
-			else:
-				logging.error("Kale: Failed read")
-				itext = None
+			itext = formatIText(inb, inbc)
+			#logging.debug("Kale: Input Bytes: %s" % itext)
 
+			ip = self.rr.GetInput("YSw17")  #Switch positions
+			nb = getBit(inb[0], 0)
+			rb = getBit(inb[0], 1)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("YSw19") 
+			nb = getBit(inb[0], 2)
+			rb = getBit(inb[0], 3)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("YSw21") 
+			nb = getBit(inb[0], 4)
+			rb = getBit(inb[0], 5)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("YSw23") 
+			nb = getBit(inb[0], 6)
+			rb = getBit(inb[0], 7)
+			ip.SetTOState(nb, rb)
+
+			ip = self.rr.GetInput("YSw25") 
+			nb = getBit(inb[1], 0)
+			rb = getBit(inb[1], 1)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("YSw27") 
+			nb = getBit(inb[1], 2)
+			rb = getBit(inb[1], 3)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("YSw29") 
+			nb = getBit(inb[1], 4)
+			rb = getBit(inb[1], 5)
+			ip.SetTOState(nb, rb)
+			ip = self.rr.GetInput("Y30") 
+			ip.SetValue(getBit(inb[1], 6))   #detection
+			ip = self.rr.GetInput("YOSKL4")  # KAOS1
+			ip.SetValue(getBit(inb[1], 7)) 
+
+			ip = self.rr.GetInput("Y53") 
+			ip.SetValue(getBit(inb[2], 0))
+			ip = self.rr.GetInput("Y52") 
+			ip.SetValue(getBit(inb[2], 1))
+			ip = self.rr.GetInput("Y51") 
+			ip.SetValue(getBit(inb[2], 2))
+			ip = self.rr.GetInput("Y50") 
+			ip.SetValue(getBit(inb[2], 3))
+			ip = self.rr.GetInput("YOSKL2")   #KAOS3
+			ip.SetValue(getBit(inb[2], 4))
+			ip = self.rr.GetInput("YOSKL1")   #KAOS4
+			ip.SetValue(getBit(inb[2], 5))
+			ip = self.rr.GetInput("YOSKL3")   #KAOS2
+			ip.SetValue(getBit(inb[2], 6))
+			ip = self.rr.GetInput("Y10") 
+			ip.SetValue(getBit(inb[2], 7))
+			
 		if self.sendIO:
 			self.rr.ShowText("Kale", KALE, otext, itext, 2, 5)
 
@@ -391,7 +381,7 @@ class Yard(District):
 		outb[5] = setBit(outb[5], 5, self.rr.GetOutput("YSw33").GetLock())
 
 		otext = formatOText(outb, outbc)
-		logging.debug("Yard: Output bytes: %s" % otext)
+		#logging.debug("Yard: Output bytes: %s" % otext)
 
 		inbc = outbc			
 		if self.settings.simulation:
@@ -399,77 +389,72 @@ class Yard(District):
 		else:
 			inb = self.rrBus.sendRecv(YARD, outb, outbc)
 
-			if self.AcceptResponse(inb, inbc, YARD):
-				itext = formatIText(inb, inbc)
-				logging.debug("Yard: Input Bytes: %s" % itext)
-	
-				ip = self.rr.GetInput("YSw33")  # Switch positions
-				nb = getBit(inb[0], 0)
-				rb = getBit(inb[0], 1)
-				ip.SetTOState(nb, rb)
-	
-				if optControl == 0:  # Control by yard
-					lvrR = getBit(inb[0], 2)       # signal levers
-					lvrCallOn = getBit(inb[0], 3)
-					lvrL = getBit(inb[0], 4)
-					self.rr.GetInput("Y2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrR = getBit(inb[0], 5)
-					lvrCallOn = getBit(inb[0], 6)
-					lvrL = getBit(inb[0], 7)
-					self.rr.GetInput("Y4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-	
-					lvrR = getBit(inb[1], 0)
-					lvrCallOn = getBit(inb[1], 1)
-					lvrL = getBit(inb[1], 2)
-					self.rr.GetInput("Y8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrR = getBit(inb[1], 3)
-					lvrCallOn = getBit(inb[1], 4)
-					lvrL = getBit(inb[1], 5)
-					self.rr.GetInput("Y10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrR = getBit(inb[1], 6)
-					lvrCallOn = getBit(inb[1], 7)
-	
-					lvrL = getBit(inb[2], 0)
-					self.rr.GetInput("Y22.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrCallOn = getBit(inb[2], 1)
-					lvrL = getBit(inb[2], 2)
-					self.rr.GetInput("Y24.lvr").SetState(leverState(lvrL, lvrCallOn, 0))
-					lvrR = getBit(inb[2], 3)
-					lvrCallOn = getBit(inb[2], 4)
-					lvrL = getBit(inb[2], 5)
-					self.rr.GetInput("Y26.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrR = getBit(inb[2], 6)
-					lvrCallOn = getBit(inb[2], 7)
-	
-					lvrL = getBit(inb[3], 0)
-					self.rr.GetInput("Y34.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					self.rr.GetInput("yrelease").SetState(getBit(inb[3], 1))  # Y Release switch
-					self.rr.GetInput("wos1norm").SetState(getBit(inb[3], 2))  # WOS1 Norm
-	
-				self.rr.GetInput("Y81W").SetValue(getBit(inb[3], 3))
-				self.rr.GetInput("Y82W").SetValue(getBit(inb[3], 4)) 
-				self.rr.GetInput("Y83W").SetValue(getBit(inb[3], 5)) 
-				self.rr.GetInput("Y84W").SetValue(getBit(inb[3], 6)) 
-				self.rr.GetInput("Y81E").SetValue(getBit(inb[3], 7)) 
-	
-				self.rr.GetInput("Y82E").SetValue(getBit(inb[4], 0)) 
-				self.rr.GetInput("Y83E").SetValue(getBit(inb[4], 1)) 
-				self.rr.GetInput("Y84E").SetValue(getBit(inb[4], 2))  
-				self.rr.GetInput("Y70").SetValue(getBit(inb[4], 3))   # Waterman detection
-				self.rr.GetInput("YOSWYW").SetValue(getBit(inb[4], 4))  # WOS1
-				# bit 5 is bad
-				self.rr.GetInput("Y82").SetValue(getBit(inb[4], 6))  
-				self.rr.GetInput("Y83").SetValue(getBit(inb[4], 7))  
-	
-				self.rr.GetInput("Y84").SetValue(getBit(inb[5], 0))  
-				self.rr.GetInput("YOSWYE").SetValue(getBit(inb[5], 1))  # WOS2
-				self.rr.GetInput("Y87").SetValue(getBit(inb[5], 2))  
-				self.rr.GetInput("Y81").SetValue(getBit(inb[5], 3))  
-	
-			else:
-				logging.error("Yard: Failed read")
-				itext = None
-	
+			itext = formatIText(inb, inbc)
+			#logging.debug("Yard: Input Bytes: %s" % itext)
+
+			ip = self.rr.GetInput("YSw33")  # Switch positions
+			nb = getBit(inb[0], 0)
+			rb = getBit(inb[0], 1)
+			ip.SetTOState(nb, rb)
+
+			if optControl == 0:  # Control by yard
+				lvrR = getBit(inb[0], 2)       # signal levers
+				lvrCallOn = getBit(inb[0], 3)
+				lvrL = getBit(inb[0], 4)
+				self.rr.GetInput("Y2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrR = getBit(inb[0], 5)
+				lvrCallOn = getBit(inb[0], 6)
+				lvrL = getBit(inb[0], 7)
+				self.rr.GetInput("Y4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+
+				lvrR = getBit(inb[1], 0)
+				lvrCallOn = getBit(inb[1], 1)
+				lvrL = getBit(inb[1], 2)
+				self.rr.GetInput("Y8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrR = getBit(inb[1], 3)
+				lvrCallOn = getBit(inb[1], 4)
+				lvrL = getBit(inb[1], 5)
+				self.rr.GetInput("Y10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrR = getBit(inb[1], 6)
+				lvrCallOn = getBit(inb[1], 7)
+
+				lvrL = getBit(inb[2], 0)
+				self.rr.GetInput("Y22.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrCallOn = getBit(inb[2], 1)
+				lvrL = getBit(inb[2], 2)
+				self.rr.GetInput("Y24.lvr").SetState(leverState(lvrL, lvrCallOn, 0))
+				lvrR = getBit(inb[2], 3)
+				lvrCallOn = getBit(inb[2], 4)
+				lvrL = getBit(inb[2], 5)
+				self.rr.GetInput("Y26.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrR = getBit(inb[2], 6)
+				lvrCallOn = getBit(inb[2], 7)
+
+				lvrL = getBit(inb[3], 0)
+				self.rr.GetInput("Y34.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				self.rr.GetInput("yrelease").SetState(getBit(inb[3], 1))  # Y Release switch
+				self.rr.GetInput("wos1norm").SetState(getBit(inb[3], 2))  # WOS1 Norm
+
+			self.rr.GetInput("Y81W").SetValue(getBit(inb[3], 3))
+			self.rr.GetInput("Y82W").SetValue(getBit(inb[3], 4)) 
+			self.rr.GetInput("Y83W").SetValue(getBit(inb[3], 5)) 
+			self.rr.GetInput("Y84W").SetValue(getBit(inb[3], 6)) 
+			self.rr.GetInput("Y81E").SetValue(getBit(inb[3], 7)) 
+
+			self.rr.GetInput("Y82E").SetValue(getBit(inb[4], 0)) 
+			self.rr.GetInput("Y83E").SetValue(getBit(inb[4], 1)) 
+			self.rr.GetInput("Y84E").SetValue(getBit(inb[4], 2))  
+			self.rr.GetInput("Y70").SetValue(getBit(inb[4], 3))   # Waterman detection
+			self.rr.GetInput("YOSWYW").SetValue(getBit(inb[4], 4))  # WOS1
+			# bit 5 is bad
+			self.rr.GetInput("Y82").SetValue(getBit(inb[4], 6))  
+			self.rr.GetInput("Y83").SetValue(getBit(inb[4], 7))  
+
+			self.rr.GetInput("Y84").SetValue(getBit(inb[5], 0))  
+			self.rr.GetInput("YOSWYE").SetValue(getBit(inb[5], 1))  # WOS2
+			self.rr.GetInput("Y87").SetValue(getBit(inb[5], 2))  
+			self.rr.GetInput("Y81").SetValue(getBit(inb[5], 3))  
+
 		if self.sendIO:
 			self.rr.ShowText("Yard", YARD, otext, itext, 3, 5)
 
@@ -543,7 +528,7 @@ class Yard(District):
 		outb[4] = setBit(outb[4], 7, 1 if op > 0 else 0)
 
 		otext = formatOText(outb, outbc)
-		logging.debug("YardSW: Output bytes: %s" % otext)
+		#logging.debug("YardSW: Output bytes: %s" % otext)
 			
 		if not self.settings.simulation:
 			inb = self.rrBus.sendRecv(YARDSW, outb, outbc)

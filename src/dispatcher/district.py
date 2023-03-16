@@ -102,7 +102,7 @@ class District:
 	def PerformButtonAction(self, btn):
 		pass
 
-	def DoEntryExitButtons(self, btn, groupName, sendButtons=False):
+	def DoEntryExitButtons(self, btn, groupName, sendButtons=False, interval = 0):
 		bname = btn.GetName()
 		if self.westButton[groupName] and not self.westButton[groupName].IsPressed():
 			self.westButton[groupName] = None
@@ -147,7 +147,7 @@ class District:
 				if sendButtons:
 					self.frame.Request({"nxbutton": { "entry": wButton.GetName(),  "exit": eButton.GetName()}})
 				else:
-					self.MatrixTurnoutRequest(toList)
+					self.MatrixTurnoutRequest(toList, interval = interval)
 
 			self.westButton[groupName] = None
 			self.eastButton[groupName] = None
@@ -167,11 +167,19 @@ class District:
 		for osn, rte in rteMap.items():
 			self.blocks[osn].SetRoute(None if rte is None else rte)
 
-	def MatrixTurnoutRequest(self, tolist):
+	def MatrixTurnoutRequest(self, tolist, interval = 0):
+		first = True
+		delay = interval
 		for toname, state in tolist:
 			if (state == "R" and self.turnouts[toname].IsNormal()) or \
 					(state == "N" and self.turnouts[toname].IsReverse()):
-				self.frame.Request({"turnout": {"name": toname, "status": state}})
+				req = {"turnout": {"name": toname, "status": state}}
+				if not first and interval != 0:
+					req["turnout"]["delay"] = delay
+					delay += interval
+					
+				first = False
+				self.frame.Request(req)
 
 	def PerformTurnoutAction(self, turnout):
 		turnout = turnout.GetControlledBy()
