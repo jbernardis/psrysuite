@@ -179,7 +179,7 @@ class MainUnit:
 				elif cmd == "sessionID":
 					self.sessionid = int(parms)
 					logging.info("session ID %d" % self.sessionid)
-					self.rrServer.SendRequest({"identify": {"SID": self.sessionid, "function": "AR"}})
+					self.Request({"identify": {"SID": self.sessionid, "function": "AR"}})
 	
 				elif cmd == "end":
 					if parms["type"] == "layout":
@@ -203,11 +203,11 @@ class MainUnit:
 
 	def requestRoutes(self):
 		if self.sessionid is not None:
-			self.rrServer.SendRequest({"refresh": {"SID": self.sessionid, "type": "routes"}})
+			self.Request({"refresh": {"SID": self.sessionid, "type": "routes"}})
 
 	def requestTrains(self):
 		if self.sessionid is not None:
-			self.rrServer.SendRequest({"refresh": {"SID": self.sessionid, "type": "trains"}})
+			self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 
 	def SignalLockChange(self, sigName, nLock):
 		logging.info("signal %s lock has changed %s" % (sigName, str(nLock)))

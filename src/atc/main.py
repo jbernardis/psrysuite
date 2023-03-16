@@ -431,7 +431,7 @@ class MainFrame(wx.Frame):
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)
 				logging.info("session ID %d" % self.sessionid)
-				self.rrServer.SendRequest({"identify": {"SID": self.sessionid, "function": "ATC"}})
+				self.RRRequest({"identify": {"SID": self.sessionid, "function": "ATC"}})
 
 			elif cmd == "end":
 				if parms["type"] == "layout":

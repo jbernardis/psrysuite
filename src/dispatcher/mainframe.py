@@ -994,10 +994,10 @@ class MainFrame(wx.Frame):
 		self.ShowTitle()
 
 	def OnRefresh(self, _):
-		self.rrServer.SendRequest({"refresh": {"SID": self.sessionid}})
+		self.Request({"refresh": {"SID": self.sessionid}})
 		
 	def OnConfig(self, _):		
-		self.rrServer.SendRequest({"refresh": {"type": "subblocks", "SID": self.sessionid}})
+		self.Request({"refresh": {"type": "subblocks", "SID": self.sessionid}})
 
 	def raiseDeliveryEvent(self, data): # thread context
 		try:
@@ -1243,7 +1243,7 @@ class MainFrame(wx.Frame):
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)
 				logging.info("connected to railroad server with session ID %d" % self.sessionid)
-				self.rrServer.SendRequest({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatch else "DISPLAY"}})
+				self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatch else "DISPLAY"}})
 				self.districts.OnConnect()
 				self.ShowTitle()
 
@@ -1252,7 +1252,7 @@ class MainFrame(wx.Frame):
 					if self.settings.dispatch:
 						self.SendBlockDirRequests()
 						self.SendOSRoutes()
-					self.rrServer.SendRequest({"refresh": {"SID": self.sessionid, "type": "trains"}})
+					self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 				elif parms["type"] == "trains":
 					pass
 				

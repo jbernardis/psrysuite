@@ -176,7 +176,7 @@ class MainFrame(wx.Frame):
 		self.ShowTitle()
 
 	def OnRefresh(self, _):
-		self.rrServer.SendRequest({"refresh": {"SID": self.sessionid}})
+		self.Request({"refresh": {"SID": self.sessionid}})
 
 	def OnSelectAll(self, _):
 		self.scriptList.SelectAll()
@@ -330,11 +330,11 @@ class MainFrame(wx.Frame):
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)
 				self.ShowTitle()
-				self.rrServer.SendRequest({"identify": {"SID": self.sessionid, "function": "SIM"}})
+				self.Request({"identify": {"SID": self.sessionid, "function": "SIM"}})
 
 			elif cmd == "end":
 				if parms["type"] == "layout":
-					self.rrServer.SendRequest({"refresh": {"SID": self.sessionid, "type": "trains"}})
+					self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 				elif parms["type"] == "trains":
 					pass
 
