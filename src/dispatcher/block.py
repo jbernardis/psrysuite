@@ -85,7 +85,10 @@ class Route:
 			b = self.blkin
 		else:
 			b = self.blkout
-		self.osblk.frame.blocks[b].RemoveClearStatus()
+		blk = self.osblk.frame.blocks[b]
+		if blk.GetBlockType() != OVERSWITCH:
+			# do NOT clear on an adjacent OS block
+			blk.RemoveClearStatus()
 
 	def ReleaseSignalLocks(self):
 		frame = self.osblk.frame

@@ -138,25 +138,25 @@ class Port (District):
 		self.turnouts["PBSw3"].SetLock("PBSw1", s1 == 'R', refresh=True)
 		self.turnouts["PBSw3b"].SetLock("PBSw1", s1 == 'R', refresh=True)
 
-		s27 = 'N' if self.turnouts["PASw27"].IsNormal() else 'R'
-		s29 = 'N' if self.turnouts["PASw29"].IsNormal() else 'R'
-		s31 = 'N' if self.turnouts["PASw31"].IsNormal() else 'R'
-		s33 = 'N' if self.turnouts["PASw33"].IsNormal() else 'R'
-		s35 = 'N' if self.turnouts["PASw35"].IsNormal() else 'R'
-		s37 = 'N' if self.turnouts["PASw37"].IsNormal() else 'R'
-
-		s1 = 'N' if self.turnouts["PASw1"].IsNormal() else 'R'
-		s3 = 'N' if self.turnouts["PASw3"].IsNormal() else 'R'
-		s5 = 'N' if self.turnouts["PASw5"].IsNormal() else 'R'
-		s7 = 'N' if self.turnouts["PASw7"].IsNormal() else 'R'
-		s9 = 'N' if self.turnouts["PASw9"].IsNormal() else 'R'
-		s11 = 'N' if self.turnouts["PASw11"].IsNormal() else 'R'
-		s13 = 'N' if self.turnouts["PASw13"].IsNormal() else 'R'
-		s15 = 'N' if self.turnouts["PASw15"].IsNormal() else 'R'
-		s17 = 'N' if self.turnouts["PASw17"].IsNormal() else 'R'
-		s19 = 'N' if self.turnouts["PASw19"].IsNormal() else 'R'
-		s21 = 'N' if self.turnouts["PASw21"].IsNormal() else 'R'
-		s23 = 'N' if self.turnouts["PASw23"].IsNormal() else 'R'
+		# s27 = 'N' if self.turnouts["PASw27"].IsNormal() else 'R'
+		# s29 = 'N' if self.turnouts["PASw29"].IsNormal() else 'R'
+		# s31 = 'N' if self.turnouts["PASw31"].IsNormal() else 'R'
+		# s33 = 'N' if self.turnouts["PASw33"].IsNormal() else 'R'
+		# s35 = 'N' if self.turnouts["PASw35"].IsNormal() else 'R'
+		# s37 = 'N' if self.turnouts["PASw37"].IsNormal() else 'R'
+		#
+		# s1 = 'N' if self.turnouts["PASw1"].IsNormal() else 'R'
+		# s3 = 'N' if self.turnouts["PASw3"].IsNormal() else 'R'
+		# s5 = 'N' if self.turnouts["PASw5"].IsNormal() else 'R'
+		# s7 = 'N' if self.turnouts["PASw7"].IsNormal() else 'R'
+		# s9 = 'N' if self.turnouts["PASw9"].IsNormal() else 'R'
+		# s11 = 'N' if self.turnouts["PASw11"].IsNormal() else 'R'
+		# s13 = 'N' if self.turnouts["PASw13"].IsNormal() else 'R'
+		# s15 = 'N' if self.turnouts["PASw15"].IsNormal() else 'R'
+		# s17 = 'N' if self.turnouts["PASw17"].IsNormal() else 'R'
+		# s19 = 'N' if self.turnouts["PASw19"].IsNormal() else 'R'
+		# s21 = 'N' if self.turnouts["PASw21"].IsNormal() else 'R'
+		# s23 = 'N' if self.turnouts["PASw23"].IsNormal() else 'R'
 
 		self.FindTurnoutCombinations(blocks, [
 			"PBSw1", "PBSw3", "PBSw11", "PBSw13",    # Port B - Circus and south junctions

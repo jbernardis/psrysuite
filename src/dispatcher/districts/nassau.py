@@ -161,7 +161,6 @@ class Nassau (District):
 				turnout.Draw()
 			elif tn == "NSw31":
 				bstat = NORMAL if self.turnouts["NSw29"].IsNormal() else REVERSE
-				b1, b2 = self.turnouts["NSw29"].GetStatus()
 				turnout.SetStatus([bstat, state])
 				turnout.Draw()
 			elif tn == "NSw23":
@@ -171,7 +170,6 @@ class Nassau (District):
 			elif tn == "NSw43":
 				bstat = NORMAL if self.turnouts["NSw45"].IsNormal() else REVERSE
 				turnout.SetStatus([state, bstat])
-				b1, b2 = turnout.GetStatus()
 				turnout.Draw()
 			elif tn == "NSw45":
 				bstat = NORMAL if self.turnouts["NSw47"].IsNormal() else REVERSE
@@ -180,7 +178,7 @@ class Nassau (District):
 
 		else:
 			if tn in ["NSw13", "NSw15", "NSw17"]:  # Coach Yard - update display
-				for t, screen, pos, revflag in self.blocks["N60"].GetTiles():
+				for t, screen, pos, _ in self.blocks["N60"].GetTiles():
 					bmp = t.getBmp(EMPTY, False, False)
 					self.frame.DrawTile(screen, pos, bmp)
 
@@ -220,15 +218,22 @@ class Nassau (District):
 			s15 = 'N' if self.turnouts["NSw15"].IsNormal() else 'R'
 			s17 = 'N' if self.turnouts["NSw17"].IsNormal() else 'R'
 			if s13+s17 == "NR":
-				block.SetRoute(self.routes["NRtN60A"])
+				newRoute = "NRtN60A"
 			elif s13+s17 == "RR":
-				block.SetRoute(self.routes["NRtN60B"])
+				newRoute = "NRtN60B"
 			elif s15+s17 == "RN":
-				block.SetRoute(self.routes["NRtN60C"])
+				newRoute = "NRtN60C"
 			elif s15+s17 == "NN":
-				block.SetRoute(self.routes["NRtN60D"])
+				newRoute = "NRtN60D"
 			else:
 				block.SetRoute(None)
+				return
+			
+			if block.GetRouteName() == newRoute:
+				block.Draw()
+			else:
+				block.SetRoute(self.routes[newRoute])
+				
 		else:
 			# now exclude block N60 from the remainder of the normal processing
 			nblocks = [b for b in blocks if b.GetName() != "N60"]

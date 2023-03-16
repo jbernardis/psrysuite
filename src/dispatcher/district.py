@@ -200,7 +200,7 @@ class District:
 			# print("block, sigs = %s %s" % (blknm, str(siglist)))
 			if signm in siglist:
 				osblk = self.frame.blocks[blknm]
-				osblknm = blknm
+				#osblknm = blknm
 				rname = osblk.GetRouteName()
 				# print("os: %s route: %s" % (osblknm, str(rname)))
 				if osblk.route is None:

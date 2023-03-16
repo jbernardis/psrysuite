@@ -43,7 +43,6 @@ class TrackDiagram(wx.Panel):
 	def DrawBackground(self, dc):
 		for i in range(len(self.bgbmps)):
 			dc.DrawBitmap(self.bgbmps[i], self.offsets[i], 0)
-		w, h = self.GetSize()
 
 	def OnMotion(self, evt):
 		pt = evt.GetPosition()

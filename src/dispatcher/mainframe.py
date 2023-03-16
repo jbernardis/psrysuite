@@ -99,7 +99,7 @@ class MainFrame(wx.Frame):
 		if self.settings.pages == 1:  # set up a single ultra-wide display accross 3 monitors
 			dp = TrackDiagram(self, [self.diagrams[sn] for sn in screensList])
 			dp.SetPosition((16, 120))
-			diagramw, diagramh = dp.GetSize()
+			_, diagramh = dp.GetSize()
 			self.panels = {self.diagrams[sn].screen : dp for sn in screensList}  # all 3 screens just point to the same diagram
 			totalw = 2560*3
 			self.centerOffset = 2560
@@ -109,7 +109,7 @@ class MainFrame(wx.Frame):
 			diagramh = 0
 			for d in [self.diagrams[sn] for sn in screensList]:
 				dp = TrackDiagram(self, [d])
-				diagramw, diagramh = dp.GetSize()
+				_, diagramh = dp.GetSize()
 				dp.Hide()
 				dp.SetPosition((8, 120))
 				self.panels[d.screen] = dp
@@ -650,7 +650,7 @@ class MainFrame(wx.Frame):
 		return self.settings.dispatch
 
 	def resolveObjects(self):
-		for bknm, bk in self.blocks.items():
+		for _, bk in self.blocks.items():
 			sgWest, sgEast = bk.GetSignals()
 			if sgWest is not None:
 				try:
@@ -915,7 +915,7 @@ class MainFrame(wx.Frame):
 
 	def NewTrain(self):
 		tr = Train(None)
-		name, loco = tr.GetNameAndLoco()
+		name, _ = tr.GetNameAndLoco()
 		self.trains[name] = tr
 		return tr
 
@@ -1387,7 +1387,7 @@ class MainFrame(wx.Frame):
 				if blk:
 					if blk.IsOccupied():
 						tr = blk.GetTrain()
-						oldName, oldLoco = tr.GetNameAndLoco()
+						oldName, _ = tr.GetNameAndLoco()
 						self.Request({"renametrain": { "oldname": oldName, "newname": tid}})
 
 	def OnBSaveLocos(self, _):
@@ -1401,7 +1401,7 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 
 		locoDict = {}
-		for trid, tr in self.trains.items():
+		for _, tr in self.trains.items():
 			loco = tr.GetLoco()
 			if loco is not None and not loco.startswith("??"):
 				locoDict[loco] = tr.GetBlockNameList()

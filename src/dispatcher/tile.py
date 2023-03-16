@@ -1,6 +1,4 @@
-import os
 
-from dispatcher.bitmaps import BitMaps
 from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, NORMAL, REVERSE, STOP, CLEAR
 
 class Tile:
