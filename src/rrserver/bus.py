@@ -77,6 +77,7 @@ class Bus:
 			if len(b) == 0:
 				tries += 1
 				time.sleep(0.0001)
+				print("No characters read", flush=True)
 			else:
 				tries = 0
 				inbuf.extend([bytes([b[i]]) for i in range(len(b))])
@@ -84,6 +85,7 @@ class Bus:
 				
 		if len(inbuf) != nbytes:
 			logging.error("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
+			print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)), flush=True)
 			return [b'\x00']*nbytes
 		else:
 			return inbuf

@@ -34,10 +34,10 @@ tester remaining nodes:
 	NassauE
 	NassauNX
 	Bank
-	Cliveden
-	Green Mtn
-	Cliff
-	Sheffield
+			- Cliveden
+			- Green Mtn
+			- Cliff
+		Sheffield
 	HydeJct
 	Hyde
 	PortA

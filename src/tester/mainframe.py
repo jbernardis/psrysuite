@@ -16,6 +16,10 @@ from tester.nodes.foss import Foss
 from tester.nodes.shore import Shore
 from tester.nodes.krulish import Krulish
 
+from tester.nodes.cliveden import Cliveden
+from tester.nodes.greenmtn import GreenMtn
+from tester.nodes.cliff import Cliff
+
 # district node addresses
 YARD      = 0x11
 KALE      = 0x12
@@ -63,9 +67,9 @@ nodes = {
 	"Nassau E" : ( NASSAUE, None ),
 	"Nassau NX" : ( NASSAUNX, None ),
 	"Bank" : ( BANK, None ),
-	"Cliveden" : ( CLIVEDEN, None ),
-	"Green Mtn" : ( GREENMTN, None ),
-	"Cliff" : ( CLIFF, None ),
+	"Cliveden" : ( CLIVEDEN, Cliveden ),
+	"Green Mtn" : ( GREENMTN, GreenMtn ),
+	"Cliff" : ( CLIFF, Cliff ),
 	"Sheffield" : ( SHEFFIELD, None )	
 }
 

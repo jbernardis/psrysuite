@@ -19,7 +19,7 @@ class Settings:
 
 		if self.cfg.has_section(self.section):
 			for opt, value in self.cfg.items(self.section):
-				if opt == "tty":
+				if opt == "rrtty":
 					self.tty = value
 
 		else:

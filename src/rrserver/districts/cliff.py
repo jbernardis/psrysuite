@@ -290,7 +290,7 @@ class Cliff(District):
 		outb[7] - setBit(outb[7], 4, 1 if self.rr.GetInput("CSw11").GetValue() == "R" else 0)
 
 		otext = formatOText(outb, outbc)
-		#print("CLIFF output: %s" % otext)
+		print("CLIFF output: %s" % otext, flush=True)
 		#logging.debug("Cliff: Output bytes: %s" % otext)
 
 		inbc = outbc
@@ -303,6 +303,7 @@ class Cliff(District):
 			if self.AcceptResponse(inb, inbc, CLIFF):
 
 				itext = formatIText(inb, 7)
+				print("Accepted", flush=True)
 				#logging.debug("Cliff: Input Bytes: %s" % itext)
 	
 				self.rr.GetInput("CC21W").SetValue(getBit(inb[0], 0))  # Routes
@@ -382,12 +383,13 @@ class Cliff(District):
 					self.rr.GetInput("CSw15.lvr").SetState(getBit(inb[6], 6))
 					self.rr.GetInput("CSw19.lvr").SetState(getBit(inb[6], 7))
 	
-					st = getBit(inb[6], 7)
+					st = getBit(inb[7], 0)
 					self.rr.GetInput("CSw21a.lvr").SetState(st)
 					self.rr.GetInput("CSw21b.lvr").SetState(st)
 				
 			else:
 				itext = None
+				print("Not accepted", flush=True)
 				logging.error("Cliff: Failed read")
 				
 		if self.sendIO:
@@ -461,6 +463,7 @@ class Cliff(District):
 		outb[3] = setBit(outb[3], 5, 1 if op != 0 else 0)
 
 		otext = formatOText(outb, outbc)
+		print("SHEFFIELD output: %s" % otext, flush=True)
 		#logging.debug("Sheffield: Output bytes: %s" % otext)
 		
 		inbc = outbc
@@ -468,8 +471,12 @@ class Cliff(District):
 			itext = None
 		else:
 			inb = self.rrBus.sendRecv(SHEFFIELD, outb, outbc)
+			
+			itext = formatIText(inb, inbc)
+			print("SHEFFIELD Input: %s" % itext, flush=True)
 
 			if self.AcceptResponse(inb, inbc, SHEFFIELD):
+				print("Accepted", flush=True)
 				itext = formatIText(inb, inbc)
 				#logging.debug("Sheffield: Input Bytes: %s" % itext)
 	
@@ -493,6 +500,7 @@ class Cliff(District):
 			else:
 				itext = None
 				logging.error("Sheffield: Failed read")
+				print("Not accepted", flush=True)
 			
 		if self.sendIO:
 			self.rr.ShowText("Shfd", SHEFFIELD, otext, itext, 2, 3)
