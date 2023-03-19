@@ -343,7 +343,7 @@ class Railroad(wx.Notebook):
 
 	def allIO(self):
 		for dname, d in self.districts.items():
-			logging.debug("starting io for district %s" % dname)
+			#logging.debug("starting io for district %s" % dname)
 			d.OutIn()
 
 		self.ReleasePendingEvents()
@@ -362,7 +362,4 @@ class Railroad(wx.Notebook):
 		for iput, district, itype in self.inputs.values():
 			if itype == district.block:
 				subblocks.update(iput.ToJson())
-
-		# with open("subblocks.json", "w") as jfp:
-		# 	json.dump(subblocks, jfp, sort_keys=True, indent=2)
 		return subblocks

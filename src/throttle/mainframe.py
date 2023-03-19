@@ -5,6 +5,7 @@ import wx.lib.gizmos as gizmos
 
 from throttle.settings import Settings
 from throttle.dccserver import DCCServer
+from throttle.rrserver import RRServer
 from throttle.dccremote import DCCRemote
 from throttle.enterlocodlg import EnterLocoDlg
 
@@ -145,6 +146,18 @@ class MainFrame(wx.Frame):
 		self.dccServer = DCCServer()
 		self.dccServer.SetServerAddress(self.settings.ipaddr, self.settings.dccserverport)
 		self.dccRemote = DCCRemote(self.dccServer)
+		self.rrServer = RRServer()
+		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
+		
+		# retrieve the loco information from the server
+		locos = self.rrServer.Get("getlocos", {})
+		if locos is None:
+			print("Unable to retrieve locos")
+			locos = {}
+		self.locoList = sorted(list(locos.keys()), key=self.BuildLocoKey)
+		
+	def BuildLocoKey(self, lid):
+		return int(lid)
 		
 	def EnableControls(self):
 		flag = self.selectedLoco is not None
@@ -291,7 +304,7 @@ class MainFrame(wx.Frame):
 		self.dccRemote.SetDirection(self.direction)
 		
 	def OnBSelect(self, _):
-		dlg = EnterLocoDlg(self)
+		dlg = EnterLocoDlg(self, self.locoList)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			nlid = dlg.GetResults()

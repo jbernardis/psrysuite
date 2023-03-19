@@ -70,6 +70,9 @@ class MainFrame(wx.Frame):
 		
 		self.eventsList = []
 		self.adviceList = []
+		
+		self.locoList = []
+		self.trainList = []
 			
 		self.settings = Settings()
 		logging.info("%s process starting" % "dispatcher" if self.settings.dispatch else "display")
@@ -391,6 +394,7 @@ class MainFrame(wx.Frame):
 		self.Request({"autorouter": { "status": rqStatus}})
 
 	def OnCBATC(self, evt):
+		# ATC must run on the same machine as this dispatcher because it has a windowing interface
 		self.ATCEnabled = self.cbATC.IsChecked()
 		if self.ATCEnabled:
 			#self.pidATC = 1
@@ -409,14 +413,10 @@ class MainFrame(wx.Frame):
 	def OnCBAdvisor(self, evt):
 		self.AdvisorEnabled = self.cbAdvisor.IsChecked()
 		if self.AdvisorEnabled:
-			if self.pidAdvisor is None:			
-				advisorExec = os.path.join(os.getcwd(), "advisor", "main.py")
-				self.pidAdvisor = Popen([sys.executable, advisorExec]).pid
-				logging.debug("advisor server started as PID %d" % self.pidAdvisor)
+			rqStatus = "on"
 		else:
-			if self.pidAdvisor is not None:			
-				self.Request( {"close": {"function": "ADVISOR"}})
-				self.pidAdvisor = None
+			rqStatus = "off"
+		self.Request({"advisor": { "status": rqStatus}})
 		
 	def sendPendingATCShow(self):
 		self.Request(self.pendingATCShowCmd)
@@ -822,7 +822,7 @@ class MainFrame(wx.Frame):
 					tr = blk.GetTrain()
 					oldName, oldLoco = tr.GetNameAndLoco()
 					oldATC = tr.IsOnATC() if self.IsDispatcher() else False
-					dlg = EditTrainDlg(self, tr, self.IsDispatcher() and self.ATCEnabled)
+					dlg = EditTrainDlg(self, tr, self.locoList, self.trainList, self.IsDispatcher() and self.ATCEnabled)
 					rc = dlg.ShowModal()
 					if rc == wx.ID_OK:
 						trainid, locoid, atc = dlg.GetResults()
@@ -989,9 +989,29 @@ class MainFrame(wx.Frame):
 				self.cbAutoRouter.Enable(True)
 				self.cbATC.Enable(True)
 				self.cbAdvisor.Enable(True)
+				
+			self.RetrieveData()
 
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()
+
+	def RetrieveData(self):
+		locos = self.Get("getlocos", {})
+		if locos is None:
+			logging.error("Unable to retrieve locos")
+			locos = {}
+			
+		self.locoList = sorted(list(locos.keys()), key=self.BuildLocoKey)
+
+		trains = self.Get("gettrains", {})
+		if trains is None:
+			logging.error("Unable to retrieve trains")
+			trains = {}
+			
+		self.trainList = sorted(list(trains.keys()))
+
+	def BuildLocoKey(self, lid):
+		return int(lid)
 
 	def OnRefresh(self, _):
 		self.Request({"refresh": {"SID": self.sessionid}})
@@ -1311,6 +1331,9 @@ class MainFrame(wx.Frame):
 					logging.debug(json.dumps(req))
 					# print("Outgoing HTTP request: %s" % json.dumps(req))
 					self.rrServer.SendRequest(req)
+					
+	def Get(self, cmd, parms):
+		return self.rrServer.Get(cmd, parms)
 
 	def SendBlockDirRequests(self):
 		for b in self.blocks.values():

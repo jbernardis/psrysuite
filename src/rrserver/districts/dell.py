@@ -84,7 +84,7 @@ class Dell(District):
 		RXO = (r10b and self.RXE) or (r10c and self.RXW)
 
 		#Dell
-		outbc = 4
+		outbc = 5
 		outb = [0 for _ in range(outbc)]
 		asp = self.rr.GetOutput("D4RA").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])  # eastbound signals
@@ -141,41 +141,43 @@ class Dell(District):
 			itext = None
 		else:
 			inb = self.rrBus.sendRecv(DELL, outb, outbc)
-
-			itext = formatIText(inb, 3)
-			#logging.debug("Dell: Input Bytes: %s" % itext)
-
-			nb = getBit(inb[0], 0)  # Switch positions
-			rb = getBit(inb[0], 1)
-			self.rr.GetInput("DSw1").SetTOState(nb, rb)
-			nb = getBit(inb[0], 2) 
-			rb = getBit(inb[0], 3)
-			self.rr.GetInput("DSw3").SetTOState(nb, rb)
-			nb = getBit(inb[0], 4) 
-			rb = getBit(inb[0], 5)
-			self.rr.GetInput("DSw5").SetTOState(nb, rb)
-			nb = getBit(inb[0], 6) 
-			rb = getBit(inb[0], 7)
-			self.rr.GetInput("DSw7").SetTOState(nb, rb)
-
-			nb = getBit(inb[1], 0)  
-			rb = getBit(inb[1], 1)
-			self.rr.GetInput("DSw9").SetTOState(nb, rb)
-			nb = getBit(inb[1], 2)  
-			rb = getBit(inb[1], 3)
-			self.rr.GetInput("DSw11").SetTOState(nb, rb)
-			self.rr.GetInput("D20").SetValue(getBit(inb[1], 4))  # Detection
-			self.rr.GetInput("D20.E").SetValue(getBit(inb[1], 5))
-			self.rr.GetInput("H23").SetValue(getBit(inb[1], 6)) 
-			self.rr.GetInput("H23.E").SetValue(getBit(inb[1], 7))
-
-			self.rr.GetInput("DOSVJW").SetValue(getBit(inb[2], 0)) #DOS1
-			self.rr.GetInput("DOSVJE").SetValue(getBit(inb[2], 1)) #DOS2
-			self.rr.GetInput("D11.W").SetValue(getBit(inb[2], 2))
-			self.rr.GetInput("D11A").SetValue(getBit(inb[2], 3))
-			self.rr.GetInput("D11B").SetValue(getBit(inb[2], 4))
-			self.rr.GetInput("D11.E").SetValue(getBit(inb[2], 5))
-			
+			if inb is None:
+				itext = "Read Error"
+			else:
+				itext = formatIText(inb, 3)
+				#logging.debug("Dell: Input Bytes: %s" % itext)
+	
+				nb = getBit(inb[0], 0)  # Switch positions
+				rb = getBit(inb[0], 1)
+				self.rr.GetInput("DSw1").SetTOState(nb, rb)
+				nb = getBit(inb[0], 2) 
+				rb = getBit(inb[0], 3)
+				self.rr.GetInput("DSw3").SetTOState(nb, rb)
+				nb = getBit(inb[0], 4) 
+				rb = getBit(inb[0], 5)
+				self.rr.GetInput("DSw5").SetTOState(nb, rb)
+				nb = getBit(inb[0], 6) 
+				rb = getBit(inb[0], 7)
+				self.rr.GetInput("DSw7").SetTOState(nb, rb)
+	
+				nb = getBit(inb[1], 0)  
+				rb = getBit(inb[1], 1)
+				self.rr.GetInput("DSw9").SetTOState(nb, rb)
+				nb = getBit(inb[1], 2)  
+				rb = getBit(inb[1], 3)
+				self.rr.GetInput("DSw11").SetTOState(nb, rb)
+				self.rr.GetInput("D20").SetValue(getBit(inb[1], 4))  # Detection
+				self.rr.GetInput("D20.E").SetValue(getBit(inb[1], 5))
+				self.rr.GetInput("H23").SetValue(getBit(inb[1], 6)) 
+				self.rr.GetInput("H23.E").SetValue(getBit(inb[1], 7))
+	
+				self.rr.GetInput("DOSVJW").SetValue(getBit(inb[2], 0)) #DOS1
+				self.rr.GetInput("DOSVJE").SetValue(getBit(inb[2], 1)) #DOS2
+				self.rr.GetInput("D11.W").SetValue(getBit(inb[2], 2))
+				self.rr.GetInput("D11A").SetValue(getBit(inb[2], 3))
+				self.rr.GetInput("D11B").SetValue(getBit(inb[2], 4))
+				self.rr.GetInput("D11.E").SetValue(getBit(inb[2], 5))
+				
 		if self.sendIO:
 			self.rr.ShowText("Dell", DELL, otext, itext, 0, 2)
 
@@ -218,28 +220,31 @@ class Dell(District):
 			itext = None
 		else:
 			inb = self.rrBus.sendRecv(FOSS, outb, outbc)
-			itext = formatIText(inb, inbc)
-			#logging.debug("FOSS: Input Bytes: %s" % itext)
-
-			self.rr.GetInput("D21.W").SetValue(getBit(inb[0], 0))  # Detection
-			self.rr.GetInput("D21A").SetValue(getBit(inb[0], 1))
-			self.rr.GetInput("D21B").SetValue(getBit(inb[0], 2))
-			self.rr.GetInput("D21.E").SetValue(getBit(inb[0], 3))
-			self.rr.GetInput("DOSFOW").SetValue(getBit(inb[0], 4)) #MFOS1
-			self.rr.GetInput("DOSFOE").SetValue(getBit(inb[0], 5)) #MFOS2
-			self.rr.GetInput("S10.W").SetValue(getBit(inb[0], 6))
-			self.rr.GetInput("S10A").SetValue(getBit(inb[0], 7))
-
-			self.rr.GetInput("S10B").SetValue(getBit(inb[1], 0))
-			self.rr.GetInput("S10C").SetValue(getBit(inb[1], 1))
-			self.rr.GetInput("S10.E").SetValue(getBit(inb[1], 2))
-			self.rr.GetInput("R10.W").SetValue(getBit(inb[1], 3))
-			self.rr.GetInput("R10A").SetValue(getBit(inb[1], 4)) 
-			self.rr.GetInput("R10B").SetValue(getBit(inb[1], 5)) 
-			self.rr.GetInput("R10C").SetValue(getBit(inb[1], 6))
-			self.rr.GetInput("R11").SetValue(getBit(inb[1], 7))
-
-			self.rr.GetInput("R12").SetValue(getBit(inb[2], 0))
+			if inb is None:
+				itext = "Read Error"
+			else:
+				itext = formatIText(inb, inbc)
+				#logging.debug("FOSS: Input Bytes: %s" % itext)
 	
+				self.rr.GetInput("D21.W").SetValue(getBit(inb[0], 0))  # Detection
+				self.rr.GetInput("D21A").SetValue(getBit(inb[0], 1))
+				self.rr.GetInput("D21B").SetValue(getBit(inb[0], 2))
+				self.rr.GetInput("D21.E").SetValue(getBit(inb[0], 3))
+				self.rr.GetInput("DOSFOW").SetValue(getBit(inb[0], 4)) #MFOS1
+				self.rr.GetInput("DOSFOE").SetValue(getBit(inb[0], 5)) #MFOS2
+				self.rr.GetInput("S10.W").SetValue(getBit(inb[0], 6))
+				self.rr.GetInput("S10A").SetValue(getBit(inb[0], 7))
+	
+				self.rr.GetInput("S10B").SetValue(getBit(inb[1], 0))
+				self.rr.GetInput("S10C").SetValue(getBit(inb[1], 1))
+				self.rr.GetInput("S10.E").SetValue(getBit(inb[1], 2))
+				self.rr.GetInput("R10.W").SetValue(getBit(inb[1], 3))
+				self.rr.GetInput("R10A").SetValue(getBit(inb[1], 4)) 
+				self.rr.GetInput("R10B").SetValue(getBit(inb[1], 5)) 
+				self.rr.GetInput("R10C").SetValue(getBit(inb[1], 6))
+				self.rr.GetInput("R11").SetValue(getBit(inb[1], 7))
+	
+				self.rr.GetInput("R12").SetValue(getBit(inb[2], 0))
+		
 		if self.sendIO:
 			self.rr.ShowText("Foss", FOSS, otext, itext, 1, 2)

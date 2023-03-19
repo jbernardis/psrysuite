@@ -1,22 +1,11 @@
 import wx
-import os
-import json
 
 class EnterLocoDlg(wx.Dialog):
-	def __init__(self, parent):
+	def __init__(self, parent, locoList):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Enter Locomotive Number")
 		
 		self.chosenLoco = None
-		path = os.path.join(os.getcwd(), "data", "locos.json")
-		try:
-			with open(path, "r") as jfp:
-				locos = json.load(jfp)
-		except:
-			print("Unable to load locomotives file: %s" % path)
-			locos = {}
-			
-		locoList = sorted(list(locos.keys()), key=self.BuildSortKey)
-		
+
 		self.Bind(wx.EVT_CLOSE, self.OnCancel)
 
 		vsz = wx.BoxSizer(wx.VERTICAL)

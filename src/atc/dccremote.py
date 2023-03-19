@@ -11,16 +11,20 @@ class DCCRemote:
 		self.initialized = False
 		self.locos = []
 		self.profiles = {}
+		self.defaultProfile = {
+				    "start": 0,
+				    "slow": 10,
+				    "medium": 58,
+				    "fast": 80,
+				    "acc": 1,
+				    "dec": 1
+				  }
 		
-	def Initialize(self):
-		path = os.path.join(os.getcwd(), "data", "locoprofiles.json")
-		try:
-			with open(path, "r") as jfp:
-				self.profiles = json.load(jfp)
-		except:
-			logging.error("Unable to load loco profiles file: %s" % path)
-			return False
-		
+	def Initialize(self, locos):
+		if locos is None:
+			self.profiles = {}
+		else:
+			self.profiles = {loco: locos[loco]["prof"] for loco in locos}	
 		return True
 		
 	def LocoCount(self):
@@ -37,8 +41,8 @@ class DCCRemote:
 		if loco in self.profiles:
 			profile = self.profiles[loco]
 		else:
-			logging.info("loco %s not in profiles - using defaule profile %s" % (str(loco), type(loco)))
-			profile = self.profiles["default"]
+			logging.info("loco %s not in profiles - using default profile %s" % (str(loco), type(loco)))
+			profile = self.defaultProfile
 			
 		if aspect == 0:
 			return 0, 0, 0 if speed == 0 else -10
@@ -75,6 +79,14 @@ class DCCRemote:
 			self.SetSpeedAndDirection(nspeed=l.GetSpeed(), ndir=l.GetDirection(), assertValues=True)
 			self.SetFunction(headlight=l.GetHeadlight(), horn=l.GetHorn(), bell=l.GetBell(), assertValues=True)
 		return l
+	
+	def StopAll(self):
+		saveSelectedLoco = self.selectedLoco
+		for l in self.locos:
+			self.selectedLoco = l
+			self.SetSpeed(0, assertValues=True)
+			
+		self.selectedLoco = saveSelectedLoco
 		
 	def ClearSelection(self):
 		self.selectedLoco = None

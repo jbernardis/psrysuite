@@ -57,23 +57,33 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_BUTTON, self.OnBExit, self.bExit)
 		self.bRevert = wx.Button(self, wx.ID_ANY, "Revert", size=(80, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBRevert, self.bRevert)
-		self.bGenSim = wx.Button(self, wx.ID_ANY, "Simulator\nScript", size=(80, 50))
+		self.bGenSim = wx.Button(self, wx.ID_ANY, "Sim/ATC\nScript", size=(80, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBGenSim, self.bGenSim)
 		self.bGenSim.Enable(False)
-		self.bGenAR = wx.Button(self, wx.ID_ANY, "Automatic\nRouter", size=(80, 50))
+		self.bGenAR = wx.Button(self, wx.ID_ANY, "AR/Advisor\nScript", size=(80, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBGenAR, self.bGenAR)
 		self.bGenAR.Enable(False)
+		self.bGenSimAll = wx.Button(self, wx.ID_ANY, "Sim/ATC\nAll", size=(80, 50))
+		self.Bind(wx.EVT_BUTTON, self.OnBGenSimAll, self.bGenSimAll)
+		self.bGenARAll = wx.Button(self, wx.ID_ANY, "AR/Advisor\nAll", size=(80, 50))
+		self.Bind(wx.EVT_BUTTON, self.OnBGenARAll, self.bGenARAll)
 		
 		buttonsz = wx.BoxSizer(wx.HORIZONTAL)
+		buttonsz.AddSpacer(10)
 		buttonsz.Add(self.bGenSim)
 		buttonsz.AddSpacer(10)
+		buttonsz.Add(self.bGenSimAll)
+		buttonsz.AddSpacer(30)
 		buttonsz.Add(self.bGenAR)
-		buttonsz.AddSpacer(50)
+		buttonsz.AddSpacer(10)
+		buttonsz.Add(self.bGenARAll)
+		buttonsz.AddSpacer(30)
 		buttonsz.Add(self.bSave)
 		buttonsz.AddSpacer(20)
 		buttonsz.Add(self.bRevert)
 		buttonsz.AddSpacer(50)
 		buttonsz.Add(self.bExit)
+		buttonsz.AddSpacer(10)
 		
 		vszl = wx.BoxSizer(wx.VERTICAL)
 		vszl.AddSpacer(20)
@@ -294,51 +304,20 @@ class MainFrame(wx.Frame):
 		
 		self.SetModified()
 
+	def OnBGenSimAll(self, _):
+		allSim = {}
+		for tr in self.trains:
+			_, scr = self.GenSim(tr)
+			allSim.update(scr)
+		
+		fn = os.path.join(os.getcwd(), "data", SIMSCRIPTFN)
+		with open(fn, "w") as jfp:
+			json.dump(allSim, jfp, indent=2)
+
 	def OnBGenSim(self, _):
 		# TODO; need to do sometning about loco number.  Do we put it here, or should it be put inmy the simulator?
 		# TODO - train length
-		locoid = 7600
-		trainid = self.currentTrain.GetTrainID()
-		east = self.currentTrain.IsEast()
-		segTimes, segString = self.determineSegmentsAndTimes(self.startBlock, None, east, self.currentTrain.GetStartBlockTime())
-		sBlk = self.startBlock
-		if self.startSubBlock is not None:
-			sBlk = self.startSubBlock
-			
-		# determine which segment is our starting position and ignore the seqments before it in the list
-		for idx in range(len(segTimes)):
-			if sBlk == segTimes[idx][0]:
-				break
-		else:
-			idx = 0
-			
-		script = []
-		placeTrainCmd = {"block": self.startBlock, "name": trainid, "loco": locoid, "time": segTimes[idx][1], "length": 3}
-		if self.startSubBlock is not None:
-			placeTrainCmd["subblock"] = segTimes[idx][0]
-			
-		script.append({"placetrain": placeTrainCmd})
-
-		idx += 1
-		while idx < len(segTimes):
-			script.append({"movetrain": {"block": segTimes[idx][0], "time": segTimes[idx][1]}})
-			idx += 1
-
-		blkSeq = self.blockSeq.GetBlocks()
-		nblocks = len(blkSeq)
-		bx = 0
-		for b in blkSeq:
-			bx += 1
-			terminus = bx == nblocks
-			segTimes, segString = self.determineSegmentsAndTimes(b["block"], b["os"], east, b["time"], terminus=terminus)
-
-			script.append({"waitfor": {"signal": b["signal"], "route": b["route"], "os": segTimes[0][0], "block": segString}})
-			
-			script.append({"movetrain": {"block": segTimes[0][0], "time": segTimes[0][1]}})
-			for seg, tm in segTimes[1:]:
-				script.append({"movetrain": {"block": seg, "time": tm}})
-
-		scr = {"%s" % trainid: script}
+		trainid, scr = self.GenSim(self.currentTrain)
 		scrString = json.dumps(scr, indent=2)
 		dlg = SimScriptDlg(self, scrString, trainid)
 		rc = dlg.ShowModal()
@@ -355,6 +334,52 @@ class MainFrame(wx.Frame):
 				json.dump(j, jfp, indent=2)
 								
 		dlg.Destroy()
+		
+	def GenSim(self, tr):
+		locoid = 0
+		trainid = tr.GetTrainID()
+		east = tr.IsEast()
+		segTimes, segString = self.determineSegmentsAndTimes(tr.GetStartBlock(), None, east, tr.GetStartBlockTime())
+		sBlk = tr.GetStartBlock()
+		subBlk = tr.GetStartSubBlock()
+		if subBlk is not None:
+			sBlk = subBlk
+			
+		# determine which segment is our starting position and ignore the seqments before it in the list
+		for idx in range(len(segTimes)):
+			if sBlk == segTimes[idx][0]:
+				break
+		else:
+			idx = 0
+			
+		script = []
+		placeTrainCmd = {"block": sBlk, "name": trainid, "loco": locoid, "time": segTimes[idx][1], "length": 3}
+		if subBlk is not None:
+			placeTrainCmd["subblock"] = segTimes[idx][0]
+			
+		script.append({"placetrain": placeTrainCmd})
+
+		idx += 1
+		while idx < len(segTimes):
+			script.append({"movetrain": {"block": segTimes[idx][0], "time": segTimes[idx][1]}})
+			idx += 1
+
+		blkSeq = tr.GetSteps()
+		nblocks = len(blkSeq)
+		bx = 0
+		for b in blkSeq:
+			bx += 1
+			terminus = bx == nblocks
+			segTimes, segString = self.determineSegmentsAndTimes(b["block"], b["os"], east, b["time"], terminus=terminus)
+
+			script.append({"waitfor": {"signal": b["signal"], "route": b["route"], "os": segTimes[0][0], "block": segString}})
+			
+			script.append({"movetrain": {"block": segTimes[0][0], "time": segTimes[0][1]}})
+			for seg, tm in segTimes[1:]:
+				script.append({"movetrain": {"block": seg, "time": tm}})
+
+		scr = {"%s" % trainid: script}
+		return trainid, scr
 		
 		
 	def determineSegmentsAndTimes(self, block, os, east, blockTime, terminus=False):
@@ -400,10 +425,21 @@ class MainFrame(wx.Frame):
 		
 		return segTimes,waitString
 
+	def OnBGenARAll(self, _):
+		allAR = {}
+		for tr in self.trains:
+			_, scr = self.GenAR(tr, None)
+			allAR.update(scr)
+		
+		print(json.dumps(allAR, indent=2))
+		#fn = os.path.join(os.getcwd(), "data", ARSCRIPTFN)
+		#with open(fn, "w") as jfp:
+	#		json.dump(allAR, jfp, indent=2)
+		
 	def OnBGenAR(self, _):
 		# TODO: we may not want to autproute at every OS - need a way to check the ones we do want
-		lb = self.startBlock
 		blist = []
+		lb = self.startBlock
 		for b in self.blockSeq.GetBlocks():
 			blist.append("%s => %s" % (lb, b["block"]))
 			lb = b["block"]
@@ -415,21 +451,8 @@ class MainFrame(wx.Frame):
 		
 		blks = [self.blockSeq.GetBlocks()[b]["block"] for b in blist]
 		
-		trainid = self.currentTrain.GetTrainID()
-		lastBlock = self.startBlock
-		script = {}
-		for b in self.blockSeq.GetBlocks():
-			if len(script) == 0:
-				script["origin"] = lastBlock
-				
-			if b["block"] in blks:
-				trigger = 'F' if b["trigger"] == "Front" else 'B'			
-				script[lastBlock] = {"route": b["route"], "trigger": trigger}
-			lastBlock = b["block"]
-			
-		script["terminus"] = lastBlock
-
-		scr = {"%s" % trainid: script}
+		trainid, scr = self.GenAR(self.currentTrain, blks)
+		
 		scrString = json.dumps(scr, indent=2)
 		dlg = ARScriptDlg(self, scrString, trainid)
 		rc = dlg.ShowModal()
@@ -446,6 +469,25 @@ class MainFrame(wx.Frame):
 				json.dump(j, jfp, indent=2)
 			
 		dlg.Destroy()
+
+	def GenAR(self, tr, blks):		
+		trainid = tr.GetTrainID()
+		lastBlock = tr.GetStartBlock()
+		blkSeq = tr.GetSteps()
+		script = {}
+		for b in blkSeq:
+			if len(script) == 0:
+				script["origin"] = lastBlock
+				
+			if blks is None or b["block"] in blks:
+				trigger = 'F' if b["trigger"] == "Front" else 'B'			
+				script[lastBlock] = {"route": b["route"], "trigger": trigger}
+			lastBlock = b["block"]
+			
+		script["terminus"] = lastBlock
+
+		scr = {"%s" % trainid: script}
+		return trainid, scr
 		
 	def SetModified(self, flag=True):
 		self.modified = flag

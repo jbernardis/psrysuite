@@ -19,6 +19,7 @@ from tester.nodes.krulish import Krulish
 from tester.nodes.cliveden import Cliveden
 from tester.nodes.greenmtn import GreenMtn
 from tester.nodes.cliff import Cliff
+from tester.nodes.sheffield import Sheffield
 
 # district node addresses
 YARD      = 0x11
@@ -70,7 +71,7 @@ nodes = {
 	"Cliveden" : ( CLIVEDEN, Cliveden ),
 	"Green Mtn" : ( GREENMTN, GreenMtn ),
 	"Cliff" : ( CLIFF, Cliff ),
-	"Sheffield" : ( SHEFFIELD, None )	
+	"Sheffield" : ( SHEFFIELD, Sheffield )	
 }
 
 def formatInputBytes(inb):

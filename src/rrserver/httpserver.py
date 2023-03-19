@@ -3,6 +3,8 @@ from threading import Thread
 from socketserver import ThreadingMixIn 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
+import json
+import os
 
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
@@ -66,7 +68,61 @@ class HTTPServer:
 		return self.server
 
 	def dispatch(self, cmd):
-		self.cbCommand(cmd)
+		verb = cmd["cmd"][0]
+		if verb == "getlocos":
+			fn = os.path.join(os.getcwd(), "data", "locos.json")
+			try:
+				with open(fn, "r") as jfp:
+					j = json.load(jfp)
+			except FileNotFoundError:
+				return 400, "File Not Found"
+			
+			except:
+				return 400, "Unknown error encountered"
+			
+			return 200, json.dumps(j)
+		
+		elif verb == "gettrains":
+			fn = os.path.join(os.getcwd(), "data", "trains.json")
+			try:
+				with open(fn, "r") as jfp:
+					j = json.load(jfp)
+			except FileNotFoundError:
+				return 400, "File Not Found"
+			
+			except:
+				return 400, "Unknown error encountered"
+			
+			return 200, json.dumps(j)
+		
+		elif verb == "getlayout":
+			fn = os.path.join(os.getcwd(), "data", "layout.json")
+			try:
+				with open(fn, "r") as jfp:
+					j = json.load(jfp)
+			except FileNotFoundError:
+				return 400, "File Not Found"
+			
+			except:
+				return 400, "Unknown error encountered"
+			
+			return 200, json.dumps(j)
+		
+		elif verb == "getsimscripts":
+			fn = os.path.join(os.getcwd(), "data", "simscripts.json")
+			try:
+				with open(fn, "r") as jfp:
+					j = json.load(jfp)
+			except FileNotFoundError:
+				return 400, "File Not Found"
+			
+			except:
+				return 400, "Unknown error encountered"
+			
+			return 200, json.dumps(j)
+
+		else:
+			self.cbCommand(cmd)
 		
 		rc = 200
 		body = b'request received'

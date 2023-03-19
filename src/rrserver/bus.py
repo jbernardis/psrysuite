@@ -67,7 +67,7 @@ class Bus:
 		
 		nb = self.port.write(sendBuffer)
 		if nb != (nbytes+1):
-			logging.error("expected %d byte(s) written, got %d" % (nbytes+1, nb))
+			logging.error("expected %d byte(s) written, got %d for address %x" % (nbytes+1, nb, address))
 
 		tries = 0
 		inbuf = []
@@ -84,9 +84,9 @@ class Bus:
 				remaining = nbytes-len(inbuf)
 				
 		if len(inbuf) != nbytes:
-			logging.error("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
+			logging.error("incomplete read for address %x.  Expecting %d characters, got %d" % (address, nbytes, len(inbuf)))
 			print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)), flush=True)
-			return [b'\x00']*nbytes
+			return None #[b'\x00']*nbytes
 		else:
 			return inbuf
 
@@ -121,9 +121,9 @@ class RailroadMonitor(threading.Thread):
 			current = time.monotonic_ns()
 			elapsed = current - lastPoll
 			if self.isRunning and elapsed > self.pollInterval:
-				logging.debug("Starting all io")
+				#logging.debug("Starting all io")
 				self.rr.allIO()
-				logging.debug("all io finished")
+				#logging.debug("all io finished")
 				lastPoll = current
 			else:
 				time.sleep(0.0001) # yield to other threads

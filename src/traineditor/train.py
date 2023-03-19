@@ -63,6 +63,18 @@ class Trains:
 			tr.SetStartSubBlock(trData["startsubblock"])
 			tr.SetStartBlockTime(trData["time"])
 			tr.SetSteps(trData["steps"])
+			
+	def __iter__(self):
+		self._nx_ = 0
+		return self
+	
+	def __next__(self):
+		if self._nx_ >= len(self.trainlist):
+			raise StopIteration
+		
+		nx = self._nx_
+		self._nx_ += 1
+		return self.trainlist[nx]
 		
 	def Save(self):
 		TrainsJson = {}

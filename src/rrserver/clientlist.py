@@ -55,6 +55,13 @@ class ClientList(wx.ListCtrl):
 				cl.append((self.clientList[i], self.skts[i]))
 			
 		return cl
+	
+	def GetFunctionAtAddress(self, address):
+		for i in range(len(self.clientList)):
+			if self.clientList[i] == address:
+				return self.GetItemText(i, 0)
+			
+		return None
 
 	def DelClient(self, addr):
 		logging.info("Removing client with address %s:%s" % (addr[0], addr[1]))

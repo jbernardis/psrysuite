@@ -1,9 +1,7 @@
 import wx
-import os
-import json
 
 class EditTrainDlg(wx.Dialog):
-	def __init__(self, parent, train, dispatcher):
+	def __init__(self, parent, train, locoList, trainList, dispatcher):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details")
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
 		
@@ -14,19 +12,9 @@ class EditTrainDlg(wx.Dialog):
 
 		name, loco = train.GetNameAndLoco()
 		atc = train.IsOnATC()
-
-		self.chosenTrain = name
-		path = os.path.join(os.getcwd(), "data", "trains.json")
-		try:
-			with open(path, "r") as jfp:
-				trains = json.load(jfp)
-		except:
-			print("Unable to load trains file: %s" % path)
-			trains = {}
 			
 		font = wx.Font(wx.Font(16, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
 
-		trainList = sorted(list(trains.keys()))
 		lblTrain = wx.StaticText(self, wx.ID_ANY, "Train:", size=(90, -1))
 		lblTrain.SetFont(font)
 		self.cbTrainID = wx.ComboBox(self, wx.ID_ANY, name,
@@ -38,15 +26,7 @@ class EditTrainDlg(wx.Dialog):
 		self.Bind(wx.EVT_TEXT, self.OnTrainText, self.cbTrainID)
 		
 		self.chosenLoco = loco
-		path = os.path.join(os.getcwd(), "data", "locos.json")
-		try:
-			with open(path, "r") as jfp:
-				locos = json.load(jfp)
-		except:
-			print("Unable to load locomotives file: %s" % path)
-			locos = {}
-			
-		locoList = sorted(list(locos.keys()), key=self.BuildLocoKey)
+		
 		lblLoco  = wx.StaticText(self, wx.ID_ANY, "Loco:", size=(90, -1))
 		lblLoco.SetFont(font)
 		self.cbLocoID = wx.ComboBox(self, wx.ID_ANY, loco,
@@ -104,9 +84,6 @@ class EditTrainDlg(wx.Dialog):
 		self.SetSizer(hsz)
 		self.Layout()
 		self.Fit()
-		
-	def BuildLocoKey(self, lid):
-		return int(lid)
 		
 	def OnLocoChoice(self, evt):
 		self.chosenLoco = evt.GetString()

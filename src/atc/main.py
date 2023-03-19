@@ -2,7 +2,6 @@ import wx
 import wx.lib.newevent
 
 import os, sys
-from pickle import NONE, FALSE, TRUE
 cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
@@ -149,9 +148,6 @@ class MainFrame(wx.Frame):
 		self.Bind(EVT_DELIVERY, self.OnDeliveryEvent)
 		self.Bind(EVT_DISCONNECT, self.OnDisconnectEvent)
 		self.Bind(EVT_TICKER, self.OnTickerEvent)
-		
-		if not self.ProcessScripts():
-			return
 
 		self.dccServer = DCCServer()
 		self.dccServer.SetServerAddress(self.settings.ipaddr, self.settings.dccserverport)
@@ -168,8 +164,18 @@ class MainFrame(wx.Frame):
 		
 		logging.info("socket connection created")
 		
+		# load the scripts and layout information	
+		if not self.ProcessScripts():
+			return
+		
+		# retrieve the loco information from the server
+		locos = self.rrServer.Get("getlocos", {})
+		if locos is None:
+			logging.error("Unable to retrieve locos")
+			locos = {}
+	
 		self.dccRemote = DCCRemote(self.dccServer)
-		if not self.dccRemote.Initialize():
+		if not self.dccRemote.Initialize(locos):
 			logging.error("Unable to initialize DCC remote")
 			return
 		
@@ -180,28 +186,26 @@ class MainFrame(wx.Frame):
 		
 		self.ReportSelection(None)
 		logging.info("exit initialize")
+		
+	def BuildLocoKey(self, lid):
+		return int(lid)
 
 	def ProcessScripts(self):
-		path = os.path.join(os.getcwd(), "data", "layout.json")
-		try:
-			with open(path, "r") as jfp:
-				layout = json.load(jfp)
-		except:
-			logging.error("Unable to load layout file: %s" % path)
+		layout = self.rrServer.Get("getlayout", {})
+		if layout is None:
+			logging.error("Unable to retrieve layout information")
 			return False
-		
+
 		subblocks = layout["subblocks"]
+
 		submap = {}
 		for blk, sublist in subblocks.items():
 			for sub in sublist:
 				submap[sub] = blk
 
-		path = os.path.join(os.getcwd(), "data", "simscripts.json")		
-		try:
-			with open(path, "r") as jfp:
-				scripts = json.load(jfp)
-		except:
-			logging.error("Unable to load scripts: %s" % path)
+		scripts = self.rrServer.Get("getsimscripts", {})
+		if scripts is None:
+			logging.error("Unable to retrieve simulator/atc scripts")
 			return False
 		
 		self.scripts = {}
@@ -588,6 +592,11 @@ class MainFrame(wx.Frame):
 		wx.PostEvent(self, evt)
 
 	def OnDisconnectEvent(self, _):
+		try:
+			self.dccRemote.StopAll()
+		except:
+			pass
+		
 		self.kill()
 		
 	def ReportSelection(self, trnm):

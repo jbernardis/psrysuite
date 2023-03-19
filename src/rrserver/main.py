@@ -19,7 +19,6 @@ import wx.lib.newevent
 
 import json
 import socket
-import signal as sg
 
 from subprocess import Popen
 
@@ -52,6 +51,7 @@ class MainFrame(wx.Frame):
 		logging.info("pydispatch starting")
 		
 		self.pidAR = None
+		self.pidADV = None
 		self.pidDCC = None
 
 		self.routeDefs = {}
@@ -184,7 +184,21 @@ class MainFrame(wx.Frame):
 					del self.clients[addr]
 				except KeyError:
 					pass
+				
+				f = self.clientList.GetFunctionAtAddress(addr)
 				self.clientList.DelClient(addr)
+				
+				if f == "DISPATCH":
+					self.deleteClients(["AR", "ADVISOR", "ATC"])
+					self.pidAR = None
+					self.pidADV = None
+					
+	def deleteClients(self, clist):
+		for cname in clist:
+			addrList = self.clientList.GetFunctionAddress(cname)
+			for addr, _ in addrList:
+				self.socketServer.deleteSocket(addr)
+
 
 	def refreshClient(self, addr, skt):
 		for m in self.rr.GetCurrentValues():
@@ -222,7 +236,7 @@ class MainFrame(wx.Frame):
 			else:
 				self.socketServer.sendToAll(evt.data)
 
-	def dispCommandReceipt(self, cmd):
+	def dispCommandReceipt(self, cmd): # thread context
 		evt = HTTPMessageEvent(data=cmd)
 		wx.QueueEvent(self, evt)
 
@@ -499,6 +513,11 @@ class MainFrame(wx.Frame):
 			sid = int(evt.data["SID"][0])
 			function = evt.data["function"][0]
 			self.clientList.SetSessionFunction(sid, function)
+			if function == "DISPATCH":
+				self.deleteClients(["AR", "ADVISOR", "ATC"])
+				self.pidAR = None
+				self.pidADV = None
+
 			
 		elif verb == "autorouter":
 			stat = evt.data["status"][0]
@@ -508,9 +527,8 @@ class MainFrame(wx.Frame):
 					self.pidAR = Popen([sys.executable, arExec]).pid
 					logging.debug("autorouter started as PID %d" % self.pidAR)
 			else:
-				addrList = self.clientList.GetFunctionAddress("AR")
-				for addr, _ in addrList:
-					self.socketServer.deleteSocket(addr)
+				self.deleteClients(["AR"])
+				self.pidAR = None
 				
 		elif verb == "atc":
 			addrList = self.clientList.GetFunctionAddress("ATC")
@@ -519,7 +537,18 @@ class MainFrame(wx.Frame):
 					
 		elif verb == "atcstatus":
 			self.socketServer.sendToAll({"atcstatus": evt.data})
-			
+						
+		elif verb == "advisor":
+			stat = evt.data["status"][0]
+			if stat == "on":
+				if not self.clientList.HasFunction("ADVISOR"):
+					advExec = os.path.join(os.getcwd(), "advisor", "main.py")
+					self.pidADV = Popen([sys.executable, advExec]).pid
+					logging.debug("advisor started as PID %d" % self.pidADV)
+			else:
+				self.deleteClients(["ADVISOR"])
+				self.pidADV = None
+	
 		elif verb == "advice":
 			addrList = self.clientList.GetFunctionAddress("DISPATCH")
 			for addr, skt in addrList:
