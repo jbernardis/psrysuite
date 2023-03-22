@@ -1,9 +1,65 @@
 {
   "11": {
-    "eastbound": false,
-    "startblock": "C22",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "CLIFF",
+        "Sheffield Yd ",
+        11
+      ],
+      [
+        "BANK",
+        "",
+        3
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N31 or N32 (S)",
+        23
+      ],
+      [
+        "",
+        "Kurlish Jct",
+        19
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "",
+        "Carlton",
+        15
+      ],
+      [
+        "KRULISH",
+        "Latham",
+        10
+      ],
+      [
+        "YARD",
+        "Koehlstadt / Y51 (X)",
+        1
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "CF",
+      "track": null
+    },
+    "terminus": {
+      "loc": "YD",
+      "track": "Y51"
+    },
+    "sequence": [
       {
         "block": "C23",
         "os": "COSCLEW",
@@ -133,13 +189,72 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "C22",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
   },
   "12": {
-    "eastbound": true,
-    "startblock": "Y51",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "YARD",
+        "Koehlstadt / Y51",
+        1
+      ],
+      [
+        "",
+        "Cornell",
+        7
+      ],
+      [
+        "LATHAM",
+        "Latham Jct",
+        10
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "SHORE",
+        "",
+        5
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N41 or N42 (S)",
+        23
+      ],
+      [
+        "BANK",
+        "",
+        3
+      ],
+      [
+        "CLIFF",
+        "Sheffield Yd (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "YD",
+      "track": "Y51"
+    },
+    "terminus": {
+      "loc": "CF",
+      "track": null
+    },
+    "sequence": [
       {
         "block": "Y20",
         "os": "YOSKL1",
@@ -285,13 +400,72 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "Y51",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "17": {
-    "eastbound": false,
-    "startblock": "C22",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "CLIFF",
+        "Sheffield Yd",
+        11
+      ],
+      [
+        "",
+        "Cliveden",
+        10
+      ],
+      [
+        "BANK",
+        "",
+        3
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N31 or N32 (S)",
+        23
+      ],
+      [
+        "KRULISH",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "",
+        "Radstock",
+        14
+      ],
+      [
+        "PORT",
+        "Parsons Jct",
+        9
+      ],
+      [
+        "",
+        "Cornell Jct",
+        7
+      ],
+      [
+        "YARD",
+        "koehlstadt / Y50 (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "CF",
+      "track": null
+    },
+    "terminus": {
+      "loc": "YD",
+      "track": "Y50"
+    },
+    "sequence": [
       {
         "block": "C23",
         "os": "COSCLEW",
@@ -421,13 +595,67 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "C22",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
   },
   "18": {
-    "eastbound": true,
-    "startblock": "Y50",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "YARD",
+        "Koehlstadt / Y50",
+        1
+      ],
+      [
+        "",
+        "Cornell Jct",
+        7
+      ],
+      [
+        "PORT",
+        "",
+        9
+      ],
+      [
+        "KRULISH",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N41 or N42 (S)",
+        23
+      ],
+      [
+        "BANK",
+        "",
+        3
+      ],
+      [
+        "",
+        "Green Mountain (S)",
+        15
+      ],
+      [
+        "CLIFF",
+        "Sheffiled (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "YD",
+      "track": "Y50"
+    },
+    "terminus": {
+      "loc": "CF",
+      "track": null
+    },
+    "sequence": [
       {
         "block": "Y20",
         "os": "YOSKL1",
@@ -573,13 +801,72 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "Y50",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "21": {
-    "eastbound": false,
-    "startblock": "B10",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "NASSAU",
+        "(From Coach Yard to)",
+        22
+      ],
+      [
+        "   Start",
+        "Wilson City / N31 or N32",
+        23
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "",
+        "Bortell (S)",
+        3
+      ],
+      [
+        "",
+        "Loland (S)",
+        26
+      ],
+      [
+        "DELL",
+        "Laporte (S)",
+        21
+      ],
+      [
+        "LATHAM",
+        "Carlton (S)",
+        15
+      ],
+      [
+        "PORT",
+        "Southport (X)",
+        16
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "WC",
+      "track": "N31"
+    },
+    "terminus": {
+      "loc": "PT",
+      "track": null
+    },
+    "sequence": [
       {
         "block": "N32",
         "os": "NEOSW",
@@ -621,13 +908,72 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "B10",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
   },
   "22": {
-    "eastbound": true,
-    "startblock": "P5",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "PORT",
+        "Southport / P5",
+        16
+      ],
+      [
+        "LATHAM",
+        "Latham Jct",
+        10
+      ],
+      [
+        "",
+        "Carlton (S)",
+        15
+      ],
+      [
+        "DELL",
+        "Laporte (S)",
+        21
+      ],
+      [
+        "",
+        "Loland (S)",
+        26
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "KRULISH",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N41 or N42 (X)",
+        23
+      ],
+      [
+        "",
+        "To Coach Yard",
+        22
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "PT",
+      "track": null
+    },
+    "terminus": {
+      "loc": "WC",
+      "track": "N41"
+    },
+    "sequence": [
       {
         "block": "P20",
         "os": "POSSP3",
@@ -701,13 +1047,57 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "P5",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "43": {
-    "eastbound": false,
-    "startblock": "C31",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "CLIFF",
+        "Green Mountain / C30",
+        11
+      ],
+      [
+        "",
+        "Clivedon (S)",
+        10
+      ],
+      [
+        "",
+        "Spikes Peak (S)",
+        5
+      ],
+      [
+        "BANK",
+        "Martinsville (S)",
+        3
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N31 or N32 (X)",
+        23
+      ],
+      [
+        "",
+        "Opt (To Coach Yard)",
+        22
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "GM",
+      "track": "C30"
+    },
+    "terminus": {
+      "loc": "WC",
+      "track": "N31"
+    },
+    "sequence": [
       {
         "block": "C11",
         "os": "COSGMW",
@@ -757,13 +1147,57 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "C31",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
   },
   "44": {
-    "eastbound": true,
-    "startblock": "N42",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "NASSAU",
+        "(From Coach Yard to)",
+        22
+      ],
+      [
+        "   Start",
+        "Wilson City / N41 or N42",
+        23
+      ],
+      [
+        "BANK",
+        "Martinsville (S)",
+        3
+      ],
+      [
+        "",
+        "Spikes Peak (S)",
+        5
+      ],
+      [
+        "CLIFF",
+        "Cliveden (S)",
+        10
+      ],
+      [
+        "",
+        "Green Mountain / C31 (X)",
+        15
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "WC",
+      "track": "N41"
+    },
+    "terminus": {
+      "loc": "GM",
+      "track": "C31"
+    },
+    "sequence": [
       {
         "block": "B20",
         "os": "NEOSE",
@@ -813,13 +1247,26 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "N42",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "56": {
-    "eastbound": true,
-    "startblock": "Y60",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [],
+    "block": null,
+    "desc": null,
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": null,
+      "track": null
+    },
+    "terminus": {
+      "loc": null,
+      "track": null
+    },
+    "sequence": [
       {
         "block": "Y20",
         "os": "YOSKL3",
@@ -901,13 +1348,26 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "Y60",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "57": {
-    "eastbound": true,
-    "startblock": "R10",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [],
+    "block": null,
+    "desc": null,
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": null,
+      "track": null
+    },
+    "terminus": {
+      "loc": null,
+      "track": null
+    },
+    "sequence": [
       {
         "block": "N31",
         "os": "NEOSRH",
@@ -989,13 +1449,62 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "R10",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "61": {
-    "eastbound": false,
-    "startblock": "N31",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "NASSAU",
+        "(From Coach Yard to)",
+        22
+      ],
+      [
+        "   Start",
+        "Wilson City / N31 or N32",
+        23
+      ],
+      [
+        "KRULISH",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "",
+        "Richards (S)",
+        9
+      ],
+      [
+        "",
+        "Radstock (S)",
+        14
+      ],
+      [
+        "",
+        "South Jct",
+        9
+      ],
+      [
+        "PORT",
+        "Southport (X)",
+        16
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger (RDC)",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "NA",
+      "track": null
+    },
+    "terminus": {
+      "loc": "PT",
+      "track": null
+    },
+    "sequence": [
       {
         "block": "N11",
         "os": "NWOSW",
@@ -1037,13 +1546,139 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "N31",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
+  },
+  "62": {
+    "tracker": [
+      [
+        "PORT",
+        "Southport",
+        16
+      ],
+      [
+        "",
+        "Radstock (S)",
+        14
+      ],
+      [
+        "",
+        "Richards (S)",
+        9
+      ],
+      [
+        "KRULISH",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N41 or N42 (X)",
+        23
+      ],
+      [
+        "",
+        "(To Coach Yard / A)",
+        22
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "PT",
+      "track": null
+    },
+    "terminus": {
+      "loc": "NA",
+      "track": null
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "63": {
+    "tracker": [
+      [
+        "PORT",
+        "Southport",
+        16
+      ],
+      [
+        "",
+        "Parsons Jct",
+        9
+      ],
+      [
+        "",
+        "Cornell Jct",
+        7
+      ],
+      [
+        "YARD",
+        "Koehlstadt",
+        1
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger (RDC)",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "PT",
+      "track": null
+    },
+    "terminus": {
+      "loc": "YD",
+      "track": null
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": false
   },
   "64": {
-    "eastbound": true,
-    "startblock": "Y52",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "YARD",
+        "Koehlstadt",
+        1
+      ],
+      [
+        "",
+        "Cornell Jct",
+        7
+      ],
+      [
+        "",
+        "Parsons Jct",
+        9
+      ],
+      [
+        "PORT",
+        "Southport",
+        16
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger (RDC)",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "YD",
+      "track": null
+    },
+    "terminus": {
+      "loc": "PT",
+      "track": null
+    },
+    "sequence": [
       {
         "block": "Y20",
         "os": "YOSKL1",
@@ -1117,13 +1752,72 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "Y52",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "71": {
-    "eastbound": false,
-    "startblock": "H34",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "HYDE W",
+        "Hidden / H34",
+        11
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "",
+        "Bortell",
+        4
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "DELL",
+        "LaPorte",
+        21
+      ],
+      [
+        "",
+        "Carlton",
+        15
+      ],
+      [
+        "LATHAM",
+        "",
+        10
+      ],
+      [
+        "",
+        "Parsons Jct",
+        9
+      ],
+      [
+        "PORT",
+        "Southport (X)",
+        16
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "HY",
+      "track": "H34"
+    },
+    "terminus": {
+      "loc": "PT",
+      "track": null
+    },
+    "sequence": [
       {
         "block": "H11",
         "os": "HOSWW",
@@ -1181,13 +1875,67 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "H34",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
   },
   "72": {
-    "eastbound": true,
-    "startblock": "P4",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "PORT",
+        "Southport / P4",
+        16
+      ],
+      [
+        "LATHAM",
+        "",
+        10
+      ],
+      [
+        "",
+        "Carlton",
+        15
+      ],
+      [
+        "DELL",
+        "LaPorte",
+        21
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "",
+        "Bortell",
+        5
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "HYDE W",
+        "Hidden / H43 (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "PT",
+      "track": null
+    },
+    "terminus": {
+      "loc": "HY",
+      "track": "H43"
+    },
+    "sequence": [
       {
         "block": "P20",
         "os": "POSSP3",
@@ -1261,13 +2009,57 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "P4",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "73": {
-    "eastbound": false,
-    "startblock": "H12",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "HYDE W",
+        "Hidden / H12",
+        11
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "",
+        "Bortell",
+        4
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "HYDE E",
+        "Hidden / H34 (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Loop Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "HY",
+      "track": "H12"
+    },
+    "terminus": {
+      "loc": "HY",
+      "track": "H34"
+    },
+    "sequence": [
       {
         "block": "H11",
         "os": "HOSWW",
@@ -1317,13 +2109,72 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "H12",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
   },
   "81": {
-    "eastbound": false,
-    "startblock": "C22",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "CLIFF",
+        "Sheffield ",
+        11
+      ],
+      [
+        "BANK",
+        "",
+        3
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N31 or N32 (S)",
+        23
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "",
+        "Bortell",
+        4
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "HYDE E",
+        "Hidden / H12 (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "CF",
+      "track": null
+    },
+    "terminus": {
+      "loc": "HY",
+      "track": "H12"
+    },
+    "sequence": [
       {
         "block": "C23",
         "os": "COSCLEW",
@@ -1421,13 +2272,67 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "C22",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
   },
   "82": {
-    "eastbound": true,
-    "startblock": "H42",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "HYDE E",
+        "Hidden / H42",
+        11
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "KRULISH",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "Wilson City /N41 or N42 (S)",
+        23
+      ],
+      [
+        "BANK",
+        "",
+        3
+      ],
+      [
+        "CLIFF",
+        "Green Mountain (S)",
+        15
+      ],
+      [
+        "",
+        "Sheffield Yd (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "HY",
+      "track": "H42"
+    },
+    "terminus": {
+      "loc": "CF",
+      "track": null
+    },
+    "sequence": [
       {
         "block": "H23",
         "os": "HOSEE",
@@ -1541,13 +2446,57 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "H42",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "84": {
-    "eastbound": true,
-    "startblock": "H43",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "HYDE E",
+        "Hidden / H43",
+        11
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "",
+        "Bortell",
+        4
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "HYDE W",
+        "Hidden / H42 (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Loop Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "HY",
+      "track": "H43"
+    },
+    "terminus": {
+      "loc": "HY",
+      "track": "H42"
+    },
+    "sequence": [
       {
         "block": "H23",
         "os": "HOSEE",
@@ -1597,13 +2546,255 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "H43",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
+  },
+  "91": {
+    "tracker": [
+      [
+        "",
+        "Harpers Ferry / F33",
+        7
+      ],
+      [
+        "",
+        "Rocky Hill (S)",
+        2
+      ],
+      [
+        "NASSAU",
+        "Wilson City (N31 or N32)",
+        23
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "",
+        "Richards",
+        9
+      ],
+      [
+        "",
+        "Radstock",
+        14
+      ],
+      [
+        "",
+        "South Jct",
+        9
+      ],
+      [
+        "PORT",
+        "Southport (X)",
+        16
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "HF",
+      "track": null
+    },
+    "terminus": {
+      "loc": "PT",
+      "track": null
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": false
+  },
+  "92": {
+    "tracker": [
+      [
+        "PORT",
+        "Southport",
+        16
+      ],
+      [
+        "",
+        "Radstock",
+        14
+      ],
+      [
+        "",
+        "Richards",
+        9
+      ],
+      [
+        "KRULISH",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "Wilson City (N41 or N42)",
+        23
+      ],
+      [
+        "Branch",
+        "Rocky Hill",
+        2
+      ],
+      [
+        "",
+        "Harpers Ferry / F33",
+        7
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "PT",
+      "track": null
+    },
+    "terminus": {
+      "loc": "HF",
+      "track": null
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "95": {
+    "tracker": [
+      [
+        "",
+        "Harpers Ferry / F33",
+        7
+      ],
+      [
+        "",
+        "Rocky Hill (S)",
+        2
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N31 or N32 (S)",
+        23
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "SHORE",
+        "Bortell (S)",
+        4
+      ],
+      [
+        "",
+        "Loland (S)",
+        26
+      ],
+      [
+        "DELL",
+        "Laporte (S)",
+        22
+      ],
+      [
+        "LATHAM",
+        "Carlton (S)",
+        15
+      ],
+      [
+        "YARD",
+        "Koehlstadt / Y53 (X)",
+        1
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "HF",
+      "track": null
+    },
+    "terminus": {
+      "loc": "YD",
+      "track": "Y53"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": false
   },
   "96": {
-    "eastbound": true,
-    "startblock": "Y52",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "YARD",
+        "Koehlstadt / Y53",
+        1
+      ],
+      [
+        "LATHAM",
+        "Carlton (S)",
+        10
+      ],
+      [
+        "DELL",
+        "LaPorte (S)",
+        21
+      ],
+      [
+        "",
+        "Loland (S)",
+        25
+      ],
+      [
+        "SHORE",
+        "Bortell (S)",
+        4
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N41 or N42",
+        23
+      ],
+      [
+        "Branch",
+        "Rocky Hill (S)",
+        2
+      ],
+      [
+        "",
+        "Harpers Ferry / F33 (X)",
+        7
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "YD",
+      "track": "Y53"
+    },
+    "terminus": {
+      "loc": "HF",
+      "track": null
+    },
+    "sequence": [
       {
         "block": "Y20",
         "os": "YOSKL1",
@@ -1701,13 +2892,72 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "Y52",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "CFHY": {
-    "eastbound": false,
-    "startblock": "C22",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "CLIFF",
+        "",
+        11
+      ],
+      [
+        "BANK",
+        "",
+        3
+      ],
+      [
+        "NASSAU",
+        "",
+        23
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "",
+        "Bortell",
+        4
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "HYDE E",
+        "Hidden Trk / H33 (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Unit Freight",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "CF",
+      "track": null
+    },
+    "terminus": {
+      "loc": "HY",
+      "track": "H33"
+    },
+    "sequence": [
       {
         "block": "C23",
         "os": "COSCLEW",
@@ -1829,13 +3079,26 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
-  },
-  "CLYD": {
-    "eastbound": false,
     "startblock": "C22",
     "startsubblock": null,
-    "steps": [
+    "time": 5000,
+    "eastbound": false
+  },
+  "CLYD": {
+    "tracker": [],
+    "block": null,
+    "desc": null,
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": null,
+      "track": null
+    },
+    "terminus": {
+      "loc": null,
+      "track": null
+    },
+    "sequence": [
       {
         "block": "C23",
         "os": "COSCLEW",
@@ -1949,13 +3212,57 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "C22",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
   },
   "HEX": {
-    "eastbound": true,
-    "startblock": "H40",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "HYDE E",
+        "Hidden / H40",
+        11
+      ],
+      [
+        "DELL",
+        "",
+        21
+      ],
+      [
+        "",
+        "Loland",
+        25
+      ],
+      [
+        "",
+        "Bortell",
+        4
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "HYDE W",
+        "Hidden / H40 (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Empty Coal Hoppers",
+    "loco": "7600",
+    "normalloco": "7600",
+    "origin": {
+      "loc": "HY",
+      "track": "H40"
+    },
+    "terminus": {
+      "loc": "HY",
+      "track": "H40"
+    },
+    "sequence": [
       {
         "block": "H23",
         "os": "HOSEE",
@@ -1997,13 +3304,57 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "H40",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "HWX": {
-    "eastbound": false,
-    "startblock": "H30",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "HYDE W",
+        "Hidden / H32 ",
+        11
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "",
+        "Bortell",
+        4
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "HYDE E",
+        "Hidden / H32 (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Loaded Coal Hoppers",
+    "loco": "3809",
+    "normalloco": "3809",
+    "origin": {
+      "loc": "HY",
+      "track": "H32"
+    },
+    "terminus": {
+      "loc": "HY",
+      "track": "H32"
+    },
+    "sequence": [
       {
         "block": "S10",
         "os": "SOSW",
@@ -2045,13 +3396,72 @@
         "trigger": "Front"
       }
     ],
-    "time": 7500
+    "startblock": "H30",
+    "startsubblock": null,
+    "time": 7500,
+    "eastbound": false
   },
   "HYCF": {
-    "eastbound": true,
-    "startblock": "H22",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "HYDE W",
+        "Hidden / H22",
+        11
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "",
+        "Bortell",
+        4
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "",
+        23
+      ],
+      [
+        "BANK",
+        "",
+        3
+      ],
+      [
+        "CLIFF",
+        "Sheffield Yd (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Unit Freight",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "HY",
+      "track": "H22"
+    },
+    "terminus": {
+      "loc": "CF",
+      "track": null
+    },
+    "sequence": [
       {
         "block": "H23",
         "os": "HOSEE",
@@ -2165,13 +3575,72 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "H22",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   },
   "HYYD": {
-    "eastbound": false,
-    "startblock": "H33",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "HYDE W",
+        "Hidden / H33",
+        11
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "",
+        "Bortel",
+        4
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "",
+        "Carlton",
+        15
+      ],
+      [
+        "LATHAM",
+        "Latham Jct",
+        10
+      ],
+      [
+        "",
+        "Cornell",
+        7
+      ],
+      [
+        "YARD",
+        "Waterman Yard (X)",
+        1
+      ]
+    ],
+    "block": null,
+    "desc": "Unit Freight",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "HY",
+      "track": "H33"
+    },
+    "terminus": {
+      "loc": "YD",
+      "track": null
+    },
+    "sequence": [
       {
         "block": "H11",
         "os": "HOSWW",
@@ -2245,13 +3714,301 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "H33",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
+  },
+  "JYL1": {
+    "tracker": [
+      [
+        "JAMES YD",
+        "28 st Street / Track B",
+        26
+      ],
+      [
+        "NASSAU",
+        "",
+        25
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "DELL",
+        "LaPorte",
+        19
+      ],
+      [
+        "LATHAM",
+        "Latham / Track L21 (X)",
+        10
+      ]
+    ],
+    "block": null,
+    "desc": "Island Freight 1",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "JY",
+      "track": "B"
+    },
+    "terminus": {
+      "loc": "LA",
+      "track": "L21"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "JYL2": {
+    "tracker": [
+      [
+        "LATHAM",
+        "Latham / Track L21",
+        10
+      ],
+      [
+        "PORT",
+        "Parsons Jct",
+        9
+      ],
+      [
+        "HYDE",
+        "Hidden - Hyde Jct H41",
+        10
+      ],
+      [
+        "DELL",
+        "LaPorte",
+        19
+      ],
+      [
+        "SHORE",
+        "Bortell",
+        5
+      ],
+      [
+        "KURLISH",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU W",
+        "",
+        22
+      ],
+      [
+        "NASSAU E",
+        "Branch",
+        25
+      ],
+      [
+        "JAMES YD",
+        "Beechview / Track C",
+        26
+      ]
+    ],
+    "block": null,
+    "desc": "Island Freight 1",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "LA",
+      "track": "L21"
+    },
+    "terminus": {
+      "loc": "JY",
+      "track": "C"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": false
+  },
+  "JYP1": {
+    "tracker": [
+      [
+        "JAMES YD",
+        "28 th Street / Track B",
+        26
+      ],
+      [
+        "NASSAU",
+        "Branch",
+        25
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "DELL",
+        "LaPorte",
+        19
+      ],
+      [
+        "LATHAM",
+        "Latham Jct",
+        10
+      ],
+      [
+        "PORT",
+        "Parsons Jct",
+        9
+      ],
+      [
+        "PORT",
+        "Radstock / Track P31 (X)",
+        14
+      ]
+    ],
+    "block": null,
+    "desc": "Island Freight 2",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "JY",
+      "track": "B"
+    },
+    "terminus": {
+      "loc": "PT",
+      "track": "P31"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "JYP2": {
+    "tracker": [
+      [
+        "PORT",
+        "Radstock / Track P31",
+        14
+      ],
+      [
+        "HYDE",
+        "Hidden - Hyde / Track H41",
+        10
+      ],
+      [
+        "DELL",
+        "LaPorte",
+        19
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "SHORE",
+        "Bortell",
+        5
+      ],
+      [
+        "KRULISH",
+        "Kurlish Jct",
+        19
+      ],
+      [
+        "NASSAU W",
+        "",
+        22
+      ],
+      [
+        "NASSAU E",
+        "Branch",
+        25
+      ],
+      [
+        "JAMES YD",
+        "Beechview / Track C (X)",
+        26
+      ]
+    ],
+    "block": null,
+    "desc": "Island Freight",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "PT",
+      "track": "P31"
+    },
+    "terminus": {
+      "loc": "JY",
+      "track": "C"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": false
   },
   "PBCX": {
-    "eastbound": false,
-    "startblock": "H32",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [
+      [
+        "HYDE W",
+        "Hidden / H30",
+        11
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "",
+        "Bortell",
+        4
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "HYDE E",
+        "Hidden / H30 (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Pate Brothers Circus",
+    "loco": "4023",
+    "normalloco": "4023",
+    "origin": {
+      "loc": "HY",
+      "track": "H30"
+    },
+    "terminus": {
+      "loc": "HY",
+      "track": "H30"
+    },
+    "sequence": [
       {
         "block": "H11",
         "os": "HOSWW",
@@ -2301,13 +4058,623 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "H32",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": false
+  },
+  "RXE1": {
+    "tracker": [
+      [
+        "YARD",
+        "",
+        1
+      ],
+      [
+        "",
+        "Cornell Jct",
+        7
+      ],
+      [
+        "PORT",
+        "Parsons Jct",
+        9
+      ],
+      [
+        "PORT",
+        "South Jct",
+        9
+      ],
+      [
+        "",
+        "Radstock",
+        16
+      ],
+      [
+        "",
+        "Richards",
+        9
+      ],
+      [
+        "NASSAU",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "Wilson City / WC20 (X)",
+        23
+      ]
+    ],
+    "block": null,
+    "desc": "Express Mail Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "YD",
+      "track": null
+    },
+    "terminus": {
+      "loc": "WC",
+      "track": "W20"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "RXE2": {
+    "tracker": [
+      [
+        "NASSAU",
+        "Wilson City E / track W20",
+        23
+      ],
+      [
+        "BANK",
+        "",
+        3
+      ],
+      [
+        "",
+        "Cliveden",
+        10
+      ],
+      [
+        "GREEN MTN",
+        "GM Yard / Track G21 (X)",
+        15
+      ]
+    ],
+    "block": null,
+    "desc": "Express Mail Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "WC",
+      "track": "W20"
+    },
+    "terminus": {
+      "loc": "GM",
+      "track": "G21"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "RXW3": {
+    "tracker": [
+      [
+        "GREEN MTN",
+        "GM Yd / Trk G21 ",
+        15
+      ],
+      [
+        "CLIFF",
+        "Sheffield Yd",
+        11
+      ],
+      [
+        "",
+        "Cliveden",
+        10
+      ],
+      [
+        "BANK",
+        "",
+        3
+      ],
+      [
+        "NASSAU",
+        "Wilson City / Trk W10",
+        23
+      ],
+      [
+        "",
+        "Krulish / Trk K11 (X)",
+        19
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "GM",
+      "track": "G21"
+    },
+    "terminus": {
+      "loc": "KR",
+      "track": "K11"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "RXW4": {
+    "tracker": [
+      [
+        "NASSAU",
+        "Krulish YD / Trk K11",
+        19
+      ],
+      [
+        "NASSAU",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "",
+        "Radstock",
+        9
+      ],
+      [
+        "",
+        "Richards",
+        14
+      ],
+      [
+        "",
+        "Parsons Jct",
+        9
+      ],
+      [
+        "",
+        "Cornell Jct",
+        7
+      ],
+      [
+        "YARD",
+        "Koelstadt (X)",
+        1
+      ]
+    ],
+    "block": null,
+    "desc": "Express Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "KR",
+      "track": "K11"
+    },
+    "terminus": {
+      "loc": "YD",
+      "track": null
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": false
+  },
+  "WX1": {
+    "tracker": [
+      [
+        "LAVIN YD",
+        "",
+        9
+      ],
+      [
+        "LATHAM",
+        "",
+        10
+      ],
+      [
+        "LATHAM",
+        "Carlton / Track L31",
+        15
+      ],
+      [
+        "",
+        "Siding Switch",
+        15
+      ],
+      [
+        "",
+        "Track L40",
+        15
+      ],
+      [
+        "CARLTON E",
+        "Track L42 (X to Load)",
+        15
+      ]
+    ],
+    "block": null,
+    "desc": "Work Train - Out",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "LV",
+      "track": null
+    },
+    "terminus": {
+      "loc": "CA",
+      "track": "L42"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "WX2": {
+    "tracker": [
+      [
+        "CARLTON E",
+        "Track L42 (with load)",
+        15
+      ],
+      [
+        "",
+        "Track L40",
+        15
+      ],
+      [
+        "",
+        "Switch to Main",
+        15
+      ],
+      [
+        "",
+        "Carlton / Track L31",
+        15
+      ],
+      [
+        "LATHAM",
+        "Latham Jct / Switch 9",
+        10
+      ],
+      [
+        "LATHAM",
+        "Latham Jct / Switch 1",
+        10
+      ],
+      [
+        "PORT",
+        "Parsons Jct",
+        9
+      ],
+      [
+        "LAVIN",
+        "Switch 31 to Track V11 >",
+        9
+      ]
+    ],
+    "block": null,
+    "desc": "Work Train - Back",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "CA",
+      "track": "L42"
+    },
+    "terminus": {
+      "loc": "LV",
+      "track": "V11"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": false
+  },
+  "X51": {
+    "tracker": [
+      [
+        "Branch",
+        "Beechview / Track A",
+        26
+      ],
+      [
+        "NASSAU",
+        "Wilson City (S)",
+        23
+      ],
+      [
+        "",
+        "Wilson City W (B)",
+        22
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "JY",
+      "track": "A"
+    },
+    "terminus": {
+      "loc": "NA",
+      "track": "B"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": false
+  },
+  "X52": {
+    "tracker": [
+      [
+        "",
+        "Wilson City (B)",
+        22
+      ],
+      [
+        "Nassau",
+        "Wilson City (S)",
+        23
+      ],
+      [
+        "Branch ",
+        "",
+        26
+      ],
+      [
+        "James Yards",
+        "Beechview / Track A (X)",
+        26
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "NA",
+      "track": "B"
+    },
+    "terminus": {
+      "loc": "JY",
+      "track": "A"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "X65": {
+    "tracker": [
+      [
+        "",
+        "From Coach Yd / C or D",
+        22
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N31 or N32",
+        22
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "",
+        "Richards (S)",
+        9
+      ],
+      [
+        "",
+        "Radstock (S)",
+        14
+      ],
+      [
+        "PORT",
+        "Parsons Jct",
+        9
+      ],
+      [
+        "",
+        "Cornell",
+        7
+      ],
+      [
+        "YARD",
+        "Koelstadt Station / (X)",
+        1
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "NA",
+      "track": null
+    },
+    "terminus": {
+      "loc": "YD",
+      "track": null
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": false
+  },
+  "X66": {
+    "tracker": [
+      [
+        "YARD",
+        "Koehlstadt ",
+        1
+      ],
+      [
+        "LATHAM",
+        "Latham Depot",
+        10
+      ],
+      [
+        "",
+        "Carlton (S)",
+        15
+      ],
+      [
+        "DELL",
+        "La Porte",
+        19
+      ],
+      [
+        "",
+        "Loland (S)",
+        26
+      ],
+      [
+        "SHORE",
+        "",
+        4
+      ],
+      [
+        "",
+        "Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "Wilson City / N41 or N42",
+        23
+      ],
+      [
+        "",
+        "To Coach Track C or D (X)",
+        22
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "YD",
+      "track": null
+    },
+    "terminus": {
+      "loc": "NA",
+      "track": null
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "X98": {
+    "tracker": [
+      [
+        "NASSAU",
+        "Wilson City E / track E",
+        24
+      ],
+      [
+        "Branch",
+        "Rocky Hill (S)",
+        2
+      ],
+      [
+        "Branch",
+        "Harpers Ferry",
+        7
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger Old",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "NA",
+      "track": "E"
+    },
+    "terminus": {
+      "loc": "HF",
+      "track": null
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
+  },
+  "X99": {
+    "tracker": [
+      [
+        "Branch",
+        "Harpers Ferry",
+        7
+      ],
+      [
+        "Branch",
+        "Rocky Hill (S)",
+        2
+      ],
+      [
+        "NASSAU",
+        "Wilson City E / track E",
+        24
+      ]
+    ],
+    "block": null,
+    "desc": "Local Passenger Old",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "HF",
+      "track": null
+    },
+    "terminus": {
+      "loc": "NA",
+      "track": "E"
+    },
+    "sequence": [],
+    "startblock": null,
+    "startsubblock": null,
+    "time": null,
+    "eastbound": true
   },
   "YDCF": {
-    "eastbound": true,
-    "startblock": "Y70",
-    "startsubblock": null,
-    "steps": [
+    "tracker": [],
+    "block": null,
+    "desc": null,
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": null,
+      "track": null
+    },
+    "terminus": {
+      "loc": null,
+      "track": null
+    },
+    "sequence": [
       {
         "block": "Y20",
         "os": "YOSKL1",
@@ -2453,13 +4820,26 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
-  },
-  "YDCL": {
-    "eastbound": true,
     "startblock": "Y70",
     "startsubblock": null,
-    "steps": [
+    "time": 5000,
+    "eastbound": true
+  },
+  "YDCL": {
+    "tracker": [],
+    "block": null,
+    "desc": null,
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": null,
+      "track": null
+    },
+    "terminus": {
+      "loc": null,
+      "track": null
+    },
+    "sequence": [
       {
         "block": "Y20",
         "os": "YOSKL1",
@@ -2605,13 +4985,72 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
-  },
-  "YDHY": {
-    "eastbound": true,
     "startblock": "Y70",
     "startsubblock": null,
-    "steps": [
+    "time": 5000,
+    "eastbound": true
+  },
+  "YDHY": {
+    "tracker": [
+      [
+        "YARD",
+        "Waterman Yd",
+        1
+      ],
+      [
+        "",
+        "Cornell Jct",
+        7
+      ],
+      [
+        "LATHAM",
+        "",
+        10
+      ],
+      [
+        "",
+        "Carlton",
+        15
+      ],
+      [
+        "DELL",
+        "Laporte",
+        21
+      ],
+      [
+        "",
+        "Loland",
+        26
+      ],
+      [
+        "",
+        "Bortell",
+        5
+      ],
+      [
+        "SHORE",
+        "",
+        6
+      ],
+      [
+        "HYDE W",
+        "Hidden / H22 (X)",
+        11
+      ]
+    ],
+    "block": null,
+    "desc": "Unit Freight",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "YD",
+      "track": null
+    },
+    "terminus": {
+      "loc": "HY",
+      "track": "H22"
+    },
+    "sequence": [
       {
         "block": "Y20",
         "os": "YOSKL1",
@@ -2693,6 +5132,9 @@
         "trigger": "Front"
       }
     ],
-    "time": 5000
+    "startblock": "Y70",
+    "startsubblock": null,
+    "time": 5000,
+    "eastbound": true
   }
 }

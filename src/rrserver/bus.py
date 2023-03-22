@@ -4,7 +4,7 @@ import time
 import logging
 
 MAXTRIES = 3
-
+THRESHOLD = 2
 
 def setBit(obyte, obit, val):
 	if val != 0:
@@ -34,6 +34,8 @@ class Bus:
 	def __init__(self, tty):
 		self.initialized = False
 		self.tty = tty
+		self.byteTally = {}
+		self.lastUsed = {}
 		logging.info("Attempting to connect to serial port %s" % tty)
 		try:
 			self.port = serial.Serial(port=self.tty,
@@ -54,9 +56,15 @@ class Bus:
 	def close(self):
 		self.port.close()
 
-	def sendRecv(self, address, outbuf, nbytes):
+	def sendRecv(self, address, outbuf, nbytes, threshold=1):
 		if not self.initialized:
 			return None
+		
+		try:
+			lastused = self.lastUsed[address]
+		except:
+			lastused = [None for _ in range(nbytes)]
+			self.lastUsed[address] = lastused
 
 		sendBuffer = []
 		sendBuffer.append(address)
@@ -88,7 +96,31 @@ class Bus:
 			print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)), flush=True)
 			return None #[b'\x00']*nbytes
 		else:
+			# make sure that if a byte is different, that it is at least different for "threshold" cycles before we accept it
+			for i in range(nbytes):
+				if lastused[i] is None:
+					lastused[i] = inbuf[i]
+				elif inbuf[i] == lastused[i]:
+					self.byteTally[(address, i)] = 0
+				elif self.verifyChange(address, i, threshold):
+					lastused[i] = inbuf[i]
+				else:
+					inbuf[i] = lastused[i]
+					
+					
 			return inbuf
+		
+	def verifyChange(self, address, bx, threshold):
+		try:
+			self.byteTally[(address, bx)] += 1
+		except KeyError:
+			self.byteTally[(address, bx)] = 1
+			
+		if self.byteTally[(address, bx)] > threshold:
+			self.byteTally[(address, bx)] = 0
+			return True
+		
+		return False
 
 
 class RailroadMonitor(threading.Thread):

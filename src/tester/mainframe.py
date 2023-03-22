@@ -20,6 +20,7 @@ from tester.nodes.cliveden import Cliveden
 from tester.nodes.greenmtn import GreenMtn
 from tester.nodes.cliff import Cliff
 from tester.nodes.sheffield import Sheffield
+from tester.nodes.hyde import Hyde
 
 # district node addresses
 YARD      = 0x11
@@ -61,7 +62,7 @@ nodes = {
 	"Dell" : ( DELL, Dell ),
 	"Foss" : ( FOSS, Foss ),
 	"Hyde Jct" : ( HYDEJCT, None ),
-	"Hyde" : ( HYDE, None ),
+	"Hyde" : ( HYDE, Hyde ),
 	"Shore" : ( SHORE, Shore ),
 	"Krulish" : ( KRULISH, Krulish ),
 	"Nassau W" : ( NASSAUW, None ),

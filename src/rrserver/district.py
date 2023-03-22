@@ -164,24 +164,6 @@ class District(wx.Panel):
 			self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.inputDClick, self.ilist)
 		if self.settings.simulation or self.settings.diagnostic:
 			self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.outputDClick, self.olist)
-
-	def AcceptResponse(self, inb, inbc, addr):
-		if inb != [b'\x00'] * inbc:
-			self.nullResponseCount[addr] = 0	
-			return True     # accept a non-zero response
-
-		# ignore NULL responses until we see at least THRESHOLD of them		
-		try:
-			self.nullResponseCount[addr] += 1
-		except KeyError:
-			self.nullResponseCount[addr] = 1
-			
-		if self.nullResponseCount[addr] < THRESHOLD and not self.settings.simulation:
-			logging.warning("ignoring null response from node address %x, count=%d" % (addr, self.nullResponseCount[addr]))
-			return False
-	
-		self.nullResponseCount[addr] = 0	
-		return True
 	
 	def VerifyTurnoutAction(self, toList):
 		# tolist is a list og [inputobject, outputobject] for all turnouts that need to be chesked
@@ -409,7 +391,7 @@ class District(wx.Panel):
 			state = ic.GetState()
 			self.ilist.SetItem(ix, 1, "%s" % state)
 
-		if itype == District.block:
+		elif itype == District.block:
 			east = ic.GetEast()
 			clear = ic.GetClear()
 			val = ic.GetValue()
@@ -459,6 +441,7 @@ class District(wx.Panel):
 			if ip is None:
 				logging.warning("Unable to determine turnout input from name: %s" % toname)
 			else:
+				logging.info("set turnout %s to state %s" % (toname, tostate))
 				ip.SetState(tostate)
 		return True
 

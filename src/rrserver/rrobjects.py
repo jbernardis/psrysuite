@@ -1,3 +1,4 @@
+import logging
 
 class Input:
 	def __init__(self, name, district):
@@ -52,6 +53,7 @@ class RouteInput(Input):
 		if nv == self.value:
 			return
 		self.value = nv
+		logging.info("Route input %s = %d" % (self.name, nv))
 		if nv == 1:
 			self.district.MapRouteToTurnouts(self.name)
 

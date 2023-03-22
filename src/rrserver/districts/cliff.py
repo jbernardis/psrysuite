@@ -300,102 +300,93 @@ class Cliff(District):
 			itext = None
 		else:
 			inb = self.rrBus.sendRecv(CLIFF, outb, outbc)
-			t = formatIText(inb, 7)
-			print("CLIFF Input:  %s" % t, flush=True)
 			if inb is None:
 				itext = "Read Error"
-				
-			elif self.AcceptResponse(inb, inbc, CLIFF):
 
-				itext = formatIText(inb, 7)
-				print("Accepted", flush=True)
-				#logging.debug("Cliff: Input Bytes: %s" % itext)
-	
-				self.rr.GetInput("CC21W").SetValue(getBit(inb[0], 0))  # Routes
-				self.rr.GetInput("CC40W").SetValue(getBit(inb[0], 1))
-				self.rr.GetInput("CC44W").SetValue(getBit(inb[0], 2))
-				self.rr.GetInput("CC43W").SetValue(getBit(inb[0], 3))
-				self.rr.GetInput("CC42W").SetValue(getBit(inb[0], 4))
-				self.rr.GetInput("CC41W").SetValue(getBit(inb[0], 5))
-				self.rr.GetInput("CC41E").SetValue(getBit(inb[0], 6))
-				self.rr.GetInput("CC42E").SetValue(getBit(inb[0], 7))
-	
-				self.rr.GetInput("CC21E").SetValue(getBit(inb[1], 0))
-				self.rr.GetInput("CC40E").SetValue(getBit(inb[1], 1))
-				self.rr.GetInput("CC44E").SetValue(getBit(inb[1], 2))
-				self.rr.GetInput("CC43E").SetValue(getBit(inb[1], 3))
-				self.rr.GetInput("COSSHE").SetValue(getBit(inb[1], 4))  # Detection (COS3)
-				self.rr.GetInput("C21").SetValue(getBit(inb[1], 5))
-				self.rr.GetInput("C40").SetValue(getBit(inb[1], 6))
-				self.rr.GetInput("C41").SetValue(getBit(inb[1], 7))
-	
-				self.rr.GetInput("C42").SetValue(getBit(inb[2], 0))
-				self.rr.GetInput("C43").SetValue(getBit(inb[2], 1))
-				self.rr.GetInput("C44").SetValue(getBit(inb[2], 2))
-				self.rr.GetInput("COSSHW").SetValue(getBit(inb[2], 3))  # COS4
-				if optControl != 2:  # NOT Dispatcher: ALL
-					lvrL = getBit(inb[2], 4)       # signal levers
-					lvrCallOn = getBit(inb[2], 5)
-					lvrR = getBit(inb[2], 6)
-					self.rr.GetInput("C2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrL = getBit(inb[2], 7)
-	
-					lvrCallOn = getBit(inb[3], 0)
-					lvrR = getBit(inb[3], 1)
-					self.rr.GetInput("C4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrL = getBit(inb[3], 2)
-					lvrCallOn = getBit(inb[3], 3)
-					lvrR = getBit(inb[3], 4)
-					self.rr.GetInput("C6.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrL = getBit(inb[3], 5)
-					lvrCallOn = getBit(inb[3], 6)
-					lvrR = getBit(inb[3], 7)
-					self.rr.GetInput("C8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-	
-				if optControl == 0:  # Cliff local control
-					lvrL = getBit(inb[4], 0)
-					lvrCallOn = getBit(inb[4], 1)
-					lvrR = getBit(inb[4], 2)
-					self.rr.GetInput("C10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrL = getBit(inb[4], 3)
-					lvrCallOn = getBit(inb[4], 4)
-					lvrR = getBit(inb[4], 5)
-					self.rr.GetInput("C12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrL = getBit(inb[4], 6)
-					lvrCallOn = getBit(inb[4], 7)
-	
-					lvrR = getBit(inb[5], 0)
-					self.rr.GetInput("C14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					fleet = getBit(inb[5], 1)
-					self.rr.GetInput("cliff.fleet").SetState(fleet)  # fleet
-					lvrL = getBit(inb[5], 2)
-					lvrCallOn = getBit(inb[5], 3)
-					lvrR = getBit(inb[5], 4)
-					self.rr.GetInput("C18.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrL = getBit(inb[5], 5)
-					lvrCallOn = getBit(inb[5], 6)
-					lvrR = getBit(inb[5], 7)
-					self.rr.GetInput("C22.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-	
-					lvrL = getBit(inb[6], 0)
-					lvrCallOn = getBit(inb[6], 1)
-					lvrR = getBit(inb[6], 2)
-					self.rr.GetInput("C24.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					release = getBit(inb[6], 3)
-					self.rr.GetInput("crelease").SetState(release)  # C Release switch
-					self.rr.GetInput("CSw3.lvr").SetState(getBit(inb[6], 4))  # handswitch unlocking
-					self.rr.GetInput("CSw11.lvr").SetState(getBit(inb[6], 5))
-					self.rr.GetInput("CSw15.lvr").SetState(getBit(inb[6], 6))
-					self.rr.GetInput("CSw19.lvr").SetState(getBit(inb[6], 7))
-	
-					st = getBit(inb[7], 0)
-					self.rr.GetInput("CSw21a.lvr").SetState(st)
-					self.rr.GetInput("CSw21b.lvr").SetState(st)
-				
-			else:
-				itext = None
-				print("Not accepted", flush=True)
-				logging.error("Cliff: Failed read")
+			itext = formatIText(inb, 7)
+			#logging.debug("Cliff: Input Bytes: %s" % itext)
+			print("Cliff: Input Bytes: %s" % itext)
+
+			self.rr.GetInput("CC21W").SetValue(getBit(inb[0], 0))  # Routes
+			self.rr.GetInput("CC40W").SetValue(getBit(inb[0], 1))
+			self.rr.GetInput("CC44W").SetValue(getBit(inb[0], 2))
+			self.rr.GetInput("CC43W").SetValue(getBit(inb[0], 3))
+			self.rr.GetInput("CC42W").SetValue(getBit(inb[0], 4))
+			self.rr.GetInput("CC41W").SetValue(getBit(inb[0], 5))
+			self.rr.GetInput("CC41E").SetValue(getBit(inb[0], 6))
+			self.rr.GetInput("CC42E").SetValue(getBit(inb[0], 7))
+
+			self.rr.GetInput("CC21E").SetValue(getBit(inb[1], 0))
+			self.rr.GetInput("CC40E").SetValue(getBit(inb[1], 1))
+			self.rr.GetInput("CC44E").SetValue(getBit(inb[1], 2))
+			self.rr.GetInput("CC43E").SetValue(getBit(inb[1], 3))
+			self.rr.GetInput("COSSHE").SetValue(getBit(inb[1], 4))  # Detection (COS3)
+			self.rr.GetInput("C21").SetValue(getBit(inb[1], 5))
+			self.rr.GetInput("C40").SetValue(getBit(inb[1], 6))
+			self.rr.GetInput("C41").SetValue(getBit(inb[1], 7))
+
+			self.rr.GetInput("C42").SetValue(getBit(inb[2], 0))
+			self.rr.GetInput("C43").SetValue(getBit(inb[2], 1))
+			self.rr.GetInput("C44").SetValue(getBit(inb[2], 2))
+			self.rr.GetInput("COSSHW").SetValue(getBit(inb[2], 3))  # COS4
+			if optControl != 2:  # NOT Dispatcher: ALL
+				lvrL = getBit(inb[2], 4)       # signal levers
+				lvrCallOn = getBit(inb[2], 5)
+				lvrR = getBit(inb[2], 6)
+				self.rr.GetInput("C2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[2], 7)
+
+				lvrCallOn = getBit(inb[3], 0)
+				lvrR = getBit(inb[3], 1)
+				self.rr.GetInput("C4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[3], 2)
+				lvrCallOn = getBit(inb[3], 3)
+				lvrR = getBit(inb[3], 4)
+				self.rr.GetInput("C6.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[3], 5)
+				lvrCallOn = getBit(inb[3], 6)
+				lvrR = getBit(inb[3], 7)
+				self.rr.GetInput("C8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+
+			if optControl == 0:  # Cliff local control
+				lvrL = getBit(inb[4], 0)
+				lvrCallOn = getBit(inb[4], 1)
+				lvrR = getBit(inb[4], 2)
+				self.rr.GetInput("C10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[4], 3)
+				lvrCallOn = getBit(inb[4], 4)
+				lvrR = getBit(inb[4], 5)
+				self.rr.GetInput("C12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[4], 6)
+				lvrCallOn = getBit(inb[4], 7)
+
+				lvrR = getBit(inb[5], 0)
+				self.rr.GetInput("C14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				fleet = getBit(inb[5], 1)
+				self.rr.GetInput("cliff.fleet").SetState(fleet)  # fleet
+				lvrL = getBit(inb[5], 2)
+				lvrCallOn = getBit(inb[5], 3)
+				lvrR = getBit(inb[5], 4)
+				self.rr.GetInput("C18.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				lvrL = getBit(inb[5], 5)
+				lvrCallOn = getBit(inb[5], 6)
+				lvrR = getBit(inb[5], 7)
+				self.rr.GetInput("C22.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+
+				lvrL = getBit(inb[6], 0)
+				lvrCallOn = getBit(inb[6], 1)
+				lvrR = getBit(inb[6], 2)
+				self.rr.GetInput("C24.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
+				release = getBit(inb[6], 3)
+				self.rr.GetInput("crelease").SetState(release)  # C Release switch
+				self.rr.GetInput("CSw3.lvr").SetState(getBit(inb[6], 4))  # handswitch unlocking
+				self.rr.GetInput("CSw11.lvr").SetState(getBit(inb[6], 5))
+				self.rr.GetInput("CSw15.lvr").SetState(getBit(inb[6], 6))
+				self.rr.GetInput("CSw19.lvr").SetState(getBit(inb[6], 7))
+
+				st = getBit(inb[7], 0)
+				self.rr.GetInput("CSw21a.lvr").SetState(st)
+				self.rr.GetInput("CSw21b.lvr").SetState(st)
 				
 		if self.sendIO:
 			self.rr.ShowText("Clff", CLIFF, otext, itext, 1, 3)
@@ -477,38 +468,30 @@ class Cliff(District):
 		else:
 			inb = self.rrBus.sendRecv(SHEFFIELD, outb, outbc)
 			
-			itext = formatIText(inb, inbc)
-			print("SHEFFIELD Input: %s" % itext, flush=True)
-
 			if inb is None:
 				itext = "Read Error"
 				
-			elif self.AcceptResponse(inb, inbc, SHEFFIELD):
-				print("Accepted", flush=True)
-				itext = formatIText(inb, inbc)
-				#logging.debug("Sheffield: Input Bytes: %s" % itext)
-	
-				self.rr.GetInput("CC50W").SetValue(getBit(inb[0], 0))  # Routes
-				self.rr.GetInput("CC51W").SetValue(getBit(inb[0], 1))
-				self.rr.GetInput("CC52W").SetValue(getBit(inb[0], 2))
-				self.rr.GetInput("CC53W").SetValue(getBit(inb[0], 3))
-				self.rr.GetInput("CC54W").SetValue(getBit(inb[0], 4))
-				self.rr.GetInput("CC50E").SetValue(getBit(inb[0], 5))
-				self.rr.GetInput("CC51E").SetValue(getBit(inb[0], 6))
-				self.rr.GetInput("CC52E").SetValue(getBit(inb[0], 7))
-	
-				self.rr.GetInput("CC53E").SetValue(getBit(inb[1], 0))
-				self.rr.GetInput("CC54E").SetValue(getBit(inb[1], 1))
-				self.rr.GetInput("C50").SetValue(getBit(inb[1], 2))  # Detection
-				self.rr.GetInput("C51").SetValue(getBit(inb[1], 3))
-				self.rr.GetInput("C52").SetValue(getBit(inb[1], 4))
-				self.rr.GetInput("C53").SetValue(getBit(inb[1], 5))
-				self.rr.GetInput("C54").SetValue(getBit(inb[1], 6))
+			itext = formatIText(inb, inbc)
+			#logging.debug("Sheffield: Input Bytes: %s" % itext)
+			print("Sheffield: Input Bytes: %s" % itext)
+
+			self.rr.GetInput("CC50W").SetValue(getBit(inb[0], 0))  # Routes
+			self.rr.GetInput("CC51W").SetValue(getBit(inb[0], 1))
+			self.rr.GetInput("CC52W").SetValue(getBit(inb[0], 2))
+			self.rr.GetInput("CC53W").SetValue(getBit(inb[0], 3))
+			self.rr.GetInput("CC54W").SetValue(getBit(inb[0], 4))
+			self.rr.GetInput("CC50E").SetValue(getBit(inb[0], 5))
+			self.rr.GetInput("CC51E").SetValue(getBit(inb[0], 6))
+			self.rr.GetInput("CC52E").SetValue(getBit(inb[0], 7))
+
+			self.rr.GetInput("CC53E").SetValue(getBit(inb[1], 0))
+			self.rr.GetInput("CC54E").SetValue(getBit(inb[1], 1))
+			self.rr.GetInput("C50").SetValue(getBit(inb[1], 2))  # Detection
+			self.rr.GetInput("C51").SetValue(getBit(inb[1], 3))
+			self.rr.GetInput("C52").SetValue(getBit(inb[1], 4))
+			self.rr.GetInput("C53").SetValue(getBit(inb[1], 5))
+			self.rr.GetInput("C54").SetValue(getBit(inb[1], 6))
 				
-			else:
-				itext = None
-				logging.error("Sheffield: Failed read")
-				print("Not accepted", flush=True)
 			
 		if self.sendIO:
 			self.rr.ShowText("Shfd", SHEFFIELD, otext, itext, 2, 3)
