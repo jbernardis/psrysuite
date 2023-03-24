@@ -18,18 +18,20 @@ class MainUnit:
                 break
            
             eastbound = ws.cell(row=row, column=2).value 
-            desc = ws.cell(row=row, column=3).value
-            normalloco = ws.cell(row=row, column=4).value
-            originloc = ws.cell(row=row, column=5).value
-            origintrack = ws.cell(row=row, column=6).value
-            terminusloc = ws.cell(row=row, column=7).value
-            terminustrack = ws.cell(row=row, column=8).value
-            startblock = ws.cell(row=row, column=9).value
-            startsubblock = ws.cell(row=row, column=10).value
-            time = ws.cell(row=row, column=11).value
+            cutoff = ws.cell(row=row, column=3).value
+            desc = ws.cell(row=row, column=4).value
+            normalloco = ws.cell(row=row, column=5).value
+            originloc = ws.cell(row=row, column=6).value
+            origintrack = ws.cell(row=row, column=7).value
+            terminusloc = ws.cell(row=row, column=8).value
+            terminustrack = ws.cell(row=row, column=9).value
+            startblock = ws.cell(row=row, column=10).value
+            startsubblock = ws.cell(row=row, column=11).value
+            time = ws.cell(row=row, column=12).value
             
             jtrains[train] = {
                 "eastbound": eastbound, 
+                "cutoff": cutoff,
                 "desc": desc,
                 "block": None,
                 "loco": normalloco,

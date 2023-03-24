@@ -8,8 +8,6 @@ how to use wos1norm in yard
 
 do we really need a separate cliff fleet checkbox?  And what is port fleeting if we have no control over port
 
-checking train for non-contiguous Blocks
-
 train identification when moving in reverse
 
 operate turnout despite locks - ctrl-click or shift-click

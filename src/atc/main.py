@@ -288,25 +288,36 @@ class MainFrame(wx.Frame):
 		
 	def OnTickerEvent(self, _):
 		for dccl in self.dccRemote.GetDCCLocos():
+			logging.info("in ticker loop for loco %s" % dccl.GetLoco())
 			gs, _ = dccl.GetGoverningSignal()
 			aspect = 0  # assume STOP
 			
-			if gs is None:
+			if dccl.HasCompleted():
+				aspect = 0 # we've reached the terminus - we should stop
+				
+			elif gs is None:
+				logging.info("governing signal is None")
 				# we are moving into terminus block - move slowly
 				aspect = 4 # restricting
+				
 
 			elif "signal" in gs:
 				signame = gs["signal"]
+				logging.info("Governing signal is %s" % signame)
 				if signame in self.signals:
 					aspect = self.signals[signame].GetAspect()
+					logging.info("Retrieved aspect = %s" % str(aspect))
 					
 				if "os" in gs and "route" in gs and aspect != 0:
 					overswitch = gs["os"]
 					route = gs["route"]
+					logging.info("Wanted os/route is %s/%s, active route is %s" % (overswitch, route, self.osList[overswitch].GetActiveRouteName()))
 					if overswitch in self.osList and self.osList[overswitch].GetActiveRouteName() != route:
 						# either we don't know that OS or its not set to the needed route
+						logging.info("setting aspect to 0")
 						aspect = 0
 	
+			logging.info("Using aspect %d" % aspect)
 			dccl.SetGoverningAspect(aspect)
 			self.dccRemote.SelectLoco(dccl.GetLoco())	
 			
@@ -477,6 +488,17 @@ class MainFrame(wx.Frame):
 					if dccl is not None:
 						self.atcList.DelTrain(dccl)
 						self.dccRemote.DropLoco(loco)
+						
+				elif action == "forcestop":
+					train = parms["train"][0]
+					loco = parms["loco"][0]
+					dccl = self.dccRemote.GetDCCLocoByTrain(train)
+					if dccl is None:
+						return
+					
+					self.dccRemote.SelectLoco(loco)
+					dccl.SetForcedStop(not dccl.GetForcedStop())
+					self.atcList.RefreshTrain(dccl)
 					
 				elif action == "hide":
 					if "x" in parms:
@@ -565,20 +587,9 @@ class MainFrame(wx.Frame):
 			return
 		
 		logging.info("Train %s tail in block %s" % (train, block))
-		gs, _ = dccl.GetGoverningSignal()
 		
 		if dccl.AtTerminus(block):
 			dccl.MarkCompleted()
-							
-		elif dccl.HeadAtTerminus():
-			#change nothing here
-			pass
-		else:
-			sig = self.GetSignal(train, block)
-			if sig != gs:
-				# we've passed our signal - adopt the new signal
-				dccl.SetInBlock(False)
-				dccl.SetGoverningSignal(sig)
 
 	def TrainRemoveBlock(self, train, block, blocks):
 		logging.info("Train %s has left block %s and is now in %s" % (train, block, ",".join(blocks)))

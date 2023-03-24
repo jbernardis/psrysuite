@@ -1,5 +1,6 @@
 import json
 import os
+from pickle import FALSE
 
 TriggerPointFront = 'F'  # front of train
 TriggerPointRear = 'R'  # rear of train
@@ -27,3 +28,27 @@ class Triggers:
 			return TriggerPointFront
 
 		return self.triggerTable[train][block]["trigger"]
+	
+	def IsOrigin(self, train, block):
+		if train not in self.triggerTable:
+			return False
+		
+		return block == self.triggerTable[train]["origin"]
+	
+	def GetOrigin(self, train):
+		if train not in self.triggerTable:
+			return None
+		
+		return self.triggerTable[train]["origin"]
+	
+	def IsTerminus(self, train, block):
+		if train not in self.triggerTable:
+			return False
+		
+		return block == self.triggerTable[train]["terminus"]
+	
+	def GetTerminus(self, train):
+		if train not in self.triggerTable:
+			return None
+		
+		return self.triggerTable[train]["terminus"]

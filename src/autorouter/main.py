@@ -176,6 +176,12 @@ class MainUnit:
 	
 							self.blocks[block].SetTrain(name, loco)
 	
+				elif cmd == "ar":
+					action = parms["action"][0]
+					trnm = parms["train"][0]
+					if action == "release":
+						self.ReleaseTrain(trnm)
+	
 				elif cmd == "sessionID":
 					self.sessionid = int(parms)
 					logging.info("session ID %d" % self.sessionid)
@@ -245,9 +251,21 @@ class MainUnit:
 					del(self.trains[oldTrain])
 			except KeyError:
 				pass
+			
+	def ReleaseTrain(self, train):
+		block = self.triggers.GetOrigin(train)
+		if self.trains[train].IsInBlock(block):
+			logging.info("Releasing train %s" % train)
+			self.TrainAddBlock(train, block, released=True)
+		else:
+			logging.info("Trying to release train %s, but it is not at its origin %s" % (train, block))		
 
-	def TrainAddBlock(self, train, block):
+	def TrainAddBlock(self, train, block, released=False):
 		logging.info("Train %s has moved into block %s" % (train, block))
+		if self.triggers.IsOrigin(train, block) and not released:
+			logging.info("Train %s is not yet released from its origin location" % train)
+			return
+		
 		routeRequest = self.CheckTrainInBlock(train, block, TriggerPointFront)
 		if routeRequest is None:
 			return
@@ -269,18 +287,19 @@ class MainUnit:
 			self.EnqueueRouteRequest(routeRequest)
 
 	def TrainRemoveBlock(self, train, block, blocks):
+		if len(blocks) == 0:
+			return 
 		logging.info("Train %s has left block %s and is now in %s" % (train, block, ",".join(blocks)))
-		pass
 
 	def CheckTrainInBlock(self, train, block, triggerPoint):
 		rtName = self.triggers.GetRoute(train, block)
 		if rtName is None:
-			logging.info("train/block combination %s/%s not found" % (train, block))
+			logging.info("Train/block combination %s/%s not found" % (train, block))
 			return None
 
 		blockTriggerPoint = self.triggers.GetTriggerPoint(train, block)
 		if blockTriggerPoint != triggerPoint:
-			logging.info("trigger point mismatch, wanted %s, got %s" % (triggerPoint, blockTriggerPoint))
+			logging.info("Trigger point mismatch, wanted %s, got %s" % (triggerPoint, blockTriggerPoint))
 			return None
 		
 		return RouteRequest(train, self.routes[rtName], block)

@@ -37,6 +37,11 @@ from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg
 
+
+MENU_ATC_REMOVE = 900
+MENU_ATC_STOP   = 901
+MENU_AR_RELEASE = 902
+
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
@@ -756,18 +761,21 @@ class MainFrame(wx.Frame):
 			if self.buttonsToClear[bx][1].GetName() == bnm:
 				self.buttonsToClear[bx][0] = secs
 
-	def ProcessClick(self, screen, pos, shift):
+	def ProcessClick(self, screen, pos, shift=False, right=False, screenpos=None):
 		# ignore screen clicks if not connected
 		if not self.subscribed:
 			return
 		
-		logging.debug("click %s %d, %d %s" % (screen, pos[0], pos[1], "shift" if shift else ""))
+		logging.debug("%s click %s %d, %d %s" % ("right" if right else "left", screen, pos[0], pos[1], "shift" if shift else ""))
 		try:
 			to = self.turnoutMap[(screen, pos)]
 		except KeyError:
 			to = None
 
 		if to:
+			if right or shift:  # only process left clicks here
+				return
+			
 			if to.IsDisabled():
 				return
 
@@ -780,6 +788,9 @@ class MainFrame(wx.Frame):
 			btn = None
 
 		if btn:
+			if right or shift:  # only process left clicks here
+				return
+			
 			btn.GetDistrict().PerformButtonAction(btn)
 			return
 
@@ -789,6 +800,9 @@ class MainFrame(wx.Frame):
 			sig = None
 
 		if sig:
+			if right or shift:  # only process left clicks here
+				return
+			
 			if sig.IsDisabled():
 				return
 
@@ -800,6 +814,9 @@ class MainFrame(wx.Frame):
 			hs = None
 
 		if hs:
+			if right or shift:  # only process left clicks here
+				return
+			
 			if hs.IsDisabled():
 				return
 			
@@ -811,6 +828,9 @@ class MainFrame(wx.Frame):
 			ln = None
 
 		if ln:
+			if shift:
+				return
+			
 			for col, blk in ln:
 				if col <= pos[0] <= col+3:
 					break
@@ -820,22 +840,59 @@ class MainFrame(wx.Frame):
 			if blk:
 				if blk.IsOccupied():
 					tr = blk.GetTrain()
-					oldName, oldLoco = tr.GetNameAndLoco()
-					oldATC = tr.IsOnATC() if self.IsDispatcher() else False
-					dlg = EditTrainDlg(self, tr, self.locoList, self.trainList, self.IsDispatcher() and self.ATCEnabled)
-					rc = dlg.ShowModal()
-					if rc == wx.ID_OK:
-						trainid, locoid, atc = dlg.GetResults()
-					dlg.Destroy()
-					if rc != wx.ID_OK:
-						return
+					if right:
+						if not self.IsDispatcher():
+							return  # only a dispatcher can do this
+						
+						menu = wx.Menu()
+						self.menuTrain = tr
+						addedMenuItem = False
+						if tr.IsOnATC():
+							menu.Append( MENU_ATC_REMOVE, "Remove from ATC" )
+							self.Bind(wx.EVT_MENU, self.OnATCRemove, id=MENU_ATC_REMOVE)
+							menu.Append( MENU_ATC_STOP, "ATC Stop/Resume Train" )
+							self.Bind(wx.EVT_MENU, self.OnATCStop, id=MENU_ATC_STOP)
+							addedMenuItem = True
+							
+						if self.AREnabled:
+							menu.Append( MENU_AR_RELEASE, "Auto Router release")
+							self.Bind(wx.EVT_MENU, self.OnARRelease, id=MENU_AR_RELEASE)
 
-					self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid}})
-					if self.IsDispatcher() and atc != oldATC:
-						tr.SetATC(atc)
-						self.Request({"atc": {"action": "add" if atc else "delete", "train": trainid, "loco": locoid}})
+						if addedMenuItem:
+							self.PopupMenu( menu, screenpos )
+						menu.Destroy()
 
-					tr.Draw()
+					else:
+						oldName, oldLoco = tr.GetNameAndLoco()
+						oldATC = tr.IsOnATC() if self.IsDispatcher() else False
+						dlg = EditTrainDlg(self, tr, self.locoList, self.trainList, self.IsDispatcher() and self.ATCEnabled)
+						rc = dlg.ShowModal()
+						if rc == wx.ID_OK:
+							trainid, locoid, atc = dlg.GetResults()
+						dlg.Destroy()
+						if rc != wx.ID_OK:
+							return
+	
+						self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid}})
+						if self.IsDispatcher() and atc != oldATC:
+							tr.SetATC(atc)
+							self.Request({"atc": {"action": "add" if atc else "delete", "train": trainid, "loco": locoid}})
+	
+						tr.Draw()
+						
+	def OnATCRemove(self, evt):
+		self.menuTrain.SetATC(False)
+		trainid, locoid = self.menuTrain.GetNameAndLoco()
+		self.Request({"atc": {"action": "delete", "train": trainid, "loco": locoid}})
+		self.menuTrain.Draw()
+		
+	def OnATCStop(self, evt):
+		trainid, locoid = self.menuTrain.GetNameAndLoco()
+		self.Request({"atc": {"action": "forcestop", "train": trainid, "loco": locoid}})
+		
+	def OnARRelease(self, evt):
+		trainid = self.menuTrain.GetName()
+		self.Request({"ar": {"action": "release", "train": trainid}})
 
 	def DrawTile(self, screen, pos, bmp):
 		offset = self.diagrams[screen].offset
@@ -1195,6 +1252,8 @@ class MainFrame(wx.Frame):
 						if name is None:
 							if tr:
 								tr.RemoveFromBlock(blk)
+								if not tr.IsContiguous():
+									self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
 							delList = []
 							for trid, tr in self.trains.items():
@@ -1202,6 +1261,8 @@ class MainFrame(wx.Frame):
 									tr.RemoveFromBlock(blk)
 									if tr.IsInNoBlocks():
 										delList.append(trid)
+									elif not tr.IsContiguous():
+										self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
 							for trid in delList:
 								try:
@@ -1244,6 +1305,9 @@ class MainFrame(wx.Frame):
 							self.trains[name] = tr
 							
 						tr.AddToBlock(blk)
+						if not tr.IsContiguous():
+							self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
+
 						if loco:
 							tr.SetLoco(loco)
 
@@ -1412,6 +1476,8 @@ class MainFrame(wx.Frame):
 						tr = blk.GetTrain()
 						oldName, _ = tr.GetNameAndLoco()
 						self.Request({"renametrain": { "oldname": oldName, "newname": tid}})
+					else:
+						self.PopupEvent("Block %s not occupied, expecting train %s" % (bname, tid))
 
 	def OnBSaveLocos(self, _):
 		dlg = wx.FileDialog(self, message="Save Locomotives", defaultDir=self.settings.locodir,
@@ -1459,6 +1525,8 @@ class MainFrame(wx.Frame):
 						tr = blk.GetTrain()
 						oldName, oldLoco = tr.GetNameAndLoco()
 						self.Request({"renametrain": { "oldname": oldName, "newname": oldName, "oldloco": oldLoco, "newloco": lid}})
+					else:
+						self.PopupEvent("Block %s not occupied, expecting locomotive %s" % (bname, lid))
 
 	def OnClose(self, _):
 		self.KillWindow()

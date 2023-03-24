@@ -307,8 +307,9 @@ class MainFrame(wx.Frame):
 	def OnBGenSimAll(self, _):
 		allSim = {}
 		for tr in self.trains:
-			_, scr = self.GenSim(tr)
-			allSim.update(scr)
+			if tr.GetNSteps() > 0:
+				_, scr = self.GenSim(tr)
+				allSim.update(scr)
 		
 		fn = os.path.join(os.getcwd(), "data", SIMSCRIPTFN)
 		with open(fn, "w") as jfp:
@@ -332,7 +333,7 @@ class MainFrame(wx.Frame):
 			
 			with open(fn, "w") as jfp:
 				json.dump(j, jfp, indent=2)
-								
+									
 		dlg.Destroy()
 		
 	def GenSim(self, tr):
@@ -414,7 +415,7 @@ class MainFrame(wx.Frame):
 				stopCt += 1
 				blks.append(stopBlocks[1])
 				waitblks.append(stopBlocks[1])
-				
+
 		waitString = ",".join(waitblks) # segment string should NOT include the os
 		if os is not None:
 			blks.insert(0, os)
@@ -428,13 +429,14 @@ class MainFrame(wx.Frame):
 	def OnBGenARAll(self, _):
 		allAR = {}
 		for tr in self.trains:
-			_, scr = self.GenAR(tr, None)
-			allAR.update(scr)
+			if tr.GetNSteps() > 0:
+				_, scr = self.GenAR(tr, None)
+				allAR.update(scr)
 		
-		print(json.dumps(allAR, indent=2))
-		#fn = os.path.join(os.getcwd(), "data", ARSCRIPTFN)
-		#with open(fn, "w") as jfp:
-	#		json.dump(allAR, jfp, indent=2)
+		#print(json.dumps(allAR, indent=2))
+		fn = os.path.join(os.getcwd(), "data", ARSCRIPTFN)
+		with open(fn, "w") as jfp:
+			json.dump(allAR, jfp, indent=2)
 		
 	def OnBGenAR(self, _):
 		# TODO: we may not want to autproute at every OS - need a way to check the ones we do want

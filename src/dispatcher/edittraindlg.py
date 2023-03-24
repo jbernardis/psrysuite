@@ -22,6 +22,8 @@ class EditTrainDlg(wx.Dialog):
 					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
 		self.cbTrainID.SetFont(font)
 		
+		self.chosenTrain = name
+		
 		self.Bind(wx.EVT_COMBOBOX, self.OnTrainChoice, self.cbTrainID)
 		self.Bind(wx.EVT_TEXT, self.OnTrainText, self.cbTrainID)
 		

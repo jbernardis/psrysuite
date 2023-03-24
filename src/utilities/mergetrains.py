@@ -39,6 +39,7 @@ for k in keyList:
     else:
         train["tracker"] = []
         train["block"] = None
+        train["cutoff"] = False
         train["desc"] = None
         train["loco"] = None
         train["normalloco"] = None

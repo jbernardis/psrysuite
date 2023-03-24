@@ -22,6 +22,9 @@ class Train:
 	def SetSteps(self, steps):
 		self.steps = [x for x in steps]
 		
+	def GetNSteps(self):
+		return len(self.steps)
+		
 	def GetSteps(self):
 		return [x for x in self.steps]
 	
@@ -44,11 +47,11 @@ class Train:
 		return self.startsubblock
 	
 	def ToJSON(self):
-		return {self.tid: {"eastbound": self.east, "startblock": self.startblock, "startsubblock": self.startsubblock, "time": self.startblocktime, "steps": self.steps}}
+		return {"eastbound": self.east, "startblock": self.startblock, "startsubblock": self.startsubblock, "time": self.startblocktime, "sequence": self.steps}
 	
 class Trains:
 	def __init__(self, ddir):
-		self.fn = os.path.join(ddir, "trainseq.json") 
+		self.fn = os.path.join(ddir, "trains.json") 
 		try:
 			with open(self.fn, "r") as jfp:
 				TrainsJson = json.load(jfp)
@@ -62,7 +65,7 @@ class Trains:
 			tr.SetStartBlock(trData["startblock"])
 			tr.SetStartSubBlock(trData["startsubblock"])
 			tr.SetStartBlockTime(trData["time"])
-			tr.SetSteps(trData["steps"])
+			tr.SetSteps(trData["sequence"])
 			
 	def __iter__(self):
 		self._nx_ = 0
@@ -79,7 +82,21 @@ class Trains:
 	def Save(self):
 		TrainsJson = {}
 		for tr in self.trainlist:
-			TrainsJson.update(tr.ToJSON())
+			tid = tr.GetTrainID()
+			if tid not in TrainsJson:
+				# put in default balues for all of the traintracker fields
+				TrainsJson[tid] = {
+					"tracker": [],
+					"block": None,
+					"cutoff": False,
+					"desc": None,
+					"loco": None,
+					"normalloco": None,
+					"origin": { "loc": None, "track": None },
+					"terminus": { "loc": None, "track": None }
+					}
+			
+			TrainsJson[tid].update(tr.ToJSON())
 			
 		with open(self.fn, "w") as jfp:
 			json.dump(TrainsJson, jfp, sort_keys=True, indent=2)

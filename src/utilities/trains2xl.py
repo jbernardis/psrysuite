@@ -19,18 +19,20 @@ class MainClass:
         
         ws.cell(row=1, column=1, value="Train")
         ws.cell(row=1, column=2, value="Eastbound")
-        ws.cell(row=1, column=3, value="Description")
-        ws.cell(row=1, column=4, value="Normal Loco")
-        ws.cell(row=1, column=5, value="Origin Loc")
-        ws.cell(row=1, column=6, value="Origin Track")
-        ws.cell(row=1, column=7, value="Terminus Loc")
-        ws.cell(row=1, column=8, value="Terminus Track")
-        ws.cell(row=1, column=9, value="Start Block")
-        ws.cell(row=1, column=10, value="Start Sub Block")
-        ws.cell(row=1, column=11, value="Time")
+        ws.cell(row=1, column=3, value="Cutoff")
+        ws.cell(row=1, column=4, value="Description")
+        ws.cell(row=1, column=5, value="Normal Loco")
+        ws.cell(row=1, column=6, value="Origin Loc")
+        ws.cell(row=1, column=7, value="Origin Track")
+        ws.cell(row=1, column=8, value="Terminus Loc")
+        ws.cell(row=1, column=9, value="Terminus Track")
+        ws.cell(row=1, column=10, value="Start Block")
+        ws.cell(row=1, column=11, value="Start Sub Block")
+        ws.cell(row=1, column=12, value="Time")
         
         ws.column_dimensions['B'].width = 10
-        ws.column_dimensions['C'].width = 50
+        ws.column_dimensions['C'].width = 10
+        ws.column_dimensions['D'].width = 50
         ws.row_dimensions[1].height = 30
         
         
@@ -40,32 +42,33 @@ class MainClass:
         for tr, tri in trains.items():
             ws.cell(row=row, column=1, value=tr)
             ws.cell(row=row, column=2, value=tri["eastbound"])
-            ws.cell(row=row, column=3, value=tri["desc"])
-            ws.cell(row=row, column=4, value=tri["normalloco"])
-            ws.cell(row=row, column=5, value=tri["origin"]["loc"])
-            ws.cell(row=row, column=6, value=tri["origin"]["track"])
-            ws.cell(row=row, column=7, value=tri["terminus"]["loc"])
-            ws.cell(row=row, column=8, value=tri["terminus"]["track"])
-            ws.cell(row=row, column=9, value=tri["startblock"])
-            ws.cell(row=row, column=10, value=tri["startsubblock"])
-            ws.cell(row=row, column=11, value=tri["time"])
+            ws.cell(row=row, column=3, value=tri["cutoff"])
+            ws.cell(row=row, column=4, value=tri["desc"])
+            ws.cell(row=row, column=5, value=tri["normalloco"])
+            ws.cell(row=row, column=6, value=tri["origin"]["loc"])
+            ws.cell(row=row, column=7, value=tri["origin"]["track"])
+            ws.cell(row=row, column=8, value=tri["terminus"]["loc"])
+            ws.cell(row=row, column=9, value=tri["terminus"]["track"])
+            ws.cell(row=row, column=10, value=tri["startblock"])
+            ws.cell(row=row, column=11, value=tri["startsubblock"])
+            ws.cell(row=row, column=12, value=tri["time"])
             
             wstrk = self.CreateTrackerSheet(tr, tri, returnLink)
             wsseq = self.CreateSequenceSheet(tr, tri, returnLink)
-            ws.cell(row=row, column=12, value="=HYPERLINK(\"#'" + wstrk.title + "'!A1\", \"TRK\")")
-            ws.cell(row=row, column=13, value="=HYPERLINK(\"#'" + wsseq.title + "'!A1\", \"SEQ\")")
+            ws.cell(row=row, column=13, value="=HYPERLINK(\"#'" + wstrk.title + "'!A1\", \"TRK\")")
+            ws.cell(row=row, column=14, value="=HYPERLINK(\"#'" + wsseq.title + "'!A1\", \"SEQ\")")
             row += 1
             
         ntrains = row-2
         #cell.value = '=HYPERLINK("#Sheet2!A2", "click here")'
         
         row = ws[1] # header row
-        for c in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]:
+        for c in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]:
             cell = row[c]
             cell.alignment = Alignment(horizontal='center', wrap_text=True)
         
         for row in ws[2:ws.max_row]:  # skip the header
-            for c in [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]:
+            for c in [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]:
                 cell = row[c]
                 cell.alignment = Alignment(horizontal='center')        
         

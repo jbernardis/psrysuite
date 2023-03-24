@@ -36,6 +36,7 @@ class TrackDiagram(wx.Panel):
 		self.Bind(wx.EVT_PAINT, self.OnPaint)
 		self.Bind(wx.EVT_MOTION, self.OnMotion)
 		self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
+		self.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
 		self.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
 		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 		self.Bind(wx.EVT_ENTER_WINDOW, lambda event: self.SetFocus())
@@ -74,7 +75,7 @@ class TrackDiagram(wx.Panel):
 		keycode = event.GetKeyCode()
 		if keycode == wx.WXK_SHIFT:
 			self.shift_down = True
-			print("shift down")
+			#print("shift down")
 
 		event.Skip()
 
@@ -82,12 +83,15 @@ class TrackDiagram(wx.Panel):
 		keycode = event.GetKeyCode()
 		if keycode == wx.WXK_SHIFT:
 			self.shift_down = False
-			print("shift up")
+			#print("shift up")
 
 		event.Skip()
 
 	def OnLeftUp(self, evt):
 		self.frame.ProcessClick(self.scr, (self.tx, self.ty), shift=self.shift_down)
+
+	def OnRightUp(self, evt):
+		self.frame.ProcessClick(self.scr, (self.tx, self.ty), shift=self.shift_down, right=True, screenpos=evt.GetPosition())
 
 	def DrawTile(self, x, y, offset, bmp):
 		self.tiles[(x*16+offset, y*16)] = bmp;

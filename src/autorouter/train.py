@@ -14,6 +14,9 @@ class Train:
 		
 	def GetBlocks(self):
 		return self.blocks
+	
+	def IsInBlock(self, block):
+		return block in self.blocks
 
 	def DelBlock(self, block):
 		if block in self.blocks:

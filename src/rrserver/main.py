@@ -530,6 +530,11 @@ class MainFrame(wx.Frame):
 				self.deleteClients(["AR"])
 				self.pidAR = None
 				
+		elif verb == "ar":
+			addrList = self.clientList.GetFunctionAddress("AR")
+			for addr, skt in addrList:
+				self.socketServer.sendToOne(skt, addr, {"ar": evt.data})
+				
 		elif verb == "atc":
 			addrList = self.clientList.GetFunctionAddress("ATC")
 			for addr, skt in addrList:

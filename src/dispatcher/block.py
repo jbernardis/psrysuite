@@ -243,6 +243,9 @@ class Block:
 
 	def GetName(self):
 		return self.name
+	
+	def GetAdjacentBlocks(self):
+		return self.blkEast, self.blkWest
 
 	def GetDistrict(self):
 		return self.district
