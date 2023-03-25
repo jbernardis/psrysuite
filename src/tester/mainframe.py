@@ -15,6 +15,7 @@ from tester.nodes.dell import Dell
 from tester.nodes.foss import Foss
 from tester.nodes.shore import Shore
 from tester.nodes.krulish import Krulish
+from tester.nodes.nassauw import NassauW
 
 from tester.nodes.cliveden import Cliveden
 from tester.nodes.greenmtn import GreenMtn
@@ -65,7 +66,7 @@ nodes = {
 	"Hyde" : ( HYDE, Hyde ),
 	"Shore" : ( SHORE, Shore ),
 	"Krulish" : ( KRULISH, Krulish ),
-	"Nassau W" : ( NASSAUW, None ),
+	"Nassau W" : ( NASSAUW, NassauW ),
 	"Nassau E" : ( NASSAUE, None ),
 	"Nassau NX" : ( NASSAUNX, None ),
 	"Bank" : ( BANK, None ),

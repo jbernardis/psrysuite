@@ -20,7 +20,6 @@ Train Edit
   
 
 tester remaining nodes:
-	NassauW
 	NassauE
 	NassauNX
 	Bank

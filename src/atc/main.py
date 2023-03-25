@@ -563,12 +563,18 @@ class MainFrame(wx.Frame):
 			# ignore non-ATC trains
 			return
 		
+		logging.info("Train %s has moved into block %s" % (train, block))
 		gs, _ = dccl.GetGoverningSignal()
-		if gs is None: # initial block - set first signal
+		logging.info("gs = (%s)" % str(gs))
+		if gs is not None and gs["os"] == block:
+			#keep with current signal in this instance
+			logging.info("Maintaining current signal = (%s)" % str(gs))
+			pass
+		else:
 			gs = self.GetSignal(train, block)
+			logging.info("Changing to new governing signal = (%s)" % str(gs))
 			dccl.SetGoverningSignal(gs)
 		
-		logging.info("Train %s has moved into block %s, signal = %s" % (train, block, str(gs)))
 		dccl.CheckHasMoved(block)
 		
 		if dccl.AtTerminus(block):
