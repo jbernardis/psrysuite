@@ -91,14 +91,27 @@ class EditTrainDlg(wx.Dialog):
 		self.chosenLoco = evt.GetString()
 
 	def OnLocoText(self, evt):
-		self.chosenLoco = evt.GetString()
+		lid = evt.GetString()
+		if not lid.isdigit():			
+			lid = "".join([c for c in lid if c.isdigit()])
+			pos = self.cbLocoID.GetInsertionPoint()
+			self.cbLocoID.ChangeValue(lid)
+			if pos > 0:
+				pos -= 1
+			self.cbLocoID.SetInsertionPoint(pos)
+			
+		self.chosenLoco = lid
 		evt.Skip()
 		
 	def OnTrainChoice(self, evt):
 		self.chosenTrain = evt.GetString()
 
 	def OnTrainText(self, evt):
-		self.chosenTrain = evt.GetString()
+		nm = evt.GetString().upper()
+		pos = self.cbTrainID.GetInsertionPoint()
+		self.cbTrainID.ChangeValue(nm)
+		self.cbTrainID.SetInsertionPoint(pos)
+		self.chosenTrain = nm
 		evt.Skip()
 
 	def onCancel(self, _):

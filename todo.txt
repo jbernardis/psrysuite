@@ -11,6 +11,8 @@ do we really need a separate cliff fleet checkbox?  And what is port fleeting if
 train identification when moving in reverse
 
 operate turnout despite locks - ctrl-click or shift-click
+
+traineditdlg - uppercase train names, numeric only loco
   
 Train Edit
   change time/trigger via ??
@@ -20,16 +22,6 @@ Train Edit
   
 
 tester remaining nodes:
-	NassauE
-	NassauNX
-	Bank
-			- Cliveden
-			- Green Mtn
-			- Cliff
-			- Sheffield
-	HydeJct
-			- Hyde
-	PortA
 	PortB
 	Parsons
  

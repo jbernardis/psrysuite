@@ -16,12 +16,16 @@ from tester.nodes.foss import Foss
 from tester.nodes.shore import Shore
 from tester.nodes.krulish import Krulish
 from tester.nodes.nassauw import NassauW
-
+from tester.nodes.nassaue import NassauE
+from tester.nodes.nassaunx import NassauNX
+from tester.nodes.bank import Bank
 from tester.nodes.cliveden import Cliveden
 from tester.nodes.greenmtn import GreenMtn
 from tester.nodes.cliff import Cliff
 from tester.nodes.sheffield import Sheffield
 from tester.nodes.hyde import Hyde
+from tester.nodes.hydejct import HydeJct
+from tester.nodes.porta import PortA
 
 # district node addresses
 YARD      = 0x11
@@ -56,20 +60,20 @@ nodes = {
 	"Cornell" : ( CORNELL, Cornell ),
 	"Yard SW" : ( YARDSW, YardSw ),
 	"Parsons Jct" : ( PARSONS, None ),
-	"Port A" : ( PORTA, None ),
+	"Port A" : ( PORTA, PortA ),
 	"Port B" : ( PORTB, None ),
 	"Latham" : ( LATHAM, Latham ),
 	"Carlton" : ( CARLTON, Carlton ),
 	"Dell" : ( DELL, Dell ),
 	"Foss" : ( FOSS, Foss ),
-	"Hyde Jct" : ( HYDEJCT, None ),
+	"Hyde Jct" : ( HYDEJCT, HydeJct ),
 	"Hyde" : ( HYDE, Hyde ),
 	"Shore" : ( SHORE, Shore ),
 	"Krulish" : ( KRULISH, Krulish ),
 	"Nassau W" : ( NASSAUW, NassauW ),
-	"Nassau E" : ( NASSAUE, None ),
-	"Nassau NX" : ( NASSAUNX, None ),
-	"Bank" : ( BANK, None ),
+	"Nassau E" : ( NASSAUE, NassauE ),
+	"Nassau NX" : ( NASSAUNX, NassauNX ),
+	"Bank" : ( BANK, Bank ),
 	"Cliveden" : ( CLIVEDEN, Cliveden ),
 	"Green Mtn" : ( GREENMTN, GreenMtn ),
 	"Cliff" : ( CLIFF, Cliff ),
