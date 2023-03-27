@@ -40,7 +40,8 @@ from dispatcher.edittraindlg import EditTrainDlg
 
 MENU_ATC_REMOVE = 900
 MENU_ATC_STOP   = 901
-MENU_AR_RELEASE = 902
+MENU_ATC_ADD    = 902
+MENU_AR_RELEASE = 903
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
@@ -847,19 +848,24 @@ class MainFrame(wx.Frame):
 						menu = wx.Menu()
 						self.menuTrain = tr
 						addedMenuItem = False
-						if tr.IsOnATC():
-							menu.Append( MENU_ATC_REMOVE, "Remove from ATC" )
-							self.Bind(wx.EVT_MENU, self.OnATCRemove, id=MENU_ATC_REMOVE)
-							menu.Append( MENU_ATC_STOP, "ATC Stop/Resume Train" )
-							self.Bind(wx.EVT_MENU, self.OnATCStop, id=MENU_ATC_STOP)
+						if self.ATCEnabled:
+							if tr.IsOnATC():
+								menu.Append( MENU_ATC_REMOVE, "Remove from ATC" )
+								self.Bind(wx.EVT_MENU, self.OnATCRemove, id=MENU_ATC_REMOVE)
+								menu.Append( MENU_ATC_STOP, "ATC Stop/Resume Train" )
+								self.Bind(wx.EVT_MENU, self.OnATCStop, id=MENU_ATC_STOP)
+							else:
+								menu.Append( MENU_ATC_ADD, "Add to ATC")
+								self.Bind(wx.EVT_MENU, self.OnATCAdd, id=MENU_ATC_ADD)
 							addedMenuItem = True
 							
-						if self.AREnabled:
+						if self.AREnabled and not tr.IsARReleased():
 							menu.Append( MENU_AR_RELEASE, "Auto Router release")
 							self.Bind(wx.EVT_MENU, self.OnARRelease, id=MENU_AR_RELEASE)
+							addedMenuItem = True
 
 						if addedMenuItem:
-							self.PopupMenu( menu, screenpos )
+							self.PopupMenu( menu, (screenpos[0], screenpos[1]+50) )
 						menu.Destroy()
 
 					else:
@@ -879,7 +885,13 @@ class MainFrame(wx.Frame):
 							self.Request({"atc": {"action": "add" if atc else "delete", "train": trainid, "loco": locoid}})
 	
 						tr.Draw()
-						
+
+	def OnATCAdd(self, evt):
+		self.menuTrain.SetATC(True)
+		trainid, locoid = self.menuTrain.GetNameAndLoco()
+		self.Request({"atc": {"action": "add", "train": trainid, "loco": locoid}})
+		self.menuTrain.Draw()
+							
 	def OnATCRemove(self, evt):
 		self.menuTrain.SetATC(False)
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
@@ -892,6 +904,7 @@ class MainFrame(wx.Frame):
 		
 	def OnARRelease(self, evt):
 		trainid = self.menuTrain.GetName()
+		self.menuTrain.SetARReleased(True)
 		self.Request({"ar": {"action": "release", "train": trainid}})
 
 	def DrawTile(self, screen, pos, bmp):

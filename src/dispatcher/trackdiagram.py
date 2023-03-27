@@ -88,7 +88,7 @@ class TrackDiagram(wx.Panel):
 		event.Skip()
 
 	def OnLeftUp(self, evt):
-		self.frame.ProcessClick(self.scr, (self.tx, self.ty), shift=self.shift_down)
+		self.frame.ProcessClick(self.scr, (self.tx, self.ty), shift=self.shift_down, screenpos=evt.GetPosition())
 
 	def OnRightUp(self, evt):
 		self.frame.ProcessClick(self.scr, (self.tx, self.ty), shift=self.shift_down, right=True, screenpos=evt.GetPosition())

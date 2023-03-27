@@ -9,6 +9,7 @@ class Train:
 			self.name = "??%d" % self.index
 		self.loco = "??"
 		self.atc = False
+		self.arReleased = False
 		self.blocks = {}
 
 	def tstring(self):
@@ -16,6 +17,12 @@ class Train:
 
 	def SetName(self, name):
 		self.name = name
+		
+	def SetARReleased(self, flag):
+		self.arReleased = flag
+		
+	def IsARReleased(self):
+		return self.arReleased
 		
 	def SetATC(self, flag=True):
 		self.atc = flag
