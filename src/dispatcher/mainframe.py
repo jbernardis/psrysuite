@@ -1582,7 +1582,7 @@ class MainFrame(wx.Frame):
 		self.KillWindow()
 		
 	def KillWindow(self):
-		self.Request( {"server": {"action": "show"}})	
+		self.Request( {"server": {"action": "exit"}})	
 		self.events.Close()
 		self.advice.Close()
 		try:

@@ -579,6 +579,9 @@ class MainFrame(wx.Frame):
 				self.Raise()
 			elif action == "hide":
 				self.Hide()
+			elif action == "exit":
+				logging.info("HTTP 'server:exit' command received - terminating")
+				self.Shutdown()
 
 		elif verb == "close":
 			function = evt.data["function"][0]

@@ -26,3 +26,4 @@ tester remaining nodes:
 	
 relocate edit train dlg to lower screen position, to the left of pipups
 
+make sure advisor is kept in sync with changes to ar
