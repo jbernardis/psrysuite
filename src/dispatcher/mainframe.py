@@ -1582,7 +1582,10 @@ class MainFrame(wx.Frame):
 		self.KillWindow()
 		
 	def KillWindow(self):
-		self.Request( {"server": {"action": "exit"}})	
+		if self.IsDispatcher():
+			# bring down the server on exit
+			self.Request( {"server": {"action": "exit"}})	
+			
 		self.events.Close()
 		self.advice.Close()
 		try:
@@ -1591,5 +1594,5 @@ class MainFrame(wx.Frame):
 		except:
 			pass
 		self.Destroy()
-		logging.info("Display process ending")
+		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Display"))
 
