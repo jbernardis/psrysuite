@@ -75,8 +75,6 @@ class MainFrame(wx.Frame):
 		self.pidATC	= None
 		self.pidAdvisor = None
 		
-		print(wx.DisplaySize())
-		
 		self.eventsList = []
 		self.adviceList = []
 		
@@ -157,7 +155,14 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, self.bRefresh)
 		self.bRefresh.Enable(False)
 
-		self.bConfig = wx.Button(self, wx.ID_ANY, "Config", pos=(self.centerOffset+100, 75), size=BTNDIM)
+		self.bServerHide = wx.Button(self, wx.ID_ANY, "Hide/Show", pos=(self.centerOffset+100, 75), size=BTNDIM)
+		self.Bind(wx.EVT_BUTTON, self.OnServerHideShow, self.bServerHide)
+		self.bServerHide.Enable(False)
+		self.serverHidden = self.settings.serverhidden
+		if not self.IsDispatcher():
+			self.bServerHide.Hide()
+
+		self.bConfig = wx.Button(self, wx.ID_ANY, "Config", pos=(self.centerOffset+10, 75), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnConfig, self.bConfig)
 		self.bConfig.Enable(False)
 		
@@ -230,6 +235,10 @@ class MainFrame(wx.Frame):
 		self.DoRefresh()
 
 		wx.CallAfter(self.Initialize)
+		
+	def OnServerHideShow(self, _):
+		self.serverHidden = not self.serverHidden
+		self.Request( {"server": {"action": "hide" if self.serverHidden else "show"}})	
 
 	def DefineWidgets(self, voffset):
 		if not self.IsDispatcher():
@@ -1054,6 +1063,7 @@ class MainFrame(wx.Frame):
 			self.sessionid = None
 			self.bSubscribe.SetLabel("Connect")
 			self.bRefresh.Enable(False)
+			self.bServerHide.Enable(False)
 			self.bConfig.Enable(False)
 			self.bLoadTrains.Enable(False)
 			self.bLoadLocos.Enable(False)
@@ -1075,6 +1085,7 @@ class MainFrame(wx.Frame):
 			self.subscribed = True
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
+			self.bServerHide.Enable(True)
 			self.bConfig.Enable(True)
 			self.bLoadTrains.Enable(True)
 			self.bLoadLocos.Enable(True)
@@ -1456,6 +1467,7 @@ class MainFrame(wx.Frame):
 		self.subscribed = False
 		self.bSubscribe.SetLabel("Connect")
 		self.bRefresh.Enable(False)
+		self.bServerHide.Enable(False)
 		self.bConfig.Enable(False)
 		self.bLoadTrains.Enable(False)
 		self.bLoadLocos.Enable(False)
@@ -1570,6 +1582,7 @@ class MainFrame(wx.Frame):
 		self.KillWindow()
 		
 	def KillWindow(self):
+		self.Request( {"server": {"action": "show"}})	
 		self.events.Close()
 		self.advice.Close()
 		try:

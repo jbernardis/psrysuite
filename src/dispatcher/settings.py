@@ -34,6 +34,7 @@ class Settings:
 		self.traindir = "."
 		self.locodir = "."
 		self.hideconfigbutton = True
+		self.serverhidden = False
 
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -73,6 +74,11 @@ class Settings:
 		else:
 			logging.warning("Missing %s section - assuming defaults" % self.section)
 			
+		if self.cfg.has_section("rrserver"):
+			for opt, value in self.cfg.items("rrserver"):
+				if opt == 'hide':
+					self.serverhidden = parseBoolean(value, False)
+				
 		if self.cfg.has_section(GLOBAL):
 			for opt, value in self.cfg.items(GLOBAL):
 				if opt == 'socketport':

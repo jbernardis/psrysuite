@@ -43,7 +43,7 @@ from rrserver.dccserver import DCCHTTPServer
 
 class MainFrame(wx.Frame):
 	def __init__(self):
-		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE)
+		wx.Frame.__init__(self, None, size=(900, 800), style=(wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP))
 		self.socketServer = None
 		self.dispServer = None
 		self.rrMonitor = None
@@ -52,6 +52,7 @@ class MainFrame(wx.Frame):
 		
 		self.pidAR = None
 		self.pidADV = None
+		self.pidDispatch = None
 		self.pidDCC = None
 
 		self.routeDefs = {}
@@ -62,6 +63,11 @@ class MainFrame(wx.Frame):
 		self.clients = {}
 
 		self.settings = Settings()
+		
+		if self.settings.startDispatch:
+			dispatchExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
+			self.pidDispatch = Popen([sys.executable, dispatchExec]).pid
+			logging.debug("dispatcher started as PID %d" % self.pidDispatch)
 		
 		if self.settings.ipaddr is not None:
 			if self.ip != self.settings.ipaddr:
@@ -111,6 +117,11 @@ class MainFrame(wx.Frame):
 		self.Layout()
 		self.Fit()
 		
+		if self.settings.hide:
+			self.Hide()
+		else:
+			self.Show()
+		
 		wx.CallAfter(self.Initialize)
 
 	def Initialize(self):
@@ -121,7 +132,7 @@ class MainFrame(wx.Frame):
 		if not self.rrMonitor.initialized:
 			logging.error("Failed to open railroad bus on device %s.  Exiting..." % self.settings.rrtty)
 			exit(1)
-		self.rrMonitor.start()
+		#self.rrMonitor.start()
 
 		try:
 			self.dispServer = HTTPServer(self.ip, self.settings.serverport, self.dispCommandReceipt)
@@ -140,6 +151,8 @@ class MainFrame(wx.Frame):
 		self.socketServer.start()
 		
 		self.StartDCCServer()
+		
+		wx.CallLater(2000, self.rrMonitor.start)
 
 	def StartDCCServer(self):
 		self.DCCServer = DCCHTTPServer(self.settings.ipaddr, self.settings.dccserverport, self.settings.dcctty)
@@ -558,6 +571,14 @@ class MainFrame(wx.Frame):
 			addrList = self.clientList.GetFunctionAddress("DISPATCH")
 			for addr, skt in addrList:
 				self.socketServer.sendToOne(skt, addr, {"advice": evt.data})
+				
+		elif verb == "server":
+			action = evt.data["action"][0]
+			if action == "show":
+				self.Show()
+				self.Raise()
+			elif action == "hide":
+				self.Hide()
 
 		elif verb == "close":
 			function = evt.data["function"][0]
@@ -608,7 +629,7 @@ class App(wx.App):
 
 	def OnInit(self):
 		self.frame = MainFrame()
-		self.frame.Show()
+		#self.frame.Show()
 		return True
 
 

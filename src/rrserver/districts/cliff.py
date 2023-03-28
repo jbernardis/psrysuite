@@ -24,32 +24,6 @@ class Cliff(District):
 					"CSw81"]
 		hsNames = [ "CSw3" ]
 		handswitchNames = [ "CSw3.hand" ]
-		
-		self.btnToRoute = {
-			"CC44E": "CC44W",
-			"CC43E": "CC43W",
-			"CC42E": "CC42W",
-			"CC41E": "CC41W",
-			"CC40E": "CC40W",
-			"CC21E": "CC21W",
-			"CC50E": "CC50W",
-			"CC51E": "CC51W",
-			"CC52E": "CC52W",
-			"CC53E": "CC53W",
-			"CC54E": "CC54W",
-			
-			"CC44W": "CC44E",
-			"CC43W": "CC43E",
-			"CC42W": "CC42E",
-			"CC41W": "CC41E",
-			"CC40W": "CC40E",
-			"CC21W": "CC21E",
-			"CC50W": "CC50E",
-			"CC51W": "CC51E",
-			"CC52W": "CC52E",
-			"CC53W": "CC53E",
-			"CC54W": "CC54E"
-		}
 
 		self.routeMap = {
 			"CG21W":  [ ["CSw41", "R"] ],
@@ -62,29 +36,29 @@ class Cliff(District):
 			"CC10E":  [ ["CSw31", "N"], ["CSw33", "N"] ],
 			"CC30E":  [ ["CSw31", "N"], ["CSw33", "R"] ],
 
-			"CC44W":  [ ["CSw43", "N"], ["CSw45", "N"], ["CSw49", "N"] ],
-			"CC43W":  [ ["CSw43", "N"], ["CSw45", "R"], ["CSw49", "R"] ],			
-			"CC42W":  [ ["CSw43", "R"], ["CSw45", "N"], ["CSw47", "N"], ["CSw51", "N"] ],			
-			"CC41W":  [ ["CSw43", "R"], ["CSw45", "N"], ["CSw47", "R"], ["CSw51", "R"] ],
-			"CC40W":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "N"] ],			
-			"CC21W":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "R"] ],
-			"CC50W":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "N"], ["CSw65", "R"] ],
-			"CC51W":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "N"], ["CSw65", "N"], ["CSw67", "R"], ["CSw69", "N"] ],
-			"CC52W":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "N"], ["CSw65", "N"], ["CSw67", "R"], ["CSw69", "R"] ],
-			"CC53W":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "N"], ["CSw65", "N"], ["CSw67", "N"], ["CSw71", "R"] ],
-			"CC54W":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "N"], ["CSw65", "N"], ["CSw67", "N"], ["CSw71", "N"] ],
+			"CC44E":  [ ["CSw43", "N"], ["CSw45", "N"], ["CSw49", "N"] ],
+			"CC43E":  [ ["CSw43", "N"], ["CSw45", "R"], ["CSw49", "R"] ],			
+			"CC42E":  [ ["CSw43", "R"], ["CSw45", "N"], ["CSw47", "N"], ["CSw51", "N"] ],			
+			"CC41E":  [ ["CSw43", "R"], ["CSw45", "N"], ["CSw47", "R"], ["CSw51", "R"] ],
+			"CC40E":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "N"] ],			
+			"CC21E":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "R"] ],
+			"CC50E":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "N"], ["CSw65", "R"] ],
+			"CC51E":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "N"], ["CSw65", "N"], ["CSw67", "R"], ["CSw69", "N"] ],
+			"CC52E":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "N"], ["CSw65", "N"], ["CSw67", "R"], ["CSw69", "R"] ],
+			"CC53E":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "N"], ["CSw65", "N"], ["CSw67", "N"], ["CSw71", "R"] ],
+			"CC54E":  [ ["CSw43", "R"], ["CSw45", "R"], ["CSw47", "R"], ["CSw63", "N"], ["CSw65", "N"], ["CSw67", "N"], ["CSw71", "N"] ],
 
-			"CC44E":  [ ["CSw57", "N"], ["CSw53", "R"], ["CSw55", "R"], ["CSw59", "N"], ["CSw61", "R"] ],
-			"CC43E":  [ ["CSw57", "R"], ["CSw53", "N"], ["CSw55", "R"], ["CSw59", "N"], ["CSw61", "R"] ],
-			"CC42E":  [ ["CSw53", "R"], ["CSw55", "N"], ["CSw59", "R"], ["CSw61", "R"] ],
-			"CC41E":  [ ["CSw53", "N"], ["CSw55", "N"], ["CSw59", "R"], ["CSw61", "R"] ],
-			"CC40E":  [ ["CSw55", "R"], ["CSw61", "N"] ],
-			"CC21E":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "R"], ["CSw73", "N"] ],
-			"CC50E":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "R"] ],
-			"CC51E":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "N"], ["CSw77", "R"], ["CSw79", "N"] ],
-			"CC52E":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "N"], ["CSw77", "R"], ["CSw79", "R"] ],
-			"CC53E":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "N"], ["CSw77", "N"], ["CSw79", "N"], ["CSw81", "R"] ],
-			"CC54E":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "N"], ["CSw77", "N"], ["CSw79", "R"], ["CSw81", "N"] ],			
+			"CC44W":  [ ["CSw57", "N"], ["CSw53", "R"], ["CSw55", "R"], ["CSw59", "N"], ["CSw61", "R"] ],
+			"CC43W":  [ ["CSw57", "R"], ["CSw53", "N"], ["CSw55", "R"], ["CSw59", "N"], ["CSw61", "R"] ],
+			"CC42W":  [ ["CSw53", "R"], ["CSw55", "N"], ["CSw59", "R"], ["CSw61", "R"] ],
+			"CC41W":  [ ["CSw53", "N"], ["CSw55", "N"], ["CSw59", "R"], ["CSw61", "R"] ],
+			"CC40W":  [ ["CSw55", "R"], ["CSw61", "N"] ],
+			"CC21W":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "R"], ["CSw73", "N"] ],
+			"CC50W":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "R"] ],
+			"CC51W":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "N"], ["CSw77", "R"], ["CSw79", "N"] ],
+			"CC52W":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "N"], ["CSw77", "R"], ["CSw79", "R"] ],
+			"CC53W":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "N"], ["CSw77", "N"], ["CSw79", "N"], ["CSw81", "R"] ],
+			"CC54W":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "N"], ["CSw77", "N"], ["CSw79", "R"], ["CSw81", "N"] ],			
 		}
 		ix = 0
 		nxButtons = [
@@ -126,11 +100,7 @@ class Cliff(District):
 		if btn not in self.routeMap:
 			return
 
-		if btn in self.btnToRoute:
-			rte = self.btnToRoute[btn]
-		else:
-			rte = btn
-		tolist = self.routeMap[rte]
+		tolist = self.routeMap[btn]
 
 		for toName, status in tolist:
 			self.rr.GetInput(toName).SetState(status)
@@ -336,19 +306,19 @@ class Cliff(District):
 			#logging.debug("Cliff: Input Bytes: %s" % itext)
 			print("Cliff: Input Bytes: %s" % itext)
 
-			self.rr.GetInput("CC21W").SetValue(getBit(inb[0], 0))  # Routes
-			self.rr.GetInput("CC40W").SetValue(getBit(inb[0], 1))
-			self.rr.GetInput("CC44W").SetValue(getBit(inb[0], 2))
-			self.rr.GetInput("CC43W").SetValue(getBit(inb[0], 3))
-			self.rr.GetInput("CC42W").SetValue(getBit(inb[0], 4))
-			self.rr.GetInput("CC41W").SetValue(getBit(inb[0], 5))
-			self.rr.GetInput("CC41E").SetValue(getBit(inb[0], 6))
-			self.rr.GetInput("CC42E").SetValue(getBit(inb[0], 7))
+			self.rr.GetInput("CC21E").SetValue(getBit(inb[0], 0))  # Routes
+			self.rr.GetInput("CC40E").SetValue(getBit(inb[0], 1))
+			self.rr.GetInput("CC44E").SetValue(getBit(inb[0], 2))
+			self.rr.GetInput("CC43E").SetValue(getBit(inb[0], 3))
+			self.rr.GetInput("CC42E").SetValue(getBit(inb[0], 4))
+			self.rr.GetInput("CC41E").SetValue(getBit(inb[0], 5))
+			self.rr.GetInput("CC41W").SetValue(getBit(inb[0], 6))
+			self.rr.GetInput("CC42W").SetValue(getBit(inb[0], 7))
 
-			self.rr.GetInput("CC21E").SetValue(getBit(inb[1], 0))
-			self.rr.GetInput("CC40E").SetValue(getBit(inb[1], 1))
-			self.rr.GetInput("CC44E").SetValue(getBit(inb[1], 2))
-			self.rr.GetInput("CC43E").SetValue(getBit(inb[1], 3))
+			self.rr.GetInput("CC21W").SetValue(getBit(inb[1], 0))
+			self.rr.GetInput("CC40W").SetValue(getBit(inb[1], 1))
+			self.rr.GetInput("CC44W").SetValue(getBit(inb[1], 2))
+			self.rr.GetInput("CC43W").SetValue(getBit(inb[1], 3))
 			self.rr.GetInput("COSSHE").SetValue(getBit(inb[1], 4))  # Detection (COS3)
 			self.rr.GetInput("C21").SetValue(getBit(inb[1], 5))
 			self.rr.GetInput("C40").SetValue(getBit(inb[1], 6))
@@ -504,17 +474,17 @@ class Cliff(District):
 			#logging.debug("Sheffield: Input Bytes: %s" % itext)
 			print("Sheffield: Input Bytes: %s" % itext)
 
-			self.rr.GetInput("CC50W").SetValue(getBit(inb[0], 0))  # Routes
-			self.rr.GetInput("CC51W").SetValue(getBit(inb[0], 1))
-			self.rr.GetInput("CC52W").SetValue(getBit(inb[0], 2))
-			self.rr.GetInput("CC53W").SetValue(getBit(inb[0], 3))
-			self.rr.GetInput("CC54W").SetValue(getBit(inb[0], 4))
-			self.rr.GetInput("CC50E").SetValue(getBit(inb[0], 5))
-			self.rr.GetInput("CC51E").SetValue(getBit(inb[0], 6))
-			self.rr.GetInput("CC52E").SetValue(getBit(inb[0], 7))
+			self.rr.GetInput("CC50E").SetValue(getBit(inb[0], 0))  # Routes
+			self.rr.GetInput("CC51E").SetValue(getBit(inb[0], 1))
+			self.rr.GetInput("CC52E").SetValue(getBit(inb[0], 2))
+			self.rr.GetInput("CC53E").SetValue(getBit(inb[0], 3))
+			self.rr.GetInput("CC54E").SetValue(getBit(inb[0], 4))
+			self.rr.GetInput("CC50W").SetValue(getBit(inb[0], 5))
+			self.rr.GetInput("CC51W").SetValue(getBit(inb[0], 6))
+			self.rr.GetInput("CC52W").SetValue(getBit(inb[0], 7))
 
-			self.rr.GetInput("CC53E").SetValue(getBit(inb[1], 0))
-			self.rr.GetInput("CC54E").SetValue(getBit(inb[1], 1))
+			self.rr.GetInput("CC53W").SetValue(getBit(inb[1], 0))
+			self.rr.GetInput("CC54W").SetValue(getBit(inb[1], 1))
 			self.rr.GetInput("C50").SetValue(getBit(inb[1], 2))  # Detection
 			self.rr.GetInput("C51").SetValue(getBit(inb[1], 3))
 			self.rr.GetInput("C52").SetValue(getBit(inb[1], 4))

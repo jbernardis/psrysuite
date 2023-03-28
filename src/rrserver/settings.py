@@ -36,6 +36,8 @@ class Settings:
 		self.topulsect = 3
 		self.nxbpulselen = 4
 		self.nxbpulsect = 2
+		self.startDispatch = False
+		self.hide = False
 
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -53,6 +55,12 @@ class Settings:
 
 				elif opt == 'diagnostic':
 					self.diagnostic = parseBoolean(value, False)
+
+				elif opt == 'startdispatch':
+					self.startDispatch = parseBoolean(value, False)
+
+				elif opt == 'hide':
+					self.hide = parseBoolean(value, False)
 
 				elif opt == "rrtty":
 					self.rrtty = value
