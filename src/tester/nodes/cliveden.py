@@ -25,8 +25,7 @@ class Cliveden(Node):
 				["C12R 2", "", 0],
 				["C10R 0", "", 0],
 				["C10R 1", "", 0],
-				["C10R 2", "", 0],
-				["", "", Node.unused]
+				["C10R 2", "", 0]
 			],
 			
 			[
@@ -47,8 +46,7 @@ class Cliveden(Node):
 				["C13.Rel", "Stop Relay", 0],
 				["C23.Rel", "", 0],
 				["C12.Rel", "", 0],
-				["CSw9 R", "Switch", Node.pulsed],
-				["", "", Node.unused]
+				["CSw9 R", "Switch", Node.pulsed]
 			]
 		]
 		

@@ -56,10 +56,7 @@ class Hyde(Node):
 				["CBHydeWest", "", 0],
 				["CBHydeEast", "", 0],
 				["HydePowerWest", "Power", 0],
-				["HydePowerEast", "", 0],
-				["", "", 0],
-				["", "", 0],
-				["", "", 0]
+				["HydePowerEast", "", 0]
 			]
 		]
 		

@@ -46,9 +46,7 @@ class Sheffield(Node):
 				["CC30W", "", Node.pulsed],
 				["CC31W", "", Node.pulsed],
 				["CC10W", "", Node.pulsed],
-				["CG21W", "", Node.pulsed],
-				["", "", 0],
-				["", "", 0]
+				["CG21W", "", Node.pulsed]
 			]
 		]
 		

@@ -26,6 +26,8 @@ from tester.nodes.sheffield import Sheffield
 from tester.nodes.hyde import Hyde
 from tester.nodes.hydejct import HydeJct
 from tester.nodes.porta import PortA
+from tester.nodes.portb import PortB
+from tester.nodes.parsons import Parsons
 
 # district node addresses
 YARD      = 0x11
@@ -59,9 +61,9 @@ nodes = {
 	"East Jct" : ( EASTJCT, EastJct ),
 	"Cornell" : ( CORNELL, Cornell ),
 	"Yard SW" : ( YARDSW, YardSw ),
-	"Parsons Jct" : ( PARSONS, None ),
+	"Parsons Jct" : ( PARSONS, Parsons ),
 	"Port A" : ( PORTA, PortA ),
-	"Port B" : ( PORTB, None ),
+	"Port B" : ( PORTB, PortB ),
 	"Latham" : ( LATHAM, Latham ),
 	"Carlton" : ( CARLTON, Carlton ),
 	"Dell" : ( DELL, Dell ),
