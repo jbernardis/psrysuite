@@ -481,7 +481,7 @@ class MainFrame(wx.Frame):
 					blk = tr.GetFirstBlock()
 					dccl.SetGoverningSignal(self.GetSignal(trnm, blk))
 						
-				elif action == "delete":
+				elif action == "remove":
 					train = parms["train"][0]
 					loco = parms["loco"][0]
 					dccl = self.dccRemote.GetDCCLocoByTrain(train)

@@ -29,6 +29,7 @@ class Cliveden (District):
 		District.PerformSignalAction(self, sig)
 
 	def DetermineRoute(self, blocks):
+		print("cliveden determine routes, block list = %s" % str([b.GetName() for b in blocks]))
 		self.FindTurnoutCombinations(blocks, ["CSw9", "CSw13"])
 
 	def DefineBlocks(self):

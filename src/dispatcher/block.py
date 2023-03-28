@@ -180,9 +180,11 @@ class Block:
 			trainID = "??"
 			locoID = "??"
 			atc = False
+			ar = False
 		else:
 			trainID, locoID = self.train.GetNameAndLoco()
 			atc = self.train.IsOnATC()
+			ar = self.train.IsOnAR()
 
 		anyOccupied = self.occupied
 		if self.sbEast and self.sbEast.IsOccupied():
@@ -194,7 +196,7 @@ class Block:
 
 		for screen, loc in self.trainLoc:
 			if anyOccupied:
-				self.frame.DrawTrain(screen, loc, trainID, locoID, stopRelay, atc)
+				self.frame.DrawTrain(screen, loc, trainID, locoID, stopRelay, atc, ar)
 			else:
 				self.frame.ClearTrain(screen, loc)
 
@@ -813,13 +815,15 @@ class OverSwitch (Block):
 			trainID = "??"
 			locoID = "??"
 			atc = False
+			ar = False
 		else:
 			trainID, locoID = self.train.GetNameAndLoco()
 			atc = self.train.IsOnATC()
+			ar = self.train.IsOnAR()
 
 		for screen, loc in self.trainLoc:
 			if self.occupied:
-				self.frame.DrawTrain(screen, loc, trainID, locoID, False, atc)
+				self.frame.DrawTrain(screen, loc, trainID, locoID, False, atc, ar)
 			else:
 				self.frame.ClearTrain(screen, loc)
 

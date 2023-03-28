@@ -1,17 +1,24 @@
 import wx
 
 class EditTrainDlg(wx.Dialog):
-	def __init__(self, parent, train, locoList, trainList, dispatcher):
-		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details")
+	def __init__(self, parent, train, locos, trains, atcFlag, arFlag, dx, dy):
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details", pos=(dx, dy))
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
 		
-		self.dispatcher = dispatcher
+		self.atcFlag = atcFlag
+		self.arFlag = arFlag
 
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(20)
 
 		name, loco = train.GetNameAndLoco()
 		atc = train.IsOnATC()
+		ar = train.IsOnAR()
+		
+		self.locos = locos
+		
+		locoList  = sorted(list(locos.keys()), key=self.BuildLocoKey)
+		trainList = sorted(list(trains.keys()))
 			
 		font = wx.Font(wx.Font(16, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
 
@@ -52,19 +59,39 @@ class EditTrainDlg(wx.Dialog):
 		hsz.AddSpacer(10)
 		hsz.Add(self.cbLocoID)
 		vsz.Add(hsz)
-
-		if dispatcher:
-			self.cbATC = wx.CheckBox(self, wx.ID_ANY, "ATC")
-			self.cbATC.SetValue(atc)
-			vsz.AddSpacer(10)
-			vsz.Add(self.cbATC, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
+		self.stDescr = wx.StaticText(self, wx.ID_ANY, "", size=(300, -1))
+		self.stDescr.SetFont(font)
+		vsz.AddSpacer(20)
+		vsz.Add(self.stDescr)
+
+		if self.atcFlag or self.arFlag:
+			hsz = wx.BoxSizer(wx.HORIZONTAL)
+			
+			if self.atcFlag:
+				self.cbATC = wx.CheckBox(self, wx.ID_ANY, "ATC")
+				self.cbATC.SetFont(font)
+				self.cbATC.SetValue(atc)
+				hsz.Add(self.cbATC)
+				
+			if self.atcFlag and self.arFlag:
+				hsz.AddSpacer(20)
+	
+			if self.arFlag:
+				self.cbAR = wx.CheckBox(self, wx.ID_ANY, "Auto Router")
+				self.cbAR.SetFont(font)
+				self.cbAR.SetValue(ar)
+				hsz.Add(self.cbAR)
+				
+			vsz.AddSpacer(20)
+			vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
 		vsz.AddSpacer(30)
 
 		bsz = wx.BoxSizer(wx.HORIZONTAL)
 
 		self.bOK = wx.Button(self, wx.ID_ANY, "OK")
+		self.bOK.SetDefault()
 		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
 
 		bsz.Add(self.bOK)
@@ -87,6 +114,11 @@ class EditTrainDlg(wx.Dialog):
 		self.Layout()
 		self.Fit()
 		
+		self.ShowLocoDesc()
+
+	def BuildLocoKey(self, lid):
+		return int(lid)
+		
 	def OnLocoChoice(self, evt):
 		self.chosenLoco = evt.GetString()
 
@@ -101,10 +133,18 @@ class EditTrainDlg(wx.Dialog):
 			self.cbLocoID.SetInsertionPoint(pos)
 			
 		self.chosenLoco = lid
+		self.ShowLocoDesc()
 		evt.Skip()
 		
 	def OnTrainChoice(self, evt):
 		self.chosenTrain = evt.GetString()
+		self.ShowLocoDesc()
+
+	def ShowLocoDesc(self):
+		if self.chosenLoco in self.locos:
+			self.stDescr.SetLabel(self.locos[self.chosenLoco]["desc"])
+		else:
+			self.stDescr.SetLabel("")
 
 	def OnTrainText(self, evt):
 		nm = evt.GetString().upper()
@@ -123,5 +163,6 @@ class EditTrainDlg(wx.Dialog):
 	def GetResults(self):
 		t = self.chosenTrain
 		l = self.chosenLoco
-		atc = False if not self.dispatcher else self.cbATC.GetValue()
-		return t, l, atc
+		atc = False if not self.atcFlag else self.cbATC.GetValue()
+		ar = False if not self.arFlag else self.cbAR.GetValue()
+		return t, l, atc, ar

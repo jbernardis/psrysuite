@@ -54,14 +54,14 @@ class Cliveden(Node):
 		
 		self.inputs = [
 			[
+				["", ""],
+				["", ""],
 				["CSw13 N", "Switch"],
 				["CSw13 R", ""],
 				["CSw11 N", ""],
 				["CSw11 R", ""],
 				["CSw9 N", ""],
-				["CSw9 R", ""],
-				["", ""],
-				["", ""]
+				["CSw9 R", ""]
 			],
 
 			[

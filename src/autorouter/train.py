@@ -15,6 +15,12 @@ class Train:
 	def GetBlocks(self):
 		return self.blocks
 	
+	def GetLatestBlock(self):
+		if len(self.blocks) == 0:
+			return None
+		
+		return self.blocks[-1]
+	
 	def IsInBlock(self, block):
 		return block in self.blocks
 

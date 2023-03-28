@@ -58,6 +58,7 @@ class MainUnit:
 			return
 
 		self.listener.start()
+		self.ARTrains = []
 
 		logging.info("finished initialize")
 
@@ -179,8 +180,10 @@ class MainUnit:
 				elif cmd == "ar":
 					action = parms["action"][0]
 					trnm = parms["train"][0]
-					if action == "release":
-						self.ReleaseTrain(trnm)
+					if action == "add":
+						self.AddTrain(trnm)
+					elif action == "remove":
+						self.RemoveTrain(trnm)
 	
 				elif cmd == "sessionID":
 					self.sessionid = int(parms)
@@ -252,20 +255,36 @@ class MainUnit:
 			except KeyError:
 				pass
 			
-	def ReleaseTrain(self, train):
-		block = self.triggers.GetOrigin(train)
-		if self.trains[train].IsInBlock(block):
-			logging.info("Releasing train %s" % train)
-			self.TrainAddBlock(train, block, released=True)
-		else:
-			logging.info("Trying to release train %s, but it is not at its origin %s" % (train, block))		
+	def AddTrain(self, train):
+		if train not in self.trains:
+			return  # unknown train - skip
+		
+		logging.info("Adding train %s to AR")
+		if train not in self.ARTrains:
+			self.ARTrains.append(train)
+			
+		tr = self.trains[train]
+		block = tr.GetLatestBlock()
+		if block is None:
+			return 
+		
+		self.TrainAddBlock(train, block)
+		
+	def RemoveTrain(self, train):
+		if train not in self.ARTrains:
+			return 
+		
+		logging.info("Removing train %s from AR")
+		self.ARTrains.remove(train)
+		
+		self.DeleteQueuedRequests(train)
 
 	def TrainAddBlock(self, train, block, released=False):
-		logging.info("Train %s has moved into block %s" % (train, block))
-		if self.triggers.IsOrigin(train, block) and not released:
-			logging.info("Train %s is not yet released from its origin location" % train)
+		if train not in self.ARTrains:
+			# ignore trains not under AR control
 			return
 		
+		logging.info("Train %s has moved into block %s" % (train, block))
 		routeRequest = self.CheckTrainInBlock(train, block, TriggerPointFront)
 		if routeRequest is None:
 			return
@@ -276,6 +295,10 @@ class MainUnit:
 			self.EnqueueRouteRequest(routeRequest)
 			
 	def TrainTailInBlock(self, train, block):
+		if train not in self.ARTrains:
+			# ignore trains not under AR control
+			return
+		
 		logging.info("Train %s tail in block %s" % (train, block))
 		routeRequest = self.CheckTrainInBlock(train, block, TriggerPointRear)
 		if routeRequest is None:
@@ -366,8 +389,25 @@ class MainUnit:
 					logging.info("OK to proceed")
 					self.OSQueue[osNm].Pop()
 					self.SetupRoute(req)
-		logging.info("end of queued requests")
 
+		logging.info("end of queued requests")
+		
+	def DeleteQueuedRequests(self, train):
+		oslist = list(self.OSQueue.keys())
+		for osNm in oslist:
+			newQ = Fifo()
+			req = self.OSQueue[osNm].Pop()
+			deleted = False
+			while req is not None:
+				if req.GetTrain() != train:
+					newQ.Append(req)
+				else:
+					deleted = True
+					
+				req = self.OSQueue[osNm].Pop()
+				
+			if deleted:
+				self.OSQueue[osNm] = newQ
 
 	def Request(self, req):
 		logging.info("Outgoing request: %s" % json.dumps(req))

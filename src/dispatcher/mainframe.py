@@ -41,7 +41,8 @@ from dispatcher.edittraindlg import EditTrainDlg
 MENU_ATC_REMOVE = 900
 MENU_ATC_STOP   = 901
 MENU_ATC_ADD    = 902
-MENU_AR_RELEASE = 903
+MENU_AR_ADD     = 903
+MENU_AR_REMOVE  = 904
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
@@ -73,6 +74,8 @@ class MainFrame(wx.Frame):
 		self.AREnabled = False
 		self.pidATC	= None
 		self.pidAdvisor = None
+		
+		print(wx.DisplaySize())
 		
 		self.eventsList = []
 		self.adviceList = []
@@ -190,6 +193,7 @@ class MainFrame(wx.Frame):
 
 		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 50), size=(400, 40))
 		
+		
 		if self.IsDispatcher():
 			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(self.centerOffset+600, 25))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
@@ -208,6 +212,8 @@ class MainFrame(wx.Frame):
 			
 		self.totalw = totalw
 		self.totalh = 1080
+		self.centerw = self.totalw/2
+		self.centerh = self.totalh/2
 		self.ResetScreen()
 		
 	def OnResetScreen(self, _):
@@ -220,6 +226,8 @@ class MainFrame(wx.Frame):
 		
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})
+			
+		self.DoRefresh()
 
 		wx.CallAfter(self.Initialize)
 
@@ -859,9 +867,13 @@ class MainFrame(wx.Frame):
 								self.Bind(wx.EVT_MENU, self.OnATCAdd, id=MENU_ATC_ADD)
 							addedMenuItem = True
 							
-						if self.AREnabled and not tr.IsARReleased():
-							menu.Append( MENU_AR_RELEASE, "Auto Router release")
-							self.Bind(wx.EVT_MENU, self.OnARRelease, id=MENU_AR_RELEASE)
+						if self.AREnabled:
+							if tr.IsOnAR():
+								menu.Append( MENU_AR_REMOVE, "Remove from Auto Router")
+								self.Bind(wx.EVT_MENU, self.OnARRemove, id=MENU_AR_REMOVE)
+							else:
+								menu.Append( MENU_AR_ADD, "Add to Auto Router")
+								self.Bind(wx.EVT_MENU, self.OnARAdd, id=MENU_AR_ADD)
 							addedMenuItem = True
 
 						if addedMenuItem:
@@ -871,10 +883,14 @@ class MainFrame(wx.Frame):
 					else:
 						oldName, oldLoco = tr.GetNameAndLoco()
 						oldATC = tr.IsOnATC() if self.IsDispatcher() else False
-						dlg = EditTrainDlg(self, tr, self.locoList, self.trainList, self.IsDispatcher() and self.ATCEnabled)
+						oldAR = tr.IsOnAR() if self.IsDispatcher() else False
+						dlgx = int(self.centerw - 500)
+						dlgy = int(self.centerh + 50)
+						dlg = EditTrainDlg(self, tr, self.locoList, self.trainList, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, dlgx, dlgy)
+						dlg.SetPosition((self.centerw, self.centerh))
 						rc = dlg.ShowModal()
 						if rc == wx.ID_OK:
-							trainid, locoid, atc = dlg.GetResults()
+							trainid, locoid, atc, ar = dlg.GetResults()
 						dlg.Destroy()
 						if rc != wx.ID_OK:
 							return
@@ -882,7 +898,11 @@ class MainFrame(wx.Frame):
 						self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid}})
 						if self.IsDispatcher() and atc != oldATC:
 							tr.SetATC(atc)
-							self.Request({"atc": {"action": "add" if atc else "delete", "train": trainid, "loco": locoid}})
+							self.Request({"atc": {"action": "add" if atc else "remove", "train": trainid, "loco": locoid}})
+							
+						if self.IsDispatcher() and ar != oldAR:
+							tr.SetAR(ar)
+							self.Request({"ar": {"action": "add" if ar else "remove", "train": trainid}})
 	
 						tr.Draw()
 
@@ -895,17 +915,22 @@ class MainFrame(wx.Frame):
 	def OnATCRemove(self, evt):
 		self.menuTrain.SetATC(False)
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
-		self.Request({"atc": {"action": "delete", "train": trainid, "loco": locoid}})
+		self.Request({"atc": {"action": "remove", "train": trainid, "loco": locoid}})
 		self.menuTrain.Draw()
 		
 	def OnATCStop(self, evt):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
 		self.Request({"atc": {"action": "forcestop", "train": trainid, "loco": locoid}})
 		
-	def OnARRelease(self, evt):
+	def OnARAdd(self, evt):
 		trainid = self.menuTrain.GetName()
-		self.menuTrain.SetARReleased(True)
-		self.Request({"ar": {"action": "release", "train": trainid}})
+		self.menuTrain.SetAR(True)
+		self.Request({"ar": {"action": "add", "train": trainid}})
+		
+	def OnARRemove(self, evt):
+		trainid = self.menuTrain.GetName()
+		self.menuTrain.SetAR(False)
+		self.Request({"ar": {"action": "remove", "train": trainid}})
 
 	def DrawTile(self, screen, pos, bmp):
 		offset = self.diagrams[screen].offset
@@ -919,9 +944,9 @@ class MainFrame(wx.Frame):
 		offset = self.diagrams[screen].offset
 		self.panels[screen].ClearText(pos[0], pos[1], offset)
 
-	def DrawTrain(self, screen, pos, trainID, locoID, stopRelay, atc):
+	def DrawTrain(self, screen, pos, trainID, locoID, stopRelay, atc, ar):
 		offset = self.diagrams[screen].offset
-		self.panels[screen].DrawTrain(pos[0], pos[1], offset, trainID, locoID, stopRelay, atc)
+		self.panels[screen].DrawTrain(pos[0], pos[1], offset, trainID, locoID, stopRelay, atc, ar)
 
 	def ClearTrain(self, screen, pos):
 		offset = self.diagrams[screen].offset
@@ -1071,19 +1096,19 @@ class MainFrame(wx.Frame):
 			logging.error("Unable to retrieve locos")
 			locos = {}
 			
-		self.locoList = sorted(list(locos.keys()), key=self.BuildLocoKey)
+		self.locoList = locos
 
 		trains = self.Get("gettrains", {})
 		if trains is None:
 			logging.error("Unable to retrieve trains")
 			trains = {}
 			
-		self.trainList = sorted(list(trains.keys()))
-
-	def BuildLocoKey(self, lid):
-		return int(lid)
+		self.trainList = trains
 
 	def OnRefresh(self, _):
+		self.DoRefresh()
+		
+	def DoRefresh(self):
 		self.Request({"refresh": {"SID": self.sessionid}})
 		
 	def OnConfig(self, _):		

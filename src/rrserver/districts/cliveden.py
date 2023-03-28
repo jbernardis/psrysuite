@@ -102,14 +102,14 @@ class Cliveden(District):
 				itext = formatIText(inb, inbc)
 				#logging.debug("CLIVEDEN: Input Bytes: %s" % itext)
 	
-				nb = getBit(inb[0], 0)  # Switch positions
-				rb = getBit(inb[0], 1)
-				self.rr.GetInput("CSw13").SetTOState(nb, rb)
-				nb = getBit(inb[0], 2) 
+				nb = getBit(inb[0], 2)  # Switch positions
 				rb = getBit(inb[0], 3)
-				self.rr.GetInput("CSw11").SetTOState(nb, rb)
+				self.rr.GetInput("CSw13").SetTOState(nb, rb)
 				nb = getBit(inb[0], 4) 
 				rb = getBit(inb[0], 5)
+				self.rr.GetInput("CSw11").SetTOState(nb, rb)
+				nb = getBit(inb[0], 6) 
+				rb = getBit(inb[0], 7)
 				self.rr.GetInput("CSw9").SetTOState(nb, rb)
 	
 				self.rr.GetInput("C13.W").SetValue(getBit(inb[1], 0))  # Detection
