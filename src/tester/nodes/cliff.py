@@ -95,21 +95,21 @@ class Cliff(Node):
 		
 		self.inputs = [
 			[
-				["CC21W", "Route"],
-				["CC40W", ""],
-				["CC44W", ""],
-				["CC43W", ""],
-				["CC42W", ""],
-				["CC41W", ""],
-				["CC41E", ""],
-				["CC42E", ""]
-			],
-
-			[
 				["CC21E", "Route"],
 				["CC40E", ""],
 				["CC44E", ""],
 				["CC43E", ""],
+				["CC42E", ""],
+				["CC41E", ""],
+				["CC41W", ""],
+				["CC42W", ""]
+			],
+
+			[
+				["CC21W", "Route"],
+				["CC40W", ""],
+				["CC44W", ""],
+				["CC43W", ""],
 				["COSSHE", "Block Detection"],
 				["C21", ""],
 				["C40", ""],

@@ -52,19 +52,19 @@ class Sheffield(Node):
 		
 		self.inputs = [
 			[
-				["CC50W", "Route"],
-				["CC51W", ""],
-				["CC52W", ""],
-				["CC53W", ""],
-				["CC54W", ""],
-				["CC50E", ""],
+				["CC50E", "Route"],
 				["CC51E", ""],
-				["CC52E", ""]
+				["CC52E", ""],
+				["CC53E", ""],
+				["CC54E", ""],
+				["CC50W", ""],
+				["CC51W", ""],
+				["CC52W", ""]
 			],
 
 			[
-				["CC53E", "Route"],
-				["CC54E", ""],
+				["CC53W", "Route"],
+				["CC54W", ""],
 				["C50", "Block Detection"],
 				["C51", ""],
 				["C52", ""],
