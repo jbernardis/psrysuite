@@ -1,6 +1,7 @@
 import serial
 import select
 import time
+import logging
 from threading import Thread
 from socketserver import ThreadingMixIn 
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -124,10 +125,15 @@ class DCCHTTPServer:
 			print("Unable to Connect to serial port %s" % self.tty)
 			# sys.exit()
 
+		logging.info("calling DCCThread constructor")
 		self.server = DCCThreadingHTTPServer((ip, port), DCCHandler)
+		logging.info("Back from constructor")
 		self.server.setApp(self)
+		logging.info("Creating DCC thread")
 		self.thread = Thread(target=self.server.serve_dcc)
+		logging.info("starting DCC thread")
 		self.thread.start()
+		logging.info("DCC thread started")
 
 	def getThread(self):
 		return self.thread

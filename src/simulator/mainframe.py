@@ -331,6 +331,7 @@ class MainFrame(wx.Frame):
 				self.sessionid = int(parms)
 				self.ShowTitle()
 				self.Request({"identify": {"SID": self.sessionid, "function": "SIM"}})
+				self.Request({"refresh": {"SID": self.sessionid}})
 
 			elif cmd == "end":
 				if parms["type"] == "layout":

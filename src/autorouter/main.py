@@ -189,6 +189,7 @@ class MainUnit:
 					self.sessionid = int(parms)
 					logging.info("session ID %d" % self.sessionid)
 					self.Request({"identify": {"SID": self.sessionid, "function": "AR"}})
+					self.Request({"refresh": {"SID": self.sessionid}})
 	
 				elif cmd == "end":
 					if parms["type"] == "layout":

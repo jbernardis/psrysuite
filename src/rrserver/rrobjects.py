@@ -402,6 +402,9 @@ class SignalOutput(Output):
 			return [1 if self.aspect in [4, 5, 6, 7] else 0, 1 if self.aspect in [2, 3, 6, 7] else 0, 1 if self.aspect in [1, 3, 5, 7] else 0]
 
 	def GetEventMessage(self):
+		if self.aspect is None:
+			print("sending signal with None aspect5")
+			logging.info("sending signal with None aspect5")
 		return {"signal": [{ "name": self.name, "aspect": self.aspect}]}
 
 

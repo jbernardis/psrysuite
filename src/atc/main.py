@@ -151,7 +151,8 @@ class MainFrame(wx.Frame):
 
 		self.dccServer = DCCServer()
 		self.dccServer.SetServerAddress(self.settings.ipaddr, self.settings.dccserverport)
-		
+		self.dccRemote = DCCRemote(self.dccServer)
+				
 		self.rrServer = RRServer()
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
 		
@@ -168,16 +169,6 @@ class MainFrame(wx.Frame):
 		if not self.ProcessScripts():
 			return
 		
-		# retrieve the loco information from the server
-		locos = self.rrServer.Get("getlocos", {})
-		if locos is None:
-			logging.error("Unable to retrieve locos")
-			locos = {}
-	
-		self.dccRemote = DCCRemote(self.dccServer)
-		if not self.dccRemote.Initialize(locos):
-			logging.error("Unable to initialize DCC remote")
-			return
 		
 		self.ticker = Ticker(0.4, self.raiseTickerEvent)
 
@@ -446,7 +437,18 @@ class MainFrame(wx.Frame):
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)
 				logging.info("session ID %d" % self.sessionid)
+				# retrieve the loco information from the server
+				locos = self.rrServer.Get("getlocos", {})
+				if locos is None:
+					logging.error("Unable to retrieve locos")
+					locos = {}
+				if not self.dccRemote.Initialize(locos):
+					logging.error("Unable to initialize DCC remote")
+					return
+				# associate our session id with the ATC function
 				self.RRRequest({"identify": {"SID": self.sessionid, "function": "ATC"}})
+				# kick off the refresh action
+				self.RRRequest({"refresh": {"SID": self.sessionid}})
 
 			elif cmd == "end":
 				if parms["type"] == "layout":

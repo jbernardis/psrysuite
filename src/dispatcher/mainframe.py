@@ -935,11 +935,13 @@ class MainFrame(wx.Frame):
 		trainid = self.menuTrain.GetName()
 		self.menuTrain.SetAR(True)
 		self.Request({"ar": {"action": "add", "train": trainid}})
+		self.menuTrain.Draw()
 		
 	def OnARRemove(self, evt):
 		trainid = self.menuTrain.GetName()
 		self.menuTrain.SetAR(False)
 		self.Request({"ar": {"action": "remove", "train": trainid}})
+		self.menuTrain.Draw()
 
 	def DrawTile(self, screen, pos, bmp):
 		offset = self.diagrams[screen].offset
@@ -1377,6 +1379,7 @@ class MainFrame(wx.Frame):
 				self.sessionid = int(parms)
 				logging.info("connected to railroad server with session ID %d" % self.sessionid)
 				self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatch else "DISPLAY"}})
+				self.DoRefresh()
 				self.districts.OnConnect()
 				self.ShowTitle()
 

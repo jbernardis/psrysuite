@@ -11,7 +11,7 @@ class RRServer(object):
 	def SendRequest(self, req):
 		for cmd, parms in req.items():
 			try:
-				r = requests.get(self.ipAddr + "/" + cmd, params=parms, timeout=0.1)
+				r = requests.get(self.ipAddr + "/" + cmd, params=parms, timeout=0.5)
 			except requests.exceptions.ConnectionError:
 				logging.error("Unable to send request  is rr server running?")
 

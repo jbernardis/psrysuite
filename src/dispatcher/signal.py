@@ -122,6 +122,9 @@ class Signal:
 			self.frame.AddPendingFleet(blk, self)
 
 	def DoFleeting(self):
+		if self.lastAspect is None:
+			print("sending signal with None aspectF")
+			logging.info("sending signal with None aspectF")
 		self.frame.Request({"signal": { "name": self.GetName(), "aspect": self.lastAspect }})
 
 	def SetGuardBlock(self, blk):

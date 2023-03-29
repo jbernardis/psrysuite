@@ -141,7 +141,7 @@ class EditTrainDlg(wx.Dialog):
 		self.ShowLocoDesc()
 
 	def ShowLocoDesc(self):
-		if self.chosenLoco in self.locos:
+		if self.chosenLoco in self.locos and self.locos[self.chosenLoco]["desc"] != None:
 			self.stDescr.SetLabel(self.locos[self.chosenLoco]["desc"])
 		else:
 			self.stDescr.SetLabel("")

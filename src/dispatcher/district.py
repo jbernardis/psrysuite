@@ -503,6 +503,9 @@ class District:
 		if aspect < 0:
 			aspect = self.CalculateAspect(sig, osblock, self.routes[rname])
 			#  report calculated aspect back to the server
+			if aspect is None:
+				aspect = sig.GetAspect()
+				
 			self.frame.Request({"signal": {"name": signm, "aspect": aspect}})
 
 		if sig.GetAspect() == aspect:

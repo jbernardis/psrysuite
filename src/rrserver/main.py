@@ -133,12 +133,15 @@ class MainFrame(wx.Frame):
 			logging.error("Failed to open railroad bus on device %s.  Exiting..." % self.settings.rrtty)
 			exit(1)
 		#self.rrMonitor.start()
+		logging.info("Railroad monitor thread created - starting HTTP server")
 
 		try:
 			self.dispServer = HTTPServer(self.ip, self.settings.serverport, self.dispCommandReceipt)
 		except Exception as e:
 			print("Unable to Create HTTP server for IP address %s (%s)" % (self.ip, str(e)))
 			self.Shutdown()
+			
+		logging.info("HTTP Server created")
 			
 		self.Bind(EVT_HTTPMESSAGE, self.onHTTPMessageEvent)
 		self.Bind(EVT_RAILROAD, self.onRailroadEvent)
@@ -150,7 +153,11 @@ class MainFrame(wx.Frame):
 		self.socketServer = SktServer(self.ip, self.settings.socketport, self.socketEventReceipt)
 		self.socketServer.start()
 		
+		logging.info("socket server started - starting DCC HTTP Server")
+		
 		self.StartDCCServer()
+		
+		logging.info("DCC HTTP server successfully started")
 		
 		wx.CallLater(2000, self.rrMonitor.start)
 
@@ -187,7 +194,7 @@ class MainFrame(wx.Frame):
 				logging.info("New Client connecting from address: %s:%s" % (addr[0], addr[1]))
 				self.socketServer.sendToOne(skt, addr, {"sessionID": sid})
 				self.clients[addr] = [skt, sid]
-				self.refreshClient(addr, skt)
+				#self.refreshClient(addr, skt)
 				self.clientList.AddClient(addr, skt, sid, None)
 
 			elif cmd == "delclient":
