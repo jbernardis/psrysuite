@@ -1400,6 +1400,9 @@ class MainFrame(wx.Frame):
 			elif cmd == "advice":
 				self.PopupAdvice(parms["msg"][0])
 					
+			elif cmd == "alert":
+				self.PopupEvent(parms["msg"][0])
+					
 			elif cmd == "atcstatus":
 				action = parms["action"][0]
 				if action == "reject":

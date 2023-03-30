@@ -578,6 +578,11 @@ class MainFrame(wx.Frame):
 			addrList = self.clientList.GetFunctionAddress("DISPATCH")
 			for addr, skt in addrList:
 				self.socketServer.sendToOne(skt, addr, {"advice": evt.data})
+	
+		elif verb == "alert":
+			addrList = self.clientList.GetFunctionAddress("DISPATCH")
+			for addr, skt in addrList:
+				self.socketServer.sendToOne(skt, addr, {"alert": evt.data})
 				
 		elif verb == "server":
 			action = evt.data["action"][0]
