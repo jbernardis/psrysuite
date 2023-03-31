@@ -1190,11 +1190,11 @@ class Port (District):
 		for sl in self.sigLeverMap:
 			self.frame.AddSignalLever(sl, self)
 
-		blockSigs = {
+		blockSbSigs = {
 			# which signals govern stopping sections, west and east
-			"P10": (None,     "P34RD"),
-			"P11": ("PB34LB", "L6RB"),
-			"P20": (None,     "P32RA"),
+			"P10": (None,     "PA34RD"),
+			"P11": ("PA34LB", "L6RB"),
+			"P20": (None,     "PA32RA"),
 			"P21": (None,     "L4R"),
 			"P31": ("PB4L",   "PB14R"),
 			"P41": ("PB2L",   "PB12R"),
@@ -1202,7 +1202,39 @@ class Port (District):
 			"P42": ("PB12L",  "S16R"),
 			"P30": ("P32RB",  "PB4R"),
 			"P40": (None,     "PB2R"),
-			"P50": ("PB4LA",  "P34LA")
+			"P50": ("Y4LA",  "PA34LA")
+		}
+
+		for blknm, siglist in blockSbSigs.items():
+			self.blocks[blknm].SetSBSignals(siglist)
+
+		blockSigs = {
+			# which signals govern blocks, west and east
+			"P1": (None,      "PA4RB"),
+			"P2": (None,      "PA4RA"),
+			"P3": (None,      "PA6R"),
+			"P4": (None,      "PA8R"),
+			"P5": (None,      "PA10RB"),
+			"P6": (None,      "PA10RA"),
+			"P7": (None,      "PA12R"),
+			"P10": ("PA10L",  "PA34RD"),
+			"P11": ("PA34LB", "L6RB"),
+			"P20": ("PA8L",   "PA32RA"),
+			"P21": ("PA32L",  "L4R"),
+			"P30": ("PA32RB", "PB4R"),
+			"P31": ("PB4L",   "PB14R"),
+			"P32": ("PB14L",  "S4LC"),
+			"P40": ("PA4L",   "PB2R"),
+			"P41": ("PB2L",   "PB12R"),
+			"P42": ("PB12L",  "S16R"),
+			"P50": ("Y4LA",   "PA34LA"),
+			"P60": ("PA12LB", "PA34RB"),
+			"P61": ("PA12LC", "PA34RC"),
+			"P62": ("PA6LA",  None),
+			"P63": ("PA6LB",  None),
+			"P64": ("PA6LC",  None),
+			"V10": ("PA12LA", None),
+			"V11": (None,    "PA34RA")
 		}
 
 		for blknm, siglist in blockSigs.items():

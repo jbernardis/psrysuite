@@ -713,11 +713,34 @@ class Yard (District):
 		for sl in self.sigLeverMap:
 			self.frame.AddSignalLever(sl, self)
 
-		blockSigs = {
+		blockSbSigs = {
 			# which signals govern stopping sections, west and east
 			"Y11": ("Y8L",  None),
 			"Y20": (None, "Y10R"),
 			"Y21": ("Y10L", "Y4R"),
+		}
+
+		for blknm, siglist in blockSbSigs.items():
+			self.blocks[blknm].SetSBSignals(siglist)
+
+		blockSigs = {
+			# which signals govern blocks, west and east
+			"Y10": ("Y22L", "Y8RA"),
+			"Y11": ("Y8L",  "Y2R"),
+			"Y20": ("Y26L", "Y10R"),
+			"Y21": ("Y10L", "Y4R"),
+			"Y30": ("Y34R", "Y8RC"),
+			"Y50": ("Y34LA", "Y26RA"),
+			"Y51": ("Y34LB", "Y26RB"),
+			"Y52": (None, "Y24RA"),
+			"Y53": (None, "Y24RB"),
+			"Y60": (None, "Y22R"),
+			"Y70": (None, "Y26RC"),
+			"Y81": ("Y40LA", "Y42RA"),
+			"Y82": ("Y40LB", "Y42RB"),
+			"Y83": ("Y40LC", "Y42RC"),
+			"Y84": ("Y40LD", "Y42RD"),
+			"Y87": ("Y42L", "Y8RB"),
 		}
 
 		for blknm, siglist in blockSigs.items():

@@ -500,6 +500,7 @@ class District:
 					break
 		else:
 			return
+		
 		if aspect < 0:
 			aspect = self.CalculateAspect(sig, osblock, self.routes[rname])
 			#  report calculated aspect back to the server
@@ -517,9 +518,12 @@ class District:
 			osblock.SetEast(sig.GetEast())
 
 		exitBlkNm = osblock.GetExitBlock()
+		entryBlkNm = osblock.GetEntryBlock()
 		sig.SetAspect(aspect, refresh=True)
 		osblock.SetEntrySignal(sig)
 		osblock.SetCleared(aspect != STOP, refresh=True)
+
+		self.frame.CheckTrainsInBlock(entryBlkNm, sig)
 
 		if osblock.IsBusy() and aspect == STOP:
 			return

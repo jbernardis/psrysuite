@@ -11,6 +11,8 @@ class Train:
 		self.atc = False
 		self.ar = False
 		self.blocks = {}
+		self.blockOrder = []
+		self.signal = None
 
 	def tstring(self):
 		return "%s/%s (%s)" % (self.name, self.loco, str(self.blocks))
@@ -38,6 +40,10 @@ class Train:
 
 	def GetLoco(self):
 		return self.loco
+	
+	def SetSignal(self, sig):
+		self.signal = sig
+		print("Setting train %s to signal %s = %d" % (self.name, sig.GetName(), sig.GetAspect()))
 
 	def GetBlockNameList(self):
 		return list(self.blocks.keys())
@@ -64,6 +70,7 @@ class Train:
 			return
 
 		self.blocks[bn] = blk
+		self.blockOrder.append(bn)
 
 	def RemoveFromBlock(self, blk):
 		bn = blk.GetName()
@@ -71,6 +78,7 @@ class Train:
 			return
 
 		del self.blocks[bn]
+		self.blockOrder.remove(bn)
 		
 	def IsContiguous(self):
 		bnames = list(self.blocks.keys())
@@ -105,7 +113,11 @@ class Train:
 		
 		return True
 			
-
+	def FrontInBlock(self, bn):
+		if len(self.blockOrder) == 0:
+			return False
+		return bn == self.blockOrder[-1]
+			
 	def IsInBlock(self, blk):
 		bn = blk.GetName()
 		return bn in self.blocks

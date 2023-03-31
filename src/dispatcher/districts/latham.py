@@ -341,13 +341,25 @@ class Latham (District):
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
-		blockSigs = {
+		blockSbSigs = {
 			# which signals govern stopping sections, west and east
 			"L10": ("Y2L",  None),
 			"L11": ("L8L",  None),
 			"L20": (None, "L6RA"),
 			"L21": ("L6L",  "L16R"),
 			"L31": (None,  "L14R")
+		}
+
+		for blknm, siglist in blockSbSigs.items():
+			self.blocks[blknm].SetSBSignals(siglist)
+
+		blockSigs = {
+			# which signals govern blocks, west and east
+			"L10": ("Y2L",  "L8R"),
+			"L11": ("L8L",  "L18R"),
+			"L20": ("Y4LB", "L6RA"),
+			"L21": ("L6L",  "L16R"),
+			"L31": ("L4L",  "L14R")
 		}
 
 		for blknm, siglist in blockSigs.items():

@@ -507,7 +507,7 @@ class Shore (District):
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
-		blockSigs = {
+		blockSbSigs = {
 			# which signals govern stopping sections, west and east
 			"S10": ("D12L", "S12R"),
 			"S20": ("D10L", "S4R"),
@@ -517,7 +517,8 @@ class Shore (District):
 			"S21": ("S4LB", "S21E"),
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in blockSbSigs.items():
+			self.blocks[blknm].SetSBSignals(siglist)
 			self.blocks[blknm].SetSignals(siglist)
 
 		self.routes = {}

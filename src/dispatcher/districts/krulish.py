@@ -313,7 +313,9 @@ class Krulish (District):
 		}
 
 		for blknm, siglist in blockSigs.items():
+			self.blocks[blknm].SetSBSignals(siglist)
 			self.blocks[blknm].SetSignals(siglist)
+		self.blocks["K10"].SetSignals(("K8LA", None))
 
 		block = self.blocks["KOSW"]
 		self.routes["KRtN10K10"] = Route(self.screen, block, "KRtN10K10", "K10", [ (141, 11), (142, 11), (143, 11), (144, 11), (145, 11), (146, 11), (147, 10), (148, 9), (149, 9) ], "N10", [RESTRICTING, RESTRICTING], ["KSw3:N", "KSw5:N", "KSw7:R"], ["K8LA", "K8R"])

@@ -773,6 +773,31 @@ class Cliff (District):
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
+		blockSigs = {
+			# # which signals govern blocks, west and east
+			"C10": ("C4LC",  "C2RB"),
+			"C20": ("C2L",   "C6L"),
+			"C21": ("C8LA",  "C6RA"),
+			"C30": ("C4LB",  "C2RA"),
+			"C31": ("C4LA",  None),
+			"C40": ("C8LB",  "C6RB"),
+			"C41": ("C8LC",  "C6RC"),
+			"C42": ("C8LD",  "C6RD"),
+			"C43": ("C8LE",  "C6RE"),
+			"C44": ("C8LF",  "C6RF"),
+			"C50": ("C8LG",  "C6RG"),
+			"C51": ("C8LH",  "C6RH"),
+			"C52": ("C8LJ",  "C6RJ"),
+			"C53": ("C8LK",  "C6RK"),
+			"C54": ("C8LL",  "C6RL"),
+			"G10": (None,    "C2RC"),
+			"G12": (None,    "C2RD"),
+			"G21": ("C4LD",  None),
+		}
+
+		for blknm, siglist in blockSigs.items():
+			self.blocks[blknm].SetSignals(siglist)
+
 		self.routes = {}
 		self.osSignals = {}
 

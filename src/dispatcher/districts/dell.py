@@ -244,11 +244,22 @@ class Dell (District):
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
-		blockSigs = {
+		blockSbSigs = {
 			# which signals govern stopping sections, west and east
 			"D10": ("L18L", None),
 			"D11": ("D6L",  "D12R"),
 			"D20": (None, "D4RA"),
+			"D21": ("D4L",  "D10R")
+		}
+
+		for blknm, siglist in blockSbSigs.items():
+			self.blocks[blknm].SetSBSignals(siglist)
+
+		blockSigs = {
+			# which signals govern blocks, west and east
+			"D10": ("L18L", "D6RB"),
+			"D11": ("D6L",  "D12R"),
+			"D20": ("L14L", "D4RA"),
 			"D21": ("D4L",  "D10R")
 		}
 

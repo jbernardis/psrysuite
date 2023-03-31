@@ -171,10 +171,20 @@ class Bank (District):
 		for sl in self.sigLeverMap:
 			self.frame.AddSignalLever(sl, self)
 
-		blockSigs = {
+		blockSbSigs = {
 			# # which signals govern stopping sections, west and east
 			"B11": ("C22L",  None),
 			"B20": (None,    "C24R"),
+			"B21": ("C24L",  "C18RA"),
+		}
+
+		for blknm, siglist in blockSbSigs.items():
+			self.blocks[blknm].SetSBSignals(siglist)
+			
+		blockSigs = {
+			# # which signals govern blocks, west and east - not needed for OS and stopping blocks
+			"B11": ("C22L",  "C18RB"),
+			"B20": ("N24L",  "C24R"),
 			"B21": ("C24L",  "C18RA"),
 		}
 

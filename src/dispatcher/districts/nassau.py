@@ -1003,11 +1003,32 @@ class Nassau (District):
 		for sl in self.sigLeverMap:
 			self.frame.AddSignalLever(sl, self)
 
-		blockSigs = {
+		blockSbSigs = {
 			# # which signals govern stopping sections, west and east
 			"B10": ("N26L",  None),
 			"N21": ("K2L",   "N14R"),
 			"R10": ("N28L",  None),
+		}
+
+		for blknm, siglist in blockSbSigs.items():
+			self.blocks[blknm].SetSBSignals(siglist)
+
+		blockSigs = {
+			# # which signals govern blocks, west and east
+			"N12": ("N16L",   "N26RC"),
+			"N21": ("K2L",    "N14R"),
+			"N22": ("N14LA",  "N24RA"),
+			"N31": ("N18LB",  "N26RB"),
+			"N32": ("N18LA",  "N26RA"),
+			"N41": ("N14LB",  "N24RB"),
+			"N42": ("N14LC",  "N24RC"),
+			"N60": (None,     "N18R"),
+			"B10": ("N26L",   "C22R"),
+			"R10": ("N28L",   None),
+			"T12": (None,     "N20R"),
+			"W10": ("N20L",   None),
+			"W11": (None,     "N28R"),
+			"W20": ("N14LD",  "N24RD")
 		}
 
 		for blknm, siglist in blockSigs.items():

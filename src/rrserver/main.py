@@ -503,6 +503,9 @@ class MainFrame(wx.Frame):
 			except (IndexError, KeyError):
 				return
 			self.rr.RemoveTrain(blknm)
+			
+		elif verb == "trainsignal":
+			print("Train signal message: %s" % str(evt.data))
 
 		elif verb == "control":
 			name = evt.data["name"][0]

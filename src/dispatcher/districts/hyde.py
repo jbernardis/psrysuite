@@ -655,7 +655,7 @@ class Hyde (District):
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
-		blockSigs = {
+		blockSbSigs = {
 			# which signals govern stopping sections, west and east
 			"H11": ("S20L", None),
 			"H13": ("H12L",  None),
@@ -664,6 +664,33 @@ class Hyde (District):
 			"H30": ("S12LB", None),
 			"H10": ("S12LC", None),
 			"H20": (None, "S18R"),
+		}
+
+		for blknm, siglist in blockSbSigs.items():
+			self.blocks[blknm].SetSBSignals(siglist)
+
+		blockSigs = {
+			# which signals govern blocks, west and east
+			"H10": ("S12LC", "S20R"),
+			"H11": ("S20L",  "H6R"),
+			"H12": ("H6LD",  "H12RE"),
+			"H13": ("H12L",  "D6RA"),
+			
+			"H20": ("S4LA",  "S18R"),
+			"H21": ("S18LA", "H4R"),
+			"H22": ("H4LA",  "H10RA"),
+			"H23": ("H10L",  "D4RB"),
+			
+			"H30": ("S12LB", "H8R"),
+			"H31": ("H8L",   "H12RA"),
+			"H32": ("H6LA",  "H12RB"),
+			"H33": ("H6LB",  "H12RC"),
+			"H34": ("H6LC",  "H12RD"),
+			
+			"H40": ("S18LB", "H10RE"),
+			"H41": ("H4LD",  "H10RD"),
+			"H42": ("H4LC",  "H10RC"),
+			"H43": ("H4LB",  "H10RB"),
 		}
 
 		for blknm, siglist in blockSigs.items():

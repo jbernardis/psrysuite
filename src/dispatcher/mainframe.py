@@ -7,6 +7,8 @@ import json
 import logging
 from subprocess import Popen
 
+from dispatcher.constants import BLOCK
+
 from dispatcher.settings import Settings
 from dispatcher.bitmaps import BitMaps
 from dispatcher.district import Districts
@@ -674,7 +676,7 @@ class MainFrame(wx.Frame):
 
 	def resolveObjects(self):
 		for _, bk in self.blocks.items():
-			sgWest, sgEast = bk.GetSignals()
+			sgWest, sgEast = bk.GetSBSignals()
 			if sgWest is not None:
 				try:
 					self.signals[sgWest].SetGuardBlock(bk)
@@ -686,7 +688,7 @@ class MainFrame(wx.Frame):
 					self.signals[sgEast].SetGuardBlock(bk)
 				except KeyError:
 					sgEast = None
-			bk.SetSignals((sgWest, sgEast))
+			bk.SetSBSignals((sgWest, sgEast))
 
 		# invert osBlocks so the we can easily map a block into the OS's it interconnects
 		self.blockOSMap = {}
@@ -962,6 +964,33 @@ class MainFrame(wx.Frame):
 	def ClearTrain(self, screen, pos):
 		offset = self.diagrams[screen].offset
 		self.panels[screen].ClearTrain(pos[0], pos[1], offset)
+		
+	def CheckTrainsInBlock(self, blkNm, sig):
+		# either a train is new in a block or the signal at the end of that block has changed.  See what trains are affected
+		blk = self.GetBlockByName(blkNm)
+		if blk is None:
+			logging.info("Bad block name: %s" % blkNm)
+			return 
+		
+		if blk.GetBlockType() != BLOCK:
+			# skip OS and stopping sections
+			return 
+		
+		if sig is None:
+			sigNm = blk.GetDirectionSignal()
+			if sigNm is None:
+				# no signal at the end of this block
+				return 
+			sig = self.GetSignalByName(sigNm)
+
+		# check for trains in the entry block.  If it is the front of the train, then this signal change applies to that train.
+		for trid, tr in self.trains.items():
+			if tr.FrontInBlock(blkNm):
+				# we found a train
+				tr.SetSignal(sig)
+				req = {"trainsignal": { "train": trid, "block": blkNm, "signal": sig.GetName(), "aspect": sig.GetAspect()}}
+				self.Request(req)
+
 
 	def SwapToScreen(self, screen):
 		if screen not in screensList:
@@ -1190,6 +1219,8 @@ class MainFrame(wx.Frame):
 						if blk.GetStatus(blockend) != stat:
 							district = blk.GetDistrict()
 							district.DoBlockAction(blk, blockend, stat)
+							if self.IsDispatcher():
+								self.CheckTrainsInBlock(block, None)
 
 			elif cmd == "blockdir":
 				for p in parms:
@@ -1359,6 +1390,9 @@ class MainFrame(wx.Frame):
 						if not tr.IsContiguous():
 							self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
+						if self.IsDispatcher():
+							self.CheckTrainsInBlock(block, None)
+						
 						if loco:
 							tr.SetLoco(loco)
 

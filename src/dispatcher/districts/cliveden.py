@@ -212,11 +212,23 @@ class Cliveden (District):
 		for sl in self.sigLeverMap:
 			self.frame.AddSignalLever(sl, self)
 
-		blockSigs = {
+		blockSbSigs = {
 			# # which signals govern stopping sections, west and east
 			"C13": ("C18L",  "C14L"),
 			"C23": ("C14LB", None),
 			"C12": ("C14LA", None),
+		}
+
+		for blknm, siglist in blockSbSigs.items():
+			self.blocks[blknm].SetSBSignals(siglist)
+
+		blockSigs = {
+			# # which signals govern blocks, west and east
+			"C11": ("C12L",  "C4R"),
+			"C12": ("C14LA", "C12R"),
+			"C13": ("C18L",  "C14L"),
+			"C22": ("C10L",  "C8R"),
+			"C23": ("C14LB", "C10R"),
 		}
 
 		for blknm, siglist in blockSigs.items():

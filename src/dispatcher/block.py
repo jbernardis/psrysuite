@@ -76,7 +76,7 @@ class Route:
 
 	def GetEndPoints(self):
 		return [self.blkin, self.blkout]
-
+	
 	def GetSignals(self):
 		return self.signals
 	
@@ -119,6 +119,8 @@ class Block:
 		self.blkWest = None
 		self.sbEast = None
 		self.sbWest = None
+		self.sbSigWest = None
+		self.sbSigEast = None
 		self.sigWest = None
 		self.sigEast = None
 		self.determineStatus()
@@ -162,6 +164,19 @@ class Block:
 
 	def GetSignals(self):
 		return self.sigWest, self.sigEast
+	
+	def GetDirectionSignal(self):
+		if self.east:
+			return self.sigEast
+		else:
+			return self.sigWest
+
+	def SetSBSignals(self, sigs):
+		self.sbSigWest = sigs[0]
+		self.sbSigEast = sigs[1]
+
+	def GetSBSignals(self):
+		return self.sbSigWest, self.sbSigEast
 
 	def AddHandSwitch(self, hs):
 		self.handswitches.append(hs)
@@ -491,10 +506,10 @@ class StoppingBlock (Block):
 			return
 
 		if self.block.east and self.eastend:
-			signm = self.block.sigEast
+			signm = self.block.sbSigEast
 			blk = self.block.blkEast
 		elif (not self.block.east) and (not self.eastend):
-			signm = self.block.sigWest
+			signm = self.block.sbSigWest
 			blk = self.block.blkWest
 		else:
 			return
@@ -707,8 +722,17 @@ class OverSwitch (Block):
 
 		return self.route.GetExitBlock(reverse)
 
-	def SetSignals(self, signms):
-		pass # does not apply to OS blocks
+	def GetEntryBlock(self, reverse=False):
+		if self.route is None:
+			return None
+
+		return self.route.GetEntryBlock(reverse)
+
+ # def SetSBSignals(self, signms):
+ # 	pass # does not apply to OS blocks
+ #
+ # def GetSBSignals(self):
+ # 	return None, None # does not apply to OS blocks
 
 	def GetRoute(self):
 		return self.route
