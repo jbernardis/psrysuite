@@ -505,7 +505,9 @@ class MainFrame(wx.Frame):
 			self.rr.RemoveTrain(blknm)
 			
 		elif verb == "trainsignal":
-			print("Train signal message: %s" % str(evt.data))
+			p = {tag: evt.data[tag][0] for tag in evt.data if tag != "cmd"}
+			resp = {"trainsignal": [p]}
+			self.socketServer.sendToAll(resp)
 
 		elif verb == "control":
 			name = evt.data["name"][0]

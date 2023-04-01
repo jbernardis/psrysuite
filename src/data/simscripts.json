@@ -6884,7 +6884,8 @@
         "name": "HWX",
         "loco": 0,
         "time": 3375,
-        "length": 3
+        "length": 3,
+        "subblock": "H30A"
       }
     },
     {

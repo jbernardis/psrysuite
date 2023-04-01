@@ -12,6 +12,8 @@ from simulator.rrserver import RRServer
 from simulator.script import Script
 from simulator.scrlist import ScriptListCtrl
 
+from simulator.train import Trains
+
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
@@ -129,6 +131,8 @@ class MainFrame(wx.Frame):
 			s = Script(self, scripts[scr], scr, self.cbComplete)
 			self.scripts[scr] = s
 			self.scriptList.AddScript(s)
+			
+		self.trains = Trains(os.path.join(os.getcwd(), "data"))
 
 	def reportSelection(self):
 		selectedScripts = self.scriptList.GetChecked()
@@ -186,7 +190,13 @@ class MainFrame(wx.Frame):
 
 	def OnStart(self, _):
 		for scr in self.startable:
-			self.scripts[scr].Execute()
+			tr = self.trains.GetTrainById(scr)
+			script = self.scripts[scr]
+			print("Train %s: normal loco: %s" % (scr, tr.GetNormalLoco()))
+			script.SetTimeMultiple(3)
+			script.SetLoco(tr.GetNormalLoco())
+			
+			script.Execute()
 		self.scriptList.ClearChecks()
 		self.startable = []
 		self.stoppable = []

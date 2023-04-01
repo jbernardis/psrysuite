@@ -212,7 +212,7 @@ class TrainDlg(wx.Dialog):
 				self.startSubBlock = subblk
 			except ValueError:
 				self.chStartSubBlock.SetSelection(0)
-				self.startSubBlock = None
+				self.startSubBlock = subBlocks[0]
 
 	def OnChStartSubBlock(self, event):
 		self.SetModified()

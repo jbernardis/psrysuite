@@ -14,6 +14,7 @@ class Script (wx.Frame):
 		self.stopped = False
 		self.error = False
 		self.waitingFor = ""
+		self.tm = 1 # time multiple
 
 		self.pauseSignal = None
 		self.pauseBlock = None
@@ -22,18 +23,50 @@ class Script (wx.Frame):
 
 		self.occupiedBlocks = []
 		self.trainlen = 0
+		
+		self.loco = self.GetLoco()
 
 		self.Bind(wx.EVT_TIMER, self.onTicker)
 		self.ticker = wx.Timer(self)
 
 	def GetName(self):
 		return self.scriptName
+	
+	def GetLoco(self):
+		for step in self.script:
+			cmd, params = list(step.items())[0]
+			if cmd == "placetrain":
+				try:
+					loco = params["loco"]
+					return loco
+				except:
+					return None
+		return None
+	
+	def SetLoco(self, loco):
+		for step in self.script:
+			cmd, params = list(step.items())[0]
+			if cmd == "placetrain":
+				try:
+					params["loco"] = loco
+					self.loco = loco
+					return True
+				except:
+					return False
+		return False
+	
+	def SetTimeMultiple(self, tm):
+		self.tm = tm
+
+	def GetTimeMultiple(self):
+		return self.tm
 
 	def GetStatus(self):
+		stat = "Loco %s  " % self.loco
 		if self.stopped:
-			return "Stopped"
+			return stat + "Stopped"
 		elif self.executionCompleted:
-			return "Completed"
+			return stat + "Completed"
 		elif self.sx is None:
 			return "Ready"
 		else:
@@ -43,11 +76,11 @@ class Script (wx.Frame):
 			step = self.script[sx]
 			cmd, params = list(step.items())[0]
 			if cmd in ["placetrain", "movetrain"]:
-				return "Block: %s" % params["block"]
+				return stat + ("Block: %s" % params["block"])
 			elif cmd == "waitfor":
-				return "Waiting for: %s" % self.waitingFor
+				return stat + ("Waiting for: %s" % self.waitingFor)
 			else:
-				return "Step %d" % sx
+				return stat + ("Step %d" % sx)
 
 	def Execute(self):
 		if self.script is None:
@@ -65,6 +98,7 @@ class Script (wx.Frame):
 	def markCompleted(self, withError=False):
 		self.error = withError
 		self.sx = None
+		self.tm = 1
 		self.executionCompleted = True
 		self.cbCompletion(self.scriptName, self.error)
 
@@ -121,7 +155,7 @@ class Script (wx.Frame):
 					self.parent.Request({"blockdir": { "block": block, "dir": direction}})
 				self.parent.Request({"movetrain": {"block": subblock}})
 				self.parent.Request({"settrain": {"block": block, "name": name, "loco": loco}})
-				self.ticker.StartOnce(duration)
+				self.ticker.StartOnce(duration * self.tm)
 
 				self.AddToOccupiedBlocks(subblock)
 				return
@@ -139,12 +173,12 @@ class Script (wx.Frame):
 					duration = 1000
 
 				self.parent.Request({"movetrain": {"block": block}})
-				self.ticker.StartOnce(duration)
+				self.ticker.StartOnce(duration * self.tm)
 				self.AddToOccupiedBlocks(block)
 				return
 
 			elif cmd == "wait":
-				self.ticker.StartOnce(params["duration"])
+				self.ticker.StartOnce(params["duration"]*self.tm)
 				return
 
 			elif cmd == "waitfor":

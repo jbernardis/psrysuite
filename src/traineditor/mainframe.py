@@ -343,8 +343,8 @@ class MainFrame(wx.Frame):
 		segTimes, segString = self.determineSegmentsAndTimes(tr.GetStartBlock(), None, east, tr.GetStartBlockTime())
 		sBlk = tr.GetStartBlock()
 		subBlk = tr.GetStartSubBlock()
-		if subBlk is not None:
-			sBlk = subBlk
+		#if subBlk is not None:
+			#sBlk = subBlk
 			
 		# determine which segment is our starting position and ignore the seqments before it in the list
 		for idx in range(len(segTimes)):

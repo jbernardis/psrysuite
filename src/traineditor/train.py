@@ -9,6 +9,7 @@ class Train:
 		self.startblock = None
 		self.startsubblock = None
 		self.startblocktime = 5000
+		self.normalLoco = None
 		
 	def SetDirection(self, direction):
 		self.east = direction
@@ -46,6 +47,12 @@ class Train:
 	def GetStartSubBlock(self):
 		return self.startsubblock
 	
+	def SetNormalLoco(self, loco):
+		self.normalLoco = loco
+		
+	def GetNormalLoco(self):
+		return self.normalLoco
+	
 	def ToJSON(self):
 		return {"eastbound": self.east, "startblock": self.startblock, "startsubblock": self.startsubblock, "time": self.startblocktime, "sequence": self.steps}
 	
@@ -67,6 +74,8 @@ class Trains:
 			tr.SetStartBlockTime(trData["time"])
 			tr.SetSteps(trData["sequence"])
 			
+			tr.SetNormalLoco(trData["normalloco"])
+			
 	def __iter__(self):
 		self._nx_ = 0
 		return self
@@ -80,11 +89,16 @@ class Trains:
 		return self.trainlist[nx]
 		
 	def Save(self):
-		TrainsJson = {}
+		try:
+			with open(self.fn, "r") as jfp:
+				TrainsJson = json.load(jfp)
+		except:
+			TrainsJson = {}
+			
 		for tr in self.trainlist:
 			tid = tr.GetTrainID()
 			if tid not in TrainsJson:
-				# put in default balues for all of the traintracker fields
+				# put in default values for all of the traintracker fields
 				TrainsJson[tid] = {
 					"tracker": [],
 					"block": None,

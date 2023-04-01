@@ -43,7 +43,6 @@ class Train:
 	
 	def SetSignal(self, sig):
 		self.signal = sig
-		print("Setting train %s to signal %s = %d" % (self.name, sig.GetName(), sig.GetAspect()))
 
 	def GetBlockNameList(self):
 		return list(self.blocks.keys())
