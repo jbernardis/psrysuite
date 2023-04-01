@@ -13,12 +13,14 @@ train identification when moving in reverse
 operate turnout despite locks - ctrl-click or shift-click
   
 Train Edit
-  change time/trigger via ??
+  change len via ??
   work train length into interface
-  need a way to get loco number into simulator
   when determining order of sub-blocks need to reverse one of the two places in gen sim logic
+  edit for tracker also
   
-relocate edit train dlg to lower screen position, to the left of pipups
+loco editor - extract from tracker and make free standing
+  
+relocate edit train dlg to lower screen position, to the left of popups
 
 make sure advisor is kept in sync with changes to ar
 

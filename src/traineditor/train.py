@@ -68,13 +68,14 @@ class Trains:
 		self.trainlist = []
 		self.trainmap = {}
 		for tid, trData in TrainsJson.items():
-			tr = self.AddTrain(tid, trData["eastbound"])
-			tr.SetStartBlock(trData["startblock"])
-			tr.SetStartSubBlock(trData["startsubblock"])
-			tr.SetStartBlockTime(trData["time"])
-			tr.SetSteps(trData["sequence"])
-			
-			tr.SetNormalLoco(trData["normalloco"])
+			if len(trData["sequence"]) > 0:
+				tr = self.AddTrain(tid, trData["eastbound"])
+				tr.SetStartBlock(trData["startblock"])
+				tr.SetStartSubBlock(trData["startsubblock"])
+				tr.SetStartBlockTime(trData["time"])
+				tr.SetSteps(trData["sequence"])
+				
+				tr.SetNormalLoco(trData["normalloco"])
 			
 	def __iter__(self):
 		self._nx_ = 0

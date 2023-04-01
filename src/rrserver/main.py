@@ -262,7 +262,7 @@ class MainFrame(wx.Frame):
 
 	def onHTTPMessageEvent(self, evt):
 		logging.info("HTTP Request: %s" % json.dumps(evt.data))
-		#print("Incoming HTTP Request: %s" % json.dumps(evt.data))
+		print("Incoming HTTP Request: %s" % json.dumps(evt.data))
 		verb = evt.data["cmd"][0]
 
 		if verb == "signal":
@@ -597,6 +597,7 @@ class MainFrame(wx.Frame):
 			elif action == "hide":
 				self.Hide()
 			elif action == "exit":
+				print("exit command")
 				logging.info("HTTP 'server:exit' command received - terminating")
 				self.Shutdown()
 

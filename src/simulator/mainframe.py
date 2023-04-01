@@ -11,6 +11,7 @@ from simulator.listener import Listener
 from simulator.rrserver import RRServer
 from simulator.script import Script
 from simulator.scrlist import ScriptListCtrl
+from simulator.trainparmdlg import TrainParmDlg
 
 from simulator.train import Trains
 
@@ -189,13 +190,32 @@ class MainFrame(wx.Frame):
 		self.scriptList.SelectNone()
 
 	def OnStart(self, _):
+		trainParams = {}
 		for scr in self.startable:
 			tr = self.trains.GetTrainById(scr)
+			loco = tr.GetNormalLoco()
+			if loco is None:
+				loco = "0"
 			script = self.scripts[scr]
-			print("Train %s: normal loco: %s" % (scr, tr.GetNormalLoco()))
-			script.SetTimeMultiple(3)
-			script.SetLoco(tr.GetNormalLoco())
+			tm = script.GetTimeMultiple()
+			trainParams[scr] = [scr, loco, tm]
 			
+		dlg = TrainParmDlg(self, trainParams)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			rv = dlg.GetResults()
+			
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+		
+		print(str(rv))
+			
+		for scr in self.startable:
+			p = trainParams[scr]
+			script.SetLoco(p[1])
+			script.SetTimeMultiple(p[2])
+			script = self.scripts[scr]
 			script.Execute()
 		self.scriptList.ClearChecks()
 		self.startable = []
