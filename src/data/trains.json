@@ -1482,7 +1482,7 @@
       }
     ],
     "startblock": "R10",
-    "startsubblock": null,
+    "startsubblock": "R10A",
     "terminus": {
       "loc": "YD",
       "track": "Y70"
