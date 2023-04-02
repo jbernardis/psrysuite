@@ -1,6 +1,5 @@
 import json
 import os
-from pickle import FALSE
 
 TriggerPointFront = 'F'  # front of train
 TriggerPointRear = 'R'  # rear of train

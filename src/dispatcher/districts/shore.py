@@ -194,19 +194,24 @@ class Shore (District):
 
 		self.blocks["S21"] = Block(self, self.frame, "S21",
 			[
-				(self.tiles["eobleft"],  self.screen, (110, 19), False),
-				(self.tiles["horiz"],    self.screen, (111, 19), False),
-				(self.tiles["horiznc"],  self.screen, (112, 19), False),
 				(self.tiles["horiz"],    self.screen, (113, 19), False),
 				(self.tiles["horiznc"],  self.screen, (114, 19), False),
 				(self.tiles["horiz"],    self.screen, (115, 19), False),
 				(self.tiles["horiznc"],  self.screen, (116, 19), False),
 				(self.tiles["horiz"],    self.screen, (117, 19), False),
 				(self.tiles["horiznc"],  self.screen, (118, 19), False),
+			], True)		
+		self.blocks["S21"].AddStoppingBlock([
+				(self.tiles["eobleft"],  self.screen, (110, 19), False),
+				(self.tiles["horiz"],    self.screen, (111, 19), False),
+				(self.tiles["horiznc"],  self.screen, (112, 19), False),
+			], False)
+		self.blocks["S21"].AddStoppingBlock([
 				(self.tiles["horiz"],    self.screen, (119, 19), False),
 				(self.tiles["horiznc"],  self.screen, (120, 19), False),
 				(self.tiles["eobright"], self.screen, (121, 19), False),
 			], True)
+		
 		self.blocks["S21"].AddTrainLoc(self.screen, (112, 19))
 
 		self.blocks["SOSW"] = OverSwitch(self, self.frame, "SOSW", 

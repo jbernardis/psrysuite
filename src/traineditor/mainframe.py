@@ -482,7 +482,7 @@ class MainFrame(wx.Frame):
 				script["origin"] = lastBlock
 				
 			if blks is None or b["block"] in blks:
-				trigger = 'F' if b["trigger"] == "Front" else 'B'			
+				trigger = 'F' if b["trigger"] == "Front" else 'R'			
 				script[lastBlock] = {"route": b["route"], "trigger": trigger}
 			lastBlock = b["block"]
 			

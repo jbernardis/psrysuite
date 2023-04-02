@@ -432,7 +432,7 @@ class Nassau (District):
 				(self.tiles["houtline"],  self.screen, (1, 9), False),
 				(self.tiles["houtline"],  self.screen, (2, 9), False),
 				(self.tiles["houtline"],  self.screen, (3, 9), False),
-			], False)
+			], True)
 
 		self.blocks["NWOSTY"] = OverSwitch(self, self.frame, "NWOSTY", 
 			[
@@ -1013,6 +1013,7 @@ class Nassau (District):
 		for blknm, siglist in blockSbSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 
+			#"N60": (None,     "N18R"),
 		blockSigs = {
 			# # which signals govern blocks, west and east
 			"N12": ("N16L",   "N26RC"),
@@ -1022,7 +1023,6 @@ class Nassau (District):
 			"N32": ("N18LA",  "N26RA"),
 			"N41": ("N14LB",  "N24RB"),
 			"N42": ("N14LC",  "N24RC"),
-			"N60": (None,     "N18R"),
 			"B10": ("N26L",   "C22R"),
 			"R10": ("N28L",   None),
 			"T12": (None,     "N20R"),

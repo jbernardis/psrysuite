@@ -98,11 +98,6 @@ class BlockSequenceListCtrl(wx.ListCtrl):
 			self.parent.reportItemActivated(item)
 		except AttributeError:
 			pass
-  # if self.blocks[item]["trigger"] == "Front":
-  # 	self.blocks[item]["trigger"] = "Rear"
-  # else:
-  # 	self.blocks[item]["trigger"] = "Front"
-  # self.RefreshItem(item)
 
 	def OnGetItemText(self, item, col):
 		return str(self.blocks[item][colMap[col]])

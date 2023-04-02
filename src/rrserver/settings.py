@@ -22,9 +22,7 @@ class Settings:
 		self.inifile = os.path.join(self.datafolder, INIFILE)
 		self.section = "rrserver"	
 		
-		self.echoTurnout = True
 		self.simulation = True
-		self.diagnostic = True
 		self.ipaddr = None
 		self.serverport = 9000
 		self.socketport = 9001
@@ -47,14 +45,8 @@ class Settings:
 
 		if self.cfg.has_section(self.section):
 			for opt, value in self.cfg.items(self.section):
-				if opt == 'echoturnout':
-					self.echoTurnout = parseBoolean(value, False)
-
-				elif opt == 'simulation':
+				if opt == 'simulation':
 					self.simulation = parseBoolean(value, False)
-
-				elif opt == 'diagnostic':
-					self.diagnostic = parseBoolean(value, False)
 
 				elif opt == 'startdispatch':
 					self.startDispatch = parseBoolean(value, False)

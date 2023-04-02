@@ -987,7 +987,7 @@
     },
     "D21": {
       "route": "DRtD21S20",
-      "trigger": "B"
+      "trigger": "R"
     },
     "S20": {
       "route": "SRtS20H20",

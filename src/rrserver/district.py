@@ -162,7 +162,7 @@ class District(wx.Panel):
 
 		if self.settings.simulation:
 			self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.inputDClick, self.ilist)
-		if self.settings.simulation or self.settings.diagnostic:
+		if self.settings.simulation:
 			self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.outputDClick, self.olist)
 	
 	def VerifyTurnoutAction(self, toList):

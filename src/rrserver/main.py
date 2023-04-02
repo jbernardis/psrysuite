@@ -73,9 +73,14 @@ class MainFrame(wx.Frame):
 			if self.ip != self.settings.ipaddr:
 				logging.info("Using configured IP Address (%s) instead of retrieved IP Address: (%s)" % (self.settings.ipaddr, self.ip))
 				self.ip = self.settings.ipaddr
-				
-		self.SetTitle("PSRY Railroad Server    IP:  %s   Listening on port:  %d    Broadcasting on port:  %d    DCC Requests served on port:  %d" % 
+
+		titleString = "PSRY Railroad Server - "
+		if self.settings.simulation:
+			titleString += "SIMULATION - "
+							
+		titleString += (" IP:  %s   Listening on port:  %d    Broadcasting on port:  %d    DCC Requests served on port:  %d" % 
 				(self.ip, self.settings.serverport, self.settings.socketport, self.settings.dccserverport))
+		self.SetTitle(titleString)
 
 		logging.info("Creating railroad object")
 		self.rr = Railroad(self, self.rrEventReceipt, self.settings)
@@ -381,7 +386,7 @@ class MainFrame(wx.Frame):
 			# turnouts are not normally echoed back to listeners.  Instead,
 			# the turnout information that the railroad reponds with is sent
 			# back to listeners to convey this information.  In simulation, we echo
-			if self.settings.echoTurnout and self.settings.simulation:
+			if self.settings.simulation:
 				self.rr.GetInput(swname).SetState(status)
 
 		elif verb == "nxbutton":
@@ -407,7 +412,7 @@ class MainFrame(wx.Frame):
 			# nxbuttons are not normally echoed back to listeners.  Instead,
 			# the turnout information that the railroad reponds with is sent
 			# back to listeners to convey this information.  In simulation we echo
-			if self.settings.echoTurnout and self.settings.simulation:
+			if self.settings.simulation:
 				if bentry and bexit:
 					self.rr.EvaluateNXButtons(bentry, bexit)
 				else:

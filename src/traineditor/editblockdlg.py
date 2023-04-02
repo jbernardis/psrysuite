@@ -23,7 +23,7 @@ class EditBlockDlg(wx.Dialog):
 		self.icTTime.SetNoneAllowed(False)
 		self.Bind(wx.EVT_TEXT, self.OnText, self.icTTime)
 		
-		self.triggerValues = ["front", "rear"]
+		self.triggerValues = ["Front", "Rear"]
 		self.rbTrigger = wx.RadioBox(self, wx.ID_ANY, "Trigger Point", choices=self.triggerValues)
 		self.rbTrigger.SetSelection(0)
 		for i in range(len(self.triggerValues)):
