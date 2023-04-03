@@ -1,10 +1,9 @@
 import wx
 from wx.lib.intctrl import IntCtrl
-import json
 
-from traineditor.nextblocklist import NextBlockListCtrl
-from traineditor.blocksequence import BlockSequenceListCtrl
-from traineditor.editblockdlg import EditBlockDlg
+from traineditor.trainsequences.nextblocklist import NextBlockListCtrl
+from traineditor.trainsequences.blocksequence import BlockSequenceListCtrl
+from traineditor.trainsequences.editblockdlg import EditBlockDlg
 		
 class TrainDlg(wx.Dialog):
 	def __init__(self, parent, train, layout):

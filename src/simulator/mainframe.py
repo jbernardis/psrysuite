@@ -237,8 +237,8 @@ class MainFrame(wx.Frame):
 		self.enableButtons()
 
 	def cbComplete(self, scrName, errFlag):
-		print("script %s complete, error = %s" % (scrName, str(errFlag)))
-
+		pass
+	
 	def PauseScript(self, script):
 		self.pausedScripts.append(script)
 
@@ -281,7 +281,6 @@ class MainFrame(wx.Frame):
 		try:
 			jdata = json.loads(data)
 		except json.decoder.JSONDecodeError:
-			print("Unable to parse (%s)" % data)
 			return
 		evt = DeliveryEvent(data=jdata)
 		wx.QueueEvent(self, evt)

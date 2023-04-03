@@ -18,7 +18,3 @@ class RouteRequest:
 
 	def GetEntryBlock(self):
 		return self.entryblk
-	
-	def Print(self):
-		print("Route Request: Trn:%s Rte:%s OS:%s Blk:%s" % (self.train, self.route.GetName(), self.route.GetOS(), self.entryblk))
-		self.route.Print()

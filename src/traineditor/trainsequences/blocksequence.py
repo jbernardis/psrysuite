@@ -1,5 +1,4 @@
 import wx
-import json
 
 colMap = ["block", "signal", "os", "route", "time", "trigger"]
 

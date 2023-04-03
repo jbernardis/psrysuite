@@ -15,3 +15,6 @@ class RouteRequest:
 
 	def GetEntryBlock(self):
 		return self.entryblk
+	
+	def tostring(self):
+		return "%s: OS:%s Train:%s  EBlk:%s" % (self.GetName(), self.GetOS(), self.GetTrain(), self.GetEntryBlock())

@@ -1,1212 +1,1212 @@
 {
-  "1006": {
-    "desc": null,
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 60,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
+    "1006": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 60,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "1074": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 115,
+            "medium": 95,
+            "slow": 50,
+            "start": 40
+        }
+    },
+    "1147": {
+        "desc": "Pacific Southern / Old Style Green",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "1309": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 70,
+            "medium": 54,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "140": {
+        "desc": "RDC Western Maryland",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "1415": {
+        "desc": "NJ Transit",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "1419": {
+        "desc": "B&O",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 124,
+            "medium": 101,
+            "slow": 50,
+            "start": 35
+        }
+    },
+    "1523": {
+        "desc": null,
+        "prof": {
+            "acc": 2,
+            "dec": 1,
+            "fast": 65,
+            "medium": 52,
+            "slow": 25,
+            "start": 15
+        }
+    },
+    "1790": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 110,
+            "medium": 87,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "191": {
+        "desc": "RDC / Boston & Main",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "1921": {
+        "desc": "Nassau Northern",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "2": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 115,
+            "medium": 99,
+            "slow": 65,
+            "start": 55
+        }
+    },
+    "203": {
+        "desc": "Amtrak",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 85,
+            "medium": 71,
+            "slow": 40,
+            "start": 25
+        }
+    },
+    "2049": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 120,
+            "medium": 88,
+            "slow": 15,
+            "start": 0
+        }
+    },
+    "209": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 74,
+            "slow": 40,
+            "start": 30
+        }
+    },
+    "21": {
+        "desc": null,
+        "prof": {
+            "acc": 2,
+            "dec": 3,
+            "fast": 90,
+            "medium": 71,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "2100": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 72,
+            "medium": 53,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "2111": {
+        "desc": null,
+        "prof": {
+            "acc": 2,
+            "dec": 2,
+            "fast": 90,
+            "medium": 76,
+            "slow": 45,
+            "start": 35
+        }
+    },
+    "2113": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 85,
+            "medium": 69,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "2123": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 85,
+            "medium": 65,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "2124": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 85,
+            "medium": 69,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "2216": {
+        "desc": "Northern Pacific",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "226": {
+        "desc": "Amtrak",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "2511": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 70,
+            "slow": 25,
+            "start": 15
+        }
+    },
+    "2591": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 60,
+            "slow": 15,
+            "start": 5
+        }
+    },
+    "262": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 35,
+            "medium": 33,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "2681": {
+        "desc": "Santa Fe / old style - 4 short",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 92,
+            "medium": 73,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "277": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 2,
+            "fast": 60,
+            "medium": 50,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "2916": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 74,
+            "slow": 40,
+            "start": 30
+        }
+    },
+    "2919": {
+        "desc": "Santa Fe / Old Style",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 75,
+            "medium": 58,
+            "slow": 20,
+            "start": 7
+        }
+    },
+    "326": {
+        "desc": "Santa Fe / Open Load",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 64,
+            "slow": 27,
+            "start": 0
+        }
+    },
+    "3262": {
+        "desc": "CSX / Container",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 64,
+            "slow": 27,
+            "start": 17
+        }
+    },
+    "3322": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 95,
+            "medium": 78,
+            "slow": 40,
+            "start": 30
+        }
+    },
+    "3406": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 85,
+            "medium": 65,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "3648": {
+        "desc": "Penn / Billboard Reefer",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "375": {
+        "desc": "RDC / Boston & Main",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 70,
+            "medium": 59,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "3768": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 50,
+            "medium": 37,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "3809": {
+        "desc": "PSR / Ore",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 50,
+            "medium": 42,
+            "slow": 24,
+            "start": 14
+        }
+    },
+    "40": {
+        "desc": "RDC Northern Pacific",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "4023": {
+        "desc": "Pate Bros Circus",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 55,
+            "medium": 46,
+            "slow": 28,
+            "start": 15
+        }
+    },
+    "4024": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 91,
+            "medium": 69,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "4090": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 95,
+            "medium": 76,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "4100": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 95,
+            "medium": 76,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "4197": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 61,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "427": {
+        "desc": "PSRY / Old Style Red",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "4294": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 50,
+            "medium": 40,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "4303": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 70,
+            "medium": 54,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "4368": {
+        "desc": "Rock / Cattle",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 110,
+            "medium": 88,
+            "slow": 40,
+            "start": 30
+        }
+    },
+    "4515": {
+        "desc": "NJ Transit",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 61,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "47": {
+        "desc": "CSX / Container",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 64,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "4847": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 67,
+            "slow": 40,
+            "start": 30
+        }
+    },
+    "493": {
+        "desc": "Nickel Plate / PSR Old Style Red",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 85,
+            "medium": 66,
+            "slow": 25,
+            "start": 15
+        }
+    },
+    "498": {
+        "desc": "ATSF / Nassau Northern",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "50": {
+        "desc": "Santa Fe / 1940 Passenger ",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 86,
+            "medium": 68,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "5024": {
+        "desc": "Chicago & NW",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 85,
+            "medium": 66,
+            "slow": 25,
+            "start": 15
+        }
+    },
+    "5213": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 74,
+            "slow": 40,
+            "start": 30
+        }
+    },
+    "5298": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 50,
+            "medium": 37,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "5304": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 80,
+            "slow": 60,
+            "start": 50
+        }
+    },
+    "5450": {
+        "desc": "NYC",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 80,
+            "slow": 60,
+            "start": 50
+        }
+    },
+    "5513": {
+        "desc": null,
+        "prof": {
+            "acc": 2,
+            "dec": 2,
+            "fast": 95,
+            "medium": 78,
+            "slow": 40,
+            "start": 30
+        }
+    },
+    "552": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 100,
+            "medium": 78,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "5533": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 110,
+            "medium": 90,
+            "slow": 45,
+            "start": 35
+        }
+    },
+    "5536": {
+        "desc": "Pennsylvania",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 95,
+            "medium": 81,
+            "slow": 50,
+            "start": 25
+        }
+    },
+    "5601": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 68,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "5641": {
+        "desc": "DRG / Ski",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "5754": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 68,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "579": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 60,
+            "medium": 46,
+            "slow": 15,
+            "start": 5
+        }
+    },
+    "5840": {
+        "desc": "BNSF / Grain",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 82,
+            "medium": 67,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "600": {
+        "desc": "Denver Rio Grande",
+        "prof": {
+            "acc": 1,
+            "dec": 2,
+            "fast": 95,
+            "medium": 76,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "6002": {
+        "desc": "New York Central / Old Style",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 75,
+            "slow": 35,
+            "start": 20
+        }
+    },
+    "6013": {
+        "desc": "Penn / Reading Sea Shore",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 25,
+            "medium": 20,
+            "slow": 9,
+            "start": 0
+        }
+    },
+    "6034": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 120,
+            "medium": 100,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "604": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 2,
+            "fast": 85,
+            "medium": 72,
+            "slow": 45,
+            "start": 35
+        }
+    },
+    "6051": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 110,
+            "medium": 91,
+            "slow": 50,
+            "start": 40
+        }
+    },
+    "6076": {
+        "desc": "BHP / Tank",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 86,
+            "medium": 69,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "6118": {
+        "desc": "RDC - Boston & Maine / 2 units",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 100,
+            "medium": 84,
+            "slow": 50,
+            "start": 40
+        }
+    },
+    "6137": {
+        "desc": "RDC - B & O / 3 units",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 100,
+            "medium": 84,
+            "slow": 50,
+            "start": 40
+        }
+    },
+    "6197": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 95,
+            "medium": 76,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "64": {
+        "desc": "Pacific Southern / Exectrix",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "6418": {
+        "desc": "Penn / Mix Freight",
+        "prof": {
+            "acc": 2,
+            "dec": 2,
+            "fast": 100,
+            "medium": 84,
+            "slow": 50,
+            "start": 40
+        }
+    },
+    "669": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 71,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "6733": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 100,
+            "medium": 72,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "6798": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 100,
+            "medium": 78,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "68": {
+        "desc": "Pacific Southern / Exec",
+        "prof": {
+            "acc": 2,
+            "dec": 2,
+            "fast": 84,
+            "medium": 69,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "69": {
+        "desc": "Milwaukee",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 60,
+            "medium": 44,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "6904": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 69,
+            "slow": 21,
+            "start": 11
+        }
+    },
+    "6972": {
+        "desc": "PSRY / Santa Fe",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 50,
+            "medium": 37,
+            "slow": 7,
+            "start": 1
+        }
+    },
+    "6973": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 85,
+            "medium": 64,
+            "slow": 17,
+            "start": 7
+        }
+    },
+    "700": {
+        "desc": "New Haven",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 75,
+            "medium": 65,
+            "slow": 45,
+            "start": 35
+        }
+    },
+    "743": {
+        "desc": "B & O",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "7519": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 61,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "7600": {
+        "desc": "B&O / Empty Coal",
+        "prof": {
+            "acc": 5,
+            "dec": 10,
+            "fast": 45,
+            "medium": 37,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "777": {
+        "desc": "new one",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "791": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 71,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "80": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 71,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "8099": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 73,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "83": {
+        "desc": "Santa Fe / Old Style",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 60,
+            "slow": 15,
+            "start": 5
+        }
+    },
+    "860": {
+        "desc": "Lackawanna",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 94,
+            "medium": 78,
+            "slow": 42,
+            "start": 32
+        }
+    },
+    "905": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 75,
+            "medium": 56,
+            "slow": 15,
+            "start": 5
+        }
+    },
+    "91": {
+        "desc": "ATSF / PS Business Car",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "913": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 60,
+            "medium": 49,
+            "slow": 24,
+            "start": 14
+        }
+    },
+    "914": {
+        "desc": "UP",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 68,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "9164": {
+        "desc": "RDC / Reading",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "929": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 120,
+            "medium": 101,
+            "slow": 60,
+            "start": 50
+        }
+    },
+    "9472": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 61,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "9631": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 110,
+            "medium": 87,
+            "slow": 35,
+            "start": 25
+        }
+    },
+    "9669": {
+        "desc": "Penn / Mail",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 100,
+            "medium": 83,
+            "slow": 45,
+            "start": 35
+        }
+    },
+    "990": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 110,
+            "medium": 94,
+            "slow": 60,
+            "start": 50
+        }
+    },
+    "9916": {
+        "desc": null,
+        "prof": {
+            "acc": 2,
+            "dec": 1,
+            "fast": 70,
+            "medium": 57,
+            "slow": 30,
+            "start": 20
+        }
+    },
+    "9922": {
+        "desc": null,
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 120,
+            "medium": 101,
+            "slow": 60,
+            "start": 50
+        }
     }
-  },
-  "1074": {
-    "desc": null,
-    "prof": {
-      "start": 40,
-      "slow": 50,
-      "medium": 95,
-      "fast": 115,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "1147": {
-    "desc": "Pacific Southern / Old Style Green",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "1309": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 54,
-      "fast": 70,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "140": {
-    "desc": "RDC Western Maryland",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "1415": {
-    "desc": "NJ Transit",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "1419": {
-    "desc": "B&O",
-    "prof": {
-      "start": 35,
-      "slow": 50,
-      "medium": 101,
-      "fast": 124,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "1523": {
-    "desc": null,
-    "prof": {
-      "start": 15,
-      "slow": 25,
-      "medium": 52,
-      "fast": 65,
-      "acc": 2,
-      "dec": 1
-    }
-  },
-  "1790": {
-    "desc": null,
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 87,
-      "fast": 110,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "191": {
-    "desc": "RDC / Boston & Main",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "1921": {
-    "desc": "Nassau Northern",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "2": {
-    "desc": null,
-    "prof": {
-      "start": 55,
-      "slow": 65,
-      "medium": 99,
-      "fast": 115,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "203": {
-    "desc": "Amtrak",
-    "prof": {
-      "start": 25,
-      "slow": 40,
-      "medium": 71,
-      "fast": 85,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "2049": {
-    "desc": null,
-    "prof": {
-      "start": 0,
-      "slow": 15,
-      "medium": 88,
-      "fast": 120,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "209": {
-    "desc": null,
-    "prof": {
-      "start": 30,
-      "slow": 40,
-      "medium": 74,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "21": {
-    "desc": null,
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 71,
-      "fast": 90,
-      "acc": 2,
-      "dec": 3
-    }
-  },
-  "2100": {
-    "desc": null,
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 53,
-      "fast": 72,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "2111": {
-    "desc": null,
-    "prof": {
-      "start": 35,
-      "slow": 45,
-      "medium": 76,
-      "fast": 90,
-      "acc": 2,
-      "dec": 2
-    }
-  },
-  "2113": {
-    "desc": null,
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 69,
-      "fast": 85,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "2123": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 65,
-      "fast": 85,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "2124": {
-    "desc": null,
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 69,
-      "fast": 85,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "2216": {
-    "desc": "Northern Pacific",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "226": {
-    "desc": "Amtrak",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "2511": {
-    "desc": null,
-    "prof": {
-      "start": 15,
-      "slow": 25,
-      "medium": 70,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "2591": {
-    "desc": null,
-    "prof": {
-      "start": 5,
-      "slow": 15,
-      "medium": 60,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "262": {
-    "desc": null,
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 33,
-      "fast": 35,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "2681": {
-    "desc": "Santa Fe / old style - 4 short",
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 73,
-      "fast": 92,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "277": {
-    "desc": null,
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 50,
-      "fast": 60,
-      "acc": 1,
-      "dec": 2
-    }
-  },
-  "2916": {
-    "desc": null,
-    "prof": {
-      "start": 30,
-      "slow": 40,
-      "medium": 74,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "2919": {
-    "desc": "Santa Fe / Old Style",
-    "prof": {
-      "start": 7,
-      "slow": 20,
-      "medium": 58,
-      "fast": 75,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "326": {
-    "desc": "Santa Fe / Open Load",
-    "prof": {
-      "start": 0,
-      "slow": 27,
-      "medium": 64,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "3262": {
-    "desc": "CSX / Container",
-    "prof": {
-      "start": 17,
-      "slow": 27,
-      "medium": 64,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "3322": {
-    "desc": null,
-    "prof": {
-      "start": 30,
-      "slow": 40,
-      "medium": 78,
-      "fast": 95,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "3406": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 65,
-      "fast": 85,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "3648": {
-    "desc": "Penn / Billboard Reefer",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "375": {
-    "desc": "RDC / Boston & Main",
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 59,
-      "fast": 70,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "3768": {
-    "desc": null,
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 37,
-      "fast": 50,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "3809": {
-    "desc": "PSR / Ore",
-    "prof": {
-      "start": 14,
-      "slow": 24,
-      "medium": 42,
-      "fast": 50,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "40": {
-    "desc": "RDC Northern Pacific",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "4023": {
-    "desc": "Pate Bros Circus",
-    "prof": {
-      "start": 15,
-      "slow": 28,
-      "medium": 46,
-      "fast": 55,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "4024": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 69,
-      "fast": 91,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "4090": {
-    "desc": null,
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 76,
-      "fast": 95,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "4100": {
-    "desc": null,
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 76,
-      "fast": 95,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "4197": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 61,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "427": {
-    "desc": "PSRY / Old Style Red",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "4294": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 40,
-      "fast": 50,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "4303": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 54,
-      "fast": 70,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "4368": {
-    "desc": "Rock / Cattle",
-    "prof": {
-      "start": 30,
-      "slow": 40,
-      "medium": 88,
-      "fast": 110,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "4515": {
-    "desc": "NJ Transit",
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 61,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "47": {
-    "desc": "CSX / Container",
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 64,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "4847": {
-    "desc": null,
-    "prof": {
-      "start": 30,
-      "slow": 40,
-      "medium": 67,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "493": {
-    "desc": "Nickel Plate / PSR Old Style Red",
-    "prof": {
-      "start": 15,
-      "slow": 25,
-      "medium": 66,
-      "fast": 85,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "498": {
-    "desc": "ATSF / Nassau Northern",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "50": {
-    "desc": "Santa Fe / 1940 Passenger ",
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 68,
-      "fast": 86,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5024": {
-    "desc": "Chicago & NW",
-    "prof": {
-      "start": 15,
-      "slow": 25,
-      "medium": 66,
-      "fast": 85,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5213": {
-    "desc": null,
-    "prof": {
-      "start": 30,
-      "slow": 40,
-      "medium": 74,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5298": {
-    "desc": null,
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 37,
-      "fast": 50,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5304": {
-    "desc": null,
-    "prof": {
-      "start": 50,
-      "slow": 60,
-      "medium": 80,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5450": {
-    "desc": "NYC",
-    "prof": {
-      "start": 50,
-      "slow": 60,
-      "medium": 80,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5513": {
-    "desc": null,
-    "prof": {
-      "start": 30,
-      "slow": 40,
-      "medium": 78,
-      "fast": 95,
-      "acc": 2,
-      "dec": 2
-    }
-  },
-  "552": {
-    "desc": null,
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 78,
-      "fast": 100,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5533": {
-    "desc": null,
-    "prof": {
-      "start": 35,
-      "slow": 45,
-      "medium": 90,
-      "fast": 110,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5536": {
-    "desc": "Pennsylvania",
-    "prof": {
-      "start": 25,
-      "slow": 50,
-      "medium": 81,
-      "fast": 95,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5601": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 68,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5641": {
-    "desc": "DRG / Ski",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5754": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 68,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "579": {
-    "desc": null,
-    "prof": {
-      "start": 5,
-      "slow": 15,
-      "medium": 46,
-      "fast": 60,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "5840": {
-    "desc": "BNSF / Grain",
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 67,
-      "fast": 82,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "600": {
-    "desc": "Denver Rio Grande",
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 76,
-      "fast": 95,
-      "acc": 1,
-      "dec": 2
-    }
-  },
-  "6002": {
-    "desc": "New York Central / Old Style",
-    "prof": {
-      "start": 20,
-      "slow": 35,
-      "medium": 75,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6013": {
-    "desc": "Penn / Reading Sea Shore",
-    "prof": {
-      "start": 0,
-      "slow": 9,
-      "medium": 20,
-      "fast": 25,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6034": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 100,
-      "fast": 120,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "604": {
-    "desc": null,
-    "prof": {
-      "start": 35,
-      "slow": 45,
-      "medium": 72,
-      "fast": 85,
-      "acc": 1,
-      "dec": 2
-    }
-  },
-  "6051": {
-    "desc": null,
-    "prof": {
-      "start": 40,
-      "slow": 50,
-      "medium": 91,
-      "fast": 110,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6076": {
-    "desc": "BHP / Tank",
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 69,
-      "fast": 86,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6118": {
-    "desc": "RDC - Boston & Maine / 2 units",
-    "prof": {
-      "start": 40,
-      "slow": 50,
-      "medium": 84,
-      "fast": 100,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6137": {
-    "desc": "RDC - B & O / 3 units",
-    "prof": {
-      "start": 40,
-      "slow": 50,
-      "medium": 84,
-      "fast": 100,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6197": {
-    "desc": null,
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 76,
-      "fast": 95,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "64": {
-    "desc": "Pacific Southern / Exectrix",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6418": {
-    "desc": "Penn / Mix Freight",
-    "prof": {
-      "start": 40,
-      "slow": 50,
-      "medium": 84,
-      "fast": 100,
-      "acc": 2,
-      "dec": 2
-    }
-  },
-  "669": {
-    "desc": null,
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 71,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6733": {
-    "desc": null,
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 72,
-      "fast": 100,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6798": {
-    "desc": null,
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 78,
-      "fast": 100,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "68": {
-    "desc": "Pacific Southern / Exec",
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 69,
-      "fast": 84,
-      "acc": 2,
-      "dec": 2
-    }
-  },
-  "69": {
-    "desc": "Milwaukee",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 44,
-      "fast": 60,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6904": {
-    "desc": null,
-    "prof": {
-      "start": 11,
-      "slow": 21,
-      "medium": 69,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6972": {
-    "desc": "PSRY / Santa Fe",
-    "prof": {
-      "start": 1,
-      "slow": 7,
-      "medium": 37,
-      "fast": 50,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "6973": {
-    "desc": null,
-    "prof": {
-      "start": 7,
-      "slow": 17,
-      "medium": 64,
-      "fast": 85,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "700": {
-    "desc": "New Haven",
-    "prof": {
-      "start": 35,
-      "slow": 45,
-      "medium": 65,
-      "fast": 75,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "743": {
-    "desc": "B & O",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "7519": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 61,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "7600": {
-    "desc": "B&O / Empty Coal",
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 37,
-      "fast": 45,
-      "acc": 5,
-      "dec": 10
-    }
-  },
-  "777": {
-    "desc": "new one",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "791": {
-    "desc": null,
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 71,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "80": {
-    "desc": null,
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 71,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "8099": {
-    "desc": null,
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 73,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "83": {
-    "desc": "Santa Fe / Old Style",
-    "prof": {
-      "start": 5,
-      "slow": 15,
-      "medium": 60,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "860": {
-    "desc": "Lackawanna",
-    "prof": {
-      "start": 32,
-      "slow": 42,
-      "medium": 78,
-      "fast": 94,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "905": {
-    "desc": null,
-    "prof": {
-      "start": 5,
-      "slow": 15,
-      "medium": 56,
-      "fast": 75,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "91": {
-    "desc": "ATSF / PS Business Car",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "913": {
-    "desc": null,
-    "prof": {
-      "start": 14,
-      "slow": 24,
-      "medium": 49,
-      "fast": 60,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "914": {
-    "desc": "UP",
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 68,
-      "fast": 90,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "9164": {
-    "desc": "RDC / Reading",
-    "prof": {
-      "start": 0,
-      "slow": 10,
-      "medium": 58,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "929": {
-    "desc": null,
-    "prof": {
-      "start": 50,
-      "slow": 60,
-      "medium": 101,
-      "fast": 120,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "9472": {
-    "desc": null,
-    "prof": {
-      "start": 10,
-      "slow": 20,
-      "medium": 61,
-      "fast": 80,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "9631": {
-    "desc": null,
-    "prof": {
-      "start": 25,
-      "slow": 35,
-      "medium": 87,
-      "fast": 110,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "9669": {
-    "desc": "Penn / Mail",
-    "prof": {
-      "start": 35,
-      "slow": 45,
-      "medium": 83,
-      "fast": 100,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "990": {
-    "desc": null,
-    "prof": {
-      "start": 50,
-      "slow": 60,
-      "medium": 94,
-      "fast": 110,
-      "acc": 1,
-      "dec": 1
-    }
-  },
-  "9916": {
-    "desc": null,
-    "prof": {
-      "start": 20,
-      "slow": 30,
-      "medium": 57,
-      "fast": 70,
-      "acc": 2,
-      "dec": 1
-    }
-  },
-  "9922": {
-    "desc": null,
-    "prof": {
-      "start": 50,
-      "slow": 60,
-      "medium": 101,
-      "fast": 120,
-      "acc": 1,
-      "dec": 1
-    }
-  }
 }

@@ -59,6 +59,9 @@ class MainUnit:
 
 		self.listener.start()
 		self.ARTrains = []
+		
+		self.blocks["KOSN10S11"] = Block(self, "KOSN10S11", 0, 'W', True)
+		self.blocks["KOSN20S21"] = Block(self, "KOSN20S21", 0, 'E', True)
 
 		logging.info("finished initialize")
 
@@ -201,7 +204,7 @@ class MainUnit:
 					self.running = False
 	
 				else:
-					if cmd not in ["control", "relay", "handswitch", "siglever", "breaker", "fleet"]:
+					if cmd not in ["control", "relay", "handswitch", "siglever", "breaker", "fleet", "trainsignal"]:
 						logging.info("unknown command ignored: %s: %s" % (cmd, parms))
 
 		try:
@@ -329,6 +332,7 @@ class MainUnit:
 		return RouteRequest(train, self.routes[rtName], block)
 
 	def EvaluateRouteRequest(self, rteRq):
+		logging.info("evaluating routeRequest %s" % rteRq.tostring())
 		rname = rteRq.GetName()
 		blkName = rteRq.GetEntryBlock()
 		logging.info("evaluate route %s" % rname)
@@ -355,7 +359,7 @@ class MainUnit:
 			return True  # OK to proceed with this route
 		else:
 			#  TODO - do something with the tolock and siglock arrays
-			logging.info("Eval false %s %s" % (str(tolock), str(siglock)))
+			logging.info("Eval false to=%s sig=%s" % (str(tolock), str(siglock)))
 			return False  # this route is unavailable right now
 
 	def SetupRoute(self, rteRq):
@@ -364,11 +368,16 @@ class MainUnit:
 		logging.info("set up route %s" % rname)
 		rte = self.routes[rname]
 		for t in rte.GetTurnouts():
+			logging.info("Turnout %s" % t)
 			toname, state = t.split(":")
 			if self.turnouts[toname].GetState() != state:
+				logging.info("command sent")
 				self.ReqQueue.Append({"turnout": {"name": toname, "status": state}})
+			else:
+				logging.info("command not necessary")
 
 		sigNm = rte.GetSignalForEnd(blkName)
+		logging.info("signal %s" % sigNm)
 		if sigNm is not None:
 			self.ReqQueue.Append({"signal": {"name": sigNm, "aspect": -1}})
 
@@ -380,6 +389,8 @@ class MainUnit:
 		self.OSQueue[osNm].Append(rteRq)
 
 	def EvaluateQueuedRequests(self):
+		if len(self.OSQueue) == 0:
+			return
 		logging.info("evaluating queued requests")
 		for osNm in self.OSQueue:
 			logging.info("OS: %s" % osNm)
@@ -413,6 +424,14 @@ class MainUnit:
 	def Request(self, req):
 		logging.info("Outgoing request: %s" % json.dumps(req))
 		self.rrServer.SendRequest(req)
+
+
+
+# ofp = open("ar.out", "w")
+# efp = open("ar.err", "w")
+#
+# sys.stdout = ofp
+# sys.stderr = efp
 
 
 main = MainUnit()

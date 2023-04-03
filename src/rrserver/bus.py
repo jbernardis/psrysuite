@@ -85,7 +85,6 @@ class Bus:
 			if len(b) == 0:
 				tries += 1
 				time.sleep(0.0001)
-				print("No characters read", flush=True)
 			else:
 				tries = 0
 				inbuf.extend([bytes([b[i]]) for i in range(len(b))])
@@ -93,7 +92,6 @@ class Bus:
 				
 		if len(inbuf) != nbytes:
 			logging.error("incomplete read for address %x.  Expecting %d characters, got %d" % (address, nbytes, len(inbuf)))
-			print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)), flush=True)
 			return None #[b'\x00']*nbytes
 		else:
 			# make sure that if a byte is different, that it is at least different for "threshold" cycles before we accept it

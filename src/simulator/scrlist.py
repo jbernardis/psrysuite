@@ -79,7 +79,7 @@ class ScriptListCtrl(wx.ListCtrl):
 	def setSelection(self, tx):
 		self.selected = tx;
 		if tx is not None:
-			self.Select(tx)
+			self.Select(tx, on=0)
 			self.parent.reportSelection()
 
 	def SelectAll(self):

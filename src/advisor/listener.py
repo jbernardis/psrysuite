@@ -68,7 +68,6 @@ class Listener(threading.Thread):
 			try:
 				msgSize = int.from_bytes(szBuf, "little")
 			except:
-				print("Unable to determine message length: (", szBuf, ")")
 				msgSize = None
 
 			if msgSize:		

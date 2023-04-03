@@ -176,6 +176,10 @@ class MainFrame(wx.Frame):
 		self.SetPos()
 		
 		self.ReportSelection(None)
+		
+		self.blocks["KOSN10S11"] = Block(self, "KOSN10S11", 0, 'W', True)
+		self.blocks["KOSN20S21"] = Block(self, "KOSN20S21", 0, 'E', True)
+
 		logging.info("exit initialize")
 		
 	def BuildLocoKey(self, lid):
@@ -326,7 +330,6 @@ class MainFrame(wx.Frame):
 		try:
 			jdata = json.loads(data)
 		except json.decoder.JSONDecodeError:
-			#print("Unable to parse (%s)" % data)
 			return
 		evt = DeliveryEvent(data=jdata)
 		wx.QueueEvent(self, evt)
