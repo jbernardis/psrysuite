@@ -1326,7 +1326,7 @@ class Port (District):
 
 		self.routes["PRtP20P21"] = Route(self.screen, block, "PRtP20P21", "P21",
 					[ (119, 26), (120, 26), (121, 26), (122, 26), (123, 26), (124, 26), (125, 26), (126, 26), (127, 26) ],
-					"P20", [MAIN, RESTRICTING], ["PASw33:N", "PASw35:N"], ["PA32RA", "PA32L"])
+					"P20", [MAIN, RESTRICTING], ["PASw33:N", "PASw35:N"], ["PA32L", "PA32RA"])
 		self.routes["PRtP30P21"] = Route(self.screen, block, "PRtP30P21", "P21",
 					[ (119, 28), (120, 28), (121, 27), (122, 26), (123, 26), (124, 26), (125, 26), (126, 26), (127, 26) ],
 					"P30", [DIVERGING, RESTRICTING], ["PASw33:R", "PASw35:N"], ["PA32RB", "PA32L"])
@@ -1474,11 +1474,11 @@ class Port (District):
 		self.signals["PA4RA"].AddPossibleRoutes("POSSP2", [ "PRtP2P10" ])
 		self.signals["PA4RA"].AddPossibleRoutes("POSSP3", [ "PRtP2P20" ])
 		self.signals["PA4RA"].AddPossibleRoutes("POSSP4", [ "PRtP2P62", "PRtP2P63", "PRtP2P64" ])
-		self.signals["PA4RA"].AddPossibleRoutes("POSSP5", [ "PRtP3P40" ])
+		self.signals["PA4RA"].AddPossibleRoutes("POSSP5", [ "PRtP2P40", "PRtP1P40" ])
 		self.signals["PA4RB"].AddPossibleRoutes("POSSP2", [ "PRtP1P10" ])
 		self.signals["PA4RB"].AddPossibleRoutes("POSSP3", [ "PRtP1P20" ])
 		self.signals["PA4RB"].AddPossibleRoutes("POSSP4", [ "PRtP1P62", "PRtP1P63", "PRtP1P64" ])
-		self.signals["PA4RB"].AddPossibleRoutes("POSSP5", [ "PRtP3P40" ])
+		self.signals["PA4RB"].AddPossibleRoutes("POSSP5", [ "PRtP2P40", "PRtP1P40" ])
 		self.signals["PA4L"].AddPossibleRoutes("POSSP5", [ "PRtP3P40", "PRtP2P40", "PRtP1P40" ])
 
 		self.osSignals["POSSP1"] = [ "PA12R", "PA12LA", "PA12LB", "PA12LC" ]

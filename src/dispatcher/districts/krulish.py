@@ -39,6 +39,16 @@ class Krulish (District):
 			else:
 				bmp = self.misctiles["indicator"].getBmp(None, "green")
 			self.frame.DrawTile(self.screen, (124, 24), bmp)
+	
+	def DoBlockAction(self, blk, blockend, state):
+		blknm = blk.GetName()
+		if blknm == "N20" and blockend == "W" and self.blocks["KOSN20S21"].GetEast():
+			District.DoBlockAction(self, self.blocks["KOSN20S21"], None, state)
+		elif blknm == "N10" and blockend == "W" and self.blocks["KOSN10S11"].GetEast():
+			District.DoBlockAction(self, self.blocks["KOSN10S11"], None, state)
+
+		District.DoBlockAction(self, blk, blockend, state)
+
 
 	def DetermineRoute(self, blocks):
 		s3 = 'N' if self.turnouts["KSw3"].IsNormal() else 'R'
@@ -303,6 +313,9 @@ class Krulish (District):
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
+		for signm in ["N20W", "N10W", "S21E", "S11E"]:
+			self.signals[signm].EnableFleeting(True)
+			
 		blockSigs = {
 			# # which signals govern stopping sections, west and east
 			"N10": ("N10W",  "K8R"),

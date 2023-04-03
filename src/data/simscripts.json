@@ -718,8 +718,20 @@
     },
     {
       "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
         "block": "S21",
-        "time": 2500
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
       }
     },
     {
@@ -1702,8 +1714,20 @@
     },
     {
       "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
         "block": "S21",
-        "time": 2500
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
       }
     },
     {
@@ -2164,7 +2188,7 @@
     },
     {
       "waitfor": {
-        "signal": "PA32L",
+        "signal": "PA32RA",
         "route": "PRtP20P21",
         "os": "POSPJ2",
         "block": "P21,P21.E"
@@ -2327,19 +2351,31 @@
         "signal": "S4R",
         "route": "SRtS20S21",
         "os": "SOSE",
-        "block": "S21"
+        "block": "S21.W,S21,S21.E"
       }
     },
     {
       "movetrain": {
         "block": "SOSE",
-        "time": 2500
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.W",
+        "time": 500
       }
     },
     {
       "movetrain": {
         "block": "S21",
-        "time": 2500
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
       }
     },
     {
@@ -5007,8 +5043,20 @@
     },
     {
       "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
         "block": "S21",
-        "time": 2500
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
       }
     },
     {
@@ -5713,8 +5761,20 @@
     },
     {
       "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
         "block": "S21",
-        "time": 2500
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
       }
     },
     {
@@ -7189,8 +7249,20 @@
     },
     {
       "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
         "block": "S21",
-        "time": 2500
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
       }
     },
     {
@@ -8176,8 +8248,20 @@
     },
     {
       "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
         "block": "S21",
-        "time": 2500
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
       }
     },
     {
@@ -8691,8 +8775,20 @@
     },
     {
       "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
         "block": "S21",
-        "time": 2500
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
       }
     },
     {

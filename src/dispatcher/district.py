@@ -5,6 +5,7 @@ import os
 from dispatcher.constants import RegAspects, RegSloAspects, AdvAspects, SloAspects, \
 	MAIN, SLOW, DIVERGING, RESTRICTING, \
 	CLEARED, OCCUPIED, STOP, NORMAL, OVERSWITCH
+from pickle import NONE
 
 def aspecttype(atype):
 	if atype == RegAspects:
@@ -487,15 +488,15 @@ class District:
 			turnout.SetReverse(refresh=True)
 
 	def DoSignalAction(self, sig, aspect):
-
 		signm = sig.GetName()
 
 		for blknm, siglist in self.osSignals.items():
 			if signm in siglist:
 				osblock = self.frame.blocks[blknm]
-				rname = osblock.GetRouteName()
 				if osblock.route is None:
 					continue
+				
+				rname = osblock.GetRouteName()
 				if sig.IsPossibleRoute(blknm, rname):
 					break
 		else:
@@ -558,29 +559,39 @@ class District:
 		for osblknm in osblknms:
 			osblk = self.frame.blocks[osblknm]
 			route = osblk.GetRoute()
+			
 			if route:
 				sigs = route.GetSignals()
+				sigl = None
+				sigr = None
+				for sig in sigs:
+					if sig.startswith(sigPrefix):
+						if sig[len(sigPrefix)] == "L":
+							sigl = sig
+						elif sig[len(sigPrefix)] == "R":
+							sigr = sig
+							
 				if state == "L":
-					if sigs[1].startswith(sigPrefix+state):
-						signm = sigs[1]
+					if sigl is not None:
+						signm = sigl
 						movement = True   # trying to set to non-stopping aspect
 						break
 				elif state == 'R':
-					if sigs[0].startswith(sigPrefix+state):
-						signm = sigs[0]
+					if sigr is not None:
+						signm = sigr
 						movement = True   # trying to set to non-stopping aspect
 						break
 				elif state == "N":
-					if sigs[0].startswith(sigPrefix+"R"):
-						sig = self.frame.signals[sigs[0]]
+					if sigl is not None:
+						sig = self.frame.signals[sigl]
 						if sig and sig.GetAspect() != 0:
-							signm = sigs[0]
+							signm = sigl
 							movement = False
 							break
-					if sigs[1].startswith(sigPrefix+"L"):
-						sig = self.frame.signals[sigs[1]]
+					if sigr is not None:
+						sig = self.frame.signals[sigr]
 						if sig and sig.GetAspect() != 0:
-							signm = sigs[1]
+							signm = sigr
 							movement = False
 							break
 

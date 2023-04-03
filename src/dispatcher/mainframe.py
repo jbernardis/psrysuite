@@ -1168,7 +1168,7 @@ class MainFrame(wx.Frame):
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
 			logging.info("Dispatch: %s: %s" % (cmd, parms))
-			#print("Incoming socket message: %s: %s" % (cmd, parms), flush=True)
+			#print("Incoming socket message to dispatcher: %s: %s" % (cmd, parms), flush=True)
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]

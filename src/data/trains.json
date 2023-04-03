@@ -942,7 +942,7 @@
         "block": "P21",
         "os": "POSPJ2",
         "route": "PRtP20P21",
-        "signal": "PA32L",
+        "signal": "PA32RA",
         "time": 5000,
         "trigger": "Front"
       },

@@ -208,8 +208,6 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 		if rc != wx.ID_OK:
 			return 
-		
-		print(str(rv))
 			
 		for scr in self.startable:
 			p = trainParams[scr]

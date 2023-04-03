@@ -207,6 +207,10 @@ class Script (wx.Frame):
 		for b in self.occupiedBlocks:
 			self.parent.Request({"removetrain": {"block": b}})
 		self.occupiedBlocks = []
+		self.sx = None
+		self.stopped = False
+		self.executionCompleted = False
+
 
 	def Resume(self):
 		self.run()

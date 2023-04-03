@@ -22,6 +22,11 @@ loco editor - extract from tracker and make free standing
   
 relocate edit train dlg to lower screen position, to the left of popups
 
-make sure advisor is kept in sync with changes to ar
 
 incorporate traintracker - move trains and locos admin outside the scope of tt
+
+
+sim - try to figure out why interface is hesitant
+
+check the order of signal definitions in port routes - had to change for P20P21 route - after doing this, regenerate the layout file and determine if trains/arscripts/simscripts needs to be updated
+

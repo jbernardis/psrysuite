@@ -1,5 +1,4 @@
 import logging
-import traceback
 
 from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, BLOCK, OVERSWITCH, STOPPINGBLOCK, MAIN, STOP
 
@@ -87,8 +86,9 @@ class Route:
 		else:
 			b = self.blkout
 		blk = self.osblk.frame.blocks[b]
-		if blk.GetBlockType() != OVERSWITCH:
-			# do NOT clear on an adjacent OS block
+
+		if blk.GetBlockType() != OVERSWITCH and blk.GetEast() == self.osblk.GetEast():
+			# do NOT clear on an adjacent OS block or if the blocks differ in direction
 			blk.RemoveClearStatus()
 
 	def ReleaseSignalLocks(self):
@@ -235,6 +235,7 @@ class Block:
 			logging.debug("Block %s: next east block is None" % self.GetName())
 		else:
 			logging.debug("Block %s: next east block is %s" % (self.GetName(), blk.GetName()))
+
 		self.blkEast = blk
 
 	def SetNextBlockWest(self, blk):
@@ -242,6 +243,7 @@ class Block:
 			logging.debug("Block %s: next west block is None" % self.GetName())
 		else:
 			logging.debug("Block %s: next west block is %s" % (self.GetName(), blk.GetName()))
+
 		self.blkWest = blk
 
 	def determineStatus(self):
@@ -474,6 +476,8 @@ class Block:
 				b.SetCleared(cleared, refresh)
 				
 	def RemoveClearStatus(self):
+		#if self.name == "C13":
+			#return  # do not do this on single track
 		self.cleared = False
 		self.determineStatus()
 		for b in [self.sbEast, self.sbWest]:
@@ -688,17 +692,29 @@ class OverSwitch (Block):
 			logging.warning("could not determine exit block for %s/%s from name %s" % (self.name, self.rtName, exitBlkName))
 		if self.east:
 			if entryBlk:
-				entryBlk.SetNextBlockEast(self)
+				if self.district.CrossingEastWestBoundary(self, entryBlk):
+					entryBlk.SetNextBlockWest(self)
+				else:
+					entryBlk.SetNextBlockEast(self)
 			self.SetNextBlockWest(entryBlk)
 			if exitBlk:
-				exitBlk.SetNextBlockWest(self)
+				if self.district.CrossingEastWestBoundary(self, exitBlk):
+					exitBlk.SetNextBlockEast(self)
+				else:
+					exitBlk.SetNextBlockWest(self)
 			self.SetNextBlockEast(exitBlk)
 		else:
 			if entryBlk:
-				entryBlk.SetNextBlockWest(self)
+				if self.district.CrossingEastWestBoundary(self, entryBlk):
+					entryBlk.SetNextBlockEast(self)
+				else:
+					entryBlk.SetNextBlockWest(self)
 			self.SetNextBlockEast(entryBlk)
 			if exitBlk:
-				exitBlk.SetNextBlockEast(self)
+				if self.district.CrossingEastWestBoundary(self, exitBlk):
+					exitBlk.SetNextBlockWest(self)
+				else:
+					exitBlk.SetNextBlockEast(self)
 			self.SetNextBlockWest(exitBlk)
 		self.Draw()
 		

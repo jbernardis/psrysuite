@@ -91,26 +91,12 @@ class Train:
 		count2 = 0
 		# for each block the train is in, count how many blocks adjacent to that block contain the same train
 		for blk in self.blocks.values():
-			blkName = blk.GetName()
 			adje, adjw = blk.GetAdjacentBlocks()
 			adjc = 0
 			for adj in adje, adjw:
 				if adj is None:
 					continue
-				adjName = adj.GetName()
-				# adjust for the two 0-length OS blocks 
-				if adjName == "KOSN10S11":
-					if blkName == "N10":
-						adjName = "S11"
-					else:
-						adjName = "N10"
-				elif adjName == "KOSN20S21":
-					if blkName == "N20":
-						adjName = "S21"
-					else:
-						adjName = "N20"
-						
-				if adjName in bnames:
+				if adj.GetName() in bnames:
 					adjc += 1
 
 			# the count is either 1 (for the blocks at the beginning and the end of the train)

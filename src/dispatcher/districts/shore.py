@@ -70,6 +70,15 @@ class Shore (District):
 		exitBlk.SetEast(east)
 		entryBlk.SetEast(east)
 		exitBlk.SetCleared(aspect!=STOP, refresh=True)
+		
+	def DoBlockAction(self, blk, blockend, state):
+		blknm = blk.GetName()
+		if blknm == "S21" and blockend == "E" and not self.frame.GetBlockByName("KOSN20S21").GetEast():
+			District.DoBlockAction(self, self.frame.GetBlockByName("KOSN20S21"), None, state)
+		elif blknm == "S11" and blockend == "E" and not self.frame.GetBlockByName("KOSN10S11").GetEast():
+			District.DoBlockAction(self, self.frame.GetBlockByName("KOSN10S11"), None, state)
+
+		District.DoBlockAction(self, blk, blockend, state)
 
 	def DrawOthers(self, block):
 		if block.GetName() in ["SOSHF", "SOSW", "SOSE"]:

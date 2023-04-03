@@ -47,7 +47,6 @@ class TrainParmDlg(wx.Dialog):
 		self.Layout()
 		
 	def TrainSelected(self, tx, tr):
-		print("in train selected")
 		dlg = SingleTrainDlg(self, tr)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
