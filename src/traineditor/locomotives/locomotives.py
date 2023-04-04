@@ -14,7 +14,7 @@ class Locomotives:
 		
 	def getLocoListFull(self):
 		ll = sorted(list(self.locos.keys()), key=self.buildSortKey)
-		return ["%s - %s" % (lid, self.locos[lid]) for lid in ll]
+		return ["%s - %s" % (lid, "" if self.locos[lid]["desc"] is None else self.locos[lid]['desc']) for lid in ll]
 		
 	def getLoco(self, lId):
 		if lId not in self.locos:

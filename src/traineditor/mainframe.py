@@ -1,5 +1,6 @@
 import wx
 from traineditor.trainsequences.trainblocksequencedlg import TrainBlockSequencesDlg
+from traineditor.tracker.traintrackerdlg import TrainTrackerDlg
 from traineditor.locomotives.managelocos import ManageLocosDlg
 
 
@@ -51,7 +52,9 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 		
 	def OnBTrainTrackerData(self, _):
-		print("tracker")
+		dlg = TrainTrackerDlg(self)
+		dlg.ShowModal()
+		dlg.Destroy()
 		
 	def OnBLocos(self, _):
 		dlg = ManageLocosDlg(self)

@@ -250,10 +250,11 @@ class District:
 			
 		return True
 
-	def CalculateAspect(self, sig, osblk, rt):
+	def CalculateAspect(self, sig, osblk, rt, silent=False):
 		#print("calculate aspect for signal %s" % sig.GetName())
 		if osblk.IsBusy():
-			self.frame.PopupEvent("Block is busy")
+			if not silent:
+				self.frame.PopupEvent("Block is busy")
 			return None
 
 		sigE = sig.GetEast()
@@ -503,7 +504,7 @@ class District:
 			return
 		
 		if aspect < 0:
-			aspect = self.CalculateAspect(sig, osblock, self.routes[rname])
+			aspect = self.CalculateAspect(sig, osblock, self.routes[rname], silent=True)
 			#  report calculated aspect back to the server
 			if aspect is None:
 				aspect = sig.GetAspect()

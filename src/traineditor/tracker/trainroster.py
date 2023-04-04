@@ -6,13 +6,6 @@ class TrainRoster:
 		self.filename = fn
 		with open(fn, "r") as fp:	
 			self.trains = json.load(fp)
-			
-		for tid in self.trains:
-			trn = self.trains[tid]
-			if "cutoff" not in trn:
-				trn["cutoff"] = False
-			trn["block"] = None
-			trn["loco"] = trn["normalloco"]
 
 	def __iter__(self):
 		self.order = sorted(self.trains.keys())
@@ -42,13 +35,3 @@ class TrainRoster:
 				return tid
 			
 		return None
-	
-	def save(self):
-		newJson = copy.deepcopy(self.trains)
-		for tid in newJson:
-			trn = newJson[tid]
-			trn["loco"] = None
-			trn["block"] = None
-
-		with open(self.filename, "w") as fp:
-			json.dump(newJson, fp, indent=4, sort_keys=True)

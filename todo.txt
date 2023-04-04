@@ -16,13 +16,15 @@ Train Edit
   change len via ??
   work train length into interface
   when determining order of sub-blocks need to reverse one of the two places in gen sim logic
-  edit for tracker also - locos done
-  
+    
 relocate edit train dlg to lower screen position, to the left of popups
 
 
 incorporate traintracker - move trains and locos admin outside the scope of tt
 
+add configuration changes to editor
+
+config button - either always generate the layout file, or do it from rrserver via a request - that way the request could come from anywhere - like the editor/configurator
 
 check the order of signal definitions in port routes - had to change for P20P21 route - after doing this, regenerate the layout file and determine if trains/arscripts/simscripts needs to be updated
 

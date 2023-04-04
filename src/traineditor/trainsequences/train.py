@@ -76,6 +76,7 @@ class Trains:
 				tr.SetSteps(trData["sequence"])
 				
 				tr.SetNormalLoco(trData["normalloco"])
+				self.trainmap[tid] = tr
 			
 	def __iter__(self):
 		self._nx_ = 0
@@ -95,6 +96,17 @@ class Trains:
 				TrainsJson = json.load(jfp)
 		except:
 			TrainsJson = {}
+
+		delList = []
+		for tid in TrainsJson:
+			if tid not in self.trainmap:
+				delList.append(tid)
+				
+		for tid in delList:
+			TrainsJson[tid]["sequence"] = []
+			TrainsJson[tid]["startblock"] = None
+			TrainsJson[tid]["startsubblock"] = None
+			TrainsJson[tid]["time"] = None
 			
 		for tr in self.trainlist:
 			tid = tr.GetTrainID()
