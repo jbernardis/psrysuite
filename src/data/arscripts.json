@@ -894,26 +894,14 @@
       "trigger": "F"
     },
     "D11": {
-      "route": "DRtD10D11",
+      "route": "DRtH13D11",
       "trigger": "F"
     },
-    "D10": {
-      "route": "LRtL11D10",
+    "H13": {
+      "route": "HRtH13H32",
       "trigger": "F"
     },
-    "L11": {
-      "route": "LRtL10L11",
-      "trigger": "F"
-    },
-    "L10": {
-      "route": "YRtY11L10",
-      "trigger": "F"
-    },
-    "Y11": {
-      "route": "YRtY87Y11",
-      "trigger": "F"
-    },
-    "terminus": "Y87"
+    "terminus": "H32"
   },
   "CLYD": {
     "origin": "C22",

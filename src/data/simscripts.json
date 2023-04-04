@@ -6227,9 +6227,9 @@
     {
       "waitfor": {
         "signal": "D6L",
-        "route": "DRtD10D11",
+        "route": "DRtH13D11",
         "os": "DOSVJW",
-        "block": "D10,D10.W"
+        "block": "H13,H13.W"
       }
     },
     {
@@ -6240,111 +6240,33 @@
     },
     {
       "movetrain": {
-        "block": "D10",
+        "block": "H13",
         "time": 2250
       }
     },
     {
       "movetrain": {
-        "block": "D10.W",
+        "block": "H13.W",
         "time": 500
       }
     },
     {
       "waitfor": {
-        "signal": "L18L",
-        "route": "LRtL11D10",
-        "os": "LOSCAW",
-        "block": "L11,L11.W"
+        "signal": "H12L",
+        "route": "HRtH13H32",
+        "os": "HOSEW",
+        "block": "H32"
       }
     },
     {
       "movetrain": {
-        "block": "LOSCAW",
-        "time": 2250
-      }
-    },
-    {
-      "movetrain": {
-        "block": "L11",
-        "time": 2250
-      }
-    },
-    {
-      "movetrain": {
-        "block": "L11.W",
-        "time": 500
-      }
-    },
-    {
-      "waitfor": {
-        "signal": "L8L",
-        "route": "LRtL10L11",
-        "os": "LOSLAW",
-        "block": "L10,L10.W"
-      }
-    },
-    {
-      "movetrain": {
-        "block": "LOSLAW",
-        "time": 2250
-      }
-    },
-    {
-      "movetrain": {
-        "block": "L10",
-        "time": 2250
-      }
-    },
-    {
-      "movetrain": {
-        "block": "L10.W",
-        "time": 500
-      }
-    },
-    {
-      "waitfor": {
-        "signal": "Y2L",
-        "route": "YRtY11L10",
-        "os": "YOSCJW",
-        "block": "Y11,Y11.W"
-      }
-    },
-    {
-      "movetrain": {
-        "block": "YOSCJW",
-        "time": 2250
-      }
-    },
-    {
-      "movetrain": {
-        "block": "Y11",
-        "time": 2250
-      }
-    },
-    {
-      "movetrain": {
-        "block": "Y11.W",
-        "time": 500
-      }
-    },
-    {
-      "waitfor": {
-        "signal": "Y8L",
-        "route": "YRtY87Y11",
-        "os": "YOSEJW",
-        "block": "Y87"
-      }
-    },
-    {
-      "movetrain": {
-        "block": "YOSEJW",
+        "block": "HOSEW",
         "time": 2500
       }
     },
     {
       "movetrain": {
-        "block": "Y87",
+        "block": "H32",
         "time": 2500
       }
     }

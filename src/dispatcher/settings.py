@@ -33,7 +33,7 @@ class Settings:
 		self.showcameras = False
 		self.traindir = "."
 		self.locodir = "."
-		self.hideconfigbutton = True
+		self.hidelayoutbutton = True
 		self.serverhidden = False
 
 		self.cfg = configparser.ConfigParser()
@@ -62,8 +62,8 @@ class Settings:
 				elif opt == 'showcameras':
 					self.showcameras = parseBoolean(value, False)
 
-				elif opt == 'hideconfigbutton':
-					self.hideconfigbutton = parseBoolean(value, False)
+				elif opt == 'hidelayoutbutton':
+					self.hidelayoutbutton = parseBoolean(value, False)
 
 				elif opt == "traindir":
 					self.traindir = value
@@ -118,7 +118,7 @@ class Settings:
 		self.cfg.set(self.section, "pages", str(self.pages))
 		self.cfg.set(self.section, "dispatch", "True" if self.dispatch else "False")
 		self.cfg.set(self.section, "showcameras", "True" if self.showcameras else "False")
-		self.cfg.set(self.section, "hideconfigbutton", "True" if self.hideconfigbutton else "False")
+		self.cfg.set(self.section, "hidelayoutbutton", "True" if self.hidelayoutbutton else "False")
 		self.cfg.set(self.section, "traindir", str(self.traindir))
 		self.cfg.set(self.section, "locodir", str(self.locodir))
 

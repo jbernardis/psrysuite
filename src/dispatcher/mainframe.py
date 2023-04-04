@@ -164,12 +164,12 @@ class MainFrame(wx.Frame):
 		if not self.IsDispatcher():
 			self.bServerHide.Hide()
 
-		self.bConfig = wx.Button(self, wx.ID_ANY, "Config", pos=(self.centerOffset+10, 75), size=BTNDIM)
-		self.Bind(wx.EVT_BUTTON, self.OnConfig, self.bConfig)
-		self.bConfig.Enable(False)
+		self.bLayout = wx.Button(self, wx.ID_ANY, "Layout", pos=(self.centerOffset+10, 75), size=BTNDIM)
+		self.Bind(wx.EVT_BUTTON, self.OnLayout, self.bLayout)
+		self.bLayout.Enable(False)
 		
-		if not self.IsDispatcher() or self.settings.hideconfigbutton:
-			self.bConfig.Hide()
+		if not self.IsDispatcher() or self.settings.hidelayoutbutton:
+			self.bLayout.Hide()
 
 		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Trains", pos=(self.centerOffset+250, 25), size=BTNDIM)
 		self.bLoadTrains.Enable(False)
@@ -1095,7 +1095,7 @@ class MainFrame(wx.Frame):
 			self.bSubscribe.SetLabel("Connect")
 			self.bRefresh.Enable(False)
 			self.bServerHide.Enable(False)
-			self.bConfig.Enable(False)
+			self.bLayout.Enable(False)
 			self.bLoadTrains.Enable(False)
 			self.bLoadLocos.Enable(False)
 			self.bSaveTrains.Enable(False)
@@ -1117,7 +1117,7 @@ class MainFrame(wx.Frame):
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
 			self.bServerHide.Enable(True)
-			self.bConfig.Enable(True)
+			self.bLayout.Enable(True)
 			self.bLoadTrains.Enable(True)
 			self.bLoadLocos.Enable(True)
 			self.bSaveTrains.Enable(True)
@@ -1153,7 +1153,9 @@ class MainFrame(wx.Frame):
 	def DoRefresh(self):
 		self.Request({"refresh": {"SID": self.sessionid}})
 		
-	def OnConfig(self, _):		
+	def OnLayout(self, _):	
+		# this request kicks off the gathering of layout information - this file is generated locally (in the data directory), but
+		# must be copied to the data directory on the main railroad server machine	
 		self.Request({"refresh": {"type": "subblocks", "SID": self.sessionid}})
 
 	def raiseDeliveryEvent(self, data): # thread context
@@ -1430,6 +1432,11 @@ class MainFrame(wx.Frame):
 				# parms contains subblocks information
 				if self.settings.dispatch:
 					self.districts.GenerateLayoutInformation(parms)
+			
+					dlg = wx.MessageDialog(self, "File 'layout.json' has been created in the local 'data' directory.\nMake sure to copy this file to the 'data' directory on the main server computer.",
+			               "File 'layout.json' created", wx.OK | wx.ICON_INFORMATION)
+					dlg.ShowModal()
+					dlg.Destroy()
 					
 			elif cmd == "advice":
 				self.PopupAdvice(parms["msg"][0])
@@ -1508,7 +1515,7 @@ class MainFrame(wx.Frame):
 		self.bSubscribe.SetLabel("Connect")
 		self.bRefresh.Enable(False)
 		self.bServerHide.Enable(False)
-		self.bConfig.Enable(False)
+		self.bLayout.Enable(False)
 		self.bLoadTrains.Enable(False)
 		self.bLoadLocos.Enable(False)
 		self.bSaveTrains.Enable(False)

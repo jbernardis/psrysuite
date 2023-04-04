@@ -29,3 +29,6 @@ class Route:
 			return self.signals[1]
 		else:
 			return 0
+		
+	def Print(self):
+		print("Route %s: OS: %s Turnouts: %s Ends: %s, Signals: %s" % (self.name, self.os, str(self.turnouts), str(self.ends), str(self.signals)))

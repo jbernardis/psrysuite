@@ -53,6 +53,10 @@ class MainUnit:
 			self.listener = None
 			return
 
+		
+		self.blocks["KOSN10S11"] = Block(self, "KOSN10S11", 0, 'W', True)
+		self.blocks["KOSN20S21"] = Block(self, "KOSN20S21", 0, 'E', True)
+
 		self.listener.start()
 
 		logging.info("finished initialize")

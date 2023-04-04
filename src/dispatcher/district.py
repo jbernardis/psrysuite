@@ -770,4 +770,3 @@ class Districts:
 		layout = {"routes": routes, "blocks": blocks, "subblocks": subblocks}
 		with open(os.path.join(os.getcwd(), "data", "layout.json"), "w") as jfp:
 			json.dump(layout, jfp, sort_keys=True, indent=2)
-
