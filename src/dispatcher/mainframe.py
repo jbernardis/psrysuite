@@ -1410,6 +1410,27 @@ class MainFrame(wx.Frame):
 							tr.Draw()
 						else:
 							blk.DrawTrain()
+							
+			elif cmd == "traincomplete": # from simulator when a train reaches its terminus
+				for p in parms:
+					train = p["train"]
+
+					try:
+						tr = self.trains[train]
+					except:
+						logging.error("Unknown train name (%s) in traincomplete message" % train)
+						return
+						
+					if self.ATCEnabled and tr.IsOnATC():
+						locoid = tr.GetLoco()
+						self.Request({"atc": {"action": "remove", "train": train, "loco": locoid}})
+						tr.SetATC(False)
+						
+					if self.AREnabled and tr.IsOnAR():				
+						tr.SetAR(False)
+						self.Request({"ar": {"action": "remove", "train": train}})
+						
+					tr.Draw()
 
 			elif cmd == "control":
 				for p in parms:
@@ -1474,7 +1495,13 @@ class MainFrame(wx.Frame):
 					if action == "complete":
 						self.PopupEvent("ATC train %s has completed" % trnm)	
 					else:			
-						self.PopupEvent("Train %s removed from ATC" % trnm)				
+						self.PopupEvent("Train %s removed from ATC" % trnm)	
+						
+					tr.SetATC(False)
+					if self.AREnabled and tr.IsOnAR():				
+						tr.SetAR(False)
+						self.Request({"ar": {"action": "remove", "train": train}})
+			
 					tr.Draw()
 
 	def raiseDisconnectEvent(self): # thread context

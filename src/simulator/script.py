@@ -100,7 +100,7 @@ class Script (wx.Frame):
 		self.sx = None
 		self.tm = 1
 		self.executionCompleted = True
-		self.cbCompletion(self.scriptName, self.error)
+		self.cbCompletion(self.scriptName)
 
 	def Stop(self):
 		self.stopped = True

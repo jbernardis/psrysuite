@@ -8,8 +8,6 @@ how to use wos1norm in yard
 
 do we really need a separate cliff fleet checkbox?  And what is port fleeting if we have no control over port
 
-train identification when moving in reverse
-
 Train Edit
   change len via start dlg box
   when determining order of sub-blocks need to reverse one of the two places in gen sim logic
@@ -25,5 +23,3 @@ add configuration changes to editor or add a separate configurator
 config button - either always generate the layout file, or do it from rrserver via a request - that way the request could come from anywhere - like the editor/configurator
 
 check the order of signal definitions in port routes - had to change for P20P21 route - after doing this, regenerate the layout file and determine if trains/arscripts/simscripts needs to be updated
-
-need a way to turn off AR either when a train is first placed on the tracks or after it has reached its destination (not really a problem)

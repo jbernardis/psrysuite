@@ -272,7 +272,7 @@ class MainFrame(wx.Frame):
 
 	def onHTTPMessageEvent(self, evt):
 		logging.info("HTTP Request: %s" % json.dumps(evt.data))
-		print("Incoming HTTP Request: %s" % json.dumps(evt.data))
+		#print("Incoming HTTP Request: %s" % json.dumps(evt.data))
 		verb = evt.data["cmd"][0]
 
 		if verb == "signal":
@@ -521,6 +521,11 @@ class MainFrame(wx.Frame):
 		elif verb == "trainsignal":
 			p = {tag: evt.data[tag][0] for tag in evt.data if tag != "cmd"}
 			resp = {"trainsignal": [p]}
+			self.socketServer.sendToAll(resp)
+			
+		elif verb == "traincomplete":
+			p = {tag: evt.data[tag][0] for tag in evt.data if tag != "cmd"}
+			resp = {"traincomplete": [p]}
 			self.socketServer.sendToAll(resp)
 
 		elif verb == "control":

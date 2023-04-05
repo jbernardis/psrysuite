@@ -236,8 +236,8 @@ class MainFrame(wx.Frame):
 		self.stoppable = []
 		self.enableButtons()
 
-	def cbComplete(self, scrName, errFlag):
-		pass
+	def cbComplete(self, scrName):
+			self.Request({"traincomplete": {"train": scrName}})
 	
 	def PauseScript(self, script):
 		self.pausedScripts.append(script)
