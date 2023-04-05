@@ -167,7 +167,7 @@ class Cliff(District):
 		if self.settings.simulation:
 			itext = None
 		else:
-			inb = self.rrBus.sendRecv(GREENMTN, outb, outbc)
+			inb = self.rrBus.sendRecv(GREENMTN, outb, outbc, threshold=2)
 			if inb is None:
 				itext = "Read Error"
 			else:
@@ -298,7 +298,7 @@ class Cliff(District):
 		if self.settings.simulation:
 			itext = None
 		else:
-			inb = self.rrBus.sendRecv(CLIFF, outb, outbc)
+			inb = self.rrBus.sendRecv(CLIFF, outb, outbc, threshold=2)
 			if inb is None:
 				itext = "Read Error"
 
@@ -465,7 +465,7 @@ class Cliff(District):
 		if self.settings.simulation:
 			itext = None
 		else:
-			inb = self.rrBus.sendRecv(SHEFFIELD, outb, outbc)
+			inb = self.rrBus.sendRecv(SHEFFIELD, outb, outbc, threshold=2)
 			
 			if inb is None:
 				itext = "Read Error"

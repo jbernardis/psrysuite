@@ -10,24 +10,20 @@ do we really need a separate cliff fleet checkbox?  And what is port fleeting if
 
 train identification when moving in reverse
 
-operate turnout despite locks - ctrl-click or shift-click
-  
 Train Edit
-  change len via ??
-  work train length into interface
+  change len via start dlg box
   when determining order of sub-blocks need to reverse one of the two places in gen sim logic
     
 relocate edit train dlg to lower screen position, to the left of popups
+get the correct anchor location for a triple wide display
 
 
 incorporate traintracker - move trains and locos admin outside the scope of tt
 
-add configuration changes to editor
+add configuration changes to editor or add a separate configurator
 
 config button - either always generate the layout file, or do it from rrserver via a request - that way the request could come from anywhere - like the editor/configurator
 
 check the order of signal definitions in port routes - had to change for P20P21 route - after doing this, regenerate the layout file and determine if trains/arscripts/simscripts needs to be updated
 
 need a way to turn off AR either when a train is first placed on the tracks or after it has reached its destination (not really a problem)
-
-rrserver - railroad:86 - parameterize the starting value for sendio

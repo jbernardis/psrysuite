@@ -793,13 +793,13 @@ class MainFrame(wx.Frame):
 			to = None
 
 		if to:
-			if right or shift:  # only process left clicks here
+			if right:  # only process left clicks here
 				return
 			
 			if to.IsDisabled():
 				return
 
-			to.GetDistrict().PerformTurnoutAction(to)
+			to.GetDistrict().PerformTurnoutAction(to, force=shift)
 			return
 
 		try:
@@ -1170,21 +1170,27 @@ class MainFrame(wx.Frame):
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
 			logging.info("Dispatch: %s: %s" % (cmd, parms))
-			#print("Incoming socket message to dispatcher: %s: %s" % (cmd, parms), flush=True)
+			print("Incoming socket message to dispatcher: %s: %s" % (cmd, parms), flush=True)
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]
 					state = p["state"]
-					to = self.turnouts[turnout]
+					try:
+						force = p["force"]
+					except:
+						force = False
+						
 					try:
 						to = self.turnouts[turnout]
 					except KeyError:
 						to = None
 
+					print("turnout, compare %s to %s" % (str(state), str(to.GetStatus())))
 					if to is not None and state != to.GetStatus():
+						print("thry're not equal", flush=True)
 						district = to.GetDistrict()
 						st = REVERSE if state == "R" else NORMAL
-						district.DoTurnoutAction(to, st)
+						district.DoTurnoutAction(to, st, force=force)
 
 			elif cmd == "fleet":
 				for p in parms:
@@ -1469,9 +1475,7 @@ class MainFrame(wx.Frame):
 						self.PopupEvent("ATC train %s has completed" % trnm)	
 					else:			
 						self.PopupEvent("Train %s removed from ATC" % trnm)				
-					tr.SetATC(False)
 					tr.Draw()
-
 
 	def raiseDisconnectEvent(self): # thread context
 		evt = DisconnectEvent()

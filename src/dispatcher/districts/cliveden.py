@@ -12,13 +12,13 @@ class Cliveden (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
 
-	def PerformTurnoutAction(self, turnout):
+	def PerformTurnoutAction(self, turnout, force=False):
 		controlOpt = self.frame.rbCliffControl.GetSelection()
 		if controlOpt == 0:  # Cliveden local control
 			self.frame.PopupEvent("Cliveden control is local")
 			return
 
-		District.PerformTurnoutAction(self, turnout)
+		District.PerformTurnoutAction(self, turnout, force=force)
 
 	def PerformSignalAction(self, sig):
 		controlOpt = self.frame.rbCliffControl.GetSelection()

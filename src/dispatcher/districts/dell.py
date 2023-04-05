@@ -11,7 +11,7 @@ class Dell (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
 
-	def DoTurnoutAction(self, turnout, state):
+	def DoTurnoutAction(self, turnout, state, force=False):
 		tn = turnout.GetName()
 		if turnout.GetType() == SLIPSWITCH:
 			if tn == "DSw3":
@@ -20,7 +20,7 @@ class Dell (District):
 				turnout.Draw()
 
 		else:
-			District.DoTurnoutAction(self, turnout, state)
+			District.DoTurnoutAction(self, turnout, state, force=force)
 
 		if tn == "DSw5":
 			trnout = self.turnouts["DSw3"]

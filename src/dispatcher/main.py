@@ -4,6 +4,11 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
+try:
+	os.mkdir(os.path.join(os.getcwd(), "logs"))
+except FileExistsError:
+	pass
+
 DEVELOPMODE = True
 
 import logging

@@ -42,7 +42,7 @@ class Yard (District):
 		bmp = self.misctiles["crossover"].getBmp(blkstat, bmp)
 		self.frame.DrawTile(self.screen, (104, 12), bmp)
 
-	def DoTurnoutAction(self, turnout, state):
+	def DoTurnoutAction(self, turnout, state, force=False):
 		tn = turnout.GetName()
 		if turnout.GetType() == SLIPSWITCH:
 			if tn == "YSw19":
@@ -51,7 +51,7 @@ class Yard (District):
 				turnout.Draw()
 
 		else:
-			District.DoTurnoutAction(self, turnout, state)
+			District.DoTurnoutAction(self, turnout, state, force=force)
 
 		if tn in [ "YSw17", "YSw19", "YSw21" ]:
 			self.drawCrossover()

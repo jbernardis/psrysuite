@@ -189,6 +189,7 @@ class TurnoutInput(Input):
 	def __init__(self, name, district):
 		Input.__init__(self, name, district)
 		self.state = "N"  # assume normal switch position to start
+		self.force = False
 
 	def SetTOState(self, nb, rb):
 		if nb != 0 and rb == 0:
@@ -200,10 +201,11 @@ class TurnoutInput(Input):
 			ns = 'N'
 		self.SetState(ns)
 
-	def SetState(self, ns):
+	def SetState(self, ns, force=False):
 		if ns == self.state:
 			return
 		self.state = ns
+		self.force = force
 		self.rr.RailroadEvent({"refreshinput": [self.name]})
 		self.rr.RailroadEvent(self.GetEventMessage())
 
@@ -211,7 +213,7 @@ class TurnoutInput(Input):
 		return self.state
 		
 	def GetEventMessage(self):
-		return {"turnout": [{ "name": self.name, "state": self.state}]}
+		return {"turnout": [{ "name": self.name, "state": self.state, "force": self.force}]}
 
 
 class SignalLeverInput (Input):

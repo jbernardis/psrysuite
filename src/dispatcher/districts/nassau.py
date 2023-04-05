@@ -152,7 +152,7 @@ class Nassau (District):
 
 		self.frame.Request({"signal": { "name": signm, "aspect": aspect }})
 
-	def DoTurnoutAction(self, turnout, state):
+	def DoTurnoutAction(self, turnout, state, force=False):
 		tn = turnout.GetName()
 		if turnout.GetType() == SLIPSWITCH:
 			if tn == "NSw29":
@@ -186,7 +186,7 @@ class Nassau (District):
 				self.turnouts["NSw15"].Draw(blockstat=EMPTY, east=False)
 				self.turnouts["NSw17"].Draw(blockstat=EMPTY, east=False)
 
-			District.DoTurnoutAction(self, turnout, state)
+			District.DoTurnoutAction(self, turnout, state, force=force)
 
 		if tn == "NSw27":
 			trnout = self.turnouts["NSw29"]

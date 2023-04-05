@@ -125,10 +125,6 @@ class Shore (District):
 		self.turnouts["SSw5"].SetLock("SSw3", s3 == 'R', refresh=True)
 		self.turnouts["SSw5b"].SetLock("SSw3", s3 == 'R', refresh=True)
 
-		# if bname == "SOSHF":
-		# 	s8r = self.signals["S8R"].GetAspect()
-		# 	s8l = self.signals["S8L"].GetAspect()
-		# 	block.SetRoute(self.routes["SRtF10F11"])
 		self.FindTurnoutCombinations(blocks, ["SSw3", "SSw5", "SSw7", "SSw9", "SSw11", "SSw13", "SSw15", "SSw17", "SSw19"])
 
 	def DefineBlocks(self):
@@ -462,7 +458,7 @@ class Shore (District):
 			[ "SSw5",   "toleftleft",  ["SOSW", "SOSE"], (89, 11) ],
 			[ "SSw5b",  "toleftright", ["SOSW", "SOSE"], (87, 13) ],
 			[ "SSw7",   "torightright",["SOSW", "SOSE"], (99, 13) ],
-			[ "SSw9",   "torightright",["SOSW", "SOSE"], (102, 13) ],
+			[ "SSw9",   "torightrightinv",["SOSW", "SOSE"], (102, 13) ],
 			[ "SSw11",  "toleftrightinv", ["SOSW", "SOSE"], (99, 11) ],
 			[ "SSw13",  "toleftright", ["SOSW", "SOSE"], (102, 11) ],
 
@@ -550,10 +546,10 @@ class Shore (District):
 																				(100, 11), (101, 11), (102, 11), (103, 11), (104, 11), (105, 11)  ], "S10", [RESTRICTING, DIVERGING], ["SSw3:N", "SSw5:N", "SSw11:R", "SSw13:N"], ["S12LC", "S12R"])
 		self.routes["SRtS10H20"] = Route(self.screen, block, "SRtS10H20", "H20", [ (83, 11), (84, 11), (85, 12), (86, 13), (87, 13), (88, 13), (89, 13),
 																				(90, 13), (91, 13), (92, 13), (93, 13), (94, 13), (95, 13), (96, 13), (97, 13), (98, 13), (99, 13),
-																				(100, 13), (101, 13), (102, 13), (103, 13), (104, 13), (105, 13)  ], "S10", [DIVERGING, RESTRICTING], ["SSw3:R", "SSw5:N", "SSw7:N", "SSw9:N"], ["S4LA", "S12R"])
+																				(100, 13), (101, 13), (102, 13), (103, 13), (104, 13), (105, 13)  ], "S10", [DIVERGING, RESTRICTING], ["SSw3:R", "SSw5:N", "SSw7:N", "SSw9:R"], ["S4LA", "S12R"])
 		self.routes["SRtS10S21"] = Route(self.screen, block, "SRtS10S21", "S21", [ (83, 11), (84, 11), (85, 12), (86, 13), (87, 13), (88, 13), (89, 13),
 																				(90, 13), (91, 13), (92, 13), (93, 13), (94, 13), (95, 13), (96, 13), (97, 13), (98, 13), (99, 13),
-																				(100, 13), (101, 13), (102, 13), (103, 14), (104, 15), (105, 16), (106, 17), (107, 18), (108, 19), (109, 19)  ], "S10", [DIVERGING, RESTRICTING], ["SSw3:R", "SSw5:N", "SSw7:N", "SSw9:R"], ["S4LB", "S12R"])
+																				(100, 13), (101, 13), (102, 13), (103, 14), (104, 15), (105, 16), (106, 17), (107, 18), (108, 19), (109, 19)  ], "S10", [DIVERGING, RESTRICTING], ["SSw3:R", "SSw5:N", "SSw7:N", "SSw9:N"], ["S4LB", "S12R"])
 		self.routes["SRtS10P32"] = Route(self.screen, block, "SRtS10P32", "P32", [ (83, 11), (84, 11), (85, 12), (86, 13), (87, 13), (88, 13), (89, 13),
 																				(90, 13), (91, 13), (92, 13), (93, 13), (94, 13), (95, 13), (96, 13), (97, 13), (98, 13), (99, 13),
 																				(100, 14), (101, 15), (102, 16), (103, 17), (104, 18), (105, 19), (106, 20), (107, 21), (108, 21), (109, 21)  ], "S10", [DIVERGING, DIVERGING], ["SSw3:R", "SSw5:N", "SSw7:R"], ["S4LC", "S12R"])
@@ -561,7 +557,7 @@ class Shore (District):
 		block = self.blocks["SOSE"]
 		self.routes["SRtS20S21"] = Route(self.screen, block, "SRtS20S21", "S20", [ (83, 13), (84, 13), (85, 13), (86, 13), (87, 13), (88, 13), (89, 13),
 																				(90, 13), (91, 13), (92, 13), (93, 13), (94, 13), (95, 13), (96, 13), (97, 13), (98, 13), (99, 13),
-																				(100, 13), (101, 13), (102, 13), (103, 14), (104, 15), (105, 16), (106, 17), (107, 18), (108, 19), (109, 19)  ], "S21", [MAIN, MAIN], ["SSw3:N", "SSw5:N", "SSw7:N", "SSw9:R"], ["S4R", "S4LB"])
+																				(100, 13), (101, 13), (102, 13), (103, 14), (104, 15), (105, 16), (106, 17), (107, 18), (108, 19), (109, 19)  ], "S21", [MAIN, MAIN], ["SSw3:N", "SSw5:N", "SSw7:N", "SSw9:N"], ["S4R", "S4LB"])
 		self.routes["SRtS20S11"] = Route(self.screen, block, "SRtS20S11", "S20", [ (83, 13), (84, 13), (85, 13), (86, 13), (87, 13), (88, 12), (89, 11),
 																				(90, 11), (91, 11), (92, 11), (93, 11), (94, 11), (95, 11), (96, 11), (97, 11), (98, 11), (99, 11),
 																				(100, 10), (101, 9), (102, 8), (103, 7), (104, 7), (105, 7)  ], "S11", [DIVERGING, DIVERGING], ["SSw3:N", "SSw5:R", "SSw11:N"], ["S4R", "S12LA"])
@@ -573,7 +569,7 @@ class Shore (District):
 																				(100, 11), (101, 11), (102, 11), (103, 11), (104, 11), (105, 11)  ], "H10", [RESTRICTING, DIVERGING], ["SSw3:N", "SSw5:R", "SSw11:R", "SSw13:N"], ["S4R", "S12LC"])
 		self.routes["SRtS20H20"] = Route(self.screen, block, "SRtS20H20", "S20", [ (83, 13), (84, 13), (85, 13), (86, 13), (87, 13), (88, 13), (89, 13),
 																				(90, 13), (91, 13), (92, 13), (93, 13), (94, 13), (95, 13), (96, 13), (97, 13), (98, 13), (99, 13),
-																				(100, 13), (101, 13), (102, 13), (103, 13), (104, 13), (105, 13)  ], "H20", [DIVERGING, RESTRICTING], ["SSw3:N", "SSw5:N", "SSw7:N", "SSw9:N"], ["S4R", "S4LA"])
+																				(100, 13), (101, 13), (102, 13), (103, 13), (104, 13), (105, 13)  ], "H20", [DIVERGING, RESTRICTING], ["SSw3:N", "SSw5:N", "SSw7:N", "SSw9:R"], ["S4R", "S4LA"])
 		self.routes["SRtS20P32"] = Route(self.screen, block, "SRtS20P32", "S20", [ (83, 13), (84, 13), (85, 13), (86, 13), (87, 13), (88, 13), (89, 13),
 																				(90, 13), (91, 13), (92, 13), (93, 13), (94, 13), (95, 13), (96, 13), (97, 13), (98, 13), (99, 13),
 																				(100, 14), (101, 15), (102, 16), (103, 17), (104, 18), (105, 19), (106, 20), (107, 21), (108, 21), (109, 21)  ], "P32", [DIVERGING, DIVERGING], ["SSw3:N", "SSw5:N", "SSw7:R"], ["S4R", "S4LC"])

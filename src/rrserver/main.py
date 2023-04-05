@@ -3,6 +3,11 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
+try:
+	os.mkdir(os.path.join(os.getcwd(), "logs"))
+except FileExistsError:
+	pass
+
 DEVELOPMODE = True
 
 import logging
@@ -106,7 +111,7 @@ class MainFrame(wx.Frame):
 		vsz.AddSpacer(10)
 		
 		self.cbEnableSendIO = wx.CheckBox(self, wx.ID_ANY, "Enable IO Bits display")
-		self.cbEnableSendIO.SetValue(True)		
+		self.cbEnableSendIO.SetValue(self.settings.viewiobits and not self.settings.hide)		
 		vsz.Add(self.cbEnableSendIO, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		self.Bind(wx.EVT_CHECKBOX, self.OnCbEnableIO, self.cbEnableSendIO)
 		vsz.AddSpacer(10)
@@ -380,6 +385,10 @@ class MainFrame(wx.Frame):
 		elif verb == "turnout":
 			swname = evt.data["name"][0]
 			status = evt.data["status"][0]
+			try:
+				force = evt.data["force"][0]
+			except:
+				force = False
 
 			self.rr.SetOutPulseTo(swname, status)
 
@@ -387,7 +396,7 @@ class MainFrame(wx.Frame):
 			# the turnout information that the railroad reponds with is sent
 			# back to listeners to convey this information.  In simulation, we echo
 			if self.settings.simulation:
-				self.rr.GetInput(swname).SetState(status)
+				self.rr.GetInput(swname).SetState(status, force=force)
 
 		elif verb == "nxbutton":
 			try:

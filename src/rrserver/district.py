@@ -193,6 +193,7 @@ class District(wx.Panel):
 
 	
 	def SendIO(self, flag):
+		print("sendio %s" % str(flag))
 		if not self.rr.SendIOEnabled():
 			self.sendIO = False
 		else:

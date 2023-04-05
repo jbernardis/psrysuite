@@ -348,18 +348,35 @@ class MainUnit:
 					#  turnout is locked AND we need to change it
 					tolock.append(toname)
 		#  else we are already on this route - no turnout evauation needed
+		
+		# look at state of exit block
+		exitBlockAvailable = False
+		ends = rte.GetEnds()
+		if ends[0] == blkName:
+			exitBlk = ends[1]
+		else:
+			exitBlk = ends[0]
+			
+		if exitBlk in self.blocks:
+			b = self.blocks[exitBlk]
+			state = b.GetState()
+			exitBlockAvailable = state == 0
+			logging.info("Exit block %s State = %d" % (exitBlk, state))
+		else:
+			state = None
+		
 
 		sigNm = rte.GetSignalForEnd(blkName)
 		if sigNm is not None:
 			if self.signals[sigNm].IsLocked():
 				siglock.append(sigNm)
 
-		if len(tolock) + len(siglock) == 0:
+		if len(tolock) + len(siglock) == 0 and exitBlockAvailable:
 			logging.info("eval true")
 			return True  # OK to proceed with this route
 		else:
 			#  TODO - do something with the tolock and siglock arrays
-			logging.info("Eval false to=%s sig=%s" % (str(tolock), str(siglock)))
+			logging.info("Eval false to=%s sig=%s block %s state = %s" % (str(tolock), str(siglock), exitBlk, str(state)))
 			return False  # this route is unavailable right now
 
 	def SetupRoute(self, rteRq):

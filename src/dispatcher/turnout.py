@@ -114,11 +114,11 @@ class Turnout:
 	def GetStatus(self):
 		return "N" if self.normal else "R"
 
-	def SetReverse(self, refresh=False):
+	def SetReverse(self, refresh=False, force=False):
 		if not self.normal:
 			return False
 
-		if self.IsLocked():
+		if self.IsLocked() and not force:
 			return False
 		
 		self.normal = False
@@ -134,11 +134,11 @@ class Turnout:
 			self.Draw()
 		return True
 
-	def SetNormal(self, refresh=False):
+	def SetNormal(self, refresh=False, force=False):
 		if self.normal:
 			return False
 
-		if self.IsLocked():
+		if self.IsLocked() and not force:
 			return False
 		
 		self.normal = True

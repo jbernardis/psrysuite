@@ -182,16 +182,16 @@ class District:
 				first = False
 				self.frame.Request(req)
 
-	def PerformTurnoutAction(self, turnout):
+	def PerformTurnoutAction(self, turnout, force=False):
 		turnout = turnout.GetControlledBy()
-		if turnout.IsLocked():
+		if turnout.IsLocked() and not force:
 			self.ReportTurnoutLocked(turnout.GetName())
 			return
 
 		if turnout.IsNormal():
-			self.frame.Request({"turnout": {"name": turnout.GetName(), "status": "R"}})
+			self.frame.Request({"turnout": {"name": turnout.GetName(), "status": "R", "force": force}})
 		else:
-			self.frame.Request({"turnout": {"name": turnout.GetName(), "status": "N"}})
+			self.frame.Request({"turnout": {"name": turnout.GetName(), "status": "N", "force": force}})
 
 	def FindRoute(self, sig):
 		signm = sig.GetName()
@@ -482,11 +482,11 @@ class District:
 		for osblk in osList:
 			osblk.Draw()
 
-	def DoTurnoutAction(self, turnout, state):
+	def DoTurnoutAction(self, turnout, state, force=False):
 		if state == NORMAL:
-			turnout.SetNormal(refresh=True)
+			turnout.SetNormal(refresh=True, force=force)
 		else:
-			turnout.SetReverse(refresh=True)
+			turnout.SetReverse(refresh=True, force=force)
 
 	def DoSignalAction(self, sig, aspect):
 		signm = sig.GetName()

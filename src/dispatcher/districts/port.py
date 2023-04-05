@@ -28,7 +28,7 @@ class Port (District):
 
 		return False
 
-	def DoTurnoutAction(self, turnout, state):
+	def DoTurnoutAction(self, turnout, state, force=False):
 		tn = turnout.GetName()
 		if tn == "PASw35":
 			bstat = NORMAL if self.turnouts["PASw37"].IsNormal() else REVERSE
@@ -45,14 +45,14 @@ class Port (District):
 			turnout.Draw()
 
 		elif tn == "PASw37":
-			District.DoTurnoutAction(self, turnout, state)
+			District.DoTurnoutAction(self, turnout, state, force=force)
 			to = self.turnouts["PASw35"]
 			sstat = to.GetStatus()
 			to.SetStatus([sstat[0], state])
 			to.Draw()
 
 		elif tn == "PASw23":
-			District.DoTurnoutAction(self, turnout, state)
+			District.DoTurnoutAction(self, turnout, state, force=force)
 			to = self.turnouts["PASw21"]
 			sstat = to.GetStatus()
 			to.SetStatus([sstat[0], state])
@@ -64,7 +64,7 @@ class Port (District):
 			turnout.Draw()
 
 		elif tn == "PASw7":
-			District.DoTurnoutAction(self, turnout, state)
+			District.DoTurnoutAction(self, turnout, state, force=force)
 			to = self.turnouts["PASw5"]
 			sstat = to.GetStatus()
 			to.SetStatus([sstat[0], state])
@@ -96,7 +96,7 @@ class Port (District):
 			turnout.Draw()
 
 		else:
-			District.DoTurnoutAction(self, turnout, state)
+			District.DoTurnoutAction(self, turnout, state, force=force)
 
 		if tn == "PASw33":
 			trnout = self.turnouts["PASw35"]

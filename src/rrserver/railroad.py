@@ -83,7 +83,7 @@ class Railroad(wx.Notebook):
 			dobj.DetermineSignalLevers()
 
 		self.currentDistrict = self.districts["Yard"]
-		self.currentDistrict.SendIO(True)
+		self.currentDistrict.SendIO(self.settings.viewiobits and not self.settings.hide)
 
 	def EnableSendIO(self, flag):
 		self.enableSendIO = flag
