@@ -36,8 +36,8 @@ class Hyde(District):
 				"H31E", "H32E", "H33E", "H34E", "H12E", "H22E", "H43E", "H42E", "H41E", "H40E",
 				"H31W", "H32W", "H33W", "H34W", "H12W", "H22W", "H43W", "H42W", "H41W"	]
 		self.routeMap = {
-				"H12W": [ ["HSw1", "N"], ["HSw3","N"] ], 
-				"H34W": [ ["HSw1", "N"], ["HSw3", "R"] ],
+				"H12W": [ ["HSw1", "N"], ["HSw3","N"], ["HSw5", "N"] ], 
+				"H34W": [ ["HSw1", "N"], ["HSw3", "R"], ["HSw5", "R"] ],
 				"H33W": [ ["HSw1", "R"], ["HSw3", "N"], ["HSw5", "N"] ], 
 				"H32W": [ ["HSw1", "R"], ["HSw3", "R"], ["HSw5", "R"], ["HSw7","N"] ], 
 				"H31W": [ ["HSw1", "R"], ["HSw3", "R"], ["HSw5", "R"], ["HSw7","R"] ], 
@@ -47,7 +47,7 @@ class Hyde(District):
 				"H33E": [ ["HSw15", "N"], ["HSw17", "R"], ["HSw19", "N"], ["HSw21", "N"] ], 
 				"H32E": [ ["HSw15", "N"], ["HSw17", "N"], ["HSw19", "R"], ["HSw21", "N"] ], 
 				"H31E": [ ["HSw15", "N"], ["HSw17", "N"], ["HSw19", "N"], ["HSw21", "R"] ], 
-				"H30E": [ ["HSw1", "N"] ],
+				"H30E": [ ["HSw7", "N"] ],
 
 				"H22W": [ ["HSw9", "N"], ["HSw11", "N"], ["HSw13", "N"] ], 
 				"H43W": [ ["HSw9", "N"], ["HSw11", "R"], ["HSw13", "R"] ], 

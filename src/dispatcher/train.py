@@ -11,6 +11,7 @@ class Train:
 		self.loco = "??"
 		self.atc = False
 		self.ar = False
+		self.sbActive = False
 		self.blocks = {}
 		self.blockOrder = []
 		self.signal = None
@@ -59,6 +60,12 @@ class Train:
 		n = self.name if self.name else "??"
 		l = self.loco if self.loco else "??"
 		return a+n+"/"+l
+	
+	def SetSBActive(self, flag):
+		self.sbActive = flag
+		
+	def GetSBActive(self):
+		return self.sbActive
 
 	def Draw(self):
 		for blk in self.blocks.values():

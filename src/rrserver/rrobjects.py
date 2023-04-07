@@ -53,6 +53,7 @@ class RouteInput(Input):
 		if nv == self.value:
 			return
 		self.value = nv
+		self.rr.RailroadEvent({"refreshinput": [self.name]})
 		logging.info("Route input %s = %d" % (self.name, nv))
 		if nv == 1:
 			self.district.MapRouteToTurnouts(self.name)

@@ -77,55 +77,75 @@ class HTTPServer:
 		verb = cmd["cmd"][0]
 		if verb == "getlocos":
 			fn = os.path.join(os.getcwd(), "data", "locos.json")
+			logging.info("Retrieving loco information from file (%s)" % fn)
 			try:
 				with open(fn, "r") as jfp:
 					j = json.load(jfp)
 			except FileNotFoundError:
+				logging.info("File not found")
 				return 400, "File Not Found"
 			
 			except:
+				logging.info("Unknown error")
 				return 400, "Unknown error encountered"
 			
-			return 200, json.dumps(j)
+			jstr = json.dumps(j)
+			logging.info("Returning %d bytes" % len(jstr))
+			return 200, jstr
 		
 		elif verb == "gettrains":
 			fn = os.path.join(os.getcwd(), "data", "trains.json")
+			logging.info("Retrieving trains information from file (%s)" % fn)
 			try:
 				with open(fn, "r") as jfp:
 					j = json.load(jfp)
 			except FileNotFoundError:
+				logging.info("File not found")
 				return 400, "File Not Found"
 			
 			except:
+				logging.info("Unknown error")
 				return 400, "Unknown error encountered"
 			
-			return 200, json.dumps(j)
+			jstr = json.dumps(j)
+			logging.info("Returning %d bytes" % len(jstr))
+			return 200, jstr
 		
 		elif verb == "getlayout":
 			fn = os.path.join(os.getcwd(), "data", "layout.json")
+			logging.info("Retrieving layout information from file (%s)" % fn)
 			try:
 				with open(fn, "r") as jfp:
 					j = json.load(jfp)
 			except FileNotFoundError:
+				logging.info("File not found")
 				return 400, "File Not Found"
 			
 			except:
+				logging.info("Unknown error")
 				return 400, "Unknown error encountered"
 			
-			return 200, json.dumps(j)
+			jstr = json.dumps(j)
+			logging.info("Returning %d bytes" % len(jstr))
+			return 200, jstr
 		
 		elif verb == "getsimscripts":
 			fn = os.path.join(os.getcwd(), "data", "simscripts.json")
+			logging.info("Retrieving simscripts from file (%s)" % fn)
 			try:
 				with open(fn, "r") as jfp:
 					j = json.load(jfp)
 			except FileNotFoundError:
+				logging.info("File not found")
 				return 400, "File Not Found"
 			
 			except:
+				logging.info("Unknown error")
 				return 400, "Unknown error encountered"
 			
-			return 200, json.dumps(j)
+			jstr = json.dumps(j)
+			logging.info("Returning %d bytes" % len(jstr))
+			return 200, jstr
 
 		else:
 			self.cbCommand(cmd)

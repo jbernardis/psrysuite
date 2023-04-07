@@ -39,6 +39,8 @@ from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg
 
+HOMEX1 = -2560
+HOMEX3 = 0
 
 MENU_ATC_REMOVE = 900
 MENU_ATC_STOP   = 901
@@ -229,7 +231,10 @@ class MainFrame(wx.Frame):
 	def ResetScreen(self):
 		self.SetMaxSize((self.totalw, self.totalh))
 		self.SetSize((self.totalw, self.totalh))
-		self.SetPosition((0, 0))
+		if self.settings.pages == 3:
+			self.SetPosition((HOMEX3, 0))
+		else:
+			self.SetPosition((HOMEX1, 0))
 		
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})

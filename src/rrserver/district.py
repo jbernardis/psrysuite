@@ -396,6 +396,11 @@ class District(wx.Panel):
 			clear = ic.GetClear()
 			val = ic.GetValue()
 			self.ilist.SetItem(ix, 1, "%d,%s,%s" % (val, "C" if clear else "N", "E" if east else "W"))
+			
+		elif itype == District.route:
+			val = ic.GetValue()
+			self.ilist.SetItem(ix, 1, "%d" % val)
+			
 		else:
 			logging.warning("Refresh input: no handling of type %s" % itype)
 

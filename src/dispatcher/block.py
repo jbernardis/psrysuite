@@ -197,8 +197,10 @@ class Block:
 			locoID = "??"
 			atc = False
 			ar = False
+			sbActive = False
 		else:
 			trainID, locoID = self.train.GetNameAndLoco()
+			sbActive = self.train.GetSBActive()
 			atc = self.train.IsOnATC()
 			ar = self.train.IsOnAR()
 
@@ -208,11 +210,9 @@ class Block:
 		if self.sbWest and self.sbWest.IsOccupied():
 			anyOccupied = True
 
-		stopRelay = self.StoppingRelayActivated()
-
 		for screen, loc in self.trainLoc:
 			if anyOccupied:
-				self.frame.DrawTrain(screen, loc, trainID, locoID, stopRelay, atc, ar)
+				self.frame.DrawTrain(screen, loc, trainID, locoID, sbActive, atc, ar)
 			else:
 				self.frame.ClearTrain(screen, loc)
 
@@ -549,6 +549,7 @@ class StoppingBlock (Block):
 			tname = "??"
 		else:
 			tname = tr.GetName()
+			tr.SetSBActive(flag)
 			
 		bname = self.block.GetName()
 		direction = "East" if self.eastend else "West"
@@ -559,7 +560,10 @@ class StoppingBlock (Block):
 		logging.debug("Block %s stopping relay %s %s end by train %s" % (bname, "activated" if flag else "cleared", direction, tname))
 		self.frame.Request({"relay": { "block": self.block.GetName(), "status": 1 if flag else 0}})
 
-		self.block.DrawTrain()
+		if tr is None:
+			self.block.DrawTrain()
+		else:
+			tr.Draw()
 
 	def IsActive(self):
 		return self.active
@@ -847,24 +851,4 @@ class OverSwitch (Block):
 	def DrawTurnouts(self):
 		for t in self.turnouts:
 			t.Draw(EMPTY, self.east)
-
-	def DrawTrain(self):
-		if len(self.trainLoc) == 0:
-			return
-
-		if self.train is None:
-			trainID = "??"
-			locoID = "??"
-			atc = False
-			ar = False
-		else:
-			trainID, locoID = self.train.GetNameAndLoco()
-			atc = self.train.IsOnATC()
-			ar = self.train.IsOnAR()
-
-		for screen, loc in self.trainLoc:
-			if self.occupied:
-				self.frame.DrawTrain(screen, loc, trainID, locoID, False, atc, ar)
-			else:
-				self.frame.ClearTrain(screen, loc)
 
