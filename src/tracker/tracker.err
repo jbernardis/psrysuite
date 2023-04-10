@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "C:\Users\jeff\git\traintracker\src\traintracker.py", line 2194, in OnInit
+    self.frame = MainFrame()
+  File "C:\Users\jeff\git\traintracker\src\traintracker.py", line 298, in __init__
+    self.panel = TrainTrackerPanel(self)
+  File "C:\Users\jeff\git\traintracker\src\traintracker.py", line 522, in __init__
+    self.selectedEngineer = self.chEngineer.GetString(0)
+wx._core.wxAssertionError: C++ assertion ""len != (-1)"" failed at ..\..\src\msw\choice.cpp(380) in wxChoice::GetString(): Invalid index
+OnInit returned false, exiting...
