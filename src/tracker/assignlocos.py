@@ -3,7 +3,7 @@ import wx
 BTNSZ = (120, 46)
 
 class AssignLocosDlg(wx.Dialog):
-	def __init__(self, parent, trains, order, extras, locos):
+	def __init__(self, parent, trains, schedule, extras, locos):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		
@@ -15,8 +15,8 @@ class AssignLocosDlg(wx.Dialog):
 		self.modified = None
 		self.setModified(False)
 		self.extraTrains = extras
-		self.timeOrder = [x for x in order] + self.extraTrains
-		self.order = [x for x in order] + self.extraTrains
+		self.timeOrder = [x for x in schedule] + self.extraTrains
+		self.schedule = [x for x in schedule] + self.extraTrains
 		
 		self.parent = parent
 		
@@ -27,7 +27,7 @@ class AssignLocosDlg(wx.Dialog):
 		self.selectedTx = None
 		
 		self.currentLoco = {}
-		for tid in self.order:
+		for tid in self.schedule:
 			tinfo = trains.getTrain(tid)
 			self.currentLoco[tid] = tinfo["loco"]
 			
@@ -58,7 +58,7 @@ class AssignLocosDlg(wx.Dialog):
 		
 		self.currentLocoList = CurrentLocoList(self)
 		self.currentLocoList.SetFont(textFont)
-		self.currentLocoList.setData(self.trains, self.currentLoco, self.order, self.locos)
+		self.currentLocoList.setData(self.trains, self.currentLoco, self.schedule, self.locos)
 		
 		vsizer.Add(self.currentLocoList, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
@@ -121,15 +121,15 @@ class AssignLocosDlg(wx.Dialog):
 
 	def onSortOrder(self, _):
 		if self.rbSequence.GetValue():
-			self.order = [x for x in self.timeOrder]
+			self.schedule = [x for x in self.timeOrder]
 		elif self.rbTID.GetValue():
-			self.order = sorted(self.timeOrder)
+			self.schedule = sorted(self.timeOrder)
 		elif self.rbOrigin.GetValue():
-			self.order = sorted(self.timeOrder, key=self.useOrigin)
+			self.schedule = sorted(self.timeOrder, key=self.useOrigin)
 		else:
 			return
 		
-		self.currentLocoList.setData(self.trains, self.currentLoco, self.order, self.locos)
+		self.currentLocoList.setData(self.trains, self.currentLoco, self.schedule, self.locos)
 		
 	def useOrigin(self, tid):
 		tr = self.trains.getTrain(tid)
@@ -145,7 +145,7 @@ class AssignLocosDlg(wx.Dialog):
 
 	def determineAvailability(self):
 		self.locosInUse = [self.currentLoco[x] for x in self.currentLoco.keys() if self.currentLoco[x] is not None]
-		self.availLocos = ["%s - %s" % (x, self.locos.getLoco(x)) for x in self.allLocos] # if x not in self.locosInUse]
+		self.availLocos = ["%s - %s" % (x, self.locos.getLocoDesc(x)) for x in self.allLocos] # if x not in self.locosInUse]
 		self.chAvail.SetItems(self.availLocos)
 		if len(self.availLocos) == 0:
 			self.chAvail.Enable(False)
@@ -160,14 +160,14 @@ class AssignLocosDlg(wx.Dialog):
 			self.bAssign.Enable(False)
 		else:
 			self.bAssign.Enable(len(self.availLocos) > 0) 
-			tid = self.order[tx]
+			tid = self.schedule[tx]
 			lId = self.currentLoco[tid]
 			self.bUnassign.Enable(lId is not None)
 			
 	def onBUnassign(self, _):
 		if self.selectedTx is None:
 			return
-		tid = self.order[self.selectedTx]
+		tid = self.schedule[self.selectedTx]
 		self.currentLoco[tid] = None
 		self.determineAvailability()
 		self.currentLocoList.RefreshItem(self.selectedTx)
@@ -178,7 +178,7 @@ class AssignLocosDlg(wx.Dialog):
 	def onBAssign(self, _):
 		if self.selectedTx is None:
 			return
-		tid = self.order[self.selectedTx]
+		tid = self.schedule[self.selectedTx]
 		
 		lx = self.chAvail.GetSelection()
 		if lx == wx.NOT_FOUND:
@@ -261,13 +261,13 @@ class CurrentLocoList(wx.ListCtrl):
 		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnItemDeselected)
 		self.Bind(wx.EVT_LIST_CACHE_HINT, self.OnItemHint)
 		
-	def setData(self, trains, currentLocos, order, locos):
+	def setData(self, trains, currentLocos, schedule, locos):
 		self.trains = trains
 		self.currentLocos = currentLocos
-		self.order = order
+		self.schedule = schedule
 		self.locos = locos
 		self.SetItemCount(0)
-		self.SetItemCount(len(self.order))
+		self.SetItemCount(len(self.schedule))
 			
 	def getSelection(self):
 		if self.selected is None:
@@ -276,7 +276,7 @@ class CurrentLocoList(wx.ListCtrl):
 		if self.selected < 0 or self.selected >= self.GetItemCount():
 			return None
 		
-		return self.order[self.selected]
+		return self.schedule[self.selected]
 			
 	def setSelection(self, tx):
 		self.selected = tx;
@@ -300,10 +300,10 @@ class CurrentLocoList(wx.ListCtrl):
 			self.setSelection(None)
 
 	def OnGetItemText(self, item, col):
-		if item < 0 or item >= len(self.order):
+		if item < 0 or item >= len(self.schedule):
 			return None
 		
-		tid = self.order[item]
+		tid = self.schedule[item]
 		lId = self.currentLocos[tid]
 		if col == 0:
 			return tid 
@@ -328,7 +328,7 @@ class CurrentLocoList(wx.ListCtrl):
 			if lId is None:
 				return ""
 			else:
-				d = self.locos.getLoco(lId)
+				d = self.locos.getLocoDesc(lId)
 				if d is None:
 					return ""
 				else:

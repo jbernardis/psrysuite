@@ -45,6 +45,9 @@ class Train:
 	
 	def SetSignal(self, sig):
 		self.signal = sig
+	
+	def GetSignal(self):
+		return self.signal
 
 	def GetBlockNameList(self):
 		return list(self.blocks.keys())
@@ -124,6 +127,12 @@ class Train:
 		if len(self.blockOrder) == 0:
 			return False
 		return bn == self.blockOrder[-1]
+			
+	def FrontBlock(self, bn):
+		if len(self.blockOrder) == 0:
+			return False
+		bn = self.blockOrder[-1]
+		return self.blocks[bn]
 			
 	def IsInBlock(self, blk):
 		bn = blk.GetName()

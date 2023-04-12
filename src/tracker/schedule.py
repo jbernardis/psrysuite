@@ -17,23 +17,23 @@ class Schedule():
 		return tid in self.extras
 		
 	def getTid(self, tx):
-		if tx < 0 or tx >= len(self.order):
+		if tx < 0 or tx >= len(self.schedule):
 			return None
 		
-		return self.order[tx]
+		return self.schedule[tx]
 		
 	def __len__(self):
-		return len(self.order)
+		return len(self.schedule)
 
 	def __iter__(self):
 		self.ox = 0
 		return self
 	
 	def __next__(self):
-		if self.ox >= len(self.order):
+		if self.ox >= len(self.schedule):
 			raise StopIteration
 		
-		rv = self.order[self.ox]
+		rv = self.schedule[self.ox]
 		self.ox += 1
 		return rv
 	

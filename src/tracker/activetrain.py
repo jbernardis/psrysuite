@@ -1,6 +1,6 @@
 
 class ActiveTrain:
-	def __init__(self, tid, tInfo, loco, ldesc, eng, block):
+	def __init__(self, tid, tInfo, loco, ldesc, llimit, eng, block):
 		self.tid = tid
 		self.dir = "East" if tInfo["eastbound"] else "West"
 
@@ -24,7 +24,7 @@ class ActiveTrain:
 		self.engineer = eng
 		self.throttle = None
 		self.speed = 0
-		self.limit = None
+		self.limit = llimit
 		self.highlight = 0
 		self.time = 0
 		self.hasStarted = False

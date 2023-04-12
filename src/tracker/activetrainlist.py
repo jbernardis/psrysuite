@@ -138,6 +138,7 @@ class ActiveTrainList:
 		for at in self.trains.values():
 			if at.loco == loco:
 				at.limit = limit
+				tx = self.order.index(at.tid)
 				try:
 					tx = self.order.index(at.tid)
 				except:

@@ -519,8 +519,12 @@ class MainFrame(wx.Frame):
 			self.rr.RemoveTrain(blknm)
 			
 		elif verb == "trainsignal":
+			trid = evt.data["train"][0]
+			signal = evt.data["signal"][0]
+			aspect = evt.data["aspect"][0]
+			self.trainList.UpdateSignal(trid, signal, aspect)
 			p = {tag: evt.data[tag][0] for tag in evt.data if tag != "cmd"}
-			resp = {"trainsignal": [p]}
+			resp = {"trainsignal": p}
 			self.socketServer.sendToAll(resp)
 			
 		elif verb == "traincomplete":

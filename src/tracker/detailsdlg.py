@@ -28,7 +28,6 @@ class DetailsDlg(wx.Dialog):
 		vsizer.Add(hsz)
 		vsizer.AddSpacer(10)
 
-		print(str(desc))		
 		if desc is None:
 			ldesc = ""
 		else:

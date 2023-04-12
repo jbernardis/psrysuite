@@ -996,7 +996,6 @@ class MainFrame(wx.Frame):
 				req = {"trainsignal": { "train": trid, "block": blkNm, "signal": sig.GetName(), "aspect": sig.GetAspect()}}
 				self.Request(req)
 
-
 	def SwapToScreen(self, screen):
 		if screen not in screensList:
 			return False
@@ -1175,7 +1174,6 @@ class MainFrame(wx.Frame):
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
 			logging.info("Dispatch: %s: %s" % (cmd, parms))
-			print("Incoming socket message to dispatcher: %s: %s" % (cmd, parms), flush=True)
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]
@@ -1190,9 +1188,7 @@ class MainFrame(wx.Frame):
 					except KeyError:
 						to = None
 
-					print("turnout, compare %s to %s" % (str(state), str(to.GetStatus())))
 					if to is not None and state != to.GetStatus():
-						print("thry're not equal", flush=True)
 						district = to.GetDistrict()
 						st = REVERSE if state == "R" else NORMAL
 						district.DoTurnoutAction(to, st, force=force)

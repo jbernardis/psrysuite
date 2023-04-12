@@ -4,6 +4,7 @@ from socketserver import ThreadingMixIn
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import json
+import html
 import os
 import logging
 
@@ -108,6 +109,24 @@ class HTTPServer:
 				return 400, "Unknown error encountered"
 			
 			jstr = json.dumps(j)
+			logging.info("Returning %d bytes" % len(jstr))
+			return 200, jstr
+		
+		elif verb == "gettrains2":
+			fn = os.path.join(os.getcwd(), "data", "trains.json")
+			logging.info("Retrieving trains information from file (%s)" % fn)
+			try:
+				with open(fn, "r") as jfp:
+					j = json.load(jfp)
+			except FileNotFoundError:
+				logging.info("File not found")
+				return 400, "File Not Found"
+			
+			except:
+				logging.info("Unknown error")
+				return 400, "Unknown error encountered"
+			
+			jstr = html.escape(json.dumps(j))
 			logging.info("Returning %d bytes" % len(jstr))
 			return 200, jstr
 		

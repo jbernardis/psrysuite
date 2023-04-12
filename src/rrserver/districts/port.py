@@ -116,34 +116,34 @@ class Port(District):
 		clr10w = inp.GetClear() and not inp.GetEast()
 		outb[5] = setBit(outb[2], 5, 1 if clr10w else 0)  # semaphore signal
 		outb[5] = setBit(outb[2], 6, 1 if clr10w else 0)  # should be using RstrW
-		st = self.rr.GetInput("PA4.lvr")   # Signal indicators
+		st = self.rr.GetInput("PA4.lvr").GetState()   # Signal indicators
 		outb[2] = setBit(outb[2], 7, 1 if st == "L" else 0)
 
 		outb[3] = setBit(outb[3], 0, 1 if st == "N" else 0)
 		outb[3] = setBit(outb[3], 1, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PA6.lvr")
+		st = self.rr.GetInput("PA6.lvr").GetState()
 		outb[3] = setBit(outb[3], 2, 1 if st == "L" else 0)
 		outb[3] = setBit(outb[3], 3, 1 if st == "N" else 0)
 		outb[3] = setBit(outb[3], 4, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PA8.lvr")
+		st = self.rr.GetInput("PA8.lvr").GetState()
 		outb[3] = setBit(outb[3], 5, 1 if st == "L" else 0)
 		outb[3] = setBit(outb[3], 6, 1 if st == "N" else 0)
 		outb[3] = setBit(outb[3], 7, 1 if st == "R" else 0)
 
-		st = self.rr.GetInput("PA10.lvr")
+		st = self.rr.GetInput("PA10.lvr").GetState()
 		outb[4] = setBit(outb[4], 0, 1 if st == "L" else 0)
 		outb[4] = setBit(outb[4], 1, 1 if st == "N" else 0)
 		outb[4] = setBit(outb[4], 2, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PA12.lvr")
+		st = self.rr.GetInput("PA12.lvr").GetState()
 		outb[4] = setBit(outb[4], 3, 1 if st == "L" else 0)
 		outb[4] = setBit(outb[4], 4, 1 if st == "N" else 0)
 		outb[4] = setBit(outb[4], 5, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PA32.lvr")
+		st = self.rr.GetInput("PA32.lvr").GetState()
 		outb[4] = setBit(outb[4], 6, 1 if st == "L" else 0)
 		outb[4] = setBit(outb[4], 7, 1 if st == "N" else 0)
 
 		outb[5] = setBit(outb[5], 0, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PA34.lvr")
+		st = self.rr.GetInput("PA34.lvr").GetState()
 		outb[5] = setBit(outb[5], 1, 1 if st == "L" else 0)
 		outb[5] = setBit(outb[5], 2, 1 if st == "N" else 0)
 		outb[5] = setBit(outb[5], 3, 1 if st == "R" else 0)
@@ -281,40 +281,48 @@ class Port(District):
 				ip = self.rr.GetInput("P10.E")
 				ip.SetValue(getBit(inb[4], 5))
 	
-				lvrL = getBit(inb[4], 6)       # signal levers
+				lvrR = getBit(inb[4], 6)       # signal levers
 				lvrCallOn = getBit(inb[4], 7)
 	
-				lvrR = getBit(inb[5], 0)
+				lvrL = getBit(inb[5], 0)
 				self.rr.GetInput("PA4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[5], 1)
+				lvrR = getBit(inb[5], 1)
 				lvrCallOn = getBit(inb[5], 2)
-				lvrR = getBit(inb[5], 3)
+				lvrL = getBit(inb[5], 3)
 				self.rr.GetInput("PA6.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[5], 4)
+				lvrR = getBit(inb[5], 4)
 				lvrCallOn = getBit(inb[5], 5)
-				lvrR = getBit(inb[5], 6)
+				lvrL = getBit(inb[5], 6)
 				self.rr.GetInput("PA8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[5], 7)
+				lvrR = getBit(inb[5], 7)
 	
 				lvrCallOn = getBit(inb[6], 0)
-				lvrR = getBit(inb[6], 1)
+				lvrL = getBit(inb[6], 1)
 				self.rr.GetInput("PA10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[6], 2)
+				lvrR = getBit(inb[6], 2)
 				lvrCallOn = getBit(inb[6], 3)
-				lvrR = getBit(inb[6], 4)
+				lvrL = getBit(inb[6], 4)
 				self.rr.GetInput("PA12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[6], 5)
+				lvrR = getBit(inb[6], 5)
 				lvrCallOn = getBit(inb[6], 6)
-				lvrR = getBit(inb[6], 7)
+				lvrL = getBit(inb[6], 7)
 				self.rr.GetInput("PA32.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 	
-				lvrL = getBit(inb[7], 0)
+				lvrR = getBit(inb[7], 0)
 				lvrCallOn = getBit(inb[7], 1)
-				lvrR = getBit(inb[7], 2)
+				lvrL = getBit(inb[7], 2)
 				self.rr.GetInput("PA34.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				release = getBit(inb[7], 3)
 				self.rr.GetInput("parelease").SetState(release)  # Port A Release switch
-	
+				
+				
+				
+				
+		self.rr.GetInput("PA4.lvr").SetState(leverState(1, 0, 0))	
+		
+		
+		
+		
 		if self.sendIO:
 			self.rr.ShowText("PrtA", PORTA, otext, itext, 0, 3)
 
@@ -465,11 +473,11 @@ class Port(District):
 		outb[2] = setBit(outb[2], 6, asp[1])
 		outb[2] = setBit(outb[2], 7, asp[2])
 
-		st = self.rr.GetInput("PB2.lvr")
+		st = self.rr.GetInput("PB2.lvr").GetState()
 		outb[3] = setBit(outb[3], 0, 1 if st == "L" else 0)  # Signal indicators
 		outb[3] = setBit(outb[3], 1, 1 if st == "N" else 0)
 		outb[3] = setBit(outb[3], 2, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PB4.lvr")
+		st = self.rr.GetInput("PB4.lvr").GetState()
 		outb[3] = setBit(outb[3], 3, 1 if st == "L" else 0)
 		outb[3] = setBit(outb[3], 4, 1 if st == "N" else 0)
 		outb[3] = setBit(outb[3], 5, 1 if st == "R" else 0)
@@ -477,11 +485,11 @@ class Port(District):
 		outb[3] = setBit(outb[3], 6, 0 if locked else 1)
 		outb[3] = setBit(outb[3], 7, 1 if locked else 0)
 
-		st = self.rr.GetInput("PB12.lvr")
+		st = self.rr.GetInput("PB12.lvr").GetState()
 		outb[3] = setBit(outb[3], 0, 1 if st == "L" else 0)  # Signal indicators
 		outb[3] = setBit(outb[3], 1, 1 if st == "N" else 0)
 		outb[3] = setBit(outb[3], 2, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PB14.lvr")
+		st = self.rr.GetInput("PB14.lvr").GetState()
 		outb[3] = setBit(outb[3], 3, 1 if st == "L" else 0)
 		outb[3] = setBit(outb[3], 4, 1 if st == "N" else 0)
 		outb[3] = setBit(outb[3], 5, 1 if st == "R" else 0)
@@ -578,24 +586,24 @@ class Port(District):
 				ip.SetValue(getBit(inb[3], 3))
 				ip = self.rr.GetInput("P41.E")
 				ip.SetValue(getBit(inb[3], 4))
-				lvrL = getBit(inb[3], 5)       # signal levers
+				lvrR = getBit(inb[3], 5)       # signal levers
 				lvrCallOn = getBit(inb[3], 6)
-				lvrR = getBit(inb[3], 7)
+				lvrL = getBit(inb[3], 7)
 				self.rr.GetInput("PB2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 	
-				lvrL = getBit(inb[4], 0)
+				lvrR = getBit(inb[4], 0)
 				lvrCallOn = getBit(inb[4], 1)
-				lvrR = getBit(inb[4], 2)
+				lvrL = getBit(inb[4], 2)
 				self.rr.GetInput("PB4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				self.rr.GetInput("PBSw5.lvr").SetState(getBit(inb[4], 3))  # handswitch unlocking
-				lvrL = getBit(inb[4], 4)
+				lvrR = getBit(inb[4], 4)
 				lvrCallOn = getBit(inb[4], 5)
-				lvrR = getBit(inb[4], 6)
+				lvrL = getBit(inb[4], 6)
 				self.rr.GetInput("PB12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[4], 7)
+				lvrR = getBit(inb[4], 7)
 	
 				lvrCallOn = getBit(inb[5], 0)
-				lvrR = getBit(inb[5], 1)
+				lvrL = getBit(inb[5], 1)
 				self.rr.GetInput("PB14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				st = getBit(inb[5], 2)
 				self.rr.GetInput("PBSw15a.lvr").SetState(st)

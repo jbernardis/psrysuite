@@ -679,9 +679,6 @@ class TrainTrackerPanel(wx.Panel):
 	def onConnectEvent(self, evt):
 		self.setConnected(True)
 		
-		self.trainRoster = TrainRoster(self.RRServer)
-		self.locos = Locomotives(self.RRServer)
-
 	def raiseDisconnectEvent(self): # thread context
 		evt = DisconnectEvent()
 		wx.QueueEvent(self, evt)
@@ -700,15 +697,18 @@ class TrainTrackerPanel(wx.Panel):
 			if cmd == "turnout":
 				pass
 			elif cmd == "breaker":
-				brkName = parms[0]["name"]
-				brkVal = parms[0]["value"]
-				self.breakers[brkName] = brkVal
+				for p in parms:
+					brkName = p["name"]
+					brkVal = p["value"]
+					self.breakers[brkName] = brkVal
 				self.ShowBreakers()
 				
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)
 				logging.info("connected to railroad server with session ID %d" % self.sessionid)
 				self.Request({"identify": {"SID": self.sessionid, "function": "TRACKER"}})
+				self.trainRoster = TrainRoster(self.RRServer)
+				self.locos = Locomotives(self.RRServer)
 				self.DoRefresh()
 				
 			elif cmd == "end":
@@ -717,6 +717,54 @@ class TrainTrackerPanel(wx.Panel):
 				elif parms["type"] == "trains":
 					evt = ConnectEvent()
 					wx.QueueEvent(self, evt)
+			
+			elif cmd == "settrain":
+				for p in parms:
+					try:
+						train = p["name"]
+					except:
+						train = None
+					try:
+						loco = p["loco"]
+					except:
+						loco = None
+					try:
+						block = p["block"]
+					except:
+						block = None
+						
+					if train is None or "??" in train:
+						continue
+						
+					if block is None:
+						continue
+
+					if loco is None or "??" in loco:
+						loco = ""
+					
+					tr = self.trainRoster.getTrain(train)					
+					tr["block"] = block
+					tr["loco"] = loco
+					
+				self.updateActiveListLocos()
+								
+			elif cmd == "trainsignal":
+				try:
+					train = parms["train"]
+				except:
+					train = None
+				try:
+					aspect = int(parms["aspect"])
+				except:
+					aspect = 0  # default is to stop
+
+				tr = self.trainRoster.getTrain(train)					
+				lid = tr["loco"]
+				if lid is not None and "??" not in lid:
+					loco = self.locos.getLoco(lid)
+					if loco is not None:
+						self.locos.setLimit(lid, aspect)
+						self.atl.setLimit(lid, self.locos.getLimit(lid))
 
 	def DoRefresh(self, rtype=None):
 		req = {"refresh": {"SID": self.sessionid}}
@@ -1004,21 +1052,29 @@ class TrainTrackerPanel(wx.Panel):
 		if rc != wx.ID_YES:
 			return
 
+		req = {"advice": {"msg": "Train %s assigned to %s" % (tid, eng)}}
+		self.Request(req)
+		
 		if tInfo["loco"] is None:
 			loco = ""
 			ldesc = ""
+			llimit = 0
 		else:
 			loco = tInfo["loco"]
-			ldesc = self.locos.getLoco(loco)
+			ldesc = self.locos.getLocoDesc(loco)
 			if ldesc is None:
 				ldesc = ""
+			try:
+				llimit = self.locos.getLimit(loco)
+			except:
+				llimit = 0
 				
 		if "block" in tInfo:
 			block = tInfo["block"]
 		else:
 			block = ""	
 
-		self.atl.addTrain(ActiveTrain(tid, tInfo, loco, ldesc, eng, block))
+		self.atl.addTrain(ActiveTrain(tid, tInfo, loco, ldesc, llimit, eng, block))
 
 		if loco in self.speeds:
 			self.atl.setThrottle(loco, self.speeds[loco][0], self.speeds[loco][1])
@@ -1182,7 +1238,7 @@ class TrainTrackerPanel(wx.Panel):
 		at = self.atl.getTrainByPosition(tx)
 		if at is None:
 			return
-		if self.trainOrder.isExtraTrain(at.tid):
+		if self.trainSchedule.isExtraTrain(at.tid):
 			phrase  = "list of extra trains."	
 		else:
 			phrase = "top of the schedule."
@@ -1196,7 +1252,7 @@ class TrainTrackerPanel(wx.Panel):
 
 		self.atl.delTrain(tx)
 
-		if self.trainOrder.isExtraTrain(at.tid):
+		if self.trainSchedule.isExtraTrain(at.tid):
 			self.setExtraTrains()
 		else:
 			self.pendingTrains = [at.tid] + self.pendingTrains
@@ -1231,6 +1287,10 @@ class TrainTrackerPanel(wx.Panel):
 		dlg.Destroy()
 		if rc == wx.ID_CANCEL:
 			return
+		
+		req = {"advice": {"msg": "Train %s has completed" % at.tid}}
+		self.Request(req)
+
 
 		mins = int(at.time / 60)
 		secs = at.time % 60
@@ -1417,10 +1477,8 @@ class TrainTrackerPanel(wx.Panel):
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			newSelEngs = dlg.getValues()
-			print("newsel = %s" % str(newSelEngs))
 			
 		if dlg.IsReloadNeeded():
-			print("reloading")
 			self.loadEngineerFile(os.path.join(os.getcwd(), "data", "engineers", "engineers.txt"), preserveActive=True)
 
 		dlg.Destroy()
@@ -1440,7 +1498,7 @@ class TrainTrackerPanel(wx.Panel):
 		self.selectedEngineers = [x for x in self.idleEngineers] + [x for x in busyEngineers if x in availableEngineers]
 
 	def onAssignLocos(self, _):
-		order = [x for x in self.trainOrder]
+		order = [x for x in self.trainSchedule]
 		dlg = AssignLocosDlg(self, self.trainRoster, order, self.extraTrains, self.locos)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
@@ -1451,7 +1509,7 @@ class TrainTrackerPanel(wx.Panel):
 		if rc != wx.ID_OK:
 			return
 		
-		for tid in list(self.trainOrder) + self.extraTrains:
+		for tid in list(self.trainSchedule) + self.extraTrains:
 			tinfo = self.trainRoster.getTrain(tid)
 			if tinfo["loco"] != result[tid]:
 				tinfo["loco"] = result[tid]
@@ -1470,7 +1528,7 @@ class TrainTrackerPanel(wx.Panel):
 		self.report.StatusReport(self.atl, self.completedTrains)
 			
 	def onReportTrainCards(self, _):
-		self.report.TrainCards(self.trainRoster, self.extraTrains, self.trainOrder)
+		self.report.TrainCards(self.trainRoster, self.extraTrains, self.trainSchedule)
 		
 	def onSaveData(self, _):
 		saveData(self, self.settings)

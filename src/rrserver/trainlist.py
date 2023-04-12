@@ -60,12 +60,22 @@ class TrainList(wx.ListCtrl):
 				if loco:
 					self.trains[train]["loco"] = loco
 			else:
-				self.trains[train] = {"blocks": [block], "loco": loco, "atc": False}
+				self.trains[train] = {"blocks": [block], "loco": loco, "atc": False, "signal": None, "aspect": 0}
 				self.order.append(train)
 				self.SetItemCount(len(self.order))
 				
 			tx = self.order.index(train)
 			self.RefreshItem(tx)
+			
+	def UpdateSignal(self, train, signal, aspect):
+		if train not in self.trains:
+			return 
+		
+		self.trains[train]["signal"] = signal
+		self.trains[train]["aspect"] = int(aspect)
+		tx = self.order.index(train)
+		self.RefreshItem(tx)
+		
 
 	def FindTrainInBlock(self, block):
 		for tr, trinfo in self.trains.items():
@@ -113,8 +123,17 @@ class TrainList(wx.ListCtrl):
 			if train is None or train == tr:
 				loco = trinfo["loco"]
 				blocks = trinfo["blocks"]
+				if len(blocks) == 0:
+					frontblock = None
+				else:
+					frontblock = blocks[-1]
 				atc = trinfo["atc"]
+				signal = trinfo["signal"]
+				aspect = "%d" % trinfo["aspect"]
 				clist = []
 				for b in blocks:
 					clist.append({"block": b, "name": tr, "loco": loco, "atc": atc})
 				yield({"settrain": clist})
+				yield({"trainsignal": {"train": tr, "block": frontblock, "signal": signal, "aspect": aspect}})
+				
+				

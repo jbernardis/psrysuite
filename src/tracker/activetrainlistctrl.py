@@ -1,5 +1,6 @@
 import wx
 import os
+from pickle import NONE
 
 MENU_REMOVE_TRAIN    = 1100
 MENU_CHANGE_ENGINEER = 1101
@@ -297,7 +298,10 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 				return ""
 			else:
 				try:
-					return at.ldesc["desc"]
+					if at.ldesc["desc"] is None:
+						return ""
+					else:
+						return at.ldesc["desc"]
 				except:
 					return ""
 		elif col == 7:
