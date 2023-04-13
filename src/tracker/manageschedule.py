@@ -69,7 +69,7 @@ class ChooseScheduleDlg(wx.Dialog):
 		
 
 class ManageScheduleDlg(wx.Dialog):
-	def __init__(self, parent, currentSchedule, currentScheduleName, alltrains, settings):
+	def __init__(self, parent, currentScheduleName, currentSchedule, alltrains, settings):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		
@@ -439,6 +439,14 @@ class ManageScheduleDlg(wx.Dialog):
 		return [os.path.splitext(os.path.split(x)[1])[0] for x in glob(fxp)]
 	
 	def bLoadPressed(self, _):
+		if self.modified:
+			dlg = wx.MessageDialog(self, 'Train schedule has been changed\nLoading a new file will lose these changes.\nPress "Yes" to proceed and lose changes,\nor "No" to return and save them.',
+								'Changes will be lost', wx.YES_NO | wx.ICON_WARNING)
+			rc = dlg.ShowModal()
+			dlg.Destroy()
+			if rc != wx.ID_YES:
+				return
+			
 		dlg = ChooseScheduleDlg(self, self.getSchedFiles(), False)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
@@ -454,6 +462,8 @@ class ManageScheduleDlg(wx.Dialog):
 		sched = Schedule()
 		if not sched.load(path):
 			return 
+		
+		self.setModified(False)
 
 		#determine if schedule references trains than are not in alltrains
 		oTrains = sched.getSchedule()
@@ -488,7 +498,13 @@ class ManageScheduleDlg(wx.Dialog):
 
 	def bOKPressed(self, _):
 		if self.modified:
-			self.doSave()
+			dlg = wx.MessageDialog(self, 'Train schedule has been changed\nPress "Yes" to exit and lose changes,\nor "No" to return and save them.',
+								'Changes will be lost', wx.YES_NO | wx.ICON_WARNING)
+			rc = dlg.ShowModal()
+			dlg.Destroy()
+			if rc != wx.ID_YES:
+				return
+			
 		self.EndModal(wx.ID_OK)
 		
 	def bSavePressed(self, _):		
@@ -531,7 +547,7 @@ class ManageScheduleDlg(wx.Dialog):
 		
 	def doCancel(self):
 		if self.modified:
-			dlg = wx.MessageDialog(self, 'Train order has been changed\nPress "Yes" to exit and lose changes,\nor "No" to return and save them.',
+			dlg = wx.MessageDialog(self, 'Train schedule has been changed\nPress "Yes" to exit and lose changes,\nor "No" to return and save them.',
 								'Changes will be lost', wx.YES_NO | wx.ICON_WARNING)
 			rc = dlg.ShowModal()
 			dlg.Destroy()

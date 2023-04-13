@@ -1,7 +1,6 @@
 import os
 import sys
 import wx
-import wx.lib.gizmos as gizmos
 
 from wx.lib import newevent
 from serial import SerialException
@@ -23,7 +22,6 @@ from tracker.rrserver import RRServer
 from tracker.trainroster import TrainRoster
 from tracker.locomotives import Locomotives
 from tracker.engineers import Engineers
-from tracker.schedule import Schedule
 from tracker.activetrain import ActiveTrain
 from tracker.activetrainlist import ActiveTrainList, FWD_128, FWD_28, REV_128, REV_28, STOP 
 from tracker.activetrainlistctrl import ActiveTrainListCtrl
@@ -40,7 +38,6 @@ from tracker.completedtrains import CompletedTrains
 from tracker.listener import Listener
 from tracker.backup import saveData, restoreData
 from tracker.dccsniffer import DCCSniffer
-from tracker.optionsdlg import OptionsDlg
 from tracker.engqueuedlg import EngQueueDlg
 
 # class dummyDCCEvt:
@@ -68,7 +65,6 @@ MENU_REPORT_LOCOS = 303
 MENU_REPORT_STATUS = 304
 MENU_DISPATCH_CONNECT = 401
 MENU_DISPATCH_DISCONNECT = 402
-MENU_DISPATCH_RESET = 405
 MENU_DCC_CONNECT = 501
 MENU_DCC_DISCONNECT = 502
 MENU_DCC_SETUPPORT = 503
@@ -217,11 +213,6 @@ class MainFrame(wx.Frame):
 		self.menuDispatch.Append(i)
 		self.menuDispatch.Enable(MENU_DISPATCH_DISCONNECT, False)
 		
-		self.menuDispatch.AppendSeparator()
-		
-		i = wx.MenuItem(self.menuDispatch, MENU_DISPATCH_RESET, "Reset Connection", helpString="Reset connection to dispatcher")
-		self.menuDispatch.Append(i)
-		
 		self.menuDCC = wx.Menu()
 		
 		i = wx.MenuItem(self.menuDCC, MENU_DCC_CONNECT, "Connect", helpString="Connect to DCC Sniffer")
@@ -279,7 +270,6 @@ class MainFrame(wx.Frame):
 		
 		self.Bind(wx.EVT_MENU, self.panel.connectToDispatch, id=MENU_DISPATCH_CONNECT)
 		self.Bind(wx.EVT_MENU, self.panel.disconnectFromDispatch, id=MENU_DISPATCH_DISCONNECT)
-		self.Bind(wx.EVT_MENU, self.panel.resetConnection, id=MENU_DISPATCH_RESET)
 		
 		self.Bind(wx.EVT_MENU, self.panel.onConnectSnifferPressed, id=MENU_DCC_CONNECT)
 		self.Bind(wx.EVT_MENU, self.panel.onDisconnectSnifferPressed, id=MENU_DCC_DISCONNECT)
@@ -659,13 +649,17 @@ class TrainTrackerPanel(wx.Panel):
 		if rc != wx.ID_YES:
 			return
 
-		self.idleEngineers = [t for t in self.selectedEngineers]
-		self.updateEngQueue()
 		self.completedTrains.clear()
 		self.completedTrainList.update()
-		self.loadEngineerFile(os.path.join(os.getcwd(), "data", "engineers", "engineers.txt"), preserveActive=True)
-		self.loadOrderFile(os.path.join(self.settings.orderdir, self.settings.orderfile))
+		
+		self.idleEngineers = [x for x in self.selectedEngineers]
+		
+		self.pendingTrains = [t for t in self.scheduledTrains]
+		self.extraTrains = sorted([t for t in self.extraScheduleTrains])
+		self.setTrainSchedule(preserveActive=False)
 		self.setExtraTrains()
+
+		self.updateEngQueue()
 		
 	def connectToDispatch(self, _):
 		self.setConnected(False)
@@ -781,19 +775,6 @@ class TrainTrackerPanel(wx.Panel):
 		
 	def disconnectFromDispatch(self, _):
 		self.listener.kill()
-		
-	def resetConnection(self, _):
-		dlg = wx.MessageDialog(self, 'This will sever the connection to the dispatcher program\nand should only be used to recover from error situations.\n\nPress "Yes" to proceed, or "No" to cancel.',
-								'Reset Dispatcher Connection', wx.YES_NO | wx.ICON_WARNING)
-		rc = dlg.ShowModal()
-		dlg.Destroy()
-		if rc != wx.ID_YES:
-			return
-
-		if self.listener is not None:
-			self.listener.kill(skipDisconnect=True)
-			self.listener = None
-		self.socketDisconnect()
 		
 	def setupDCCtty(self, _):
 		dlg = wx.TextEntryDialog(self, 'Enter/Modify COM port for DCC', 'COM Port', self.settings.dccsnifferport)
@@ -1460,11 +1441,11 @@ class TrainTrackerPanel(wx.Panel):
 		if rc != wx.ID_OK:
 			return
 
-		norder = self.trainSchedule.getSchedule()
-		nextra = self.trainSchedule.getExtras()
+		self.scheduledTrains = self.trainSchedule.getSchedule()
+		self.extraScheduleTrains = self.trainSchedule.getExtras()
 		
-		self.pendingTrains = [t for t in norder if not self.atl.hasTrain(t) and t not in self.completedTrains]
-		self.extraTrains = sorted([t for t in nextra])
+		self.pendingTrains = [t for t in self.scheduledTrains if not self.atl.hasTrain(t) and t not in self.completedTrains]
+		self.extraTrains = sorted([t for t in self.extraScheduleTrains])
 		self.setTrainSchedule(preserveActive=True)
 		self.setExtraTrains()
 		

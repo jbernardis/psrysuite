@@ -42,7 +42,6 @@ class Shore(District):
 		ix = self.AddInputs(["S20.E", "SOSW", "SOSE", "S11.W"], BlockInput, District.block, ix)
 		ix = self.AddSubBlocks("S11", ["S11A", "S11B"], ix)
 		ix = self.AddInputs(["S11.E", "H30.W"], BlockInput, District.block, ix)
-		#ix = self.AddInputs(["S11.E", "S21", "H30.W"], BlockInput, District.block, ix)
 		ix = self.AddSubBlocks("H30", ["H30A", "H30B"], ix)
 		ix = self.AddInputs(["H10.W"], BlockInput, District.block, ix)
 		ix = self.AddSubBlocks("H10", ["H10A", "H10B"], ix)

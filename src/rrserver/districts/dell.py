@@ -42,7 +42,6 @@ class Dell(District):
 		ix = self.AddInputs(["D21.E", "DOSFOW", "DOSFOE", "S10.W"], BlockInput, District.block, ix)
 		ix = self.AddSubBlocks("S10", ["S10A", "S10B", "S10C"], ix)
 		ix = self.AddInputs(["S10.E"], BlockInput, District.block, ix)
-		#ix = self.AddSubBlocks("R10", ["R10A", "R10B", "R10C"], ix)
 		ix = self.AddInputs(["R11", "R12"], BlockInput, District.block, ix)
 
 		ix = self.AddInputs(toNames+hsNames, TurnoutInput, District.turnout, ix)

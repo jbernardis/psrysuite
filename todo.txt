@@ -8,18 +8,45 @@ how to use wos1norm in yard
 
 do we really need a separate cliff fleet checkbox?  And what is port fleeting if we have no control over port
 
+
+
+verify signal lever functionality and signal indicators for nassau/port/cliff/yard
+
+verify the correct sequencing of subblocks
+    D11: D11A, D11B
+    D21: D21A, D21B
+    S10: S10A, S10B, S10C
+    S11: S11A, S11B
+    S20: S20A, S20B, S20C
+    R10: R10A, R10B, R10C
+    H10: H10A, H10B
+    H30: H30A, H30B
+
+
+
+
+
 Train Edit
-  change len via start dlg box
+  change train length via start dlg box
   when determining order of sub-blocks need to reverse one of the two places in gen sim logic
     
 relocate edit train dlg to lower screen position, to the left of popups
+also location of popups when triple wide
 get the correct anchor location for a triple wide display
 
-
-incorporate traintracker - move trains and locos admin outside the scope of tt
 
 add configuration changes to editor or add a separate configurator
 
 config button - either always generate the layout file, or do it from rrserver via a request - that way the request could come from anywhere - like the editor/configurator
 
 check the order of signal definitions in port routes - had to change for P20P21 route - after doing this, regenerate the layout file and determine if trains/arscripts/simscripts needs to be updated
+
+tracker:
+	backup/restore
+	remove DCC configuration menu
+	activate DCC functionality
+	reports
+	verify sorting of atl
+	menu items enabled or not based on connectivity/schedule loaded
+	icons - do a better job
+	legend dialog box
