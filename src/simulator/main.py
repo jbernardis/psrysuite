@@ -5,6 +5,12 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
+ofp = open("simulator.out", "w")
+efp = open("simulator.err", "w")
+
+sys.stdout = ofp
+sys.stderr = efp
+
 try:
 	os.mkdir(os.path.join(os.getcwd(), "logs"))
 except FileExistsError:

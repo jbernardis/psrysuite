@@ -6,6 +6,12 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
+ofp = open("atc.out", "w")
+efp = open("atc.err", "w")
+
+sys.stdout = ofp
+sys.stderr = efp
+
 import logging
 logging.basicConfig(filename=os.path.join("logs", "atc.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
@@ -731,13 +737,6 @@ class App(wx.App):
 		self.frame = MainFrame()
 		self.frame.Hide()
 		return True
-
-
-ofp = open("atc.out", "w")
-efp = open("atc.err", "w")
-
-sys.stdout = ofp
-sys.stderr = efp
 
 
 app = App(False)

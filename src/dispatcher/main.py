@@ -4,23 +4,19 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
+ofp = open("dispatcher.out", "w")
+efp = open("dispatcher.err", "w")
+
+sys.stdout = ofp
+sys.stderr = efp
+
 try:
 	os.mkdir(os.path.join(os.getcwd(), "logs"))
 except FileExistsError:
 	pass
 
-DEVELOPMODE = True
-
 import logging
 logging.basicConfig(filename=os.path.join("logs", "dispatch.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
-
-
-ofp = open("dispatcher.out", "w")
-efp = open("dispatcher.err", "w")
-
-if not DEVELOPMODE:
-	sys.stdout = ofp
-	sys.stderr = efp
 
 from dispatcher.mainframe import MainFrame 
 

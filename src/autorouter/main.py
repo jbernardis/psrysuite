@@ -4,6 +4,12 @@ import os, sys
 cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
+	
+ofp = open("autorouter.out", "w")
+efp = open("autorouter.err", "w")
+
+sys.stdout = ofp
+sys.stderr = efp
 
 import logging
 logging.basicConfig(filename=os.path.join("logs", "autorouter.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
@@ -441,15 +447,6 @@ class MainUnit:
 	def Request(self, req):
 		logging.info("Outgoing request: %s" % json.dumps(req))
 		self.rrServer.SendRequest(req)
-
-
-
-# ofp = open("ar.out", "w")
-# efp = open("ar.err", "w")
-#
-# sys.stdout = ofp
-# sys.stderr = efp
-
 
 main = MainUnit()
 main.run()

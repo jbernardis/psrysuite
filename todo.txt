@@ -24,6 +24,8 @@ verify the correct sequencing of subblocks
 
 
 
+installer - icons for everything, integrate with configurator for setting up different configurations
+
 
 
 Train Edit

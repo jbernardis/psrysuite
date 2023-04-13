@@ -9,14 +9,11 @@ import logging
 from dispatcher.breaker import BreakerName
 logging.basicConfig(filename=os.path.join("logs", "tracker.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
-PRODUCTION = False
+ofp = open("tracker.out", "w")
+efp = open("tracker.err", "w")
 
-if PRODUCTION:
-	ofp = open("tracker.out", "w")
-	efp = open("tracker.err", "w")
-
-	sys.stdout = ofp
-	sys.stderr = efp
+sys.stdout = ofp
+sys.stderr = efp
 
 from tracker.rrserver import RRServer
 from tracker.trainroster import TrainRoster

@@ -4,8 +4,13 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-from throttle.mainframe import MainFrame 
+ofp = open("throttle.out", "w")
+efp = open("throttle.err", "w")
 
+sys.stdout = ofp
+sys.stderr = efp
+
+from throttle.mainframe import MainFrame 
 
 class App(wx.App):
 	def OnInit(self):

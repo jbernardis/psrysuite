@@ -4,8 +4,13 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-from tester.mainframe import MainFrame 
+ofp = open("tester.out", "w")
+efp = open("tester.err", "w")
 
+sys.stdout = ofp
+sys.stderr = efp
+
+from tester.mainframe import MainFrame 
 
 class App(wx.App):
 	def OnInit(self):

@@ -4,8 +4,13 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-from traineditor.mainframe import MainFrame 
+ofp = open("trainedit.out", "w")
+efp = open("trainedit.err", "w")
 
+sys.stdout = ofp
+sys.stderr = efp
+
+from traineditor.mainframe import MainFrame 
 
 class App(wx.App):
 	def OnInit(self):
