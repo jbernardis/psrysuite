@@ -64,12 +64,9 @@ MENU_DISPATCH_CONNECT = 401
 MENU_DISPATCH_DISCONNECT = 402
 MENU_DCC_CONNECT = 501
 MENU_DCC_DISCONNECT = 502
-MENU_DCC_SETUPPORT = 503
-MENU_DCC_SETUPBAUD = 504
 MENU_VIEW_ENG_QUEUE = 601
 MENU_VIEW_ACTIVE_TRAINS = 602
 MENU_VIEW_LEGEND = 603
-MENU_VIEW_SHOWATTENTION = 604
 MENU_VIEW_SORT = 610
 MENU_SORT_TID = 650
 MENU_SORT_TIME = 651
@@ -94,21 +91,20 @@ class MainFrame(wx.Frame):
 	def __init__(self):
 		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE)
 		self.Bind(wx.EVT_CLOSE, self.onClose)
+		
+		self.titleSched = None
+		self.titleConnected = False
+		self.titleDCC = False
 
 		icon = wx.Icon()
-		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "traintracker.ico"), wx.BITMAP_TYPE_ANY))
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "tracker.ico"), wx.BITMAP_TYPE_ANY))
 		self.SetIcon(icon)
 
 		self.CreateStatusBar()
 		menuBar = wx.MenuBar()
 		
-		self.trainfile = None
-		self.orderfile = None
-		self.engineerfile = None
-		self.locofile = None
 		self.connection = None
 		self.dcc = None
-		self.sessionsched = None
 
 		self.menuFile = wx.Menu()
 		
@@ -162,22 +158,18 @@ class MainFrame(wx.Frame):
 		i = wx.MenuItem(self.menuView, MENU_VIEW_ACTIVE_TRAINS, "Active Train List", helpString="Display Active Train List")
 		self.menuView.Append(i)
 
-		i = wx.MenuItem(self.menuView, MENU_VIEW_SHOWATTENTION, "High-light Trains", helpString="Show High-lighting on trains that need attention", kind=wx.ITEM_CHECK)
-		self.menuView.Append(i)
-		i.Check(True)
-
 		i = wx.MenuItem(self.menuView, MENU_VIEW_LEGEND, "Legend", helpString="Display a legend for icons")
 		self.menuView.Append(i)
 		
 		self.menuManage = wx.Menu()
 		
-		i = wx.MenuItem(self.menuManage, MENU_MANAGE_SCHEDULE, "Train Schedule", helpString="Add/remove/reorder trains to/from the schedule and extra train list")
-		self.menuManage.Append(i)
-		
 		i = wx.MenuItem(self.menuManage, MENU_MANAGE_ENGINEERS, "Engineers", helpString="Manage the content and ordering of active engineers list")
 		self.menuManage.Append(i)
 		
 		self.menuManage.AppendSeparator()
+		
+		i = wx.MenuItem(self.menuManage, MENU_MANAGE_SCHEDULE, "Train Schedule", helpString="Add/remove/reorder trains to/from the schedule and extra train list")
+		self.menuManage.Append(i)
 		
 		i = wx.MenuItem(self.menuManage, MENU_MANAGE_ASSIGN_LOCOS, "Assign Locomotives", helpString="Assign locomotives to trains")
 		self.menuManage.Append(i)
@@ -218,14 +210,6 @@ class MainFrame(wx.Frame):
 		i = wx.MenuItem(self.menuDCC, MENU_DCC_DISCONNECT, "Disconnect", helpString="Disconnect from DCC Sniffer")
 		self.menuDCC.Append(i)
 		self.menuDCC.Enable(MENU_DCC_DISCONNECT, False)
-		
-		self.menuDCC.AppendSeparator()
-		
-		i = wx.MenuItem(self.menuDCC, MENU_DCC_SETUPPORT, "Configure DCC Port Name", helpString="Configure DCC Port Name")
-		self.menuDCC.Append(i)
-		
-		i = wx.MenuItem(self.menuDCC, MENU_DCC_SETUPBAUD, "Configure DCC Baud Rate", helpString="Configure DCC Baud Rate")
-		self.menuDCC.Append(i)
 
 		menuBar.Append(self.menuFile, "File")
 		menuBar.Append(self.menuView, "View")
@@ -248,7 +232,6 @@ class MainFrame(wx.Frame):
 		
 		self.Bind(wx.EVT_MENU, self.panel.onViewEngQueue, id=MENU_VIEW_ENG_QUEUE)
 		self.Bind(wx.EVT_MENU, self.panel.onViewActiveTrains, id=MENU_VIEW_ACTIVE_TRAINS)
-		self.Bind(wx.EVT_MENU, self.panel.onViewHiLite, id=MENU_VIEW_SHOWATTENTION)
 		self.Bind(wx.EVT_MENU, self.panel.onViewLegend, id=MENU_VIEW_LEGEND)
 		self.Bind(wx.EVT_MENU, self.panel.onChangeSort, id=MENU_SORT_TID)	
 		self.Bind(wx.EVT_MENU, self.panel.onChangeSort, id=MENU_SORT_TIME)		
@@ -270,8 +253,6 @@ class MainFrame(wx.Frame):
 		
 		self.Bind(wx.EVT_MENU, self.panel.onConnectSnifferPressed, id=MENU_DCC_CONNECT)
 		self.Bind(wx.EVT_MENU, self.panel.onDisconnectSnifferPressed, id=MENU_DCC_DISCONNECT)
-		self.Bind(wx.EVT_MENU, self.panel.setupDCCtty, id=MENU_DCC_SETUPPORT)
-		self.Bind(wx.EVT_MENU, self.panel.setupDCCBaud, id=MENU_DCC_SETUPBAUD)
 		
 		sizer.AddSpacer(100)
 		self.SetSizer(sizer)
@@ -280,10 +261,29 @@ class MainFrame(wx.Frame):
 		
 		self.enableForConnection(False)
 		
-	def setTitle(self, schedule=None):
-		title = "Train Tracker"
+	def setTitle(self, schedule=None, connected=None, dcc=None):
 		if schedule is not None:
+			self.titleSched = schedule
+			
+		if connected is not None:
+			self.titleConnected = connected
+			
+		if dcc is not None:
+			self.titleDCC = dcc
+			
+		title = "Train Tracker"
+		if self.titleSched is not None:
 			title += ("   Schedule: %s" % schedule)
+			
+		if self.titleConnected:
+			title += "    Connected to server"
+		else:
+			title += "    Not Connected to server"
+			
+		if self.titleDCC:
+			title += "    Connected to DCC"
+		else:
+			title += "    Not Connected to DCC"
 			
 		self.SetTitle(title)
 		
@@ -583,28 +583,24 @@ class TrainTrackerPanel(wx.Panel):
 		self.splash()
 		
 		self.settings = Settings(self)
-		self.atl.setTimingThresholds(unstarted=self.settings.unstartedthreshold, stopped=self.settings.stoppedthreshold)
 		
 		self.completedTrains.clear()
 		self.completedTrainList.update()
 
-		self.loadEngineerFile(os.path.join(os.getcwd(), "data", "engineers", "engineers.txt"))
-		self.parent.setTitle()
+		self.loadEngineerFile(os.path.join(os.getcwd(), "data", "engineers.txt"))
 		
 		self.report = Report(self, self.settings)
 		if not self.report.Initialized():
 			self.parent.disableReports()
 
-		#self.setBreakerValue("All OK")
-		#self.setClockValue("")
 		self.setExtraTrains()
-		self.parent.setTitle()
 		
 		self.atl.addDisplay("main", self.lcActiveTrains)
 		
 		self.Bind(wx.EVT_TIMER, self.onTicker)
 		self.ticker = wx.Timer(self)
 		self.ticker.Start(1000)
+		logging.info("Tracker initialization completed")
 		
 	def ShowBreakers(self):
 		self.tripped = [name for name in self.breakers if self.breakers[name] == 0]
@@ -646,6 +642,7 @@ class TrainTrackerPanel(wx.Panel):
 		if rc != wx.ID_YES:
 			return
 
+		logging.info("resetting session")
 		self.completedTrains.clear()
 		self.completedTrainList.update()
 		
@@ -660,6 +657,7 @@ class TrainTrackerPanel(wx.Panel):
 		
 	def connectToDispatch(self, _):
 		self.setConnected(False)
+		logging.info("connecting to server")
 
 		self.RRServer = RRServer()
 		self.RRServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
@@ -684,10 +682,8 @@ class TrainTrackerPanel(wx.Panel):
 
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
-			#logging.info("Dispatch: %s: %s" % (cmd, parms))
-			if cmd == "turnout":
-				pass
-			elif cmd == "breaker":
+			if  cmd == "breaker":
+				logging.info("breaker: %s" % parms)
 				for p in parms:
 					brkName = p["name"]
 					brkVal = p["value"]
@@ -710,6 +706,7 @@ class TrainTrackerPanel(wx.Panel):
 					wx.QueueEvent(self, evt)
 			
 			elif cmd == "settrain":
+				logging.info("settrain: %s" % parms)
 				for p in parms:
 					try:
 						train = p["name"]
@@ -740,6 +737,7 @@ class TrainTrackerPanel(wx.Panel):
 				self.updateActiveListLocos()
 								
 			elif cmd == "trainsignal":
+				logging.info("trainsignal: %s" % parms)
 				try:
 					train = parms["train"]
 				except:
@@ -768,38 +766,13 @@ class TrainTrackerPanel(wx.Panel):
 	
 	def setConnected(self, flag=True):
 		self.connected = flag
+		logging.info("Server connection: %s" % str(flag))
 		self.parent.enableForConnection(flag)
+		self.parent.setTitle(connected=flag)
 		
 	def disconnectFromDispatch(self, _):
 		self.listener.kill()
-		
-	def setupDCCtty(self, _):
-		dlg = wx.TextEntryDialog(self, 'Enter/Modify COM port for DCC', 'COM Port', self.settings.dccsnifferport)
-		rc = dlg.ShowModal()
-		if rc == wx.ID_OK:
-			newPort = dlg.GetValue()
-
-		dlg.Destroy()
-		
-		if rc != wx.ID_OK:
-			return
-		
-		self.settings.dccsnifferport = newPort
-		self.settings.setModified()
-		
-	def setupDCCBaud(self, _):
-		dlg = wx.TextEntryDialog(self, 'Enter/Modify DCC Sniffer Baud rate', 'Baud Rate', "%d" % self.settings.dccsnifferbaud)
-		rc = dlg.ShowModal()
-		if rc == wx.ID_OK:
-			newBaud = dlg.GetValue()
-
-		dlg.Destroy()
-		
-		if rc != wx.ID_OK:
-			return
-		
-		self.settings.dccsnifferbaud = int(newBaud)
-		self.settings.setModified()
+		self.setConnected(False)
 
 	def onViewEngQueue(self, _):
 		if self.dlgEngQueue is None:
@@ -834,12 +807,6 @@ class TrainTrackerPanel(wx.Panel):
 		
 		self.dlgActiveTrains.Destroy()
 		self.dlgActiveTrains = None
-
-	def onViewHiLite(self, _):
-		if self.parent.menuView.FindItemById(MENU_VIEW_SHOWATTENTION).IsChecked():
-			self.lcActiveTrains.setShowAttention(True)
-		else:
-			self.lcActiveTrains.setShowAttention(False)
 
 	def onViewLegend(self, _):
 		if self.dlgLegend is None:
@@ -989,6 +956,8 @@ class TrainTrackerPanel(wx.Panel):
 		if rc != wx.ID_YES:
 			return
 		
+		logging.info("removing engineer: %s" % self.selectedEngineer)
+		
 		self.idleEngineers.remove(self.selectedEngineer)
 		self.updateEngQueue()
 		self.selectedEngineers.remove(self.selectedEngineer)
@@ -1030,6 +999,7 @@ class TrainTrackerPanel(wx.Panel):
 		if rc != wx.ID_YES:
 			return
 
+		logging.info("Train %s assigned to %s" % (tid, eng))
 		req = {"advice": {"msg": "Train %s assigned to %s" % (tid, eng)}}
 		self.Request(req)
 		
@@ -1117,7 +1087,7 @@ class TrainTrackerPanel(wx.Panel):
 		if rc != wx.ID_OK:
 			dlg.Destroy()
 			return
-		
+				
 		if at.engineer in self.selectedEngineers:
 			if at.engineer not in self.idleEngineers:
 				self.idleEngineers.append(at.engineer)
@@ -1146,6 +1116,8 @@ class TrainTrackerPanel(wx.Panel):
 
 		oeng = at.engineer	
 		tid = at.tid	
+		logging.info("Reassigning train %s from %s to %s" % (tid, oeng, neng))
+		
 		self.atl.setNewEngineer(tid, neng)
 		
 	def onAbout(self, _):
@@ -1186,6 +1158,8 @@ class TrainTrackerPanel(wx.Panel):
 		dlg.Destroy()
 		if rc == wx.ID_CANCEL:
 			return
+		
+		logging.info("Removing train %s from schedule" % self.selectedTrain)
 		
 		self.pendingTrains.remove(self.selectedTrain)
 		self.chTrain.SetItems(self.pendingTrains)
@@ -1277,6 +1251,8 @@ class TrainTrackerPanel(wx.Panel):
 		self.completedTrainList.update()
 		self.atl.delTrain(tx)
 		
+		logging.log("Train %s has completed" % at.tid)
+		
 		if self.trainSchedule.isExtraTrain(at.tid):
 			self.setExtraTrains()
 		
@@ -1313,6 +1289,8 @@ class TrainTrackerPanel(wx.Panel):
 		
 		if rc != wx.ID_OK:
 			return
+		
+		logging.info("changing locomotive for train %s to %s" % (at.tid, lid))
 		
 		desc = self.locos.getLoco(lid)
 		self.atl.updateTrain(at.tid, lid, desc, None)
@@ -1457,7 +1435,7 @@ class TrainTrackerPanel(wx.Panel):
 			newSelEngs = dlg.getValues()
 			
 		if dlg.IsReloadNeeded():
-			self.loadEngineerFile(os.path.join(os.getcwd(), "data", "engineers", "engineers.txt"), preserveActive=True)
+			self.loadEngineerFile(os.path.join(os.getcwd(), "data", "engineers.txt"), preserveActive=True)
 
 		dlg.Destroy()
 		if rc != wx.ID_OK:
@@ -1517,9 +1495,10 @@ class TrainTrackerPanel(wx.Panel):
 	def onConnectSnifferPressed(self, _):
 		self.connectSniffer()
 
-	def connectSniffer(self):		
+	def connectSniffer(self):	
+		print("connect to sniffer")	
 		self.sniffer = DCCSniffer()
-		self.sniffer.bind(self.DCCMessage, self.DCCClosed, self.DCCLog)
+		self.sniffer.bind(self.DCCMessage, self.DCCClosed)
 
 		try:
 			self.sniffer.connect(self.settings.dccsnifferport, self.settings.dccsnifferbaud, 1)
@@ -1535,7 +1514,7 @@ class TrainTrackerPanel(wx.Panel):
 		if self.sniffer:
 			self.parent.setTitle(dcc="DCC Connected(%s)" % self.settings.dccsnifferport)
 		else:
-			self.parent.setTitle(dcc="DCC Not Connected")
+			self.parent.setTitle(dcc=True)
 
 	def onDisconnectSnifferPressed(self, _):
 		self.disconnectSniffer()
@@ -1552,7 +1531,7 @@ class TrainTrackerPanel(wx.Panel):
 		
 		self.sniffer = None
 		self.enableDCCDisconnect(False)
-		self.parent.setTitle(dcc="DCC Not Connected")
+		self.parent.setTitle(dcc=False)
 		
 	def enableDCCDisconnect(self, flag=True):
 		self.parent.menuDCC.Enable(MENU_DCC_DISCONNECT, flag)
@@ -1637,15 +1616,14 @@ class LegendDlg(wx.Dialog):
 		self.idxEmpty = self.il.Add(empty)
 		self.idxRed = self.il.Add(self.imageRed)
 		self.idxGreen = self.il.Add(self.imageGreen)
+		self.idxRedGreen = self.il.Add(self.imageRedGreen)
 		self.idxYellow = self.il.Add(self.imageYellow)
-		self.idxStopped = self.il.Add(self.imageStopped)
-		self.idxNotStarted = self.il.Add(self.imageNotStarted)
 		text = [
 			[ self.idxGreen,      "Train is operating at correct speed or lower" ],
 			[ self.idxYellow,     "Train is moving, Signal speed limit is unknown" ],
-			[ self.idxRed,        "Train is traveling too fast for current signal" ],
-			[ self.idxStopped,    "Train is stopped" ],
-			[ self.idxNotStarted, "Train has not started since being assigned" ]
+			[ self.idxRedGreen,   "Train is traveling too fast for current signal" ],
+			[ self.idxRed,        "Train is stopped" ],
+			[ self.idxEmpty,      "Train has not started since being assigned" ]
 		]
 
 		textFont = wx.Font(wx.Font(10, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.NORMAL, faceName="Arial"))
@@ -1683,26 +1661,29 @@ class LegendDlg(wx.Dialog):
 		self.Destroy()	
 
 	def loadImages(self):
-		png = wx.Image("trainRed.png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		fn = os.path.join(os.getcwd(), "images", "atlRed.png")
+		png = wx.Image(fn, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
 		mask = wx.Mask(png, wx.BLUE)
 		png.SetMask(mask)
 		self.imageRed = png
-		png = wx.Image("trainGreen.png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		
+		fn = os.path.join(os.getcwd(), "images", "atlGreen.png")
+		png = wx.Image(fn, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
 		mask = wx.Mask(png, wx.BLUE)
 		png.SetMask(mask)
 		self.imageGreen = png
-		png = wx.Image("trainYellow.png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		
+		fn = os.path.join(os.getcwd(), "images", "atlRedGreen.png")
+		png = wx.Image(fn, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(png, wx.BLUE)
+		png.SetMask(mask)
+		self.imageRedGreen = png
+		
+		fn = os.path.join(os.getcwd(), "images", "atlYellow.png")
+		png = wx.Image(fn, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
 		mask = wx.Mask(png, wx.BLUE)
 		png.SetMask(mask)
 		self.imageYellow = png
-		png = wx.Image("trainStopped.png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-		mask = wx.Mask(png, wx.BLUE)
-		png.SetMask(mask)
-		self.imageStopped = png
-		png = wx.Image("trainNotStarted.png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-		mask = wx.Mask(png, wx.BLUE)
-		png.SetMask(mask)
-		self.imageNotStarted = png
 
 	def makeBlank(self):
 		empty = wx.Bitmap(16,16,32)

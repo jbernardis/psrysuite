@@ -32,11 +32,6 @@ Train Edit
   change train length via start dlg box
   when determining order of sub-blocks need to reverse one of the two places in gen sim logic
     
-relocate edit train dlg to lower screen position, to the left of popups
-also location of popups when triple wide
-get the correct anchor location for a triple wide display
-
-
 add configuration changes to editor or add a separate configurator
 
 config button - either always generate the layout file, or do it from rrserver via a request - that way the request could come from anywhere - like the editor/configurator
@@ -45,10 +40,5 @@ check the order of signal definitions in port routes - had to change for P20P21 
 
 tracker:
 	backup/restore
-	remove DCC configuration menu
 	activate DCC functionality
 	reports
-	verify sorting of atl
-	menu items enabled or not based on connectivity/schedule loaded
-	icons - do a better job
-	legend dialog box

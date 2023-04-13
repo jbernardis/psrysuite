@@ -1,17 +1,5 @@
 import wx
 
-TB_UPPERLEFT = 0
-TB_UPPERRIGHT = 1
-TB_LOWERLEFT = 2
-TB_LOWERRIGHT = 3
-TB_CENTER = 4
-TB_UPPERCENTER = 5
-TB_LOWERCENTER = 6
-TB_CENTERLEFT = 7
-TB_CENTERRIGHT = 8
-
-locString = ["ul", "ur", "ll", "lr", "c", "uc", "lc", "cl", "cr"]
-
 TB_DEFAULT_STYLE = 0x2008002
 TB_CAPTION = 0x22009806
 
@@ -40,22 +28,11 @@ class Toaster(wx.Frame):
 	def SetTextColour(self, color):
 		self.lb.SetForegroundColour(color)
 		
-	def SetPositionByCorner(self, pos):
+	def SetPosition(self, xoffset):
 		w, h = wx.GetDisplaySize()
 		
-		if pos in [TB_UPPERLEFT, TB_CENTERLEFT, TB_LOWERLEFT]:
-			px = 0
-		elif pos in [TB_UPPERCENTER, TB_CENTER, TB_LOWERCENTER]:
-			px = (w-self.size[0])/2
-		else:
-			px = w-self.size[0]
-			
-		if pos in [TB_UPPERLEFT, TB_UPPERCENTER, TB_UPPERRIGHT]:
-			py = 0
-		elif pos in [TB_CENTERLEFT, TB_CENTER, TB_CENTERRIGHT]:
-			py = (h-self.size[1])/2+150
-		else:
-			py = h-self.size[1]
+		px = (w-self.size[0])/2-xoffset
+		py = (h-self.size[1])/2+150
 
 		self.SetPosition(wx.Point(int(px), int(py)))
 			

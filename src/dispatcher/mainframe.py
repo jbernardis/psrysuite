@@ -17,7 +17,7 @@ from dispatcher.tile import loadTiles
 from dispatcher.train import Train
 
 from dispatcher.breaker import BreakerDisplay, BreakerName
-from dispatcher.toaster import Toaster, TB_CENTER
+from dispatcher.toaster import Toaster
 from dispatcher.listdlg import ListDlg
 from dispatcher.delayedrequest import DelayedRequests
 
@@ -38,9 +38,6 @@ from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg
-
-HOMEX1 = -2560
-HOMEX3 = 0
 
 MENU_ATC_REMOVE = 900
 MENU_ATC_STOP   = 901
@@ -231,10 +228,7 @@ class MainFrame(wx.Frame):
 	def ResetScreen(self):
 		self.SetMaxSize((self.totalw, self.totalh))
 		self.SetSize((self.totalw, self.totalh))
-		if self.settings.pages == 3:
-			self.SetPosition((HOMEX3, 0))
-		else:
-			self.SetPosition((HOMEX1, 0))
+		self.SetPosition((-self.centerOffset, 0))
 		
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})
@@ -432,13 +426,13 @@ class MainFrame(wx.Frame):
 				atcExec = os.path.join(os.getcwd(), "atc", "main.py")
 				self.pidATC = Popen([sys.executable, atcExec]).pid
 				logging.debug("atc server started as PID %d" % self.pidATC)
-				self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": self.centerOffset+1600, "y": 31}}
+				self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": 1600, "y": 31}}
 				wx.CallLater(750, self.sendPendingATCShow)
 			else:
-				self.Request( {"atc": {"action": ["show"], "x": self.centerOffset+1600, "y": 31}})
+				self.Request( {"atc": {"action": ["show"], "x": 1600, "y": 31}})
 
 		else:
-			self.Request({"atc": { "action": "hide", "x": self.centerOffset+1600, "y": 31}})
+			self.Request({"atc": { "action": "hide", "x": 1600, "y": 31}})
 
 	def OnCBAdvisor(self, evt):
 		self.AdvisorEnabled = self.cbAdvisor.IsChecked()
@@ -900,7 +894,7 @@ class MainFrame(wx.Frame):
 						oldName, oldLoco = tr.GetNameAndLoco()
 						oldATC = tr.IsOnATC() if self.IsDispatcher() else False
 						oldAR = tr.IsOnAR() if self.IsDispatcher() else False
-						dlgx = int(self.centerw - 500)
+						dlgx = int(self.centerw - 500)-self.centerOffset
 						dlgy = int(self.centerh + 50)
 						dlg = EditTrainDlg(self, tr, self.locoList, self.trainList, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, dlgx, dlgy)
 						dlg.SetPosition((self.centerw, self.centerh))
@@ -1060,13 +1054,13 @@ class MainFrame(wx.Frame):
 
 	def ToasterSetup(self):
 		self.events = Toaster()
-		self.events.SetPositionByCorner(TB_CENTER)
+		self.events.SetPosition(self.centerOffset)
 		self.events.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
 		self.events.SetBackgroundColour(wx.Colour(255, 179, 154))
 		self.events.SetTextColour(wx.Colour(0, 0, 0))
 		
 		self.advice = Toaster()
-		self.advice.SetPositionByCorner(TB_CENTER)
+		self.advice.SetPosition(self.centerOffset)
 		self.advice.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
 		self.advice.SetBackgroundColour(wx.Colour(120, 255, 154))
 		self.advice.SetTextColour(wx.Colour(0, 0, 0))

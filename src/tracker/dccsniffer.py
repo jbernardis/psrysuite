@@ -1,5 +1,6 @@
 import threading
 import serial
+import logging
 
 class DCCSniffer(threading.Thread):
 	def __init__(self):
@@ -11,12 +12,10 @@ class DCCSniffer(threading.Thread):
 		self.endOfLife = False
 		self.cbDCCMessage = None
 		self.cbClosed = None
-		self.cbLog = None
 		
-	def bind(self, cbDCCMessage, cbClosed, cbLog):
+	def bind(self, cbDCCMessage, cbClosed):
 		self.cbDCCMessage = cbDCCMessage
 		self.cbClosed = cbClosed
-		self.cbLog = cbLog
 
 	def connect(self, tty, baud, timeout):
 		self.tty = tty
@@ -51,8 +50,7 @@ class DCCSniffer(threading.Thread):
 						try:
 							s = str(c, 'UTF-8')
 						except:
-							if callable(self.cbLog):
-								self.cbLog("unable to convert DCC message to string: (" + s + ")")
+							logging.info("unable to convert DCC message to string: (" + s + ")")
 						else:
 							self.cbDCCMessage(s.split())
 
@@ -64,7 +62,6 @@ class DCCSniffer(threading.Thread):
 		self.endOfLife = True
 		if callable(self.cbClosed):
 			self.cbClosed()
-		if callable(self.cbLog):
-			self.cbLog("DCC sniffer thread ended execution")
+		logging.info("DCC sniffer thread ended execution")
 
 

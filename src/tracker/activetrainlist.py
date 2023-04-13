@@ -10,14 +10,11 @@ class ActiveTrainList:
 		self.trains = {}
 		self.order = []
 		self.displays = {}
-		self.unstartedthreshold = 600
-		self.stoppedthreshold = 120
 		
 	def addDisplay(self, tag, lc):
 		self.displays[tag] = lc
 		lc.setAtl(self)
 		lc.setSortHeaders(self.sortKey, self.sortGroupDir, self.sortAscending)
-		lc.setTimingThresholds(unstarted = self.unstartedthreshold, stopped=self.stoppedthreshold)		
 		
 	def removeDisplay(self, tag):
 		try:
@@ -148,15 +145,6 @@ class ActiveTrainList:
 					self.refreshDisplays(tx)
 				return
 
-	def setTimingThresholds(self, unstarted=None, stopped=None):
-		if stopped is not None:
-			self.stoppedthreshold = stopped
-		if unstarted is not None:
-			self.unstartedthreshold = unstarted
-
-		for lc in self.displays.values():
-			lc.setTimingThresholds(unstarted=unstarted, stopped=stopped)		
-		
 	def hasTrain(self, tid):
 		return tid in self.order
 	

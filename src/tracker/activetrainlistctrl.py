@@ -1,6 +1,5 @@
 import wx
 import os
-from pickle import NONE
 
 MENU_REMOVE_TRAIN    = 1100
 MENU_CHANGE_ENGINEER = 1101
@@ -24,9 +23,6 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 		
 		self.atl = None
 		self.altFlag = False
-		self.unstartedthreshold = 600
-		self.stoppedthreshold = 120
-		self.showAttentionAtributes = True
 		
 		self.InsertColumn(0, "Train")
 		self.InsertColumn(1, "Origin")
@@ -66,14 +62,6 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 		self.hilite = wx.ItemAttr()
 		self.hilite.SetBackgroundColour(wx.Colour(0, 116, 232))
 		self.hilite.SetTextColour(wx.Colour(255, 255, 255))
-		
-		self.attentionA = wx.ItemAttr()
-		self.attentionA.SetBackgroundColour(wx.Colour(0, 0, 0))
-		self.attentionA.SetTextColour(wx.Colour(255, 255, 255))
-
-		self.attentionB = wx.ItemAttr()
-		self.attentionB.SetTextColour(wx.Colour(255, 255, 255))
-		self.attentionB.SetBackgroundColour(wx.Colour(255, 10, 10))
 
 		self.loadImages()		
 		self.il = wx.ImageList(16, 16)
@@ -82,8 +70,6 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 		self.idxRed = self.il.Add(self.imageRed)
 		self.idxGreen = self.il.Add(self.imageGreen)
 		self.idxYellow = self.il.Add(self.imageYellow)
-		self.idxStopped = self.il.Add(self.imageStopped)
-		self.idxNotStarted = self.il.Add(self.imageNotStarted)
 		self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 		
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected)
@@ -96,21 +82,12 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 	def setAtl(self, atl):
 		self.atl = atl
 		self.refreshItemCount()
-
-	def setTimingThresholds(self, unstarted=None, stopped=None):
-		if unstarted is not None:
-			self.unstartedthreshold = unstarted
-		if stopped is not None:
-			self.stoppedthreshold = stopped
 		
 	def refreshItemCount(self):
 		self.SetItemCount(self.atl.count())	
 
 	def ticker(self):
 		self.altFlag = not self.altFlag
-
-	def setShowAttention(self, flag=True):
-		self.showAttentionAtributes = flag
 		
 	def refreshAll(self):
 		self.refreshItemCount()
@@ -127,35 +104,23 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 		return empty
 	
 	def loadImages(self):
-		fn = os.path.join(os.getcwd(), "images", "trainRed.png")
+		fn = os.path.join(os.getcwd(), "images", "atlRed.png")
 		png = wx.Image(fn, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
 		mask = wx.Mask(png, wx.BLUE)
 		png.SetMask(mask)
 		self.imageRed = png
 		
-		fn = os.path.join(os.getcwd(), "images", "trainGreen.png")
+		fn = os.path.join(os.getcwd(), "images", "atlGreen.png")
 		png = wx.Image(fn, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
 		mask = wx.Mask(png, wx.BLUE)
 		png.SetMask(mask)
 		self.imageGreen = png
 		
-		fn = os.path.join(os.getcwd(), "images", "trainYellow.png")
+		fn = os.path.join(os.getcwd(), "images", "atlYellow.png")
 		png = wx.Image(fn, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
 		mask = wx.Mask(png, wx.BLUE)
 		png.SetMask(mask)
 		self.imageYellow = png
-		
-		fn = os.path.join(os.getcwd(), "images", "trainStopped.png")
-		png = wx.Image(fn, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-		mask = wx.Mask(png, wx.BLUE)
-		png.SetMask(mask)
-		self.imageStopped = png
-		
-		fn = os.path.join(os.getcwd(), "images", "trainNotStarted.png")
-		png = wx.Image(fn, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-		mask = wx.Mask(png, wx.BLUE)
-		png.SetMask(mask)
-		self.imageNotStarted = png
 		
 	def onRightClick(self, evt):
 		self.itemSelected = self.GetFirstSelected()
@@ -251,16 +216,19 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 			return self.idxEmpty
 
 		if not at.hasStarted:
-			return self.idxNotStarted
+			return self.idxEmpty
 		
 		if at.throttle is None:
 			return self.idxEmpty
 
 		if at.speed == 0:
-			return self.idxStopped
+			return self.idxRed
 		
 		if at.limit is None:
-			return self.idxYellow
+			if self.altFlag:
+				return self.idxRed
+			else:
+				return self.idxGreen
 		
 		if at.speed > at.limit:
 			return self.idxRed
@@ -332,19 +300,6 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 		hilite = at.highlight > 0
 		if hilite:
 			return self.hilite
-
-		if self.showAttentionAtributes:
-			if not at.hasStarted and at.time > self.unstartedthreshold:
-				if self.altFlag:
-					return self.attentionA
-				else:
-					return self.attentionB
-
-			if at.stopTime is not None and at.stopTime > self.stoppedthreshold:
-				if self.altFlag:
-					return self.attentionA
-				else:
-					return self.attentionB
 
 		if at.engineer == "ATC":
 			if item % 2 == 1:

@@ -385,7 +385,7 @@ class ManageEngineersDlg(wx.Dialog):
 		self.stCountActive.SetLabel("(%d Active)" % cActive)
 
 	def bSavePressed(self, _):
-		fn = os.path.join(os.getcwd(), "data", "engineers", "engineers.txt")
+		fn = os.path.join(os.getcwd(), "data", "engineers.txt")
 		with open(fn, "w") as ofp:
 			for ln in self.allEngs:
 				ofp.write("%s\n" % ln)
