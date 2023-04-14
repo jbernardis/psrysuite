@@ -1,4 +1,5 @@
 import logging
+import json
 
 from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, BLOCK, OVERSWITCH, STOPPINGBLOCK, MAIN, STOP
 
@@ -13,18 +14,23 @@ class Route:
 		self.blkout = blkout
 		self.rtype = [x for x in rtype]
 		self.turnouts = [x.split(":") for x in turnouts]
+		print("define route %s, turnouts = (%s)" % (name, str(self.turnouts)))
 		self.signals = [x for x in signals]
 
 	def GetDefinition(self):
 		msg = {
 			"name": self.name,
 			"os":   self.osblk.GetName(),
-			"ends": [self.blkin, self.blkout],
+			"ends": ["-" if self.blkin is None else self.blkin, "" if self.blkout is None else self.blkout],
 			"signals":
 				[x for x in self.signals],
 			"turnouts":
 				["%s:%s" % (x[0], x[1]) for x in self.turnouts]
 		}
+		
+		if self.name.startswith("NRtN60"):
+			print("===================get definition")
+			print(json.dumps(msg, indent=2))
 		return msg
 
 	def GetName(self):
@@ -733,7 +739,7 @@ class OverSwitch (Block):
 			}
 		}
 		if self.route is not None:
-			msg["setroute"]["ends"] = self.route.GetEndPoints()
+			msg["setroute"]["ends"] = ["-" if e is None else e for e in self.route.GetEndPoints()]
 			msg["setroute"]["signals"] = self.route.GetSignals()
 		self.frame.Request(msg)
 

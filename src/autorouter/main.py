@@ -151,7 +151,7 @@ class MainUnit:
 				elif cmd == "routedef":
 					name = parms["name"]
 					os = parms["os"]
-					ends = parms["ends"]
+					ends = [None if e == "-" else e for e in parms["ends"]]
 					signals = parms["signals"]
 					turnouts = parms["turnouts"]
 					if os not in self.osList:

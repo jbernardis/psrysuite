@@ -2,6 +2,8 @@ import wx
 import logging
 from rrserver.rrobjects import BlockInput, SubBlockInput
 
+import traceback
+
 
 class RadioDlg (wx.Dialog):
 	def __init__(self, parent, title, choices, value):
@@ -349,6 +351,7 @@ class District(wx.Panel):
 
 	def AddInputs(self, ilist, iclass, itype, ix=0):
 		for iname in ilist:
+			print("add inputs %s" % iname, flush=True)
 			ic = iclass(iname, self)
 			self.rr.AddInput(ic, self, itype)
 			self.ilist.InsertItem(ix, iname)
@@ -364,6 +367,8 @@ class District(wx.Panel):
 				self.ilist.SetItem(ix, 1, "0")
 			self.ilist.SetItem(ix, 2, District.typeLabels[itype])
 			self.inputMap[iname] = (ix, ic, itype)
+			if iname == "S11":
+				print("adding S11 to input map for district %s" % str(self), flush=True)
 			ix += 1
 		return ix
 
@@ -380,6 +385,7 @@ class District(wx.Panel):
 		try:
 			ix, ic, dtype = self.inputMap[iname]
 		except KeyError:
+			traceback.print_stack()
 			logging.warning("Input for %s in district %s not found" % (iname, self.name))
 			return
 		

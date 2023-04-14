@@ -314,14 +314,6 @@ class Port(District):
 				self.rr.GetInput("PA34.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				release = getBit(inb[7], 3)
 				self.rr.GetInput("parelease").SetState(release)  # Port A Release switch
-				
-				
-				
-				
-		self.rr.GetInput("PA4.lvr").SetState(leverState(1, 0, 0))	
-		
-		
-		
 		
 		if self.sendIO:
 			self.rr.ShowText("PrtA", PORTA, otext, itext, 0, 3)

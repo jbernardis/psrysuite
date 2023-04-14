@@ -327,7 +327,7 @@ class MainFrame(wx.Frame):
 					blknm = p["block"]
 					rte = p["route"]
 					try:
-						ends = p["ends"]
+						ends = [None if e == "-" else e for e in p["ends"]]
 					except KeyError:
 						ends = None
 					self.routes[blknm] = [rte, ends]

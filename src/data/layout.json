@@ -541,7 +541,7 @@
       "sbwest": "P11.W"
     },
     "P2": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -691,7 +691,7 @@
       "sbwest": null
     },
     "POSSP5": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -699,6 +699,16 @@
       "east": 0,
       "sbeast": null,
       "sbwest": "R10.W"
+    },
+    "R11": {
+      "east": 1,
+      "sbeast": null,
+      "sbwest": null
+    },
+    "R12": {
+      "east": 1,
+      "sbeast": null,
+      "sbwest": null
     },
     "S10": {
       "east": 0,
@@ -6460,7 +6470,7 @@
         ],
         [
           "SSw9",
-          "N"
+          "R"
         ]
       ]
     },
@@ -6568,7 +6578,7 @@
         ],
         [
           "SSw9",
-          "R"
+          "N"
         ]
       ]
     },
@@ -6626,7 +6636,7 @@
         ],
         [
           "SSw9",
-          "N"
+          "R"
         ]
       ]
     },
@@ -6734,7 +6744,7 @@
         ],
         [
           "SSw9",
-          "R"
+          "N"
         ]
       ]
     },

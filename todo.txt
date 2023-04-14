@@ -40,5 +40,4 @@ check the order of signal definitions in port routes - had to change for P20P21 
 
 tracker:
 	backup/restore
-	activate DCC functionality
 	reports

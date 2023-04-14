@@ -3,11 +3,11 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("rrserver.out", "w")
-efp = open("rrserver.err", "w")
-
-sys.stdout = ofp
-sys.stderr = efp
+# ofp = open("rrserver.out", "w")
+# efp = open("rrserver.err", "w")
+#
+# sys.stdout = ofp
+# sys.stderr = efp
 
 try:
 	os.mkdir(os.path.join(os.getcwd(), "logs"))
@@ -225,6 +225,53 @@ class MainFrame(wx.Frame):
 			addrList = self.clientList.GetFunctionAddress(cname)
 			for addr, _ in addrList:
 				self.socketServer.deleteSocket(addr)
+				
+	def generateLayoutFile(self):
+		routes = {}
+		for rte in self.routeDefs.values():
+			r = rte.FormatRoute()["routedef"]
+			tos = [t.split(":") for t in r["turnouts"]]
+			routes[r["name"]] = {"os": r["os"], "ends": r["ends"], "signals": r["signals"], "turnouts": tos}
+
+		subblocks = self.rr.GetSubBlockInfo()
+		sbList = []
+		for sbl in subblocks.values():
+			sbList.extend(sbl)
+			
+		print("SB List = %s" % str(sbList), flush=True)
+			
+		blks = self.rr.GetBlockInfo()
+		blocks = {}
+		for bnm, bdir in blks:
+			if bnm in sbList:
+				continue
+			
+			if bnm.endswith(".W") or bnm.endswith(".E"):
+				sb = bnm[-1]
+				bnm = bnm[:-2]
+			else:
+				sb = None
+				
+			if bnm not in blocks:
+				blocks[bnm] = {"east": 0, "sbeast": None, "sbwest": None}
+				
+			if sb == "W":
+				blocks[bnm]["sbwest"] = ("%s.W" % bnm)
+			elif sb == "E":
+				blocks[bnm]["sbeast"] = ("%s.E" % bnm)
+			else:
+				blocks[bnm]["east"] = bdir
+
+		# include definitions for pseudo blocks
+		blocks["K10"] =       { "east": 0, "sbeast": None, "sbwest": None }
+		blocks["KOSN10S11"] = { "east": 0, "sbeast": None, "sbwest": None }
+		blocks["KOSN20S21"] = { "east": 1, "sbeast": None, "sbwest": None }
+				
+		subblocks = self.rr.GetSubBlockInfo()
+			
+		layout = {"routes": routes, "blocks": blocks, "subblocks": subblocks}
+		with open(os.path.join(os.getcwd(), "data", "layout.json"), "w") as jfp:
+			json.dump(layout, jfp, sort_keys=True, indent=2)
 
 
 	def refreshClient(self, addr, skt):
@@ -280,6 +327,14 @@ class MainFrame(wx.Frame):
 			self.socketServer.sendToAll(resp)
 			self.rr.SetAspect(signame, aspect)
 
+		elif verb == "genlayout":
+			addrList = self.clientList.GetFunctionAddress("DISPATCH")
+			if len(addrList) == 0:
+				logging.error("Cannot generate layout information until dispatcher has connected")
+			else:
+				self.generateLayoutFile()
+				logging.info("Layout file has been generated")
+			
 		elif verb == "signallock":
 			signame = evt.data["name"][0]
 			status = int(evt.data["status"][0])
@@ -484,7 +539,7 @@ class MainFrame(wx.Frame):
 				signals = None
 			else:
 				try:
-					ends = evt.data["ends"][0:2]
+					ends = [None if e == "-" else e for e in evt.data["ends"][0:2]]
 				except (IndexError, KeyError):
 					ends = None
 				try:
@@ -495,7 +550,7 @@ class MainFrame(wx.Frame):
 			self.rr.SetOSRoute(blknm, route, ends, signals)
 			resp = {"setroute": [{ "block": blknm, "route": route}]}
 			if ends is not None:
-				resp["setroute"][0]["ends"] = ends
+				resp["setroute"][0]["ends"] = ["-" if e is None else e for e in ends]
 			if signals is not None:
 				resp["setroute"][0]["signals"] = signals
 
@@ -551,8 +606,12 @@ class MainFrame(wx.Frame):
 				turnouts = evt.data["turnouts"]
 			except KeyError:
 				turnouts = []
+			try:
+				ends = [None if e == "-" else e for e in evt.data["ends"]]
+			except KeyError:
+				ends = [None, None]
 
-			self.routeDefs[name] = (RouteDef(name, evt.data["os"][0], evt.data["ends"], signals, turnouts))
+			self.routeDefs[name] = (RouteDef(name, evt.data["os"][0], ends, signals, turnouts))
 			
 		elif verb == "identify":
 			sid = int(evt.data["SID"][0])

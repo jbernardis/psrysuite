@@ -28,7 +28,7 @@ class Toaster(wx.Frame):
 	def SetTextColour(self, color):
 		self.lb.SetForegroundColour(color)
 		
-	def SetPosition(self, xoffset):
+	def SetXOffset(self, xoffset):
 		w, h = wx.GetDisplaySize()
 		
 		px = (w-self.size[0])/2-xoffset

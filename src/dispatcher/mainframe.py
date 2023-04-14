@@ -95,7 +95,6 @@ class MainFrame(wx.Frame):
 		self.delayedRequests = DelayedRequests()
 
 		self.title = "PSRY Dispatcher" if self.settings.dispatch else "PSRY Monitor"
-		self.ToasterSetup()
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.bitmaps = BitMaps(os.path.join(os.getcwd(), "data", "bitmaps"))
 		singlePage = self.settings.pages == 1
@@ -136,6 +135,8 @@ class MainFrame(wx.Frame):
 			totalw = 2560+20
 			self.centerOffset = 0
 
+		self.ToasterSetup()
+
 		if self.settings.showcameras:
 			self.DrawCameras()
 
@@ -162,13 +163,6 @@ class MainFrame(wx.Frame):
 		self.serverHidden = self.settings.serverhidden
 		if not self.IsDispatcher():
 			self.bServerHide.Hide()
-
-		self.bLayout = wx.Button(self, wx.ID_ANY, "Layout", pos=(self.centerOffset+10, 75), size=BTNDIM)
-		self.Bind(wx.EVT_BUTTON, self.OnLayout, self.bLayout)
-		self.bLayout.Enable(False)
-		
-		if not self.IsDispatcher() or self.settings.hidelayoutbutton:
-			self.bLayout.Hide()
 
 		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Trains", pos=(self.centerOffset+250, 25), size=BTNDIM)
 		self.bLoadTrains.Enable(False)
@@ -1054,13 +1048,13 @@ class MainFrame(wx.Frame):
 
 	def ToasterSetup(self):
 		self.events = Toaster()
-		self.events.SetPosition(self.centerOffset)
+		self.events.SetXOffset(self.centerOffset)
 		self.events.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
 		self.events.SetBackgroundColour(wx.Colour(255, 179, 154))
 		self.events.SetTextColour(wx.Colour(0, 0, 0))
 		
 		self.advice = Toaster()
-		self.advice.SetPosition(self.centerOffset)
+		self.advice.SetXOffset(self.centerOffset)
 		self.advice.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
 		self.advice.SetBackgroundColour(wx.Colour(120, 255, 154))
 		self.advice.SetTextColour(wx.Colour(0, 0, 0))
@@ -1093,7 +1087,6 @@ class MainFrame(wx.Frame):
 			self.bSubscribe.SetLabel("Connect")
 			self.bRefresh.Enable(False)
 			self.bServerHide.Enable(False)
-			self.bLayout.Enable(False)
 			self.bLoadTrains.Enable(False)
 			self.bLoadLocos.Enable(False)
 			self.bSaveTrains.Enable(False)
@@ -1115,7 +1108,6 @@ class MainFrame(wx.Frame):
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
 			self.bServerHide.Enable(True)
-			self.bLayout.Enable(True)
 			self.bLoadTrains.Enable(True)
 			self.bLoadLocos.Enable(True)
 			self.bSaveTrains.Enable(True)
@@ -1150,11 +1142,6 @@ class MainFrame(wx.Frame):
 		
 	def DoRefresh(self):
 		self.Request({"refresh": {"SID": self.sessionid}})
-		
-	def OnLayout(self, _):	
-		# this request kicks off the gathering of layout information - this file is generated locally (in the data directory), but
-		# must be copied to the data directory on the main railroad server machine	
-		self.Request({"refresh": {"type": "subblocks", "SID": self.sessionid}})
 
 	def raiseDeliveryEvent(self, data): # thread context
 		try:
@@ -1449,16 +1436,6 @@ class MainFrame(wx.Frame):
 					self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 				elif parms["type"] == "trains":
 					pass
-				
-			elif cmd == "subblocks":
-				# parms contains subblocks information
-				if self.settings.dispatch:
-					self.districts.GenerateLayoutInformation(parms)
-			
-					dlg = wx.MessageDialog(self, "File 'layout.json' has been created in the local 'data' directory.\nMake sure to copy this file to the 'data' directory on the main server computer.",
-			               "File 'layout.json' created", wx.OK | wx.ICON_INFORMATION)
-					dlg.ShowModal()
-					dlg.Destroy()
 					
 			elif cmd == "advice":
 				self.PopupAdvice(parms["msg"][0])
@@ -1508,6 +1485,8 @@ class MainFrame(wx.Frame):
 
 	def Request(self, req):
 		command = list(req.keys())[0]
+		if command == "routedef":
+			print(str(req))
 		if self.settings.dispatch or command in allowedCommands:
 			
 			if self.subscribed:
@@ -1541,7 +1520,6 @@ class MainFrame(wx.Frame):
 		self.bSubscribe.SetLabel("Connect")
 		self.bRefresh.Enable(False)
 		self.bServerHide.Enable(False)
-		self.bLayout.Enable(False)
 		self.bLoadTrains.Enable(False)
 		self.bLoadLocos.Enable(False)
 		self.bSaveTrains.Enable(False)

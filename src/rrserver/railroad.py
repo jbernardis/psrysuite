@@ -13,6 +13,8 @@ from rrserver.districts.cliveden import Cliveden
 from rrserver.districts.cliff import Cliff
 from rrserver.districts.port import Port
 
+from rrserver.district import District
+
 
 class Railroad(wx.Notebook):
 	def __init__(self, frame, cbEvent, settings):
@@ -133,6 +135,8 @@ class Railroad(wx.Notebook):
 			return
 
 		self.inputs[iname] = [iput, district, itype]
+		if iname == "S11":
+			print("adding input S11 to %s as %d" % (str(district), itype))
 
 	def GetOutput(self, oname):
 		try:
@@ -178,7 +182,7 @@ class Railroad(wx.Notebook):
 			ends = rtinfo[1]
 			m = {"setroute": [{ "block": osblk, "route": str(rt)}]}
 			if ends is not None:
-				m["setroute"][0]["ends"] = ends
+				m["setroute"][0]["ends"] = ["-" if e is None else e for e in ends]
 			yield m
 
 		for signm, flag in self.fleetedSignals.items():
@@ -356,10 +360,17 @@ class Railroad(wx.Notebook):
 			self.cbEvent(event)
 		
 		self.pendingEvents = []
+		
+	def GetBlockInfo(self):
+		blocks = []
+		for iput, district, itype in self.inputs.values():
+			if itype == District.block:				
+				blocks.append([iput.GetName(), 1 if iput.GetEast() else 0])
+		return sorted(blocks)
 
 	def GetSubBlockInfo(self):
 		subblocks = {}
 		for iput, district, itype in self.inputs.values():
-			if itype == district.block:
+			if itype == District.block:
 				subblocks.update(iput.ToJson())
 		return subblocks
