@@ -375,38 +375,66 @@ class MainFrame(wx.Frame):
 			return
 		if name == "nassau":
 			self.rbNassauControl.SetSelection(value)
+			self.cbNassauFleet.Enable(value != 0)
+			
 		elif name == "cliff":
 			self.rbCliffControl.SetSelection(value)
+			
 		elif name == "yard":
 			self.rbYardControl.SetSelection(value)
+			self.cbYardFleet.Enable(value != 0)
+			
 		elif name == "signal4":
 			self.rbS4Control.SetSelection(value)
+			
 		elif name == "cliff.fleet":
 			self.cbCliffFleet.SetValue(value != 0)
+			
 		elif name == "port.fleet":
 			self.cbPortFleet.SetValue(value != 0)
+			
 		elif name == "hyde.fleet":
-			self.cbHydeFleet.SetValue(value != 0)
+			self.cbHydeFleet.SetValue(value != 0)			
+			f = 1 if value != 0 else 0
+			for signm in self.HydeFleetSignals:
+				self.Request({"fleet": { "name": signm, "value": f}})
+			
 		elif name == "yard.fleet":
 			self.cbYardFleet.SetValue(value != 0)
+			f = 1 if value != 0 else 0
+			for signm in self.YardFleetSignals:
+				self.Request({"fleet": { "name": signm, "value": f}})			
+			
 		elif name == "latham.fleet":
 			self.cbLathamFleet.SetValue(value != 0)
+			
 		elif name == "shore.fleet":
 			self.cbShoreFleet.SetValue(value != 0)
+			
 		elif name == "hydejct.fleet":
 			self.cbHydeJctFleet.SetValue(value != 0)
+			
 		elif name == "krulish.fleet":
 			self.cbKrulishFleet.SetValue(value != 0)
+			
 		elif name == "nassau.fleet":
 			self.cbNassauFleet.SetValue(value != 0)
+			f = 1 if value != 0 else 0
+			for signm in self.NassauFleetSignals:
+				self.Request({"fleet": { "name": signm, "value": f}})			
+			
 		elif name == "bank.fleet":
 			self.cbBankFleet.SetValue(value != 0)
+			
 		elif name == "cliveden.fleet":
 			self.cbClivedenFleet.SetValue(value != 0)
+			
 		elif name == "carlton.fleet":
 			self.cbCarltonFleet.SetValue(value != 0)
+			
 		elif name == "foss.fleet":
 			self.cbFossFleet.SetValue(value != 0)
+			
 		elif name == "valleyjct.fleet":
 			self.cbValleyJctFleet.SetValue(value != 0)
 
@@ -455,7 +483,9 @@ class MainFrame(wx.Frame):
 		self.Request({"control": { "name": "cliff", "value": evt.GetInt()}})
 
 	def OnRBYard(self, evt):
-		self.Request({"control": { "name": "yard", "value": evt.GetInt()}})
+		ctl = evt.GetInt()
+		self.cbYardFleet.Enable(ctl != 0)
+		self.Request({"control": { "name": "yard", "value": ctl}})
 
 	def OnRBS4(self, evt):
 		self.Request({"control": { "name": "signal4", "value": evt.GetInt()}})
@@ -1498,8 +1528,6 @@ class MainFrame(wx.Frame):
 
 	def Request(self, req):
 		command = list(req.keys())[0]
-		if command == "routedef":
-			print(str(req))
 		if self.settings.dispatch or command in allowedCommands:
 			
 			if self.subscribed:

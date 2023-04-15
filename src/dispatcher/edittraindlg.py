@@ -1,5 +1,7 @@
 import wx
 
+MAXSTEPS = 9
+
 class EditTrainDlg(wx.Dialog):
 	def __init__(self, parent, train, locos, trains, atcFlag, arFlag, dx, dy):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details", pos=(dx, dy))
@@ -16,6 +18,7 @@ class EditTrainDlg(wx.Dialog):
 		ar = train.IsOnAR()
 		
 		self.locos = locos
+		self.trains = trains
 		
 		locoList  = sorted(list(locos.keys()), key=self.BuildLocoKey)
 		trainList = sorted(list(trains.keys()))
@@ -59,12 +62,8 @@ class EditTrainDlg(wx.Dialog):
 		hsz.AddSpacer(10)
 		hsz.Add(self.cbLocoID)
 		vsz.Add(hsz)
-		
-		self.stDescr = wx.StaticText(self, wx.ID_ANY, "", size=(300, -1))
-		self.stDescr.SetFont(font)
-		vsz.AddSpacer(20)
-		vsz.Add(self.stDescr)
 
+		vsz.AddSpacer(20)
 		if self.atcFlag or self.arFlag:
 			hsz = wx.BoxSizer(wx.HORIZONTAL)
 			
@@ -85,7 +84,25 @@ class EditTrainDlg(wx.Dialog):
 				
 			vsz.AddSpacer(20)
 			vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vsz.AddSpacer(20)
+		self.stDescr = wx.StaticText(self, wx.ID_ANY, "", size=(600, -1))
+		self.stDescr.SetFont(font)		
+		vsz.Add(self.stDescr)
+			
+		vsz.AddSpacer(20)
+		self.stFlags = wx.StaticText(self, wx.ID_ANY, "", size=(600, -1))
+		self.stFlags.SetFont(font)
+		vsz.Add(self.stFlags)
 
+		vsz.AddSpacer(20)
+		self.stTrainInfo = []
+		for _ in range(MAXSTEPS):
+			st = wx.StaticText(self, wx.ID_ANY, "", size=(600, -1))
+			st.SetFont(font)
+			vsz.Add(st)
+			self.stTrainInfo.append(st)
+			
 		vsz.AddSpacer(30)
 
 		bsz = wx.BoxSizer(wx.HORIZONTAL)
@@ -114,13 +131,14 @@ class EditTrainDlg(wx.Dialog):
 		self.Layout()
 		self.Fit()
 		
-		self.ShowLocoDesc()
+		self.ShowTrainLocoDesc()
 
 	def BuildLocoKey(self, lid):
 		return int(lid)
 		
 	def OnLocoChoice(self, evt):
 		self.chosenLoco = evt.GetString()
+		self.ShowTrainLocoDesc()
 
 	def OnLocoText(self, evt):
 		lid = evt.GetString()
@@ -133,18 +151,12 @@ class EditTrainDlg(wx.Dialog):
 			self.cbLocoID.SetInsertionPoint(pos)
 			
 		self.chosenLoco = lid
-		self.ShowLocoDesc()
+		self.ShowTrainLocoDesc()
 		evt.Skip()
 		
 	def OnTrainChoice(self, evt):
 		self.chosenTrain = evt.GetString()
-		self.ShowLocoDesc()
-
-	def ShowLocoDesc(self):
-		if self.chosenLoco in self.locos and self.locos[self.chosenLoco]["desc"] != None:
-			self.stDescr.SetLabel(self.locos[self.chosenLoco]["desc"])
-		else:
-			self.stDescr.SetLabel("")
+		self.ShowTrainLocoDesc()
 
 	def OnTrainText(self, evt):
 		nm = evt.GetString().upper()
@@ -152,7 +164,33 @@ class EditTrainDlg(wx.Dialog):
 		self.cbTrainID.ChangeValue(nm)
 		self.cbTrainID.SetInsertionPoint(pos)
 		self.chosenTrain = nm
+		self.ShowTrainLocoDesc()
 		evt.Skip()
+
+	def ShowTrainLocoDesc(self):
+		if self.chosenLoco in self.locos and self.locos[self.chosenLoco]["desc"] != None:
+			self.stDescr.SetLabel(self.locos[self.chosenLoco]["desc"])
+		else:
+			self.stDescr.SetLabel("")
+			
+		if self.chosenTrain in self.trains:
+			tr = self.trains[self.chosenTrain]
+			track = tr["tracker"]
+			for lx in range(MAXSTEPS):
+				if lx >= len(track):
+					self.stTrainInfo[lx].SetLabel("")
+				else:
+					self.stTrainInfo[lx].SetLabel("%-12.12s  %-4.4s  %s" % (track[lx][0], "(%d)" % track[lx][2], track[lx][1]))
+					
+			details = "Eastbound" if tr["eastbound"] else "Westbound"
+			if tr["cutoff"]:
+				details += " via cutoff"
+			self.stFlags.SetLabel(details)
+			
+		else:
+			for st in self.stTrainInfo:
+				st.SetLabel("")
+			self.stFlags.SetLabel("")
 
 	def onCancel(self, _):
 		self.EndModal(wx.ID_CANCEL)

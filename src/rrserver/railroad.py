@@ -137,8 +137,6 @@ class Railroad(wx.Notebook):
 			return
 
 		self.inputs[iname] = [iput, district, itype]
-		if iname == "S11":
-			print("adding input S11 to %s as %d" % (str(district), itype))
 
 	def GetOutput(self, oname):
 		try:

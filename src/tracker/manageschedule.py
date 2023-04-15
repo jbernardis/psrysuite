@@ -488,7 +488,7 @@ class ManageScheduleDlg(wx.Dialog):
 			oNew = [t for t in oTrains if t in self.allTrains]
 			eNew = [t for t in eTrains if t in self.allTrains]
 
-			sched.setNewOrder(oNew)
+			sched.setNewSchedule(oNew)
 			sched.setNewExtras(eNew)
 			self.setModified()
 

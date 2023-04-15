@@ -1,12 +1,16 @@
-import os
-import sys
+import os, sys
+cmdFolder = os.getcwd()
+if cmdFolder not in sys.path:
+	sys.path.insert(0, cmdFolder)
+
 import wx
 
 from wx.lib import newevent
 from serial import SerialException
 import json
 import logging
-from dispatcher.breaker import BreakerName
+
+
 logging.basicConfig(filename=os.path.join("logs", "tracker.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 ofp = open("tracker.out", "w")
@@ -36,6 +40,7 @@ from tracker.listener import Listener
 from tracker.backup import saveData, restoreData
 from tracker.dccsniffer import DCCSniffer
 from tracker.engqueuedlg import EngQueueDlg
+from dispatcher.breaker import BreakerName
 
 # class dummyDCCEvt:
 # 	def __init__(self, loco, spd):

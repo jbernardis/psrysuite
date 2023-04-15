@@ -238,8 +238,6 @@ class MainFrame(wx.Frame):
 		for sbl in subblocks.values():
 			sbList.extend(sbl)
 			
-		print("SB List = %s" % str(sbList), flush=True)
-			
 		blks = self.rr.GetBlockInfo()
 		blocks = {}
 		for bnm, bdir in blks:

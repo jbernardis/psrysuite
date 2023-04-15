@@ -96,6 +96,8 @@ class Yard(District):
 				
 		optControl = self.rr.GetControlOption("yard")  # 0 => Yard, 1 => Dispatcher
 		optFleet = self.rr.GetControlOption("yard.fleet")  # 0 => no fleeting, 1 => fleeting
+		yrelease = self.rr.GetInput("yrelease").GetState()
+
 		#Cornell Jct
 		outbc = 2
 		outb = [0 for _ in range(outbc)]
@@ -373,18 +375,18 @@ class Yard(District):
 		outb[4] = setBit(outb[4], 0, self.rr.GetInput("CBWaterman").GetInvertedValue())
 		outb[4] = setBit(outb[4], 1, self.rr.GetInput("L20").GetValue())  # adjacent block indicators
 		outb[4] = setBit(outb[4], 2, self.rr.GetInput("P50").GetValue())
-		outb[4] = setBit(outb[4], 3, self.rr.GetOutput("YSw1").GetLock())  # Switch Locks
-		outb[4] = setBit(outb[4], 4, self.rr.GetOutput("YSw3").GetLock())  
-		outb[4] = setBit(outb[4], 5, self.rr.GetOutput("YSw7").GetLock()) 
-		outb[4] = setBit(outb[4], 6, self.rr.GetOutput("YSw9").GetLock()) 
-		outb[4] = setBit(outb[4], 7, self.rr.GetOutput("YSw17").GetLock())  
+		outb[4] = setBit(outb[4], 3, self.rr.GetOutput("YSw1").GetLock() if yrelease == 0 else 0)  # Switch Locks
+		outb[4] = setBit(outb[4], 4, self.rr.GetOutput("YSw3").GetLock() if yrelease == 0 else 0)  
+		outb[4] = setBit(outb[4], 5, self.rr.GetOutput("YSw7").GetLock() if yrelease == 0 else 0) 
+		outb[4] = setBit(outb[4], 6, self.rr.GetOutput("YSw9").GetLock() if yrelease == 0 else 0) 
+		outb[4] = setBit(outb[4], 7, self.rr.GetOutput("YSw17").GetLock() if yrelease == 0 else 0)  
 
-		outb[5] = setBit(outb[5], 0, self.rr.GetOutput("YSw19").GetLock())
-		outb[5] = setBit(outb[5], 1, self.rr.GetOutput("YSw21").GetLock())
-		outb[5] = setBit(outb[5], 2, self.rr.GetOutput("YSw23").GetLock())
-		outb[5] = setBit(outb[5], 3, self.rr.GetOutput("YSw25").GetLock())
-		outb[5] = setBit(outb[5], 4, self.rr.GetOutput("YSw29").GetLock())
-		outb[5] = setBit(outb[5], 5, self.rr.GetOutput("YSw33").GetLock())
+		outb[5] = setBit(outb[5], 0, self.rr.GetOutput("YSw19").GetLock() if yrelease == 0 else 0)
+		outb[5] = setBit(outb[5], 1, self.rr.GetOutput("YSw21").GetLock() if yrelease == 0 else 0)
+		outb[5] = setBit(outb[5], 2, self.rr.GetOutput("YSw23").GetLock() if yrelease == 0 else 0)
+		outb[5] = setBit(outb[5], 3, self.rr.GetOutput("YSw25").GetLock() if yrelease == 0 else 0)
+		outb[5] = setBit(outb[5], 4, self.rr.GetOutput("YSw29").GetLock() if yrelease == 0 else 0)
+		outb[5] = setBit(outb[5], 5, self.rr.GetOutput("YSw33").GetLock() if yrelease == 0 else 0)
 
 		otext = formatOText(outb, outbc)
 		#logging.debug("Yard: Output bytes: %s" % otext)

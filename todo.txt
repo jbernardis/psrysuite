@@ -1,14 +1,15 @@
 
 
-how to use release - yard nassau and cliff
+how to use release - yard nassau and cliff (I think nassau and yard are done)
+
+need to resolve fleeting in cliff - does cliff panel lever control sheffield/gm/cliveden, and bank, or just sheffield/gm.  How to reconcile with software
+that has 3 controls - sheffield/gm, cliveben, and bank.  Make cb on screen work in conjunction with control field - disable fleet cb if control is local
+
+port fleeting - is there a switch on the panel that we need to keep in sync with?
 
 call on signals - I think it refers to JUST lighting the signal with no route clearing etc
 
 how to use wos1norm in yard
-
-do we really need a separate cliff fleet checkbox?  And what is port fleeting if we have no control over port
-
-
 
 verify signal lever functionality and signal indicators for nassau/port/cliff/yard
 

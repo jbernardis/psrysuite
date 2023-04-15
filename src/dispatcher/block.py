@@ -14,7 +14,6 @@ class Route:
 		self.blkout = blkout
 		self.rtype = [x for x in rtype]
 		self.turnouts = [x.split(":") for x in turnouts]
-		print("define route %s, turnouts = (%s)" % (name, str(self.turnouts)))
 		self.signals = [x for x in signals]
 
 	def GetDefinition(self):
@@ -27,10 +26,6 @@ class Route:
 			"turnouts":
 				["%s:%s" % (x[0], x[1]) for x in self.turnouts]
 		}
-		
-		if self.name.startswith("NRtN60"):
-			print("===================get definition")
-			print(json.dumps(msg, indent=2))
 		return msg
 
 	def GetName(self):
