@@ -86,6 +86,8 @@ class Railroad(wx.Notebook):
 
 		self.currentDistrict = self.districts["Yard"]
 		self.currentDistrict.SendIO(self.settings.viewiobits and not self.settings.hide)
+		
+		self.GetSubBlockInfo()
 
 	def EnableSendIO(self, flag):
 		self.enableSendIO = flag
@@ -325,6 +327,15 @@ class Railroad(wx.Notebook):
 		district.RefreshOutput(oname)
 
 	def RefreshInput(self, iname):
+		if iname in self.inputs:
+			district, itype = self.inputs[iname][1:3]
+			district.RefreshInput(iname, itype)
+
+		else:
+			logging.warning("No input defined for %s" % iname)
+			return
+
+	def xRefreshInput(self, iname):
 		if iname not in self.inputs:
 			logging.warning("No input defined for %s" % iname)
 			return
@@ -369,8 +380,9 @@ class Railroad(wx.Notebook):
 		return sorted(blocks)
 
 	def GetSubBlockInfo(self):
-		subblocks = {}
+		self.subblocks = {}
 		for iput, district, itype in self.inputs.values():
 			if itype == District.block:
-				subblocks.update(iput.ToJson())
-		return subblocks
+				self.subblocks.update(iput.ToJson())
+		logging.info("subblocks = %s" % str(self.subblocks))
+		return self.subblocks

@@ -2,8 +2,6 @@ import wx
 import logging
 from rrserver.rrobjects import BlockInput, SubBlockInput
 
-import traceback
-
 
 class RadioDlg (wx.Dialog):
 	def __init__(self, parent, title, choices, value):
@@ -385,7 +383,6 @@ class District(wx.Panel):
 		try:
 			ix, ic, dtype = self.inputMap[iname]
 		except KeyError:
-			traceback.print_stack()
 			logging.warning("Input for %s in district %s not found" % (iname, self.name))
 			return
 		

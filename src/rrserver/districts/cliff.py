@@ -122,6 +122,7 @@ class Cliff(District):
 		optBank = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
 		optCliveden = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
 		optFleet = optBank or optCliveden
+		optCliffFleet = self.rr.GetControlOption("cliff.fleet")  # 0 => no fleeting, 1 => fleeting
 		# Green Mountain
 		outbc = 3		
 		outb = [0 for _ in range(outbc)]
@@ -232,8 +233,8 @@ class Cliff(District):
 		outb[2] = setBit(outb[2], 2, 1 if sigl == "L" else 0)
 		outb[2] = setBit(outb[2], 3, 1 if sigl == "N" else 0)
 		outb[2] = setBit(outb[2], 4, 1 if sigl == "R" else 0)
-		outb[2] = setBit(outb[2], 5, optFleet)                    # fleet indicator
-		outb[2] = setBit(outb[2], 6, 1-optFleet)
+		outb[2] = setBit(outb[2], 5, optCliffFleet)                    # fleet indicator
+		outb[2] = setBit(outb[2], 6, 1-optCliffFleet)
 		sigl = self.sigLever["C18"]
 		outb[2] = setBit(outb[2], 7, 1 if sigl == "L" else 0)
 
@@ -329,52 +330,52 @@ class Cliff(District):
 			self.rr.GetInput("C44").SetValue(getBit(inb[2], 2))
 			self.rr.GetInput("COSSHW").SetValue(getBit(inb[2], 3))  # COS4
 			if optControl != 2:  # NOT Dispatcher: ALL
-				lvrL = getBit(inb[2], 4)       # signal levers
+				lvrR = getBit(inb[2], 4)       # signal levers
 				lvrCallOn = getBit(inb[2], 5)
-				lvrR = getBit(inb[2], 6)
+				lvrL = getBit(inb[2], 6)
 				self.rr.GetInput("C2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[2], 7)
+				lvrR = getBit(inb[2], 7)
 
 				lvrCallOn = getBit(inb[3], 0)
-				lvrR = getBit(inb[3], 1)
+				lvrL = getBit(inb[3], 1)
 				self.rr.GetInput("C4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[3], 2)
+				lvrR = getBit(inb[3], 2)
 				lvrCallOn = getBit(inb[3], 3)
-				lvrR = getBit(inb[3], 4)
+				lvrL = getBit(inb[3], 4)
 				self.rr.GetInput("C6.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[3], 5)
+				lvrR = getBit(inb[3], 5)
 				lvrCallOn = getBit(inb[3], 6)
-				lvrR = getBit(inb[3], 7)
+				lvrL = getBit(inb[3], 7)
 				self.rr.GetInput("C8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 
 			if optControl == 0:  # Cliff local control
-				lvrL = getBit(inb[4], 0)
+				lvrR = getBit(inb[4], 0)
 				lvrCallOn = getBit(inb[4], 1)
-				lvrR = getBit(inb[4], 2)
+				lvrL = getBit(inb[4], 2)
 				self.rr.GetInput("C10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[4], 3)
+				lvrR = getBit(inb[4], 3)
 				lvrCallOn = getBit(inb[4], 4)
-				lvrR = getBit(inb[4], 5)
+				lvrL = getBit(inb[4], 5)
 				self.rr.GetInput("C12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[4], 6)
+				lvrR = getBit(inb[4], 6)
 				lvrCallOn = getBit(inb[4], 7)
 
-				lvrR = getBit(inb[5], 0)
+				lvrL = getBit(inb[5], 0)
 				self.rr.GetInput("C14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				fleet = getBit(inb[5], 1)
 				self.rr.GetInput("cliff.fleet").SetState(fleet)  # fleet
-				lvrL = getBit(inb[5], 2)
+				lvrR = getBit(inb[5], 2)
 				lvrCallOn = getBit(inb[5], 3)
-				lvrR = getBit(inb[5], 4)
+				lvrL = getBit(inb[5], 4)
 				self.rr.GetInput("C18.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrL = getBit(inb[5], 5)
+				lvrR = getBit(inb[5], 5)
 				lvrCallOn = getBit(inb[5], 6)
-				lvrR = getBit(inb[5], 7)
+				lvrL = getBit(inb[5], 7)
 				self.rr.GetInput("C22.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 
-				lvrL = getBit(inb[6], 0)
+				lvrR = getBit(inb[6], 0)
 				lvrCallOn = getBit(inb[6], 1)
-				lvrR = getBit(inb[6], 2)
+				lvrL = getBit(inb[6], 2)
 				self.rr.GetInput("C24.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 				release = getBit(inb[6], 3)
 				self.rr.GetInput("crelease").SetState(release)  # C Release switch

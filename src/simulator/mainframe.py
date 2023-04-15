@@ -202,18 +202,15 @@ class MainFrame(wx.Frame):
 			
 		dlg = TrainParmDlg(self, trainParams)
 		rc = dlg.ShowModal()
-		if rc == wx.ID_OK:
-			rv = dlg.GetResults()
-			
 		dlg.Destroy()
 		if rc != wx.ID_OK:
 			return 
 			
 		for scr in self.startable:
 			p = trainParams[scr]
+			script = self.scripts[scr]
 			script.SetLoco(p[1])
 			script.SetTimeMultiple(p[2])
-			script = self.scripts[scr]
 			script.Execute()
 		self.scriptList.ClearChecks()
 		self.startable = []

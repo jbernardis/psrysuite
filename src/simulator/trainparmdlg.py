@@ -54,7 +54,7 @@ class TrainParmDlg(wx.Dialog):
 		dlg.Destroy()
 		if rc != wx.ID_OK:
 			return 
-		
+
 		self.lcParms.SetParams(tx, lid, tm)
 		
 	def GetResults(self):

@@ -2,7 +2,7 @@ import logging
 
 from rrserver.district import District, leverState,  NASSAUE, NASSAUW, NASSAUNX, formatIText, formatOText
 from rrserver.rrobjects import SignalOutput, TurnoutOutput, NXButtonOutput, RelayOutput, BreakerInput, BlockInput, \
-	TurnoutInput, SignalLeverInput, ToggleInput, IndicatorOutput
+	TurnoutInput, SignalLeverInput, ToggleInput, FleetLeverInput, IndicatorOutput
 from rrserver.bus import setBit, getBit
 
 
@@ -122,6 +122,7 @@ class Nassau(District):
 						"N60", "T12", "W10", "W11", "W20", "R10.W" ]
 		signalLeverNames = [ "N14.lvr", "N16.lvr", "N18.lvr", "N20.lvr", "N24.lvr", "N26.lvr", "N28.lvr" ]
 		toggleNames = [ "nrelease" ]
+		fleetLeverNames = [ "nassau.fleet" ]
 
 		ix = 0
 		ix = self.AddInputs(blockNames, BlockInput, District.block, ix)
@@ -129,6 +130,7 @@ class Nassau(District):
 		ix = self.AddInputs(toONames+toNames, TurnoutInput, District.turnout, ix)
 		ix = self.AddInputs(brkrNames, BreakerInput, District.breaker, ix)
 		ix = self.AddInputs(signalLeverNames, SignalLeverInput, District.slever, ix)
+		ix = self.AddInputs(fleetLeverNames, FleetLeverInput, District.flever, ix)
 		ix = self.AddInputs(toggleNames, ToggleInput, District.toggle, ix)
 
 	def EvaluateNXButtons(self, bEntry, bExit):
@@ -156,8 +158,17 @@ class Nassau(District):
 		optControl = self.rr.GetControlOption("nassau")  # 0 => Nassau, 1 => Dispatcher Main, 2 => Dispatcher All
 		optFleet = self.rr.GetControlOption("nassau.fleet")  # 0 => no fleeting, 1 => fleeting
 
+		release = self.rr.GetInput("nrelease").GetState()
 		NESL = self.rr.GetDistrictLock("NESL")
 		NWSL = self.rr.GetDistrictLock("NWSL")
+		if release == 1:
+			# don't set any switch locks if release button is being pressed
+			NESL = [0 for _ in range(len(NESL))]
+			NWSL = [0 for _ in range(len(NWSL))]
+			if optControl == 1:  # Dispatcher Main only
+				NESL[0] = 1
+				NWSL[0] = 1
+			
 		# Nassau West
 		outbc = 8
 		outb = [0 for _ in range(outbc)]
@@ -331,37 +342,37 @@ class Nassau(District):
 					self.rr.GetInput("nrelease").SetState(release)  # C Release switch
 					fleet = getBit(inb[3], 3)
 					self.rr.GetInput("nassau.fleet").SetState(fleet)  # fleet
-					lvrL = getBit(inb[3], 4)  # signal levers
+					lvrR = getBit(inb[3], 4)  # signal levers
 					lvrCallOn = getBit(inb[3], 5)
-					lvrR = getBit(inb[3], 6)
+					lvrL = getBit(inb[3], 6)
 					self.rr.GetInput("N14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrL = getBit(inb[3], 7)
+					lvrR = getBit(inb[3], 7)
 	
 					lvrCallOn = getBit(inb[4], 0)
-					lvrR = getBit(inb[4], 1)
+					lvrL = getBit(inb[4], 1)
 					self.rr.GetInput("N16.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrL = getBit(inb[4], 2)
+					lvrR = getBit(inb[4], 2)
 					lvrCallOn = getBit(inb[4], 3)
-					lvrR = getBit(inb[4], 4)
+					lvrL = getBit(inb[4], 4)
 					self.rr.GetInput("N18.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 	
-					lvrL = getBit(inb[5], 0)
+					lvrR = getBit(inb[5], 0)
 					lvrCallOn = getBit(inb[5], 1)
-					lvrR = getBit(inb[5], 2)
+					lvrL = getBit(inb[5], 2)
 					self.rr.GetInput("N24.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrL = getBit(inb[5], 3)
+					lvrR = getBit(inb[5], 3)
 					lvrCallOn = getBit(inb[5], 4)
-					lvrR = getBit(inb[5], 5)
+					lvrL = getBit(inb[5], 5)
 					self.rr.GetInput("N26.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 	
 				if optControl != 2:  # NOT dispatcher ALL
-					lvrL = getBit(inb[4], 5)
+					lvrR = getBit(inb[4], 5)
 					lvrCallOn = getBit(inb[4], 6)
-					lvrR = getBit(inb[4], 7)
+					lvrL = getBit(inb[4], 7)
 					self.rr.GetInput("N20.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrL = getBit(inb[5], 6)
+					lvrR = getBit(inb[5], 6)
 					lvrCallOn = getBit(inb[5], 7)
-					lvrR = getBit(inb[6], 0)
+					lvrL = getBit(inb[6], 0)
 					self.rr.GetInput("N28.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 	
 				self.rr.GetInput("CBKrulishYd").SetValue(getBit(inb[6], 1)) # Breakers

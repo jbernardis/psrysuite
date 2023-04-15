@@ -3,11 +3,11 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-# ofp = open("rrserver.out", "w")
-# efp = open("rrserver.err", "w")
-#
-# sys.stdout = ofp
-# sys.stderr = efp
+ofp = open("rrserver.out", "w")
+efp = open("rrserver.err", "w")
+
+sys.stdout = ofp
+sys.stderr = efp
 
 try:
 	os.mkdir(os.path.join(os.getcwd(), "logs"))

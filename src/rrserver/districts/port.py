@@ -478,16 +478,16 @@ class Port(District):
 		outb[3] = setBit(outb[3], 7, 1 if locked else 0)
 
 		st = self.rr.GetInput("PB12.lvr").GetState()
-		outb[3] = setBit(outb[3], 0, 1 if st == "L" else 0)  # Signal indicators
-		outb[3] = setBit(outb[3], 1, 1 if st == "N" else 0)
-		outb[3] = setBit(outb[3], 2, 1 if st == "R" else 0)
+		outb[4] = setBit(outb[4], 0, 1 if st == "L" else 0)  # Signal indicators
+		outb[4] = setBit(outb[4], 1, 1 if st == "N" else 0)
+		outb[4] = setBit(outb[4], 2, 1 if st == "R" else 0)
 		st = self.rr.GetInput("PB14.lvr").GetState()
-		outb[3] = setBit(outb[3], 3, 1 if st == "L" else 0)
-		outb[3] = setBit(outb[3], 4, 1 if st == "N" else 0)
-		outb[3] = setBit(outb[3], 5, 1 if st == "R" else 0)
+		outb[4] = setBit(outb[4], 3, 1 if st == "L" else 0)
+		outb[4] = setBit(outb[4], 4, 1 if st == "N" else 0)
+		outb[4] = setBit(outb[4], 5, 1 if st == "R" else 0)
 		psw15 = self.rr.GetOutput("PBSw15a.hand").GetStatus() + self.rr.GetOutput("PBSw15b.hand").GetStatus()
-		outb[3] = setBit(outb[3], 6, 0 if psw15 != 0 else 1)  # hand switch unlocks
-		outb[3] = setBit(outb[3], 7, 0 if psw15 == 0 else 1)
+		outb[4] = setBit(outb[4], 6, 0 if psw15 != 0 else 1)  # hand switch unlocks
+		outb[4] = setBit(outb[4], 7, 0 if psw15 == 0 else 1)
 
 		outb[5] = setBit(outb[5], 0, self.rr.GetInput("P30").GetValue())
 		outb[5] = setBit(outb[5], 1, self.rr.GetInput("P42").GetValue())
