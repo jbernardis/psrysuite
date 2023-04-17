@@ -68,7 +68,7 @@ class Yard (District):
 			return
 
 		Y20H = not blk.IsSectionOccupied(None) and not blk.IsSectionOccupied("E") and blk.GetEast()
-		Y20D = Y20H and blk.IsClear and blk.GetEast()
+		Y20D = Y20H and blk.IsCleared() and blk.GetEast()
 		self.indicators["Y20H"].SetValue(1 if Y20H else 0)
 		self.indicators["Y20D"].SetValue(1 if Y20D else 0)
 

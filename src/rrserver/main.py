@@ -64,12 +64,7 @@ class MainFrame(wx.Frame):
 
 		self.clients = {}
 
-		self.settings = Settings()
-		
-		if self.settings.startDispatch:
-			dispatchExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-			self.pidDispatch = Popen([sys.executable, dispatchExec]).pid
-			logging.debug("dispatcher started as PID %d" % self.pidDispatch)
+		self.settings = Settings(sys.argv)
 		
 		if self.settings.ipaddr is not None:
 			if self.ip != self.settings.ipaddr:

@@ -1675,8 +1675,8 @@ class MainFrame(wx.Frame):
 		
 	def KillWindow(self):
 		if self.IsDispatcher():
-			# bring down the server on exit
-			self.Request( {"server": {"action": "exit"}})	
+			# make the server visible on exit
+			self.Request( {"server": {"action": "show"}})	
 			
 		self.events.Close()
 		self.advice.Close()

@@ -17,12 +17,12 @@ def parseBoolean(val, defaultVal):
 	return defaultVal
 
 class Settings:
-	def __init__(self):
+	def __init__(self, cmdline):
 		self.datafolder = os.path.join(os.getcwd(), "data")
 		self.inifile = os.path.join(self.datafolder, INIFILE)
 		self.section = "rrserver"	
 		
-		self.simulation = True
+		self.simulation = "simulation" in cmdline
 		self.ipaddr = None
 		self.serverport = 9000
 		self.socketport = 9001
@@ -34,7 +34,6 @@ class Settings:
 		self.topulsect = 3
 		self.nxbpulselen = 4
 		self.nxbpulsect = 2
-		self.startDispatch = False
 		self.hide = False
 		self.viewiobits = False
 
@@ -48,9 +47,6 @@ class Settings:
 			for opt, value in self.cfg.items(self.section):
 				if opt == 'simulation':
 					self.simulation = parseBoolean(value, False)
-
-				elif opt == 'startdispatch':
-					self.startDispatch = parseBoolean(value, False)
 
 				elif opt == 'hide':
 					self.hide = parseBoolean(value, False)
@@ -112,3 +108,6 @@ class Settings:
 					self.ipaddr = value
 		else:
 			logging.warning("Missing global section - assuming defaults")
+			
+		if "simulation" in cmdline:
+			self.simultion = True
