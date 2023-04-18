@@ -134,6 +134,9 @@ class DCCHTTPServer:
 		logging.info("starting DCC thread")
 		self.thread.start()
 		logging.info("DCC thread started")
+	
+	def IsConnected(self):
+		return self.port is not None
 
 	def getThread(self):
 		return self.thread

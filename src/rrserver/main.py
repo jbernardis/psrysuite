@@ -133,7 +133,12 @@ class MainFrame(wx.Frame):
 		self.rrMonitor = RailroadMonitor(self.settings.rrtty, self.rr, self.settings)
 		if not self.rrMonitor.initialized:
 			logging.error("Failed to open railroad bus on device %s.  Exiting..." % self.settings.rrtty)
+			dlg = wx.MessageDialog(self, "Unable to open connection to\nrailroad via port %s\n\nServer is exiting" % self.settings.rrtty,
+				"Unable to open port", wx.OK | wx.ICON_ERROR)
+			dlg.ShowModal()
+			dlg.Destroy()
 			exit(1)
+			
 		#self.rrMonitor.start()
 		logging.info("Railroad monitor thread created - starting HTTP server")
 
@@ -165,6 +170,13 @@ class MainFrame(wx.Frame):
 
 	def StartDCCServer(self):
 		self.DCCServer = DCCHTTPServer(self.settings.ipaddr, self.settings.dccserverport, self.settings.dcctty)
+		if not self.DCCServer.IsConnected():
+			logging.error("Failed to open DCC bus on device %s.  Exiting..." % self.settings.dcctty)
+			dlg = wx.MessageDialog(self, "Unable to open connection to\nDCC via port %s\n\nServer is exiting" % self.settings.dcctty,
+				"Unable to open port", wx.OK | wx.ICON_ERROR)
+			dlg.ShowModal()
+			dlg.Destroy()
+			#exit(1)
 		
 	def OnCbEnableIO(self, _):
 		self.rr.EnableSendIO(self.cbEnableSendIO.IsChecked())

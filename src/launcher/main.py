@@ -13,13 +13,20 @@ from launcher.rrserver import RRServer
 np = len(sys.argv)
 
 if np < 2:
-    launchmode = "dispatcher"
+    parameters = [ "dispatcher" ]
 
 else:
-    launchmode = sys.argv[1]
-    
-ofp = open("launch%s.out" % launchmode, "w")
-efp = open("launch%s.err" % launchmode, "w")
+    parameters = [x for x in sys.argv[1:]]
+  
+mode = parameters[0]
+if mode == "remote":
+    if np > 2:
+        mode = parameters[1]  
+    else:
+        mode = "dispatch"
+        
+ofp = open("launch%s.out" % mode, "w")
+efp = open("launch%s.err" % mode, "w")
 
 sys.stdout = ofp
 sys.stderr = efp
@@ -34,8 +41,30 @@ interpreter = sys.executable.replace("python.exe", "pythonw.exe")
 for i in range(len(sys.argv)):
     print("%d: %s" % (i, sys.argv[i]))
 
-if launchmode == "dispatcher":
+if "dispatcher" in parameters and "remote" in parameters:
+    print("Launch mode: remote dispatcher")
+    
+    settings.SetSimulation(False)
+    settings.SetDispatcher(True)
+    
+    dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
+    dispProc = Popen([sys.executable, dispExec])
+    print("dispatcher started as PID %d" % dispProc.pid)
+ 
+    dispActive = True   
+    while dispActive:
+        time.sleep(1)
+            
+        if dispActive and dispProc.poll() is not None:
+            print("Dispatcher has terminated")
+            dispActive = False
+ 
+elif "dispatcher" in parameters:
     print("Launch mode: dispatcher")
+    
+    settings.SetSimulation(False)
+    settings.SetDispatcher(True)
+    
     svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
     svrProc = Popen([sys.executable, svrExec])
     print("server started as PID %d" % svrProc.pid)
@@ -57,10 +86,13 @@ if launchmode == "dispatcher":
             dispActive = False
             rrServer.SendRequest( {"server": {"action": "show"}})    
 
-elif launchmode == "simulation":
+elif "simulation" in parameters:
     print("launch mode: simulation")
+    settings.SetDispatcher(True)
+    settings.SetSimulation(True)
+    
     svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
-    svrProc = Popen([sys.executable, svrExec, "simulation"])
+    svrProc = Popen([sys.executable, svrExec])
     print("server started as PID %d" % svrProc.pid)
     
     simExec = os.path.join(os.getcwd(), "simulator", "main.py")
@@ -89,4 +121,23 @@ elif launchmode == "simulation":
             dispActive = False
             rrServer.SendRequest( {"server": {"action": "show"}})    
 
+elif "display" in parameters:
+    print("launch mode: display")
+    settings.SetDispatcher(False)
+    
+    dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
+    dispProc = Popen([sys.executable, dispExec])
+    print("dispatcher started as PID %d" % dispProc.pid)
+ 
+    dispActive = True   
+    while dispActive:
+        time.sleep(1)
+            
+        if dispActive and dispProc.poll() is not None:
+            print("Dispatcher has terminated")
+            dispActive = False
+            
+else:
+    print("Unknown mode.  Must specify either 'dispatch', 'remote dispatch', 'simulation', or 'display'")
+ 
 

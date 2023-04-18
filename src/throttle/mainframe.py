@@ -15,10 +15,10 @@ BTNDIM3 = (144, 48)
 
 class MainFrame(wx.Frame):
 	def __init__(self):
-		wx.Frame.__init__(self, None, style=wx.DEFAULT_FRAME_STYLE)
+		wx.Frame.__init__(self, None, style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
 		self.SetTitle("PSRY Throttle")
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
-		
+	
 		self.selectedLoco = None
 		self.selectedLid = 0
 		
@@ -69,6 +69,10 @@ class MainFrame(wx.Frame):
 		
 		self.bSelect = wx.Button(self, wx.ID_ANY, "SELECT LOCO", size=BTNDIM3)
 		self.Bind(wx.EVT_BUTTON, self.OnBSelect, self.bSelect)
+		
+		self.cbStayOnTop = wx.CheckBox(self, wx.ID_ANY, "Stay on Top")
+		self.cbStayOnTop.SetValue(True)
+		self.Bind(wx.EVT_CHECKBOX, self.ObCbStayOnTop, self.cbStayOnTop)
 	
 		vszr = wx.BoxSizer(wx.VERTICAL)
 		vszr.AddSpacer(20)
@@ -125,6 +129,10 @@ class MainFrame(wx.Frame):
 		
 		vszr.Add(self.bSelect, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
+		vszr.AddSpacer(10)
+		
+		vszr.Add(self.cbStayOnTop, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
 		vszr.AddSpacer(20)
 
 		hszr = wx.BoxSizer(wx.HORIZONTAL)
@@ -155,6 +163,17 @@ class MainFrame(wx.Frame):
 			print("Unable to retrieve locos")
 			locos = {}
 		self.locoList = sorted(list(locos.keys()), key=self.BuildLocoKey)
+
+	def ObCbStayOnTop(self, _):
+		flag = self.cbStayOnTop.GetValue()		
+
+		st = self.GetWindowStyle()
+		if flag:
+			st |= wx.STAY_ON_TOP
+		else:
+			st &= ~wx.STAY_ON_TOP
+			
+		self.SetWindowStyle(st)
 		
 	def BuildLocoKey(self, lid):
 		return int(lid)

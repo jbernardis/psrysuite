@@ -14,7 +14,7 @@
         "signal": "C10L",
         "route": "CRtC23C22",
         "os": "COSCLEW",
-        "block": "C23,C23.W"
+        "block": "C23.W,C23"
       }
     },
     {
@@ -25,14 +25,14 @@
     },
     {
       "movetrain": {
-        "block": "C23",
-        "time": 2250
+        "block": "C23.W",
+        "time": 500
       }
     },
     {
       "movetrain": {
-        "block": "C23.W",
-        "time": 500
+        "block": "C23",
+        "time": 2250
       }
     },
     {
@@ -40,7 +40,7 @@
         "signal": "C14LB",
         "route": "CRtC13C23",
         "os": "COSCLW",
-        "block": "C13.E,C13,C13.W"
+        "block": "C13.W,C13,C13.E"
       }
     },
     {
@@ -51,7 +51,7 @@
     },
     {
       "movetrain": {
-        "block": "C13.E",
+        "block": "C13.W",
         "time": 500
       }
     },
@@ -63,7 +63,7 @@
     },
     {
       "movetrain": {
-        "block": "C13.W",
+        "block": "C13.E",
         "time": 500
       }
     },
@@ -72,7 +72,7 @@
         "signal": "C18L",
         "route": "BRtB11C13",
         "os": "BOSE",
-        "block": "B11,B11.W"
+        "block": "B11.W,B11"
       }
     },
     {
@@ -83,14 +83,14 @@
     },
     {
       "movetrain": {
-        "block": "B11",
-        "time": 2250
+        "block": "B11.W",
+        "time": 500
       }
     },
     {
       "movetrain": {
-        "block": "B11.W",
-        "time": 500
+        "block": "B11",
+        "time": 2250
       }
     },
     {
@@ -98,7 +98,7 @@
         "signal": "C22L",
         "route": "BRtB10B11",
         "os": "BOSWW",
-        "block": "B10,B10.W"
+        "block": "B10.W,B10"
       }
     },
     {
@@ -109,14 +109,14 @@
     },
     {
       "movetrain": {
-        "block": "B10",
-        "time": 2250
+        "block": "B10.W",
+        "time": 500
       }
     },
     {
       "movetrain": {
-        "block": "B10.W",
-        "time": 500
+        "block": "B10",
+        "time": 2250
       }
     },
     {
@@ -144,7 +144,7 @@
         "signal": "N18LB",
         "route": "NRtN11N31",
         "os": "NWOSW",
-        "block": "N11.E,N11,N11.W"
+        "block": "N11.W,N11,N11.E"
       }
     },
     {
@@ -155,7 +155,7 @@
     },
     {
       "movetrain": {
-        "block": "N11.E",
+        "block": "N11.W",
         "time": 500
       }
     },
@@ -167,7 +167,7 @@
     },
     {
       "movetrain": {
-        "block": "N11.W",
+        "block": "N11.E",
         "time": 500
       }
     },
@@ -176,7 +176,7 @@
         "signal": "K8LB",
         "route": "KRtN10N11",
         "os": "KOSW",
-        "block": "N10.E,N10,N10.W"
+        "block": "N10.W,N10,N10.E"
       }
     },
     {
@@ -187,7 +187,7 @@
     },
     {
       "movetrain": {
-        "block": "N10.E",
+        "block": "N10.W",
         "time": 500
       }
     },
@@ -199,7 +199,7 @@
     },
     {
       "movetrain": {
-        "block": "N10.W",
+        "block": "N10.E",
         "time": 500
       }
     },
@@ -208,7 +208,7 @@
         "signal": "N10W",
         "route": "KRtN10S11",
         "os": "KOSN10S11",
-        "block": "S11.E,S11,S11.W"
+        "block": "S11.W,S11,S11.E"
       }
     },
     {
@@ -219,7 +219,7 @@
     },
     {
       "movetrain": {
-        "block": "S11.E",
+        "block": "S11.W",
         "time": 500
       }
     },
@@ -237,7 +237,7 @@
     },
     {
       "movetrain": {
-        "block": "S11.W",
+        "block": "S11.E",
         "time": 500
       }
     },
@@ -246,7 +246,7 @@
         "signal": "S12LA",
         "route": "SRtS10S11",
         "os": "SOSW",
-        "block": "S10.E,S10,S10.W"
+        "block": "S10.W,S10,S10.E"
       }
     },
     {
@@ -257,7 +257,7 @@
     },
     {
       "movetrain": {
-        "block": "S10.E",
+        "block": "S10.W",
         "time": 500
       }
     },
@@ -281,7 +281,7 @@
     },
     {
       "movetrain": {
-        "block": "S10.W",
+        "block": "S10.E",
         "time": 500
       }
     },
@@ -290,7 +290,7 @@
         "signal": "D12L",
         "route": "DRtD11S10",
         "os": "DOSFOW",
-        "block": "D11.E,D11,D11.W"
+        "block": "D11.W,D11,D11.E"
       }
     },
     {
@@ -301,7 +301,7 @@
     },
     {
       "movetrain": {
-        "block": "D11.E",
+        "block": "D11.W",
         "time": 500
       }
     },
@@ -319,7 +319,7 @@
     },
     {
       "movetrain": {
-        "block": "D11.W",
+        "block": "D11.E",
         "time": 500
       }
     },
@@ -328,7 +328,7 @@
         "signal": "D6L",
         "route": "DRtD10D11",
         "os": "DOSVJW",
-        "block": "D10,D10.W"
+        "block": "D10.W,D10"
       }
     },
     {
@@ -339,14 +339,14 @@
     },
     {
       "movetrain": {
-        "block": "D10",
-        "time": 2250
+        "block": "D10.W",
+        "time": 500
       }
     },
     {
       "movetrain": {
-        "block": "D10.W",
-        "time": 500
+        "block": "D10",
+        "time": 2250
       }
     },
     {
@@ -354,7 +354,7 @@
         "signal": "L18L",
         "route": "LRtL11D10",
         "os": "LOSCAW",
-        "block": "L11,L11.W"
+        "block": "L11.W,L11"
       }
     },
     {
@@ -365,14 +365,14 @@
     },
     {
       "movetrain": {
-        "block": "L11",
-        "time": 2250
+        "block": "L11.W",
+        "time": 500
       }
     },
     {
       "movetrain": {
-        "block": "L11.W",
-        "time": 500
+        "block": "L11",
+        "time": 2250
       }
     },
     {
@@ -380,7 +380,7 @@
         "signal": "L8L",
         "route": "LRtL10L11",
         "os": "LOSLAW",
-        "block": "L10,L10.W"
+        "block": "L10.W,L10"
       }
     },
     {
@@ -391,14 +391,14 @@
     },
     {
       "movetrain": {
-        "block": "L10",
-        "time": 2250
+        "block": "L10.W",
+        "time": 500
       }
     },
     {
       "movetrain": {
-        "block": "L10.W",
-        "time": 500
+        "block": "L10",
+        "time": 2250
       }
     },
     {
@@ -406,7 +406,7 @@
         "signal": "Y2L",
         "route": "YRtY11L10",
         "os": "YOSCJW",
-        "block": "Y11,Y11.W"
+        "block": "Y11.W,Y11"
       }
     },
     {
@@ -417,14 +417,14 @@
     },
     {
       "movetrain": {
-        "block": "Y11",
-        "time": 2250
+        "block": "Y11.W",
+        "time": 500
       }
     },
     {
       "movetrain": {
-        "block": "Y11.W",
-        "time": 500
+        "block": "Y11",
+        "time": 2250
       }
     },
     {
@@ -444,26 +444,6 @@
     {
       "movetrain": {
         "block": "Y30",
-        "time": 2500
-      }
-    },
-    {
-      "waitfor": {
-        "signal": "Y34R",
-        "route": "YRtY30Y51",
-        "os": "YOSKL4",
-        "block": "Y51"
-      }
-    },
-    {
-      "movetrain": {
-        "block": "YOSKL4",
-        "time": 2500
-      }
-    },
-    {
-      "movetrain": {
-        "block": "Y51",
         "time": 2500
       }
     }
@@ -707,13 +687,13 @@
         "signal": "S4R",
         "route": "SRtS20S21",
         "os": "SOSE",
-        "block": "S21"
+        "block": "S21.W,S21,S21.E"
       }
     },
     {
       "movetrain": {
         "block": "SOSE",
-        "time": 2500
+        "time": 2000
       }
     },
     {
@@ -725,7 +705,7 @@
     {
       "movetrain": {
         "block": "S21",
-        "time": 1500
+        "time": 2000
       }
     },
     {
@@ -1703,13 +1683,13 @@
         "signal": "S4R",
         "route": "SRtS20S21",
         "os": "SOSE",
-        "block": "S21"
+        "block": "S21.W,S21,S21.E"
       }
     },
     {
       "movetrain": {
         "block": "SOSE",
-        "time": 2500
+        "time": 2000
       }
     },
     {
@@ -1721,7 +1701,7 @@
     {
       "movetrain": {
         "block": "S21",
-        "time": 1500
+        "time": 2000
       }
     },
     {
@@ -1994,159 +1974,197 @@
   "21": [
     {
       "placetrain": {
-        "block": "B10",
+        "block": "H33",
         "name": "21",
         "loco": 0,
-        "time": 4500,
+        "time": 5000,
         "length": 3
       }
     },
     {
-      "movetrain": {
-        "block": "B10.W",
-        "time": 500
-      }
-    },
-    {
       "waitfor": {
-        "signal": "N26L",
-        "route": "NRtB10N32",
-        "os": "NEOSW",
-        "block": "N32"
+        "signal": "H6LB",
+        "route": "HRtH11H33",
+        "os": "HOSWW",
+        "block": "H11,H11.W"
       }
     },
     {
       "movetrain": {
-        "block": "NEOSW",
-        "time": 2500
-      }
-    },
-    {
-      "movetrain": {
-        "block": "N32",
-        "time": 2500
-      }
-    },
-    {
-      "waitfor": {
-        "signal": "N18LA",
-        "route": "NRtN11N32",
-        "os": "NWOSW",
-        "block": "N11.E,N11,N11.W"
-      }
-    },
-    {
-      "movetrain": {
-        "block": "NWOSW",
-        "time": 2000
-      }
-    },
-    {
-      "movetrain": {
-        "block": "N11.E",
-        "time": 500
-      }
-    },
-    {
-      "movetrain": {
-        "block": "N11",
-        "time": 2000
-      }
-    },
-    {
-      "movetrain": {
-        "block": "N11.W",
-        "time": 500
-      }
-    },
-    {
-      "waitfor": {
-        "signal": "K8LB",
-        "route": "KRtN25N11",
-        "os": "KOSM",
-        "block": "N25.E,N25,N25.W"
-      }
-    },
-    {
-      "movetrain": {
-        "block": "KOSM",
-        "time": 2000
-      }
-    },
-    {
-      "movetrain": {
-        "block": "N25.E",
-        "time": 500
-      }
-    },
-    {
-      "movetrain": {
-        "block": "N25",
-        "time": 2000
-      }
-    },
-    {
-      "movetrain": {
-        "block": "N25.W",
-        "time": 500
-      }
-    },
-    {
-      "waitfor": {
-        "signal": "S16L",
-        "route": "SRtP42N25",
-        "os": "SOSHJE",
-        "block": "P42.E,P42,P42.W"
-      }
-    },
-    {
-      "movetrain": {
-        "block": "SOSHJE",
-        "time": 2000
-      }
-    },
-    {
-      "movetrain": {
-        "block": "P42.E",
-        "time": 500
-      }
-    },
-    {
-      "movetrain": {
-        "block": "P42",
-        "time": 2000
-      }
-    },
-    {
-      "movetrain": {
-        "block": "P42.W",
-        "time": 500
-      }
-    },
-    {
-      "waitfor": {
-        "signal": "PB12L",
-        "route": "PRtP41P42",
-        "os": "POSCJ2",
-        "block": "P41.E,P41"
-      }
-    },
-    {
-      "movetrain": {
-        "block": "POSCJ2",
+        "block": "HOSWW",
         "time": 2250
       }
     },
     {
       "movetrain": {
-        "block": "P41.E",
+        "block": "H11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S20L",
+        "route": "SRtH10H11",
+        "os": "SOSHJW",
+        "block": "H10,H10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSHJW",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10A",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10B",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LC",
+        "route": "SRtS10H10",
+        "os": "SOSW",
+        "block": "S10.E,S10,S10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
         "time": 500
       }
     },
     {
       "movetrain": {
-        "block": "P41",
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.E,D11,D11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtH13D11",
+        "os": "DOSVJW",
+        "block": "H13,H13.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
         "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H12L",
+        "route": "HRtH13H33",
+        "os": "HOSEW",
+        "block": "H33"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H33",
+        "time": 2500
       }
     }
   ],
@@ -3097,7 +3115,8 @@
         "name": "57",
         "loco": 0,
         "time": 500,
-        "length": 3
+        "length": 3,
+        "subblock": "R10.W"
       }
     },
     {
@@ -3412,7 +3431,7 @@
         "signal": "N18LB",
         "route": "NRtN11N31",
         "os": "NWOSW",
-        "block": "N11.E,N11,N11.W"
+        "block": "N11.W,N11,N11.E"
       }
     },
     {
@@ -3423,7 +3442,7 @@
     },
     {
       "movetrain": {
-        "block": "N11.E",
+        "block": "N11.W",
         "time": 500
       }
     },
@@ -3435,7 +3454,7 @@
     },
     {
       "movetrain": {
-        "block": "N11.W",
+        "block": "N11.E",
         "time": 500
       }
     },
@@ -3444,7 +3463,7 @@
         "signal": "K8LB",
         "route": "KRtN25N11",
         "os": "KOSM",
-        "block": "N25.E,N25,N25.W"
+        "block": "N25.W,N25,N25.E"
       }
     },
     {
@@ -3455,7 +3474,7 @@
     },
     {
       "movetrain": {
-        "block": "N25.E",
+        "block": "N25.W",
         "time": 500
       }
     },
@@ -3467,7 +3486,7 @@
     },
     {
       "movetrain": {
-        "block": "N25.W",
+        "block": "N25.E",
         "time": 500
       }
     },
@@ -3476,7 +3495,7 @@
         "signal": "S16L",
         "route": "SRtP42N25",
         "os": "SOSHJE",
-        "block": "P42.E,P42,P42.W"
+        "block": "P42.W,P42,P42.E"
       }
     },
     {
@@ -3487,7 +3506,7 @@
     },
     {
       "movetrain": {
-        "block": "P42.E",
+        "block": "P42.W",
         "time": 500
       }
     },
@@ -3499,7 +3518,7 @@
     },
     {
       "movetrain": {
-        "block": "P42.W",
+        "block": "P42.E",
         "time": 500
       }
     },
@@ -3508,7 +3527,7 @@
         "signal": "PB12L",
         "route": "PRtP41P42",
         "os": "POSCJ2",
-        "block": "P41.E,P41,P41.W"
+        "block": "P41.W,P41,P41.E"
       }
     },
     {
@@ -3519,7 +3538,7 @@
     },
     {
       "movetrain": {
-        "block": "P41.E",
+        "block": "P41.W",
         "time": 500
       }
     },
@@ -3531,7 +3550,7 @@
     },
     {
       "movetrain": {
-        "block": "P41.W",
+        "block": "P41.E",
         "time": 500
       }
     },
@@ -3540,25 +3559,19 @@
         "signal": "PB2L",
         "route": "PRtP40P41",
         "os": "POSSJ2",
-        "block": "P40.E,P40"
+        "block": "P40"
       }
     },
     {
       "movetrain": {
         "block": "POSSJ2",
-        "time": 2250
-      }
-    },
-    {
-      "movetrain": {
-        "block": "P40.E",
-        "time": 500
+        "time": 2500
       }
     },
     {
       "movetrain": {
         "block": "P40",
-        "time": 2250
+        "time": 2500
       }
     }
   ],
@@ -5032,13 +5045,13 @@
         "signal": "S4R",
         "route": "SRtS20S21",
         "os": "SOSE",
-        "block": "S21"
+        "block": "S21.W,S21,S21.E"
       }
     },
     {
       "movetrain": {
         "block": "SOSE",
-        "time": 2500
+        "time": 2000
       }
     },
     {
@@ -5050,7 +5063,7 @@
     {
       "movetrain": {
         "block": "S21",
-        "time": 1500
+        "time": 2000
       }
     },
     {
@@ -5750,13 +5763,13 @@
         "signal": "S4R",
         "route": "SRtS20S21",
         "os": "SOSE",
-        "block": "S21"
+        "block": "S21.W,S21,S21.E"
       }
     },
     {
       "movetrain": {
         "block": "SOSE",
-        "time": 2500
+        "time": 2000
       }
     },
     {
@@ -5768,7 +5781,7 @@
     {
       "movetrain": {
         "block": "S21",
-        "time": 1500
+        "time": 2000
       }
     },
     {
@@ -5900,11 +5913,11 @@
       }
     }
   ],
-  "CFHY": [
+  "CF1": [
     {
       "placetrain": {
         "block": "C22",
-        "name": "CFHY",
+        "name": "CF1",
         "loco": 0,
         "time": 5000,
         "length": 3
@@ -6189,9 +6202,9 @@
     {
       "waitfor": {
         "signal": "D12L",
-        "route": "DRtD11S10",
+        "route": "DRtD21S10",
         "os": "DOSFOW",
-        "block": "D11.E,D11,D11.W"
+        "block": "D21.E,D21,D21.W"
       }
     },
     {
@@ -6202,80 +6215,158 @@
     },
     {
       "movetrain": {
-        "block": "D11.E",
+        "block": "D21.E",
         "time": 500
       }
     },
     {
       "movetrain": {
-        "block": "D11A",
+        "block": "D21A",
         "time": 1333
       }
     },
     {
       "movetrain": {
-        "block": "D11B",
+        "block": "D21B",
         "time": 1333
       }
     },
     {
       "movetrain": {
-        "block": "D11.W",
+        "block": "D21.W",
         "time": 500
       }
     },
     {
       "waitfor": {
-        "signal": "D6L",
-        "route": "DRtH13D11",
-        "os": "DOSVJW",
-        "block": "H13,H13.W"
+        "signal": "D4L",
+        "route": "DRtD10D21",
+        "os": "DOSVJE",
+        "block": "D10,D10.W"
       }
     },
     {
       "movetrain": {
-        "block": "DOSVJW",
+        "block": "DOSVJE",
         "time": 2250
       }
     },
     {
       "movetrain": {
-        "block": "H13",
+        "block": "D10",
         "time": 2250
       }
     },
     {
       "movetrain": {
-        "block": "H13.W",
+        "block": "D10.W",
         "time": 500
       }
     },
     {
       "waitfor": {
-        "signal": "H12L",
-        "route": "HRtH13H32",
-        "os": "HOSEW",
-        "block": "H32"
+        "signal": "L18L",
+        "route": "LRtL11D10",
+        "os": "LOSCAW",
+        "block": "L11,L11.W"
       }
     },
     {
       "movetrain": {
-        "block": "HOSEW",
+        "block": "LOSCAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L8L",
+        "route": "LRtL10L11",
+        "os": "LOSLAW",
+        "block": "L10,L10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y2L",
+        "route": "YRtY11L10",
+        "os": "YOSCJW",
+        "block": "Y11,Y11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y8L",
+        "route": "YRtY87Y11",
+        "os": "YOSEJW",
+        "block": "Y87"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJW",
         "time": 2500
       }
     },
     {
       "movetrain": {
-        "block": "H32",
+        "block": "Y87",
         "time": 2500
       }
     }
   ],
-  "CLYD": [
+  "CF2": [
     {
       "placetrain": {
         "block": "C22",
-        "name": "CLYD",
+        "name": "CF2",
         "loco": 0,
         "time": 5000,
         "length": 3
@@ -6678,18 +6769,3404 @@
         "signal": "Y2L",
         "route": "YRtY11L10",
         "os": "YOSCJW",
-        "block": "Y11"
+        "block": "Y11,Y11.W"
       }
     },
     {
       "movetrain": {
         "block": "YOSCJW",
-        "time": 2500
+        "time": 2250
       }
     },
     {
       "movetrain": {
         "block": "Y11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y8L",
+        "route": "YRtY87Y11",
+        "os": "YOSEJW",
+        "block": "Y87"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y87",
+        "time": 2500
+      }
+    }
+  ],
+  "CF3": [
+    {
+      "placetrain": {
+        "block": "C22",
+        "name": "CF3",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C10L",
+        "route": "CRtC23C22",
+        "os": "COSCLEW",
+        "block": "C23,C23.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14LB",
+        "route": "CRtC13C23",
+        "os": "COSCLW",
+        "block": "C13.E,C13,C13.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18L",
+        "route": "BRtB11C13",
+        "os": "BOSE",
+        "block": "B11,B11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C22L",
+        "route": "BRtB10B11",
+        "os": "BOSWW",
+        "block": "B10,B10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N26L",
+        "route": "NRtB10N12",
+        "os": "NEOSW",
+        "block": "N12"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N12",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N16L",
+        "route": "NRtN11N12",
+        "os": "NWOSW",
+        "block": "N11.E,N11,N11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K8LB",
+        "route": "KRtN10N11",
+        "os": "KOSW",
+        "block": "N10.E,N10,N10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N10W",
+        "route": "KRtN10S11",
+        "os": "KOSN10S11",
+        "block": "S11.E,S11,S11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN10S11",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LA",
+        "route": "SRtS10S11",
+        "os": "SOSW",
+        "block": "S10.E,S10,S10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.E,D11,D11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtD10D11",
+        "os": "DOSVJW",
+        "block": "D10,D10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L18L",
+        "route": "LRtL11D10",
+        "os": "LOSCAW",
+        "block": "L11,L11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L8L",
+        "route": "LRtL10L11",
+        "os": "LOSLAW",
+        "block": "L10,L10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y2L",
+        "route": "YRtY11L10",
+        "os": "YOSCJW",
+        "block": "Y11,Y11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y8L",
+        "route": "YRtY87Y11",
+        "os": "YOSEJW",
+        "block": "Y87"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y87",
+        "time": 2500
+      }
+    }
+  ],
+  "CFHY": [
+    {
+      "placetrain": {
+        "block": "C22",
+        "name": "CFHY",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C10L",
+        "route": "CRtC23C22",
+        "os": "COSCLEW",
+        "block": "C23,C23.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14LB",
+        "route": "CRtC13C23",
+        "os": "COSCLW",
+        "block": "C13.E,C13,C13.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18L",
+        "route": "BRtB11C13",
+        "os": "BOSE",
+        "block": "B11,B11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C22L",
+        "route": "BRtB10B11",
+        "os": "BOSWW",
+        "block": "B10,B10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N26L",
+        "route": "NRtB10N12",
+        "os": "NEOSW",
+        "block": "N12"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N12",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N16L",
+        "route": "NRtN11N12",
+        "os": "NWOSW",
+        "block": "N11.E,N11,N11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K8LB",
+        "route": "KRtN10N11",
+        "os": "KOSW",
+        "block": "N10.E,N10,N10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N10W",
+        "route": "KRtN10S11",
+        "os": "KOSN10S11",
+        "block": "S11.E,S11,S11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN10S11",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LA",
+        "route": "SRtS10S11",
+        "os": "SOSW",
+        "block": "S10.E,S10,S10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.E,D11,D11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtH13D11",
+        "os": "DOSVJW",
+        "block": "H13,H13.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H12L",
+        "route": "HRtH13H32",
+        "os": "HOSEW",
+        "block": "H32"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H32",
+        "time": 2500
+      }
+    }
+  ],
+  "CLYD": [
+    {
+      "placetrain": {
+        "block": "C22",
+        "name": "CLYD",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C10L",
+        "route": "CRtC23C22",
+        "os": "COSCLEW",
+        "block": "C23.W,C23"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14LB",
+        "route": "CRtC13C23",
+        "os": "COSCLW",
+        "block": "C13.W,C13,C13.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18L",
+        "route": "BRtB11C13",
+        "os": "BOSE",
+        "block": "B11.W,B11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C22L",
+        "route": "BRtB10B11",
+        "os": "BOSWW",
+        "block": "B10.W,B10"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N26L",
+        "route": "NRtB10N12",
+        "os": "NEOSW",
+        "block": "N12"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N12",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N16L",
+        "route": "NRtN11N12",
+        "os": "NWOSW",
+        "block": "N11.W,N11,N11.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K8LB",
+        "route": "KRtN10N11",
+        "os": "KOSW",
+        "block": "N10.W,N10,N10.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N10W",
+        "route": "KRtN10S11",
+        "os": "KOSN10S11",
+        "block": "S11.W,S11,S11.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN10S11",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LA",
+        "route": "SRtS10S11",
+        "os": "SOSW",
+        "block": "S10.W,S10,S10.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.W,D11,D11.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtD10D11",
+        "os": "DOSVJW",
+        "block": "D10.W,D10"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D10.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D10",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L18L",
+        "route": "LRtL11D10",
+        "os": "LOSCAW",
+        "block": "L11.W,L11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L8L",
+        "route": "LRtL10L11",
+        "os": "LOSLAW",
+        "block": "L10.W,L10"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y2L",
+        "route": "YRtY11L10",
+        "os": "YOSCJW",
+        "block": "Y11.W,Y11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11",
+        "time": 2250
+      }
+    }
+  ],
+  "CP1": [
+    {
+      "placetrain": {
+        "block": "C22",
+        "name": "CP1",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C10L",
+        "route": "CRtC23C22",
+        "os": "COSCLEW",
+        "block": "C23.W,C23"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14LB",
+        "route": "CRtC13C23",
+        "os": "COSCLW",
+        "block": "C13.W,C13,C13.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18L",
+        "route": "BRtB11C13",
+        "os": "BOSE",
+        "block": "B11.W,B11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C22L",
+        "route": "BRtB10B11",
+        "os": "BOSWW",
+        "block": "B10.W,B10"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N26L",
+        "route": "NRtB10N31",
+        "os": "NEOSW",
+        "block": "N31"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N31",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N18LB",
+        "route": "NRtN11N31",
+        "os": "NWOSW",
+        "block": "N11.W,N11,N11.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K8LB",
+        "route": "KRtN10N11",
+        "os": "KOSW",
+        "block": "N10.W,N10,N10.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N10W",
+        "route": "KRtN10S11",
+        "os": "KOSN10S11",
+        "block": "S11.W,S11,S11.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN10S11",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LA",
+        "route": "SRtS10S11",
+        "os": "SOSW",
+        "block": "S10.W,S10,S10.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.W,D11,D11.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtD10D11",
+        "os": "DOSVJW",
+        "block": "D10.W,D10"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D10.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D10",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L18L",
+        "route": "LRtL11D10",
+        "os": "LOSCAW",
+        "block": "L11.W,L11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L8L",
+        "route": "LRtL10L11",
+        "os": "LOSLAW",
+        "block": "L10.W,L10"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y2L",
+        "route": "YRtY11L10",
+        "os": "YOSCJW",
+        "block": "Y11.W,Y11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y8L",
+        "route": "YRtY30Y11",
+        "os": "YOSEJW",
+        "block": "Y30"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y30",
+        "time": 2500
+      }
+    }
+  ],
+  "CP2": [
+    {
+      "placetrain": {
+        "block": "C22",
+        "name": "CP2",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C10L",
+        "route": "CRtC23C22",
+        "os": "COSCLEW",
+        "block": "C23,C23.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14LB",
+        "route": "CRtC13C23",
+        "os": "COSCLW",
+        "block": "C13.E,C13,C13.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18L",
+        "route": "BRtB11C13",
+        "os": "BOSE",
+        "block": "B11,B11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C22L",
+        "route": "BRtB10B11",
+        "os": "BOSWW",
+        "block": "B10,B10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N26L",
+        "route": "NRtB10N31",
+        "os": "NEOSW",
+        "block": "N31"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N31",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N18LB",
+        "route": "NRtN11N31",
+        "os": "NWOSW",
+        "block": "N11.E,N11,N11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K8LB",
+        "route": "KRtN10N11",
+        "os": "KOSW",
+        "block": "N10.E,N10,N10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N10W",
+        "route": "KRtN10S11",
+        "os": "KOSN10S11",
+        "block": "S11.E,S11,S11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN10S11",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LA",
+        "route": "SRtS10S11",
+        "os": "SOSW",
+        "block": "S10.E,S10,S10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.E,D11,D11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtD10D11",
+        "os": "DOSVJW",
+        "block": "D10,D10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L18L",
+        "route": "LRtL11D10",
+        "os": "LOSCAW",
+        "block": "L11,L11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L8L",
+        "route": "LRtL10L11",
+        "os": "LOSLAW",
+        "block": "L10,L10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y2L",
+        "route": "YRtY11L10",
+        "os": "YOSCJW",
+        "block": "Y11,Y11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y8L",
+        "route": "YRtY30Y11",
+        "os": "YOSEJW",
+        "block": "Y30"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y30",
+        "time": 2500
+      }
+    }
+  ],
+  "CP3": [
+    {
+      "placetrain": {
+        "block": "C22",
+        "name": "CP3",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C10L",
+        "route": "CRtC23C22",
+        "os": "COSCLEW",
+        "block": "C23,C23.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C23.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14LB",
+        "route": "CRtC13C23",
+        "os": "COSCLW",
+        "block": "C13.E,C13,C13.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18L",
+        "route": "BRtB11C13",
+        "os": "BOSE",
+        "block": "B11,B11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C22L",
+        "route": "BRtB10B11",
+        "os": "BOSWW",
+        "block": "B10,B10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N26L",
+        "route": "NRtB10N31",
+        "os": "NEOSW",
+        "block": "N31"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N31",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N18LB",
+        "route": "NRtN11N31",
+        "os": "NWOSW",
+        "block": "N11.E,N11,N11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K8LB",
+        "route": "KRtN10N11",
+        "os": "KOSW",
+        "block": "N10.E,N10,N10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSW",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N10W",
+        "route": "KRtN10S11",
+        "os": "KOSN10S11",
+        "block": "S11.E,S11,S11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN10S11",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LA",
+        "route": "SRtS10S11",
+        "os": "SOSW",
+        "block": "S10.E,S10,S10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.E,D11,D11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtD10D11",
+        "os": "DOSVJW",
+        "block": "D10,D10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L18L",
+        "route": "LRtL11D10",
+        "os": "LOSCAW",
+        "block": "L11,L11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L8L",
+        "route": "LRtL10L11",
+        "os": "LOSLAW",
+        "block": "L10,L10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y2L",
+        "route": "YRtY11L10",
+        "os": "YOSCJW",
+        "block": "Y11,Y11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y8L",
+        "route": "YRtY30Y11",
+        "os": "YOSEJW",
+        "block": "Y30"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y30",
+        "time": 2500
+      }
+    }
+  ],
+  "HE22": [
+    {
+      "placetrain": {
+        "block": "H22",
+        "name": "HE22",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H10RA",
+        "route": "HRtH22H23",
+        "os": "HOSEE",
+        "block": "H23,H23.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H23",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H23.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RB",
+        "route": "DRtH23D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20H20",
+        "os": "SOSE",
+        "block": "H20,H20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S18R",
+        "route": "SRtH20H21",
+        "os": "SOSHJM",
+        "block": "H21,H21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSHJM",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H21",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H4R",
+        "route": "HRtH21H22",
+        "os": "HOSWE",
+        "block": "H22"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSWE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H22",
+        "time": 2500
+      }
+    }
+  ],
+  "HE41": [
+    {
+      "placetrain": {
+        "block": "H41",
+        "name": "HE41",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H10RD",
+        "route": "HRtH23H41",
+        "os": "HOSEE",
+        "block": "H23,H23.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H23",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H23.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RB",
+        "route": "DRtH23D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20H20",
+        "os": "SOSE",
+        "block": "H20,H20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S18R",
+        "route": "SRtH20H21",
+        "os": "SOSHJM",
+        "block": "H21,H21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSHJM",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H21",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H4R",
+        "route": "HRtH21H41",
+        "os": "HOSWE",
+        "block": "H41"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSWE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H41",
+        "time": 2500
+      }
+    }
+  ],
+  "HE42": [
+    {
+      "placetrain": {
+        "block": "H42",
+        "name": "HE42",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H10RC",
+        "route": "HRtH23H42",
+        "os": "HOSEE",
+        "block": "H23,H23.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H23",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H23.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RB",
+        "route": "DRtH23D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20H20",
+        "os": "SOSE",
+        "block": "H20,H20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S18R",
+        "route": "SRtH20H21",
+        "os": "SOSHJM",
+        "block": "H21,H21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSHJM",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H21",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H4R",
+        "route": "HRtH21H42",
+        "os": "HOSWE",
+        "block": "H42"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSWE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H42",
+        "time": 2500
+      }
+    }
+  ],
+  "HE43": [
+    {
+      "placetrain": {
+        "block": "H43",
+        "name": "HE43",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H10RB",
+        "route": "HRtH23H43",
+        "os": "HOSEE",
+        "block": "H23,H23.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H23",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H23.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RB",
+        "route": "DRtH23D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20H20",
+        "os": "SOSE",
+        "block": "H20,H20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S18R",
+        "route": "SRtH20H21",
+        "os": "SOSHJM",
+        "block": "H21,H21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSHJM",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H21",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H4R",
+        "route": "HRtH21H43",
+        "os": "HOSWE",
+        "block": "H43"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSWE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H43",
         "time": 2500
       }
     }
@@ -6855,6 +10332,597 @@
     {
       "movetrain": {
         "block": "H40",
+        "time": 2500
+      }
+    }
+  ],
+  "HW12": [
+    {
+      "placetrain": {
+        "block": "H12",
+        "name": "HW12",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H6LD",
+        "route": "HRtH11H12",
+        "os": "HOSWW",
+        "block": "H11,H11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSWW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S20L",
+        "route": "SRtH10H11",
+        "os": "SOSHJW",
+        "block": "H10,H10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSHJW",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10A",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10B",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LC",
+        "route": "SRtS10H10",
+        "os": "SOSW",
+        "block": "S10.E,S10,S10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.E,D11,D11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtH13D11",
+        "os": "DOSVJW",
+        "block": "H13,H13.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H12L",
+        "route": "HRtH12H13",
+        "os": "HOSEW",
+        "block": "H12"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H12",
+        "time": 2500
+      }
+    }
+  ],
+  "HW33": [
+    {
+      "placetrain": {
+        "block": "H33",
+        "name": "HW33",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H6LB",
+        "route": "HRtH11H33",
+        "os": "HOSWW",
+        "block": "H11,H11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSWW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S20L",
+        "route": "SRtH10H11",
+        "os": "SOSHJW",
+        "block": "H10,H10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSHJW",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10A",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10B",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LC",
+        "route": "SRtS10H10",
+        "os": "SOSW",
+        "block": "S10.E,S10,S10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.E,D11,D11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtH13D11",
+        "os": "DOSVJW",
+        "block": "H13,H13.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H12L",
+        "route": "HRtH13H33",
+        "os": "HOSEW",
+        "block": "H33"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H33",
+        "time": 2500
+      }
+    }
+  ],
+  "HW34": [
+    {
+      "placetrain": {
+        "block": "H34",
+        "name": "HW34",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H6LC",
+        "route": "HRtH11H34",
+        "os": "HOSWW",
+        "block": "H11,H11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSWW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H11",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S20L",
+        "route": "SRtH10H11",
+        "os": "SOSHJW",
+        "block": "H10,H10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSHJW",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10A",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10B",
+        "time": 1500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S12LC",
+        "route": "SRtS10H10",
+        "os": "SOSW",
+        "block": "S10.E,S10,S10.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSW",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S10.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D12L",
+        "route": "DRtD11S10",
+        "os": "DOSFOW",
+        "block": "D11.E,D11,D11.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOW",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.E",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D11.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D6L",
+        "route": "DRtH13D11",
+        "os": "DOSVJW",
+        "block": "H13,H13.W"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H13.W",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "H12L",
+        "route": "HRtH13H34",
+        "os": "HOSEW",
+        "block": "H34"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "HOSEW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "H34",
         "time": 2500
       }
     }
@@ -7160,13 +11228,13 @@
         "signal": "S4R",
         "route": "SRtS20S21",
         "os": "SOSE",
-        "block": "S21"
+        "block": "S21.W,S21,S21.E"
       }
     },
     {
       "movetrain": {
         "block": "SOSE",
-        "time": 2500
+        "time": 2000
       }
     },
     {
@@ -7178,7 +11246,7 @@
     {
       "movetrain": {
         "block": "S21",
-        "time": 1500
+        "time": 2000
       }
     },
     {
@@ -8159,13 +12227,13 @@
         "signal": "S4R",
         "route": "SRtS20S21",
         "os": "SOSE",
-        "block": "S21"
+        "block": "S21.W,S21,S21.E"
       }
     },
     {
       "movetrain": {
         "block": "SOSE",
-        "time": 2500
+        "time": 2000
       }
     },
     {
@@ -8177,7 +12245,7 @@
     {
       "movetrain": {
         "block": "S21",
-        "time": 1500
+        "time": 2000
       }
     },
     {
@@ -8686,13 +12754,13 @@
         "signal": "S4R",
         "route": "SRtS20S21",
         "os": "SOSE",
-        "block": "S21"
+        "block": "S21.W,S21,S21.E"
       }
     },
     {
       "movetrain": {
         "block": "SOSE",
-        "time": 2500
+        "time": 2000
       }
     },
     {
@@ -8704,7 +12772,7 @@
     {
       "movetrain": {
         "block": "S21",
-        "time": 1500
+        "time": 2000
       }
     },
     {
@@ -9277,6 +13345,3108 @@
     {
       "movetrain": {
         "block": "H22",
+        "time": 2500
+      }
+    }
+  ],
+  "YF1": [
+    {
+      "placetrain": {
+        "block": "Y70",
+        "name": "YF1",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y26RC",
+        "route": "YRtY20Y70",
+        "os": "YOSKL1",
+        "block": "Y20,Y20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSKL1",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y10R",
+        "route": "YRtY20Y21",
+        "os": "YOSEJE",
+        "block": "Y21.W,Y21,Y21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y4R",
+        "route": "YRtY21L20",
+        "os": "YOSCJE",
+        "block": "L20,L20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L6RA",
+        "route": "LRtL20L21",
+        "os": "LOSLAM",
+        "block": "L21.W,L21,L21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAM",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L16R",
+        "route": "LRtL21D20",
+        "os": "LOSCAM",
+        "block": "D20,D20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAM",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RA",
+        "route": "DRtD20D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20S21",
+        "os": "SOSE",
+        "block": "S21.W,S21,S21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S21E",
+        "route": "KRtN20S21",
+        "os": "KOSN20S21",
+        "block": "N20.W,N20,N20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN20S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K2R",
+        "route": "KRtN20N21",
+        "os": "KOSE",
+        "block": "N21.W,N21,N21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N14R",
+        "route": "NRtN21N22",
+        "os": "NWOSE",
+        "block": "N22"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N22",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N24RA",
+        "route": "NRtB20N22",
+        "os": "NEOSE",
+        "block": "B20,B20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C24R",
+        "route": "BRtB20B21",
+        "os": "BOSWE",
+        "block": "B21.W,B21,B21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18RA",
+        "route": "BRtB21C13",
+        "os": "BOSE",
+        "block": "C13.W,C13,C13.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14R",
+        "route": "CRtC13C12",
+        "os": "COSCLW",
+        "block": "C12.W,C12"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C12R",
+        "route": "CRtC12C11",
+        "os": "COSCLEE",
+        "block": "C11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C11",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C4R",
+        "route": "CRtC11C10",
+        "os": "COSGMW",
+        "block": "C10"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGMW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C10",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C2RB",
+        "route": "CRtC10C20",
+        "os": "COSGME",
+        "block": "C20"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGME",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C20",
+        "time": 2500
+      }
+    }
+  ],
+  "YF2": [
+    {
+      "placetrain": {
+        "block": "Y70",
+        "name": "YF2",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y26RC",
+        "route": "YRtY20Y70",
+        "os": "YOSKL1",
+        "block": "Y20,Y20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSKL1",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y10R",
+        "route": "YRtY20Y21",
+        "os": "YOSEJE",
+        "block": "Y21.W,Y21,Y21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y4R",
+        "route": "YRtY21L20",
+        "os": "YOSCJE",
+        "block": "L20,L20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L6RA",
+        "route": "LRtL20L21",
+        "os": "LOSLAM",
+        "block": "L21.W,L21,L21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAM",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L16R",
+        "route": "LRtL21D20",
+        "os": "LOSCAM",
+        "block": "D20,D20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAM",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RA",
+        "route": "DRtD20D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20S21",
+        "os": "SOSE",
+        "block": "S21.W,S21,S21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S21E",
+        "route": "KRtN20S21",
+        "os": "KOSN20S21",
+        "block": "N20.W,N20,N20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN20S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K2R",
+        "route": "KRtN20N21",
+        "os": "KOSE",
+        "block": "N21.W,N21,N21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N14R",
+        "route": "NRtN21N22",
+        "os": "NWOSE",
+        "block": "N22"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N22",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N24RA",
+        "route": "NRtB20N22",
+        "os": "NEOSE",
+        "block": "B20,B20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C24R",
+        "route": "BRtB20B21",
+        "os": "BOSWE",
+        "block": "B21.W,B21,B21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18RA",
+        "route": "BRtB21C13",
+        "os": "BOSE",
+        "block": "C13.W,C13,C13.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14R",
+        "route": "CRtC13C12",
+        "os": "COSCLW",
+        "block": "C12.W,C12"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C12R",
+        "route": "CRtC12C11",
+        "os": "COSCLEE",
+        "block": "C11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C11",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C4R",
+        "route": "CRtC11C10",
+        "os": "COSGMW",
+        "block": "C10"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGMW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C10",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C2RB",
+        "route": "CRtC10C20",
+        "os": "COSGME",
+        "block": "C20"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGME",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C20",
+        "time": 2500
+      }
+    }
+  ],
+  "YF3": [
+    {
+      "placetrain": {
+        "block": "Y70",
+        "name": "YF3",
+        "loco": 0,
+        "time": 5000,
+        "length": 3
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y26RC",
+        "route": "YRtY20Y70",
+        "os": "YOSKL1",
+        "block": "Y20,Y20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSKL1",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y10R",
+        "route": "YRtY20Y21",
+        "os": "YOSEJE",
+        "block": "Y21.W,Y21,Y21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y4R",
+        "route": "YRtY21L20",
+        "os": "YOSCJE",
+        "block": "L20,L20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L6RA",
+        "route": "LRtL20L21",
+        "os": "LOSLAM",
+        "block": "L21.W,L21,L21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAM",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L16R",
+        "route": "LRtL21D20",
+        "os": "LOSCAM",
+        "block": "D20,D20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAM",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RA",
+        "route": "DRtD20D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20S21",
+        "os": "SOSE",
+        "block": "S21.W,S21,S21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S21E",
+        "route": "KRtN20S21",
+        "os": "KOSN20S21",
+        "block": "N20.W,N20,N20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN20S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K2R",
+        "route": "KRtN20N21",
+        "os": "KOSE",
+        "block": "N21.W,N21,N21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N14R",
+        "route": "NRtN21N22",
+        "os": "NWOSE",
+        "block": "N22"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N22",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N24RA",
+        "route": "NRtB20N22",
+        "os": "NEOSE",
+        "block": "B20,B20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C24R",
+        "route": "BRtB20B21",
+        "os": "BOSWE",
+        "block": "B21.W,B21,B21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18RA",
+        "route": "BRtB21C13",
+        "os": "BOSE",
+        "block": "C13.W,C13,C13.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14R",
+        "route": "CRtC13C12",
+        "os": "COSCLW",
+        "block": "C12.W,C12"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C12R",
+        "route": "CRtC12C11",
+        "os": "COSCLEE",
+        "block": "C11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C11",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C4R",
+        "route": "CRtC11C10",
+        "os": "COSGMW",
+        "block": "C10"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGMW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C10",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C2RB",
+        "route": "CRtC10C20",
+        "os": "COSGME",
+        "block": "C20"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGME",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C20",
+        "time": 2500
+      }
+    }
+  ],
+  "YP1": [
+    {
+      "placetrain": {
+        "block": "Y20",
+        "name": "YP1",
+        "loco": 0,
+        "time": 4500,
+        "length": 3
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y10R",
+        "route": "YRtY20Y21",
+        "os": "YOSEJE",
+        "block": "Y21.W,Y21,Y21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y4R",
+        "route": "YRtY21L20",
+        "os": "YOSCJE",
+        "block": "L20,L20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L6RA",
+        "route": "LRtL20L21",
+        "os": "LOSLAM",
+        "block": "L21.W,L21,L21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAM",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L16R",
+        "route": "LRtL21D20",
+        "os": "LOSCAM",
+        "block": "D20,D20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAM",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RA",
+        "route": "DRtD20D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20S21",
+        "os": "SOSE",
+        "block": "S21.W,S21,S21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S21E",
+        "route": "KRtN20S21",
+        "os": "KOSN20S21",
+        "block": "N20.W,N20,N20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN20S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K2R",
+        "route": "KRtN20N21",
+        "os": "KOSE",
+        "block": "N21.W,N21,N21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N14R",
+        "route": "NRtN21N41",
+        "os": "NWOSE",
+        "block": "N41"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N41",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N24RB",
+        "route": "NRtB20N41",
+        "os": "NEOSE",
+        "block": "B20,B20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C24R",
+        "route": "BRtB20B21",
+        "os": "BOSWE",
+        "block": "B21.W,B21,B21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18RA",
+        "route": "BRtB21C13",
+        "os": "BOSE",
+        "block": "C13.W,C13,C13.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14R",
+        "route": "CRtC13C12",
+        "os": "COSCLW",
+        "block": "C12.W,C12"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C12R",
+        "route": "CRtC12C11",
+        "os": "COSCLEE",
+        "block": "C11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C11",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C4R",
+        "route": "CRtC11C30",
+        "os": "COSGMW",
+        "block": "C30"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGMW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C30",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C2RA",
+        "route": "CRtC30C20",
+        "os": "COSGME",
+        "block": "C20"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGME",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C20",
+        "time": 2500
+      }
+    }
+  ],
+  "YP2": [
+    {
+      "placetrain": {
+        "block": "Y20",
+        "name": "YP2",
+        "loco": 0,
+        "time": 4500,
+        "length": 3
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y10R",
+        "route": "YRtY20Y21",
+        "os": "YOSEJE",
+        "block": "Y21.W,Y21,Y21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y4R",
+        "route": "YRtY21L20",
+        "os": "YOSCJE",
+        "block": "L20,L20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L6RA",
+        "route": "LRtL20L21",
+        "os": "LOSLAM",
+        "block": "L21.W,L21,L21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAM",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L16R",
+        "route": "LRtL21D20",
+        "os": "LOSCAM",
+        "block": "D20,D20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAM",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RA",
+        "route": "DRtD20D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20S21",
+        "os": "SOSE",
+        "block": "S21.W,S21,S21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S21E",
+        "route": "KRtN20S21",
+        "os": "KOSN20S21",
+        "block": "N20.W,N20,N20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN20S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K2R",
+        "route": "KRtN20N21",
+        "os": "KOSE",
+        "block": "N21.W,N21,N21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N14R",
+        "route": "NRtN21N41",
+        "os": "NWOSE",
+        "block": "N41"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N41",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N24RB",
+        "route": "NRtB20N41",
+        "os": "NEOSE",
+        "block": "B20,B20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C24R",
+        "route": "BRtB20B21",
+        "os": "BOSWE",
+        "block": "B21.W,B21,B21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18RA",
+        "route": "BRtB21C13",
+        "os": "BOSE",
+        "block": "C13.W,C13,C13.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14R",
+        "route": "CRtC13C12",
+        "os": "COSCLW",
+        "block": "C12.W,C12"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C12R",
+        "route": "CRtC12C11",
+        "os": "COSCLEE",
+        "block": "C11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C11",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C4R",
+        "route": "CRtC11C30",
+        "os": "COSGMW",
+        "block": "C30"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGMW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C30",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C2RA",
+        "route": "CRtC30C20",
+        "os": "COSGME",
+        "block": "C20"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGME",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C20",
+        "time": 2500
+      }
+    }
+  ],
+  "YP3": [
+    {
+      "placetrain": {
+        "block": "Y20",
+        "name": "YP3",
+        "loco": 0,
+        "time": 4500,
+        "length": 3
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y10R",
+        "route": "YRtY20Y21",
+        "os": "YOSEJE",
+        "block": "Y21.W,Y21,Y21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSEJE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "Y21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "Y4R",
+        "route": "YRtY21L20",
+        "os": "YOSCJE",
+        "block": "L20,L20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "YOSCJE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L6RA",
+        "route": "LRtL20L21",
+        "os": "LOSLAM",
+        "block": "L21.W,L21,L21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSLAM",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "L21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "L16R",
+        "route": "LRtL21D20",
+        "os": "LOSCAM",
+        "block": "D20,D20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "LOSCAM",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D4RA",
+        "route": "DRtD20D21",
+        "os": "DOSVJE",
+        "block": "D21.W,D21,D21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSVJE",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21A",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21B",
+        "time": 1333
+      }
+    },
+    {
+      "movetrain": {
+        "block": "D21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "D10R",
+        "route": "DRtD21S20",
+        "os": "DOSFOE",
+        "block": "S20.W,S20,S20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "DOSFOE",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20A",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20B",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20C",
+        "time": 1000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S4R",
+        "route": "SRtS20S21",
+        "os": "SOSE",
+        "block": "S21.W,S21,S21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "SOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "S21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "S21E",
+        "route": "KRtN20S21",
+        "os": "KOSN20S21",
+        "block": "N20.W,N20,N20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSN20S21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "K2R",
+        "route": "KRtN20N21",
+        "os": "KOSE",
+        "block": "N21.W,N21,N21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "KOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N14R",
+        "route": "NRtN21N41",
+        "os": "NWOSE",
+        "block": "N41"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NWOSE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "N41",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "N24RB",
+        "route": "NRtB20N41",
+        "os": "NEOSE",
+        "block": "B20,B20.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "NEOSE",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B20.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C24R",
+        "route": "BRtB20B21",
+        "os": "BOSWE",
+        "block": "B21.W,B21,B21.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSWE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "B21.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C18RA",
+        "route": "BRtB21C13",
+        "os": "BOSE",
+        "block": "C13.W,C13,C13.E"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "BOSE",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13",
+        "time": 2000
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C13.E",
+        "time": 500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C14R",
+        "route": "CRtC13C12",
+        "os": "COSCLW",
+        "block": "C12.W,C12"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLW",
+        "time": 2250
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12.W",
+        "time": 500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C12",
+        "time": 2250
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C12R",
+        "route": "CRtC12C11",
+        "os": "COSCLEE",
+        "block": "C11"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSCLEE",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C11",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C4R",
+        "route": "CRtC11C30",
+        "os": "COSGMW",
+        "block": "C30"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGMW",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C30",
+        "time": 2500
+      }
+    },
+    {
+      "waitfor": {
+        "signal": "C2RA",
+        "route": "CRtC30C20",
+        "os": "COSGME",
+        "block": "C20"
+      }
+    },
+    {
+      "movetrain": {
+        "block": "COSGME",
+        "time": 2500
+      }
+    },
+    {
+      "movetrain": {
+        "block": "C20",
         "time": 2500
       }
     }

@@ -159,7 +159,6 @@ class MainFrame(wx.Frame):
 
 		self.bServerHide = wx.Button(self, wx.ID_ANY, "Hide/Show", pos=(self.centerOffset+100, 75), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnServerHideShow, self.bServerHide)
-		self.bServerHide.Enable(False)
 		self.serverHidden = self.settings.serverhidden
 		if not self.IsDispatcher():
 			self.bServerHide.Hide()
@@ -233,7 +232,7 @@ class MainFrame(wx.Frame):
 		
 	def OnServerHideShow(self, _):
 		self.serverHidden = not self.serverHidden
-		self.Request( {"server": {"action": "hide" if self.serverHidden else "show"}})	
+		self.Request( {"server": {"action": "hide" if self.serverHidden else "show"}}, force=True)	
 
 	def DefineWidgets(self, voffset):
 		if not self.IsDispatcher():
@@ -1129,7 +1128,7 @@ class MainFrame(wx.Frame):
 			self.sessionid = None
 			self.bSubscribe.SetLabel("Connect")
 			self.bRefresh.Enable(False)
-			self.bServerHide.Enable(False)
+			#self.bServerHide.Enable(False)
 			self.bLoadTrains.Enable(False)
 			self.bLoadLocos.Enable(False)
 			self.bSaveTrains.Enable(False)
@@ -1150,7 +1149,7 @@ class MainFrame(wx.Frame):
 			self.subscribed = True
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
-			self.bServerHide.Enable(True)
+			#self.bServerHide.Enable(True)
 			self.bLoadTrains.Enable(True)
 			self.bLoadLocos.Enable(True)
 			self.bSaveTrains.Enable(True)
@@ -1526,11 +1525,11 @@ class MainFrame(wx.Frame):
 		except RuntimeError:
 			logging.info("Runtime error caught while trying to post disconnect event - not a problem if this is during shutdown")
 
-	def Request(self, req):
+	def Request(self, req, force=False):
 		command = list(req.keys())[0]
 		if self.settings.dispatch or command in allowedCommands:
 			
-			if self.subscribed:
+			if self.subscribed or force:
 				if "delay" in req[command] and req[command]["delay"] > 0:
 					self.delayedRequests.Append(req)
 				else:
@@ -1560,7 +1559,7 @@ class MainFrame(wx.Frame):
 		self.subscribed = False
 		self.bSubscribe.SetLabel("Connect")
 		self.bRefresh.Enable(False)
-		self.bServerHide.Enable(False)
+		#self.bServerHide.Enable(False)
 		self.bLoadTrains.Enable(False)
 		self.bLoadLocos.Enable(False)
 		self.bSaveTrains.Enable(False)
@@ -1571,6 +1570,13 @@ class MainFrame(wx.Frame):
 			self.cbAdvisor.Enable(False)
 		logging.info("Server socket closed")
 		self.breakerDisplay.UpdateDisplay()
+
+		dlg = wx.MessageDialog(self, "The railroad server connection has gone down.",
+			"Server Connection Error",
+			wx.OK | wx.ICON_ERROR)
+		dlg.ShowModal()
+		dlg.Destroy()
+		
 		self.ShowTitle()
 
 	def OnBSaveTrains(self, _):

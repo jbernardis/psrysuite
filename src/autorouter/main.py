@@ -269,7 +269,7 @@ class MainUnit:
 		if train not in self.trains:
 			return  # unknown train - skip
 		
-		logging.info("Adding train %s to AR")
+		logging.info("Adding train %s to AR" % train)
 		if train not in self.ARTrains:
 			self.ARTrains.append(train)
 			
@@ -284,7 +284,7 @@ class MainUnit:
 		if train not in self.ARTrains:
 			return 
 		
-		logging.info("Removing train %s from AR")
+		logging.info("Removing train %s from AR" % train)
 		self.ARTrains.remove(train)
 		
 		self.DeleteQueuedRequests(train)
@@ -338,7 +338,7 @@ class MainUnit:
 		return RouteRequest(train, self.routes[rtName], block)
 
 	def EvaluateRouteRequest(self, rteRq):
-		logging.info("evaluating routeRequest %s" % rteRq.tostring())
+		logging.info("evaluating routeRequest %s" % rteRq.toString())
 		rname = rteRq.GetName()
 		blkName = rteRq.GetEntryBlock()
 		logging.info("evaluate route %s" % rname)
@@ -388,7 +388,7 @@ class MainUnit:
 	def SetupRoute(self, rteRq):
 		rname = rteRq.GetName()
 		blkName = rteRq.GetEntryBlock()
-		logging.info("set up route %s" % rname)
+		logging.info("set up route %s" % rteRq.toString())
 		rte = self.routes[rname]
 		for t in rte.GetTurnouts():
 			logging.info("Turnout %s" % t)

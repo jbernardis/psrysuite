@@ -264,18 +264,19 @@ class MainUnit:
 		
 	def ReportRouteRequest(self, routeRequest):	
 		osnm = routeRequest.GetOS()
-		osblk = self.osList[osnm]
+		osblk = self.osList[osnm]			
 		actRt = osblk.GetActiveRoute()
-		actRtNm = actRt.GetName()
-		
-		neededRt = routeRequest.GetRoute()
-		entryBlkNm = routeRequest.GetEntryBlock()
-		exitBlkNm = neededRt.GetOtherEnd(entryBlkNm)
-		signalNm = neededRt.GetSignalForEnd(entryBlkNm)
-		aspect = self.signals[signalNm].GetAspect()
-		if actRtNm == routeRequest.GetName() and aspect != 0:
-			logging.info("already set to the active route with a signal")
-			return
+		if actRt is not None:
+			actRtNm = actRt.GetName()
+			
+			neededRt = routeRequest.GetRoute()
+			entryBlkNm = routeRequest.GetEntryBlock()
+			exitBlkNm = neededRt.GetOtherEnd(entryBlkNm)
+			signalNm = neededRt.GetSignalForEnd(entryBlkNm)
+			aspect = self.signals[signalNm].GetAspect()
+			if actRtNm == routeRequest.GetName() and aspect != 0:
+				logging.info("already set to the active route with a signal")
+				return
 
 		routeRequest.Print()
 		logging.info("Advise: Train %s needs a route to block %s via signal %s" % (routeRequest.GetTrain(), exitBlkNm, signalNm))

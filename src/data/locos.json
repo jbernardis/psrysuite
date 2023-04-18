@@ -22,7 +22,7 @@
         }
     },
     "1147": {
-        "desc": "Pacific Southern / Old Style Green",
+        "desc": "PSRY 2-8-0 / Old Style Green",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -55,7 +55,7 @@
         }
     },
     "1415": {
-        "desc": "NJ Transit",
+        "desc": "PSRY / Old Style Green",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -66,7 +66,7 @@
         }
     },
     "1419": {
-        "desc": "B&O",
+        "desc": "B&O / Long Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -77,7 +77,7 @@
         }
     },
     "1523": {
-        "desc": null,
+        "desc": "NJ Ctrl / Engine (Test)",
         "prof": {
             "acc": 2,
             "dec": 1,
@@ -110,7 +110,18 @@
         }
     },
     "1921": {
-        "desc": "Nassau Northern",
+        "desc": "Nassau Nthn 4-6-2 / Old Pass",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "198": {
+        "desc": "WM / Short Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -132,7 +143,7 @@
         }
     },
     "203": {
-        "desc": "Amtrak",
+        "desc": "Amtrak / Long Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -176,7 +187,7 @@
         }
     },
     "2100": {
-        "desc": null,
+        "desc": "Redding 4-8-4 / Mixed Freight",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -231,7 +242,7 @@
         }
     },
     "2216": {
-        "desc": "Northern Pacific",
+        "desc": "NP / Long Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -242,7 +253,7 @@
         }
     },
     "226": {
-        "desc": "Amtrak",
+        "desc": "Amtrak / Short Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -261,6 +272,17 @@
             "medium": 70,
             "slow": 25,
             "start": 15
+        }
+    },
+    "252": {
+        "desc": "Susquehanna / Mixed Freight",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
         }
     },
     "2591": {
@@ -286,7 +308,7 @@
         }
     },
     "2681": {
-        "desc": "Santa Fe / old style - 4 short",
+        "desc": "Santa Fe / Old Style (4 short)",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -374,7 +396,7 @@
         }
     },
     "3648": {
-        "desc": "Penn / Billboard Reefer",
+        "desc": "Penn / Bill Board Reefer",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -385,7 +407,7 @@
         }
     },
     "375": {
-        "desc": "RDC / Boston & Main",
+        "desc": "RDC / Boston & Main (3 units)",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -393,6 +415,17 @@
             "medium": 59,
             "slow": 35,
             "start": 25
+        }
+    },
+    "3758": {
+        "desc": "Santa Fe 4-8-8 / Old Style",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
         }
     },
     "3768": {
@@ -407,7 +440,7 @@
         }
     },
     "3809": {
-        "desc": "PSR / Ore",
+        "desc": "PSRY 2-6-6-4 / Ore Train",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -418,7 +451,7 @@
         }
     },
     "40": {
-        "desc": "RDC Northern Pacific",
+        "desc": "RDC NP (3 units)",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -429,7 +462,7 @@
         }
     },
     "4023": {
-        "desc": "Pate Bros Circus",
+        "desc": "UP 4-8-8-4 / Pate Bros Circus",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -440,7 +473,7 @@
         }
     },
     "4024": {
-        "desc": null,
+        "desc": "NYC / Streamline",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -484,7 +517,7 @@
         }
     },
     "427": {
-        "desc": "PSRY / Old Style Red",
+        "desc": "PSRY 2-8-2 / Old Style Red",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -516,8 +549,19 @@
             "start": 10
         }
     },
+    "4350": {
+        "desc": "SP 4-8-2 / Daylight",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
     "4368": {
-        "desc": "Rock / Cattle",
+        "desc": "Rock / Cattle Train",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -528,7 +572,7 @@
         }
     },
     "4515": {
-        "desc": "NJ Transit",
+        "desc": "NJ Transit / Bi-directional",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -561,7 +605,7 @@
         }
     },
     "493": {
-        "desc": "Nickel Plate / PSR Old Style Red",
+        "desc": "NP / PSR Old Style Red",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -572,7 +616,7 @@
         }
     },
     "498": {
-        "desc": "ATSF / Nassau Northern",
+        "desc": "ATSF 4-4-0 Coal / Nassau Nrth",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -583,7 +627,7 @@
         }
     },
     "50": {
-        "desc": "Santa Fe / 1940 Passenger ",
+        "desc": "Santa Fe / 1940 Pass ",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -594,7 +638,7 @@
         }
     },
     "5024": {
-        "desc": "Chicago & NW",
+        "desc": "C&NW / Bi-directonal",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -602,6 +646,17 @@
             "medium": 66,
             "slow": 25,
             "start": 15
+        }
+    },
+    "513": {
+        "desc": "Penn 2-10-0 / Bill Board",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
         }
     },
     "5213": {
@@ -627,7 +682,7 @@
         }
     },
     "5304": {
-        "desc": null,
+        "desc": "Reading (6) / Coal Full",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -638,7 +693,7 @@
         }
     },
     "5450": {
-        "desc": "NYC",
+        "desc": "NYC 4-6-4 / Streamline Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -682,7 +737,7 @@
         }
     },
     "5536": {
-        "desc": "Pennsylvania",
+        "desc": "Penn / Long Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -704,7 +759,7 @@
         }
     },
     "5641": {
-        "desc": "DRG / Ski",
+        "desc": "DRG Ski / Long Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -737,7 +792,7 @@
         }
     },
     "5840": {
-        "desc": "BNSF / Grain",
+        "desc": "BNSF / Grain Train",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -748,7 +803,7 @@
         }
     },
     "600": {
-        "desc": "Denver Rio Grande",
+        "desc": "DRG / Long Pass",
         "prof": {
             "acc": 1,
             "dec": 2,
@@ -759,7 +814,7 @@
         }
     },
     "6002": {
-        "desc": "New York Central / Old Style",
+        "desc": "NYC 4-8-4 / Old Style",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -781,7 +836,7 @@
         }
     },
     "6034": {
-        "desc": null,
+        "desc": "SP PA / Daylight",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -814,7 +869,7 @@
         }
     },
     "6076": {
-        "desc": "BHP / Tank",
+        "desc": "BHP / Tank Train",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -824,8 +879,30 @@
             "start": 20
         }
     },
+    "6078": {
+        "desc": "CXS / Tank Train",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "609": {
+        "desc": "Reading (4) / Mixed Freight",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
     "6118": {
-        "desc": "RDC - Boston & Maine / 2 units",
+        "desc": "RDC - B&M (2 units)",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -836,7 +913,7 @@
         }
     },
     "6137": {
-        "desc": "RDC - B & O / 3 units",
+        "desc": "RDC - B&O (3 units)",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -858,7 +935,7 @@
         }
     },
     "64": {
-        "desc": "Pacific Southern / Exectrix",
+        "desc": "PSRY PA / Exectrix",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -877,6 +954,17 @@
             "medium": 84,
             "slow": 50,
             "start": 40
+        }
+    },
+    "6511": {
+        "desc": "NP / Long Pass",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
         }
     },
     "669": {
@@ -913,7 +1001,7 @@
         }
     },
     "68": {
-        "desc": "Pacific Southern / Exec",
+        "desc": "PSRY F8 / Exec",
         "prof": {
             "acc": 2,
             "dec": 2,
@@ -924,7 +1012,7 @@
         }
     },
     "69": {
-        "desc": "Milwaukee",
+        "desc": "Milwaukee / Long Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -946,7 +1034,7 @@
         }
     },
     "6972": {
-        "desc": "PSRY / Santa Fe",
+        "desc": "PSRY / Santa Fe -Old Style",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -968,7 +1056,7 @@
         }
     },
     "700": {
-        "desc": "New Haven",
+        "desc": "New Haven / Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -979,7 +1067,7 @@
         }
     },
     "743": {
-        "desc": "B & O",
+        "desc": "B&O / Short Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1001,7 +1089,7 @@
         }
     },
     "7600": {
-        "desc": "B&O / Empty Coal",
+        "desc": "B&O(2)  2-8-8-4 / Empty Coal",
         "prof": {
             "acc": 5,
             "dec": 10,
@@ -1011,19 +1099,8 @@
             "start": 10
         }
     },
-    "777": {
-        "desc": "new one",
-        "prof": {
-            "acc": 1,
-            "dec": 1,
-            "fast": 80,
-            "medium": 58,
-            "slow": 10,
-            "start": 0
-        }
-    },
     "791": {
-        "desc": null,
+        "desc": "New Haven / Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1067,7 +1144,7 @@
         }
     },
     "860": {
-        "desc": "Lackawanna",
+        "desc": "Lackawanna / Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1089,7 +1166,7 @@
         }
     },
     "91": {
-        "desc": "ATSF / PS Business Car",
+        "desc": "ATSF4-4-0 / PS Bus Car",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1111,7 +1188,7 @@
         }
     },
     "914": {
-        "desc": "UP",
+        "desc": "UP / Long Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1122,7 +1199,7 @@
         }
     },
     "9164": {
-        "desc": "RDC / Reading",
+        "desc": "RDC / Reading (1 unit)",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1166,7 +1243,7 @@
         }
     },
     "9669": {
-        "desc": "Penn / Mail",
+        "desc": "Penn / Mail Train",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1207,6 +1284,17 @@
             "medium": 101,
             "slow": 60,
             "start": 50
+        }
+    },
+    "9968": {
+        "desc": "Burlington / Denger Rio Grande",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
         }
     }
 }

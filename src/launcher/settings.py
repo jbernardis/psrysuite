@@ -34,3 +34,19 @@ class Settings:
 		
 		else:
 			logging.warning("Missing global section - assuming defaults")
+			
+	def SetSimulation(self, flag=True):
+		self.cfg.set("rrserver", "simulation", "True" if flag else "False")
+		self.saveSettings()
+		
+	def SetDispatcher(self, flag=True):
+		self.cfg.set("dispatcher", "dispatch", "True" if flag else "False")
+		
+		self.saveSettings()
+		
+	def saveSettings(self):
+		with open(self.inifile, 'w') as cfp:
+			self.cfg.write(cfp)
+
+		
+

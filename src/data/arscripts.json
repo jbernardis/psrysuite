@@ -61,11 +61,7 @@
       "route": "YRtY30Y11",
       "trigger": "F"
     },
-    "Y30": {
-      "route": "YRtY30Y51",
-      "trigger": "F"
-    },
-    "terminus": "Y51"
+    "terminus": "Y30"
   },
   "12": {
     "origin": "Y51",
@@ -288,28 +284,32 @@
     "terminus": "C20"
   },
   "21": {
-    "origin": "B10",
-    "B10": {
-      "route": "NRtB10N32",
+    "origin": "H33",
+    "H33": {
+      "route": "HRtH11H33",
       "trigger": "F"
     },
-    "N32": {
-      "route": "NRtN11N32",
+    "H11": {
+      "route": "SRtH10H11",
       "trigger": "F"
     },
-    "N11": {
-      "route": "KRtN25N11",
+    "H10": {
+      "route": "SRtS10H10",
       "trigger": "F"
     },
-    "N25": {
-      "route": "SRtP42N25",
+    "S10": {
+      "route": "DRtD11S10",
       "trigger": "F"
     },
-    "P42": {
-      "route": "PRtP41P42",
+    "D11": {
+      "route": "DRtH13D11",
       "trigger": "F"
     },
-    "terminus": "P41"
+    "H13": {
+      "route": "HRtH13H33",
+      "trigger": "F"
+    },
+    "terminus": "H33"
   },
   "22": {
     "origin": "P5",
@@ -851,6 +851,198 @@
     },
     "terminus": "R10"
   },
+  "CF1": {
+    "origin": "C22",
+    "C22": {
+      "route": "CRtC23C22",
+      "trigger": "F"
+    },
+    "C23": {
+      "route": "CRtC13C23",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "BRtB11C13",
+      "trigger": "F"
+    },
+    "B11": {
+      "route": "BRtB10B11",
+      "trigger": "F"
+    },
+    "B10": {
+      "route": "NRtB10N12",
+      "trigger": "F"
+    },
+    "N12": {
+      "route": "NRtN11N12",
+      "trigger": "F"
+    },
+    "N11": {
+      "route": "KRtN10N11",
+      "trigger": "F"
+    },
+    "N10": {
+      "route": "KRtN10S11",
+      "trigger": "F"
+    },
+    "S11": {
+      "route": "SRtS10S11",
+      "trigger": "F"
+    },
+    "S10": {
+      "route": "DRtD21S10",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD10D21",
+      "trigger": "F"
+    },
+    "D10": {
+      "route": "LRtL11D10",
+      "trigger": "F"
+    },
+    "L11": {
+      "route": "LRtL10L11",
+      "trigger": "F"
+    },
+    "L10": {
+      "route": "YRtY11L10",
+      "trigger": "F"
+    },
+    "Y11": {
+      "route": "YRtY87Y11",
+      "trigger": "F"
+    },
+    "terminus": "Y87"
+  },
+  "CF2": {
+    "origin": "C22",
+    "C22": {
+      "route": "CRtC23C22",
+      "trigger": "F"
+    },
+    "C23": {
+      "route": "CRtC13C23",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "BRtB11C13",
+      "trigger": "F"
+    },
+    "B11": {
+      "route": "BRtB10B11",
+      "trigger": "F"
+    },
+    "B10": {
+      "route": "NRtB10N12",
+      "trigger": "F"
+    },
+    "N12": {
+      "route": "NRtN11N12",
+      "trigger": "F"
+    },
+    "N11": {
+      "route": "KRtN10N11",
+      "trigger": "F"
+    },
+    "N10": {
+      "route": "KRtN10S11",
+      "trigger": "F"
+    },
+    "S11": {
+      "route": "SRtS10S11",
+      "trigger": "F"
+    },
+    "S10": {
+      "route": "DRtD11S10",
+      "trigger": "F"
+    },
+    "D11": {
+      "route": "DRtD10D11",
+      "trigger": "F"
+    },
+    "D10": {
+      "route": "LRtL11D10",
+      "trigger": "F"
+    },
+    "L11": {
+      "route": "LRtL10L11",
+      "trigger": "F"
+    },
+    "L10": {
+      "route": "YRtY11L10",
+      "trigger": "F"
+    },
+    "Y11": {
+      "route": "YRtY87Y11",
+      "trigger": "F"
+    },
+    "terminus": "Y87"
+  },
+  "CF3": {
+    "origin": "C22",
+    "C22": {
+      "route": "CRtC23C22",
+      "trigger": "F"
+    },
+    "C23": {
+      "route": "CRtC13C23",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "BRtB11C13",
+      "trigger": "F"
+    },
+    "B11": {
+      "route": "BRtB10B11",
+      "trigger": "F"
+    },
+    "B10": {
+      "route": "NRtB10N12",
+      "trigger": "F"
+    },
+    "N12": {
+      "route": "NRtN11N12",
+      "trigger": "F"
+    },
+    "N11": {
+      "route": "KRtN10N11",
+      "trigger": "F"
+    },
+    "N10": {
+      "route": "KRtN10S11",
+      "trigger": "F"
+    },
+    "S11": {
+      "route": "SRtS10S11",
+      "trigger": "F"
+    },
+    "S10": {
+      "route": "DRtD11S10",
+      "trigger": "F"
+    },
+    "D11": {
+      "route": "DRtD10D11",
+      "trigger": "F"
+    },
+    "D10": {
+      "route": "LRtL11D10",
+      "trigger": "F"
+    },
+    "L11": {
+      "route": "LRtL10L11",
+      "trigger": "F"
+    },
+    "L10": {
+      "route": "YRtY11L10",
+      "trigger": "F"
+    },
+    "Y11": {
+      "route": "YRtY87Y11",
+      "trigger": "F"
+    },
+    "terminus": "Y87"
+  },
   "CFHY": {
     "origin": "C22",
     "C22": {
@@ -963,6 +1155,310 @@
     },
     "terminus": "Y11"
   },
+  "CP1": {
+    "origin": "C22",
+    "C22": {
+      "route": "CRtC23C22",
+      "trigger": "F"
+    },
+    "C23": {
+      "route": "CRtC13C23",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "BRtB11C13",
+      "trigger": "F"
+    },
+    "B11": {
+      "route": "BRtB10B11",
+      "trigger": "F"
+    },
+    "B10": {
+      "route": "NRtB10N31",
+      "trigger": "F"
+    },
+    "N31": {
+      "route": "NRtN11N31",
+      "trigger": "F"
+    },
+    "N11": {
+      "route": "KRtN10N11",
+      "trigger": "F"
+    },
+    "N10": {
+      "route": "KRtN10S11",
+      "trigger": "F"
+    },
+    "S11": {
+      "route": "SRtS10S11",
+      "trigger": "F"
+    },
+    "S10": {
+      "route": "DRtD11S10",
+      "trigger": "F"
+    },
+    "D11": {
+      "route": "DRtD10D11",
+      "trigger": "F"
+    },
+    "D10": {
+      "route": "LRtL11D10",
+      "trigger": "F"
+    },
+    "L11": {
+      "route": "LRtL10L11",
+      "trigger": "F"
+    },
+    "L10": {
+      "route": "YRtY11L10",
+      "trigger": "F"
+    },
+    "Y11": {
+      "route": "YRtY30Y11",
+      "trigger": "F"
+    },
+    "terminus": "Y30"
+  },
+  "CP2": {
+    "origin": "C22",
+    "C22": {
+      "route": "CRtC23C22",
+      "trigger": "F"
+    },
+    "C23": {
+      "route": "CRtC13C23",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "BRtB11C13",
+      "trigger": "F"
+    },
+    "B11": {
+      "route": "BRtB10B11",
+      "trigger": "F"
+    },
+    "B10": {
+      "route": "NRtB10N31",
+      "trigger": "F"
+    },
+    "N31": {
+      "route": "NRtN11N31",
+      "trigger": "F"
+    },
+    "N11": {
+      "route": "KRtN10N11",
+      "trigger": "F"
+    },
+    "N10": {
+      "route": "KRtN10S11",
+      "trigger": "F"
+    },
+    "S11": {
+      "route": "SRtS10S11",
+      "trigger": "F"
+    },
+    "S10": {
+      "route": "DRtD11S10",
+      "trigger": "F"
+    },
+    "D11": {
+      "route": "DRtD10D11",
+      "trigger": "F"
+    },
+    "D10": {
+      "route": "LRtL11D10",
+      "trigger": "F"
+    },
+    "L11": {
+      "route": "LRtL10L11",
+      "trigger": "F"
+    },
+    "L10": {
+      "route": "YRtY11L10",
+      "trigger": "F"
+    },
+    "Y11": {
+      "route": "YRtY30Y11",
+      "trigger": "F"
+    },
+    "terminus": "Y30"
+  },
+  "CP3": {
+    "origin": "C22",
+    "C22": {
+      "route": "CRtC23C22",
+      "trigger": "F"
+    },
+    "C23": {
+      "route": "CRtC13C23",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "BRtB11C13",
+      "trigger": "F"
+    },
+    "B11": {
+      "route": "BRtB10B11",
+      "trigger": "F"
+    },
+    "B10": {
+      "route": "NRtB10N31",
+      "trigger": "F"
+    },
+    "N31": {
+      "route": "NRtN11N31",
+      "trigger": "F"
+    },
+    "N11": {
+      "route": "KRtN10N11",
+      "trigger": "F"
+    },
+    "N10": {
+      "route": "KRtN10S11",
+      "trigger": "F"
+    },
+    "S11": {
+      "route": "SRtS10S11",
+      "trigger": "F"
+    },
+    "S10": {
+      "route": "DRtD11S10",
+      "trigger": "F"
+    },
+    "D11": {
+      "route": "DRtD10D11",
+      "trigger": "F"
+    },
+    "D10": {
+      "route": "LRtL11D10",
+      "trigger": "F"
+    },
+    "L11": {
+      "route": "LRtL10L11",
+      "trigger": "F"
+    },
+    "L10": {
+      "route": "YRtY11L10",
+      "trigger": "F"
+    },
+    "Y11": {
+      "route": "YRtY30Y11",
+      "trigger": "F"
+    },
+    "terminus": "Y30"
+  },
+  "HE22": {
+    "origin": "H22",
+    "H22": {
+      "route": "HRtH22H23",
+      "trigger": "F"
+    },
+    "H23": {
+      "route": "DRtH23D21",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD21S20",
+      "trigger": "F"
+    },
+    "S20": {
+      "route": "SRtS20H20",
+      "trigger": "F"
+    },
+    "H20": {
+      "route": "SRtH20H21",
+      "trigger": "F"
+    },
+    "H21": {
+      "route": "HRtH21H22",
+      "trigger": "F"
+    },
+    "terminus": "H22"
+  },
+  "HE41": {
+    "origin": "H41",
+    "H41": {
+      "route": "HRtH23H41",
+      "trigger": "F"
+    },
+    "H23": {
+      "route": "DRtH23D21",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD21S20",
+      "trigger": "F"
+    },
+    "S20": {
+      "route": "SRtS20H20",
+      "trigger": "F"
+    },
+    "H20": {
+      "route": "SRtH20H21",
+      "trigger": "F"
+    },
+    "H21": {
+      "route": "HRtH21H41",
+      "trigger": "F"
+    },
+    "terminus": "H41"
+  },
+  "HE42": {
+    "origin": "H42",
+    "H42": {
+      "route": "HRtH23H42",
+      "trigger": "F"
+    },
+    "H23": {
+      "route": "DRtH23D21",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD21S20",
+      "trigger": "F"
+    },
+    "S20": {
+      "route": "SRtS20H20",
+      "trigger": "F"
+    },
+    "H20": {
+      "route": "SRtH20H21",
+      "trigger": "F"
+    },
+    "H21": {
+      "route": "HRtH21H42",
+      "trigger": "F"
+    },
+    "terminus": "H42"
+  },
+  "HE43": {
+    "origin": "H43",
+    "H43": {
+      "route": "HRtH23H43",
+      "trigger": "F"
+    },
+    "H23": {
+      "route": "DRtH23D21",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD21S20",
+      "trigger": "F"
+    },
+    "S20": {
+      "route": "SRtS20H20",
+      "trigger": "F"
+    },
+    "H20": {
+      "route": "SRtH20H21",
+      "trigger": "F"
+    },
+    "H21": {
+      "route": "HRtH21H43",
+      "trigger": "F"
+    },
+    "terminus": "H43"
+  },
   "HEX": {
     "origin": "H40",
     "H40": {
@@ -986,6 +1482,90 @@
       "trigger": "F"
     },
     "terminus": "H40"
+  },
+  "HW12": {
+    "origin": "H12",
+    "H12": {
+      "route": "HRtH11H12",
+      "trigger": "F"
+    },
+    "H11": {
+      "route": "SRtH10H11",
+      "trigger": "F"
+    },
+    "H10": {
+      "route": "SRtS10H10",
+      "trigger": "F"
+    },
+    "S10": {
+      "route": "DRtD11S10",
+      "trigger": "F"
+    },
+    "D11": {
+      "route": "DRtH13D11",
+      "trigger": "F"
+    },
+    "H13": {
+      "route": "HRtH12H13",
+      "trigger": "F"
+    },
+    "terminus": "H12"
+  },
+  "HW33": {
+    "origin": "H33",
+    "H33": {
+      "route": "HRtH11H33",
+      "trigger": "F"
+    },
+    "H11": {
+      "route": "SRtH10H11",
+      "trigger": "F"
+    },
+    "H10": {
+      "route": "SRtS10H10",
+      "trigger": "F"
+    },
+    "S10": {
+      "route": "DRtD11S10",
+      "trigger": "F"
+    },
+    "D11": {
+      "route": "DRtH13D11",
+      "trigger": "F"
+    },
+    "H13": {
+      "route": "HRtH13H33",
+      "trigger": "F"
+    },
+    "terminus": "H33"
+  },
+  "HW34": {
+    "origin": "H34",
+    "H34": {
+      "route": "HRtH11H34",
+      "trigger": "F"
+    },
+    "H11": {
+      "route": "SRtH10H11",
+      "trigger": "F"
+    },
+    "H10": {
+      "route": "SRtS10H10",
+      "trigger": "F"
+    },
+    "S10": {
+      "route": "DRtD11S10",
+      "trigger": "F"
+    },
+    "D11": {
+      "route": "DRtH13D11",
+      "trigger": "F"
+    },
+    "H13": {
+      "route": "HRtH13H34",
+      "trigger": "F"
+    },
+    "terminus": "H34"
   },
   "HWX": {
     "origin": "H30",
@@ -1334,5 +1914,449 @@
       "trigger": "F"
     },
     "terminus": "H22"
+  },
+  "YF1": {
+    "origin": "Y70",
+    "Y70": {
+      "route": "YRtY20Y70",
+      "trigger": "F"
+    },
+    "Y20": {
+      "route": "YRtY20Y21",
+      "trigger": "F"
+    },
+    "Y21": {
+      "route": "YRtY21L20",
+      "trigger": "F"
+    },
+    "L20": {
+      "route": "LRtL20L21",
+      "trigger": "F"
+    },
+    "L21": {
+      "route": "LRtL21D20",
+      "trigger": "F"
+    },
+    "D20": {
+      "route": "DRtD20D21",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD21S20",
+      "trigger": "F"
+    },
+    "S20": {
+      "route": "SRtS20S21",
+      "trigger": "F"
+    },
+    "S21": {
+      "route": "KRtN20S21",
+      "trigger": "F"
+    },
+    "N20": {
+      "route": "KRtN20N21",
+      "trigger": "F"
+    },
+    "N21": {
+      "route": "NRtN21N22",
+      "trigger": "F"
+    },
+    "N22": {
+      "route": "NRtB20N22",
+      "trigger": "F"
+    },
+    "B20": {
+      "route": "BRtB20B21",
+      "trigger": "F"
+    },
+    "B21": {
+      "route": "BRtB21C13",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "CRtC13C12",
+      "trigger": "F"
+    },
+    "C12": {
+      "route": "CRtC12C11",
+      "trigger": "F"
+    },
+    "C11": {
+      "route": "CRtC11C10",
+      "trigger": "F"
+    },
+    "C10": {
+      "route": "CRtC10C20",
+      "trigger": "F"
+    },
+    "terminus": "C20"
+  },
+  "YF2": {
+    "origin": "Y70",
+    "Y70": {
+      "route": "YRtY20Y70",
+      "trigger": "F"
+    },
+    "Y20": {
+      "route": "YRtY20Y21",
+      "trigger": "F"
+    },
+    "Y21": {
+      "route": "YRtY21L20",
+      "trigger": "F"
+    },
+    "L20": {
+      "route": "LRtL20L21",
+      "trigger": "F"
+    },
+    "L21": {
+      "route": "LRtL21D20",
+      "trigger": "F"
+    },
+    "D20": {
+      "route": "DRtD20D21",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD21S20",
+      "trigger": "F"
+    },
+    "S20": {
+      "route": "SRtS20S21",
+      "trigger": "F"
+    },
+    "S21": {
+      "route": "KRtN20S21",
+      "trigger": "F"
+    },
+    "N20": {
+      "route": "KRtN20N21",
+      "trigger": "F"
+    },
+    "N21": {
+      "route": "NRtN21N22",
+      "trigger": "F"
+    },
+    "N22": {
+      "route": "NRtB20N22",
+      "trigger": "F"
+    },
+    "B20": {
+      "route": "BRtB20B21",
+      "trigger": "F"
+    },
+    "B21": {
+      "route": "BRtB21C13",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "CRtC13C12",
+      "trigger": "F"
+    },
+    "C12": {
+      "route": "CRtC12C11",
+      "trigger": "F"
+    },
+    "C11": {
+      "route": "CRtC11C10",
+      "trigger": "F"
+    },
+    "C10": {
+      "route": "CRtC10C20",
+      "trigger": "F"
+    },
+    "terminus": "C20"
+  },
+  "YF3": {
+    "origin": "Y70",
+    "Y70": {
+      "route": "YRtY20Y70",
+      "trigger": "F"
+    },
+    "Y20": {
+      "route": "YRtY20Y21",
+      "trigger": "F"
+    },
+    "Y21": {
+      "route": "YRtY21L20",
+      "trigger": "F"
+    },
+    "L20": {
+      "route": "LRtL20L21",
+      "trigger": "F"
+    },
+    "L21": {
+      "route": "LRtL21D20",
+      "trigger": "F"
+    },
+    "D20": {
+      "route": "DRtD20D21",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD21S20",
+      "trigger": "F"
+    },
+    "S20": {
+      "route": "SRtS20S21",
+      "trigger": "F"
+    },
+    "S21": {
+      "route": "KRtN20S21",
+      "trigger": "F"
+    },
+    "N20": {
+      "route": "KRtN20N21",
+      "trigger": "F"
+    },
+    "N21": {
+      "route": "NRtN21N22",
+      "trigger": "F"
+    },
+    "N22": {
+      "route": "NRtB20N22",
+      "trigger": "F"
+    },
+    "B20": {
+      "route": "BRtB20B21",
+      "trigger": "F"
+    },
+    "B21": {
+      "route": "BRtB21C13",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "CRtC13C12",
+      "trigger": "F"
+    },
+    "C12": {
+      "route": "CRtC12C11",
+      "trigger": "F"
+    },
+    "C11": {
+      "route": "CRtC11C10",
+      "trigger": "F"
+    },
+    "C10": {
+      "route": "CRtC10C20",
+      "trigger": "F"
+    },
+    "terminus": "C20"
+  },
+  "YP1": {
+    "origin": "Y20",
+    "Y20": {
+      "route": "YRtY20Y21",
+      "trigger": "F"
+    },
+    "Y21": {
+      "route": "YRtY21L20",
+      "trigger": "F"
+    },
+    "L20": {
+      "route": "LRtL20L21",
+      "trigger": "F"
+    },
+    "L21": {
+      "route": "LRtL21D20",
+      "trigger": "F"
+    },
+    "D20": {
+      "route": "DRtD20D21",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD21S20",
+      "trigger": "F"
+    },
+    "S20": {
+      "route": "SRtS20S21",
+      "trigger": "F"
+    },
+    "S21": {
+      "route": "KRtN20S21",
+      "trigger": "F"
+    },
+    "N20": {
+      "route": "KRtN20N21",
+      "trigger": "F"
+    },
+    "N21": {
+      "route": "NRtN21N41",
+      "trigger": "F"
+    },
+    "N41": {
+      "route": "NRtB20N41",
+      "trigger": "F"
+    },
+    "B20": {
+      "route": "BRtB20B21",
+      "trigger": "F"
+    },
+    "B21": {
+      "route": "BRtB21C13",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "CRtC13C12",
+      "trigger": "F"
+    },
+    "C12": {
+      "route": "CRtC12C11",
+      "trigger": "F"
+    },
+    "C11": {
+      "route": "CRtC11C30",
+      "trigger": "F"
+    },
+    "C30": {
+      "route": "CRtC30C20",
+      "trigger": "F"
+    },
+    "terminus": "C20"
+  },
+  "YP2": {
+    "origin": "Y20",
+    "Y20": {
+      "route": "YRtY20Y21",
+      "trigger": "F"
+    },
+    "Y21": {
+      "route": "YRtY21L20",
+      "trigger": "F"
+    },
+    "L20": {
+      "route": "LRtL20L21",
+      "trigger": "F"
+    },
+    "L21": {
+      "route": "LRtL21D20",
+      "trigger": "F"
+    },
+    "D20": {
+      "route": "DRtD20D21",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD21S20",
+      "trigger": "F"
+    },
+    "S20": {
+      "route": "SRtS20S21",
+      "trigger": "F"
+    },
+    "S21": {
+      "route": "KRtN20S21",
+      "trigger": "F"
+    },
+    "N20": {
+      "route": "KRtN20N21",
+      "trigger": "F"
+    },
+    "N21": {
+      "route": "NRtN21N41",
+      "trigger": "F"
+    },
+    "N41": {
+      "route": "NRtB20N41",
+      "trigger": "F"
+    },
+    "B20": {
+      "route": "BRtB20B21",
+      "trigger": "F"
+    },
+    "B21": {
+      "route": "BRtB21C13",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "CRtC13C12",
+      "trigger": "F"
+    },
+    "C12": {
+      "route": "CRtC12C11",
+      "trigger": "F"
+    },
+    "C11": {
+      "route": "CRtC11C30",
+      "trigger": "F"
+    },
+    "C30": {
+      "route": "CRtC30C20",
+      "trigger": "F"
+    },
+    "terminus": "C20"
+  },
+  "YP3": {
+    "origin": "Y20",
+    "Y20": {
+      "route": "YRtY20Y21",
+      "trigger": "F"
+    },
+    "Y21": {
+      "route": "YRtY21L20",
+      "trigger": "F"
+    },
+    "L20": {
+      "route": "LRtL20L21",
+      "trigger": "F"
+    },
+    "L21": {
+      "route": "LRtL21D20",
+      "trigger": "F"
+    },
+    "D20": {
+      "route": "DRtD20D21",
+      "trigger": "F"
+    },
+    "D21": {
+      "route": "DRtD21S20",
+      "trigger": "F"
+    },
+    "S20": {
+      "route": "SRtS20S21",
+      "trigger": "F"
+    },
+    "S21": {
+      "route": "KRtN20S21",
+      "trigger": "F"
+    },
+    "N20": {
+      "route": "KRtN20N21",
+      "trigger": "F"
+    },
+    "N21": {
+      "route": "NRtN21N41",
+      "trigger": "F"
+    },
+    "N41": {
+      "route": "NRtB20N41",
+      "trigger": "F"
+    },
+    "B20": {
+      "route": "BRtB20B21",
+      "trigger": "F"
+    },
+    "B21": {
+      "route": "BRtB21C13",
+      "trigger": "F"
+    },
+    "C13": {
+      "route": "CRtC13C12",
+      "trigger": "F"
+    },
+    "C12": {
+      "route": "CRtC12C11",
+      "trigger": "F"
+    },
+    "C11": {
+      "route": "CRtC11C30",
+      "trigger": "F"
+    },
+    "C30": {
+      "route": "CRtC30C20",
+      "trigger": "F"
+    },
+    "terminus": "C20"
   }
 }
