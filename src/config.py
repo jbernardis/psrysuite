@@ -7,11 +7,11 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-# ofp = open("config.out", "w")
-# efp = open("config.err", "w")
-#
-# sys.stdout = ofp
-# sys.stderr = efp
+ofp = open("config.out", "w")
+efp = open("config.err", "w")
+
+sys.stdout = ofp
+sys.stderr = efp
 
 
 INIFILE = "psry.ini"
