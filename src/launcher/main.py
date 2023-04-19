@@ -13,17 +13,10 @@ from launcher.rrserver import RRServer
 np = len(sys.argv)
 
 if np < 2:
-    parameters = [ "dispatcher" ]
+    mode = "dispatcher"
 
 else:
-    parameters = [x for x in sys.argv[1:]]
-  
-mode = parameters[0]
-if mode == "remote":
-    if np > 2:
-        mode = parameters[1]  
-    else:
-        mode = "dispatch"
+    mode = sys.argv[1]
         
 ofp = open("launch%s.out" % mode, "w")
 efp = open("launch%s.err" % mode, "w")
@@ -41,7 +34,7 @@ interpreter = sys.executable.replace("python.exe", "pythonw.exe")
 for i in range(len(sys.argv)):
     print("%d: %s" % (i, sys.argv[i]))
 
-if "dispatcher" in parameters and "remote" in parameters:
+if mode == "remotedispatcher":
     print("Launch mode: remote dispatcher")
     
     settings.SetSimulation(False)
@@ -59,7 +52,7 @@ if "dispatcher" in parameters and "remote" in parameters:
             print("Dispatcher has terminated")
             dispActive = False
  
-elif "dispatcher" in parameters:
+elif mode == "dispatcher":
     print("Launch mode: dispatcher")
     
     settings.SetSimulation(False)
@@ -86,7 +79,7 @@ elif "dispatcher" in parameters:
             dispActive = False
             rrServer.SendRequest( {"server": {"action": "show"}})    
 
-elif "simulation" in parameters:
+elif mode == "simulation":
     print("launch mode: simulation")
     settings.SetDispatcher(True)
     settings.SetSimulation(True)
@@ -121,7 +114,7 @@ elif "simulation" in parameters:
             dispActive = False
             rrServer.SendRequest( {"server": {"action": "show"}})    
 
-elif "display" in parameters:
+elif mode == "display":
     print("launch mode: display")
     settings.SetDispatcher(False)
     

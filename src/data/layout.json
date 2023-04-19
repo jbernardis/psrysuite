@@ -541,7 +541,7 @@
       "sbwest": "P11.W"
     },
     "P2": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     },
@@ -691,7 +691,7 @@
       "sbwest": null
     },
     "POSSP5": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     },
@@ -5421,8 +5421,8 @@
       ],
       "os": "POSPJ2",
       "signals": [
-        "PA32RB",
-        "PA34LA"
+        "PA34LA",
+        "PA32RB"
       ],
       "turnouts": [
         [

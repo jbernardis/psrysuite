@@ -120,9 +120,9 @@ class MainFrame(wx.Frame):
 		self.Fit()
 		
 		if self.settings.hide:
-			self.Hide()
+			self.Iconize()
 		else:
-			self.Show()
+			self.Restore()
 		
 		wx.CallAfter(self.Initialize)
 
@@ -676,10 +676,11 @@ class MainFrame(wx.Frame):
 		elif verb == "server":
 			action = evt.data["action"][0]
 			if action == "show":
-				self.Show()
+				self.Restore()
 				self.Raise()
 			elif action == "hide":
-				self.Hide()
+				print("calling iconize from command")
+				self.Iconize()
 			elif action == "exit":
 				print("exit command")
 				logging.info("HTTP 'server:exit' command received - terminating")
@@ -734,7 +735,7 @@ class App(wx.App):
 
 	def OnInit(self):
 		self.frame = MainFrame()
-		#self.frame.Show()
+		self.frame.Show()
 		return True
 
 

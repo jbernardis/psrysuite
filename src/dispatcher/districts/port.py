@@ -1315,7 +1315,7 @@ class Port (District):
 					"P20", [DIVERGING, RESTRICTING], ["PASw33:N", "PASw35:R", "PASw37:R"], ["PA32RA", "PA34LA"])
 		self.routes["PRtP30P50"] = Route(self.screen, block, "PRtP30P50", "P50",
 					[ (119, 28), (120, 28), (121, 27), (122, 26), (123, 25), (124, 24), (125, 23), (126, 22), (127, 22) ],
-					"P30", [MAIN, MAIN], ["PASw33:R", "PASw35:R", "PASw37:R"], ["PA32RB", "PA34LA"])
+					"P30", [MAIN, MAIN], ["PASw33:R", "PASw35:R", "PASw37:R"], ["PA34LA", "PA32RB"])
 
 		self.routes["PRtP20P11"] = Route(self.screen, block, "PRtP20P11", "P11",
 					[ (119, 26), (120, 26), (121, 26), (122, 26), (123, 25), (124, 24), (125, 24), (126, 24), (127, 24) ],

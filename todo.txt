@@ -42,3 +42,7 @@ check the order of signal definitions in port routes - had to change for P20P21 
 tracker:
 	backup/restore
 	reports
+
+AR should not be setting  switches or turnouts in port
+
+need a better way to handle subblock ordering in P50 (and others???)

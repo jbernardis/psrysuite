@@ -389,6 +389,10 @@ class TrainBlockSequencesDlg(wx.Dialog):
 			subBlocks = [block]  # no sub-blocks - just use the block name itself
 		stopBlocks = self.layout.GetStopBlocks(block)
 		
+		print("determining order for block %s train direction %s" % (block, east))
+		print(str(stopBlocks))
+		print("block direction: %s" % self.layout.IsBlockEast(block))
+		
 		blks = []
 		waitblks = []
 		subCt = len(subBlocks)
@@ -423,6 +427,8 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		stopTime = int(blockTime * 0.1)
 		subTime = int((blockTime - stopTime * stopCt) / subCt)
 		segTimes = [[blk, stopTime if StoppingSection(blk) else subTime] for blk in blks]
+		
+		print("result %s" % str(segTimes))
 		
 		return segTimes,waitString
 

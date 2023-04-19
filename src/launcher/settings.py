@@ -40,8 +40,7 @@ class Settings:
 		self.saveSettings()
 		
 	def SetDispatcher(self, flag=True):
-		self.cfg.set("dispatcher", "dispatch", "True" if flag else "False")
-		
+		self.cfg.set("dispatcher", "dispatch", "True" if flag else "False")		
 		self.saveSettings()
 		
 	def saveSettings(self):
