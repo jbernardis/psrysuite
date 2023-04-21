@@ -387,7 +387,19 @@ class MainFrame(wx.Frame):
 			self.rbS4Control.SetSelection(value)
 			
 		elif name == "cliff.fleet":
-			self.cbCliffFleet.SetValue(value != 0)
+			ctl = self.rbCliffControl.GetSelection()
+			if ctl == 0:
+				self.cbCliffFleet.SetValue(value != 0)
+				self.cbClivedenFleet.SetValue(value != 0)
+				self.cbBankFleet.SetValue(value != 0)
+				f = 1 if value != 0 else 0
+				for signm in self.CliffFleetSignals + self.ClivedenFleetSignals + self.BankFleetSignals:
+					self.Request({"fleet": { "name": signm, "value": f}})
+			elif ctl == 1:
+				self.cbCliffFleet.SetValue(value != 0)
+				f = 1 if value != 0 else 0
+				for signm in self.CliffFleetSignals:
+					self.Request({"fleet": { "name": signm, "value": f}})
 			
 		elif name == "port.fleet":
 			self.cbPortFleet.SetValue(value != 0)
@@ -479,7 +491,11 @@ class MainFrame(wx.Frame):
 		self.Request({"control": { "name": "nassau", "value": ctl}})
 
 	def OnRBCliff(self, evt):
-		self.Request({"control": { "name": "cliff", "value": evt.GetInt()}})
+		ctl = evt.GetInt()
+		self.cbCliffFleet.Enable(ctl == 2)
+		self.cbBankFleet.Enable(ctl != 0)
+		self.cbClivedenFleet.Enable(ctl != 0)
+		self.Request({"control": { "name": "cliff", "value": ctl}})
 
 	def OnRBYard(self, evt):
 		ctl = evt.GetInt()
@@ -931,9 +947,8 @@ class MainFrame(wx.Frame):
 						oldATC = tr.IsOnATC() if self.IsDispatcher() else False
 						oldAR = tr.IsOnAR() if self.IsDispatcher() else False
 						dlgx = int(self.centerw - 500)-self.centerOffset
-						dlgy = int(self.centerh + 50)
+						dlgy = int(self.totalh - 600)
 						dlg = EditTrainDlg(self, tr, self.locoList, self.trainList, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, dlgx, dlgy)
-						dlg.SetPosition((self.centerw, self.centerh))
 						rc = dlg.ShowModal()
 						if rc == wx.ID_OK:
 							trainid, locoid, atc, ar = dlg.GetResults()
@@ -1419,6 +1434,7 @@ class MainFrame(wx.Frame):
 							self.trains[name] = tr
 							
 						tr.AddToBlock(blk)
+						tr.SetEast(blk.GetEast()) # train takes on the direction of the block
 						if not tr.IsContiguous():
 							self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
@@ -1580,6 +1596,9 @@ class MainFrame(wx.Frame):
 		self.ShowTitle()
 
 	def OnBSaveTrains(self, _):
+		self.SaveTrains()
+		
+	def SaveTrains(self):
 		dlg = wx.FileDialog(self, message="Save Trains", defaultDir=self.settings.traindir,
 			defaultFile="", wildcard=wildcardTrain, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 		if dlg.ShowModal() != wx.ID_OK:
@@ -1628,6 +1647,9 @@ class MainFrame(wx.Frame):
 						self.PopupEvent("Block %s not occupied, expecting train %s" % (bname, tid))
 
 	def OnBSaveLocos(self, _):
+		self.SaveLocos()
+		
+	def SaveLocos(self):
 		dlg = wx.FileDialog(self, message="Save Locomotives", defaultDir=self.settings.locodir,
 			defaultFile="", wildcard=wildcardLoco, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 		if dlg.ShowModal() != wx.ID_OK:
@@ -1677,6 +1699,12 @@ class MainFrame(wx.Frame):
 						self.PopupEvent("Block %s not occupied, expecting locomotive %s" % (bname, lid))
 
 	def OnClose(self, _):
+		if self.IsDispatcher():
+			dlg = ExitDlg(self)
+			rc = dlg.ShowModal()
+			dlg.Destroy()
+			if rc != wx.ID_OK:
+				return
 		self.KillWindow()
 		
 	def KillWindow(self):
@@ -1693,4 +1721,66 @@ class MainFrame(wx.Frame):
 			pass
 		self.Destroy()
 		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Display"))
+
+class ExitDlg (wx.Dialog):
+	def __init__(self, parent):
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Save Trains/Locomotives")
+		self.parent = parent
+		self.Bind(wx.EVT_CLOSE, self.onCancel)
+
+		dw, dh = wx.GetDisplaySize()
+		sw, sh = self.GetSize()
+		px = (dw-sw)/2
+		py = (dh-sh)/2
+		self.SetPosition(wx.Point(int(px), int(py)))
+
+		vsz = wx.BoxSizer(wx.VERTICAL)
+		vsz.AddSpacer(20)
+
+		self.bTrains = wx.Button(self, wx.ID_ANY, "Save Trains")
+		self.bLocos  = wx.Button(self, wx.ID_ANY, "Save Locos")
+
+		vsz.Add(self.bTrains, 0, wx.ALIGN_CENTER)
+		vsz.AddSpacer(10)
+		vsz.Add(self.bLocos, 0, wx.ALIGN_CENTER)
+		vsz.AddSpacer(20)
+
+		bsz = wx.BoxSizer(wx.HORIZONTAL)
+
+		self.bOK = wx.Button(self, wx.ID_ANY, "OK")
+		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+
+		bsz.Add(self.bOK)
+		bsz.AddSpacer(10)
+		bsz.Add(self.bCancel)
+
+		self.Bind(wx.EVT_BUTTON, self.onSaveTrains, self.bTrains)
+		self.Bind(wx.EVT_BUTTON, self.onSaveLocos, self.bLocos)
+		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
+		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
+
+		vsz.Add(bsz, 0, wx.ALIGN_CENTER)
+
+		vsz.AddSpacer(20)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(10)
+		hsz.Add(vsz)
+		hsz.AddSpacer(10)
+
+		self.SetSizer(hsz)
+		self.Layout()
+		self.Fit()
+
+	def onSaveTrains(self, _):
+		self.parent.SaveTrains()
+
+	def onSaveLocos(self, _):
+		self.parent.SaveLocos()
+
+	def onCancel(self, _):
+		self.EndModal(wx.ID_CANCEL)
+
+	def onOK(self, _):
+		self.EndModal(wx.ID_OK)
 

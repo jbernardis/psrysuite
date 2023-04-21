@@ -374,7 +374,7 @@ class MainUnit:
 
 		sigNm = rte.GetSignalForEnd(blkName)
 		if sigNm is not None:
-			if self.signals[sigNm].IsLocked():
+			if self.signals[sigNm].IsLocked() and self.signals[sigNm].GetAspect() == 0:
 				siglock.append(sigNm)
 
 		if len(tolock) + len(siglock) == 0 and exitBlockAvailable:
@@ -394,15 +394,31 @@ class MainUnit:
 			logging.info("Turnout %s" % t)
 			toname, state = t.split(":")
 			if self.turnouts[toname].GetState() != state:
-				logging.info("command sent")
-				self.ReqQueue.Append({"turnout": {"name": toname, "status": state}})
+				if not toname.startswith("P"):
+					self.ReqQueue.Append({"turnout": {"name": toname, "status": state}})
+					logging.info("command sent")
+				else:
+					logging.info("skipping this turnout since we do not control Port")
 			else:
-				logging.info("command not necessary")
+				logging.info("turnout already in desired position - no command sent")
 
 		sigNm = rte.GetSignalForEnd(blkName)
-		logging.info("signal %s" % sigNm)
 		if sigNm is not None:
-			self.ReqQueue.Append({"signal": {"name": sigNm, "aspect": -1}})
+			logging.info("signal %s" % sigNm)
+			try:
+				aspect = self.signals[sigNm].GetAspect()
+			except:
+				logging.info("Unable to retrieve signal aspect - assume 0")
+				aspect = 0
+				
+			if aspect == 0:
+				if not sigNm.startswith("P"):
+					self.ReqQueue.Append({"signal": {"name": sigNm, "aspect": -1}})
+					logging.info("command sent")
+				else:
+					logging.info("skipping this signal since we do not control Port")
+			else:
+				logging.info("Current signal aspect (%s) allows movement - no command sent" % aspect)
 
 	def EnqueueRouteRequest(self, rteRq):
 		osNm = rteRq.GetOS()

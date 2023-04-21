@@ -2,10 +2,20 @@
 
 how to use release - yard nassau and cliff (I think nassau and yard are done)
 
-need to resolve fleeting in cliff - does cliff panel lever control sheffield/gm/cliveden, and bank, or just sheffield/gm.  How to reconcile with software
-that has 3 controls - sheffield/gm, cliveben, and bank.  Make cb on screen work in conjunction with control field - disable fleet cb if control is local
-
-port fleeting - is there a switch on the panel that we need to keep in sync with?
+need to resolve fleeting in cliff:
+	if cliff enabled:
+		look at cliff.fleet input and use that to set all 3 checkboxes, disable those checkboxes
+		
+	if cliff except bank/cliveden
+		look at cliff.fleet and use that for the cliff checkbox, disable only cliff checkbox, and leave others enabled
+		
+	if dispatcher all enabled
+		enable all checkboxes
+		ignore cliff.fleet input
+		
+		
+		
+port fleeting - is there a switch on the panel that we need to keep in sync with?  is there porta versus portb fleeting>
 
 call on signals - I think it refers to JUST lighting the signal with no route clearing etc
 
@@ -14,15 +24,19 @@ how to use wos1norm in yard
 verify signal lever functionality and signal indicators for nassau/port/cliff/yard
 
 verify the correct sequencing of subblocks
+    S11: S11A, S11B
+    R10: R10A, R10B, R10C
+    H30: H30A, H30B
+
+already verified these: eastbound => ABC ordering, westbound: CBA (S20 had B and C backwards - I reversed in software)
     D11: D11A, D11B
     D21: D21A, D21B
     S10: S10A, S10B, S10C
-    S11: S11A, S11B
     S20: S20A, S20B, S20C
-    R10: R10A, R10B, R10C
     H10: H10A, H10B
-    H30: H30A, H30B
-
+    
+Make sure that all of the stopping blocks report in correctly as east versus west.  If they do NOT on the actual railroad, it means that the block definition is wrong.  Need a more robust algorithm for determining 
+if a block is being traversed in its default direction or if it needs to be reversed.  This impacts dispatcher, but also sim/ar
 
 
 installer - icons for everything, integrate with configurator for setting up different configurations
@@ -42,6 +56,11 @@ check the order of signal definitions in port routes - had to change for P20P21 
 tracker:
 	backup/restore
 	reports
+
+
+solve bank signal 18 issue
+
+faceoff trains 43/44 in cliveden - why didn't downhill train start after the other train cleared
 
 AR should not be setting  switches or turnouts in port
 

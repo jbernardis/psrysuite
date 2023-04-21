@@ -1,4 +1,59 @@
 {
+    "040": {
+        "desc": "RDC Northern Pacific (3 units)",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 10,
+            "start": 0
+        }
+    },
+    "047": {
+        "desc": "CSX / Tontainer Train",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 64,
+            "slow": 35,
+            "start": 20
+        }
+    },
+    "050": {
+        "desc": "Santa Fe / 1940 Passenger",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 88,
+            "medium": 68,
+            "slow": 20,
+            "start": 10
+        }
+    },
+    "064": {
+        "desc": "PSRY PA / Exectrix",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 85,
+            "medium": 60,
+            "slow": 25,
+            "start": 10
+        }
+    },
+    "086": {
+        "desc": "B&O F7s / Long Passenger",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 90,
+            "medium": 60,
+            "slow": 20,
+            "start": 10
+        }
+    },
     "1006": {
         "desc": null,
         "prof": {
@@ -66,7 +121,7 @@
         }
     },
     "1419": {
-        "desc": "B&O / Long Pass",
+        "desc": "B&O / Long Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -77,7 +132,7 @@
         }
     },
     "1523": {
-        "desc": "NJ Ctrl / Engine (Test)",
+        "desc": "NJ Central / Engine (Test)",
         "prof": {
             "acc": 2,
             "dec": 1,
@@ -121,7 +176,7 @@
         }
     },
     "198": {
-        "desc": "WM / Short Pass",
+        "desc": "Western Maryland / Short Pass",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -143,7 +198,7 @@
         }
     },
     "203": {
-        "desc": "Amtrak / Long Pass",
+        "desc": "Amtrak / Long Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -242,7 +297,7 @@
         }
     },
     "2216": {
-        "desc": "NP / Long Pass",
+        "desc": "NP / Long Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -253,7 +308,7 @@
         }
     },
     "226": {
-        "desc": "Amtrak / Short Pass",
+        "desc": "Amtrak / Short Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -363,7 +418,7 @@
         }
     },
     "3262": {
-        "desc": "CSX / Container",
+        "desc": "CSX / Container Train",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -550,7 +605,7 @@
         }
     },
     "4350": {
-        "desc": "SP 4-8-2 / Daylight",
+        "desc": "SP 4-8-2 / Daylight (silver)",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -561,7 +616,7 @@
         }
     },
     "4368": {
-        "desc": "Rock / Cattle Train",
+        "desc": "Rock Island / Cattle Train",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -638,7 +693,7 @@
         }
     },
     "5024": {
-        "desc": "C&NW / Bi-directonal",
+        "desc": "C&NW / Bi-directional",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -649,7 +704,7 @@
         }
     },
     "513": {
-        "desc": "Penn 2-10-0 / Bill Board",
+        "desc": "Penn 2-10-0 / Bill Board Freight",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -682,7 +737,7 @@
         }
     },
     "5304": {
-        "desc": "Reading (6) / Coal Full",
+        "desc": "Reading (6) / Full Coal Train",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -737,7 +792,7 @@
         }
     },
     "5536": {
-        "desc": "Penn / Long Pass",
+        "desc": "Penn / Long Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -803,7 +858,7 @@
         }
     },
     "600": {
-        "desc": "DRG / Long Pass",
+        "desc": "DRG / Long Passenger",
         "prof": {
             "acc": 1,
             "dec": 2,
@@ -829,10 +884,10 @@
         "prof": {
             "acc": 1,
             "dec": 1,
-            "fast": 25,
-            "medium": 20,
-            "slow": 9,
-            "start": 0
+            "fast": 40,
+            "medium": 30,
+            "slow": 10,
+            "start": 5
         }
     },
     "6034": {
@@ -869,7 +924,7 @@
         }
     },
     "6076": {
-        "desc": "BHP / Tank Train",
+        "desc": "BHP / Bill Board Freight",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -957,7 +1012,7 @@
         }
     },
     "6511": {
-        "desc": "NP / Long Pass",
+        "desc": "NP / Long Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1034,7 +1089,7 @@
         }
     },
     "6972": {
-        "desc": "PSRY / Santa Fe -Old Style",
+        "desc": "PSRY / Santa Fe - Old Style",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1067,7 +1122,7 @@
         }
     },
     "743": {
-        "desc": "B&O / Short Pass",
+        "desc": "B&O / Short Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1089,7 +1144,7 @@
         }
     },
     "7600": {
-        "desc": "B&O(2)  2-8-8-4 / Empty Coal",
+        "desc": "B&O(2)  2-8-8-4 / Empty Coal Train",
         "prof": {
             "acc": 5,
             "dec": 10,
@@ -1100,7 +1155,7 @@
         }
     },
     "791": {
-        "desc": "New Haven / Pass",
+        "desc": "New Haven / Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1144,7 +1199,7 @@
         }
     },
     "860": {
-        "desc": "Lackawanna / Pass",
+        "desc": "Lackawanna / Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1152,6 +1207,17 @@
             "medium": 78,
             "slow": 42,
             "start": 32
+        }
+    },
+    "9002": {
+        "desc": "Indiana / Tank Train",
+        "prof": {
+            "acc": 1,
+            "dec": 1,
+            "fast": 80,
+            "medium": 58,
+            "slow": 30,
+            "start": 10
         }
     },
     "905": {
@@ -1171,9 +1237,9 @@
             "acc": 1,
             "dec": 1,
             "fast": 80,
-            "medium": 58,
-            "slow": 10,
-            "start": 0
+            "medium": 60,
+            "slow": 20,
+            "start": 10
         }
     },
     "913": {
@@ -1188,7 +1254,7 @@
         }
     },
     "914": {
-        "desc": "UP / Long Pass",
+        "desc": "UP / Long Passenger",
         "prof": {
             "acc": 1,
             "dec": 1,
@@ -1287,7 +1353,7 @@
         }
     },
     "9968": {
-        "desc": "Burlington / Denger Rio Grande",
+        "desc": "Burlington / Denver Rio Grande",
         "prof": {
             "acc": 1,
             "dec": 1,

@@ -636,7 +636,10 @@ class District:
 	def DoIndicatorAction(self, ind, value):
 		pass
 
-	def CrossingEastWestBoundary(self, blk1, blk2):
+	def CrossingEastWestBoundary(self, osblk, blk):
+		blkNm = blk.GetName()
+		osNm = osblk.GetName()
+		print("in district %s cross east west boundary for os block %s, exit block %s" % (self.name, osNm, blkNm))
 		return False
 
 	def DefineBlocks(self):

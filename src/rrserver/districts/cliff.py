@@ -119,9 +119,8 @@ class Cliff(District):
 
 	def OutIn(self):
 		optControl = self.rr.GetControlOption("cliff")  # 0 => Cliff, 1 => Dispatcher bank/cliveden, 2 => Dispatcher All
-		optBank = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
-		optCliveden = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
-		optFleet = optBank or optCliveden
+		optBankFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
+		optClivedenFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
 		optCliffFleet = self.rr.GetControlOption("cliff.fleet")  # 0 => no fleeting, 1 => fleeting
 		# Green Mountain
 		outbc = 3		

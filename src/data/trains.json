@@ -1634,7 +1634,7 @@
     "cutoff": true,
     "desc": "RDC Passenger",
     "dir": "West",
-    "eastbound": false,
+    "eastbound": true,
     "loco": null,
     "normalloco": null,
     "origin": {
@@ -1875,7 +1875,7 @@
     "cutoff": false,
     "desc": "Local Passenger",
     "dir": "West",
-    "eastbound": true,
+    "eastbound": false,
     "loco": null,
     "normalloco": null,
     "origin": {
@@ -2819,7 +2819,7 @@
     "cutoff": false,
     "desc": "Local Pass / Nassau Nrth",
     "dir": "West",
-    "eastbound": true,
+    "eastbound": false,
     "loco": null,
     "normalloco": null,
     "origin": {
@@ -2870,38 +2870,58 @@
   "92": {
     "block": null,
     "cutoff": false,
-    "desc": "Local Passenger",
+    "desc": "Local Pass / Nassau Nrth",
     "dir": "West",
     "eastbound": true,
     "loco": null,
     "normalloco": null,
     "origin": {
-      "loc": "HF",
-      "track": "A"
+      "loc": "NA",
+      "track": "W-E"
     },
     "sequence": [],
     "startblock": null,
     "startsubblock": null,
     "terminus": {
       "loc": "HF",
-      "track": "A"
+      "track": "B"
     },
     "time": null,
     "tracker": [
       [
-        "Harper Ferry",
-        "Station Track A",
-        7
+        "Nassau E",
+        "Wilson City / Track E",
+        24
       ],
       [
-        "SHORE",
-        "(sig) River Jct",
-        6
+        "",
+        "(sig) Branch Line",
+        25
       ],
       [
         "Rocky Hill",
-        "Rocky Hill Station (S)",
+        "Rocky Hill Depot",
         2
+      ],
+      [
+        "",
+        "(sig) Branch Line",
+        3
+      ],
+      [
+        "SHORE",
+        "(sig) Cross Main Line ",
+        6
+      ],
+      [
+        "Harpers Ferry",
+        "Turn Engine ",
+        7
+      ],
+      [
+        "",
+        "Store on Track B",
+        7
       ]
     ]
   },
@@ -2910,7 +2930,7 @@
     "cutoff": false,
     "desc": "Local Passenger",
     "dir": "West",
-    "eastbound": false,
+    "eastbound": true,
     "loco": null,
     "normalloco": null,
     "origin": {
@@ -3228,7 +3248,7 @@
     "cutoff": true,
     "desc": "Local Passenger",
     "dir": "West",
-    "eastbound": true,
+    "eastbound": false,
     "loco": null,
     "normalloco": null,
     "origin": {
@@ -3286,7 +3306,7 @@
       ],
       [
         "YARD",
-        "(sig) Koehlstadt / Y53",
+        "(sig) Koehlstadt / Track Y53",
         1
       ]
     ]
@@ -5259,6 +5279,16 @@
         "SHORE",
         "River Jct",
         6
+      ],
+      [
+        "Hyde",
+        "Hyde Jct (Hidden)",
+        10
+      ],
+      [
+        "HYDE",
+        "Hyde Jct / Track H34",
+        11
       ]
     ]
   },
@@ -5325,7 +5355,7 @@
     "tracker": [
       [
         "HYDE E",
-        "Hidden / H40",
+        "Hidden / Track H40",
         11
       ],
       [
@@ -5350,7 +5380,7 @@
       ],
       [
         "HYDE W",
-        "Hidden / H40 (X)",
+        "Hidden / Track H40 (X)",
         11
       ]
     ]
@@ -5957,7 +5987,7 @@
     "tracker": [
       [
         "HYDE",
-        "Stored H41",
+        "Stored / Track H41",
         11
       ],
       [
@@ -6091,7 +6121,7 @@
     "startsubblock": null,
     "terminus": {
       "loc": "YD",
-      "track": null
+      "track": "Y87"
     },
     "time": 5000,
     "tracker": [
@@ -6204,7 +6234,7 @@
         10
       ],
       [
-        "HYDE",
+        "HYDE *",
         "Hyde / Track H41 (Hold)",
         11
       ]
@@ -6355,7 +6385,7 @@
     "normalloco": "4023",
     "origin": {
       "loc": "HY",
-      "track": "H30"
+      "track": "H32"
     },
     "sequence": [
       {
@@ -6411,13 +6441,13 @@
     "startsubblock": null,
     "terminus": {
       "loc": "HY",
-      "track": "H30"
+      "track": "H32"
     },
     "time": 5000,
     "tracker": [
       [
         "HYDE W",
-        "Hidden / Track H30",
+        "Hidden / Track H32",
         11
       ],
       [
@@ -6880,7 +6910,7 @@
     "normalloco": null,
     "origin": {
       "loc": "YD",
-      "track": null
+      "track": "Y70"
     },
     "sequence": [
       {
@@ -7354,7 +7384,7 @@
   "YF3": {
     "block": null,
     "cutoff": false,
-    "desc": "Express Passenger",
+    "desc": "Show / Freight",
     "dir": "East",
     "eastbound": true,
     "loco": null,
@@ -7574,7 +7604,7 @@
     "normalloco": null,
     "origin": {
       "loc": "YD",
-      "track": null
+      "track": "Y20"
     },
     "sequence": [
       {
@@ -7984,7 +8014,7 @@
     "normalloco": null,
     "origin": {
       "loc": "YD",
-      "track": null
+      "track": "Y20"
     },
     "sequence": [
       {
@@ -8134,22 +8164,22 @@
     "tracker": [
       [
         "YARD",
-        "Koehlstadt",
+        "(sig) Koehlstadt",
         1
       ],
       [
         "Cornell",
-        "Cornell Jct",
+        "(sig) Cornell Jct",
         8
       ],
       [
         "Latham",
-        "Latham Jct",
+        "(sig) Latham Jct",
         10
       ],
       [
         "DELL",
-        "LaPorte",
+        "(sig) LaPorte",
         22
       ],
       [
@@ -8159,17 +8189,17 @@
       ],
       [
         "NASSAU",
-        "Wilson City",
+        "(sig) Wilson City",
         23
       ],
       [
         "Bank",
-        "Martinsville",
+        "Martinsville (sig)",
         3
       ],
       [
         "Green Mountain",
-        "Green Mtn Station",
+        "(sig) Green Mtn Station",
         15
       ],
       [

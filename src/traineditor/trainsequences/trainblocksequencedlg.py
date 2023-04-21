@@ -402,7 +402,7 @@ class TrainBlockSequencesDlg(wx.Dialog):
 				stopCt += 1
 				blks.append(stopBlocks[1])
 				waitblks.append(stopBlocks[1])
-			blks.extend(subBlocks) # TODO: one of these will need to be reversed
+			blks.extend(subBlocks)
 			waitblks.append(block)
 			if stopBlocks[0] and not terminus: # Don't include stop block in terminus'
 				stopCt += 1
@@ -413,7 +413,8 @@ class TrainBlockSequencesDlg(wx.Dialog):
 				stopCt += 1
 				blks.append(stopBlocks[0])
 				waitblks.append(stopBlocks[0])
-			blks.extend(subBlocks) # one of these will need to be reversed
+			# when traveling westbound, subblocks are visited in the reverse order
+			blks.extend(list(reversed(subBlocks)))
 			waitblks.append(block)
 			if stopBlocks[1] and not terminus: # Don't include stop block in terminus:
 				stopCt += 1

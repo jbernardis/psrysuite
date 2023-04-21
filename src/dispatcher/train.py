@@ -15,6 +15,13 @@ class Train:
 		self.blocks = {}
 		self.blockOrder = []
 		self.signal = None
+		self.east = True
+	
+	def GetEast(self):
+		return self.east
+	
+	def SetEast(self, flag=True):
+		self.east = flag
 
 	def tstring(self):
 		return "%s/%s (%s)" % (self.name, self.loco, str(self.blocks))

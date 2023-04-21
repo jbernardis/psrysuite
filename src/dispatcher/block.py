@@ -286,6 +286,9 @@ class Block:
 	def GetEast(self, reverse=False):
 		return not self.east if reverse else self.east
 
+	def GetDefaultEast(self):
+		return not self.defaultEast
+
 	def SetEast(self, east, broadcast=True):
 		if self.east == east:
 			return

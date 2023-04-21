@@ -197,8 +197,8 @@ class Shore(District):
 				self.rr.GetInput("S20.W").SetValue(getBit(inb[1], 6))  # Shore Detection
 				self.rr.GetInput("S20A").SetValue(getBit(inb[1], 7))
 	
-				self.rr.GetInput("S20B").SetValue(getBit(inb[2], 0))
-				self.rr.GetInput("S20C").SetValue(getBit(inb[2], 1))
+				self.rr.GetInput("S20C").SetValue(getBit(inb[2], 0)) # intentional B and C seem to be reversed
+				self.rr.GetInput("S20B").SetValue(getBit(inb[2], 1))
 				self.rr.GetInput("S20.E").SetValue(getBit(inb[2], 2))
 				self.rr.GetInput("SOSW").SetValue(getBit(inb[2], 3))
 				self.rr.GetInput("SOSE").SetValue(getBit(inb[2], 4))

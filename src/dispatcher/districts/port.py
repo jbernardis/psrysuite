@@ -16,6 +16,7 @@ class Port (District):
 	def CrossingEastWestBoundary(self, osblk, blk):
 		blkNm = blk.GetName()
 		osNm = osblk.GetName()
+		print("in port cross east west boundary for os block %s, exit block %s" % (osNm, blkNm))
 		if blkNm == "P50":
 			if osNm in [ "POSPJ1", "POSPJ2" ]:
 				return True
@@ -711,12 +712,12 @@ class Port (District):
 				(self.tiles["eobleft"],  self.screen, (128, 22), False),
 				(self.tiles["horiznc"],  self.screen, (129, 22), True),
 				(self.tiles["horiz"],    self.screen, (130, 22), True),
-			], False)
+			], True)
 		self.blocks["P50"].AddStoppingBlock([
 				(self.tiles["turnleftup"], self.screen, (139, 16), False),
 				(self.tiles["turnrightright"], self.screen, (138, 15), False),
 				(self.tiles["horiz"],    self.screen, (137, 15), False),
-			], True)
+			], False)
 
 		self.blocks["P60"] = Block(self, self.frame, "P60",
 			[
