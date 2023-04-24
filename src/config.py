@@ -117,6 +117,10 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		
 		self.settings = Settings()
+		
+		icon = wx.Icon()
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "config.ico"), wx.BITMAP_TYPE_ANY))
+		self.SetIcon(icon)
 
 	
 		vszr = wx.BoxSizer(wx.VERTICAL)
@@ -142,14 +146,8 @@ class MainFrame(wx.Frame):
 		self.bGenDisplay = wx.Button(genBox, wx.ID_ANY, "Display", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenDisplay, self.bGenDisplay)
 		boxsizer.Add(self.bGenDisplay, 0, wx.ALL, 10)
-					
-		self.bGenServerOnly = wx.Button(genBox, wx.ID_ANY, "Server Only", size=GENBTNSZ)
-		self.Bind(wx.EVT_BUTTON, self.OnBGenServerOnly, self.bGenServerOnly)
-		boxsizer.Add(self.bGenServerOnly, 0, wx.ALL, 10)
-					
-		self.bGenDispatcherOnly = wx.Button(genBox, wx.ID_ANY, "Dispatcher Only", size=GENBTNSZ)
-		self.Bind(wx.EVT_BUTTON, self.OnBGenDispatcherOnly, self.bGenDispatcherOnly)
-		boxsizer.Add(self.bGenDispatcherOnly, 0, wx.ALL, 10)
+		
+		boxsizer.AddSpacer(20)
 					
 		self.bGenThrottle = wx.Button(genBox, wx.ID_ANY, "Throttle", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenThrottle, self.bGenThrottle)
@@ -162,6 +160,16 @@ class MainFrame(wx.Frame):
 		self.bGenEditor = wx.Button(genBox, wx.ID_ANY, "Train Editor", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenEditor, self.bGenEditor)
 		boxsizer.Add(self.bGenEditor, 0, wx.ALL, 10)
+		
+		boxsizer.AddSpacer(20)
+					
+		self.bGenServerOnly = wx.Button(genBox, wx.ID_ANY, "Server Only", size=GENBTNSZ)
+		self.Bind(wx.EVT_BUTTON, self.OnBGenServerOnly, self.bGenServerOnly)
+		boxsizer.Add(self.bGenServerOnly, 0, wx.ALL, 10)
+					
+		self.bGenDispatcherOnly = wx.Button(genBox, wx.ID_ANY, "Dispatcher Only", size=GENBTNSZ)
+		self.Bind(wx.EVT_BUTTON, self.OnBGenDispatcherOnly, self.bGenDispatcherOnly)
+		boxsizer.Add(self.bGenDispatcherOnly, 0, wx.ALL, 10)
 					
 		self.bGenTester = wx.Button(genBox, wx.ID_ANY, "Tester", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenTester, self.bGenTester)
@@ -185,6 +193,8 @@ class MainFrame(wx.Frame):
 		self.SetSizer(hszr)
 		self.Fit()
 		self.Layout()
+		
+		self.GenConfigShortcut()
 		
 	def OnBGenDispatch(self, _):
 		module = {
@@ -214,7 +224,7 @@ class MainFrame(wx.Frame):
 			"dir":  "launcher",
 			"main": "main.py",
 			"desc": "Launcher for Simulation",
-			"icon": "simulator.ico",
+			"icon": "dispatch.ico",
 			"parameter": "simulation"
 		}
 		self.GenShortcut(module)
@@ -290,13 +300,26 @@ class MainFrame(wx.Frame):
 		}
 		self.GenShortcut(module)
 		
+	def GenConfigShortcut(self):
+		module = {
+			"name": "PSRY Suite Configuration",
+			"dir":  None,
+			"main": "config.py",
+			"desc": "Configuration Tool",
+			"icon": "config.ico"
+		}
+		self.GenShortcut(module)
+		
 	def GenShortcut(self, module):
 		psrypath = os.getcwd()
 		python = sys.executable.replace("python.exe", "pythonw.exe")
 		
 		desktop = winshell.desktop()
 		link_path = os.path.join(desktop, "%s.lnk" % module["name"])
-		pyfile = os.path.join(psrypath, module["dir"], module["main"])
+		if module["dir"] is None:
+			pyfile = os.path.join(psrypath, module["main"])
+		else:
+			pyfile = os.path.join(psrypath, module["dir"], module["main"])
 	
 		with winshell.shortcut(link_path) as link:
 			link.path = python

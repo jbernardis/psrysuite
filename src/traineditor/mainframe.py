@@ -1,4 +1,6 @@
 import wx
+from traineditor.settings import Settings 
+from traineditor.rrserver import RRServer
 from traineditor.trainsequences.trainblocksequencedlg import TrainBlockSequencesDlg
 from traineditor.tracker.traintrackerdlg import TrainTrackerDlg
 from traineditor.locomotives.managelocos import ManageLocosDlg
@@ -10,6 +12,9 @@ class MainFrame(wx.Frame):
 		self.SetTitle("PSRY Train/Locomotive Editor")
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		
+		self.settings = Settings()
+		self.RRServer = RRServer()
+		self.RRServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
 
 		self.bTrainSeq = wx.Button(self, wx.ID_ANY, "Edit Train Block Sequences", size=(200, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBTrainBlockSequences, self.bTrainSeq)
@@ -19,6 +24,9 @@ class MainFrame(wx.Frame):
 				
 		self.bLocos = wx.Button(self, wx.ID_ANY, "Edit Locomotive Data", size=(200, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBLocos, self.bLocos)
+				
+		self.bLayout = wx.Button(self, wx.ID_ANY, "Generate Layout File", size=(200, 50))
+		self.Bind(wx.EVT_BUTTON, self.OnBLayout, self.bLayout)
 				
 		self.bExit = wx.Button(self, wx.ID_ANY, "Exit", size=(80, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBExit, self.bExit)
@@ -32,7 +40,10 @@ class MainFrame(wx.Frame):
 		vsz.AddSpacer(20)
 		vsz.Add(self.bLocos, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
-		vsz.AddSpacer(50)
+		vsz.AddSpacer(40)
+		vsz.Add(self.bLayout, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vsz.AddSpacer(40)
 		
 		vsz.Add(self.bExit, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		vsz.AddSpacer(20)
@@ -60,6 +71,15 @@ class MainFrame(wx.Frame):
 		dlg = ManageLocosDlg(self)
 		dlg.ShowModal()
 		dlg.Destroy()
+		
+	def OnBLayout(self, _):
+		dlg = wx.MessageDialog(self,
+				"This requires that both Server, and Dispatcher are running and connected.\n\nPress 'Yes' to proceed, or\nPress 'No' to Cancel",
+                "Conform", wx.YES_NO | wx.YES_DEFAULT | wx.ICON_QUESTION)
+		rv = dlg.ShowModal()
+		dlg.Destroy()
+		if rv == wx.ID_YES:
+			self.RRServer.SendRequest({"genlayout": {}})
 		
 	def OnBExit(self, _):
 		self.doExit()

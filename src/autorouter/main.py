@@ -251,6 +251,14 @@ class MainUnit:
 
 	def BlockStateChange(self, blkName, nState):
 		logging.info("block %s has changed state: %d" % (blkName, nState))
+		if nState == 0:
+			# remove any trains we know about from this block
+			for tr in self.trains.values():
+				logging.info("looking to remove train %s from block %s" % (tr.name, blkName))
+				if tr.IsInBlock(blkName):
+					logging.info("It's in there - deleting")
+					tr.DelBlock(blkName)
+
 		self.EvaluateQueuedRequests()
 
 	def BlockClearChange(self, blkName, nClear):
@@ -366,10 +374,12 @@ class MainUnit:
 		if exitBlk in self.blocks:
 			b = self.blocks[exitBlk]
 			state = b.GetState()
-			exitBlockAvailable = state == 0
-			logging.info("Exit block %s State = %d" % (exitBlk, state))
+			clear = b.GetClear()
+			exitBlockAvailable = state == 0 and clear == 0
+			logging.info("Exit block %s State = %d clear = %d" % (exitBlk, state, clear))
 		else:
 			state = None
+			clear = None
 		
 
 		sigNm = rte.GetSignalForEnd(blkName)
@@ -382,7 +392,7 @@ class MainUnit:
 			return True  # OK to proceed with this route
 		else:
 			#  TODO - do something with the tolock and siglock arrays
-			logging.info("Eval false to=%s sig=%s block %s state = %s" % (str(tolock), str(siglock), exitBlk, str(state)))
+			logging.info("Eval false to=%s sig=%s block %s state = %s clear = %s" % (str(tolock), str(siglock), exitBlk, str(state), str(clear)))
 			return False  # this route is unavailable right now
 
 	def SetupRoute(self, rteRq):
@@ -426,6 +436,7 @@ class MainUnit:
 			self.OSQueue[osNm] = Fifo()
 
 		self.OSQueue[osNm].Append(rteRq)
+		logging.info("Queued route request %s" % rteRq.toString())
 
 	def EvaluateQueuedRequests(self):
 		if len(self.OSQueue) == 0:
@@ -439,6 +450,7 @@ class MainUnit:
 				if self.EvaluateRouteRequest(req):
 					logging.info("OK to proceed")
 					self.OSQueue[osNm].Pop()
+					logging.info("popping from queue for os %s" % osNm)
 					self.SetupRoute(req)
 
 		logging.info("end of queued requests")

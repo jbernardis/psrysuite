@@ -4,6 +4,7 @@ if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
 import wx
+from subprocess import Popen
 
 from wx.lib import newevent
 from serial import SerialException
@@ -32,28 +33,18 @@ from tracker.manageengineers import ManageEngineersDlg
 from tracker.manageschedule import ManageScheduleDlg
 from tracker.assignlocos import AssignLocosDlg
 from tracker.detailsdlg import DetailsDlg
-from tracker.aboutdlg import AboutDlg
 from tracker.settings import Settings
 from tracker.reports import Report
 from tracker.completedtrains import CompletedTrains
 from tracker.listener import Listener
 from tracker.backup import saveData, restoreData
-from tracker.dccsniffer import DCCSniffer
 from tracker.engqueuedlg import EngQueueDlg
 from dispatcher.breaker import BreakerName
 
-# class dummyDCCEvt:
-# 	def __init__(self, loco, spd):
-# 		self.dcc = {"instr": "F", "param": spd, "loco": loco}
-# self.onDCCMessage(dummyDCCEvt("2216", "10"))
-# self.onDCCMessage(dummyDCCEvt("2216", "0"))
-
 DEVELOPMODE = True
-VERSIONDATE = "2-February-2023"
 
 BTNSZ = (120, 46)
 
-MENU_FILE_ABOUT = 120
 MENU_FILE_BACKUP = 113
 MENU_FILE_RESTORE = 114
 MENU_FILE_EXIT = 199
@@ -67,8 +58,6 @@ MENU_REPORT_LOCOS = 303
 MENU_REPORT_STATUS = 304
 MENU_DISPATCH_CONNECT = 401
 MENU_DISPATCH_DISCONNECT = 402
-MENU_DCC_CONNECT = 501
-MENU_DCC_DISCONNECT = 502
 MENU_VIEW_ENG_QUEUE = 601
 MENU_VIEW_ACTIVE_TRAINS = 602
 MENU_VIEW_LEGEND = 603
@@ -89,9 +78,6 @@ wildcardTxt = "TXT file (*.txt)|*.txt|"	 \
 (DisconnectEvent, EVT_DISCONNECT) = newevent.NewEvent() 
 (ConnectEvent, EVT_CONNECT) = newevent.NewEvent() 
 
-(DCCMessageEvent, EVT_DCCMESSAGE) = newevent.NewEvent()  
-(DCCClosedEvent,  EVT_DCCCLOSED)  = newevent.NewEvent()  
-
 class MainFrame(wx.Frame):
 	def __init__(self):
 		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE)
@@ -99,7 +85,6 @@ class MainFrame(wx.Frame):
 		
 		self.titleSched = None
 		self.titleConnected = False
-		self.titleDCC = False
 
 		icon = wx.Icon()
 		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "tracker.ico"), wx.BITMAP_TYPE_ANY))
@@ -109,7 +94,6 @@ class MainFrame(wx.Frame):
 		menuBar = wx.MenuBar()
 		
 		self.connection = None
-		self.dcc = None
 
 		self.menuFile = wx.Menu()
 		
@@ -117,11 +101,6 @@ class MainFrame(wx.Frame):
 		self.menuFile.Append(i)
 		
 		i = wx.MenuItem(self.menuFile, MENU_FILE_RESTORE, "Restore", helpString="Restore data files from a ZIP file")
-		self.menuFile.Append(i)
-		
-		self.menuFile.AppendSeparator()
-		
-		i = wx.MenuItem(self.menuFile, MENU_FILE_ABOUT, "About", helpString="About")
 		self.menuFile.Append(i)
 		
 		self.menuFile.AppendSeparator()
@@ -206,22 +185,12 @@ class MainFrame(wx.Frame):
 		i = wx.MenuItem(self.menuDispatch, MENU_DISPATCH_DISCONNECT, "Disconnect", helpString="Disconnect from dispatcher")
 		self.menuDispatch.Append(i)
 		self.menuDispatch.Enable(MENU_DISPATCH_DISCONNECT, False)
-		
-		self.menuDCC = wx.Menu()
-		
-		i = wx.MenuItem(self.menuDCC, MENU_DCC_CONNECT, "Connect", helpString="Connect to DCC Sniffer")
-		self.menuDCC.Append(i)
-		
-		i = wx.MenuItem(self.menuDCC, MENU_DCC_DISCONNECT, "Disconnect", helpString="Disconnect from DCC Sniffer")
-		self.menuDCC.Append(i)
-		self.menuDCC.Enable(MENU_DCC_DISCONNECT, False)
 
 		menuBar.Append(self.menuFile, "File")
 		menuBar.Append(self.menuView, "View")
 		menuBar.Append(self.menuManage, "Manage")
 		menuBar.Append(self.menuReports, "Reports")
 		menuBar.Append(self.menuDispatch, "Dispatch")
-		menuBar.Append(self.menuDCC, "DCC")
 				
 		self.SetMenuBar(menuBar)
 		self.menuBar = menuBar
@@ -230,7 +199,6 @@ class MainFrame(wx.Frame):
 		self.panel = TrainTrackerPanel(self)
 		sizer.Add(self.panel)
 		
-		self.Bind(wx.EVT_MENU, self.panel.onAbout, id=MENU_FILE_ABOUT)
 		self.Bind(wx.EVT_MENU, self.panel.onSaveData, id=MENU_FILE_BACKUP)
 		self.Bind(wx.EVT_MENU, self.panel.onRestoreData, id=MENU_FILE_RESTORE)
 		self.Bind(wx.EVT_MENU, self.onClose, id=MENU_FILE_EXIT)
@@ -256,9 +224,6 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.panel.connectToDispatch, id=MENU_DISPATCH_CONNECT)
 		self.Bind(wx.EVT_MENU, self.panel.disconnectFromDispatch, id=MENU_DISPATCH_DISCONNECT)
 		
-		self.Bind(wx.EVT_MENU, self.panel.onConnectSnifferPressed, id=MENU_DCC_CONNECT)
-		self.Bind(wx.EVT_MENU, self.panel.onDisconnectSnifferPressed, id=MENU_DCC_DISCONNECT)
-		
 		sizer.AddSpacer(100)
 		self.SetSizer(sizer)
 		self.Layout()
@@ -266,15 +231,12 @@ class MainFrame(wx.Frame):
 		
 		self.enableForConnection(False)
 		
-	def setTitle(self, schedule=None, connected=None, dcc=None):
+	def setTitle(self, schedule=None, connected=None):
 		if schedule is not None:
 			self.titleSched = schedule
 			
 		if connected is not None:
 			self.titleConnected = connected
-			
-		if dcc is not None:
-			self.titleDCC = dcc
 			
 		title = "Train Tracker"
 		if self.titleSched is not None:
@@ -284,11 +246,6 @@ class MainFrame(wx.Frame):
 			title += "    Connected to server"
 		else:
 			title += "    Not Connected to server"
-			
-		if self.titleDCC:
-			title += "    Connected to DCC"
-		else:
-			title += "    Not Connected to DCC"
 			
 		self.SetTitle(title)
 		
@@ -334,9 +291,6 @@ class TrainTrackerPanel(wx.Panel):
 		self.schedName = None
 		self.trainSchedule = None
 		
-		self.dlgSplash = None
-		self.splashTimer = 0;
-
 		self.dlgLegend = None
 
 		self.atl = ActiveTrainList()
@@ -577,10 +531,6 @@ class TrainTrackerPanel(wx.Panel):
 		self.Bind(EVT_DELIVERY, self.onDeliveryEvent)
 		self.Bind(EVT_DISCONNECT, self.onDisconnectEvent)
 		self.Bind(EVT_CONNECT, self.onConnectEvent)
-
-		# events from DCC tracker
-		self.Bind(EVT_DCCMESSAGE, self.onDCCMessage)
-		self.Bind(EVT_DCCCLOSED,  self.onDCCClosed)
 		
 		wx.CallAfter(self.initialize)
 		
@@ -613,14 +563,6 @@ class TrainTrackerPanel(wx.Panel):
 			self.breakerx = 0
 		
 	def onTicker(self, _):
-		if self.splashTimer > 0:
-			self.splashTimer -= 1
-			if self.splashTimer == 0:
-				try:
-					self.dlgSplash.Destroy()
-				except:
-					pass
-
 		if not self.connected:
 			self.teBreaker.SetBackgroundColour(wx.Colour(128, 128, 128))
 			self.teBreaker.SetValue("Not Connected")
@@ -1125,16 +1067,10 @@ class TrainTrackerPanel(wx.Panel):
 		
 		self.atl.setNewEngineer(tid, neng)
 		
-	def onAbout(self, _):
-		dlg = AboutDlg(self, self.pngPSRY, VERSIONDATE)
-		dlg.ShowModal()
-		dlg.Destroy()
-		
 	def splash(self):
-		self.dlgSplash = AboutDlg(self, self.pngPSRY, VERSIONDATE)
-		self.dlgSplash.CenterOnScreen()
-		self.dlgSplash.Show()
-		self.splashTimer = 5;
+		splashExec = os.path.join(os.getcwd(), "splash", "main.py")
+		pid = Popen([sys.executable, splashExec]).pid
+		logging.debug("displaying splash screen as PID %d" % pid)
 		
 	def showDetails(self, tx):
 		at = self.atl.getTrainByPosition(tx)
@@ -1496,92 +1432,6 @@ class TrainTrackerPanel(wx.Panel):
 		
 	def onRestoreData(self, _):
 		restoreData(self, self.settings)
-		
-	def onConnectSnifferPressed(self, _):
-		self.connectSniffer()
-
-	def connectSniffer(self):	
-		print("connect to sniffer")	
-		self.sniffer = DCCSniffer()
-		self.sniffer.bind(self.DCCMessage, self.DCCClosed)
-
-		try:
-			self.sniffer.connect(self.settings.dccsnifferport, self.settings.dccsnifferbaud, 1)
-		except SerialException:
-			dlg = wx.MessageDialog(self, 'Connection to DCC Sniffer on port ' + self.settings.dccsnifferport + ' failed',
-					'Connection Failed',
-					wx.OK | wx.ICON_ERROR)
-			dlg.ShowModal()
-			dlg.Destroy()
-			self.sniffer = None
-			
-		self.enableDCCDisconnect(self.sniffer is not None)
-		if self.sniffer:
-			self.parent.setTitle(dcc="DCC Connected(%s)" % self.settings.dccsnifferport)
-		else:
-			self.parent.setTitle(dcc=True)
-
-	def onDisconnectSnifferPressed(self, _):
-		self.disconnectSniffer()
-		
-	def disconnectSniffer(self):
-		if self.sniffer is None:
-			return
-		
-		try:
-			self.sniffer.kill()
-			self.sniffer.join()	
-		except:
-			pass
-		
-		self.sniffer = None
-		self.enableDCCDisconnect(False)
-		self.parent.setTitle(dcc=False)
-		
-	def enableDCCDisconnect(self, flag=True):
-		self.parent.menuDCC.Enable(MENU_DCC_DISCONNECT, flag)
-		self.parent.menuDCC.Enable(MENU_DCC_CONNECT, not flag)
-
-			
-	def DCCMessage(self, txt): # thread context
-		dccMsg = {
-			"instr": txt[0],
-			"loco": "%d" % int(txt[1]), # strip off any leading zeroes
-			"param": txt[2]
-		}
-		evt = DCCMessageEvent(dcc=dccMsg)
-		wx.PostEvent(self, evt)
-		
-	def onDCCMessage(self, evt):
-		dccMsg = evt.dcc
-		cmd = dccMsg["instr"]
-		if cmd in ["F", "f", "R", "r", "s", "e"]:
-			if cmd == "F":
-				speedType = FWD_128
-			elif cmd == "f":
-				speedType = FWD_28
-			elif cmd == "R":
-				speedType = REV_128
-			elif cmd == "r":
-				speedType = REV_28
-			else:
-				speedType = STOP
-
-			try:
-				speed = int(dccMsg["param"])
-			except:
-				speed = None
-				
-			if speed is not None:
-				self.speeds[dccMsg["loco"]] = [speed, speedType]
-				self.atl.setThrottle(dccMsg["loco"], speed, speedType)
-		
-	def DCCClosed(self): # thread context
-		evt = DCCClosedEvent()
-		wx.PostEvent(self, evt)
-		
-	def onDCCClosed(self, evt):
-		self.disconnectSniffer()
 			
 	def onClose(self, _):
 		if self.atl.count() > 0:

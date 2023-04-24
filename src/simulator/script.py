@@ -22,7 +22,7 @@ class Script (wx.Frame):
 		self.pauseOSBlk = None
 
 		self.occupiedBlocks = []
-		self.trainlen = 0
+		self.trainlen = None
 		
 		self.loco = self.GetLoco()
 
@@ -60,6 +60,12 @@ class Script (wx.Frame):
 
 	def GetTimeMultiple(self):
 		return self.tm
+	
+	def GetTrainLen(self):
+		return self.trainlen
+	
+	def SetTrainLen(self, tlen):
+		self.trainlen = tlen
 
 	def GetStatus(self):
 		stat = "Loco %s  " % self.loco
@@ -141,10 +147,11 @@ class Script (wx.Frame):
 				except KeyError:
 					direction = None
 
-				try:
-					self.trainlen = int(params["length"])
-				except KeyError:
-					self.trainlen = 3
+				if self.trainlen is None:
+					try:
+						self.trainlen = int(params["length"])
+					except KeyError:
+						self.trainlen = 3
 
 				try:
 					duration = int(params["time"])

@@ -198,7 +198,10 @@ class MainFrame(wx.Frame):
 				loco = "0"
 			script = self.scripts[scr]
 			tm = script.GetTimeMultiple()
-			trainParams[scr] = [scr, loco, tm]
+			tlen = script.GetTrainLen()
+			if tlen is None:
+				tlen = 3
+			trainParams[scr] = [scr, loco, tm, tlen]
 			
 		dlg = TrainParmDlg(self, trainParams)
 		rc = dlg.ShowModal()
@@ -211,6 +214,7 @@ class MainFrame(wx.Frame):
 			script = self.scripts[scr]
 			script.SetLoco(p[1])
 			script.SetTimeMultiple(p[2])
+			script.SetTrainLen(p[3])
 			script.Execute()
 		self.scriptList.ClearChecks()
 		self.startable = []

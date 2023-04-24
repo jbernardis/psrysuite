@@ -762,14 +762,3 @@ class Districts:
 	def SendRouteDefinitions(self):
 		for t in self.districts.values():
 			t.SendRouteDefinitions()
-
-	def GenerateLayoutInformation(self, subblocks):
-		routes = {}
-		blocks = {}
-		for t in self.districts.values():
-			routes.update(t.GenerateRouteInformation())
-			blocks.update(t.GenerateBlockInformation())
-
-		layout = {"routes": routes, "blocks": blocks, "subblocks": subblocks}
-		with open(os.path.join(os.getcwd(), "data", "layout.json"), "w") as jfp:
-			json.dump(layout, jfp, sort_keys=True, indent=2)

@@ -84,6 +84,10 @@ class MainFrame(wx.Frame):
 			
 		self.settings = Settings()
 		logging.info("%s process starting" % "dispatcher" if self.settings.dispatch else "display")
+		
+		icon = wx.Icon()
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "dispatch.ico"), wx.BITMAP_TYPE_ANY))
+		self.SetIcon(icon)
 
 		self.logCount = 6
 		
@@ -337,6 +341,8 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBPortFleet, self.cbPortFleet)
 		self.cbPortFleet.Hide()
 		self.widgetMap[HyYdPt].append(self.cbPortFleet)
+		self.PortFleetSignals = ["PA32RA", "PA32RB", "PA32L", "PA34RA", "PA34RB", "PA34RC", "PA34RD", "PA34LA", "PA34LB",
+								"PB2R", "PB2L", "PB4R", "PB4L", "PB12R", "PB12L", "PB14R", "PB14L" ]
 
 		self.cbCliffFleet = wx.CheckBox(self, -1, "Cliff Fleeting", (2100, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBCliffFleet, self.cbCliffFleet)
@@ -579,6 +585,8 @@ class MainFrame(wx.Frame):
 
 	def OnCBPortFleet(self, _):
 		f = 1 if self.cbPortFleet.IsChecked() else 0
+		for signm in self.PortFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
 		self.Request({"control": {"name": "port.fleet", "value": f}})
 
 	def OnCBHydeFleet(self, _):
@@ -712,6 +720,14 @@ class MainFrame(wx.Frame):
 		self.ticker = wx.Timer(self)
 		self.tickerFlag = False
 		self.ticker.Start(500)
+		
+		self.splash()
+		
+	def splash(self):
+		splashExec = os.path.join(os.getcwd(), "splash", "main.py")
+		pid = Popen([sys.executable, splashExec]).pid
+		logging.debug("displaying splash screen as PID %d" % pid)
+
 
 	def AddSignalLever(self, slname, district):
 		self.signalLeverMap[slname] = district
@@ -1105,13 +1121,13 @@ class MainFrame(wx.Frame):
 
 	def ToasterSetup(self):
 		self.events = Toaster()
-		self.events.SetXOffset(self.centerOffset)
+		self.events.SetOffsets(0, 150)
 		self.events.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
 		self.events.SetBackgroundColour(wx.Colour(255, 179, 154))
 		self.events.SetTextColour(wx.Colour(0, 0, 0))
 		
 		self.advice = Toaster()
-		self.advice.SetXOffset(self.centerOffset)
+		self.advice.SetOffsets(0, 150)
 		self.advice.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
 		self.advice.SetBackgroundColour(wx.Colour(120, 255, 154))
 		self.advice.SetTextColour(wx.Colour(0, 0, 0))

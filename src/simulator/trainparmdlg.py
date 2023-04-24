@@ -50,12 +50,12 @@ class TrainParmDlg(wx.Dialog):
 		dlg = SingleTrainDlg(self, tr)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			lid, tm = dlg.GetResults()
+			lid, tm, tlen = dlg.GetResults()
 		dlg.Destroy()
 		if rc != wx.ID_OK:
 			return 
 
-		self.lcParms.SetParams(tx, lid, tm)
+		self.lcParms.SetParams(tx, lid, tm, tlen)
 		
 	def GetResults(self):
 		return {}
@@ -77,7 +77,7 @@ class ParmListCtrl(wx.ListCtrl):
 		self.parent = parent
 
 		wx.ListCtrl.__init__(
-			self, parent, wx.ID_ANY, size=(300, 160),
+			self, parent, wx.ID_ANY, size=(380, 160),
 			style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_VRULES
 			)
 
@@ -87,9 +87,11 @@ class ParmListCtrl(wx.ListCtrl):
 		self.InsertColumn(0, "Train")
 		self.InsertColumn(1, "Loco")
 		self.InsertColumn(2, "Time Mult")
+		self.InsertColumn(3, "Length")
 		self.SetColumnWidth(0, 80)
 		self.SetColumnWidth(1, 80)
 		self.SetColumnWidth(2, 80)
+		self.SetColumnWidth(3, 80)
 
 		self.SetItemCount(0)
 
@@ -101,7 +103,7 @@ class ParmListCtrl(wx.ListCtrl):
 		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated)
 
 	def AddTrain(self, trarray):
-		self.trains.append(trarray) # (trainid, loco, timemultiple)
+		self.trains.append(trarray) # (trainid, loco, timemultiple, length)
 		self.refreshItemCount()
 
 	def refreshItemCount(self):
@@ -123,9 +125,10 @@ class ParmListCtrl(wx.ListCtrl):
 		self.RefreshItem(idx)
 		self.setSelection(event.Index)
 		
-	def SetParams(self, tx, lid, tm):
+	def SetParams(self, tx, lid, tm, tlen):
 		self.trains[tx][1] = lid
 		self.trains[tx][2] = tm
+		self.trains[tx][3] = tlen
 		self.RefreshItem(tx)
 
 	def OnGetItemText(self, item, col):
@@ -145,6 +148,7 @@ class SingleTrainDlg(wx.Dialog):
 		self.tid = trinfo[0]
 		self.lid = trinfo[1]
 		self.tm = trinfo[2]
+		self.tlen = trinfo[3]
 		
 		wx.Dialog.__init__(self, self.parent, style=wx.DEFAULT_FRAME_STYLE)
 		self.SetTitle("Edit Single Train Parameters")
@@ -172,6 +176,17 @@ class SingleTrainDlg(wx.Dialog):
 		self.scTime.SetRange(1,10)
 		self.scTime.SetValue(self.tm)
 		hsz.Add(self.scTime)
+		vsz.Add(hsz)
+		vsz.AddSpacer(10)
+		
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		st = wx.StaticText(self, wx.ID_ANY, "Train Length:", size=(100, -1))
+		hsz.Add(st)
+		hsz.AddSpacer(10)	
+		self.scLen = wx.SpinCtrl(self, -1, "%d" % self.tm)
+		self.scLen.SetRange(2, 5)
+		self.scLen.SetValue(self.tlen)
+		hsz.Add(self.scLen)
 		
 		vsz.Add(hsz)
 		vsz.AddSpacer(30)
@@ -205,7 +220,8 @@ class SingleTrainDlg(wx.Dialog):
 	def GetResults(self):
 		loco = self.tcLocoID.GetValue()
 		tm = self.scTime.GetValue()
-		return loco, tm
+		tlen = self.scLen.GetValue()
+		return loco, tm, tlen
 
 	def OnClose(self, _):
 		self.DoClose()

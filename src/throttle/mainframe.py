@@ -18,6 +18,10 @@ class MainFrame(wx.Frame):
 		wx.Frame.__init__(self, None, style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
 		self.SetTitle("PSRY Throttle")
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
+		
+		icon = wx.Icon()
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "throttle.ico"), wx.BITMAP_TYPE_ANY))
+		self.SetIcon(icon)
 	
 		self.selectedLoco = None
 		self.selectedLid = 0

@@ -166,7 +166,14 @@ class MainFrame(wx.Frame):
 		
 		logging.info("DCC HTTP server successfully started")
 		
-		wx.CallLater(2000, self.rrMonitor.start)
+		wx.CallLater(2000, self.DelayedStartup)
+		
+	def DelayedStartup(self):
+		self.rrMonitor.start()
+		pname = os.path.join(os.getcwd(), "dccsniffer", "main.py")
+		pid = Popen([sys.executable, pname]).pid
+		logging.info("started DCC sniffer process as PID %d" % pid)
+
 
 	def StartDCCServer(self):
 		self.DCCServer = DCCHTTPServer(self.settings.ipaddr, self.settings.dccserverport, self.settings.dcctty)

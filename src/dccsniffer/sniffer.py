@@ -1,39 +1,28 @@
-import threading
 import serial
 import logging
 
-class DCCSniffer(threading.Thread):
+class Sniffer:
 	def __init__(self):
-		threading.Thread.__init__(self)
 		self.tty = None
 		self.baud = None
 		self.port = None
 		self.isRunning = False
-		self.endOfLife = False
-		self.cbDCCMessage = None
-		self.cbClosed = None
-		
-	def bind(self, cbDCCMessage, cbClosed):
-		self.cbDCCMessage = cbDCCMessage
-		self.cbClosed = cbClosed
 
-	def connect(self, tty, baud, timeout):
+	def connect(self, tty):
 		self.tty = tty
-		self.baud = baud
 		try:
-			self.port = serial.Serial(port=self.tty, baudrate=self.baud, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_TWO, timeout=timeout)
+			self.port = serial.Serial(port=self.tty, baudrate=115200, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_TWO, timeout=1)
 		except serial.SerialException:
 			self.port = None
 			raise
-		self.start()
-
+		
+	def isConnected(self):
+		return self.port is not None
+	
 	def kill(self):
 		self.isRunning = False
-
-	def isKilled(self):
-		return self.endOfLife
 		
-	def run(self):
+	def run(self, rrserver):
 		self.isRunning = True
 		while self.isRunning:
 			if self.port is None or not self.port.is_open:
@@ -52,16 +41,21 @@ class DCCSniffer(threading.Thread):
 						except:
 							logging.info("unable to convert DCC message to string: (" + s + ")")
 						else:
-							self.cbDCCMessage(s.split())
+							p = s.split()
+							req = {
+								"dccspeed": {
+									"cmd": p[0],
+									"loco": "%d" % int(p[1]), # strip off any leading zeroes
+									"speed": p[2]
+								}
+							}
+							rrserver.SendRequest(req)
 
 		try:
 			self.port.close()
 		except:
 			pass
 				
-		self.endOfLife = True
-		if callable(self.cbClosed):
-			self.cbClosed()
-		logging.info("DCC sniffer thread ended execution")
+		logging.info("DCC sniffer ended execution")
 
 

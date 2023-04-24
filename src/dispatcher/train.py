@@ -92,10 +92,11 @@ class Train:
 	def RemoveFromBlock(self, blk):
 		bn = blk.GetName()
 		if bn not in self.blocks:
-			return
+			return False
 
 		del self.blocks[bn]
 		self.blockOrder.remove(bn)
+		return True
 		
 	def IsContiguous(self):
 		bnames = list(self.blocks.keys())

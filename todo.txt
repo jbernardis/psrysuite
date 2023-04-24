@@ -1,21 +1,7 @@
-
+move all .out and .err files into a subdirectory
+get rid of the trains and locos directory being stored in ini file and just build the path as for other files.  Get rid of file open dialogs and make custom dialogs like I do for shortcut cleanup
 
 how to use release - yard nassau and cliff (I think nassau and yard are done)
-
-need to resolve fleeting in cliff:
-	if cliff enabled:
-		look at cliff.fleet input and use that to set all 3 checkboxes, disable those checkboxes
-		
-	if cliff except bank/cliveden
-		look at cliff.fleet and use that for the cliff checkbox, disable only cliff checkbox, and leave others enabled
-		
-	if dispatcher all enabled
-		enable all checkboxes
-		ignore cliff.fleet input
-		
-		
-		
-port fleeting - is there a switch on the panel that we need to keep in sync with?  is there porta versus portb fleeting>
 
 call on signals - I think it refers to JUST lighting the signal with no route clearing etc
 
@@ -39,29 +25,26 @@ Make sure that all of the stopping blocks report in correctly as east versus wes
 if a block is being traversed in its default direction or if it needs to be reversed.  This impacts dispatcher, but also sim/ar
 
 
-installer - icons for everything, integrate with configurator for setting up different configurations
+general - better icons for everything, set icons for the programs themselves,
+
+expand config to allow changing of ini file parameters
+
+sniffer interface - a new process that sends messages to rrserver who then forwards them to all.
+
+ar/atc/advisor - ??get rid of checkboxes and have always on???
 
 
-
-Train Edit
-  change train length via start dlg box
-  when determining order of sub-blocks need to reverse one of the two places in gen sim logic
-    
 add configuration changes to editor or add a separate configurator
 
-config button - either always generate the layout file, or do it from rrserver via a request - that way the request could come from anywhere - like the editor/configurator
-
 check the order of signal definitions in port routes - had to change for P20P21 route - after doing this, regenerate the layout file and determine if trains/arscripts/simscripts needs to be updated
+actually revisit port block definitions - only P50, P30, and P32 are where direction changes are needed.  Determine the
+proper east/west orientation of the blocks (all yard tracks are east bound), determine proper stop block locations, and arrow directions.
 
 tracker:
-	backup/restore
-	reports
+	backup/restore - need a backup/restore for the entire suite - not in tracker
+	reports - the only thing we really need is train cards, and this is not in tracker, but in train editor
+	
+clock on dispatcher display
 
 
 solve bank signal 18 issue
-
-faceoff trains 43/44 in cliveden - why didn't downhill train start after the other train cleared
-
-AR should not be setting  switches or turnouts in port
-
-need a better way to handle subblock ordering in P50 (and others???)
