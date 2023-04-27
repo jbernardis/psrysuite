@@ -4,8 +4,8 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("tester.out", "w")
-efp = open("tester.err", "w")
+ofp = open(os.path.join(os.getcwd(), "output", "tester.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "tester.err"), "w")
 
 sys.stdout = ofp
 sys.stderr = efp

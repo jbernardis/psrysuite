@@ -251,7 +251,6 @@ class District:
 		return True
 
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
-		#print("calculate aspect for signal %s" % sig.GetName())
 		if osblk.IsBusy():
 			if not silent:
 				self.frame.PopupEvent("Block is busy")
@@ -261,12 +260,12 @@ class District:
 		if sigE != osblk.GetEast():
 			# the block will need to be reversed, but it's premature
 			# to do so now - so force return values as if reversed
-			doReverseExit = True
+			doReverseOS = True
 		else:
-			doReverseExit = False
+			doReverseOS = False
 
-		exitBlkNm = rt.GetExitBlock(reverse=doReverseExit)
-		rType = rt.GetRouteType(reverse=doReverseExit)
+		exitBlkNm = rt.GetExitBlock(reverse=doReverseOS)
+		rType = rt.GetRouteType(reverse=doReverseOS)
 
 		exitBlk = self.frame.blocks[exitBlkNm]
 		if exitBlk.IsOccupied():
@@ -274,7 +273,6 @@ class District:
 			return None
 
 		crossEW = self.CrossingEastWestBoundary(osblk, exitBlk)
-
 		if exitBlk.IsCleared():
 			if (sigE != exitBlk.GetEast() and not crossEW) or (sigE == exitBlk.GetEast() and crossEW):
 				self.frame.PopupEvent("Block is cleared in opposite direction")
@@ -284,6 +282,10 @@ class District:
 			self.frame.PopupEvent("Block is locked")
 			return None
 
+		if exitBlk.GetEast() != osblk.GetEast():
+			doReverseExit = True
+		else:
+			doReverseExit = False
 		nb = exitBlk.NextBlock(reverse=doReverseExit)
 		if nb:
 			nbStatus = nb.GetStatus()
@@ -317,7 +319,6 @@ class District:
 			nnbClear = False
 
 		aspect = self.GetAspect(sig.GetAspectType(), rType, nbStatus, nbRType, nnbClear)
-		#print("calculated aspect = %d" % aspect)
 
 		self.CheckBlockSignals(sig, aspect, exitBlk, doReverseExit, rType, nbStatus, nbRType, nnbClear)
 

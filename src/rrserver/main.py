@@ -3,19 +3,14 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("rrserver.out", "w")
-efp = open("rrserver.err", "w")
+ofp = open(os.path.join(os.getcwd(), "output", "rrserver.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "rrserver.err"), "w")
 
 sys.stdout = ofp
 sys.stderr = efp
 
-try:
-	os.mkdir(os.path.join(os.getcwd(), "logs"))
-except FileExistsError:
-	pass
-
 import logging
-logging.basicConfig(filename=os.path.join("logs", "rrserver.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "rrserver.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 import wx.lib.newevent
 
@@ -56,6 +51,7 @@ class MainFrame(wx.Frame):
 		self.pidADV = None
 		self.pidDispatch = None
 		self.pidDCC = None
+		self.timeValue = None
 
 		self.routeDefs = {}
 
@@ -64,7 +60,7 @@ class MainFrame(wx.Frame):
 
 		self.clients = {}
 
-		self.settings = Settings(sys.argv)
+		self.settings = Settings()
 		
 		if self.settings.ipaddr is not None:
 			if self.ip != self.settings.ipaddr:
@@ -287,6 +283,11 @@ class MainFrame(wx.Frame):
 
 
 	def refreshClient(self, addr, skt):
+		print("refresh client, tv = %s" % self.timeValue, flush=True)
+		if self.timeValue is not None:
+			m = {"clock": [{ "value": self.timeValue}]}
+			self.socketServer.sendToOne(skt, addr, m)
+		
 		for m in self.rr.GetCurrentValues():
 			self.socketServer.sendToOne(skt, addr, m)
 		self.socketServer.sendToOne(skt, addr, {"end": {"type": "layout"}})
@@ -310,7 +311,7 @@ class MainFrame(wx.Frame):
 		wx.QueueEvent(self, evt)
 
 	def onRailroadEvent(self, evt):
-		logging.info("Railroad event: %s" % json.dumps(evt.data))
+		#logging.info("Railroad event: %s" % json.dumps(evt.data))
 
 		for cmd, parms in evt.data.items():
 			if cmd == "refreshoutput":
@@ -327,8 +328,7 @@ class MainFrame(wx.Frame):
 		wx.QueueEvent(self, evt)
 
 	def onHTTPMessageEvent(self, evt):
-		logging.info("HTTP Request: %s" % json.dumps(evt.data))
-		#print("Incoming HTTP Request: %s" % json.dumps(evt.data))
+		#logging.info("HTTP Request: %s" % json.dumps(evt.data))
 		verb = evt.data["cmd"][0]
 
 		if verb == "signal":
@@ -514,8 +514,19 @@ class MainFrame(wx.Frame):
 			status = int(evt.data["status"][0])
 
 			self.rr.SetRelay(relay, status)
+			
+		elif verb == "clock":
+			print("server: clock command", flush=True)
+			value = evt.data["value"][0]
+			resp = {"clock": [{ "value": value}]}
+			self.timeValue = value
+			addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER")
+			for addr, skt in addrList:
+				print("forwarding clock to a listened", flush=True)
+				self.socketServer.sendToOne(skt, addr, resp)
 
 		elif verb == "refresh":
+			print("server refresh %s" % str(evt.data))
 			sid = int(evt.data["SID"][0])
 			for addr, data in self.clients.items():
 				if data[1] == sid:

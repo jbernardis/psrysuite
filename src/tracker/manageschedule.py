@@ -66,7 +66,57 @@ class ChooseScheduleDlg(wx.Dialog):
 	def OnBOK(self, _):
 		self.EndModal(wx.ID_OK)
 		
+				
+class ChooseSchedulesDlg(wx.Dialog):
+	def __init__(self, parent, schedules):
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
+		self.Bind(wx.EVT_CLOSE, self.OnCancel)
+		self.SetTitle("Choose schedules")
+
+		vszr = wx.BoxSizer(wx.VERTICAL)
+		vszr.AddSpacer(20)
 		
+		cb = wx.CheckListBox(self, wx.ID_ANY, size=(160, -1), choices=schedules)
+		self.cbSchedule = cb
+		vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vszr.AddSpacer(20)
+		
+		btnszr = wx.BoxSizer(wx.HORIZONTAL)
+		
+		bOK = wx.Button(self, wx.ID_ANY, "OK")
+		self.Bind(wx.EVT_BUTTON, self.OnBOK, bOK)
+		
+		bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+		self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
+		
+		btnszr.Add(bOK)
+		btnszr.AddSpacer(20)
+		btnszr.Add(bCancel)
+		
+		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vszr.AddSpacer(20)
+				
+		hszr = wx.BoxSizer(wx.HORIZONTAL)
+		hszr.AddSpacer(20)
+		hszr.Add(vszr)
+		
+		hszr.AddSpacer(20)
+		
+		self.SetSizer(hszr)
+		self.Layout()
+		self.Fit();
+		
+	def GetValue(self):
+		return self.cbSchedule.GetCheckedStrings()
+		
+	def OnCancel(self, _):
+		self.EndModal(wx.ID_CANCEL)
+		
+	def OnBOK(self, _):
+		self.EndModal(wx.ID_OK)
+				
 
 class ManageScheduleDlg(wx.Dialog):
 	def __init__(self, parent, currentScheduleName, currentSchedule, alltrains, settings):
@@ -188,7 +238,7 @@ class ManageScheduleDlg(wx.Dialog):
 		
 		self.bLoad = wx.Button(self, wx.ID_ANY, "Load", size=BTNSZ)
 		self.bLoad.SetFont(btnFont)
-		self.bLoad.SetToolTip("LOad a new train order from a file")
+		self.bLoad.SetToolTip("Load a train schedule from a file")
 		self.Bind(wx.EVT_BUTTON, self.bLoadPressed, self.bLoad)
 		btnSizer.Add(self.bLoad)
 
@@ -196,9 +246,17 @@ class ManageScheduleDlg(wx.Dialog):
 		
 		self.bSave = wx.Button(self, wx.ID_ANY, "Save", size=BTNSZ)
 		self.bSave.SetFont(btnFont)
-		self.bSave.SetToolTip("Save the train order to the currently loaded file")
+		self.bSave.SetToolTip("Save the train schedule to a file")
 		self.Bind(wx.EVT_BUTTON, self.bSavePressed, self.bSave)
 		btnSizer.Add(self.bSave)
+
+		btnSizer.AddSpacer(10)
+		
+		self.bDelete = wx.Button(self, wx.ID_ANY, "Delete", size=BTNSZ)
+		self.bDelete.SetFont(btnFont)
+		self.bDelete.SetToolTip("Delete train schedule file(s)")
+		self.Bind(wx.EVT_BUTTON, self.bDeletePressed, self.bDelete)
+		btnSizer.Add(self.bDelete)
 		
 		btnSizer2 = wx.BoxSizer(wx.HORIZONTAL)
 		
@@ -438,6 +496,21 @@ class ManageScheduleDlg(wx.Dialog):
 		fxp = os.path.join(self.schedDir, "*.json")
 		return [os.path.splitext(os.path.split(x)[1])[0] for x in glob(fxp)]
 	
+	def bDeletePressed(self, _):			
+		dlg = ChooseSchedulesDlg(self, self.getSchedFiles())
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			scheds = dlg.GetValue()
+			
+		dlg.Destroy()
+		
+		if rc != wx.ID_OK:
+			return 	
+		
+		for sched in scheds:	
+			path = os.path.join(os.getcwd(), "data", "schedules", sched + ".json")
+			os.unlink(path)
+	
 	def bLoadPressed(self, _):
 		if self.modified:
 			dlg = wx.MessageDialog(self, 'Train schedule has been changed\nLoading a new file will lose these changes.\nPress "Yes" to proceed and lose changes,\nor "No" to return and save them.',
@@ -455,8 +528,7 @@ class ManageScheduleDlg(wx.Dialog):
 		dlg.Destroy()
 		
 		if rc != wx.ID_OK:
-			return 
-		
+			return 		
 		
 		path = os.path.join(os.getcwd(), "data", "schedules", schedNm + ".json")
 		sched = Schedule()

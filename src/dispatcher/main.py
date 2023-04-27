@@ -4,25 +4,29 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("dispatcher.out", "w")
-efp = open("dispatcher.err", "w")
+from dispatcher.settings import Settings
+
+settings = Settings()
+
+if settings.dispatch:
+	fn = "dispatch"
+else:
+	fn = "display"
+
+ofp = open(os.path.join(os.getcwd(), "output", "%s.out" % fn), "w")
+efp = open(os.path.join(os.getcwd(), "output", "%s.err" % fn), "w")
 
 sys.stdout = ofp
 sys.stderr = efp
 
-try:
-	os.mkdir(os.path.join(os.getcwd(), "logs"))
-except FileExistsError:
-	pass
-
 import logging
-logging.basicConfig(filename=os.path.join("logs", "dispatch.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "%s.log" % fn), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 from dispatcher.mainframe import MainFrame 
 
 class App(wx.App):
 	def OnInit(self):
-		self.frame = MainFrame()
+		self.frame = MainFrame(settings)
 		self.frame.Show()
 		return True
 

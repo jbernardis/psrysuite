@@ -5,19 +5,14 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("simulator.out", "w")
-efp = open("simulator.err", "w")
+ofp = open(os.path.join(os.getcwd(), "output", "simulator.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "simulator.err"), "w")
 
 sys.stdout = ofp
 sys.stderr = efp
 
-try:
-	os.mkdir(os.path.join(os.getcwd(), "logs"))
-except FileExistsError:
-	pass
-
 import logging
-logging.basicConfig(filename=os.path.join("logs", "simulator.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "simulator.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 from simulator.mainframe import MainFrame 
 

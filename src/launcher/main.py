@@ -18,8 +18,8 @@ if np < 2:
 else:
     mode = sys.argv[1]
         
-ofp = open("launch%s.out" % mode, "w")
-efp = open("launch%s.err" % mode, "w")
+ofp = open(os.path.join(os.getcwd(), "output", ("launch%s.out" % mode)), "w")
+efp = open(os.path.join(os.getcwd(), "output", ("launch%s.err" % mode)), "w")
 
 sys.stdout = ofp
 sys.stderr = efp

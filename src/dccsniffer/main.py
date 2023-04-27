@@ -3,14 +3,14 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("dccsniffer.out", "w")
-efp = open("dccsniffer.err", "w")
+ofp = open(os.path.join(os.getcwd(), "output", "dccsniffer.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "dccsniffer.err"), "w")
 sys.stdout = ofp
 sys.stderr = efp
 
 import json
 import logging
-logging.basicConfig(filename=os.path.join("logs", "dccsniffer.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "dccsniffer.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 from dccsniffer.settings import Settings
 from dccsniffer.sniffer import Sniffer

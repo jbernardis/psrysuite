@@ -7,8 +7,19 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("config.out", "w")
-efp = open("config.err", "w")
+try:
+	os.mkdir(os.path.join(os.getcwd(), "logs"))
+except FileExistsError:
+	pass
+
+try:
+	os.mkdir(os.path.join(os.getcwd(), "output"))
+except FileExistsError:
+	pass
+
+
+ofp = open(os.path.join(os.getcwd(), "output", "config.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "config.err"), "w")
 
 sys.stdout = ofp
 sys.stderr = efp

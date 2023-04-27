@@ -17,12 +17,12 @@ def parseBoolean(val, defaultVal):
 	return defaultVal
 
 class Settings:
-	def __init__(self, cmdline):
+	def __init__(self):
 		self.datafolder = os.path.join(os.getcwd(), "data")
 		self.inifile = os.path.join(self.datafolder, INIFILE)
 		self.section = "rrserver"	
 		
-		self.simulation = "simulation" in cmdline
+		self.simulation = False
 		self.ipaddr = None
 		self.serverport = 9000
 		self.socketport = 9001
@@ -108,6 +108,3 @@ class Settings:
 					self.ipaddr = value
 		else:
 			logging.warning("Missing global section - assuming defaults")
-			
-		if "simulation" in cmdline:
-			self.simultion = True

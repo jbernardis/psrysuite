@@ -1,15 +1,17 @@
-#import wx
+import wx
 import wx.lib.newevent
+from wx.lib.gizmos.ledctrl import LEDNumberCtrl
 
 import os
 import sys
 import json
 import logging
+import time
 from subprocess import Popen
+from glob import glob
 
 from dispatcher.constants import BLOCK
 
-from dispatcher.settings import Settings
 from dispatcher.bitmaps import BitMaps
 from dispatcher.district import Districts
 from dispatcher.trackdiagram import TrackDiagram
@@ -48,7 +50,7 @@ MENU_AR_REMOVE  = 904
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
-allowedCommands = [ "settrain", "renametrain" ]
+allowedCommands = [ "settrain", "renametrain", "identify", "refresh" ]
 
 wildcardTrain = "train files (*.trn)|*.trn|"	 \
 			"All files (*.*)|*.*"
@@ -64,7 +66,7 @@ class Node:
 BTNDIM = (80, 23)
 
 class MainFrame(wx.Frame):
-	def __init__(self):
+	def __init__(self, settings):
 		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE)
 		self.events = None
 		self.advice = None
@@ -76,13 +78,17 @@ class MainFrame(wx.Frame):
 		self.pidATC	= None
 		self.pidAdvisor = None
 		
+		self.ToD = True
+		self.timeValue = self.GetToD()
+		self.clockRunning = False # only applies to non-TOD clock
+		
 		self.eventsList = []
 		self.adviceList = []
 		
 		self.locoList = []
 		self.trainList = []
 			
-		self.settings = Settings()
+		self.settings = settings
 		logging.info("%s process starting" % "dispatcher" if self.settings.dispatch else "display")
 		
 		icon = wx.Icon()
@@ -167,17 +173,23 @@ class MainFrame(wx.Frame):
 		if not self.IsDispatcher():
 			self.bServerHide.Hide()
 
-		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Trains", pos=(self.centerOffset+250, 25), size=BTNDIM)
+		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Train IDs", pos=(self.centerOffset+250, 15), size=BTNDIM)
 		self.bLoadTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadTrains, self.bLoadTrains)
-		self.bLoadLocos = wx.Button(self, wx.ID_ANY, "Load Locos", pos=(self.centerOffset+250, 65), size=BTNDIM)
+		
+		self.bSaveTrains = wx.Button(self, wx.ID_ANY, "Save Train IDs", pos=(self.centerOffset+250, 45), size=BTNDIM)
+		self.bSaveTrains.Enable(False)
+		self.Bind(wx.EVT_BUTTON, self.OnBSaveTrains, self.bSaveTrains)
+		
+		self.bClearTrains = wx.Button(self, wx.ID_ANY, "Clear Train IDs", pos=(self.centerOffset+250, 75), size=BTNDIM)
+		self.bClearTrains.Enable(False)
+		self.Bind(wx.EVT_BUTTON, self.OnBClearTrains, self.bClearTrains)
+		
+		self.bLoadLocos = wx.Button(self, wx.ID_ANY, "Load Loco #s", pos=(self.centerOffset+350, 15), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadLocos, self.bLoadLocos)
 		self.bLoadLocos.Enable(False)
 		
-		self.bSaveTrains = wx.Button(self, wx.ID_ANY, "Save Trains", pos=(self.centerOffset+350, 25), size=BTNDIM)
-		self.bSaveTrains.Enable(False)
-		self.Bind(wx.EVT_BUTTON, self.OnBSaveTrains, self.bSaveTrains)
-		self.bSaveLocos = wx.Button(self, wx.ID_ANY, "Save Locos", pos=(self.centerOffset+350, 65), size=BTNDIM)
+		self.bSaveLocos = wx.Button(self, wx.ID_ANY, "Save Loco #s", pos=(self.centerOffset+350, 45), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBSaveLocos, self.bSaveLocos)
 		self.bSaveLocos.Enable(False)
 		
@@ -195,22 +207,36 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_BUTTON, self.OnResetScreen, self.bResetScreen)
 
 		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 50), size=(400, 40))
-		
-		
+
+		self.timeDisplay = LEDNumberCtrl(self, wx.ID_ANY, pos=(self.centerOffset+480, 10), size=(150, 50))
+
 		if self.IsDispatcher():
-			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(self.centerOffset+600, 25))
+			self.DisplayTimeValue()
+			self.cbToD = wx.CheckBox(self, wx.ID_ANY, "Time of Day", pos=(self.centerOffset+515, 65))
+			self.cbToD.SetValue(True)
+			self.Bind(wx.EVT_CHECKBOX, self.OnCBToD, self.cbToD)
+			
+			self.bStartClock = wx.Button(self, wx.ID_ANY, "Start", pos=(self.centerOffset+485, 90), size=(60, 23))
+			self.Bind(wx.EVT_BUTTON, self.OnBStartClock, self.bStartClock)
+			self.bStartClock.Enable(False)
+			
+			self.bResetClock = wx.Button(self, wx.ID_ANY, "Reset", pos=(self.centerOffset+565, 90), size=(60, 23))
+			self.Bind(wx.EVT_BUTTON, self.OnBResetClock, self.bResetClock)
+			self.bResetClock.Enable(False)
+
+			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(self.centerOffset+670, 25))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
 			self.cbAutoRouter.Enable(False)
-			self.cbATC = wx.CheckBox(self, wx.ID_ANY, "Automatic Train Control", pos=(self.centerOffset+600, 50))
+			self.cbATC = wx.CheckBox(self, wx.ID_ANY, "Automatic Train Control", pos=(self.centerOffset+670, 50))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBATC, self.cbATC)
 			self.cbATC.Enable(False)
-			self.cbAdvisor = wx.CheckBox(self, wx.ID_ANY, "Advisor", pos=(self.centerOffset+600, 75))
+			self.cbAdvisor = wx.CheckBox(self, wx.ID_ANY, "Advisor", pos=(self.centerOffset+670, 75))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAdvisor, self.cbAdvisor)
 			self.cbAdvisor.Enable(False)
 			
-			self.bEvents = wx.Button(self, wx.ID_ANY, "Events Log", pos=(self.centerOffset+800, 25), size=BTNDIM)
+			self.bEvents = wx.Button(self, wx.ID_ANY, "Events Log", pos=(self.centerOffset+840, 25), size=BTNDIM)
 			self.Bind(wx.EVT_BUTTON, self.OnBEventsLog, self.bEvents)
-			self.bAdvice = wx.Button(self, wx.ID_ANY, "Advice Log", pos=(self.centerOffset+800, 65), size=BTNDIM)
+			self.bAdvice = wx.Button(self, wx.ID_ANY, "Advice Log", pos=(self.centerOffset+840, 65), size=BTNDIM)
 			self.Bind(wx.EVT_BUTTON, self.OnBAdviceLog, self.bAdvice)
 			
 		self.totalw = totalw
@@ -233,6 +259,47 @@ class MainFrame(wx.Frame):
 		self.DoRefresh()
 
 		wx.CallAfter(self.Initialize)
+		
+	def OnBResetClock(self, _):
+		self.tickerCount = 0
+		self.timeValue = 360 # 6:00
+		self.DisplayTimeValue()
+		
+	def OnBStartClock(self, _):
+		self.clockRunning = not self.clockRunning
+		self.bStartClock.SetLabel("Stop" if self.clockRunning else "Start")
+		self.bResetClock.Enable(not self.clockRunning)
+		if self.clockRunning:
+			self.tickerCount = 0
+
+	def OnCBToD(self, _):
+		if self.cbToD.IsChecked():
+			self.ToD = True
+			self.bStartClock.Enable(False)
+			self.bResetClock.Enable(False)
+			self.timeValue = self.GetToD()
+		else:		
+			self.ToD = False
+			self.bStartClock.Enable(True)
+			self.bResetClock.Enable(True)
+			#self.timeValue = 360 # initial value 6:00
+			
+		self.clockRunning = False
+		self.bStartClock.SetLabel("Start")
+			
+		self.DisplayTimeValue()
+		
+	def GetToD(self):
+		tm = time.localtime()
+		return (tm.tm_hour%12) * 60 + tm.tm_min
+		
+	def DisplayTimeValue(self):
+		hours = int(self.timeValue/60)
+		minutes = self.timeValue % 60
+		self.timeDisplay.SetValue("%2d:%02d" % (hours, minutes))
+		if self.subscribed and self.IsDispatcher():
+			self.Request({"clock": { "value": self.timeValue}})
+			
 		
 	def OnServerHideShow(self, _):
 		self.serverHidden = not self.serverHidden
@@ -719,6 +786,7 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_TIMER, self.onTicker)
 		self.ticker = wx.Timer(self)
 		self.tickerFlag = False
+		self.tickerCount = 0
 		self.ticker.Start(500)
 		
 		self.splash()
@@ -810,11 +878,27 @@ class MainFrame(wx.Frame):
 			# call 1sec every other time to simulate a 1 second timer
 			self.onTicker1Sec()
 			
+		self.tickerCount += 1
+		if self.tickerCount == 120:
+			self.tickerCount = 0
+			self.onTicker1Min()
+			
 		self.delayedRequests.CheckForExpiry(self.Request)
 
 	def onTicker1Sec(self):
 		self.ClearExpiredButtons()
 		self.breakerDisplay.ticker()
+		
+	def onTicker1Min(self):
+		logging.info("ticker 1 minute, timevalue = %d" % self.timeValue )
+		if self.IsDispatcher():
+			if self.ToD:
+				self.timeValue = self.GetToD()
+				self.DisplayTimeValue()
+			else:
+				if self.clockRunning:
+					self.timeValue += 1
+					self.DisplayTimeValue()
 
 	def ClearExpiredButtons(self):
 		collapse = False
@@ -1163,6 +1247,7 @@ class MainFrame(wx.Frame):
 			self.bLoadTrains.Enable(False)
 			self.bLoadLocos.Enable(False)
 			self.bSaveTrains.Enable(False)
+			self.bClearTrains.Enable(False)
 			self.bSaveLocos.Enable(False)
 			if self.IsDispatcher():
 				self.cbAutoRouter.Enable(False)
@@ -1184,6 +1269,7 @@ class MainFrame(wx.Frame):
 			self.bLoadTrains.Enable(True)
 			self.bLoadLocos.Enable(True)
 			self.bSaveTrains.Enable(True)
+			self.bClearTrains.Enable(True)
 			self.bSaveLocos.Enable(True)
 			if self.IsDispatcher():
 				self.cbAutoRouter.Enable(True)
@@ -1214,6 +1300,9 @@ class MainFrame(wx.Frame):
 		self.DoRefresh()
 		
 	def DoRefresh(self):
+		if self.IsDispatcher():
+			self.Request({"clock": { "value": self.timeValue}})
+
 		self.Request({"refresh": {"SID": self.sessionid}})
 
 	def raiseDeliveryEvent(self, data): # thread context
@@ -1227,7 +1316,7 @@ class MainFrame(wx.Frame):
 
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
-			logging.info("Dispatch: %s: %s" % (cmd, parms))
+			#logging.info("Dispatch: %s: %s" % (cmd, parms))
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]
@@ -1487,6 +1576,11 @@ class MainFrame(wx.Frame):
 						self.Request({"ar": {"action": "remove", "train": train}})
 						
 					tr.Draw()
+					
+			elif cmd == "clock":
+				if not self.IsDispatcher():
+					self.timeValue = int(parms[0]["value"])
+					self.DisplayTimeValue()
 
 			elif cmd == "control":
 				for p in parms:
@@ -1509,7 +1603,8 @@ class MainFrame(wx.Frame):
 						self.SendOSRoutes()
 					self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 				elif parms["type"] == "trains":
-					pass
+					for trid, tr in self.trains.items():
+						pass
 					
 			elif cmd == "advice":
 				self.PopupAdvice(parms["msg"][0])
@@ -1595,6 +1690,7 @@ class MainFrame(wx.Frame):
 		self.bLoadTrains.Enable(False)
 		self.bLoadLocos.Enable(False)
 		self.bSaveTrains.Enable(False)
+		self.bClearTrains.Enable(False)
 		self.bSaveLocos.Enable(False)
 		if self.IsDispatcher():
 			self.cbAutoRouter.Enable(False)
@@ -1614,42 +1710,63 @@ class MainFrame(wx.Frame):
 	def OnBSaveTrains(self, _):
 		self.SaveTrains()
 		
-	def SaveTrains(self):
-		dlg = wx.FileDialog(self, message="Save Trains", defaultDir=self.settings.traindir,
-			defaultFile="", wildcard=wildcardTrain, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-		if dlg.ShowModal() != wx.ID_OK:
-			dlg.Destroy()
-			return False
-
-		path = dlg.GetPath()
+	def OnBClearTrains(self, _):
+		dlg = wx.MessageDialog(self, 'This clears all train IDs.  Are you sure you want to continue?\nPress "Yes" to confirm,\nor "No" to cancel.',
+				'Clear Train IDs', wx.YES_NO | wx.ICON_WARNING)
+		rc = dlg.ShowModal()
 		dlg.Destroy()
+		if rc != wx.ID_YES:
+			return
+
+		newnames = []
+		for trid, tr in self.trains.items():
+			oldname = trid
+			newname = Train.NextName()
+			tr.SetName(newname)
+			newnames.append([oldname, newname])
+			self.Request({"renametrain": { "oldname": oldname, "newname": newname}}) #, "oldloco": oldLoco, "newloco": locoid}})
+		
+		for oname, nname in newnames:
+			tr = self.trains[oname]
+			del(self.trains[oname])
+			self.trains[nname] = tr
+		
+	def SaveTrains(self):
+		dlg = ChooseItemDlg(self, True, True)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			file = dlg.GetValue()
+			
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+		
+		if file is None:
+			return
 
 		trDict = {}
 		for trid, tr in self.trains.items():
 			if not trid.startswith("??"):
 				trDict[trid] = tr.GetBlockNameList()
 
-		with open(path, "w") as fp:
+		with open(file, "w") as fp:
 			json.dump(trDict, fp, indent=4, sort_keys=True)
 
-		self.settings.SetTrainDir(os.path.split(path)[0])
-		self.settings.save()
-
 	def OnBLoadTrains(self, _):
-		dlg = wx.FileDialog(self, message="Load Trains", defaultDir=self.settings.traindir,
-			defaultFile="", wildcard=wildcardTrain, style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_NO_FOLLOW)
-		if dlg.ShowModal() != wx.ID_OK:
-			dlg.Destroy()
-			return False
-
-		path = dlg.GetPath()
+		dlg = ChooseItemDlg(self, True, False)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			file = dlg.GetValue()
+			
 		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+		
+		if file is None:
+			return
 
-		with open(path, "r") as fp:
+		with open(file, "r") as fp:
 			trDict = json.load(fp)
-
-		self.settings.SetTrainDir(os.path.split(path)[0])
-		self.settings.save()
 
 		for tid, blist in trDict.items():
 			for bname in blist:
@@ -1666,14 +1783,17 @@ class MainFrame(wx.Frame):
 		self.SaveLocos()
 		
 	def SaveLocos(self):
-		dlg = wx.FileDialog(self, message="Save Locomotives", defaultDir=self.settings.locodir,
-			defaultFile="", wildcard=wildcardLoco, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-		if dlg.ShowModal() != wx.ID_OK:
-			dlg.Destroy()
-			return False
-
-		path = dlg.GetPath()
+		dlg = ChooseItemDlg(self, False, True)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			file = dlg.GetValue()
+			
 		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+		
+		if file is None:
+			return
 
 		locoDict = {}
 		for _, tr in self.trains.items():
@@ -1681,27 +1801,24 @@ class MainFrame(wx.Frame):
 			if loco is not None and not loco.startswith("??"):
 				locoDict[loco] = tr.GetBlockNameList()
 
-		with open(path, "w") as fp:
+		with open(file, "w") as fp:
 			json.dump(locoDict, fp, indent=4, sort_keys=True)
 
-		self.settings.SetLocoDir(os.path.split(path)[0])
-		self.settings.save()
-
 	def OnBLoadLocos(self, _):
-		dlg = wx.FileDialog(self, message="Load Locomotives", defaultDir=self.settings.locodir,
-			defaultFile="", wildcard=wildcardLoco, style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_NO_FOLLOW)
-		if dlg.ShowModal() != wx.ID_OK:
-			dlg.Destroy()
-			return False
-
-		path = dlg.GetPath()
+		dlg = ChooseItemDlg(self, False, False)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			file = dlg.GetValue()
+			
 		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+		
+		if file is None:
+			return
 
-		with open(path, "r") as fp:
+		with open(file, "r") as fp:
 			locoDict = json.load(fp)
-
-		self.settings.SetLocoDir(os.path.split(path)[0])
-		self.settings.save()
 
 		for lid, blist in locoDict.items():
 			for bname in blist:
@@ -1737,6 +1854,180 @@ class MainFrame(wx.Frame):
 			pass
 		self.Destroy()
 		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Display"))
+		
+
+class ChooseItemDlg(wx.Dialog):
+	def __init__(self, parent, trains, allowentry):
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
+		self.Bind(wx.EVT_CLOSE, self.OnCancel)
+		self.trains = trains
+		if trains:
+			if allowentry:
+				self.SetTitle("Choose/Enter train IDs file")
+			else:
+				self.SetTitle("Choose train IDs file")
+		else:
+			if allowentry:
+				self.SetTitle("Choose/Enter loco #s file")
+			else:
+				self.SetTitle("Choose loco #s file")
+		
+		self.allowentry = allowentry
+
+		vszr = wx.BoxSizer(wx.VERTICAL)
+		vszr.AddSpacer(20)
+		
+		if allowentry:
+			style = wx.CB_DROPDOWN
+		else:
+			style = wx.CB_DROPDOWN | wx.CB_READONLY	
+			
+		self.GetFiles()				
+		
+		cb = wx.ComboBox(self, 500, "", size=(160, -1), choices=self.files, style=style)
+		self.cbItems = cb
+		vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		if not allowentry and len(self.files) > 0:
+			self.cbItems.SetSelection(0)
+		else:
+			self.cbItems.SetSelection(wx.NOT_FOUND)
+		
+		vszr.AddSpacer(20)
+		
+		btnszr = wx.BoxSizer(wx.HORIZONTAL)
+		
+		bOK = wx.Button(self, wx.ID_ANY, "OK")
+		bOK.SetDefault()
+		self.Bind(wx.EVT_BUTTON, self.OnBOK, bOK)
+		
+		bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+		self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
+		
+		bDelete = wx.Button(self, wx.ID_ANY, "Delete")
+		self.Bind(wx.EVT_BUTTON, self.OnDelete, bDelete)
+		
+		btnszr.Add(bOK)
+		btnszr.AddSpacer(20)
+		btnszr.Add(bCancel)
+		btnszr.AddSpacer(20)
+		btnszr.Add(bDelete)
+		
+		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vszr.AddSpacer(20)
+				
+		hszr = wx.BoxSizer(wx.HORIZONTAL)
+		hszr.AddSpacer(20)
+		hszr.Add(vszr)
+		
+		hszr.AddSpacer(20)
+		
+		self.SetSizer(hszr)
+		self.Layout()
+		self.Fit();
+		
+	def GetFiles(self):
+		if self.trains:
+			fxp = os.path.join(os.getcwd(), "data", "trains", "*.trn")
+		else:
+			fxp = os.path.join(os.getcwd(), "data", "locos", "*.loco")
+		self.files = [os.path.splitext(os.path.split(x)[1])[0] for x in glob(fxp)]
+		
+	def GetValue(self):
+		fn = self.cbItems.GetValue()
+		if fn is None or fn == "":
+			return None
+		
+		if self.trains:
+			return os.path.join(os.getcwd(), "data", "trains", fn+".trn")
+		else:
+			return os.path.join(os.getcwd(), "data", "locos", fn+".loco")
+		
+	def OnCancel(self, _):
+		self.EndModal(wx.ID_CANCEL)
+		
+	def OnBOK(self, _):
+		self.EndModal(wx.ID_OK)
+		
+	def OnDelete(self, _):
+		dlg = ChooseItemsDlg(self, self.files, self.trains)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			l = dlg.GetValue()
+			
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+
+		if len(l) == 0:
+			return 
+				
+		for fn in l:
+			if self.trains:
+				path = os.path.join(os.getcwd(), "data", "trains", fn+".trn")
+			else:
+				path = os.path.join(os.getcwd(), "data", "locos", fn+".loco")
+			os.unlink(path)
+			
+		self.GetFiles()
+		self.cbItems.SetItems(self.files)
+		if not self.allowentry and len(self.files) > 0:
+			self.cbItems.SetSelection(0)
+		else:
+			self.cbItems.SetSelection(wx.NOT_FOUND)
+
+class ChooseItemsDlg(wx.Dialog):
+	def __init__(self, parent, items, trains):
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
+		self.Bind(wx.EVT_CLOSE, self.OnCancel)
+		if trains:
+			self.SetTitle("Choose train file(s) to delete")
+		else:
+			self.SetTitle("Choose loco file(s) to delete")
+
+		vszr = wx.BoxSizer(wx.VERTICAL)
+		vszr.AddSpacer(20)
+		
+		cb = wx.CheckListBox(self, wx.ID_ANY, size=(160, -1), choices=items)
+		self.cbItems = cb
+		vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vszr.AddSpacer(20)
+		
+		btnszr = wx.BoxSizer(wx.HORIZONTAL)
+		
+		bOK = wx.Button(self, wx.ID_ANY, "OK")
+		self.Bind(wx.EVT_BUTTON, self.OnBOK, bOK)
+		
+		bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+		self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
+		
+		btnszr.Add(bOK)
+		btnszr.AddSpacer(20)
+		btnszr.Add(bCancel)
+		
+		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vszr.AddSpacer(20)
+				
+		hszr = wx.BoxSizer(wx.HORIZONTAL)
+		hszr.AddSpacer(20)
+		hszr.Add(vszr)
+		
+		hszr.AddSpacer(20)
+		
+		self.SetSizer(hszr)
+		self.Layout()
+		self.Fit();
+		
+	def GetValue(self):
+		return self.cbItems.GetCheckedStrings()
+		
+	def OnCancel(self, _):
+		self.EndModal(wx.ID_CANCEL)
+		
+	def OnBOK(self, _):
+		self.EndModal(wx.ID_OK)
 
 class ExitDlg (wx.Dialog):
 	def __init__(self, parent):

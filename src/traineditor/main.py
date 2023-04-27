@@ -4,8 +4,8 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("trainedit.out", "w")
-efp = open("trainedit.err", "w")
+ofp = open(os.path.join(os.getcwd(), "output", "trainedit.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "trainedit.err"), "w")
 
 sys.stdout = ofp
 sys.stderr = efp

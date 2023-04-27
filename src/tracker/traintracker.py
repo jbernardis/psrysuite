@@ -7,15 +7,14 @@ import wx
 from subprocess import Popen
 
 from wx.lib import newevent
-from serial import SerialException
 import json
 import logging
 
 
-logging.basicConfig(filename=os.path.join("logs", "tracker.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "tracker.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
-ofp = open("tracker.out", "w")
-efp = open("tracker.err", "w")
+ofp = open(os.path.join(os.getcwd(), "output", "tracker.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "tracker.err"), "w")
 
 sys.stdout = ofp
 sys.stderr = efp
@@ -628,6 +627,7 @@ class TrainTrackerPanel(wx.Panel):
 		wx.QueueEvent(self, evt)
 
 	def onDeliveryEvent(self, evt):
+		print("delivery event: %s" % str(evt.data))
 		for cmd, parms in evt.data.items():
 			if  cmd == "breaker":
 				logging.info("breaker: %s" % parms)
@@ -1453,9 +1453,7 @@ class TrainTrackerPanel(wx.Panel):
 			
 		if self.listener is not None:
 			self.listener.kill()
-			
-		self.disconnectSniffer()
-			
+
 		self.Destroy()
 
 class LegendDlg(wx.Dialog):

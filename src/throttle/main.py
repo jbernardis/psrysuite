@@ -4,8 +4,8 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("throttle.out", "w")
-efp = open("throttle.err", "w")
+ofp = open(os.path.join(os.getcwd(), "output", "throttle.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "throttle.err"), "w")
 
 sys.stdout = ofp
 sys.stderr = efp

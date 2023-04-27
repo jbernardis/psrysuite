@@ -6,14 +6,14 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("atc.out", "w")
-efp = open("atc.err", "w")
+ofp = open(os.path.join(os.getcwd(), "output", "atc.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "atc.err"), "w")
 
 sys.stdout = ofp
 sys.stderr = efp
 
 import logging
-logging.basicConfig(filename=os.path.join("logs", "atc.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "atc.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 import json
 

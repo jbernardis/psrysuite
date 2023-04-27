@@ -5,13 +5,13 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open("advisor.out", "w")
-efp = open("advisor.err", "w")
+ofp = open(os.path.join(os.getcwd(), "output", "advisor.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "advisor.err"), "w")
 sys.stdout = ofp
 sys.stderr = efp
 
 import logging
-logging.basicConfig(filename=os.path.join("logs", "advisor.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "advisor.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 from queue import Queue
 

@@ -2,12 +2,10 @@
 class Train:
 	tx = 0
 	def __init__(self, name=None):
-		self.index = Train.tx
-		Train.tx += 1
 		if name:
 			self.name = name
 		else:
-			self.name = "??%d" % self.index
+			self.name = Train.NextName()
 		self.loco = "??"
 		self.atc = False
 		self.ar = False
@@ -16,6 +14,16 @@ class Train:
 		self.blockOrder = []
 		self.signal = None
 		self.east = True
+	
+	@classmethod	
+	def ResetTX(cls):
+		Train.tx = 0
+		
+	@classmethod
+	def NextName(cls):
+		rv = "??%s" % Train.tx
+		Train.tx += 1
+		return rv
 	
 	def GetEast(self):
 		return self.east

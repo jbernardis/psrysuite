@@ -31,8 +31,6 @@ class Settings:
 		self.serverport = 9000
 		self.socketport = 9001
 		self.showcameras = False
-		self.traindir = "."
-		self.locodir = "."
 		self.serverhidden = False
 
 		self.cfg = configparser.ConfigParser()
@@ -60,12 +58,6 @@ class Settings:
 
 				elif opt == 'showcameras':
 					self.showcameras = parseBoolean(value, False)
-
-				elif opt == "traindir":
-					self.traindir = value
-
-				elif opt == "locodir":
-					self.locodir = value
 
 		else:
 			logging.warning("Missing %s section - assuming defaults" % self.section)
@@ -98,34 +90,3 @@ class Settings:
 
 		else:
 			logging.warning("Missing global section - assuming defaults")
-
-	def SetTrainDir(self, tdir):
-		self.traindir = tdir
-
-	def SetLocoDir(self, ldir):
-		self.locodir = ldir
-
-	def save(self):
-		try:
-			self.cfg.add_section(self.section)
-		except configparser.DuplicateSectionError:
-			pass
-
-		self.cfg.set(self.section, "pages", str(self.pages))
-		self.cfg.set(self.section, "dispatch", "True" if self.dispatch else "False")
-		self.cfg.set(self.section, "showcameras", "True" if self.showcameras else "False")
-		self.cfg.set(self.section, "traindir", str(self.traindir))
-		self.cfg.set(self.section, "locodir", str(self.locodir))
-
-		try:
-			cfp = open(self.inifile, 'w')
-		except:
-			dlg = wx.MessageDialog(None, "Unable to open settings file %s for writing" % self.inifile,
-									'Errors writing settings',
-									wx.OK | wx.ICON_WARNING)
-			dlg.ShowModal()
-			dlg.Destroy()
-			return
-
-		self.cfg.write(cfp)
-		cfp.close()
