@@ -153,6 +153,8 @@ class MainFrame(wx.Frame):
 		self.Fit()
 		self.Layout()
 		
+		self.GenConfigShortcut()
+		
 	def GenConfigShortcut(self):
 		module = {
 			"name": "PSRY Suite Configuration",

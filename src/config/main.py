@@ -19,11 +19,11 @@ except FileExistsError:
 	pass
 
 
-# ofp = open(os.path.join(os.getcwd(), "output", "config.out"), "w")
-# efp = open(os.path.join(os.getcwd(), "output", "config.err"), "w")
-#
-# sys.stdout = ofp
-# sys.stderr = efp
+ofp = open(os.path.join(os.getcwd(), "output", "config.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "config.err"), "w")
+
+sys.stdout = ofp
+sys.stderr = efp
 
 class App(wx.App):
 	def OnInit(self):
