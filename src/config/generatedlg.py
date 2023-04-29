@@ -23,49 +23,61 @@ class GenerateDlg(wx.Dialog):
         boxsizer = wx.BoxSizer(wx.VERTICAL)
         boxsizer.AddSpacer(topBorder)
         
+        hsz = wx.BoxSizer(wx.HORIZONTAL)
+        
+        vsz = wx.BoxSizer(wx.VERTICAL)
+        
         self.bGenDispatch = wx.Button(genBox, wx.ID_ANY, "Dispatcher", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenDispatch, self.bGenDispatch)
-        boxsizer.Add(self.bGenDispatch, 0, wx.ALL, 10)
+        vsz.Add(self.bGenDispatch, 0, wx.ALL, 10)
                 
         self.bGenRemoteDispatch = wx.Button(genBox, wx.ID_ANY, "Remote Dispatcher", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenRemoteDispatch, self.bGenRemoteDispatch)
-        boxsizer.Add(self.bGenRemoteDispatch, 0, wx.ALL, 10)
+        vsz.Add(self.bGenRemoteDispatch, 0, wx.ALL, 10)
                     
         self.bGenSimulation = wx.Button(genBox, wx.ID_ANY, "Simulation", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenSimulation, self.bGenSimulation)
-        boxsizer.Add(self.bGenSimulation, 0, wx.ALL, 10)
+        vsz.Add(self.bGenSimulation, 0, wx.ALL, 10)
                     
         self.bGenDisplay = wx.Button(genBox, wx.ID_ANY, "Display", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenDisplay, self.bGenDisplay)
-        boxsizer.Add(self.bGenDisplay, 0, wx.ALL, 10)
+        vsz.Add(self.bGenDisplay, 0, wx.ALL, 10)
         
-        boxsizer.AddSpacer(20)
+        hsz.Add(vsz)
+        
+        vsz = wx.BoxSizer(wx.VERTICAL)
                     
         self.bGenThrottle = wx.Button(genBox, wx.ID_ANY, "Throttle", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenThrottle, self.bGenThrottle)
-        boxsizer.Add(self.bGenThrottle, 0, wx.ALL, 10)
+        vsz.Add(self.bGenThrottle, 0, wx.ALL, 10)
                     
         self.bGenTracker = wx.Button(genBox, wx.ID_ANY, "Tracker", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenTracker, self.bGenTracker)
-        boxsizer.Add(self.bGenTracker, 0, wx.ALL, 10)
+        vsz.Add(self.bGenTracker, 0, wx.ALL, 10)
                     
         self.bGenEditor = wx.Button(genBox, wx.ID_ANY, "Train Editor", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenEditor, self.bGenEditor)
-        boxsizer.Add(self.bGenEditor, 0, wx.ALL, 10)
+        vsz.Add(self.bGenEditor, 0, wx.ALL, 10)
         
-        boxsizer.AddSpacer(20)
+        hsz.Add(vsz)
+        
+        vsz = wx.BoxSizer(wx.VERTICAL)
                     
         self.bGenServerOnly = wx.Button(genBox, wx.ID_ANY, "Server Only", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenServerOnly, self.bGenServerOnly)
-        boxsizer.Add(self.bGenServerOnly, 0, wx.ALL, 10)
+        vsz.Add(self.bGenServerOnly, 0, wx.ALL, 10)
                     
         self.bGenDispatcherOnly = wx.Button(genBox, wx.ID_ANY, "Dispatcher Only", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenDispatcherOnly, self.bGenDispatcherOnly)
-        boxsizer.Add(self.bGenDispatcherOnly, 0, wx.ALL, 10)
+        vsz.Add(self.bGenDispatcherOnly, 0, wx.ALL, 10)
                     
         self.bGenTester = wx.Button(genBox, wx.ID_ANY, "Tester", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenTester, self.bGenTester)
-        boxsizer.Add(self.bGenTester, 0, wx.ALL, 10)
+        vsz.Add(self.bGenTester, 0, wx.ALL, 10)
+        
+        hsz.Add(vsz)
+        
+        boxsizer.Add(hsz)
         
         genBox.SetSizer(boxsizer)
         
@@ -75,17 +87,20 @@ class GenerateDlg(wx.Dialog):
         self.cbStartMenu = wx.CheckBox(self, wx.ID_ANY, "Also add to Start menu")
         vszr.Add(self.cbStartMenu, 0, wx.ALIGN_CENTER_HORIZONTAL)
         self.cbStartMenu.SetValue(False)
-        vszr.AddSpacer(10)
+        vszr.AddSpacer(30)
         
+        hsz = wx.BoxSizer(wx.HORIZONTAL)
         
         self.bClean = wx.Button(self, wx.ID_ANY, "Clean up Shortcuts", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBClean, self.bClean)
-        vszr.Add(self.bClean, 0, wx.ALIGN_CENTER_HORIZONTAL)
-        vszr.AddSpacer(20)
+        hsz.Add(self.bClean)
+        hsz.AddSpacer(50)
 
         self.bCleanMenu = wx.Button(self, wx.ID_ANY, "Clean up Start Menu", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBCleanMenu, self.bCleanMenu)
-        vszr.Add(self.bCleanMenu, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        hsz.Add(self.bCleanMenu)
+        
+        vszr.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
         vszr.AddSpacer(20)
 
         hszr = wx.BoxSizer(wx.HORIZONTAL)
@@ -99,7 +114,7 @@ class GenerateDlg(wx.Dialog):
         
     def OnBGenDispatch(self, _):
         module = {
-            "name": "PSRY Dispatcher",
+            "name": "PSRY Dispatcher Suite",
             "dir":  "launcher",
             "main": "main.py",
             "desc": "Launcher for Local Dispatcher",
@@ -121,7 +136,7 @@ class GenerateDlg(wx.Dialog):
         
     def OnBGenSimulation(self, _):
         module = {
-            "name": "PSRY Simulation",
+            "name": "PSRY Simulator Suite",
             "dir":  "launcher",
             "main": "main.py",
             "desc": "Launcher for Simulation",
@@ -144,20 +159,22 @@ class GenerateDlg(wx.Dialog):
     def OnBGenServerOnly(self, _):
         module = {
             "name": "PSRY Server Only",
-            "dir":  "rrserver",
+            "dir":  "launcher",
             "main": "main.py",
             "desc": "Railroad Server",
-            "icon": "server.ico"
+            "icon": "server.ico",
+            "parameter": "serveronly"
         }    
         self.generator(module, self.cbStartMenu.IsChecked())
         
     def OnBGenDispatcherOnly(self, _):
         module = {
             "name": "PSRY Dispatcher Only",
-            "dir":  "dispatcher",
+            "dir":  "launcher",
             "main": "main.py",
             "desc": "Dispatcher Only",
-            "icon": "dispatch.ico"
+            "icon": "dispatch.ico",
+            "parameter": "dispatcheronly"
         }    
         self.generator(module, self.cbStartMenu.IsChecked())
         

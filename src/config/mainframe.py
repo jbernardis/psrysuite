@@ -202,7 +202,24 @@ class MainFrame(wx.Frame):
 		dlg.Destroy
 		
 	def OnBSave(self, _):
-		print("save")
+		self.settings.ipaddr = self.teIpAddr.GetValue()
+		self.settings.serverport = int(self.teRRPort.GetValue())
+		self.settings.dccserverport = int(self.teDCCPort.GetValue())
+		self.settings.socketport = int(self.teBroadcastPort.GetValue())
+		self.settings.rrtty = self.teRRComPort.GetValue()
+		self.settings.dcctty = self.teDCCComPort.GetValue()
+		self.settings.dccsniffertty = self.teSnifferComPort.GetValue()
+		self.settings.pages = 1 if self.rbPages.GetSelection() == 0 else 3
+		self.settings.showcameras = self.cbShowCameras.IsChecked()
+		
+		if self.settings.save():		
+			dlg = wx.MessageDialog(self, "Configuration Data has been saved", "Data Saved", wx.OK | wx.ICON_INFORMATION)
+		else:
+			dlg = wx.MessageDialog(self, "Unable to save configuration data", "Save Failed", wx.OK | wx.ICON_ERROR)
+			
+		dlg.ShowModal()
+		dlg.Destroy()
+
 		
 	def OnClose(self, _):
 		self.Destroy()

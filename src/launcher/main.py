@@ -53,7 +53,7 @@ if mode == "remotedispatcher":
             dispActive = False
  
 elif mode == "dispatcher":
-    print("Launch mode: dispatcher")
+    print("Launch mode: dispatcher suite")
     
     settings.SetSimulation(False)
     settings.SetDispatcher(True)
@@ -130,7 +130,39 @@ elif mode == "display":
             print("Dispatcher has terminated")
             dispActive = False
             
+elif mode == "dispatcheronly":
+    print("launch mode: dispatcher only")
+    settings.SetDispatcher(True)
+    
+    dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
+    dispProc = Popen([sys.executable, dispExec])
+    print("dispatcher started as PID %d" % dispProc.pid)
+ 
+    dispActive = True   
+    while dispActive:
+        time.sleep(1)
+            
+        if dispActive and dispProc.poll() is not None:
+            print("Dispatcher has terminated")
+            dispActive = False
+            
+elif mode == "serveronly":
+    print("launch mode: server only")
+    settings.SetSimulation(False)
+    
+    svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
+    svrProc = Popen([sys.executable, svrExec])
+    print("server started as PID %d" % svrProc.pid)
+ 
+    svrActive = True   
+    while svrActive:
+        time.sleep(1)
+            
+        if svrActive and svrProc.poll() is not None:
+            print("Server has terminated")
+            svrActive = False
+            
 else:
-    print("Unknown mode.  Must specify either 'dispatch', 'remote dispatch', 'simulation', or 'display'")
+    print("Unknown mode.  Must specify either 'dispatcher', 'remote dispatch', 'simulation', 'display', 'dispatcheronly', 'serveronly")
  
 

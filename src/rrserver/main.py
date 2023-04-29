@@ -158,7 +158,8 @@ class MainFrame(wx.Frame):
 		
 		logging.info("socket server started - starting DCC HTTP Server")
 		
-		self.StartDCCServer()
+		if not self.settings.simulation:
+			self.StartDCCServer()
 		
 		logging.info("DCC HTTP server successfully started")
 		
@@ -166,9 +167,10 @@ class MainFrame(wx.Frame):
 		
 	def DelayedStartup(self):
 		self.rrMonitor.start()
-		pname = os.path.join(os.getcwd(), "dccsniffer", "main.py")
-		pid = Popen([sys.executable, pname]).pid
-		logging.info("started DCC sniffer process as PID %d" % pid)
+		if not self.settings.simulation:
+			pname = os.path.join(os.getcwd(), "dccsniffer", "main.py")
+			pid = Popen([sys.executable, pname]).pid
+			logging.info("started DCC sniffer process as PID %d" % pid)
 
 
 	def StartDCCServer(self):

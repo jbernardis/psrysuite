@@ -113,3 +113,38 @@ class Settings:
        
         else:
             print("Missing %s section - assuming defaults" % section)
+            
+            
+    def save(self):
+        self.cfg = configparser.ConfigParser()
+        self.cfg.optionxform = str
+        if not self.cfg.read(self.inifile):
+            print("Settings file %s does not exist" % INIFILE)
+            return False
+        
+        self.cfg.set(GLOBAL, "ipaddr", self.ipaddr)
+        self.cfg.set(GLOBAL, "serverport", "%d" % self.serverport)
+        self.cfg.set(GLOBAL, "dccserverport", "%d" % self.dccserverport)
+        self.cfg.set(GLOBAL, "socketport", "%d" % self.socketport)
+
+        section = "dispatcher" 
+        self.cfg.set(section, "pages", "%d" % self.pages)
+        self.cfg.set(section, "showcameras", "True" if self.showcameras else "False")
+        
+        section = "rrserver"        
+        self.cfg.set(section, "rrtty", self.rrtty)
+        self.cfg.set(section, "dcctty", self.dcctty)
+                       
+        section = "dccsniffer"        
+        self.cfg.set(section, "dccsniffertty", self.dccsniffertty)
+
+        try:        
+            cfp = open(self.inifile, 'w')
+        except:
+            print("Unable to open settings file %s for writing" % self.inifile)
+            return False
+        self.cfg.write(cfp)
+        cfp.close()
+        return True
+
+

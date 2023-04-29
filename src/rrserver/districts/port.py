@@ -502,10 +502,10 @@ class Port(District):
 		outb[5] = setBit(outb[5], 6, 1 if self.rr.GetSwitchLock("PBSw1") else 0)  # Switch Locks
 		outb[5] = setBit(outb[5], 7, 1 if self.rr.GetSwitchLock("PBSw3") else 0)
 
-		outb[6] = setBit(outb[6], 0, 1 if self.rr.GetSwitchLock("PBSw5") else 0)
+		outb[6] = setBit(outb[6], 0, 0 if self.rr.GetOutput("PBSw5.hand").GetStatus() != 0 else 1)
 		outb[6] = setBit(outb[6], 1, 1 if self.rr.GetSwitchLock("PBSw11") else 0)
 		outb[6] = setBit(outb[6], 2, 1 if self.rr.GetSwitchLock("PBSw13") else 0)
-		outb[6] = setBit(outb[6], 3, 1 if self.rr.GetSwitchLock("PBSw15") else 0)
+		outb[6] = setBit(outb[6], 3, 0 if psw15 != 0 else 1)  # hand switch unlock
 		outb[6] = setBit(outb[6], 4, self.rr.GetOutput("P32.srel").GetStatus())	      # Stop relays
 		outb[6] = setBit(outb[6], 5, self.rr.GetOutput("P41.srel").GetStatus())
 		outb[6] = setBit(outb[6], 6, 1 if PBXO else 0)  # Crossing signal
