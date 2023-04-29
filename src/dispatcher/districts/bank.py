@@ -149,8 +149,8 @@ class Bank (District):
 		self.signals = {}
 
 		sigList = [
-			[ "C18RB",  RegAspects, True,    "right", (68, 12) ],
-			[ "C18RA",  RegAspects, True,    "rightlong", (68, 14) ],
+			[ "C18RA",  RegAspects, True,    "right", (68, 12) ],
+			[ "C18RB",  RegAspects, True,    "rightlong", (68, 14) ],
 			[ "C18L",   RegAspects, False,   "leftlong", (72, 12) ],
 
 			[ "C22R",   RegAspects, True,    "right", (53, 12) ],
@@ -175,7 +175,7 @@ class Bank (District):
 			# # which signals govern stopping sections, west and east
 			"B11": ("C22L",  None),
 			"B20": (None,    "C24R"),
-			"B21": ("C24L",  "C18RA"),
+			"B21": ("C24L",  "C18RB"),
 		}
 
 		for blknm, siglist in blockSbSigs.items():
@@ -183,9 +183,9 @@ class Bank (District):
 			
 		blockSigs = {
 			# # which signals govern blocks, west and east - not needed for OS and stopping blocks
-			"B11": ("C22L",  "C18RB"),
+			"B11": ("C22L",  "C18RA"),
 			"B20": ("N24L",  "C24R"),
-			"B21": ("C24L",  "C18RA"),
+			"B21": ("C24L",  "C18RB"),
 		}
 
 		for blknm, siglist in blockSigs.items():
@@ -202,8 +202,8 @@ class Bank (District):
 		self.routes["BRtB20B21"] = Route(self.screen, block, "BRtB20B21", "B21", [ (53, 13), (54, 13), (55, 13), (56, 13), (57, 13) ], "B20", [MAIN, RESTRICTING], ["CSw23:N"], ["C24L", "C24R"])
 
 		block=self.blocks["BOSE"]
-		self.routes["BRtB11C13"] = Route(self.screen, block, "BRtB11C13", "B11", [ (68, 11), (69, 11), (70, 12), (71, 13), (72, 13) ], "C13", [RESTRICTING, DIVERGING], ["CSw17:R"], ["C18RB", "C18L"])
-		self.routes["BRtB21C13"] = Route(self.screen, block, "BRtB21C13", "B21", [ (68, 13), (69, 13), (70, 13), (71, 13), (72, 13) ], "C13", [MAIN, MAIN], ["CSw17:N"], ["C18RA", "C18L"])
+		self.routes["BRtB11C13"] = Route(self.screen, block, "BRtB11C13", "B11", [ (68, 11), (69, 11), (70, 12), (71, 13), (72, 13) ], "C13", [RESTRICTING, DIVERGING], ["CSw17:R"], ["C18RA", "C18L"])
+		self.routes["BRtB21C13"] = Route(self.screen, block, "BRtB21C13", "B21", [ (68, 13), (69, 13), (70, 13), (71, 13), (72, 13) ], "C13", [MAIN, MAIN], ["CSw17:N"], ["C18RB", "C18L"])
 
 		self.signals["C22R"].AddPossibleRoutes("BOSWW", [ "BRtB10B11", "BRtB10B21" ])
 		self.signals["C22L"].AddPossibleRoutes("BOSWW", [ "BRtB10B11" ])
@@ -212,8 +212,8 @@ class Bank (District):
 		self.signals["C24L"].AddPossibleRoutes("BOSWE", [ "BRtB20B21" ])
 		self.signals["C24L"].AddPossibleRoutes("BOSWW", [ "BRtB10B21" ])
 
-		self.signals["C18RB"].AddPossibleRoutes("BOSE", ["BRtB11C13"])
-		self.signals["C18RA"].AddPossibleRoutes("BOSE", ["BRtB21C13"])
+		self.signals["C18RA"].AddPossibleRoutes("BOSE", ["BRtB11C13"])
+		self.signals["C18RB"].AddPossibleRoutes("BOSE", ["BRtB21C13"])
 		self.signals["C18L"].AddPossibleRoutes("BOSE", ["BRtB11C13", "BRtB21C13"])
 
 		self.osSignals["BOSWW"] = [ "C22R", "C22L", "C24L" ]

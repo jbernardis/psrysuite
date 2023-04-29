@@ -963,7 +963,7 @@
       ],
       "os": "BOSE",
       "signals": [
-        "C18RB",
+        "C18RA",
         "C18L"
       ],
       "turnouts": [
@@ -997,7 +997,7 @@
       ],
       "os": "BOSE",
       "signals": [
-        "C18RA",
+        "C18RB",
         "C18L"
       ],
       "turnouts": [

@@ -858,7 +858,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -1854,7 +1854,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -2692,7 +2692,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -5222,7 +5222,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -11399,7 +11399,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -12398,7 +12398,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -12925,7 +12925,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -13759,7 +13759,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -14286,7 +14286,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -14813,7 +14813,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -15320,7 +15320,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -15827,7 +15827,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"
@@ -16334,7 +16334,7 @@
     },
     {
       "waitfor": {
-        "signal": "C18RA",
+        "signal": "C18RB",
         "route": "BRtB21C13",
         "os": "BOSE",
         "block": "C13.W,C13,C13.E"

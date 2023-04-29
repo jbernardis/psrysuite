@@ -293,9 +293,18 @@ class Yard (District):
 
 		self.blocks["Y60"] = Block(self, self.frame, "Y60",
 			[
+				(self.tiles["houtline"],       self.screen, (85, 5), False),
+				(self.tiles["houtline"],       self.screen, (86, 5), False),
+				(self.tiles["houtline"],       self.screen, (87, 5), False),
+				(self.tiles["houtline"],       self.screen, (88, 5), False),
+				(self.tiles["houtline"],       self.screen, (89, 5), False),
+				(self.tiles["houtline"],       self.screen, (90, 5), False),
+				(self.tiles["houtline"],       self.screen, (91, 5), False),
+				(self.tiles["houtline"],       self.screen, (92, 5), False),
 				(self.tiles["houtline"],       self.screen, (93, 5), False),
 				(self.tiles["houtline"],       self.screen, (94, 5), False),
 			], True)
+		self.blocks["Y60"].AddTrainLoc(self.screen, (86, 5))
 
 		self.blocks["Y70"] = Block(self, self.frame, "Y70",
 			[

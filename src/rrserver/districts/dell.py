@@ -111,7 +111,7 @@ class Dell(District):
 
 		outb[2] = setBit(outb[2], 0, self.rr.GetInput("D10").GetValue())
 		outb[2] = setBit(outb[2], 1, self.rr.GetInput("S20").GetValue())
-		outb[2] = setBit(outb[2], 2, 0 if self.rr.GetOutput("DSw9.hand").GetStatus() != 0 else 1) 
+		outb[2] = setBit(outb[2], 2, 0 if self.rr.GetOutput("DSw9.hand").GetStatus() == 0 else 1) 
 		op = self.rr.GetOutput("DSw1").GetOutPulse()
 		outb[2] = setBit(outb[2], 3, 1 if op > 0 else 0)                   # switches
 		outb[2] = setBit(outb[2], 4, 1 if op < 0 else 0)

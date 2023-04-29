@@ -182,8 +182,8 @@ class Latham(District):
 		outb[1] = setBit(outb[1], 0, asp[0]) 
 		outb[1] = setBit(outb[1], 1, asp[1])
 		outb[1] = setBit(outb[1], 2, asp[2])
-		outb[1] = setBit(outb[1], 3, 0 if self.rr.GetOutput("LSw11.hand").GetStatus() != 0 else 1) # hand switch unlocks
-		outb[1] = setBit(outb[1], 4, 0 if self.rr.GetOutput("LSw13.hand").GetStatus() != 0 else 1) 
+		outb[1] = setBit(outb[1], 3, 0 if self.rr.GetOutput("LSw11.hand").GetStatus() == 0 else 1) # hand switch unlocks
+		outb[1] = setBit(outb[1], 4, 0 if self.rr.GetOutput("LSw13.hand").GetStatus() == 0 else 1) 
 		op = self.rr.GetOutput("LSw15").GetOutPulse()
 		outb[1] = setBit(outb[1], 5, 1 if op > 0 else 0) 
 		outb[1] = setBit(outb[1], 6, 1 if op < 0 else 0)

@@ -39,4 +39,4 @@ tracker:
 	backup/restore - need a backup/restore for the entire suite - not in tracker
 	reports - the only thing we really need is train cards, and this is not in tracker, but in train editor
 
-solve bank signal 18 issue
+hand switch levers for port - there is not a separate 15a and 15b, also, I don't seem to be getting the input values when they change

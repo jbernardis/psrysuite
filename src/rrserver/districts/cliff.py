@@ -158,7 +158,7 @@ class Cliff(District):
 		outb[2] = setBit(outb[2], 2, asp[0])
 		outb[2] = setBit(outb[2], 3, asp[1])
 		outb[2] = setBit(outb[2], 4, asp[2])
-		outb[2] = setBit(outb[2], 5, 0 if self.rr.GetOutput("CSw3.hand").GetStatus() != 0 else 1)  # hand switch 3
+		outb[2] = setBit(outb[2], 5, 0 if self.rr.GetOutput("CSw3.hand").GetStatus() == 0 else 1)  # hand switch 3
 
 		otext = formatOText(outb, outbc)
 		#logging.debug("Green Mountain: Output bytes: %s" % otext)

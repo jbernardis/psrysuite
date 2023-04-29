@@ -127,7 +127,7 @@ class Shore(District):
 		outb[3] = setBit(outb[3], 6, self.rr.GetInput("CBShore").GetInvertedValue())
 		outb[3] = setBit(outb[3], 7, self.rr.GetInput("CBHarpersFerry").GetInvertedValue())
 
-		outb[4] = setBit(outb[4], 0, 0 if self.rr.GetOutput("SSw1.hand").GetStatus() != 0 else 1) # hand switch unlocks
+		outb[4] = setBit(outb[4], 0, 0 if self.rr.GetOutput("SSw1.hand").GetStatus() == 0 else 1) # hand switch unlocks
 		op = self.rr.GetOutput("SSw3").GetOutPulse()
 		outb[4] = setBit(outb[4], 1, 1 if op > 0 else 0)   # Switch outputs
 		outb[4] = setBit(outb[4], 2, 1 if op < 0 else 0)
