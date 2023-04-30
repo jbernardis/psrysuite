@@ -243,6 +243,7 @@ class MainFrame(wx.Frame):
 		self.totalh = 1080
 		self.centerw = self.totalw/2
 		self.centerh = self.totalh/2
+		self.showSplash = True
 		self.ResetScreen()
 		
 	def OnResetScreen(self, _):
@@ -792,9 +793,11 @@ class MainFrame(wx.Frame):
 		self.splash()
 		
 	def splash(self):
-		splashExec = os.path.join(os.getcwd(), "splash", "main.py")
-		pid = Popen([sys.executable, splashExec]).pid
-		logging.debug("displaying splash screen as PID %d" % pid)
+		if self.showSplash:
+			self.showSplash = False
+			splashExec = os.path.join(os.getcwd(), "splash", "main.py")
+			pid = Popen([sys.executable, splashExec]).pid
+			logging.debug("displaying splash screen as PID %d" % pid)
 
 
 	def AddSignalLever(self, slname, district):
