@@ -249,30 +249,30 @@ class Yard (District):
 		self.blocks["Y52"] = Block(self, self.frame, "Y52",
 			[
 				(self.tiles["eobleft"],        self.screen, (85, 9), False),
-				(self.tiles["horiz"],          self.screen, (86, 9), False),
+				(self.tiles["horiznc"],        self.screen, (86, 9), False),
 				(self.tiles["horiznc"],        self.screen, (87, 9), False),
-				(self.tiles["horiz"],          self.screen, (88, 9), False),
+				(self.tiles["horiznc"],        self.screen, (88, 9), False),
 				(self.tiles["horiznc"],        self.screen, (89, 9), False),
-				(self.tiles["horiz"],          self.screen, (90, 9), False),
+				(self.tiles["horiznc"],        self.screen, (90, 9), False),
 				(self.tiles["horiznc"],        self.screen, (91, 9), False),
-				(self.tiles["horiz"],          self.screen, (92, 9), False),
+				(self.tiles["horiznc"],        self.screen, (92, 9), False),
 				(self.tiles["horiznc"],        self.screen, (93, 9), False),
-				(self.tiles["horiz"],          self.screen, (94, 9), False),
+				(self.tiles["horiznc"],        self.screen, (94, 9), False),
 			], True)
 		self.blocks["Y52"].AddTrainLoc(self.screen, (86, 9))
 
 		self.blocks["Y53"] = Block(self, self.frame, "Y53",
 			[
 				(self.tiles["eobleft"],        self.screen, (85, 7), False),
-				(self.tiles["horiz"],          self.screen, (86, 7), False),
+				(self.tiles["horiznc"],        self.screen, (86, 7), False),
 				(self.tiles["horiznc"],        self.screen, (87, 7), False),
-				(self.tiles["horiz"],          self.screen, (88, 7), False),
+				(self.tiles["horiznc"],        self.screen, (88, 7), False),
 				(self.tiles["horiznc"],        self.screen, (89, 7), False),
-				(self.tiles["horiz"],          self.screen, (90, 7), False),
+				(self.tiles["horiznc"],        self.screen, (90, 7), False),
 				(self.tiles["horiznc"],        self.screen, (91, 7), False),
-				(self.tiles["horiz"],          self.screen, (92, 7), False),
+				(self.tiles["horiznc"],        self.screen, (92, 7), False),
 				(self.tiles["horiznc"],        self.screen, (93, 7), False),
-				(self.tiles["horiz"],          self.screen, (94, 7), False),
+				(self.tiles["horiznc"],        self.screen, (94, 7), False),
 			], True)
 		self.blocks["Y53"].AddTrainLoc(self.screen, (86, 7))
 

@@ -321,11 +321,11 @@ class Port (District):
 		self.blocks["P1"] = Block(self, self.frame, "P1",
 			[
 				(self.tiles["eobleft"],  self.screen, (93, 32), False),
-				(self.tiles["horiz"],    self.screen, (94, 32), False),
+				(self.tiles["horiznc"],  self.screen, (94, 32), False),
 				(self.tiles["horiznc"],  self.screen, (95, 32), False),
-				(self.tiles["horiz"],    self.screen, (96, 32), False),
+				(self.tiles["horiznc"],  self.screen, (96, 32), False),
 				(self.tiles["horiznc"],  self.screen, (97, 32), False),
-				(self.tiles["horiz"],    self.screen, (98, 32), False),
+				(self.tiles["horiznc"],  self.screen, (98, 32), False),
 				(self.tiles["eobright"],  self.screen, (99, 32), False),
 			], True)
 		self.blocks["P1"].AddTrainLoc(self.screen, (94, 32))
@@ -333,95 +333,95 @@ class Port (District):
 		self.blocks["P2"] = Block(self, self.frame, "P2",
 			[
 				(self.tiles["eobleft"],  self.screen, (89, 30), False),
-				(self.tiles["horiz"],    self.screen, (90, 30), False),
+				(self.tiles["horiznc"],  self.screen, (90, 30), False),
 				(self.tiles["horiznc"],  self.screen, (91, 30), False),
-				(self.tiles["horiz"],    self.screen, (92, 30), False),
+				(self.tiles["horiznc"],  self.screen, (92, 30), False),
 				(self.tiles["horiznc"],  self.screen, (93, 30), False),
-				(self.tiles["horiz"],    self.screen, (94, 30), False),
+				(self.tiles["horiznc"],  self.screen, (94, 30), False),
 				(self.tiles["horiznc"],  self.screen, (95, 30), False),
-				(self.tiles["horiz"],    self.screen, (96, 30), False),
+				(self.tiles["horiznc"],  self.screen, (96, 30), False),
 				(self.tiles["horiznc"],  self.screen, (97, 30), False),
-				(self.tiles["horiz"],    self.screen, (98, 30), False),
-				(self.tiles["eobright"],  self.screen, (99, 30), False),
+				(self.tiles["horiznc"],  self.screen, (98, 30), False),
+				(self.tiles["eobright"], self.screen, (99, 30), False),
 			], True)
 		self.blocks["P2"].AddTrainLoc(self.screen, (90, 30))
 
 		self.blocks["P3"] = Block(self, self.frame, "P3",
 			[
 				(self.tiles["eobleft"],  self.screen, (89, 28), False),
-				(self.tiles["horiz"],    self.screen, (90, 28), False),
+				(self.tiles["horiznc"],  self.screen, (90, 28), False),
 				(self.tiles["horiznc"],  self.screen, (91, 28), False),
-				(self.tiles["horiz"],    self.screen, (92, 28), False),
+				(self.tiles["horiznc"],  self.screen, (92, 28), False),
 				(self.tiles["horiznc"],  self.screen, (93, 28), False),
-				(self.tiles["horiz"],    self.screen, (94, 28), False),
+				(self.tiles["horiznc"],  self.screen, (94, 28), False),
 				(self.tiles["horiznc"],  self.screen, (95, 28), False),
-				(self.tiles["horiz"],    self.screen, (96, 28), False),
+				(self.tiles["horiznc"],  self.screen, (96, 28), False),
 				(self.tiles["horiznc"],  self.screen, (97, 28), False),
-				(self.tiles["horiz"],    self.screen, (98, 28), False),
+				(self.tiles["horiznc"],  self.screen, (98, 28), False),
 				(self.tiles["horiznc"],  self.screen, (99, 28), False),
-				(self.tiles["eobright"],  self.screen, (100, 28), False),
+				(self.tiles["eobright"], self.screen, (100, 28), False),
 			], True)
 		self.blocks["P3"].AddTrainLoc(self.screen, (90, 28))
 
 		self.blocks["P4"] = Block(self, self.frame, "P4",
 			[
 				(self.tiles["eobleft"],  self.screen, (89, 26), False),
-				(self.tiles["horiz"],    self.screen, (90, 26), False),
+				(self.tiles["horiznc"],  self.screen, (90, 26), False),
 				(self.tiles["horiznc"],  self.screen, (91, 26), False),
-				(self.tiles["horiz"],    self.screen, (92, 26), False),
+				(self.tiles["horiznc"],  self.screen, (92, 26), False),
 				(self.tiles["horiznc"],  self.screen, (93, 26), False),
-				(self.tiles["horiz"],    self.screen, (94, 26), False),
+				(self.tiles["horiznc"],  self.screen, (94, 26), False),
 				(self.tiles["horiznc"],  self.screen, (95, 26), False),
-				(self.tiles["horiz"],    self.screen, (96, 26), False),
+				(self.tiles["horiznc"],  self.screen, (96, 26), False),
 				(self.tiles["horiznc"],  self.screen, (97, 26), False),
-				(self.tiles["horiz"],    self.screen, (98, 26), False),
+				(self.tiles["horiznc"],  self.screen, (98, 26), False),
 				(self.tiles["horiznc"],  self.screen, (99, 26), False),
-				(self.tiles["horiz"],    self.screen, (100, 26), False),
-				(self.tiles["eobright"],  self.screen, (101, 26), False),
+				(self.tiles["horiznc"],  self.screen, (100, 26), False),
+				(self.tiles["eobright"], self.screen, (101, 26), False),
 			], True)
 		self.blocks["P4"].AddTrainLoc(self.screen, (90, 26))
 
 		self.blocks["P5"] = Block(self, self.frame, "P5",
 			[
 				(self.tiles["eobleft"],  self.screen, (89, 24), False),
-				(self.tiles["horiz"],    self.screen, (90, 24), False),
+				(self.tiles["horiznc"],  self.screen, (90, 24), False),
 				(self.tiles["horiznc"],  self.screen, (91, 24), False),
-				(self.tiles["horiz"],    self.screen, (92, 24), False),
+				(self.tiles["horiznc"],  self.screen, (92, 24), False),
 				(self.tiles["horiznc"],  self.screen, (93, 24), False),
-				(self.tiles["horiz"],    self.screen, (94, 24), False),
+				(self.tiles["horiznc"],  self.screen, (94, 24), False),
 				(self.tiles["horiznc"],  self.screen, (95, 24), False),
-				(self.tiles["horiz"],    self.screen, (96, 24), False),
+				(self.tiles["horiznc"],  self.screen, (96, 24), False),
 				(self.tiles["horiznc"],  self.screen, (97, 24), False),
-				(self.tiles["horiz"],    self.screen, (98, 24), False),
+				(self.tiles["horiznc"],  self.screen, (98, 24), False),
 				(self.tiles["horiznc"],  self.screen, (99, 24), False),
-				(self.tiles["horiz"],    self.screen, (100, 24), False),
-				(self.tiles["eobright"],  self.screen, (101, 24), False),
+				(self.tiles["horiznc"],  self.screen, (100, 24), False),
+				(self.tiles["eobright"], self.screen, (101, 24), False),
 			], False)
 		self.blocks["P5"].AddTrainLoc(self.screen, (90, 24))
 
 		self.blocks["P6"] = Block(self, self.frame, "P6",
 			[
 				(self.tiles["eobleft"],  self.screen, (93, 22), False),
-				(self.tiles["horiz"],    self.screen, (94, 22), False),
+				(self.tiles["horiznc"],  self.screen, (94, 22), False),
 				(self.tiles["horiznc"],  self.screen, (95, 22), False),
-				(self.tiles["horiz"],    self.screen, (96, 22), False),
+				(self.tiles["horiznc"],  self.screen, (96, 22), False),
 				(self.tiles["horiznc"],  self.screen, (97, 22), False),
-				(self.tiles["horiz"],    self.screen, (98, 22), False),
-				(self.tiles["eobright"],  self.screen, (99, 22), False),
+				(self.tiles["horiznc"],  self.screen, (98, 22), False),
+				(self.tiles["eobright"], self.screen, (99, 22), False),
 			], False)
 		self.blocks["P6"].AddTrainLoc(self.screen, (94, 22))
 
 		self.blocks["P7"] = Block(self, self.frame, "P7",
 			[
 				(self.tiles["eobleft"],  self.screen, (89, 20), False),
-				(self.tiles["horiz"],    self.screen, (90, 20), False),
+				(self.tiles["horiznc"],  self.screen, (90, 20), False),
 				(self.tiles["horiznc"],  self.screen, (91, 20), False),
-				(self.tiles["horiz"],    self.screen, (92, 20), False),
+				(self.tiles["horiznc"],  self.screen, (92, 20), False),
 				(self.tiles["horiznc"],  self.screen, (93, 20), False),
-				(self.tiles["horiz"],    self.screen, (94, 20), False),
+				(self.tiles["horiznc"],  self.screen, (94, 20), False),
 				(self.tiles["horiznc"],  self.screen, (95, 20), False),
-				(self.tiles["horiz"],    self.screen, (96, 20), False),
-				(self.tiles["eobright"],  self.screen, (97, 20), False),
+				(self.tiles["horiznc"],  self.screen, (96, 20), False),
+				(self.tiles["eobright"], self.screen, (97, 20), False),
 			], False)
 		self.blocks["P7"].AddTrainLoc(self.screen, (90, 20))
 

@@ -434,6 +434,13 @@ class MainFrame(wx.Frame):
 			direction = evt.data["dir"][0]
 			self.rr.SetBlockDirection(block, direction)
 
+		elif verb == "blockdirs":
+			data = json.loads(evt.data["data"][0])
+			for b in data:
+				block = b["block"]
+				direction = b["dir"]
+				self.rr.SetBlockDirection(block, direction)
+
 		elif verb == "blockclear":
 			block = evt.data["block"][0]
 			clear = evt.data["clear"][0]
@@ -620,6 +627,7 @@ class MainFrame(wx.Frame):
 
 		elif verb == "routedef":
 			name = evt.data["name"][0]
+			osNm = evt.data["os"][0]
 			try:
 				signals = evt.data["signals"]
 			except KeyError:
@@ -633,7 +641,27 @@ class MainFrame(wx.Frame):
 			except KeyError:
 				ends = [None, None]
 
-			self.routeDefs[name] = (RouteDef(name, evt.data["os"][0], ends, signals, turnouts))
+			self.routeDefs[name] = (RouteDef(name, osNm, ends, signals, turnouts))
+
+		elif verb == "routedefs":
+			data = json.loads(evt.data["data"][0])
+			for r in data:
+				name = r["name"]
+				osNm = r["os"]
+				try:
+					signals = r["signals"]
+				except KeyError:
+					signals = []
+				try:
+					turnouts = r["turnouts"]
+				except KeyError:
+					turnouts = []
+				try:
+					ends = [None if e == "-" else e for e in r["ends"]]
+				except KeyError:
+					ends = [None, None]
+	
+				self.routeDefs[name] = (RouteDef(name, osNm, ends, signals, turnouts))
 			
 		elif verb == "crossover":
 			self.CrossoverPoints = []

@@ -1,6 +1,4 @@
 import logging
-import json
-import os
 
 from dispatcher.constants import RegAspects, RegSloAspects, AdvAspects, SloAspects, \
 	MAIN, SLOW, DIVERGING, RESTRICTING, \
@@ -335,9 +333,8 @@ class District:
 
 		return aspect
 
-	def SendRouteDefinitions(self):
-		for r in self.routes.values():
-			self.frame.Request({"routedef": r.GetDefinition()})
+	def GetRouteDefinitions(self):
+		return [r.GetDefinition() for r in self.routes.values()]
 
 	def anyTurnoutLocked(self, toList):
 		rv = False
@@ -770,9 +767,11 @@ class Districts:
 
 		return indicators
 
-	def SendRouteDefinitions(self):
+	def GetRouteDefinitions(self):
+		rtes = []
 		for t in self.districts.values():
-			t.SendRouteDefinitions()
+			rtes.extend(t.GetRouteDefinitions())
+		return rtes
 			
 	def GetCrossoverPoints(self):
 		return EWCrossoverPoints

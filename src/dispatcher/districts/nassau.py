@@ -6,6 +6,7 @@ from dispatcher.signal import Signal
 from dispatcher.button import Button
 
 from dispatcher.constants import LaKr, SloAspects, SLOW, RESTRICTING, SLIPSWITCH, NORMAL, REVERSE, RegAspects, EMPTY
+from afxres import AFX_IDC_PRINT_PORTNAME
 
 
 class Nassau (District):
@@ -177,16 +178,27 @@ class Nassau (District):
 				turnout.Draw()
 
 		else:
+			reClearN60 = False
 			if tn in ["NSw13", "NSw15", "NSw17"]:  # Coach Yard - update display
-				for t, screen, pos, _ in self.blocks["N60"].GetTiles():
-					bmp = t.getBmp(EMPTY, False, False)
-					self.frame.DrawTile(screen, pos, bmp)
+				updBlk = self.blocks["N60"]
+				if updBlk.IsCleared():
+					# temporarily remove the clearance from this block so it can 
+					# be redrawn as empty.  We'll put the clearance back at the end
+					updBlk.SetCleared(False, False)
+					reClearN60 = True
+					for t, screen, pos, _ in updBlk.GetTiles():
+						bmp = t.getBmp(EMPTY, False, False)
+						self.frame.DrawTile(screen, pos, bmp)
 
 				self.turnouts["NSw13"].Draw(blockstat=EMPTY, east=False)
 				self.turnouts["NSw15"].Draw(blockstat=EMPTY, east=False)
 				self.turnouts["NSw17"].Draw(blockstat=EMPTY, east=False)
 
 			District.DoTurnoutAction(self, turnout, state, force=force)
+			if reClearN60:
+				# we removed the cleared status from N60 because a switch not under
+				# our control was changed under the clearance.  Re-clear the block				
+				updBlk.SetCleared(True, True)
 
 		if tn == "NSw27":
 			trnout = self.turnouts["NSw29"]
@@ -214,25 +226,15 @@ class Nassau (District):
 		has60 = [b for b in blocks if b.GetName() == "N60"]
 		if len(has60) > 0:
 			block = self.blocks["N60"]
-			s13 = 'N' if self.turnouts["NSw13"].IsNormal() else 'R'
-			s15 = 'N' if self.turnouts["NSw15"].IsNormal() else 'R'
-			s17 = 'N' if self.turnouts["NSw17"].IsNormal() else 'R'
-			if s13+s17 == "NR":
-				newRoute = "NRtN60A"
-			elif s13+s17 == "RR":
-				newRoute = "NRtN60B"
-			elif s15+s17 == "RN":
-				newRoute = "NRtN60C"
-			elif s15+s17 == "NN":
-				newRoute = "NRtN60D"
-			else:
+			rte = self.GetCoachYardRoute()
+			if rte is None:
 				block.SetRoute(None)
 				return
 			
-			if block.GetRouteName() == newRoute:
+			if block.GetRouteName() == rte:
 				block.Draw()
 			else:
-				block.SetRoute(self.routes[newRoute])
+				block.SetRoute(self.routes[rte])
 				
 		else:
 			# now exclude block N60 from the remainder of the normal processing
@@ -241,7 +243,21 @@ class Nassau (District):
 					["NSw19", "NSw21", "NSw23", "NSw25", "NSw27", "NSw29", "NSw31", "NSw33", "NSw35",
 					"NSw39", "NSw41", "NSw43", "NSw45", "NSw47", "NSw51", "NSw53", "NSw55", "NSw57",
 					"NSw13", "NSw15", "NSw17"])
-
+			
+	def GetCoachYardRoute(self):
+		s13 = 'N' if self.turnouts["NSw13"].IsNormal() else 'R'
+		s15 = 'N' if self.turnouts["NSw15"].IsNormal() else 'R'
+		s17 = 'N' if self.turnouts["NSw17"].IsNormal() else 'R'
+		if s13+s17 == "NR":
+			return "NRtN60A"
+		if s13+s17 == "RR":
+			return "NRtN60B"
+		if s15+s17 == "RN":
+			return "NRtN60C"
+		if s15+s17 == "NN":
+			return "NRtN60D"
+		return None
+	
 	def DefineBlocks(self):
 		self.blocks = {}
 		self.osBlocks = {}

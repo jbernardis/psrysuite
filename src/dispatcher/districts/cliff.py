@@ -120,9 +120,9 @@ class Cliff (District):
 		self.blocks["C31"] = Block(self, self.frame, "C31",
 			[
 				(self.tiles["horiznc"], self.screen,  (127, 34), False),
-				(self.tiles["horiz"],   self.screen,  (128, 34), False),
+				(self.tiles["horiznc"], self.screen,  (128, 34), False),
 				(self.tiles["horiznc"], self.screen,  (129, 34), False),
-				(self.tiles["horiz"],   self.screen,  (130, 34), False),
+				(self.tiles["horiznc"], self.screen,  (130, 34), False),
 				(self.tiles["eobright"], self.screen,  (131, 34), False),
 			], True)
 		self.blocks["C31"].AddTrainLoc(self.screen, (128, 34))

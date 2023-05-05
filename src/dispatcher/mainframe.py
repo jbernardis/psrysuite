@@ -1,6 +1,7 @@
 import wx
 import wx.lib.newevent
 from wx.lib.gizmos.ledctrl import LEDNumberCtrl
+import time
 
 import os
 import sys
@@ -1264,6 +1265,7 @@ class MainFrame(wx.Frame):
 				self.listener = None
 				return
 
+			print("press connect at %d" % time.time())
 			self.listener.start()
 			self.subscribed = True
 			self.bSubscribe.SetLabel("Disconnect")
@@ -1280,6 +1282,7 @@ class MainFrame(wx.Frame):
 				self.cbAdvisor.Enable(True)
 				
 			self.RetrieveData()
+			print("back from retrieve data at %d" % time.time())
 
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()
@@ -1592,6 +1595,7 @@ class MainFrame(wx.Frame):
 					self.UpdateControlWidget(name, value)
 
 			elif cmd == "sessionID":
+				print("sessionid at %d" % time.time())
 				self.sessionid = int(parms)
 				logging.info("connected to railroad server with session ID %d" % self.sessionid)
 				self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatch else "DISPLAY"}})
@@ -1600,11 +1604,15 @@ class MainFrame(wx.Frame):
 				self.ShowTitle()
 
 			elif cmd == "end":
+				print("end %s at %d" % (parms["type"], time.time()))
 				if parms["type"] == "layout":
 					if self.settings.dispatch:
 						self.SendBlockDirRequests()
+						print("after send blockdir at %d" % time.time())
 						self.SendOSRoutes()
+						print("after send routes at %d" % time.time())
 						self.SendCrossoverPoints()
+						print("after send crossover at %d" % time.time(), flush=True)
 					self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 				elif parms["type"] == "trains":
 					for trid, tr in self.trains.items():
@@ -1674,19 +1682,21 @@ class MainFrame(wx.Frame):
 		return self.rrServer.Get(cmd, parms)
 
 	def SendBlockDirRequests(self):
+		bdirs = []
 		for b in self.blocks.values():
-			self.Request({"blockdir": { "block": b.GetName(), "dir": "E" if b.GetEast() else "W"}})
+			bdirs.append({ "block": b.GetName(), "dir": "E" if b.GetEast() else "W"})
 			sbw, sbe = b.GetStoppingSections()
 			for sb in [sbw, sbe]:
 				if sb:
-					self.Request({"blockdir": { "block": sb.GetName(), "dir": "E" if b.GetEast() else "W"}})
+					bdirs.append({ "block": sb.GetName(), "dir": "E" if b.GetEast() else "W"})
+		self.Request({"blockdirs": { "data": json.dumps(bdirs)}})
 
 	def SendOSRoutes(self):
 		for b in self.blocks.values():
 			if b.GetBlockType() == OVERSWITCH:
 				b.SendRouteRequest()
-		self.districts.SendRouteDefinitions()
-		
+		self.Request({"routedefs": { "data": json.dumps(self.districts.GetRouteDefinitions())}})
+			
 	def SendCrossoverPoints(self):
 		self.Request({"crossover": {"data": ["%s:%s" % (b[0], b[1]) for b in self.districts.GetCrossoverPoints()]}})
 

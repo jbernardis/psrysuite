@@ -36,3 +36,5 @@ hand switch levers for port - there is not a separate 15a and 15b, also, I don't
 siding unlock levers from port
 
 fleet levers from port/cliff/yard/nassau
+
+coach yard if 13/15/17 are changed after route is cleared, the clearance should move to the new route

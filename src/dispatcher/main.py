@@ -15,12 +15,14 @@ else:
 
 ofp = open(os.path.join(os.getcwd(), "output", "%s.out" % fn), "w")
 efp = open(os.path.join(os.getcwd(), "output", "%s.err" % fn), "w")
-
+#
 sys.stdout = ofp
 sys.stderr = efp
 
 import logging
-logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "%s.log" % fn), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "%s.log" % fn), filemode='w', format='%(asctime)s %(name)s %(message)s', level=logging.DEBUG)
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 from dispatcher.mainframe import MainFrame 
 
