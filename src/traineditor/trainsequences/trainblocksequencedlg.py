@@ -368,9 +368,13 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		blkSeq = tr.GetSteps()
 		nblocks = len(blkSeq)
 		bx = 0
+		lastBlock = sBlk
 		for b in blkSeq:
 			bx += 1
 			terminus = bx == nblocks
+			if self.checkChangeDirection(lastBlock, b["os"], b["block"]):
+				east = not east
+				
 			segTimes, segString = self.determineSegmentsAndTimes(b["block"], b["os"], east, b["time"], terminus=terminus)
 
 			script.append({"waitfor": {"signal": b["signal"], "route": b["route"], "os": segTimes[0][0], "block": segString}})
@@ -378,10 +382,17 @@ class TrainBlockSequencesDlg(wx.Dialog):
 			script.append({"movetrain": {"block": segTimes[0][0], "time": segTimes[0][1]}})
 			for seg, tm in segTimes[1:]:
 				script.append({"movetrain": {"block": seg, "time": tm}})
+				
+			lastBlock = b["block"]
 
 		scr = {"%s" % trainid: script}
 		return trainid, scr
+	
+	def checkChangeDirection(self, b1, os, b2):
+		if self.layout.IsCrossoverPt(os, b1):
+			return True
 		
+		return self.layout.IsCrossoverPt(os, b2)		
 		
 	def determineSegmentsAndTimes(self, block, os, east, blockTime, terminus=False):
 		subBlocks = self.layout.GetSubBlocks(block)

@@ -2862,7 +2862,7 @@
         "signal": "Y4R",
         "route": "YRtY21P50",
         "os": "YOSCJE",
-        "block": "P50.W,P50,P50.E"
+        "block": "P50.E,P50,P50.W"
       }
     },
     {
@@ -2873,7 +2873,7 @@
     },
     {
       "movetrain": {
-        "block": "P50.W",
+        "block": "P50.E",
         "time": 500
       }
     },
@@ -2885,7 +2885,7 @@
     },
     {
       "movetrain": {
-        "block": "P50.E",
+        "block": "P50.W",
         "time": 500
       }
     },
@@ -2894,7 +2894,7 @@
         "signal": "PA34LA",
         "route": "PRtP30P50",
         "os": "POSPJ2",
-        "block": "P30.W,P30,P30.E"
+        "block": "P30.E,P30,P30.W"
       }
     },
     {
@@ -2905,7 +2905,7 @@
     },
     {
       "movetrain": {
-        "block": "P30.W",
+        "block": "P30.E",
         "time": 500
       }
     },
@@ -2917,7 +2917,7 @@
     },
     {
       "movetrain": {
-        "block": "P30.E",
+        "block": "P30.W",
         "time": 500
       }
     },
@@ -3290,7 +3290,7 @@
         "signal": "PB2L",
         "route": "PRtP30P41",
         "os": "POSSJ1",
-        "block": "P30.E,P30,P30.W"
+        "block": "P30.W,P30,P30.E"
       }
     },
     {
@@ -3301,7 +3301,7 @@
     },
     {
       "movetrain": {
-        "block": "P30.E",
+        "block": "P30.W",
         "time": 500
       }
     },
@@ -3313,7 +3313,7 @@
     },
     {
       "movetrain": {
-        "block": "P30.W",
+        "block": "P30.E",
         "time": 500
       }
     },
@@ -3322,7 +3322,7 @@
         "signal": "PA32RB",
         "route": "PRtP30P50",
         "os": "POSPJ2",
-        "block": "P50.E,P50,P50.W"
+        "block": "P50.W,P50,P50.E"
       }
     },
     {
@@ -3333,7 +3333,7 @@
     },
     {
       "movetrain": {
-        "block": "P50.E",
+        "block": "P50.W",
         "time": 500
       }
     },
@@ -3345,7 +3345,7 @@
     },
     {
       "movetrain": {
-        "block": "P50.W",
+        "block": "P50.E",
         "time": 500
       }
     },
@@ -3654,7 +3654,7 @@
         "signal": "Y4R",
         "route": "YRtY21P50",
         "os": "YOSCJE",
-        "block": "P50.W,P50,P50.E"
+        "block": "P50.E,P50,P50.W"
       }
     },
     {
@@ -3665,7 +3665,7 @@
     },
     {
       "movetrain": {
-        "block": "P50.W",
+        "block": "P50.E",
         "time": 500
       }
     },
@@ -3677,7 +3677,7 @@
     },
     {
       "movetrain": {
-        "block": "P50.E",
+        "block": "P50.W",
         "time": 500
       }
     },
@@ -3686,7 +3686,7 @@
         "signal": "PA34LA",
         "route": "PRtP30P50",
         "os": "POSPJ2",
-        "block": "P30.W,P30,P30.E"
+        "block": "P30.E,P30,P30.W"
       }
     },
     {
@@ -3697,7 +3697,7 @@
     },
     {
       "movetrain": {
-        "block": "P30.W",
+        "block": "P30.E",
         "time": 500
       }
     },
@@ -3709,7 +3709,7 @@
     },
     {
       "movetrain": {
-        "block": "P30.E",
+        "block": "P30.W",
         "time": 500
       }
     },

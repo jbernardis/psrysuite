@@ -54,6 +54,7 @@ class MainFrame(wx.Frame):
 		self.timeValue = None
 
 		self.routeDefs = {}
+		self.CrossoverPoints = []
 
 		hostname = socket.gethostname()
 		self.ip = socket.gethostbyname(hostname)
@@ -279,13 +280,12 @@ class MainFrame(wx.Frame):
 				
 		subblocks = self.rr.GetSubBlockInfo()
 			
-		layout = {"routes": routes, "blocks": blocks, "subblocks": subblocks}
+		layout = {"routes": routes, "blocks": blocks, "subblocks": subblocks, "crossover": self.CrossoverPoints}
 		with open(os.path.join(os.getcwd(), "data", "layout.json"), "w") as jfp:
 			json.dump(layout, jfp, sort_keys=True, indent=2)
 
 
 	def refreshClient(self, addr, skt):
-		print("refresh client, tv = %s" % self.timeValue, flush=True)
 		if self.timeValue is not None:
 			m = {"clock": [{ "value": self.timeValue}]}
 			self.socketServer.sendToOne(skt, addr, m)
@@ -518,17 +518,14 @@ class MainFrame(wx.Frame):
 			self.rr.SetRelay(relay, status)
 			
 		elif verb == "clock":
-			print("server: clock command", flush=True)
 			value = evt.data["value"][0]
 			resp = {"clock": [{ "value": value}]}
 			self.timeValue = value
 			addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER")
 			for addr, skt in addrList:
-				print("forwarding clock to a listened", flush=True)
 				self.socketServer.sendToOne(skt, addr, resp)
 
 		elif verb == "refresh":
-			print("server refresh %s" % str(evt.data))
 			sid = int(evt.data["SID"][0])
 			for addr, data in self.clients.items():
 				if data[1] == sid:
@@ -638,6 +635,11 @@ class MainFrame(wx.Frame):
 
 			self.routeDefs[name] = (RouteDef(name, evt.data["os"][0], ends, signals, turnouts))
 			
+		elif verb == "crossover":
+			self.CrossoverPoints = []
+			for b in evt.data["data"]:
+				self.CrossoverPoints.append(b.split(":"))
+			
 		elif verb == "identify":
 			sid = int(evt.data["SID"][0])
 			function = evt.data["function"][0]
@@ -699,10 +701,8 @@ class MainFrame(wx.Frame):
 				self.Restore()
 				self.Raise()
 			elif action == "hide":
-				print("calling iconize from command")
 				self.Iconize()
 			elif action == "exit":
-				print("exit command")
 				logging.info("HTTP 'server:exit' command received - terminating")
 				self.Shutdown()
 

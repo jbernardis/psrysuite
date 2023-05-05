@@ -1604,6 +1604,7 @@ class MainFrame(wx.Frame):
 					if self.settings.dispatch:
 						self.SendBlockDirRequests()
 						self.SendOSRoutes()
+						self.SendCrossoverPoints()
 					self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 				elif parms["type"] == "trains":
 					for trid, tr in self.trains.items():
@@ -1666,6 +1667,8 @@ class MainFrame(wx.Frame):
 					logging.debug(json.dumps(req))
 					# print("Outgoing HTTP request: %s" % json.dumps(req))
 					self.rrServer.SendRequest(req)
+		else:
+			logging.info("disallowing command %s from non dispatcher" % command)
 					
 	def Get(self, cmd, parms):
 		return self.rrServer.Get(cmd, parms)
@@ -1683,6 +1686,9 @@ class MainFrame(wx.Frame):
 			if b.GetBlockType() == OVERSWITCH:
 				b.SendRouteRequest()
 		self.districts.SendRouteDefinitions()
+		
+	def SendCrossoverPoints(self):
+		self.Request({"crossover": {"data": ["%s:%s" % (b[0], b[1]) for b in self.districts.GetCrossoverPoints()]}})
 
 	def onDisconnectEvent(self, _):
 		self.listener = None

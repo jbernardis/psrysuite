@@ -61,12 +61,6 @@ class Cliff (District):
 			"CSw51", "CSw53", "CSw55", "CSw57", "CSw59", "CSw61", "CSw63", "CSw65", "CSw67", "CSw69",
 			"CSw71", "CSw73", "CSw75", "CSw77", "CSw79", "CSw81"])
 
-	def CrossingEastWestBoundary(self, osblk, blk):
-		if osblk.GetName() == "COSSHE" and blk.GetName() == "C20":
-			return True
-
-		return False
-
 	def DefineBlocks(self):
 		self.blocks = {}
 		self.osBlocks = {}

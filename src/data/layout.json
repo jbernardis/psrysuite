@@ -531,12 +531,12 @@
       "sbwest": null
     },
     "P10": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P10.E",
       "sbwest": null
     },
     "P11": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P11.E",
       "sbwest": "P11.W"
     },
@@ -571,7 +571,7 @@
       "sbwest": "P31.W"
     },
     "P32": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P32.E",
       "sbwest": "P32.W"
     },
@@ -581,22 +581,22 @@
       "sbwest": null
     },
     "P40": {
-      "east": 0,
+      "east": 1,
       "sbeast": "P40.E",
       "sbwest": null
     },
     "P41": {
-      "east": 0,
+      "east": 1,
       "sbeast": "P41.E",
       "sbwest": "P41.W"
     },
     "P42": {
-      "east": 0,
+      "east": 1,
       "sbeast": "P42.E",
       "sbwest": "P42.W"
     },
     "P5": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -606,17 +606,17 @@
       "sbwest": "P50.W"
     },
     "P6": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "P60": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "P61": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -636,7 +636,7 @@
       "sbwest": null
     },
     "P7": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -696,7 +696,7 @@
       "sbwest": null
     },
     "R10": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": "R10.W"
     },
@@ -771,7 +771,7 @@
       "sbwest": null
     },
     "V11": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -921,6 +921,44 @@
       "sbwest": null
     }
   },
+  "crossover": [
+    [
+      "COSSHE",
+      "C20"
+    ],
+    [
+      "YOSCJE",
+      "P50"
+    ],
+    [
+      "YOSCJW",
+      "P50"
+    ],
+    [
+      "POSSJ1",
+      "P30"
+    ],
+    [
+      "SOSE",
+      "P32"
+    ],
+    [
+      "SOSW",
+      "P32"
+    ],
+    [
+      "YOSKL4",
+      "Y30"
+    ],
+    [
+      "YOSKL1",
+      "Y70"
+    ],
+    [
+      "YOSKL2",
+      "Y70"
+    ]
+  ],
   "routes": {
     "BRtB10B11": {
       "ends": [

@@ -8,6 +8,7 @@ class LayoutData:
 
 		self.routes = self.layout["routes"]
 		self.subblocks = self.layout["subblocks"]
+		self.crossovers = self.layout["crossover"]
 
 		self.block2route = {}
 		self.osblocks = []
@@ -33,6 +34,9 @@ class LayoutData:
 
 		self.osblocks = sorted(self.osblocks)
 		self.blocks = sorted([x for x in self.blocks if x not in self.osblocks])
+		
+	def IsCrossoverPt(self, osBlk, blk):
+		return [osBlk, blk] in self.crossovers
 
 	def GetRoutesForBlock(self, blknm):
 		try:

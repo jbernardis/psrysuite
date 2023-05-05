@@ -291,7 +291,6 @@ class Cliff(District):
 		outb[7] - setBit(outb[7], 4, 1 if self.rr.GetInput("CSw11").GetValue() == "R" else 0)
 
 		otext = formatOText(outb, outbc)
-		#print("CLIFF output: %s" % otext, flush=True)
 		#logging.debug("Cliff: Output bytes: %s" % otext)
 
 		inbc = outbc
@@ -304,7 +303,6 @@ class Cliff(District):
 
 			itext = formatIText(inb, 7)
 			#logging.debug("Cliff: Input Bytes: %s" % itext)
-			print("Cliff: Input Bytes: %s" % itext)
 
 			self.rr.GetInput("CC21E").SetValue(getBit(inb[0], 0))  # Routes
 			self.rr.GetInput("CC40E").SetValue(getBit(inb[0], 1))
@@ -458,7 +456,6 @@ class Cliff(District):
 		outb[3] = setBit(outb[3], 5, 1 if op != 0 else 0)
 
 		otext = formatOText(outb, outbc)
-		#print("SHEFFIELD output: %s" % otext, flush=True)
 		#logging.debug("Sheffield: Output bytes: %s" % otext)
 		
 		inbc = outbc
@@ -472,7 +469,6 @@ class Cliff(District):
 				
 			itext = formatIText(inb, inbc)
 			#logging.debug("Sheffield: Input Bytes: %s" % itext)
-			print("Sheffield: Input Bytes: %s" % itext)
 
 			self.rr.GetInput("CC50E").SetValue(getBit(inb[0], 0))  # Routes
 			self.rr.GetInput("CC51E").SetValue(getBit(inb[0], 1))

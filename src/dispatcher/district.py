@@ -5,7 +5,18 @@ import os
 from dispatcher.constants import RegAspects, RegSloAspects, AdvAspects, SloAspects, \
 	MAIN, SLOW, DIVERGING, RESTRICTING, \
 	CLEARED, OCCUPIED, STOP, NORMAL, OVERSWITCH
-from pickle import NONE
+	
+EWCrossoverPoints = [
+	["COSSHE", "C20"],
+	["YOSCJE", "P50"],
+	["YOSCJW", "P50"],
+	["POSSJ1", "P30"],
+	["SOSE",   "P32"],
+	["SOSW",   "P32"],
+	["YOSKL4", "Y30"],
+	["YOSKL1", "Y70"],
+	["YOSKL2", "Y70"]
+]
 
 def aspecttype(atype):
 	if atype == RegAspects:
@@ -640,8 +651,7 @@ class District:
 	def CrossingEastWestBoundary(self, osblk, blk):
 		blkNm = blk.GetName()
 		osNm = osblk.GetName()
-		print("in district %s cross east west boundary for os block %s, exit block %s" % (self.name, osNm, blkNm))
-		return False
+		return [osNm, blkNm] in EWCrossoverPoints
 
 	def DefineBlocks(self):
 		self.blocks = {}
@@ -763,3 +773,7 @@ class Districts:
 	def SendRouteDefinitions(self):
 		for t in self.districts.values():
 			t.SendRouteDefinitions()
+			
+	def GetCrossoverPoints(self):
+		return EWCrossoverPoints
+

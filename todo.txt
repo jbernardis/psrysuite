@@ -17,26 +17,22 @@ already verified these: eastbound => ABC ordering, westbound: CBA (S20 had B and
     S10: S10A, S10B, S10C
     S20: S20A, S20B, S20C
     H10: H10A, H10B
-    
-Make sure that all of the stopping blocks report in correctly as east versus west.  If they do NOT on the actual railroad, it means that the block definition is wrong.  Need a more robust algorithm for determining 
-if a block is being traversed in its default direction or if it needs to be reversed.  This impacts dispatcher, but also sim/ar
-
 
 general - better icons for everything, set icons for the programs themselves,
-
-expand config to allow changing of ini file parameters
 
 sniffer interface - a new process that sends messages to rrserver who then forwards them to all.
 
 ar/atc/advisor - ??get rid of checkboxes and have always on???
 
+clear up the cryptic advisor messages
 
-check the order of signal definitions in port routes - had to change for P20P21 route - after doing this, regenerate the layout file and determine if trains/arscripts/simscripts needs to be updated
-actually revisit port block definitions - only P50, P30, and P32 are where direction changes are needed.  Determine the
-proper east/west orientation of the blocks (all yard tracks are east bound), determine proper stop block locations, and arrow directions.
 
 tracker:
 	backup/restore - need a backup/restore for the entire suite - not in tracker
 	reports - the only thing we really need is train cards, and this is not in tracker, but in train editor
 
 hand switch levers for port - there is not a separate 15a and 15b, also, I don't seem to be getting the input values when they change
+
+siding unlock levers from port
+
+fleet levers from port/cliff/yard/nassau

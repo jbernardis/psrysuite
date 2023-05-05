@@ -1,3 +1,4 @@
+import logging
 
 class Train:
 	tx = 0
@@ -116,6 +117,7 @@ class Train:
 		count1 = 0
 		count2 = 0
 		# for each block the train is in, count how many blocks adjacent to that block contain the same train
+		adjStr = ""
 		for blk in self.blocks.values():
 			adje, adjw = blk.GetAdjacentBlocks()
 			adjc = 0
@@ -124,6 +126,7 @@ class Train:
 					continue
 				if adj.GetName() in bnames:
 					adjc += 1
+			adjStr += "%s: %s, " % (blk.GetName(), adjc)
 
 			# the count is either 1 (for the blocks at the beginning and the end of the train)
 			# or two for all of the blocks in between
@@ -135,6 +138,8 @@ class Train:
 		# so when we reach here, there MUST be 2 blocks whose adjacent count is 1 - the first and last blocks
 		# there must also be countBlocks-2 blocks whose count is 2 - this is all the blocks mid train						
 		if count1 != 2 or count2 != countBlocks-2:
+			logging.info("train %s is non contiguous, blocks=%s c1=%d c2=%d" % (self.GetName(), str(bnames), count1, count2))
+			logging.info(adjStr)
 			return False
 		
 		return True

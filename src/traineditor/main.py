@@ -4,11 +4,11 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofp = open(os.path.join(os.getcwd(), "output", "trainedit.out"), "w")
-efp = open(os.path.join(os.getcwd(), "output", "trainedit.err"), "w")
+#ofp = open(os.path.join(os.getcwd(), "output", "trainedit.out"), "w")
+#efp = open(os.path.join(os.getcwd(), "output", "trainedit.err"), "w")
 
-sys.stdout = ofp
-sys.stderr = efp
+#sys.stdout = ofp
+#sys.stderr = efp
 
 from traineditor.mainframe import MainFrame 
 

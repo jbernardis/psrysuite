@@ -13,22 +13,6 @@ class Port (District):
 		District.__init__(self, name, frame, screen)
 		self.sw9 = self.sw3 = None
 
-	def CrossingEastWestBoundary(self, osblk, blk):
-		blkNm = blk.GetName()
-		osNm = osblk.GetName()
-		print("in port cross east west boundary for os block %s, exit block %s" % (osNm, blkNm))
-		if blkNm == "P50":
-			if osNm in [ "POSPJ1", "POSPJ2" ]:
-				return True
-		elif blkNm == "P30":
-			if osNm == "POSPJ2":
-				return True
-		elif blkNm == "P32":
-			if osNm in [ "POSCJ1", "POSCJ2" ]:
-				return True
-
-		return False
-
 	def DoTurnoutAction(self, turnout, state, force=False):
 		tn = turnout.GetName()
 		if tn == "PASw35":
@@ -332,7 +316,7 @@ class Port (District):
 				(self.tiles["houtline"],  self.screen, (112, 18), False),
 				(self.tiles["houtline"],  self.screen, (113, 18), False),
 				(self.tiles["houtline"],  self.screen, (114, 18), False),
-			], True)
+			], False)
 
 		self.blocks["P1"] = Block(self, self.frame, "P1",
 			[
@@ -412,7 +396,7 @@ class Port (District):
 				(self.tiles["horiznc"],  self.screen, (99, 24), False),
 				(self.tiles["horiz"],    self.screen, (100, 24), False),
 				(self.tiles["eobright"],  self.screen, (101, 24), False),
-			], True)
+			], False)
 		self.blocks["P5"].AddTrainLoc(self.screen, (90, 24))
 
 		self.blocks["P6"] = Block(self, self.frame, "P6",
@@ -424,7 +408,7 @@ class Port (District):
 				(self.tiles["horiznc"],  self.screen, (97, 22), False),
 				(self.tiles["horiz"],    self.screen, (98, 22), False),
 				(self.tiles["eobright"],  self.screen, (99, 22), False),
-			], True)
+			], False)
 		self.blocks["P6"].AddTrainLoc(self.screen, (94, 22))
 
 		self.blocks["P7"] = Block(self, self.frame, "P7",
@@ -438,7 +422,7 @@ class Port (District):
 				(self.tiles["horiznc"],  self.screen, (95, 20), False),
 				(self.tiles["horiz"],    self.screen, (96, 20), False),
 				(self.tiles["eobright"],  self.screen, (97, 20), False),
-			], True)
+			], False)
 		self.blocks["P7"].AddTrainLoc(self.screen, (90, 20))
 
 		self.blocks["P10"] = Block(self, self.frame, "P10",
@@ -449,7 +433,7 @@ class Port (District):
 				(self.tiles["horiz"],    self.screen, (114, 24), False),
 				(self.tiles["horiznc"],  self.screen, (115, 24), False),
 				(self.tiles["horiz"],    self.screen, (116, 24), False),
-			], True)
+			], False)
 		self.blocks["P10"].AddTrainLoc(self.screen, (114, 24))
 		self.blocks["P10"].AddStoppingBlock([
 				(self.tiles["horiznc"],  self.screen, (117, 24), False),
@@ -494,7 +478,7 @@ class Port (District):
 				(self.tiles["horiz"],    LaKr, (2, 15), False),
 				(self.tiles["horiznc"],  LaKr, (3, 15), False),
 				(self.tiles["horiz"],    LaKr, (4, 15), False),
-			], True)
+			], False)
 		self.blocks["P11"].AddTrainLoc(self.screen, (130, 24))
 		self.blocks["P11"].AddTrainLoc(LaKr, (2, 15))
 		self.blocks["P11"].AddStoppingBlock([
@@ -573,19 +557,19 @@ class Port (District):
 		self.blocks["P30"] = Block(self, self.frame, "P30",
 			[
 				(self.tiles["turnrightup"],self.screen, (116, 29), False),
-				(self.tiles["verticalnc"],self.screen, (116, 30), True),
-				(self.tiles["vertical"],  self.screen, (116, 31), True),
+				(self.tiles["verticalnc"],self.screen, (116, 30), False),
+				(self.tiles["vertical"],  self.screen, (116, 31), False),
 				(self.tiles["turnleftdown"],self.screen, (116, 32), False),
 			], False)
 		self.blocks["P30"].AddTrainLoc(self.screen, (116, 30))
 		self.blocks["P30"].AddStoppingBlock([
 				(self.tiles["eobright"], self.screen, (118, 28), False),
 				(self.tiles["turnleftleft"],self.screen, (117, 28), False),
-			], False)
+			], True)
 		self.blocks["P30"].AddStoppingBlock([
 				(self.tiles["turnrightleft"],self.screen, (117, 33), False),
 				(self.tiles["eobright"], self.screen, (118, 33), False),
-			], True)
+			], False)
 
 		self.blocks["P31"] = Block(self, self.frame, "P31",
 			[
@@ -622,7 +606,7 @@ class Port (District):
 				(self.tiles["horiznc"],  LaKr,        (117, 21), False),
 				(self.tiles["horiz"],    LaKr,        (118, 21), False),
 				(self.tiles["horiznc"],  LaKr,        (119, 21), False),
-			], True)
+			], False)
 		self.blocks["P32"].AddTrainLoc(self.screen, (149, 29))
 		self.blocks["P32"].AddTrainLoc(LaKr, (113, 21))
 		self.blocks["P32"].AddStoppingBlock([
@@ -643,7 +627,7 @@ class Port (District):
 				(self.tiles["horiz"],    self.screen, (114, 35), False),
 				(self.tiles["horiznc"],  self.screen, (115, 35), False),
 				(self.tiles["horiz"],    self.screen, (116, 35), False),
-			], False)
+			], True)
 		self.blocks["P40"].AddTrainLoc(self.screen, (113, 35))
 		self.blocks["P40"].AddStoppingBlock([
 				(self.tiles["horiznc"],  self.screen, (117, 35), False),
@@ -655,7 +639,7 @@ class Port (District):
 				(self.tiles["horiz"],    self.screen, (130, 35), False),
 				(self.tiles["horiznc"],  self.screen, (131, 35), False),
 				(self.tiles["horiz"],    self.screen, (132, 35), False),
-			], False)
+			], True)
 		self.blocks["P41"].AddTrainLoc(self.screen, (131, 35))
 		self.blocks["P41"].AddStoppingBlock([
 				(self.tiles["eobleft"],  self.screen, (127, 35), False),
@@ -678,7 +662,7 @@ class Port (District):
 
 				(self.tiles["horiznc"],  LaKr,        (109, 15), False),
 				(self.tiles["horiz"],    LaKr,        (110, 15), False),
-			], False)
+			], True)
 		self.blocks["P42"].AddTrainLoc(self.screen, (151, 35))
 		self.blocks["P42"].AddTrainLoc(LaKr, (109, 15))
 		self.blocks["P42"].AddStoppingBlock([
@@ -693,31 +677,31 @@ class Port (District):
 
 		self.blocks["P50"] = Block(self, self.frame, "P50",
 			[
-				(self.tiles["horiznc"],  self.screen, (131, 22), True),
-				(self.tiles["horiz"],    self.screen, (132, 22), True),
-				(self.tiles["horiznc"],  self.screen, (133, 22), True),
-				(self.tiles["horiz"],    self.screen, (134, 22), True),
-				(self.tiles["horiznc"],  self.screen, (135, 22), True),
-				(self.tiles["horiz"],    self.screen, (136, 22), True),
+				(self.tiles["horiznc"],  self.screen, (131, 22), False),
+				(self.tiles["horiz"],    self.screen, (132, 22), False),
+				(self.tiles["horiznc"],  self.screen, (133, 22), False),
+				(self.tiles["horiz"],    self.screen, (134, 22), False),
+				(self.tiles["horiznc"],  self.screen, (135, 22), False),
+				(self.tiles["horiz"],    self.screen, (136, 22), False),
 				(self.tiles["horiznc"],  self.screen, (137, 22), False),
 				(self.tiles["turnleftright"],self.screen, (138, 22), False),
 				(self.tiles["turnrightdown"],self.screen, (139, 21), False),
-				(self.tiles["vertical"], self.screen, (139, 20), True),
-				(self.tiles["verticalnc"], self.screen, (139, 19), True),
-				(self.tiles["vertical"], self.screen, (139, 18), True),
-				(self.tiles["verticalnc"], self.screen, (139, 17), True),
+				(self.tiles["vertical"], self.screen, (139, 20), False),
+				(self.tiles["verticalnc"], self.screen, (139, 19), False),
+				(self.tiles["vertical"], self.screen, (139, 18), False),
+				(self.tiles["verticalnc"], self.screen, (139, 17), False),
 		], False)
 		self.blocks["P50"].AddTrainLoc(self.screen, (131, 22))
 		self.blocks["P50"].AddStoppingBlock([
 				(self.tiles["eobleft"],  self.screen, (128, 22), False),
-				(self.tiles["horiznc"],  self.screen, (129, 22), True),
-				(self.tiles["horiz"],    self.screen, (130, 22), True),
-			], True)
+				(self.tiles["horiznc"],  self.screen, (129, 22), False),
+				(self.tiles["horiz"],    self.screen, (130, 22), False),
+			], False)
 		self.blocks["P50"].AddStoppingBlock([
 				(self.tiles["turnleftup"], self.screen, (139, 16), False),
 				(self.tiles["turnrightright"], self.screen, (138, 15), False),
-				(self.tiles["horiz"],    self.screen, (137, 15), False),
-			], False)
+				(self.tiles["horiz"],    self.screen, (137, 15), True),
+			], True)
 
 		self.blocks["P60"] = Block(self, self.frame, "P60",
 			[
@@ -729,7 +713,7 @@ class Port (District):
 				(self.tiles["houtline"],  self.screen, (113, 20), False),
 				(self.tiles["houtline"],  self.screen, (114, 20), False),
 				(self.tiles["houtline"],  self.screen, (115, 20), False),
-			], True)
+			], False)
 
 		self.blocks["P61"] = Block(self, self.frame, "P61",
 			[
@@ -744,7 +728,7 @@ class Port (District):
 				(self.tiles["houtline"],  self.screen, (115, 22), False),
 				(self.tiles["houtline"],  self.screen, (116, 22), False),
 				(self.tiles["houtline"],  self.screen, (117, 22), False),
-			], True)
+			], False)
 
 		self.blocks["P62"] = Block(self, self.frame, "P62",
 			[

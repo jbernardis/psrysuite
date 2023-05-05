@@ -77,21 +77,6 @@ class Yard (District):
 			"YSw1", "YSw3", "YSw7", "YSw9", "YSw11", "YSw17", "YSw19", "YSw21", "YSw23", "YSw25",
 			"YSw27", "YSw29", "YSw33", "YSw113", "YSw115", "YSw116", "YSw131", "YSw132", "YSw134"])
 
-	def CrossingEastWestBoundary(self, osblk, blk):
-		blkNm = blk.GetName()
-		osNm = osblk.GetName()
-		print("in yard cross east west boundary for os block %s, exit block %s" % (osNm, blkNm))
-		if osNm == "YOSKL4" and blkNm == "Y30":
-			return True
-		if osNm == "YOSKL1" and blkNm == "Y70":
-			return True
-		if osNm == "YOSKL2" and blkNm == "Y70":
-			return True
-  # if osNm in ["YOSCJE", "YOSCJW"] and blkNm == "P50":
-  # 	return True
-
-		return False
-
 	def PerformSignalAction(self, sig):
 		controlOpt = self.frame.rbYardControl.GetSelection()
 		if controlOpt == 0:  # Yard local control
