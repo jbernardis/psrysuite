@@ -20,7 +20,7 @@ already verified these: eastbound => ABC ordering, westbound: CBA (S20 had B and
 
 general - better icons for everything, set icons for the programs themselves,
 
-sniffer interface - a new process that sends messages to rrserver who then forwards them to all.
+sniffer interface - a new process that sends messages to rrserver who then forwards them to all. - needs debugging
 
 ar/atc/advisor - ??get rid of checkboxes and have always on???
 
@@ -33,8 +33,10 @@ tracker:
 
 hand switch levers for port - there is not a separate 15a and 15b, also, I don't seem to be getting the input values when they change
 
-siding unlock levers from port
+siding unlock levers from all tower panels - cliff, nassau, port, yard
 
 fleet levers from port/cliff/yard/nassau
 
-coach yard if 13/15/17 are changed after route is cleared, the clearance should move to the new route
+why was a single car train being reported as non-contiguous??
+
+what happened when we lost detection

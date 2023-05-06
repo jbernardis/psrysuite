@@ -297,6 +297,8 @@ class MainFrame(wx.Frame):
 		
 	def DisplayTimeValue(self):
 		hours = int(self.timeValue/60)
+		if hours == 0:
+			hours = 12
 		minutes = self.timeValue % 60
 		self.timeDisplay.SetValue("%2d:%02d" % (hours, minutes))
 		if self.subscribed and self.IsDispatcher():
