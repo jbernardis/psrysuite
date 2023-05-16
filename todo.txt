@@ -37,6 +37,12 @@ siding unlock levers from all tower panels - cliff, nassau, port, yard
 
 fleet levers from port/cliff/yard/nassau
 
+why do I have a fleet checkbox for port since we have no control over port?
+
+should C18RA/RB/L be included with bank fleeting and 14R/LA/LB be included with cliveden?  Right now they are not affected by fleeting.
+
 why was a single car train being reported as non-contiguous??
 
 what happened when we lost detection
+
+train 57 moving through block P50 - block loses "cleared" status and turns white as train moves through it - why?

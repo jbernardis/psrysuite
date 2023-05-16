@@ -733,6 +733,12 @@ class MainFrame(wx.Frame):
 			elif action == "exit":
 				logging.info("HTTP 'server:exit' command received - terminating")
 				self.Shutdown()
+				
+		elif verb == "debug":
+			function = evt.data["function"][0]
+			addrList = self.clientList.GetFunctionAddress(function)
+			for addr, skt in addrList:
+				self.socketServer.sendToOne(skt, addr, {"debug": evt.data})
 
 		elif verb == "close":
 			function = evt.data["function"][0]

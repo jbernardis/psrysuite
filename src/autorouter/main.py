@@ -199,6 +199,11 @@ class MainUnit:
 					logging.info("session ID %d" % self.sessionid)
 					self.Request({"identify": {"SID": self.sessionid, "function": "AR"}})
 					self.Request({"refresh": {"SID": self.sessionid}})
+					
+				elif cmd == "debug":
+					tag = parms["tag"][0]
+					logging.info("debug request with tag %s" % tag)
+					self.DumpQueuedRequests()
 	
 				elif cmd == "end":
 					if parms["type"] == "layout":
@@ -254,9 +259,7 @@ class MainUnit:
 		if nState == 0:
 			# remove any trains we know about from this block
 			for tr in self.trains.values():
-				logging.info("looking to remove train %s from block %s" % (tr.name, blkName))
 				if tr.IsInBlock(blkName):
-					logging.info("It's in there - deleting")
 					tr.DelBlock(blkName)
 
 		self.EvaluateQueuedRequests()
@@ -375,6 +378,12 @@ class MainUnit:
 			b = self.blocks[exitBlk]
 			state = b.GetState()
 			clear = b.GetClear()
+			for sbNm in [exitBlk+".E", exitBlk+".W"]:
+				if sbNm in self.blocks:
+					sb = self.blocks[sbNm]
+					state += sb.GetState()
+					clear += sb.GetClear()
+					
 			exitBlockAvailable = state == 0 and clear == 0
 			logging.info("Exit block %s State = %d clear = %d" % (exitBlk, state, clear))
 		else:
@@ -447,6 +456,7 @@ class MainUnit:
 			req = self.OSQueue[osNm].Peek()
 			if req is not None:
 				logging.info("Request for block %s" % req.GetName())
+				logging.info("%s" % req.toString())
 				if self.EvaluateRouteRequest(req):
 					logging.info("OK to proceed")
 					self.OSQueue[osNm].Pop()
@@ -455,22 +465,27 @@ class MainUnit:
 
 		logging.info("end of queued requests")
 		
+	def DumpQueuedRequests(self):
+		logging.info("Number of OSes with requests: %d" % len(self.OSQueue))
+		for osNm in self.OSQueue:
+			logging.info("OS: %s" % osNm)
+			self.OSQueue[osNm].DumpQueue()
+			logging.info("===================================")
+		logging.info("Done with dump of queues")
+
 	def DeleteQueuedRequests(self, train):
+		logging.info("deleting queued request for train %s" % train)
 		oslist = list(self.OSQueue.keys())
 		for osNm in oslist:
 			newQ = Fifo()
 			req = self.OSQueue[osNm].Pop()
-			deleted = False
 			while req is not None:
 				if req.GetTrain() != train:
 					newQ.Append(req)
-				else:
-					deleted = True
 					
 				req = self.OSQueue[osNm].Pop()
 				
-			if deleted:
-				self.OSQueue[osNm] = newQ
+			self.OSQueue[osNm] = newQ
 
 	def Request(self, req):
 		logging.info("Outgoing request: %s" % json.dumps(req))

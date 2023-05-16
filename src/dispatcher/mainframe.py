@@ -41,6 +41,7 @@ from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg
+from pickle import NONE
 
 MENU_ATC_REMOVE = 900
 MENU_ATC_STOP   = 901
@@ -318,12 +319,14 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBNassau, self.rbNassauControl)
 		self.rbNassauControl.Hide()
 		self.widgetMap[NaCl].append(self.rbNassauControl)
+		self.nassauControl = 0
 
 		self.rbCliffControl = wx.RadioBox(self, wx.ID_ANY, "Cliff", (1550, voffset), wx.DefaultSize,
 				["Cliff", "Dispatcher: Bank/Cliveden", "Dispatcher: All"], 1, wx.RA_SPECIFY_COLS)
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBCliff, self.rbCliffControl)
 		self.rbCliffControl.Hide()
 		self.widgetMap[NaCl].append(self.rbCliffControl)
+		self.cliffControl = 0
 
 		self.rbYardControl = wx.RadioBox(self, wx.ID_ANY, "Yard", (1450, voffset), wx.DefaultSize,
 				["Yard", "Dispatcher"], 1, wx.RA_SPECIFY_COLS)
@@ -383,10 +386,15 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBNassauFleet, self.cbNassauFleet)
 		self.cbNassauFleet.Hide()
 		self.widgetMap[NaCl].append(self.cbNassauFleet)
-		self.NassauFleetSignals = ["N18R", "N16R", "N14R",
+		self.NassauFleetSignalsMain = ["N16R", "N14R",
+						"N18LB", "N16L", "N14LA", "N14LB",
+						"N26RB", "N26RC", "N24RA", "N24RB",
+						"N26L", "N24L"]
+		self.NassauFleetSignalsAll = ["N18R", "N16R", "N14R",
 						"N18LA", "N18LB", "N16L", "N14LA", "N14LB", "N14LC", "N14LD",
 						"N28R", "N26RA", "N26RB", "N26RC", "N24RA", "N24RB", "N24RC", "N24RD",
 						"N28L", "N26L", "N24L"]
+		self.NassauFleetSignals = self.NassauFleetSignalsAll
 
 		self.cbBankFleet = wx.CheckBox(self, -1, "Martinsville Fleeting", (900, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBBankFleet, self.cbBankFleet)
@@ -431,12 +439,13 @@ class MainFrame(wx.Frame):
 		self.HydeFleetSignals = [ "H4R", "H4LA", "H4LB", "H4LC", "H4LD", "H6R", "H6LA", "H6LB", "H6LC", "H6LD", "H8R", "H8L",
 					"H10L", "H10RA", "H10RB", "H10RC", "H10RD", "H10RE", "H12L", "H12RA", "H12RB", "H12RC", "H12RD", "H12RE"  ]
 
-		self.fleetMaps = [
+	def GetFleetMaps(self, signm):
+		siglists = [
+			[ self.NassauFleetSignals,    self.cbNassauFleet ],
 			[ self.LathamFleetSignals,    self.cbLathamFleet ],
 			[ self.CarltonFleetSignals,   self.cbCarltonFleet ],
 			[ self.ValleyJctFleetSignals, self.cbValleyJctFleet ],
 			[ self.FossFleetSignals,      self.cbFossFleet ],
-			[ self.NassauFleetSignals,    self.cbNassauFleet ],
 			[ self.ShoreFleetSignals,     self.cbShoreFleet ],
 			[ self.HydeJctFleetSignals,   self.cbHydeJctFleet ],
 			[ self.KrulishFleetSignals,   self.cbKrulishFleet ],
@@ -445,16 +454,24 @@ class MainFrame(wx.Frame):
 			[ self.HydeFleetSignals,      self.cbHydeFleet ],
 			[ self.YardFleetSignals,      self.cbYardFleet ],
 		]
+		for siglist, checkbox in siglists:
+			if signm in siglist:
+				return siglist, checkbox
+			
+		return None, None
 
 	def UpdateControlWidget(self, name, value):
+		print("update control %s %s" % (name, value))
 		if not self.IsDispatcher():
 			return
 		if name == "nassau":
 			self.rbNassauControl.SetSelection(value)
+			self.nassauControl = value
 			self.cbNassauFleet.Enable(value != 0)
 			
 		elif name == "cliff":
 			self.rbCliffControl.SetSelection(value)
+			self.cliffControl = value
 			
 		elif name == "yard":
 			self.rbYardControl.SetSelection(value)
@@ -465,6 +482,7 @@ class MainFrame(wx.Frame):
 			
 		elif name == "cliff.fleet":
 			ctl = self.rbCliffControl.GetSelection()
+			self.cliffControl = ctl
 			if ctl == 0:
 				self.cbCliffFleet.SetValue(value != 0)
 				self.cbClivedenFleet.SetValue(value != 0)
@@ -566,6 +584,7 @@ class MainFrame(wx.Frame):
 		ctl = evt.GetInt()
 		self.cbNassauFleet.Enable(ctl != 0)
 		self.Request({"control": { "name": "nassau", "value": ctl}})
+		self.nassauControl = ctl
 
 	def OnRBCliff(self, evt):
 		ctl = evt.GetInt()
@@ -573,6 +592,7 @@ class MainFrame(wx.Frame):
 		self.cbBankFleet.Enable(ctl != 0)
 		self.cbClivedenFleet.Enable(ctl != 0)
 		self.Request({"control": { "name": "cliff", "value": ctl}})
+		self.cliffControl = ctl
 
 	def OnRBYard(self, evt):
 		ctl = evt.GetInt()
@@ -608,9 +628,22 @@ class MainFrame(wx.Frame):
 
 	def OnCBNassauFleet(self, _):
 		f = 1 if self.cbNassauFleet.IsChecked() else 0
+		print("in cb nassau fleet, f = %d" % f)
+		if self.nassauControl == 1:
+			self.NassauFleetSignals = self.NassauFleetSignalsMain
+			print("set to main signals", flush=True)
+		elif self.nassauControl == 2:
+			self.NassauFleetSignals = self.NassauFleetSignalsAll
+			print("set to all signals", flush=True)
+		else:
+			print("unknown control value: %d" % self.nassauControl, flush=True)
+			return
+
 		for signm in self.NassauFleetSignals:
+			print("request fleet %s %d" % (signm, f))
 			self.Request({"fleet": { "name": signm, "value": f}})
 		self.Request({"control": {"name": "nassau.fleet", "value": f}})
+		
 
 	def OnCBBankFleet(self, _):
 		f = 1 if self.cbBankFleet.IsChecked() else 0
@@ -669,16 +702,16 @@ class MainFrame(wx.Frame):
 	def FleetCheckBoxes(self, signm):
 		if not self.IsDispatcher():
 			return
-		for siglist, checkbox in self.fleetMaps:
-			if signm in siglist:
-				fltct = nfltct = 0
-				for sn in siglist:
-					sig = self.signals[sn]
-					if sig.IsFleeted():
-						fltct += 1
-					else:
-						nfltct += 1
-				checkbox.SetValue(nfltct == 0)
+		siglist, checkbox = self.GetFleetMap(signm)
+		if siglist is not None:
+			fltct = nfltct = 0
+			for sn in siglist:
+				sig = self.signals[sn]
+				if sig.IsFleeted():
+					fltct += 1
+				else:
+					nfltct += 1
+			checkbox.SetValue(nfltct == 0)
 
 	def DrawCameras(self):
 		cams = {LaKr: [
@@ -1351,6 +1384,7 @@ class MainFrame(wx.Frame):
 						value = int(p["value"])
 					except:
 						value = 0
+					print("delivery: fleet %s %d" % (signm, value))
 
 					sig = self.signals[signm]
 					sig.EnableFleeting(value == 1)
@@ -1594,6 +1628,7 @@ class MainFrame(wx.Frame):
 				for p in parms:
 					name = p["name"]
 					value = int(p["value"])
+					print("delivery: control %s %d" % (name, value))
 					self.UpdateControlWidget(name, value)
 
 			elif cmd == "sessionID":
