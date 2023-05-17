@@ -9,6 +9,8 @@ from rrserver.bus import setBit, getBit
 class Nassau(District):
 	def __init__(self, parent, name, settings):
 		District.__init__(self, parent, name, settings)
+		
+		self.panelFleet = False
 
 		sigNames =  [
 			["N20R", 1], ["N20L", 1],
@@ -156,7 +158,10 @@ class Nassau(District):
 
 	def OutIn(self):
 		optControl = self.rr.GetControlOption("nassau")  # 0 => Nassau, 1 => Dispatcher Main, 2 => Dispatcher All
-		optFleet = self.rr.GetControlOption("nassau.fleet")  # 0 => no fleeting, 1 => fleeting
+		if optControl == 0:
+			optFleet = self.rr.GetInput("nassau.fleet").GetState() # get the state of the lever on the panel
+		else:
+			optFleet = self.rr.GetControlOption("nassau.fleet")  # otherwise get the fleeting state from the check box
 
 		release = self.rr.GetInput("nrelease").GetState()
 		NESL = self.rr.GetDistrictLock("NESL")

@@ -287,7 +287,7 @@ class HandswitchLeverInput (Input):
 			return
 
 		self.state = state
-		# self.rr.RailroadEvent({"refreshinput": [self.name]})
+		self.rr.RailroadEvent({"refreshinput": [self.name]})
 		self.rr.RailroadEvent(self.GetEventMessage())
 
 	def GetState(self):

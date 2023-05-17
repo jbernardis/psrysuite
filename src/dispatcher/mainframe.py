@@ -1,7 +1,6 @@
 import wx
 import wx.lib.newevent
 from wx.lib.gizmos.ledctrl import LEDNumberCtrl
-import time
 
 import os
 import sys
@@ -41,7 +40,6 @@ from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg
-from pickle import NONE
 
 MENU_ATC_REMOVE = 900
 MENU_ATC_STOP   = 901
@@ -91,6 +89,11 @@ class MainFrame(wx.Frame):
 		self.trainList = []
 			
 		self.settings = settings
+		if self.settings.pages == 3:
+			self.xoffset = 0
+		else:
+			self.xoffset = self.settings.xoffset
+			
 		logging.info("%s process starting" % "dispatcher" if self.settings.dispatch else "display")
 		
 		icon = wx.Icon()
@@ -140,10 +143,13 @@ class MainFrame(wx.Frame):
 			voffset = topSpace+diagramh+20
 			b = wx.Button(self, wx.ID_ANY, "Hyde/Yard/Port", pos=(500, voffset), size=(200, 50))
 			self.Bind(wx.EVT_BUTTON, lambda event: self.SwapToScreen(HyYdPt), b)
+			self.bScreenHyYdPt = b
 			b = wx.Button(self, wx.ID_ANY, "Latham/Dell/Shore/Krulish", pos=(1145, voffset), size=(200, 50))
 			self.Bind(wx.EVT_BUTTON, lambda event: self.SwapToScreen(LaKr), b)
+			self.bScreenLaKr = b
 			b = wx.Button(self, wx.ID_ANY, "Nassau/Bank/Cliff",   pos=(1790, voffset), size=(200, 50))
 			self.Bind(wx.EVT_BUTTON, lambda event: self.SwapToScreen(NaCl), b)
+			self.bScreenNaCl = b
 			totalw = 2560+20
 			self.centerOffset = 0
 
@@ -200,6 +206,7 @@ class MainFrame(wx.Frame):
 			self.bLoadLocos.Hide()
 			self.bSaveTrains.Hide()
 			self.bSaveLocos.Hide()
+			self.bClearTrains.Hide()
 
 		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(self.centerOffset+2200, 25), style=wx.TE_READONLY)
 		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(self.centerOffset+2300, 25), style=wx.TE_READONLY)
@@ -254,7 +261,7 @@ class MainFrame(wx.Frame):
 	def ResetScreen(self):
 		self.SetMaxSize((self.totalw, self.totalh))
 		self.SetSize((self.totalw, self.totalh))
-		self.SetPosition((-self.centerOffset, 0))
+		self.SetPosition((-self.centerOffset * self.xoffset, 0))
 		
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})
@@ -1085,8 +1092,8 @@ class MainFrame(wx.Frame):
 						oldName, oldLoco = tr.GetNameAndLoco()
 						oldATC = tr.IsOnATC() if self.IsDispatcher() else False
 						oldAR = tr.IsOnAR() if self.IsDispatcher() else False
-						dlgx = int(self.centerw - 500)-self.centerOffset
-						dlgy = int(self.totalh - 600)
+						dlgx = int(self.centerw - 500)-(self.centerOffset*self.xoffset)
+						dlgy = int(self.totalh - 660)
 						dlg = EditTrainDlg(self, tr, self.locoList, self.trainList, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, dlgx, dlgy)
 						rc = dlg.ShowModal()
 						if rc == wx.ID_OK:
@@ -1181,8 +1188,21 @@ class MainFrame(wx.Frame):
 				self.Request(req)
 
 	def SwapToScreen(self, screen):
-		if screen not in screensList:
+		if screen == HyYdPt:
+			self.bScreenHyYdPt.Enable(False)
+			self.bScreenLaKr.Enable(True)
+			self.bScreenNaCl.Enable(True)
+		elif screen == LaKr:
+			self.bScreenHyYdPt.Enable(True)
+			self.bScreenLaKr.Enable(False)
+			self.bScreenNaCl.Enable(True) 
+		elif screen == NaCl:
+			self.bScreenHyYdPt.Enable(True) 
+			self.bScreenLaKr.Enable(True)
+			self.bScreenNaCl.Enable(False) 
+		else:
 			return False
+
 		if screen == self.currentScreen:
 			return True
 		self.panels[screen].Show()
@@ -1244,13 +1264,13 @@ class MainFrame(wx.Frame):
 
 	def ToasterSetup(self):
 		self.events = Toaster()
-		self.events.SetOffsets(0, 150)
+		self.events.SetOffsets(-self.centerOffset*self.xoffset, 150)
 		self.events.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
 		self.events.SetBackgroundColour(wx.Colour(255, 179, 154))
 		self.events.SetTextColour(wx.Colour(0, 0, 0))
 		
 		self.advice = Toaster()
-		self.advice.SetOffsets(0, 150)
+		self.advice.SetOffsets(-self.centerOffset*self.xoffset, 150)
 		self.advice.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
 		self.advice.SetBackgroundColour(wx.Colour(120, 255, 154))
 		self.advice.SetTextColour(wx.Colour(0, 0, 0))
@@ -1660,6 +1680,30 @@ class MainFrame(wx.Frame):
 					
 			elif cmd == "alert":
 				self.PopupEvent(parms["msg"][0])
+				
+			elif cmd == "ar":
+				trnm = parms["train"][0]
+				try:
+					tr = self.trains[trnm]
+				except KeyError:
+					logging.warning("AR train %s does not exist" % trnm)
+					return
+				
+				action = parms["action"][0]
+				tr.SetAR(action == "add")
+				tr.Draw()
+				
+			elif cmd == "atc":
+				trnm = parms["train"][0]
+				try:
+					tr = self.trains[trnm]
+				except KeyError:
+					logging.warning("ATC train %s does not exist" % trnm)
+					return
+				
+				action = parms["action"][0]
+				tr.SetATC(action == "add")
+				tr.Draw()
 					
 			elif cmd == "atcstatus":
 				action = parms["action"][0]

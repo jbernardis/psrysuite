@@ -16,11 +16,11 @@ class Port(District):
 					["PA8R", 2], ["PA8L", 1], ["PA6R", 2], ["PA6LA", 1], ["PA6LB", 1], ["PA6LC", 1], ["PA4RA", 2], ["PA4RB", 2], ["PA4L", 1],
 					["PA34RA", 1], ["PA34RB", 1], ["PA34RC", 1], ["PA34RD", 3], ["PA34LA", 3], ["PA34LB", 3], ["PA32RA", 3], ["PA32RB", 3], ["PA32L", 1],
 					["PB2R", 3], ["PB2L", 3], ["PB4R", 3], ["PB4L", 3], ["PB12R", 3], ["PB12L", 3], ["PB14R", 3], ["PB14L", 3] ]
-		toNames = [ "PBSw1", "PBSw3", "PBSw11", "PBSw13",
-					"PASw1", "PASw3", "PASw5", "PASw7", "PASw9", "PASw11", "PASw13",
+		toNames = [ "PASw1", "PASw3", "PASw5", "PASw7", "PASw9", "PASw11", "PASw13",
 					"PASw15", "PASw17", "PASw19", "PASw21", "PASw23",
 					"PASw27", "PASw29", "PASw31", "PASw33", "PASw35", "PASw37"]
-		hsNames = [ "PBSw5", "PBSw15a", "PBSw15b" ]
+		hsNames = [ "PBSw5", "PBSw15a", "PBSw15b",
+					"PBSw1", "PBSw3", "PBSw11", "PBSw13" ]
 		handswitchNames = [ "PBSw5.hand", "PBSw15a.hand", "PBSw15b.hand" ]
 		#relayNames = [ "P10.srel", "P11.srel", "P20.srel", "P21.srel",
 		relayNames = [ "P10.srel", "P11.srel", "P20.srel",
@@ -485,7 +485,7 @@ class Port(District):
 		outb[4] = setBit(outb[4], 3, 1 if st == "L" else 0)
 		outb[4] = setBit(outb[4], 4, 1 if st == "N" else 0)
 		outb[4] = setBit(outb[4], 5, 1 if st == "R" else 0)
-		psw15 = self.rr.GetOutput("PBSw15a.hand").GetStatus() + self.rr.GetOutput("PBSw15b.hand").GetStatus()
+		psw15 = self.rr.GetInput("PBSw15a.lvr").GetStatus() + self.rr.GetInput("PBSw15b.lvr").GetStatus()
 		outb[4] = setBit(outb[4], 6, 0 if psw15 != 0 else 1)  # hand switch unlocks
 		outb[4] = setBit(outb[4], 7, 0 if psw15 == 0 else 1)
 

@@ -401,9 +401,13 @@ class District(wx.Panel):
 			val = ic.GetValue()
 			self.ilist.SetItem(ix, 1, "%d" % val)
 			
-		elif itype == District.slever:
+		elif itype == District.flever:
+			val = ic.GetValue()
+			self.ilist.SetItem(ix, 1, "%d" % val)
+			
+		elif itype in [ District.slever, District.hslever ]:
 			val = ic.GetState()
-			self.ilist.SetItem(ix, 1, val)
+			self.ilist.SetItem(ix, 1, "%d" % val)
 			
 		else:
 			logging.warning("Refresh input: no handling of type %s" % itype)

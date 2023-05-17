@@ -26,6 +26,7 @@ class Settings:
 		self.section = "dispatcher"
 		
 		self.pages = 3
+		self.xoffset = 1
 		self.dispatch = True
 		self.ipaddr = "192.168.1.138"
 		self.serverport = 9000
