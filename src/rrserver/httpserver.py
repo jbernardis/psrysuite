@@ -57,16 +57,11 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 
 class HTTPServer:
 	def __init__(self, ip, port, cbCommand):
-		logging.info("calling ThreadingHTTPServer constructor")
 		self.server = ThreadingHTTPServer((ip, port), Handler)
-		logging.info("back from constructor")
 		self.server.setApp(self)
 		self.cbCommand = cbCommand
-		logging.info("Creating thread")
 		self.thread = Thread(target=self.server.serve_railroad)
-		logging.info("starting thread")
 		self.thread.start()
-		logging.info("thread started")
 
 	def getThread(self):
 		return self.thread

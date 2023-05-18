@@ -65,7 +65,7 @@ class Nassau(District):
 				"NNXBtnN42W": [ ["NSw19", "N"], ["NSw29", "N"], ["NSw31", "R"], ["NSw33", "N"], ["NSw35", "R"] ],
 				"NNXBtnW20W": [ ["NSw19", "N"], ["NSw29", "N"], ["NSw31", "R"], ["NSw33", "N"], ["NSw35", "N"] ],
 			},
-						"NNXBtnR10": {
+			"NNXBtnR10": {
 				"NNXBtnW11":  [ ["NSw47", "N"], ["NSw55", "N"] ],
 				"NNXBtnN32E": [ ["NSw51", "N"], ["NSw53", "R"], ["NSw55", "N"], ["NSw45", "N"], ["NSw47", "R"] ],
 				"NNXBtnN31E": [ ["NSw51", "R"], ["NSw53", "R"], ["NSw55", "N"], ["NSw45", "N"], ["NSw47", "R"] ],
@@ -109,7 +109,7 @@ class Nassau(District):
 		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
 		for sig, bits in sigNames:
 			self.rr.GetOutput(sig).SetBits(bits)
-		ix = self.AddOutputs(toONames, TurnoutOutput, District.turnout, ix)
+		ix = self.AddOutputs(toONames+toNames, TurnoutOutput, District.turnout, ix)
 		ix = self.AddOutputs(nxButtons, NXButtonOutput, District.nxbutton, ix)
 		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
 		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
@@ -216,7 +216,8 @@ class Nassau(District):
 		outb[2] = setBit(outb[2], 4, asp[0]) 
 		outb[2] = setBit(outb[2], 5, asp[1])
 		outb[2] = setBit(outb[2], 6, asp[2])
-		outb[2] = setBit(outb[2], 6, self.rr.GetInput("S11").GetValue())  # Shore approach indicator
+		v = self.rr.GetInput("S11A").GetValue() + self.rr.GetInput("S11B").GetValue()
+		outb[2] = setBit(outb[2], 6, 1 if v != 0 else 0)  # Shore approach indicator
 
 		v = self.rr.GetInput("R10").GetValue() + self.rr.GetInput("R10.W").GetValue() 
 		outb[3] = setBit(outb[3], 0, 1 if v != 0 else 0 )  				# Rocky Hill approach indicator

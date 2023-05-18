@@ -6,7 +6,6 @@ from dispatcher.signal import Signal
 from dispatcher.button import Button
 
 from dispatcher.constants import LaKr, SloAspects, SLOW, RESTRICTING, SLIPSWITCH, NORMAL, REVERSE, RegAspects, EMPTY
-from afxres import AFX_IDC_PRINT_PORTNAME
 
 
 class Nassau (District):
@@ -1007,13 +1006,13 @@ class Nassau (District):
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
 		self.sigLeverMap = {
-			"N14.lvr": [ "NWOSE" ],
-			"N16.lvr": [ "NWOSW" ],
-			"N18.lvr": [ "NWOSCY" ],
-			"N20.lvr": [ "NWOSTY" ],
-			"N24.lvr": [ "NEOSE" ],
-			"N26.lvr": [ "NEOSW" ],
-			"N28.lvr": [ "NEOSRH" ]
+			"N14.lvr": [ "NWOSCY", "NWOSW", "NWOSE" ],
+			"N16.lvr": [ "NWOSCY", "NWOSW", "NWOSE" ],
+			"N18.lvr": [ "NWOSCY", "NWOSW", "NWOSE" ],
+			"N20.lvr": [ "NWOSTY", "NWOSCY", "NWOSW", "NWOSE" ],
+			"N24.lvr": [ "NEOSRH", "NEOSW", "NEOSE" ],
+			"N26.lvr": [ "NEOSRH", "NEOSW", "NEOSE" ],
+			"N28.lvr": [ "NEOSRH", "NEOSW", "NEOSE" ]
 		}
 
 		for sl in self.sigLeverMap:

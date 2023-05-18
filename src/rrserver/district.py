@@ -2,6 +2,8 @@ import wx
 import logging
 from rrserver.rrobjects import BlockInput, SubBlockInput
 
+import traceback
+
 
 class RadioDlg (wx.Dialog):
 	def __init__(self, parent, title, choices, value):
@@ -140,6 +142,7 @@ class District(wx.Panel):
 		self.outputMap = {}
 		self.inputMap = {}
 		self.sigLever = {}  # outbound representation of signal levers
+		self.dividedBlocks = {}  # blocks that are broken into subblocks
 		self.sendIO = False
 		
 		self.nullResponseCount = {}
@@ -205,7 +208,6 @@ class District(wx.Panel):
 
 	def outputDClick(self, evt):
 		index = evt.Index
-		logging.debug("Double click output %d" % index)
 		if index == wx.NOT_FOUND:
 			return
 
@@ -261,7 +263,6 @@ class District(wx.Panel):
 		
 	def inputDClick(self, evt):
 		index = evt.Index
-		logging.debug("Double click input %d" % index)
 		if index == wx.NOT_FOUND:
 			return
 
@@ -368,6 +369,7 @@ class District(wx.Panel):
 		return ix
 
 	def AddSubBlocks(self, bname, sblist, ix):
+		self.dividedBlocks[bname] = sblist
 		blkinp = BlockInput(bname, self)
 		self.rr.AddInput(blkinp, self, District.block)
 		ix = self.AddInputs(sblist, SubBlockInput, District.block, ix)
@@ -377,6 +379,10 @@ class District(wx.Panel):
 		return ix
 
 	def RefreshInput(self, iname, itype):
+		if iname in self.dividedBlocks and itype == District.block:
+			# bypassing input refresh for divided block
+			return
+
 		try:
 			ix, ic, dtype = self.inputMap[iname]
 		except KeyError:
@@ -401,13 +407,16 @@ class District(wx.Panel):
 			val = ic.GetValue()
 			self.ilist.SetItem(ix, 1, "%d" % val)
 			
-		elif itype == District.flever:
-			val = ic.GetValue()
-			self.ilist.SetItem(ix, 1, "%d" % val)
-			
-		elif itype in [ District.slever, District.hslever ]:
+		elif itype in [ District.flever, District.hslever ]:
 			val = ic.GetState()
-			self.ilist.SetItem(ix, 1, "%d" % val)
+			try:
+				self.ilist.SetItem(ix, 1, "%d" % val)
+			except TypeError:
+				logging.error("got type error trying to evaluate (%s) as an integer.  input %s" % (val, ic.GetName()))
+			
+		elif itype == District.slever:
+			val = ic.GetState()
+			self.ilist.SetItem(ix, 1, val)
 			
 		else:
 			logging.warning("Refresh input: no handling of type %s" % itype)

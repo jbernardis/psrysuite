@@ -485,7 +485,7 @@ class Port(District):
 		outb[4] = setBit(outb[4], 3, 1 if st == "L" else 0)
 		outb[4] = setBit(outb[4], 4, 1 if st == "N" else 0)
 		outb[4] = setBit(outb[4], 5, 1 if st == "R" else 0)
-		psw15 = self.rr.GetInput("PBSw15a.lvr").GetStatus() + self.rr.GetInput("PBSw15b.lvr").GetStatus()
+		psw15 = self.rr.GetInput("PBSw15a.lvr").GetState() + self.rr.GetInput("PBSw15b.lvr").GetState()
 		outb[4] = setBit(outb[4], 6, 0 if psw15 != 0 else 1)  # hand switch unlocks
 		outb[4] = setBit(outb[4], 7, 0 if psw15 == 0 else 1)
 

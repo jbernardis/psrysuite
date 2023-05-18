@@ -446,7 +446,7 @@ class MainFrame(wx.Frame):
 		self.HydeFleetSignals = [ "H4R", "H4LA", "H4LB", "H4LC", "H4LD", "H6R", "H6LA", "H6LB", "H6LC", "H6LD", "H8R", "H8L",
 					"H10L", "H10RA", "H10RB", "H10RC", "H10RD", "H10RE", "H12L", "H12RA", "H12RB", "H12RC", "H12RD", "H12RE"  ]
 
-	def GetFleetMaps(self, signm):
+	def GetFleetMap(self, signm):
 		siglists = [
 			[ self.NassauFleetSignals,    self.cbNassauFleet ],
 			[ self.LathamFleetSignals,    self.cbLathamFleet ],
@@ -468,7 +468,6 @@ class MainFrame(wx.Frame):
 		return None, None
 
 	def UpdateControlWidget(self, name, value):
-		print("update control %s %s" % (name, value))
 		if not self.IsDispatcher():
 			return
 		if name == "nassau":
@@ -983,7 +982,7 @@ class MainFrame(wx.Frame):
 		if not self.subscribed:
 			return
 		
-		logging.debug("%s click %s %d, %d %s" % ("right" if right else "left", screen, pos[0], pos[1], "shift" if shift else ""))
+		#logging.debug("%s click %s %d, %d %s" % ("right" if right else "left", screen, pos[0], pos[1], "shift" if shift else ""))
 		try:
 			to = self.turnoutMap[(screen, pos)]
 		except KeyError:
@@ -1320,7 +1319,6 @@ class MainFrame(wx.Frame):
 				self.listener = None
 				return
 
-			print("press connect at %d" % time.time())
 			self.listener.start()
 			self.subscribed = True
 			self.bSubscribe.SetLabel("Disconnect")
@@ -1337,7 +1335,6 @@ class MainFrame(wx.Frame):
 				self.cbAdvisor.Enable(True)
 				
 			self.RetrieveData()
-			print("back from retrieve data at %d" % time.time())
 
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()
@@ -1404,7 +1401,6 @@ class MainFrame(wx.Frame):
 						value = int(p["value"])
 					except:
 						value = 0
-					print("delivery: fleet %s %d" % (signm, value))
 
 					sig = self.signals[signm]
 					sig.EnableFleeting(value == 1)
@@ -1519,7 +1515,6 @@ class MainFrame(wx.Frame):
 				for p in parms:
 					name = p["name"]
 					val = p["value"]
-					logging.debug("Set Breaker %s to %s" % (name, "TRIPPED" if val != 0 else "CLEAR"))
 					if val == 0:
 						self.PopupEvent("Breaker: %s" % BreakerName(name))
 						self.breakerDisplay.AddBreaker(name)
@@ -1648,11 +1643,9 @@ class MainFrame(wx.Frame):
 				for p in parms:
 					name = p["name"]
 					value = int(p["value"])
-					print("delivery: control %s %d" % (name, value))
 					self.UpdateControlWidget(name, value)
 
 			elif cmd == "sessionID":
-				print("sessionid at %d" % time.time())
 				self.sessionid = int(parms)
 				logging.info("connected to railroad server with session ID %d" % self.sessionid)
 				self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatch else "DISPLAY"}})
@@ -1661,19 +1654,12 @@ class MainFrame(wx.Frame):
 				self.ShowTitle()
 
 			elif cmd == "end":
-				print("end %s at %d" % (parms["type"], time.time()))
 				if parms["type"] == "layout":
 					if self.settings.dispatch:
 						self.SendBlockDirRequests()
-						print("after send blockdir at %d" % time.time())
 						self.SendOSRoutes()
-						print("after send routes at %d" % time.time())
 						self.SendCrossoverPoints()
-						print("after send crossover at %d" % time.time(), flush=True)
 					self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
-				elif parms["type"] == "trains":
-					for trid, tr in self.trains.items():
-						pass
 					
 			elif cmd == "advice":
 				self.PopupAdvice(parms["msg"][0])
@@ -1753,8 +1739,7 @@ class MainFrame(wx.Frame):
 				if "delay" in req[command] and req[command]["delay"] > 0:
 					self.delayedRequests.Append(req)
 				else:
-					logging.debug(json.dumps(req))
-					# print("Outgoing HTTP request: %s" % json.dumps(req))
+					#logging.debug(json.dumps(req))
 					self.rrServer.SendRequest(req)
 		else:
 			logging.info("disallowing command %s from non dispatcher" % command)

@@ -232,19 +232,9 @@ class Block:
 		self.SetEast(self.defaultEast)
 
 	def SetNextBlockEast(self, blk):
-		if blk is None:
-			logging.debug("Block %s: next east block is None" % self.GetName())
-		else:
-			logging.debug("Block %s: next east block is %s" % (self.GetName(), blk.GetName()))
-
 		self.blkEast = blk
 
 	def SetNextBlockWest(self, blk):
-		if blk is None:
-			logging.debug("Block %s: next west block is None" % self.GetName())
-		else:
-			logging.debug("Block %s: next west block is %s" % (self.GetName(), blk.GetName()))
-
 		self.blkWest = blk
 
 	def determineStatus(self):
@@ -672,7 +662,6 @@ class OverSwitch (Block):
 
 		if route is None:
 			newName = "<None>"
-			logging.info("Block %s: route is None" % self.name)
 		else:
 			newName = route.GetName()
 

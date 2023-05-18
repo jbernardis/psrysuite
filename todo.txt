@@ -31,13 +31,11 @@ tracker:
 	backup/restore - need a backup/restore for the entire suite - not in tracker
 	reports - the only thing we really need is train cards, and this is not in tracker, but in train editor
 
-hand switch levers for port - there is not a separate 15a and 15b, also, I don't seem to be getting the input values when they change
+siding unlock levers from all tower panels - cliff
 
-siding unlock levers from all tower panels - cliff, port
+fleet levers from port/cliff
 
-fleet levers from port/cliff/nassau
-
-why do I have a fleet checkbox for port since we have no control over port AND there is no fleet swotch on the port panel??
+why do I have a fleet checkbox for port since we have no control over port AND there is no fleet switch on the port panel??
 
 should C18RA/RB/L be included with bank fleeting and 14R/LA/LB be included with cliveden?  Right now they are not affected by fleeting.
 
@@ -53,7 +51,7 @@ train 57 moving through block P50 - block loses "cleared" status and turns white
 
 ==> test ==> Nassau - fleet is working, but I can't find anything to affect the panel lights
 
-Look closer and signal 18L - it would not clear route from N21 <=> N32
+==> test ==> Look closer and signal 18L - it would not clear route from N21 <=> N32
 
 ==> test ==> port B - I'm receiving the handswitch settings for Sw5 and 15a/b, and I'm turning on the on-screen arrows, but I'm not updating the input object nor am I changing the panel lights
 
