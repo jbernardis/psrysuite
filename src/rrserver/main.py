@@ -498,7 +498,7 @@ class MainFrame(wx.Frame):
 				if bentry and bexit:
 					self.rr.EvaluateNXButtons(bentry, bexit)
 				else:
-					print("calling evaluate button")
+					self.rr.EvaluateNXButton(button)
 
 		elif verb == "turnoutlock":
 			swname = evt.data["name"][0]

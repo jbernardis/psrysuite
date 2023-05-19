@@ -1,3 +1,5 @@
+import logging
+
 FORWARD = 'F'
 REVERSE = 'R'
 
@@ -21,10 +23,35 @@ class DCCLoco:
 		self.completed = False
 		self.inBlock = False
 		self.forcedStop = False
+		self.pendingStop = False
+		self.pendingStopCount = 0
+		self.pendingStopping = False
 		
 	def SetOriginTerminus(self, origin, terminus):
 		self.origin = origin
 		self.terminus = terminus
+		
+	def SetPendingStop(self, flag):
+		if not flag:
+			self.pendingStop = False
+			self.pendingStopCount = 0
+			self.pendingStopping = False
+			return 
+		
+		if self.pendingStopCount == 0 and not self.pendingStopping:
+			self.pendingStop = True
+			self.pendingStopCount = 7
+			return 
+		
+		if not self.pendingStopping:
+			self.pendingStopCount -= 1
+			if self.pendingStopCount <= 0:
+				self.pendingStop = False
+				self.pendingStopCount = 0
+				self.pendingStopping = True
+			
+	def IsWaitingPendingStop(self):
+		return self.pendingStop
 		
 	def SetInBlock(self, flag):
 		self.inBlock = flag		
@@ -98,6 +125,10 @@ class DCCLoco:
 
 		# step == 0 implies we are stopped - so we stay that way		
 		if self.step == 0:
+			return 0
+
+		# if we are waiting the "pending" interval before stopping, return 0		
+		if self.pendingStop:
 			return 0
 
 		# jump to the start speed if we are just starting out

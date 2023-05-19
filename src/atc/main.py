@@ -320,7 +320,9 @@ class MainFrame(wx.Frame):
 	
 			logging.info("Using aspect %d" % aspect)
 			dccl.SetGoverningAspect(aspect)
-			self.dccRemote.SelectLoco(dccl.GetLoco())	
+			dccl.SetPendingStop(dccl.GetGoverningAspect() == 0)	
+			
+			self.dccRemote.SelectLoco(dccl.GetLoco())
 			
 			speed = self.dccRemote.ApplySpeedStep() #step)
 			if speed == 0 and dccl.HasCompleted():
