@@ -75,7 +75,6 @@ class Railroad(wx.Notebook):
 		self.SetControlOption("krulish.fleet", 0)
 		self.SetControlOption("latham.fleet", 0)
 		self.SetControlOption("nassau.fleet", 0)
-		self.SetControlOption("port.fleet", 0)
 		self.SetControlOption("shore.fleet", 0)
 		self.SetControlOption("valleyjct.fleet", 0)
 		self.SetControlOption("yard.fleet", 0)

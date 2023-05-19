@@ -698,6 +698,11 @@ class MainFrame(wx.Frame):
 			addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY")
 			for addr, skt in addrList:
 				self.socketServer.sendToOne(skt, addr, {"atc": evt.data})
+				
+		elif verb == "atcrequest":
+			addrList = self.clientList.GetFunctionAddress("DISPATCH")
+			for addr, skt in addrList:
+				self.socketServer.sendToOne(skt, addr, {"atcrequest": evt.data})
 					
 		elif verb == "atcstatus":
 			self.socketServer.sendToAll({"atcstatus": evt.data})

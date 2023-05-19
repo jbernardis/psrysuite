@@ -473,9 +473,9 @@ class Port(District):
 		outb[3] = setBit(outb[3], 3, 1 if st == "L" else 0)
 		outb[3] = setBit(outb[3], 4, 1 if st == "N" else 0)
 		outb[3] = setBit(outb[3], 5, 1 if st == "R" else 0)
-		locked = self.rr.GetOutput("PBSw5.hand").GetStatus() != 0  # Hand switch unlock indicators
-		outb[3] = setBit(outb[3], 6, 0 if locked else 1)
-		outb[3] = setBit(outb[3], 7, 1 if locked else 0)
+		psw5 = self.rr.GetInput("PBSw5.lvr").GetState()  # Hand switch unlock indicators
+		outb[3] = setBit(outb[3], 6, 0 if psw5 != 0 else 1)
+		outb[3] = setBit(outb[3], 7, 1 if psw5 == 0 else 0)
 
 		st = self.rr.GetInput("PB12.lvr").GetState()
 		outb[4] = setBit(outb[4], 0, 1 if st == "L" else 0)  # Signal indicators

@@ -267,6 +267,7 @@ class District(wx.Panel):
 			return
 
 		iname = self.ilist.GetItemText(index, 0)
+			
 		itype = self.inputMap[iname][2]
 		if itype == District.turnout:
 			cval = self.ilist.GetItemText(index, 1)

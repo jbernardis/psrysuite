@@ -89,10 +89,6 @@ class MainFrame(wx.Frame):
 		self.trainList = []
 			
 		self.settings = settings
-		if self.settings.pages == 3:
-			self.xoffset = 0
-		else:
-			self.xoffset = self.settings.xoffset
 			
 		logging.info("%s process starting" % "dispatcher" if self.settings.dispatch else "display")
 		
@@ -250,8 +246,8 @@ class MainFrame(wx.Frame):
 			
 		self.totalw = totalw
 		self.totalh = 1080
-		self.centerw = self.totalw/2
-		self.centerh = self.totalh/2
+		self.centerw = int(self.totalw/2)
+		self.centerh = int(self.totalh/2)
 		self.showSplash = True
 		self.ResetScreen()
 		
@@ -261,7 +257,7 @@ class MainFrame(wx.Frame):
 	def ResetScreen(self):
 		self.SetMaxSize((self.totalw, self.totalh))
 		self.SetSize((self.totalw, self.totalh))
-		self.SetPosition((-self.centerOffset * self.xoffset, 0))
+		self.SetPosition((-self.centerOffset, 0))
 		
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})
@@ -423,13 +419,6 @@ class MainFrame(wx.Frame):
 					"Y22L", "Y22R", "Y24RA", "Y24RB", "Y26L", "Y26RA", "Y26RB", "Y26RC", "Y34LA", "Y34LB", "Y34R",
 					"Y40LA", "Y40LB", "Y40LC", "Y40LD", "Y40R", "Y42L", "Y42RA", "Y42RB", "Y42RC", "Y42RD" ]
 
-		self.cbPortFleet = wx.CheckBox(self, -1, "Port Fleeting", (1650, voffset+30))
-		self.Bind(wx.EVT_CHECKBOX, self.OnCBPortFleet, self.cbPortFleet)
-		self.cbPortFleet.Hide()
-		self.widgetMap[HyYdPt].append(self.cbPortFleet)
-		self.PortFleetSignals = ["PA32RA", "PA32RB", "PA32L", "PA34RA", "PA34RB", "PA34RC", "PA34RD", "PA34LA", "PA34LB",
-								"PB2R", "PB2L", "PB4R", "PB4L", "PB12R", "PB12L", "PB14R", "PB14L" ]
-
 		self.cbCliffFleet = wx.CheckBox(self, -1, "Cliff Fleeting", (2100, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBCliffFleet, self.cbCliffFleet)
 		self.cbCliffFleet.Hide()
@@ -501,9 +490,6 @@ class MainFrame(wx.Frame):
 				f = 1 if value != 0 else 0
 				for signm in self.CliffFleetSignals:
 					self.Request({"fleet": { "name": signm, "value": f}})
-			
-		elif name == "port.fleet":
-			self.cbPortFleet.SetValue(value != 0)
 			
 		elif name == "hyde.fleet":
 			self.cbHydeFleet.SetValue(value != 0)			
@@ -692,12 +678,6 @@ class MainFrame(wx.Frame):
 		for signm in self.YardFleetSignals:
 			self.Request({"fleet": { "name": signm, "value": f}})
 		self.Request({"control": {"name": "yard.fleet", "value": f}})
-
-	def OnCBPortFleet(self, _):
-		f = 1 if self.cbPortFleet.IsChecked() else 0
-		for signm in self.PortFleetSignals:
-			self.Request({"fleet": { "name": signm, "value": f}})
-		self.Request({"control": {"name": "port.fleet", "value": f}})
 
 	def OnCBHydeFleet(self, _):
 		f = 1 if self.cbHydeFleet.IsChecked() else 0
@@ -1091,8 +1071,8 @@ class MainFrame(wx.Frame):
 						oldName, oldLoco = tr.GetNameAndLoco()
 						oldATC = tr.IsOnATC() if self.IsDispatcher() else False
 						oldAR = tr.IsOnAR() if self.IsDispatcher() else False
-						dlgx = int(self.centerw - 500)-(self.centerOffset*self.xoffset)
-						dlgy = int(self.totalh - 660)
+						dlgx = self.centerw - 500 - self.centerOffset
+						dlgy = self.totalh - 660
 						dlg = EditTrainDlg(self, tr, self.locoList, self.trainList, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, dlgx, dlgy)
 						rc = dlg.ShowModal()
 						if rc == wx.ID_OK:
@@ -1263,13 +1243,13 @@ class MainFrame(wx.Frame):
 
 	def ToasterSetup(self):
 		self.events = Toaster()
-		self.events.SetOffsets(-self.centerOffset*self.xoffset, 150)
+		self.events.SetOffsets(0, 150)
 		self.events.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
 		self.events.SetBackgroundColour(wx.Colour(255, 179, 154))
 		self.events.SetTextColour(wx.Colour(0, 0, 0))
 		
 		self.advice = Toaster()
-		self.advice.SetOffsets(-self.centerOffset*self.xoffset, 150)
+		self.advice.SetOffsets(0, 150)
 		self.advice.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
 		self.advice.SetBackgroundColour(wx.Colour(120, 255, 154))
 		self.advice.SetTextColour(wx.Colour(0, 0, 0))
@@ -1690,6 +1670,25 @@ class MainFrame(wx.Frame):
 				action = parms["action"][0]
 				tr.SetATC(action == "add")
 				tr.Draw()
+				
+			elif cmd == "atcrequest":
+				logging.info("atcrequest: %s" % str(parms))
+				trnm = parms["train"][0]
+				try:
+					tr = self.trains[trnm]
+				except KeyError:
+					logging.warning("ATC train %s does not exist" % trnm)
+					return
+				
+				action = parms["action"][0]
+				
+				tr.SetATC(action == "add")
+				tr.Draw()
+				
+				trainid, locoid = tr.GetNameAndLoco()
+				self.Request({"atc": {"action": action, "train": trainid, "loco": locoid}})
+				self.menuTrain.Draw()
+
 					
 			elif cmd == "atcstatus":
 				action = parms["action"][0]
@@ -1946,6 +1945,7 @@ class ChooseItemDlg(wx.Dialog):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.Bind(wx.EVT_CLOSE, self.OnCancel)
 		self.trains = trains
+		self.allowentry = allowentry
 		if trains:
 			if allowentry:
 				self.SetTitle("Choose/Enter train IDs file")
@@ -2032,6 +2032,15 @@ class ChooseItemDlg(wx.Dialog):
 		self.EndModal(wx.ID_CANCEL)
 		
 	def OnBOK(self, _):
+		fn = self.cbItems.GetValue()
+		if fn in self.files and self.allowentry:
+			dlg = wx.MessageDialog(self, "File '%s' already exists.\n Are you sure you want to over-write it?" % fn,
+				"File exists", wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
+			rv = dlg.ShowModal()
+			dlg.Destroy()
+			if rv == wx.ID_NO:
+				return
+
 		self.EndModal(wx.ID_OK)
 		
 	def OnDelete(self, _):

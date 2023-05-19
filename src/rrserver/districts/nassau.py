@@ -222,8 +222,8 @@ class Nassau(District):
 		v = self.rr.GetInput("R10").GetValue() + self.rr.GetInput("R10.W").GetValue() 
 		outb[3] = setBit(outb[3], 0, 1 if v != 0 else 0 )  				# Rocky Hill approach indicator
 		outb[3] = setBit(outb[3], 1, self.rr.GetInput("B20").GetValue())  # Bank approach indicator
-		outb[3] = setBit(outb[3], 2, optFleet)                    # fleet indicator
-		outb[3] = setBit(outb[3], 3, 1-optFleet)
+		outb[3] = setBit(outb[3], 2, 1-optFleet)                    # fleet indicator
+		outb[3] = setBit(outb[3], 3, optFleet)
 		sigL = self.sigLever["N14"]
 		outb[3] = setBit(outb[3], 4, 1 if sigL == "L" else 0)       # Signal Indicators
 		outb[3] = setBit(outb[3], 5, 1 if sigL == "N" else 0)

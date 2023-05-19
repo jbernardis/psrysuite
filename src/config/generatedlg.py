@@ -74,6 +74,10 @@ class GenerateDlg(wx.Dialog):
         self.bGenTester = wx.Button(genBox, wx.ID_ANY, "Tester", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenTester, self.bGenTester)
         vsz.Add(self.bGenTester, 0, wx.ALL, 10)
+                    
+        self.bGenConfig = wx.Button(genBox, wx.ID_ANY, "Configuration Utility", size=GENBTNSZ)
+        self.Bind(wx.EVT_BUTTON, self.OnBGenConfig, self.bGenConfig)
+        vsz.Add(self.bGenConfig, 0, wx.ALL, 10)
         
         hsz.Add(vsz)
         
@@ -218,6 +222,15 @@ class GenerateDlg(wx.Dialog):
         }
         self.generator(module, self.cbStartMenu.IsChecked())
         
+    def OnBGenConfig(self, _):
+        module = {
+            "name": "PSRY Suite Configuration",
+            "dir":  "config",
+            "main": "main.py",
+            "desc": "Configuration Tool",
+            "icon": "config.ico"
+        }
+        self.generator(module, self.cbStartMenu.IsChecked())
             
     def OnBClean(self, _):
         desktop = winshell.desktop()
