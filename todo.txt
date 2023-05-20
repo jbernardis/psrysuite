@@ -36,7 +36,6 @@ should C18RA/RB/L be included with bank fleeting and 14R/LA/LB be included with 
 
 
 
-
 why was a single car train being reported as non-contiguous??
 
 what happened when we lost detection
