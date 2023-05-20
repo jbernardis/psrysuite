@@ -1073,7 +1073,7 @@ class MainFrame(wx.Frame):
 						oldAR = tr.IsOnAR() if self.IsDispatcher() else False
 						dlgx = self.centerw - 500 - self.centerOffset
 						dlgy = self.totalh - 660
-						dlg = EditTrainDlg(self, tr, self.locoList, self.trainList, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, dlgx, dlgy)
+						dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.trains, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, dlgx, dlgy)
 						rc = dlg.ShowModal()
 						if rc == wx.ID_OK:
 							trainid, locoid, atc, ar = dlg.GetResults()
@@ -1081,7 +1081,9 @@ class MainFrame(wx.Frame):
 						if rc != wx.ID_OK:
 							return
 	
-						self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid}})
+						if oldName != trainid or oldLoco != locoid:
+							self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid}})
+							
 						if self.IsDispatcher() and atc != oldATC:
 							tr.SetATC(atc)
 							self.Request({"atc": {"action": "add" if atc else "remove", "train": trainid, "loco": locoid}})

@@ -1,12 +1,14 @@
 import wx
+import logging
 
 MAXSTEPS = 9
 
 class EditTrainDlg(wx.Dialog):
-	def __init__(self, parent, train, locos, trains, atcFlag, arFlag, dx, dy):
+	def __init__(self, parent, train, block, locos, trains, existingTrains, atcFlag, arFlag, dx, dy):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details", pos=(dx, dy))
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
-		
+
+		self.existingTrains = existingTrains		
 		self.atcFlag = atcFlag
 		self.arFlag = arFlag
 
@@ -14,8 +16,10 @@ class EditTrainDlg(wx.Dialog):
 		vsz.AddSpacer(20)
 
 		name, loco = train.GetNameAndLoco()
+		self.name = name
 		atc = train.IsOnATC()
 		ar = train.IsOnAR()
+		self.block = block
 		
 		self.locos = locos
 		self.trains = trains
@@ -196,6 +200,24 @@ class EditTrainDlg(wx.Dialog):
 		self.EndModal(wx.ID_CANCEL)
 
 	def onOK(self, _):
+		if self.chosenTrain != self.name and self.chosenTrain in self.existingTrains:
+			blist = self.existingTrains[self.chosenTrain].GetBlockNameList()
+			bstr = ", ".join(blist)
+			
+			adje, adjw = self.block.GetAdjacentBlocks()
+			adjacent = False
+			for adj in adje, adjw:
+				if adj is not  None and adj.GetName() in blist:
+					adjacent = True
+					break
+
+			if not adjacent:
+				dlg = wx.MessageDialog(self, "Train %s already exists on the layout\non block(s) %s" % (self.chosenTrain, bstr),
+						   'Duplicate Train', wx.OK | wx.ICON_ERROR)
+				dlg.ShowModal()
+				dlg.Destroy()
+				return
+
 		self.EndModal(wx.ID_OK)
 
 	def GetResults(self):
