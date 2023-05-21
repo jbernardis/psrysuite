@@ -4,7 +4,7 @@ call on signals - I think it refers to JUST lighting the signal with no route cl
 
 how to use wos1norm in yard
 
-verify signal lever functionality and signal indicators for nassau/port/cliff/yard
+verify signal lever functionality and signal indicators for cliff/yard
 
 verify the correct sequencing of subblocks
     S11: S11A, S11B

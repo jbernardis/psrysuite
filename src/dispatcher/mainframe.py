@@ -1721,7 +1721,7 @@ class MainFrame(wx.Frame):
 					tr.SetATC(False)
 					if self.AREnabled and tr.IsOnAR():				
 						tr.SetAR(False)
-						self.Request({"ar": {"action": "remove", "train": train}})
+						self.Request({"ar": {"action": "remove", "train": trnm}})
 			
 					tr.Draw()
 
