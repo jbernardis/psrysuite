@@ -123,184 +123,11 @@ class Port (District):
 		self.turnouts["PBSw3"].SetLock("PBSw1", s1 == 'R', refresh=True)
 		self.turnouts["PBSw3b"].SetLock("PBSw1", s1 == 'R', refresh=True)
 
-		# s27 = 'N' if self.turnouts["PASw27"].IsNormal() else 'R'
-		# s29 = 'N' if self.turnouts["PASw29"].IsNormal() else 'R'
-		# s31 = 'N' if self.turnouts["PASw31"].IsNormal() else 'R'
-		# s33 = 'N' if self.turnouts["PASw33"].IsNormal() else 'R'
-		# s35 = 'N' if self.turnouts["PASw35"].IsNormal() else 'R'
-		# s37 = 'N' if self.turnouts["PASw37"].IsNormal() else 'R'
-		#
-		# s1 = 'N' if self.turnouts["PASw1"].IsNormal() else 'R'
-		# s3 = 'N' if self.turnouts["PASw3"].IsNormal() else 'R'
-		# s5 = 'N' if self.turnouts["PASw5"].IsNormal() else 'R'
-		# s7 = 'N' if self.turnouts["PASw7"].IsNormal() else 'R'
-		# s9 = 'N' if self.turnouts["PASw9"].IsNormal() else 'R'
-		# s11 = 'N' if self.turnouts["PASw11"].IsNormal() else 'R'
-		# s13 = 'N' if self.turnouts["PASw13"].IsNormal() else 'R'
-		# s15 = 'N' if self.turnouts["PASw15"].IsNormal() else 'R'
-		# s17 = 'N' if self.turnouts["PASw17"].IsNormal() else 'R'
-		# s19 = 'N' if self.turnouts["PASw19"].IsNormal() else 'R'
-		# s21 = 'N' if self.turnouts["PASw21"].IsNormal() else 'R'
-		# s23 = 'N' if self.turnouts["PASw23"].IsNormal() else 'R'
-
 		self.FindTurnoutCombinations(blocks, [
 			"PBSw1", "PBSw3", "PBSw11", "PBSw13",    # Port B - Circus and south junctions
 			"PASw27", "PASw29", "PASw31", "PASw33", "PASw35", "PASw37",  # Port A - Parson's Junction
 			"PASw1", "PASw3", "PASw5", "PASw7", "PASw9", "PASw11",  # Port A - Southport
 			"PASw13", "PASw15", "PASw17", "PASw19", "PASw21", "PASw23"])
-
-		# for block in blocks:
-		# 	bname = block.GetName()
-		# 	if bname in ["POSCJ1", "POSCJ2", "POSSJ1", "POSSJ2"]:  # Port B
-		#
-		# 		if bname == "POSCJ1":
-		# 			if s11+s13 == "NN":
-		# 				block.SetRoute(self.routes["PRtP31P32"])
-		# 			elif s11+s13 == "RN":
-		# 				block.SetRoute(self.routes["PRtP31P42"])
-		# 			else:
-		# 				block.SetRoute(None)
-		#
-		# 		elif bname == "POSCJ2":
-		# 			if s11+s13 == "NN":
-		# 				block.SetRoute(self.routes["PRtP41P42"])
-		# 			elif s11+s13 == "NR":
-		# 				block.SetRoute(self.routes["PRtP41P32"])
-		# 			else:
-		# 				block.SetRoute(None)
-		#
-		# 		elif bname == "POSSJ1":
-		# 			if s1+s3 == "NN":
-		# 				block.SetRoute(self.routes["PRtP30P31"])
-		# 			elif s1+s3 == "NR":
-		# 				block.SetRoute(self.routes["PRtP30P41"])
-		# 			else:
-		# 				block.SetRoute(None)
-		#
-		# 		elif bname == "POSSJ2":
-		# 			if s1+s3 == "NN":
-		# 				block.SetRoute(self.routes["PRtP40P41"])
-		# 			elif s1+s3 == "RN":
-		# 				block.SetRoute(self.routes["PRtP40P31"])
-		# 			else:
-		# 				block.SetRoute(None)
-		#
-		# 	elif bname in ["POSPJ1", "POSPJ2"]:  # Port A
-		#
-		# 		if bname == "POSPJ1":
-		# 			if s27+s29+s31+s35+s37 == "NNRNR":
-		# 				block.SetRoute(self.routes["PRtV11P50"])
-		# 			elif s27+s29+s31+s35+s37 == "RNRNR":
-		# 				block.SetRoute(self.routes["PRtP60P50"])
-		# 			elif s29+s31+s35+s37 == "RRNR":
-		# 				block.SetRoute(self.routes["PRtP61P50"])
-		# 			elif s31+s35+s37 == "NNR":
-		# 				block.SetRoute(self.routes["PRtP10P50"])
-		# 			elif s27+s29+s31+s35+s37 == "NNRNN":
-		# 				block.SetRoute(self.routes["PRtV11P11"])
-		# 			elif s27+s29+s31+s35+s37 == "RNRNN":
-		# 				block.SetRoute(self.routes["PRtP60P11"])
-		# 			elif s29+s31+s35+s37 == "RRNN":
-		# 				block.SetRoute(self.routes["PRtP61P11"])
-		# 			elif s31+s35+s37 == "NNN":
-		# 				block.SetRoute(self.routes["PRtP10P11"])
-		# 			else:
-		# 				block.SetRoute(None)
-		#
-		# 		elif bname == "POSPJ2":
-		# 			if s33+s35+s37 == "NRR":
-		# 				block.SetRoute(self.routes["PRtP20P50"])
-		# 			elif s33+s35+s37 == "RRR":
-		# 				block.SetRoute(self.routes["PRtP30P50"])
-		# 			elif s33+s35+s37 == "NRN":
-		# 				block.SetRoute(self.routes["PRtP20P11"])
-		# 			elif s33+s35+s37 == "RRN":
-		# 				block.SetRoute(self.routes["PRtP30P11"])
-		# 			elif s33+s35 == "NN":
-		# 				block.SetRoute(self.routes["PRtP20P21"])
-		# 			elif s33+s35 == "RN":
-		# 				block.SetRoute(self.routes["PRtP30P21"])
-		# 			else:
-		# 				block.SetRoute(None)
-		#
-		# 	elif bname in ["POSSP1", "POSSP2", "POSSP3", "POSSP4", "POSSP5" ]:  # Southport
-		# 		if bname == "POSSP1":
-		# 			if s15+s17 == "RN":
-		# 				block.SetRoute(self.routes["PRtP7V10"])
-		# 			elif s15+s17 == "RR":
-		# 				block.SetRoute(self.routes["PRtP7P60"])
-		# 			elif s15+s19 == "NN":
-		# 				block.SetRoute(self.routes["PRtP7P61"])
-		# 			else:
-		# 				block.SetRoute(None)
-		#
-		# 		elif bname == "POSSP2":
-		# 			if s7+s15+s19+s21+s23 == "NNRRN":
-		# 				block.SetRoute(self.routes["PRtP7P10"])
-		# 			elif s7+s19+s21+s23 == "NNRN":
-		# 				block.SetRoute(self.routes["PRtP6P10"])
-		# 			elif s7+s21+s23 == "NNN":
-		# 				block.SetRoute(self.routes["PRtP5P10"])
-		# 			elif s5+s7+s23 == "NRN":
-		# 				block.SetRoute(self.routes["PRtP4P10"])
-		# 			elif s3+s5+s7+s9 == "NRRN":
-		# 				block.SetRoute(self.routes["PRtP3P10"])
-		# 			elif s1+s3+s5+s7+s9 == "NRRRN":
-		# 				block.SetRoute(self.routes["PRtP2P10"])
-		# 			elif s1+s3+s5+s7+s9 == "RRRRN":
-		# 				block.SetRoute(self.routes["PRtP1P10"])
-		# 			else:
-		# 				block.SetRoute(None)
-		#
-		# 		elif bname == "POSSP3":
-		# 			if s5+s7+s15+s19+s21+s23 == "NNNRRR":
-		# 				block.SetRoute(self.routes["PRtP7P20"])
-		# 			elif s5+s7+s19+s21+s23 == "NNNRR":
-		# 				block.SetRoute(self.routes["PRtP6P20"])
-		# 			elif s5+s7+s21+s23 == "NNNR":
-		# 				block.SetRoute(self.routes["PRtP5P20"])
-		# 			elif s5+s7+s23 == "NNN":
-		# 				block.SetRoute(self.routes["PRtP4P20"])
-		# 			elif s3+s5+s7+s9 == "NRNN":
-		# 				block.SetRoute(self.routes["PRtP3P20"])
-		# 			elif s1+s3+s5+s7+s9 == "NRRNN":
-		# 				block.SetRoute(self.routes["PRtP2P20"])
-		# 			elif s1+s3+s5+s7+s9 == "RRRNN":
-		# 				block.SetRoute(self.routes["PRtP1P20"])
-		# 			else:
-		# 				block.SetRoute(None)
-		#
-		# 		elif bname == "POSSP4":
-		# 			if s3+s5+s9+s11 == "NNNN":
-		# 				block.SetRoute(self.routes["PRtP3P62"])
-		# 			elif s3+s5+s9+s11+s13 == "NNNRR":
-		# 				block.SetRoute(self.routes["PRtP3P63"])
-		# 			elif s3+s5+s9+s11+s13 == "NNNRN":
-		# 				block.SetRoute(self.routes["PRtP3P64"])
-		# 			elif s1+s3+s5+s9+s11 == "NRNNN":
-		# 				block.SetRoute(self.routes["PRtP2P62"])
-		# 			elif s1+s3+s5+s9+s11+s13 == "NRNNRR":
-		# 				block.SetRoute(self.routes["PRtP2P63"])
-		# 			elif s1+s3+s5+s9+s11+s13 == "NRNNRN":
-		# 				block.SetRoute(self.routes["PRtP2P64"])
-		# 			elif s1+s3+s5+s9+s11 == "RRNNN":
-		# 				block.SetRoute(self.routes["PRtP1P62"])
-		# 			elif s1+s3+s5+s9+s11+s13 == "RRNNRR":
-		# 				block.SetRoute(self.routes["PRtP1P63"])
-		# 			elif s1+s3+s5+s9+s11+s13 == "RRNNRN":
-		# 				block.SetRoute(self.routes["PRtP1P64"])
-		# 			else:
-		# 				block.SetRoute(None)
-		#
-		# 		elif bname == "POSSP5":
-		# 			if s3+s9 == "NR":
-		# 				block.SetRoute(self.routes["PRtP3P40"])
-		# 			elif s1+s3+s9 == "NNN":
-		# 				block.SetRoute(self.routes["PRtP2P40"])
-		# 			elif s1+s3+s9 == "RNN":
-		# 				block.SetRoute(self.routes["PRtP1P40"])
-		# 			else:
-		# 				block.SetRoute(None)
 
 	def DefineBlocks(self):
 		self.blocks = {}
@@ -714,6 +541,7 @@ class Port (District):
 				(self.tiles["houtline"],  self.screen, (114, 20), False),
 				(self.tiles["houtline"],  self.screen, (115, 20), False),
 			], False)
+		self.blocks["P60"].AddTrainLoc(self.screen, (109, 20))
 
 		self.blocks["P61"] = Block(self, self.frame, "P61",
 			[
@@ -729,6 +557,7 @@ class Port (District):
 				(self.tiles["houtline"],  self.screen, (116, 22), False),
 				(self.tiles["houtline"],  self.screen, (117, 22), False),
 			], False)
+		self.blocks["P61"].AddTrainLoc(self.screen, (109, 22))
 
 		self.blocks["P62"] = Block(self, self.frame, "P62",
 			[

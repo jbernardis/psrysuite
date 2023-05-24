@@ -41,16 +41,18 @@ from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg
 
-MENU_ATC_REMOVE = 900
-MENU_ATC_STOP   = 901
-MENU_ATC_ADD    = 902
-MENU_AR_ADD     = 903
-MENU_AR_REMOVE  = 904
+MENU_ATC_REMOVE  = 900
+MENU_ATC_STOP    = 901
+MENU_ATC_ADD     = 902
+MENU_AR_ADD      = 903
+MENU_AR_REMOVE   = 904
+MENU_ATC_REM_REQ = 905
+MENU_ATC_ADD_REQ = 906
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
-allowedCommands = [ "settrain", "renametrain", "identify", "refresh" ]
+allowedCommands = [ "settrain", "renametrain", "identify", "refresh", "atcrequest" ]
 
 wildcardTrain = "train files (*.trn)|*.trn|"	 \
 			"All files (*.*)|*.*"
@@ -409,7 +411,7 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBClivedenFleet, self.cbClivedenFleet)
 		self.cbClivedenFleet.Hide()
 		self.widgetMap[NaCl].append(self.cbClivedenFleet)
-		self.ClivedenFleetSignals = ["C10R", "C12R", "C10L", "C12L"]
+		self.ClivedenFleetSignals = ["C10R", "C12R", "C10L", "C12L", "C14R", "C14LA", "C14LB", "C18RA", "C18RB", "C18L"]
 
 		self.cbYardFleet = wx.CheckBox(self, -1, "Yard Fleeting", (1650, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBYardFleet, self.cbYardFleet)
@@ -1037,31 +1039,39 @@ class MainFrame(wx.Frame):
 				if blk.IsOccupied():
 					tr = blk.GetTrain()
 					if right:
-						if not self.IsDispatcher():
-							return  # only a dispatcher can do this
-						
 						menu = wx.Menu()
 						self.menuTrain = tr
 						addedMenuItem = False
-						if self.ATCEnabled:
-							if tr.IsOnATC():
-								menu.Append( MENU_ATC_REMOVE, "Remove from ATC" )
-								self.Bind(wx.EVT_MENU, self.OnATCRemove, id=MENU_ATC_REMOVE)
-								menu.Append( MENU_ATC_STOP, "ATC Stop/Resume Train" )
-								self.Bind(wx.EVT_MENU, self.OnATCStop, id=MENU_ATC_STOP)
-							else:
-								menu.Append( MENU_ATC_ADD, "Add to ATC")
-								self.Bind(wx.EVT_MENU, self.OnATCAdd, id=MENU_ATC_ADD)
-							addedMenuItem = True
-							
-						if self.AREnabled:
-							if tr.IsOnAR():
-								menu.Append( MENU_AR_REMOVE, "Remove from Auto Router")
-								self.Bind(wx.EVT_MENU, self.OnARRemove, id=MENU_AR_REMOVE)
-							else:
-								menu.Append( MENU_AR_ADD, "Add to Auto Router")
-								self.Bind(wx.EVT_MENU, self.OnARAdd, id=MENU_AR_ADD)
-							addedMenuItem = True
+						if not self.IsDispatcher():
+							if self.settings.allowatcrequests:
+								if tr.IsOnATC():
+									menu.Append( MENU_ATC_REM_REQ, "Request: ATC Remove" )
+									self.Bind(wx.EVT_MENU, self.OnATCRemReq, id=MENU_ATC_REM_REQ)
+								else:
+									menu.Append( MENU_ATC_ADD_REQ, "Request: ATC Add" )
+									self.Bind(wx.EVT_MENU, self.OnATCAddReq, id=MENU_ATC_ADD_REQ)
+								addedMenuItem = True
+						
+						else: # IS Dispatcher								
+							if self.ATCEnabled:
+								if tr.IsOnATC():
+									menu.Append( MENU_ATC_REMOVE, "Remove from ATC" )
+									self.Bind(wx.EVT_MENU, self.OnATCRemove, id=MENU_ATC_REMOVE)
+									menu.Append( MENU_ATC_STOP, "ATC Stop/Resume Train" )
+									self.Bind(wx.EVT_MENU, self.OnATCStop, id=MENU_ATC_STOP)
+								else:
+									menu.Append( MENU_ATC_ADD, "Add to ATC")
+									self.Bind(wx.EVT_MENU, self.OnATCAdd, id=MENU_ATC_ADD)
+								addedMenuItem = True
+								
+							if self.AREnabled:
+								if tr.IsOnAR():
+									menu.Append( MENU_AR_REMOVE, "Remove from Auto Router")
+									self.Bind(wx.EVT_MENU, self.OnARRemove, id=MENU_AR_REMOVE)
+								else:
+									menu.Append( MENU_AR_ADD, "Add to Auto Router")
+									self.Bind(wx.EVT_MENU, self.OnARAdd, id=MENU_AR_ADD)
+								addedMenuItem = True
 
 						if addedMenuItem:
 							self.PopupMenu( menu, (screenpos[0], screenpos[1]+50) )
@@ -1085,42 +1095,72 @@ class MainFrame(wx.Frame):
 							self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid}})
 							
 						if self.IsDispatcher() and atc != oldATC:
-							tr.SetATC(atc)
-							self.Request({"atc": {"action": "add" if atc else "remove", "train": trainid, "loco": locoid}})
+							if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
+								tr.SetATC(atc)
+								self.Request({"atc": {"action": "add" if atc else "remove", "train": trainid, "loco": locoid}})
 							
 						if self.IsDispatcher() and ar != oldAR:
-							tr.SetAR(ar)
-							self.Request({"ar": {"action": "add" if ar else "remove", "train": trainid}})
+							if self.VerifyTrainID(trainid):
+								tr.SetAR(ar)
+								self.Request({"ar": {"action": "add" if ar else "remove", "train": trainid}})
 	
 						tr.Draw()
 
-	def OnATCAdd(self, evt):
-		self.menuTrain.SetATC(True)
+	def VerifyTrainID(self, trainid):
+		if trainid is None or trainid.startswith("??"):
+			self.PopupEvent("Train ID is required")
+			return False
+		return True
+	
+	def VerifyLocoID(self, locoid):		
+		if locoid is None or locoid.startswith("??"):
+			self.PopupEvent("locomotive ID is required")
+			return False
+		
+		return True
+	
+	def OnATCAdd(self, _):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
-		self.Request({"atc": {"action": "add", "train": trainid, "loco": locoid}})
-		self.menuTrain.Draw()
+		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
+			self.menuTrain.SetATC(True)
+			self.Request({"atc": {"action": "add", "train": trainid, "loco": locoid}})
+			self.menuTrain.Draw()
+
+	def OnATCAddReq(self, evt):
+		trainid, locoid = self.menuTrain.GetNameAndLoco()
+		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
+			self.Request({"atcrequest": {"action": "add", "train": trainid, "loco": locoid}})
 							
 	def OnATCRemove(self, evt):
-		self.menuTrain.SetATC(False)
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
-		self.Request({"atc": {"action": "remove", "train": trainid, "loco": locoid}})
-		self.menuTrain.Draw()
+		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
+			self.menuTrain.SetATC(False)
+			self.Request({"atc": {"action": "remove", "train": trainid, "loco": locoid}})
+			self.menuTrain.Draw()
+							
+	def OnATCRemReq(self, evt):
+		trainid, locoid = self.menuTrain.GetNameAndLoco()
+		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
+			self.Request({"atcrequest": {"action": "remove", "train": trainid, "loco": locoid}})
 		
 	def OnATCStop(self, evt):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
-		self.Request({"atc": {"action": "forcestop", "train": trainid, "loco": locoid}})
+		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
+			self.Request({"atc": {"action": "forcestop", "train": trainid, "loco": locoid}})
 		
 	def OnARAdd(self, evt):
 		trainid = self.menuTrain.GetName()
-		self.menuTrain.SetAR(True)
-		self.Request({"ar": {"action": "add", "train": trainid}})
-		self.menuTrain.Draw()
+		if self.VerifyTrainID(trainid):
+			self.menuTrain.SetAR(True)
+			self.Request({"ar": {"action": "add", "train": trainid}})
+			self.menuTrain.Draw()
 		
 	def OnARRemove(self, evt):
 		trainid = self.menuTrain.GetName()
-		self.menuTrain.SetAR(False)
-		self.Request({"ar": {"action": "remove", "train": trainid}})
-		self.menuTrain.Draw()
+		if self.VerifyTrainID(trainid):
+			self.menuTrain.SetAR(False)
+			self.Request({"ar": {"action": "remove", "train": trainid}})
+			self.menuTrain.Draw()
 
 	def DrawTile(self, screen, pos, bmp):
 		offset = self.diagrams[screen].offset
@@ -1674,22 +1714,26 @@ class MainFrame(wx.Frame):
 				tr.Draw()
 				
 			elif cmd == "atcrequest":
-				logging.info("atcrequest: %s" % str(parms))
 				trnm = parms["train"][0]
-				try:
-					tr = self.trains[trnm]
-				except KeyError:
-					logging.warning("ATC train %s does not exist" % trnm)
-					return
+				if self.ATCEnabled:
+					logging.info("atcrequest: %s" % str(parms))
+					try:
+						tr = self.trains[trnm]
+					except KeyError:
+						logging.warning("ATC train %s does not exist" % trnm)
+						return
+					
+					action = parms["action"][0]
+					
+					tr.SetATC(action == "add")
+					tr.Draw()
+					
+					trainid, locoid = tr.GetNameAndLoco()
+					self.Request({"atc": {"action": action, "train": trainid, "loco": locoid}})
+					self.menuTrain.Draw()
 				
-				action = parms["action"][0]
-				
-				tr.SetATC(action == "add")
-				tr.Draw()
-				
-				trainid, locoid = tr.GetNameAndLoco()
-				self.Request({"atc": {"action": action, "train": trainid, "loco": locoid}})
-				self.menuTrain.Draw()
+				else:
+					self.PopupEvent("ATC request for %s - not enabled" % trnm)
 
 					
 			elif cmd == "atcstatus":
@@ -1734,7 +1778,7 @@ class MainFrame(wx.Frame):
 
 	def Request(self, req, force=False):
 		command = list(req.keys())[0]
-		if self.settings.dispatch or command in allowedCommands:
+		if self.IsDispatcher() or command in allowedCommands:
 			
 			if self.subscribed or force:
 				if "delay" in req[command] and req[command]["delay"] > 0:

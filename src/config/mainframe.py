@@ -133,6 +133,24 @@ class MainFrame(wx.Frame):
 		vszr.Add(dispBox, 0, wx.EXPAND)
 		
 		vszr.AddSpacer(20)
+
+		
+		dispBox = wx.StaticBox(self, wx.ID_ANY, "Display")
+		topBorder = dispBox.GetBordersForSizer()[0]
+		boxsizer = wx.BoxSizer(wx.VERTICAL)
+		boxsizer.AddSpacer(topBorder+10)
+		
+		self.cbAllowATCRequests = wx.CheckBox(dispBox, wx.ID_ANY, "Allow ATC Requests")
+		boxsizer.Add(self.cbAllowATCRequests, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		self.cbAllowATCRequests.SetValue(self.settings.allowatcrequests)
+		
+		boxsizer.AddSpacer(10)
+		
+		dispBox.SetSizer(boxsizer)
+		
+		vszr.Add(dispBox, 0, wx.EXPAND)
+		
+		vszr.AddSpacer(20)
 		
 		self.bSave = wx.Button(self, wx.ID_ANY, "Save", size=(200, 60))
 		vszr.Add(self.bSave, 0, wx.ALIGN_CENTER_HORIZONTAL)
@@ -213,6 +231,7 @@ class MainFrame(wx.Frame):
 		self.settings.dccsniffertty = self.teSnifferComPort.GetValue()
 		self.settings.pages = 1 if self.rbPages.GetSelection() == 0 else 3
 		self.settings.showcameras = self.cbShowCameras.IsChecked()
+		self.settings.allowatcrequests = self.cbAllowATCRequests.IsChecked()
 		
 		if self.settings.save():		
 			dlg = wx.MessageDialog(self, "Configuration Data has been saved", "Data Saved", wx.OK | wx.ICON_INFORMATION)

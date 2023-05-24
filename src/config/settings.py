@@ -27,6 +27,7 @@ class Settings:
         
         self.showcameras = True
         self.pages = 1
+        self.allowatcrequests = False
         
         self.rrtty = "COM5"
         self.dcctty = "COM6"
@@ -93,6 +94,15 @@ class Settings:
         else:
             print("Missing %s section - assuming defaults" % section)
 
+        section = "display"           
+        if self.cfg.has_section(section):
+            for opt, value in self.cfg.items(section):
+                if opt == 'allowatcrequests':
+                    self.allowatcrequests = parseBoolean(value, False)
+        else:
+            print("Missing %s section - assuming defaults" % section)
+                    
+                    
         section = "rrserver"           
         if self.cfg.has_section(section):
             for opt, value in self.cfg.items(section):
@@ -122,20 +132,48 @@ class Settings:
             print("Settings file %s does not exist" % INIFILE)
             return False
         
+        try:
+            self.cfg.add_section(GLOBAL)
+        except configparser.DuplicateSectionError:
+            pass
+        
         self.cfg.set(GLOBAL, "ipaddr", self.ipaddr)
         self.cfg.set(GLOBAL, "serverport", "%d" % self.serverport)
         self.cfg.set(GLOBAL, "dccserverport", "%d" % self.dccserverport)
         self.cfg.set(GLOBAL, "socketport", "%d" % self.socketport)
 
         section = "dispatcher" 
+        try:
+            self.cfg.add_section(section)
+        except configparser.DuplicateSectionError:
+            pass
+        
         self.cfg.set(section, "pages", "%d" % self.pages)
         self.cfg.set(section, "showcameras", "True" if self.showcameras else "False")
         
+        section = "display"  
+        try:
+            self.cfg.add_section(section)
+        except configparser.DuplicateSectionError:
+            pass
+        
+        self.cfg.set(section, "allowatcrequests", "True" if self.allowatcrequests else "False")
+         
         section = "rrserver"        
+        try:
+            self.cfg.add_section(section)
+        except configparser.DuplicateSectionError:
+            pass
+        
         self.cfg.set(section, "rrtty", self.rrtty)
         self.cfg.set(section, "dcctty", self.dcctty)
                        
         section = "dccsniffer"        
+        try:
+            self.cfg.add_section(section)
+        except configparser.DuplicateSectionError:
+            pass
+        
         self.cfg.set(section, "dccsniffertty", self.dccsniffertty)
 
         try:        

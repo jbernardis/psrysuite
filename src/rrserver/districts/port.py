@@ -475,7 +475,7 @@ class Port(District):
 		outb[3] = setBit(outb[3], 5, 1 if st == "R" else 0)
 		psw5 = self.rr.GetInput("PBSw5.lvr").GetState()  # Hand switch unlock indicators
 		outb[3] = setBit(outb[3], 6, 0 if psw5 != 0 else 1)
-		outb[3] = setBit(outb[3], 7, 1 if psw5 == 0 else 0)
+		outb[3] = setBit(outb[3], 7, 0 if psw5 == 0 else 1)
 
 		st = self.rr.GetInput("PB12.lvr").GetState()
 		outb[4] = setBit(outb[4], 0, 1 if st == "L" else 0)  # Signal indicators

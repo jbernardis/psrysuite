@@ -212,7 +212,7 @@ class EditTrainDlg(wx.Dialog):
 					break
 
 			if not adjacent:
-				dlg = wx.MessageDialog(self, "Train %s already exists on the layout\non block(s) %s" % (self.chosenTrain, bstr),
+				dlg = wx.MessageDialog(self, "Train %s already exists on the layout\nin block(s) %s" % (self.chosenTrain, bstr),
 						   'Duplicate Train', wx.OK | wx.ICON_ERROR)
 				dlg.ShowModal()
 				dlg.Destroy()

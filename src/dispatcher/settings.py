@@ -32,6 +32,7 @@ class Settings:
 		self.socketport = 9001
 		self.showcameras = False
 		self.serverhidden = False
+		self.allowatcrequests = True #False
 
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -66,6 +67,11 @@ class Settings:
 			for opt, value in self.cfg.items("rrserver"):
 				if opt == 'hide':
 					self.serverhidden = parseBoolean(value, False)
+			
+		if self.cfg.has_section("display"):
+			for opt, value in self.cfg.items("display"):
+				if opt == 'allowatcrequests':
+					self.allowatcrequests = parseBoolean(value, False)
 				
 		if self.cfg.has_section(GLOBAL):
 			for opt, value in self.cfg.items(GLOBAL):
