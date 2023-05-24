@@ -71,6 +71,18 @@ class MainFrame(wx.Frame):
 		
 		boxsizer.AddSpacer(10)
 
+		commBox.SetSizer(boxsizer)
+		
+		vszr.Add(commBox, 0, wx.EXPAND)
+		
+		vszr.AddSpacer(20)
+
+		
+		commBox = wx.StaticBox(self, wx.ID_ANY, "Server")
+		topBorder = commBox.GetBordersForSizer()[0]
+		boxsizer = wx.BoxSizer(wx.VERTICAL)
+		boxsizer.AddSpacer(topBorder+10)
+
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20)
 		hsz.Add(wx.StaticText(commBox, wx.ID_ANY, "Railroad COM Port: ", size=(130, -1)))		
