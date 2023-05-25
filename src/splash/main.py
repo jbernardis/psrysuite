@@ -1,7 +1,7 @@
 import wx
 import os
 
-versiondate = "19-May-2023"
+versiondate = "24-May-2023"
 
 class MainFrame(wx.Frame):
 	def __init__(self):
@@ -54,6 +54,17 @@ class MainFrame(wx.Frame):
 		
 		sta = wx.StaticText(self, wx.ID_ANY, "written by:", size=(100, -1), style=wx.ALIGN_RIGHT)
 		stb = wx.StaticText(self, wx.ID_ANY, "Jeff Bernardis", size=(400, -1))
+		sta.SetFont(textFont)
+		stb.SetFont(textFontBold)
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(sta)
+		hsz.AddSpacer(10)
+		hsz.Add(stb)		
+		vsizer.Add(hsz)
+		vsizer.AddSpacer(20)
+
+		sta = wx.StaticText(self, wx.ID_ANY, "based on:", size=(100, -1), style=wx.ALIGN_RIGHT)
+		stb = wx.StaticText(self, wx.ID_ANY, "Dispatcher 1 written by Geoff Green", size=(400, -1))
 		sta.SetFont(textFont)
 		stb.SetFont(textFontBold)
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
