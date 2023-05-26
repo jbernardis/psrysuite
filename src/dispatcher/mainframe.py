@@ -80,6 +80,10 @@ class MainFrame(wx.Frame):
 		self.pidATC	= None
 		self.pidAdvisor = None
 		
+		self.shift = False
+		self.shiftXOffset = 0
+		self.shiftYOffset = 0
+		
 		self.ToD = True
 		self.timeValue = self.GetToD()
 		self.clockRunning = False # only applies to non-TOD clock
@@ -118,9 +122,11 @@ class MainFrame(wx.Frame):
 			NaCl:   Node(NaCl,   self.bitmaps.diagrams.NassauCliff, self.bmpw*2 if singlePage else 0)
 		}
 		topSpace = 120
+		
+		ht = None # diagram height.  None => use bitmap size
 
 		if self.settings.pages == 1:  # set up a single ultra-wide display accross 3 monitors
-			dp = TrackDiagram(self, [self.diagrams[sn] for sn in screensList])
+			dp = TrackDiagram(self, [self.diagrams[sn] for sn in screensList], ht)
 			dp.SetPosition((16, 120))
 			_, diagramh = dp.GetSize()
 			self.panels = {self.diagrams[sn].screen : dp for sn in screensList}  # all 3 screens just point to the same diagram
@@ -131,7 +137,7 @@ class MainFrame(wx.Frame):
 			self.panels = {}
 			diagramh = 0
 			for d in [self.diagrams[sn] for sn in screensList]:
-				dp = TrackDiagram(self, [d])
+				dp = TrackDiagram(self, [d], ht)
 				_, diagramh = dp.GetSize()
 				dp.Hide()
 				dp.SetPosition((8, 120))
@@ -247,11 +253,70 @@ class MainFrame(wx.Frame):
 			self.Bind(wx.EVT_BUTTON, self.OnBAdviceLog, self.bAdvice)
 			
 		self.totalw = totalw
-		self.totalh = 1080
+		self.totalh = diagramh + 280 # 1080 if diagram is full 800 height
 		self.centerw = int(self.totalw/2)
 		self.centerh = int(self.totalh/2)
 		self.showSplash = True
 		self.ResetScreen()
+		self.Bind(wx.EVT_CHAR_HOOK, self.OnKeyDown)
+		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
+		
+	def OnKeyDown(self, evt):
+		kcd = evt.GetKeyCode()
+		if kcd == wx.WXK_LEFT:
+			if self.shift:
+				self.shiftXOffset -= 10
+				self.SetPosition((self.shiftXOffset, self.shiftYOffset))
+				
+			else:
+				if self.currentScreen == LaKr:
+					self.SwapToScreen(HyYdPt)
+				elif self.currentScreen == NaCl:
+					self.SwapToScreen(LaKr)
+				
+		elif kcd == wx.WXK_RIGHT:
+			if self.shift:
+				self.shiftXOffset += 10
+				if self.shiftXOffset > 0:
+					self.shiftXOffset = 0
+				self.SetPosition((self.shiftXOffset, self.shiftYOffset))
+				
+			else:
+				if self.currentScreen == HyYdPt:
+					self.SwapToScreen(LaKr)
+				elif self.currentScreen == LaKr:
+					self.SwapToScreen(NaCl)
+					
+		elif kcd == wx.WXK_UP:
+			self.shiftYOffset -= 10
+			self.SetPosition((self.shiftXOffset, self.shiftYOffset))
+					
+		elif kcd == wx.WXK_DOWN:
+			self.shiftYOffset += 10
+			if self.shiftYOffset > 0:
+				self.shiftYOffset = 0
+			self.SetPosition((self.shiftXOffset, self.shiftYOffset))
+							
+		elif kcd == wx.WXK_SHIFT:
+			self.SetShift(True)
+			evt.Skip()
+			
+		elif kcd == wx.WXK_HOME:
+			self.ResetScreen()
+			evt.Skip()
+				
+		else:
+			evt.Skip()
+			
+	def OnKeyUp(self, evt):
+		kcd = evt.GetKeyCode()
+		if kcd == wx.WXK_SHIFT:
+			self.SetShift(False)
+			
+		evt.Skip()
+			
+	def SetShift(self, flag):
+		self.shift = flag
 		
 	def OnResetScreen(self, _):
 		self.ResetScreen()
@@ -260,6 +325,9 @@ class MainFrame(wx.Frame):
 		self.SetMaxSize((self.totalw, self.totalh))
 		self.SetSize((self.totalw, self.totalh))
 		self.SetPosition((-self.centerOffset, 0))
+		
+		self.shiftXOffset = 0
+		self.shiftYOffset = 0
 		
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})

@@ -1,7 +1,7 @@
 import wx
 
 class TrackDiagram(wx.Panel):
-	def __init__(self, frame, dlist): #screen, id, diagramBmp, offset):
+	def __init__(self, frame, dlist, ht=None): #screen, id, diagramBmp, offset):
 		wx.Panel.__init__(self, frame, size=(100, 100), pos=(0,0), style=0)
 		self.frame = frame
 		self.screens = [d.screen for d in dlist]
@@ -28,7 +28,11 @@ class TrackDiagram(wx.Panel):
 			
 		for b in self.bgbmps:
 			w += b.GetWidth()
-		h = self.bgbmps[0].GetHeight()  # assume all the same height
+		
+		if ht is None:
+			h = self.bgbmps[0].GetHeight()  # assume all the same height
+		else:
+			h = ht
 
 		self.SetSize((w, h))
 		self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
@@ -37,7 +41,7 @@ class TrackDiagram(wx.Panel):
 		self.Bind(wx.EVT_MOTION, self.OnMotion)
 		self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
 		self.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
-		self.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+		self.Bind(wx.EVT_CHAR_HOOK, self.OnKeyDown)
 		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 		self.Bind(wx.EVT_ENTER_WINDOW, lambda event: self.SetFocus())
 
@@ -75,7 +79,7 @@ class TrackDiagram(wx.Panel):
 		keycode = event.GetKeyCode()
 		if keycode == wx.WXK_SHIFT:
 			self.shift_down = True
-			#print("shift down")
+			self.frame.SetShift(True)
 
 		event.Skip()
 
@@ -83,7 +87,7 @@ class TrackDiagram(wx.Panel):
 		keycode = event.GetKeyCode()
 		if keycode == wx.WXK_SHIFT:
 			self.shift_down = False
-			#print("shift up")
+			self.frame.SetShift(False)
 
 		event.Skip()
 
