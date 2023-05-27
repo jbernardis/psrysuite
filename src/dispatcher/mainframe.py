@@ -259,33 +259,30 @@ class MainFrame(wx.Frame):
 		self.showSplash = True
 		self.ResetScreen()
 		self.Bind(wx.EVT_CHAR_HOOK, self.OnKeyDown)
-		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 		
 	def OnKeyDown(self, evt):
 		kcd = evt.GetKeyCode()
-		if kcd == wx.WXK_LEFT:
-			if self.shift:
-				self.shiftXOffset -= 10
-				self.SetPosition((self.shiftXOffset, self.shiftYOffset))
+		if kcd == wx.WXK_PAGEUP:
+			if self.currentScreen == LaKr:
+				self.SwapToScreen(HyYdPt)
+			elif self.currentScreen == NaCl:
+				self.SwapToScreen(LaKr)
 				
-			else:
-				if self.currentScreen == LaKr:
-					self.SwapToScreen(HyYdPt)
-				elif self.currentScreen == NaCl:
-					self.SwapToScreen(LaKr)
+		elif kcd == wx.WXK_PAGEDOWN:
+			if self.currentScreen == HyYdPt:
+				self.SwapToScreen(LaKr)
+			elif self.currentScreen == LaKr:
+				self.SwapToScreen(NaCl)
+
+		elif kcd == wx.WXK_LEFT:
+			self.shiftXOffset -= 10
+			self.SetPosition((self.shiftXOffset, self.shiftYOffset))
 				
 		elif kcd == wx.WXK_RIGHT:
-			if self.shift:
-				self.shiftXOffset += 10
-				if self.shiftXOffset > 0:
-					self.shiftXOffset = 0
-				self.SetPosition((self.shiftXOffset, self.shiftYOffset))
-				
-			else:
-				if self.currentScreen == HyYdPt:
-					self.SwapToScreen(LaKr)
-				elif self.currentScreen == LaKr:
-					self.SwapToScreen(NaCl)
+			self.shiftXOffset += 10
+			if self.shiftXOffset > 0:
+				self.shiftXOffset = 0
+			self.SetPosition((self.shiftXOffset, self.shiftYOffset))
 					
 		elif kcd == wx.WXK_UP:
 			self.shiftYOffset -= 10
@@ -304,15 +301,21 @@ class MainFrame(wx.Frame):
 		elif kcd == wx.WXK_HOME:
 			self.ResetScreen()
 			evt.Skip()
+			
+		elif kcd == wx.WXK_SHIFT:
+			self.SetShift(True)
+			
+		elif kcd == wx.WXK_ESCAPE and self.shift:
+			self.CloseProgram()
 				
 		else:
 			evt.Skip()
-			
+
 	def OnKeyUp(self, evt):
 		kcd = evt.GetKeyCode()
 		if kcd == wx.WXK_SHIFT:
 			self.SetShift(False)
-			
+
 		evt.Skip()
 			
 	def SetShift(self, flag):
@@ -326,7 +329,7 @@ class MainFrame(wx.Frame):
 		self.SetSize((self.totalw, self.totalh))
 		self.SetPosition((-self.centerOffset, 0))
 		
-		self.shiftXOffset = 0
+		self.shiftXOffset = -self.centerOffset
 		self.shiftYOffset = 0
 		
 		if self.ATCEnabled:
@@ -2030,6 +2033,9 @@ class MainFrame(wx.Frame):
 						self.PopupEvent("Block %s not occupied, expecting locomotive %s" % (bname, lid))
 
 	def OnClose(self, _):
+		self.CloseProgram()
+		
+	def CloseProgram(self):
 		if self.IsDispatcher():
 			dlg = ExitDlg(self)
 			rc = dlg.ShowModal()
