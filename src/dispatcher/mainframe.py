@@ -123,7 +123,7 @@ class MainFrame(wx.Frame):
 		}
 		topSpace = 120
 		
-		ht = None # diagram height.  None => use bitmap size
+		ht = None # diagram height.  None => use bitmap size.  use a number < 800 to trim bottom off of diagram bitmaps
 
 		if self.settings.pages == 1:  # set up a single ultra-wide display accross 3 monitors
 			dp = TrackDiagram(self, [self.diagrams[sn] for sn in screensList], ht)
