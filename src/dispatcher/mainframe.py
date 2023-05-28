@@ -124,14 +124,15 @@ class MainFrame(wx.Frame):
 		topSpace = 120
 		
 		ht = None # diagram height.  None => use bitmap size.  use a number < 800 to trim bottom off of diagram bitmaps
+		self.diagramWidth = 2560
 
 		if self.settings.pages == 1:  # set up a single ultra-wide display accross 3 monitors
 			dp = TrackDiagram(self, [self.diagrams[sn] for sn in screensList], ht)
 			dp.SetPosition((16, 120))
 			_, diagramh = dp.GetSize()
 			self.panels = {self.diagrams[sn].screen : dp for sn in screensList}  # all 3 screens just point to the same diagram
-			totalw = 2560*3
-			self.centerOffset = 2560
+			totalw = self.diagramWidth*3
+			self.centerOffset = self.diagramWidth
 
 		else:  # set up three separate screens for a single monitor
 			self.panels = {}
@@ -154,7 +155,7 @@ class MainFrame(wx.Frame):
 			b = wx.Button(self, wx.ID_ANY, "Nassau/Bank/Cliff",   pos=(1790, voffset), size=(200, 50))
 			self.Bind(wx.EVT_BUTTON, lambda event: self.SwapToScreen(NaCl), b)
 			self.bScreenNaCl = b
-			totalw = 2560+20
+			totalw = self.diagramWidth+20
 			self.centerOffset = 0
 
 		self.ToasterSetup()
@@ -263,19 +264,33 @@ class MainFrame(wx.Frame):
 	def OnKeyDown(self, evt):
 		kcd = evt.GetKeyCode()
 		if kcd == wx.WXK_PAGEUP:
-			if self.currentScreen == LaKr:
-				self.SwapToScreen(HyYdPt)
-			elif self.currentScreen == NaCl:
-				self.SwapToScreen(LaKr)
+			if self.settings.pages == 3:
+				if self.currentScreen == LaKr:
+					self.SwapToScreen(HyYdPt)
+				elif self.currentScreen == NaCl:
+					self.SwapToScreen(LaKr)
+			else:
+				self.shiftXOffset += self.diagramWidth
+				if self.shiftXOffset > 0:
+					self.shiftXOffset = 0
+				self.SetPosition((self.shiftXOffset, self.shiftYOffset))
 				
 		elif kcd == wx.WXK_PAGEDOWN:
-			if self.currentScreen == HyYdPt:
-				self.SwapToScreen(LaKr)
-			elif self.currentScreen == LaKr:
-				self.SwapToScreen(NaCl)
+			if self.settings.pages == 3:
+				if self.currentScreen == HyYdPt:
+					self.SwapToScreen(LaKr)
+				elif self.currentScreen == LaKr:
+					self.SwapToScreen(NaCl)
+			else:
+				self.shiftXOffset -= self.diagramWidth
+				if self.shiftXOffset < -2*self.diagramWidth:
+					self.shiftXOffset = -2*self.diagramWidth
+				self.SetPosition((self.shiftXOffset, self.shiftYOffset))
 
 		elif kcd == wx.WXK_LEFT:
 			self.shiftXOffset -= 10
+			if self.shiftXOffset < -2*self.diagramWidth:
+				self.shiftXOffset = -2*self.diagramWidth
 			self.SetPosition((self.shiftXOffset, self.shiftYOffset))
 				
 		elif kcd == wx.WXK_RIGHT:
@@ -2269,6 +2284,7 @@ class ExitDlg (wx.Dialog):
 		bsz = wx.BoxSizer(wx.HORIZONTAL)
 
 		self.bOK = wx.Button(self, wx.ID_ANY, "OK")
+		self.bOK.SetDefault()
 		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
 
 		bsz.Add(self.bOK)
@@ -2292,6 +2308,7 @@ class ExitDlg (wx.Dialog):
 		self.SetSizer(hsz)
 		self.Layout()
 		self.Fit()
+		self.bOK.SetFocus()
 
 	def onSaveTrains(self, _):
 		self.parent.SaveTrains()
