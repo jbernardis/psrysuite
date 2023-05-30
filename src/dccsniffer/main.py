@@ -3,6 +3,8 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
+import time
+
 ofp = open(os.path.join(os.getcwd(), "output", "dccsniffer.out"), "w")
 efp = open(os.path.join(os.getcwd(), "output", "dccsniffer.err"), "w")
 sys.stdout = ofp
@@ -20,6 +22,7 @@ from dccsniffer.listener import Listener
 class MainUnit:
 	def __init__(self):
 		self.settings = Settings()
+		self.identified = False
 		
 		self.rrServer = RRServer()
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
@@ -38,6 +41,10 @@ class MainUnit:
 		self.listener.start()
 	
 	def run(self):
+		# wait until handshake with server is complete
+		while not self.identified:
+			time.sleep(0.001)
+			
 		self.sniffer.run(self.rrServer)
 		
 	def raiseDeliveryEvent(self, data):  # thread context
@@ -47,6 +54,7 @@ class MainUnit:
 				self.sessionid = int(parms)
 				logging.info("session ID %d" % self.sessionid)
 				self.rrServer.SendRequest({"identify": {"SID": self.sessionid, "function": "DCCSNIFFER"}})
+				self.identified = True
 		
 	def raiseDisconnectEvent(self): # thread context
 		self.sniffer.kill()

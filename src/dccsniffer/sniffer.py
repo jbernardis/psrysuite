@@ -35,21 +35,20 @@ class Sniffer:
 					self.isRunning = True
 				
 				if len(c) != 0:
-					if callable(self.cbDCCMessage):
-						try:
-							s = str(c, 'UTF-8')
-						except:
-							logging.info("unable to convert DCC message to string: (" + s + ")")
-						else:
-							p = s.split()
-							req = {
-								"dccspeed": {
-									"cmd": p[0],
-									"loco": "%d" % int(p[1]), # strip off any leading zeroes
-									"speed": p[2]
-								}
+					try:
+						s = str(c, 'UTF-8')
+					except:
+						logging.info("unable to convert DCC message to string: (" + s + ")")
+					else:
+						p = s.split()
+						req = {
+							"dccspeed": {
+								"cmd": p[0],
+								"loco": "%d" % int(p[1]), # strip off any leading zeroes
+								"speed": p[2]
 							}
-							rrserver.SendRequest(req)
+						}
+						rrserver.SendRequest(req)
 
 		try:
 			self.port.close()
