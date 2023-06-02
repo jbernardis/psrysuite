@@ -657,43 +657,43 @@ class Yard (District):
 		self.signals = {}
 
 		sigList = [
-			[ "Y2R",  RegAspects, True,    "right", (129, 12) ],
-			[ "Y2L",  RegAspects, False,   "leftlong",  (136, 10) ],
-			[ "Y4R",  RegAspects, True,    "rightlong", (129, 14) ],
-			[ "Y4LA", RegAspects, False,   "leftlong",  (136, 14) ],
-			[ "Y4LB", RegAspects, False,   "left",  (136, 12) ],
+			[ "Y2L",  RegAspects, True,    "right", (129, 12) ],
+			[ "Y2R",  RegAspects, False,   "leftlong",  (136, 10) ],
+			[ "Y4L",  RegAspects, True,    "rightlong", (129, 14) ],
+			[ "Y4RA", RegAspects, False,   "leftlong",  (136, 14) ],
+			[ "Y4RB", RegAspects, False,   "left",  (136, 12) ],
 
-			[ "Y8RA", RegAspects, True,    "right", (114, 12) ],
-			[ "Y8RB", RegAspects, True,    "right", (113, 10) ],
-			[ "Y8RC", RegAspects, True,    "right", (112, 8)  ],
-			[ "Y8L",  RegAspects, False,   "leftlong",  (121, 10) ],
-			[ "Y10R", AdvAspects, True,    "rightlong", (114, 14) ],
-			[ "Y10L", RegAspects, False,   "left",  (121, 12) ],
+			[ "Y8LA", RegAspects, True,    "right", (114, 12) ],
+			[ "Y8LB", RegAspects, True,    "right", (113, 10) ],
+			[ "Y8LC", RegAspects, True,    "right", (112, 8)  ],
+			[ "Y8R",  RegAspects, False,   "leftlong",  (121, 10) ],
+			[ "Y10L", AdvAspects, True,    "rightlong", (114, 14) ],
+			[ "Y10R", RegAspects, False,   "left",  (121, 12) ],
 
-			[ "Y22R",  RegAspects, True,   "right", (95, 6) ],
-			[ "Y22L",  RegSloAspects, False,  "leftlong",  (106, 10) ],
-			[ "Y24RA", RegAspects, True,   "right", (95, 10) ],
-			[ "Y24RB", RegAspects, True,   "right", (95, 8) ],
-			[ "Y26RA", RegAspects, True,   "right", (96, 16) ],
-			[ "Y26RB", RegAspects, True,   "right", (96, 14) ],
-			[ "Y26RC", RegAspects, True,   "right", (96, 12) ],
-			[ "Y26L",  RegAspects, False,  "left",  (106, 12)],
+			[ "Y22L",  RegAspects, True,   "right", (95, 6) ],
+			[ "Y22R",  RegSloAspects, False,  "leftlong",  (106, 10) ],
+			[ "Y24LA", RegAspects, True,   "right", (95, 10) ],
+			[ "Y24LB", RegAspects, True,   "right", (95, 8) ],
+			[ "Y26LA", RegAspects, True,   "right", (96, 16) ],
+			[ "Y26LB", RegAspects, True,   "right", (96, 14) ],
+			[ "Y26LC", RegAspects, True,   "right", (96, 12) ],
+			[ "Y26R",  RegAspects, False,  "left",  (106, 12)],
 
-			[ "Y34R",  RegAspects, True,   "rightlong", (84, 14) ],
-			[ "Y34LA", RegAspects, False,  "left",  (88, 14) ],
-			[ "Y34LB", RegAspects, False,  "left",  (88, 12) ],
+			[ "Y34L",  RegAspects, True,   "rightlong", (84, 14) ],
+			[ "Y34RA", RegAspects, False,  "left",  (88, 14) ],
+			[ "Y34RB", RegAspects, False,  "left",  (88, 12) ],
 
-			[ "Y40LA", RegAspects, False,  "left",  (32, 29) ],
-			[ "Y40LB", RegAspects, False,  "left",  (32, 31) ],
-			[ "Y40LC", RegAspects, False,  "left",  (32, 33) ],
-			[ "Y40LD", RegAspects, False,  "left",  (32, 35) ],
-			[ "Y40R",  RegAspects, True,   "right", (21, 31) ],
+			[ "Y40RA", RegAspects, False,  "left",  (32, 29) ],
+			[ "Y40RB", RegAspects, False,  "left",  (32, 31) ],
+			[ "Y40RC", RegAspects, False,  "left",  (32, 33) ],
+			[ "Y40RD", RegAspects, False,  "left",  (32, 35) ],
+			[ "Y40L",  RegAspects, True,   "right", (21, 31) ],
 
-			[ "Y42L",  RegAspects, False,  "left",  (55, 29) ],
-			[ "Y42RA", RegAspects, True,   "right", (45, 31) ],
-			[ "Y42RB", RegAspects, True,   "right", (45, 33) ],
-			[ "Y42RC", RegAspects, True,   "right", (45, 35) ],
-			[ "Y42RD", RegAspects, True,   "right", (45, 37) ],
+			[ "Y42R",  RegAspects, False,  "left",  (55, 29) ],
+			[ "Y42LA", RegAspects, True,   "right", (45, 31) ],
+			[ "Y42LB", RegAspects, True,   "right", (45, 33) ],
+			[ "Y42LC", RegAspects, True,   "right", (45, 35) ],
+			[ "Y42LD", RegAspects, True,   "right", (45, 37) ],
 		]
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
@@ -714,9 +714,9 @@ class Yard (District):
 
 		blockSbSigs = {
 			# which signals govern stopping sections, west and east
-			"Y11": ("Y8L",  None),
-			"Y20": (None, "Y10R"),
-			"Y21": ("Y10L", "Y4R"),
+			"Y11": ("Y8R",  None),
+			"Y20": (None, "Y10L"),
+			"Y21": ("Y10R", "Y4L"),
 		}
 
 		for blknm, siglist in blockSbSigs.items():
@@ -724,22 +724,22 @@ class Yard (District):
 
 		blockSigs = {
 			# which signals govern blocks, west and east
-			"Y10": ("Y22L", "Y8RA"),
-			"Y11": ("Y8L",  "Y2R"),
-			"Y20": ("Y26L", "Y10R"),
-			"Y21": ("Y10L", "Y4R"),
-			"Y30": ("Y34R", "Y8RC"),
-			"Y50": ("Y34LA", "Y26RA"),
-			"Y51": ("Y34LB", "Y26RB"),
-			"Y52": (None, "Y24RA"),
-			"Y53": (None, "Y24RB"),
-			"Y60": (None, "Y22R"),
-			"Y70": (None, "Y26RC"),
-			"Y81": ("Y40LA", "Y42RA"),
-			"Y82": ("Y40LB", "Y42RB"),
-			"Y83": ("Y40LC", "Y42RC"),
-			"Y84": ("Y40LD", "Y42RD"),
-			"Y87": ("Y42L", "Y8RB"),
+			"Y10": ("Y22R", "Y8LA"),
+			"Y11": ("Y8R",  "Y2L"),
+			"Y20": ("Y26R", "Y10L"),
+			"Y21": ("Y10R", "Y4L"),
+			"Y30": ("Y34L", "Y8LC"),
+			"Y50": ("Y34RA", "Y26LA"),
+			"Y51": ("Y34RB", "Y26LB"),
+			"Y52": (None, "Y24LA"),
+			"Y53": (None, "Y24LB"),
+			"Y60": (None, "Y22L"),
+			"Y70": (None, "Y26LC"),
+			"Y81": ("Y40RA", "Y42LA"),
+			"Y82": ("Y40RB", "Y42LB"),
+			"Y83": ("Y40RC", "Y42LC"),
+			"Y84": ("Y40RD", "Y42LD"),
+			"Y87": ("Y42R", "Y8LB"),
 		}
 
 		for blknm, siglist in blockSigs.items():
@@ -751,139 +751,139 @@ class Yard (District):
 
 		# cornell junction
 		block = self.blocks["YOSCJW"]
-		self.routes["YRtY11L10"] = Route(self.screen, block, "YRtY11L10", "L10", [ (130, 11), (131, 11), (132, 11), (133, 11), (134, 11), (135, 11) ], "Y11", [RESTRICTING, MAIN], ["YSw3:N"], ["Y2L", "Y2R"])
-		self.routes["YRtY11L20"] = Route(self.screen, block, "YRtY11L20", "L20", [ (130, 11), (131, 12), (132, 13), (133, 13), (134, 13), (135, 13) ], "Y11", [RESTRICTING, RESTRICTING], ["YSw1:N", "YSw3:R"], ["Y4LB", "Y2R"])
-		self.routes["YRtY11P50"] = Route(self.screen, block, "YRtY11P50", "P50", [ (130, 11), (131, 12), (132, 13), (133, 13), (134, 14), (135, 15) ], "Y11", [RESTRICTING, DIVERGING], ["YSw1:R", "YSw3:R"], ["Y4LA", "Y2R"])
+		self.routes["YRtY11L10"] = Route(self.screen, block, "YRtY11L10", "L10", [ (130, 11), (131, 11), (132, 11), (133, 11), (134, 11), (135, 11) ], "Y11", [RESTRICTING, MAIN], ["YSw3:N"], ["Y2R", "Y2L"])
+		self.routes["YRtY11L20"] = Route(self.screen, block, "YRtY11L20", "L20", [ (130, 11), (131, 12), (132, 13), (133, 13), (134, 13), (135, 13) ], "Y11", [RESTRICTING, RESTRICTING], ["YSw1:N", "YSw3:R"], ["Y4RB", "Y2L"])
+		self.routes["YRtY11P50"] = Route(self.screen, block, "YRtY11P50", "P50", [ (130, 11), (131, 12), (132, 13), (133, 13), (134, 14), (135, 15) ], "Y11", [RESTRICTING, DIVERGING], ["YSw1:R", "YSw3:R"], ["Y4RA", "Y2L"])
 
 		block = self.blocks["YOSCJE"]
-		self.routes["YRtY21L20"] = Route(self.screen, block, "YRtY21L20", "Y21", [ (130, 13), (131, 13), (132, 13), (133, 13), (134, 13), (135, 13) ], "L20", [MAIN, RESTRICTING], ["YSw1:N", "YSw3:N"], ["Y4R", "Y4LB"])
-		self.routes["YRtY21P50"] = Route(self.screen, block, "YRtY21P50", "Y21", [ (130, 13), (131, 13), (132, 13), (133, 13), (134, 14), (135, 15) ], "P50", [DIVERGING, RESTRICTING], ["YSw1:R", "YSw3:N"], ["Y4R", "Y4LA"])
+		self.routes["YRtY21L20"] = Route(self.screen, block, "YRtY21L20", "Y21", [ (130, 13), (131, 13), (132, 13), (133, 13), (134, 13), (135, 13) ], "L20", [MAIN, RESTRICTING], ["YSw1:N", "YSw3:N"], ["Y4L", "Y4RB"])
+		self.routes["YRtY21P50"] = Route(self.screen, block, "YRtY21P50", "Y21", [ (130, 13), (131, 13), (132, 13), (133, 13), (134, 14), (135, 15) ], "P50", [DIVERGING, RESTRICTING], ["YSw1:R", "YSw3:N"], ["Y4L", "Y4RA"])
 
-		self.signals["Y2R"].AddPossibleRoutes("YOSCJW", [ "YRtY11L10", "YRtY11L20", "YRtY11P50" ])
-		self.signals["Y2L"].AddPossibleRoutes("YOSCJW", [ "YRtY11L10" ])
+		self.signals["Y2L"].AddPossibleRoutes("YOSCJW", [ "YRtY11L10", "YRtY11L20", "YRtY11P50" ])
+		self.signals["Y2R"].AddPossibleRoutes("YOSCJW", [ "YRtY11L10" ])
 
-		self.signals["Y4R"].AddPossibleRoutes("YOSCJE", [ "YRtY21L20", "YRtY21P50" ])
-		self.signals["Y4LB"].AddPossibleRoutes("YOSCJE", [ "YRtY21L20" ])
-		self.signals["Y4LB"].AddPossibleRoutes("YOSCJW", [ "YRtY11L20" ])
-		self.signals["Y4LA"].AddPossibleRoutes("YOSCJE", [ "YRtY21P50" ])
-		self.signals["Y4LA"].AddPossibleRoutes("YOSCJW", [ "YRtY11P50" ])
+		self.signals["Y4L"].AddPossibleRoutes("YOSCJE", [ "YRtY21L20", "YRtY21P50" ])
+		self.signals["Y4RB"].AddPossibleRoutes("YOSCJE", [ "YRtY21L20" ])
+		self.signals["Y4RB"].AddPossibleRoutes("YOSCJW", [ "YRtY11L20" ])
+		self.signals["Y4RA"].AddPossibleRoutes("YOSCJE", [ "YRtY21P50" ])
+		self.signals["Y4RA"].AddPossibleRoutes("YOSCJW", [ "YRtY11P50" ])
 
-		self.osSignals["YOSCJW"] = [ "Y2R", "Y2L", "Y4LA", "Y4LB" ]
-		self.osSignals["YOSCJE"] = [ "Y2R", "Y4R", "Y4LA", "Y4LB" ]
+		self.osSignals["YOSCJW"] = [ "Y2L", "Y2R", "Y4RA", "Y4RB" ]
+		self.osSignals["YOSCJE"] = [ "Y2L", "Y4L", "Y4RA", "Y4RB" ]
 
 		# east end junction
 		block = self.blocks["YOSEJW"] 
-		self.routes["YRtY10Y11"] = Route(self.screen, block, "YRtY10Y11", "Y11", [ (115, 11), (116, 11), (117, 11), (118, 11), (119, 11), (120, 11) ], "Y10", [RESTRICTING, MAIN], ["YSw7:N", "YSw9:N"], ["Y8L", "Y8RA"])
-		self.routes["YRtY30Y11"] = Route(self.screen, block, "YRtY30Y11", "Y11", [ (112, 7), (113, 7), (114, 8), (115, 9), (116, 10), (117, 11), (118, 11), (119, 11), (120, 11) ], "Y30", [RESTRICTING, DIVERGING], ["YSw7:N", "YSw9:R", "YSw11:R"], ["Y8L", "Y8RC"])
-		self.routes["YRtY87Y11"] = Route(self.screen, block, "YRtY87Y11", "Y11", [ (114, 9), (115, 9), (116, 10), (117, 11), (118, 11), (119, 11), (120, 11) ], "Y87", [RESTRICTING, RESTRICTING], ["YSw7:N", "YSw9:R", "YSw11:N"], ["Y8L", "Y8RB"])
+		self.routes["YRtY10Y11"] = Route(self.screen, block, "YRtY10Y11", "Y11", [ (115, 11), (116, 11), (117, 11), (118, 11), (119, 11), (120, 11) ], "Y10", [RESTRICTING, MAIN], ["YSw7:N", "YSw9:N"], ["Y8R", "Y8LA"])
+		self.routes["YRtY30Y11"] = Route(self.screen, block, "YRtY30Y11", "Y11", [ (112, 7), (113, 7), (114, 8), (115, 9), (116, 10), (117, 11), (118, 11), (119, 11), (120, 11) ], "Y30", [RESTRICTING, DIVERGING], ["YSw7:N", "YSw9:R", "YSw11:R"], ["Y8R", "Y8LC"])
+		self.routes["YRtY87Y11"] = Route(self.screen, block, "YRtY87Y11", "Y11", [ (114, 9), (115, 9), (116, 10), (117, 11), (118, 11), (119, 11), (120, 11) ], "Y87", [RESTRICTING, RESTRICTING], ["YSw7:N", "YSw9:R", "YSw11:N"], ["Y8R", "Y8LB"])
 
 		block = self.blocks["YOSEJE"]
-		self.routes["YRtY20Y21"] = Route(self.screen, block, "YRtY20Y21", "Y20", [ (115, 13), (116, 13), (117, 13), (118, 13), (119, 13), (120, 13) ], "Y21", [MAIN, RESTRICTING], ["YSw7:N"], ["Y10R", "Y10L"])
-		self.routes["YRtY30Y21"] = Route(self.screen, block, "YRtY30Y21", "Y30", [ (112, 7), (113, 7), (114, 8), (115, 9), (116, 10), (117, 11), (118, 11), (119, 12), (120, 13) ], "Y21", [RESTRICTING, RESTRICTING], ["YSw7:R", "YSw9:R", "YSw11:R"], ["Y8RC", "Y10L"])
-		self.routes["YRtY87Y21"] = Route(self.screen, block, "YRtY87Y21", "Y87", [ (114, 9), (115, 9), (116, 10), (117, 11), (118, 11), (119, 12), (120, 13) ], "Y21", [RESTRICTING, RESTRICTING], ["YSw7:R", "YSw9:R", "YSw11:N"], ["Y8RB", "Y10L"])
-		self.routes["YRtY10Y21"] = Route(self.screen, block, "YRtY10Y21", "Y10", [ (115, 11), (116, 11), (117, 11), (118, 11), (119, 12), (120, 13) ], "Y21", [RESTRICTING, RESTRICTING], ["YSw7:R", "YSw9:N"], ["Y8RA", "Y10L"])
+		self.routes["YRtY20Y21"] = Route(self.screen, block, "YRtY20Y21", "Y20", [ (115, 13), (116, 13), (117, 13), (118, 13), (119, 13), (120, 13) ], "Y21", [MAIN, RESTRICTING], ["YSw7:N"], ["Y10L", "Y10R"])
+		self.routes["YRtY30Y21"] = Route(self.screen, block, "YRtY30Y21", "Y30", [ (112, 7), (113, 7), (114, 8), (115, 9), (116, 10), (117, 11), (118, 11), (119, 12), (120, 13) ], "Y21", [RESTRICTING, RESTRICTING], ["YSw7:R", "YSw9:R", "YSw11:R"], ["Y8LC", "Y10R"])
+		self.routes["YRtY87Y21"] = Route(self.screen, block, "YRtY87Y21", "Y87", [ (114, 9), (115, 9), (116, 10), (117, 11), (118, 11), (119, 12), (120, 13) ], "Y21", [RESTRICTING, RESTRICTING], ["YSw7:R", "YSw9:R", "YSw11:N"], ["Y8LB", "Y10R"])
+		self.routes["YRtY10Y21"] = Route(self.screen, block, "YRtY10Y21", "Y10", [ (115, 11), (116, 11), (117, 11), (118, 11), (119, 12), (120, 13) ], "Y21", [RESTRICTING, RESTRICTING], ["YSw7:R", "YSw9:N"], ["Y8LA", "Y10R"])
 
-		self.signals["Y8RA"].AddPossibleRoutes("YOSEJW", ["YRtY10Y11"])
-		self.signals["Y8RA"].AddPossibleRoutes("YOSEJE", ["YRtY10Y21"])
-		self.signals["Y8RB"].AddPossibleRoutes("YOSEJW", ["YRtY87Y11"])
-		self.signals["Y8RB"].AddPossibleRoutes("YOSEJE", ["YRtY87Y21"])
-		self.signals["Y8RC"].AddPossibleRoutes("YOSEJW", ["YRtY30Y11"])
-		self.signals["Y8RC"].AddPossibleRoutes("YOSEJE", ["YRtY30Y21"])
-		self.signals["Y8L"].AddPossibleRoutes("YOSEJW", ["YRtY10Y11", "YRtY87Y11", "YRtY30Y11"])
-		self.signals["Y10R"].AddPossibleRoutes("YOSEJE", ["YRtY20Y21"])
-		self.signals["Y10L"].AddPossibleRoutes("YOSEJE", ["YRtY20Y21", "YRtY10Y21", "YRtY87Y21", "YRtY30Y21"])
+		self.signals["Y8LA"].AddPossibleRoutes("YOSEJW", ["YRtY10Y11"])
+		self.signals["Y8LA"].AddPossibleRoutes("YOSEJE", ["YRtY10Y21"])
+		self.signals["Y8LB"].AddPossibleRoutes("YOSEJW", ["YRtY87Y11"])
+		self.signals["Y8LB"].AddPossibleRoutes("YOSEJE", ["YRtY87Y21"])
+		self.signals["Y8LC"].AddPossibleRoutes("YOSEJW", ["YRtY30Y11"])
+		self.signals["Y8LC"].AddPossibleRoutes("YOSEJE", ["YRtY30Y21"])
+		self.signals["Y8R"].AddPossibleRoutes("YOSEJW", ["YRtY10Y11", "YRtY87Y11", "YRtY30Y11"])
+		self.signals["Y10L"].AddPossibleRoutes("YOSEJE", ["YRtY20Y21"])
+		self.signals["Y10R"].AddPossibleRoutes("YOSEJE", ["YRtY20Y21", "YRtY10Y21", "YRtY87Y21", "YRtY30Y21"])
 
-		self.osSignals["YOSEJW"] = [ "Y8RA", "Y8RB", "Y8RC", "Y8L" ]
-		self.osSignals["YOSEJE"] = [ "Y8RA", "Y8RB", "Y8RC", "Y10R", "Y10L" ]
+		self.osSignals["YOSEJW"] = [ "Y8LA", "Y8LB", "Y8LC", "Y8R" ]
+		self.osSignals["YOSEJE"] = [ "Y8LA", "Y8LB", "Y8LC", "Y10L", "Y10R" ]
 
 		# Kale interlocking
 		block = self.blocks["YOSKL1"]
-		self.routes["YRtY20Y51"] = Route(self.screen, block, "YRtY20Y51", "Y51", [ (97, 13), (98, 13), (99, 13), (100, 13), (101, 13), (102, 13), (103, 13), (104, 13), (105, 13) ], "Y20", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:N", "YSw23:N", "YSw25:N", "YSw27:N"], ["Y26RB", "Y26L"])
-		self.routes["YRtY20Y50"] = Route(self.screen, block, "YRtY20Y50", "Y50", [ (97, 15), (98, 15), (99, 14), (100, 13), (101, 13), (102, 13), (103, 13), (104, 13), (105, 13) ], "Y20", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:N", "YSw23:N", "YSw25:R"], ["Y26RA", "Y26L"])
-		self.routes["YRtY20Y70"] = Route(self.screen, block, "YRtY20Y70", "Y70", [ (97, 11), (98, 12), (99, 13), (100, 13), (101, 13), (102, 13), (103, 13), (104, 13), (105, 13) ], "Y20", [RESTRICTING, DIVERGING], ["YSw17:N", "YSw21:N", "YSw23:N", "YSw25:N", "YSw27:R"], ["Y26RC", "Y26L"])
-		self.routes["YRtY20Y52"] = Route(self.screen, block, "YRtY20Y52", "Y52", [ (96, 9), (97, 9), (98, 9), (99, 10), (100, 11), (101, 12), (102, 13), (103, 13), (104, 13), (105, 13) ], "Y20", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:N", "YSw23:R", "YSw29:N"], ["Y24RA", "Y26L"])
-		self.routes["YRtY20Y53"] = Route(self.screen, block, "YRtY20Y53", "Y53", [ (96, 7), (97, 8), (98, 9), (99, 10), (100, 11), (101, 12), (102, 13), (103, 13), (104, 13), (105, 13) ], "Y20", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:N", "YSw23:R", "YSw29:R"], ["Y24RB", "Y26L"])
+		self.routes["YRtY20Y51"] = Route(self.screen, block, "YRtY20Y51", "Y51", [ (97, 13), (98, 13), (99, 13), (100, 13), (101, 13), (102, 13), (103, 13), (104, 13), (105, 13) ], "Y20", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:N", "YSw23:N", "YSw25:N", "YSw27:N"], ["Y26LB", "Y26R"])
+		self.routes["YRtY20Y50"] = Route(self.screen, block, "YRtY20Y50", "Y50", [ (97, 15), (98, 15), (99, 14), (100, 13), (101, 13), (102, 13), (103, 13), (104, 13), (105, 13) ], "Y20", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:N", "YSw23:N", "YSw25:R"], ["Y26LA", "Y26R"])
+		self.routes["YRtY20Y70"] = Route(self.screen, block, "YRtY20Y70", "Y70", [ (97, 11), (98, 12), (99, 13), (100, 13), (101, 13), (102, 13), (103, 13), (104, 13), (105, 13) ], "Y20", [RESTRICTING, DIVERGING], ["YSw17:N", "YSw21:N", "YSw23:N", "YSw25:N", "YSw27:R"], ["Y26LC", "Y26R"])
+		self.routes["YRtY20Y52"] = Route(self.screen, block, "YRtY20Y52", "Y52", [ (96, 9), (97, 9), (98, 9), (99, 10), (100, 11), (101, 12), (102, 13), (103, 13), (104, 13), (105, 13) ], "Y20", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:N", "YSw23:R", "YSw29:N"], ["Y24LA", "Y26R"])
+		self.routes["YRtY20Y53"] = Route(self.screen, block, "YRtY20Y53", "Y53", [ (96, 7), (97, 8), (98, 9), (99, 10), (100, 11), (101, 12), (102, 13), (103, 13), (104, 13), (105, 13) ], "Y20", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:N", "YSw23:R", "YSw29:R"], ["Y24LB", "Y26R"])
 
 		block = self.blocks["YOSKL3"]
-		self.routes["YRtY20Y60"] = Route(self.screen, block, "YRtY20Y60", "Y20", [ (96, 5), (97, 5), (98, 6), (99, 7), (100, 8), (101, 9), (102, 10), (103, 11), (104, 12), (105, 13) ], "Y60", [RESTRICTING, RESTRICTING], ["YSw17:R", "YSw19:R", "YSw21:N"], ["Y26L", "Y22R"])
+		self.routes["YRtY20Y60"] = Route(self.screen, block, "YRtY20Y60", "Y20", [ (96, 5), (97, 5), (98, 6), (99, 7), (100, 8), (101, 9), (102, 10), (103, 11), (104, 12), (105, 13) ], "Y60", [RESTRICTING, RESTRICTING], ["YSw17:R", "YSw19:R", "YSw21:N"], ["Y26L", "Y22L"])
 
 		block = self.blocks["YOSKL2"]
-		self.routes["YRtY10Y52"] = Route(self.screen, block, "YRtY10Y52", "Y10", [ (96, 9), (97, 9), (98, 9), (99, 10), (100, 11), (101, 11), (102, 11), (103, 11), (104, 11), (105, 11) ], "Y52", [RESTRICTING, SLOW], ["YSw17:N", "YSw19:N", "YSw21:N", "YSw23:N", "YSw29:N"], ["Y22L", "Y24RA"])
-		self.routes["YRtY10Y50"] = Route(self.screen, block, "YRtY10Y50", "Y10", [ (97, 15), (98, 15), (99, 14), (100, 13), (101, 13), (102, 13), (103, 13), (104, 12), (105, 11) ], "Y50", [RESTRICTING, SLOW], ["YSw17:N", "YSw21:R", "YSw23:N", "YSw25:R"], ["Y22L", "Y26RA"])
-		self.routes["YRtY10Y51"] = Route(self.screen, block, "YRtY10Y51", "Y10", [ (97, 13), (98, 13), (99, 13), (100, 13), (101, 13), (102, 13), (103, 13), (104, 12), (105, 11) ], "Y51", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:R", "YSw23:N", "YSw25:N", "YSw27:N"], ["Y22L", "Y26RB"])
-		self.routes["YRtY10Y70"] = Route(self.screen, block, "YRtY10Y70", "Y10", [ (97, 11), (98, 12), (99, 13), (100, 13), (101, 13), (102, 13), (103, 13), (104, 12), (105, 11) ], "Y70", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:R", "YSw23:N", "YSw25:N", "YSw27:R"], ["Y22L", "Y26RC"])
-		self.routes["YRtY10Y53"] = Route(self.screen, block, "YRtY10Y53", "Y10", [ (96, 7), (97, 8), (98, 9), (99, 10), (100, 11), (101, 11), (102, 11), (103, 11), (104, 11), (105, 11) ], "Y53", [RESTRICTING, SLOW], ["YSw17:N", "YSw19:N", "YSw21:N", "YSw23:N", "YSw29:R"], ["Y22L", "Y24RB"])
+		self.routes["YRtY10Y52"] = Route(self.screen, block, "YRtY10Y52", "Y10", [ (96, 9), (97, 9), (98, 9), (99, 10), (100, 11), (101, 11), (102, 11), (103, 11), (104, 11), (105, 11) ], "Y52", [RESTRICTING, SLOW], ["YSw17:N", "YSw19:N", "YSw21:N", "YSw23:N", "YSw29:N"], ["Y22R", "Y24LA"])
+		self.routes["YRtY10Y50"] = Route(self.screen, block, "YRtY10Y50", "Y10", [ (97, 15), (98, 15), (99, 14), (100, 13), (101, 13), (102, 13), (103, 13), (104, 12), (105, 11) ], "Y50", [RESTRICTING, SLOW], ["YSw17:N", "YSw21:R", "YSw23:N", "YSw25:R"], ["Y22R", "Y26LA"])
+		self.routes["YRtY10Y51"] = Route(self.screen, block, "YRtY10Y51", "Y10", [ (97, 13), (98, 13), (99, 13), (100, 13), (101, 13), (102, 13), (103, 13), (104, 12), (105, 11) ], "Y51", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:R", "YSw23:N", "YSw25:N", "YSw27:N"], ["Y22R", "Y26LB"])
+		self.routes["YRtY10Y70"] = Route(self.screen, block, "YRtY10Y70", "Y10", [ (97, 11), (98, 12), (99, 13), (100, 13), (101, 13), (102, 13), (103, 13), (104, 12), (105, 11) ], "Y70", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw21:R", "YSw23:N", "YSw25:N", "YSw27:R"], ["Y22R", "Y26LC"])
+		self.routes["YRtY10Y53"] = Route(self.screen, block, "YRtY10Y53", "Y10", [ (96, 7), (97, 8), (98, 9), (99, 10), (100, 11), (101, 11), (102, 11), (103, 11), (104, 11), (105, 11) ], "Y53", [RESTRICTING, SLOW], ["YSw17:N", "YSw19:N", "YSw21:N", "YSw23:N", "YSw29:R"], ["Y22R", "Y24LB"])
 
 		block = self.blocks["YOSKL3"]
-		self.routes["YRtY10Y60"] = Route(self.screen, block, "YRtY10Y60", "Y10", [ (96, 5), (97, 5), (98, 6), (99, 7), (100, 8), (101, 9), (102, 10), (103, 11), (104, 11), (105, 11) ], "Y60", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw19:R", "YSw21:N"], ["Y22L", "Y22R"])
+		self.routes["YRtY10Y60"] = Route(self.screen, block, "YRtY10Y60", "Y10", [ (96, 5), (97, 5), (98, 6), (99, 7), (100, 8), (101, 9), (102, 10), (103, 11), (104, 11), (105, 11) ], "Y60", [RESTRICTING, RESTRICTING], ["YSw17:N", "YSw19:R", "YSw21:N"], ["Y22R", "Y22L"])
 
-		self.signals["Y22L"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y50", "YRtY10Y51", "YRtY10Y52", "YRtY10Y53", "YRtY10Y70" ])
-		self.signals["Y22L"].AddPossibleRoutes("YOSKL3", [ "YRtY10Y60" ])
-		self.signals["Y26L"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y50", "YRtY20Y51", "YRtY20Y52", "YRtY20Y53", "YRtY20Y70" ])
-		self.signals["Y26L"].AddPossibleRoutes("YOSKL3", [ "YRtY20Y60" ])
-		self.signals["Y22R"].AddPossibleRoutes("YOSKL3", [ "YRtY10Y60", "YRtY20Y60" ])
-		self.signals["Y24RA"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y52" ])
-		self.signals["Y24RA"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y52" ])
-		self.signals["Y24RB"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y53" ])
-		self.signals["Y24RB"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y53" ])
-		self.signals["Y26RA"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y50" ])
-		self.signals["Y26RA"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y50" ])
-		self.signals["Y26RB"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y51" ])
-		self.signals["Y26RB"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y51" ])
-		self.signals["Y26RC"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y70" ])
-		self.signals["Y26RC"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y70" ])
+		self.signals["Y22R"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y50", "YRtY10Y51", "YRtY10Y52", "YRtY10Y53", "YRtY10Y70" ])
+		self.signals["Y22R"].AddPossibleRoutes("YOSKL3", [ "YRtY10Y60" ])
+		self.signals["Y26R"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y50", "YRtY20Y51", "YRtY20Y52", "YRtY20Y53", "YRtY20Y70" ])
+		self.signals["Y26R"].AddPossibleRoutes("YOSKL3", [ "YRtY20Y60" ])
+		self.signals["Y22L"].AddPossibleRoutes("YOSKL3", [ "YRtY10Y60", "YRtY20Y60" ])
+		self.signals["Y24LA"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y52" ])
+		self.signals["Y24LA"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y52" ])
+		self.signals["Y24LB"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y53" ])
+		self.signals["Y24LB"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y53" ])
+		self.signals["Y26LA"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y50" ])
+		self.signals["Y26LA"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y50" ])
+		self.signals["Y26LB"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y51" ])
+		self.signals["Y26LB"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y51" ])
+		self.signals["Y26LC"].AddPossibleRoutes("YOSKL2", [ "YRtY10Y70" ])
+		self.signals["Y26LC"].AddPossibleRoutes("YOSKL1", [ "YRtY20Y70" ])
 
-		self.osSignals["YOSKL2"] = [ "Y22L", "Y24RA", "Y24RB", "Y26RA", "Y26RB", "Y26RC" ]
-		self.osSignals["YOSKL1"] = [ "Y26L", "Y24RA", "Y24RB", "Y26RA", "Y26RB", "Y26RC" ]
-		self.osSignals["YOSKL3"] = [ "Y22R", "Y22L", "Y26L" ]
+		self.osSignals["YOSKL2"] = [ "Y22R", "Y24LA", "Y24LB", "Y26LA", "Y26LB", "Y26LC" ]
+		self.osSignals["YOSKL1"] = [ "Y26R", "Y24LA", "Y24LB", "Y26LA", "Y26LB", "Y26LC" ]
+		self.osSignals["YOSKL3"] = [ "Y22L", "Y22R", "Y26R" ]
 
 		# Kale west end
 		block = self.blocks["YOSKL4"]
-		self.routes["YRtY30Y51"] = Route(self.screen, block, "YRtY30Y51", "Y30", [ (84, 13), (85, 13), (86, 13), (87, 13)], "Y51", [RESTRICTING, SLOW], ["YSw33:N"], ["Y34R", "Y34LB"])
-		self.routes["YRtY30Y50"] = Route(self.screen, block, "YRtY30Y50", "Y30", [ (84, 13), (85, 13), (86, 14), (87, 15) ], "Y50", [RESTRICTING, SLOW], ["YSw33:R"], ["Y34R", "Y34LA"])
+		self.routes["YRtY30Y51"] = Route(self.screen, block, "YRtY30Y51", "Y30", [ (84, 13), (85, 13), (86, 13), (87, 13)], "Y51", [RESTRICTING, SLOW], ["YSw33:N"], ["Y34L", "Y34RB"])
+		self.routes["YRtY30Y50"] = Route(self.screen, block, "YRtY30Y50", "Y30", [ (84, 13), (85, 13), (86, 14), (87, 15) ], "Y50", [RESTRICTING, SLOW], ["YSw33:R"], ["Y34L", "Y34RA"])
 		self.buttonToRoute["YY51W"] = "YRtY30Y51"
 		self.buttonToRoute["YY50W"] = "YRtY30Y50"
 
-		self.signals["Y34R"].AddPossibleRoutes("YOSKL4", [ "YRtY30Y51", "YRtY30Y50" ])
-		self.signals["Y34LA"].AddPossibleRoutes("YOSKL4", [ "YRtY30Y50" ])
-		self.signals["Y34LB"].AddPossibleRoutes("YOSKL4", [ "YRtY30Y51" ])
+		self.signals["Y34L"].AddPossibleRoutes("YOSKL4", [ "YRtY30Y51", "YRtY30Y50" ])
+		self.signals["Y34RA"].AddPossibleRoutes("YOSKL4", [ "YRtY30Y50" ])
+		self.signals["Y34RB"].AddPossibleRoutes("YOSKL4", [ "YRtY30Y51" ])
 
-		self.osSignals["YOSKL4"] = [ "Y34R", "Y34LA", "Y34LB" ]
+		self.osSignals["YOSKL4"] = [ "Y34L", "Y34RA", "Y34RB" ]
 
 		# Waterman yard
 		block = self.blocks["YOSWYW"]
-		self.routes["YRtY70Y81"] = Route(self.screen, block, "YRtY70Y81", "Y81", [ (21, 30), (22, 30), (23, 30), (24, 30), (25, 30), (26, 30), (27, 30), (28, 30), (29, 30), (30, 30), (31, 30) ], "Y70", [RESTRICTING, DIVERGING], ["YSw113:N", "YSw115:N"], ["Y40LA", "Y40R"])
-		self.routes["YRtY70Y82"] = Route(self.screen, block, "YRtY70Y82", "Y82", [ (21, 30), (22, 30), (23, 30), (24, 30), (25, 30), (26, 31), (27, 32), (28, 32), (29, 32), (30, 32), (31, 32) ], "Y70", [RESTRICTING, DIVERGING], ["YSw113:N", "YSw115:R", "YSw116:R"], ["Y40LB", "Y40R"])
-		self.routes["YRtY70Y83"] = Route(self.screen, block, "YRtY70Y83", "Y83", [ (21, 30), (22, 30), (23, 30), (24, 30), (25, 30), (26, 31), (27, 32), (28, 33), (29, 34), (30, 34), (31, 34) ], "Y70", [RESTRICTING, DIVERGING], ["YSw113:N", "YSw115:R", "YSw116:N"], ["Y40LC", "Y40R"])
-		self.routes["YRtY70Y84"] = Route(self.screen, block, "YRtY70Y84", "Y84", [ (21, 30), (22, 30), (23, 31), (24, 32), (25, 33), (26, 34), (27, 35), (28, 36), (29, 36), (30, 36), (31, 36) ], "Y70", [RESTRICTING, DIVERGING], ["YSw113:R"], ["Y40LD", "Y40R"])
+		self.routes["YRtY70Y81"] = Route(self.screen, block, "YRtY70Y81", "Y81", [ (21, 30), (22, 30), (23, 30), (24, 30), (25, 30), (26, 30), (27, 30), (28, 30), (29, 30), (30, 30), (31, 30) ], "Y70", [RESTRICTING, DIVERGING], ["YSw113:N", "YSw115:N"], ["Y40RA", "Y40L"])
+		self.routes["YRtY70Y82"] = Route(self.screen, block, "YRtY70Y82", "Y82", [ (21, 30), (22, 30), (23, 30), (24, 30), (25, 30), (26, 31), (27, 32), (28, 32), (29, 32), (30, 32), (31, 32) ], "Y70", [RESTRICTING, DIVERGING], ["YSw113:N", "YSw115:R", "YSw116:R"], ["Y40RB", "Y40L"])
+		self.routes["YRtY70Y83"] = Route(self.screen, block, "YRtY70Y83", "Y83", [ (21, 30), (22, 30), (23, 30), (24, 30), (25, 30), (26, 31), (27, 32), (28, 33), (29, 34), (30, 34), (31, 34) ], "Y70", [RESTRICTING, DIVERGING], ["YSw113:N", "YSw115:R", "YSw116:N"], ["Y40RC", "Y40L"])
+		self.routes["YRtY70Y84"] = Route(self.screen, block, "YRtY70Y84", "Y84", [ (21, 30), (22, 30), (23, 31), (24, 32), (25, 33), (26, 34), (27, 35), (28, 36), (29, 36), (30, 36), (31, 36) ], "Y70", [RESTRICTING, DIVERGING], ["YSw113:R"], ["Y40RD", "Y40L"])
 		self.buttonToRoute["YWWB1"] = "YRtY70Y81"
 		self.buttonToRoute["YWWB2"] = "YRtY70Y82"
 		self.buttonToRoute["YWWB3"] = "YRtY70Y83"
 		self.buttonToRoute["YWWB4"] = "YRtY70Y84"
 
 		block = self.blocks["YOSWYE"]
-		self.routes["YRtY87Y81"] = Route(self.screen, block, "YRtY87Y81", "Y81", [ (46, 30), (47, 30), (48, 30), (49, 30), (50, 30), (51, 30), (52, 30), (53, 30), (54, 30), (55, 30) ], "Y87", [RESTRICTING, RESTRICTING], ["YSw134:N", "YSw132:N"], ["Y42RA", "Y42L"])
-		self.routes["YRtY87Y82"] = Route(self.screen, block, "YRtY87Y82", "Y82", [ (46, 32), (47, 32), (48, 32), (49, 32), (50, 31), (51, 30), (52, 30), (53, 30), (54, 30), (55, 30) ], "Y87", [RESTRICTING, RESTRICTING], ["YSw134:N", "YSw132:R", "YSw131:R"], ["Y42RB", "Y42L"])
-		self.routes["YRtY87Y83"] = Route(self.screen, block, "YRtY87Y83", "Y83", [ (46, 34), (47, 34), (48, 33), (49, 32), (50, 31), (51, 30), (52, 30), (53, 30), (54, 30), (55, 30) ], "Y87", [RESTRICTING, RESTRICTING], ["YSw134:N", "YSw132:R", "YSw131:N"], ["Y42RC", "Y42L"])
-		self.routes["YRtY87Y84"] = Route(self.screen, block, "YRtY87Y84", "Y84", [ (46, 36), (47, 36), (48, 36), (49, 35), (50, 34), (51, 33), (52, 32), (53, 31), (54, 30), (55, 30) ], "Y87", [RESTRICTING, RESTRICTING], ["YSw134:R"], ["Y42RD", "Y42L"])
+		self.routes["YRtY87Y81"] = Route(self.screen, block, "YRtY87Y81", "Y81", [ (46, 30), (47, 30), (48, 30), (49, 30), (50, 30), (51, 30), (52, 30), (53, 30), (54, 30), (55, 30) ], "Y87", [RESTRICTING, RESTRICTING], ["YSw134:N", "YSw132:N"], ["Y42LA", "Y42R"])
+		self.routes["YRtY87Y82"] = Route(self.screen, block, "YRtY87Y82", "Y82", [ (46, 32), (47, 32), (48, 32), (49, 32), (50, 31), (51, 30), (52, 30), (53, 30), (54, 30), (55, 30) ], "Y87", [RESTRICTING, RESTRICTING], ["YSw134:N", "YSw132:R", "YSw131:R"], ["Y42LB", "Y42R"])
+		self.routes["YRtY87Y83"] = Route(self.screen, block, "YRtY87Y83", "Y83", [ (46, 34), (47, 34), (48, 33), (49, 32), (50, 31), (51, 30), (52, 30), (53, 30), (54, 30), (55, 30) ], "Y87", [RESTRICTING, RESTRICTING], ["YSw134:N", "YSw132:R", "YSw131:N"], ["Y42LC", "Y42R"])
+		self.routes["YRtY87Y84"] = Route(self.screen, block, "YRtY87Y84", "Y84", [ (46, 36), (47, 36), (48, 36), (49, 35), (50, 34), (51, 33), (52, 32), (53, 31), (54, 30), (55, 30) ], "Y87", [RESTRICTING, RESTRICTING], ["YSw134:R"], ["Y42LD", "Y42R"])
 		self.buttonToRoute["YWEB1"] = "YRtY87Y81"
 		self.buttonToRoute["YWEB2"] = "YRtY87Y82"
 		self.buttonToRoute["YWEB3"] = "YRtY87Y83"
 		self.buttonToRoute["YWEB4"] = "YRtY87Y84"
 
-		self.signals["Y40R"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y81", "YRtY70Y82", "YRtY70Y83", "YRtY70Y84" ])
-		self.signals["Y40LA"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y81" ])
-		self.signals["Y40LB"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y82" ])
-		self.signals["Y40LC"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y83" ])
-		self.signals["Y40LD"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y84" ])
-		self.signals["Y42L"].AddPossibleRoutes("YOSWYE", [ "YRtY87Y81", "YRtY87Y82", "YRtY87Y83", "YRtY87Y84" ])
-		self.signals["Y42RA"].AddPossibleRoutes("YOSWYE", [ "YRtY87Y81" ])
-		self.signals["Y42RB"].AddPossibleRoutes("YOSWYE", [ "YRtY87Y82" ])
-		self.signals["Y42RC"].AddPossibleRoutes("YOSWYE", [ "YRtY87Y83" ])
-		self.signals["Y42RD"].AddPossibleRoutes("YOSWYE", [ "YRtY87Y84" ])
+		self.signals["Y40L"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y81", "YRtY70Y82", "YRtY70Y83", "YRtY70Y84" ])
+		self.signals["Y40RA"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y81" ])
+		self.signals["Y40RB"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y82" ])
+		self.signals["Y40RC"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y83" ])
+		self.signals["Y40RD"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y84" ])
+		self.signals["Y42R"].AddPossibleRoutes("YOSWYE", [ "YRtY87Y81", "YRtY87Y82", "YRtY87Y83", "YRtY87Y84" ])
+		self.signals["Y42LA"].AddPossibleRoutes("YOSWYE", [ "YRtY87Y81" ])
+		self.signals["Y42LB"].AddPossibleRoutes("YOSWYE", [ "YRtY87Y82" ])
+		self.signals["Y42LC"].AddPossibleRoutes("YOSWYE", [ "YRtY87Y83" ])
+		self.signals["Y42LD"].AddPossibleRoutes("YOSWYE", [ "YRtY87Y84" ])
 
-		self.osSignals["YOSWYW"] = [ "Y40R", "Y40LA", "Y40LB", "Y40LC", "Y40LD" ]
-		self.osSignals["YOSWYE"] = [ "Y42L", "Y42RA", "Y42RB", "Y42RC", "Y42RD" ]
+		self.osSignals["YOSWYW"] = [ "Y40L", "Y40RA", "Y40RB", "Y40RC", "Y40RD" ]
+		self.osSignals["YOSWYE"] = [ "Y42R", "Y42LA", "Y42LB", "Y42LC", "Y42LD" ]
 
 		return self.signals
 

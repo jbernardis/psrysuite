@@ -78,6 +78,7 @@ class MainFrame(wx.Frame):
 		self.ATCEnabled = False
 		self.AREnabled = False
 		self.pidATC	= None
+		self.procATC = None
 		self.pidAdvisor = None
 		
 		self.shift = False
@@ -410,14 +411,16 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBNassau, self.rbNassauControl)
 		self.rbNassauControl.Hide()
 		self.widgetMap[NaCl].append(self.rbNassauControl)
-		self.nassauControl = 0
+		self.rbNassauControl.SetSelection(2)
+		self.nassauControl = 2
 
 		self.rbCliffControl = wx.RadioBox(self, wx.ID_ANY, "Cliff", (1550, voffset), wx.DefaultSize,
 				["Cliff", "Dispatcher: Bank/Cliveden", "Dispatcher: All"], 1, wx.RA_SPECIFY_COLS)
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBCliff, self.rbCliffControl)
 		self.rbCliffControl.Hide()
 		self.widgetMap[NaCl].append(self.rbCliffControl)
-		self.cliffControl = 0
+		self.rbCliffControl.SetSelection(2)
+		self.cliffControl = 2
 
 		self.rbYardControl = wx.RadioBox(self, wx.ID_ANY, "Yard", (1450, voffset), wx.DefaultSize,
 				["Yard", "Dispatcher"], 1, wx.RA_SPECIFY_COLS)
@@ -491,30 +494,30 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBBankFleet, self.cbBankFleet)
 		self.cbBankFleet.Hide()
 		self.widgetMap[NaCl].append(self.cbBankFleet)
-		self.BankFleetSignals = ["C22R", "C24R", "C22L", "C24L"]
+		self.BankFleetSignals = ["C22L", "C24L", "C22R", "C24R"]
 
 		self.cbClivedenFleet = wx.CheckBox(self, -1, "Cliveden Fleeting", (1400, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBClivedenFleet, self.cbClivedenFleet)
 		self.cbClivedenFleet.Hide()
 		self.widgetMap[NaCl].append(self.cbClivedenFleet)
-		self.ClivedenFleetSignals = ["C10R", "C12R", "C10L", "C12L", "C14R", "C14LA", "C14LB", "C18RA", "C18RB", "C18L"]
+		self.ClivedenFleetSignals = ["C10L", "C12L", "C10R", "C12R", "C14L", "C14RA", "C14RB", "C18LA", "C18LB", "C18R"]
 
 		self.cbYardFleet = wx.CheckBox(self, -1, "Yard Fleeting", (1650, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBYardFleet, self.cbYardFleet)
 		self.cbYardFleet.Hide()
 		self.widgetMap[HyYdPt].append(self.cbYardFleet)
-		self.YardFleetSignals = [ "Y2L", "Y2R", "Y4LA", "Y4LB", "Y4R", "Y8L", "Y8RA", "Y8RB", "Y8RC", "Y10L", "Y10R",
-					"Y22L", "Y22R", "Y24RA", "Y24RB", "Y26L", "Y26RA", "Y26RB", "Y26RC", "Y34LA", "Y34LB", "Y34R",
-					"Y40LA", "Y40LB", "Y40LC", "Y40LD", "Y40R", "Y42L", "Y42RA", "Y42RB", "Y42RC", "Y42RD" ]
+		self.YardFleetSignals = [ "Y2R", "Y2L", "Y4RA", "Y4RB", "Y4L", "Y8R", "Y8LA", "Y8LB", "Y8LC", "Y10R", "Y10L",
+					"Y22R", "Y22L", "Y24LA", "Y24LB", "Y26R", "Y26LA", "Y26LB", "Y26LC", "Y34RA", "Y34RB", "Y34L",
+					"Y40RA", "Y40RB", "Y40RC", "Y40RD", "Y40L", "Y42R", "Y42LA", "Y42LB", "Y42LC", "Y42LD" ]
 
 		self.cbCliffFleet = wx.CheckBox(self, -1, "Cliff Fleeting", (2100, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBCliffFleet, self.cbCliffFleet)
 		self.cbCliffFleet.Hide()
 		self.widgetMap[NaCl].append(self.cbCliffFleet)
-		self.CliffFleetSignals = [ "C2RA", "C2RB", "C2RC", "C2RD", "C2L",
-					"C4R", "C4LA", "C4LB", "C4LC", "C4LD",
-					"C6RA", "C6RB", "C6RC", "C6RD", "C6RE", "C6RF", "C6RG", "C6RH", "C6RJ", "C6RK", "C6RL", "C6L",
-					"C8R", "C8LA", "C8LB", "C8LC", "C8LD", "C8LE", "C8LF", "C8LG", "C8LH", "C8LJ", "C8LK", "C8LL" ]
+		self.CliffFleetSignals = [ "C2LA", "C2LB", "C2LC", "C2LD", "C2R",
+					"C4L", "C4RA", "C4RB", "C4RC", "C4RD",
+					"C6LA", "C6LB", "C6LC", "C6LD", "C6LE", "C6LF", "C6LG", "C6LH", "C6LJ", "C6LK", "C6LL", "C6R",
+					"C8L", "C8RA", "C8RB", "C8RC", "C8RD", "C8RE", "C8RF", "C8RG", "C8RH", "C8RJ", "C8RK", "C8RL" ]
 
 		self.cbHydeFleet = wx.CheckBox(self, -1, "Hyde Fleeting", (250, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBHydeFleet, self.cbHydeFleet)
@@ -624,6 +627,103 @@ class MainFrame(wx.Frame):
 		elif name == "valleyjct.fleet":
 			self.cbValleyJctFleet.SetValue(value != 0)
 
+	def SendControlValues(self):
+		if not self.IsDispatcher():
+			return
+		
+		ctl = self.rbNassauControl.GetSelection()
+		self.cbNassauFleet.Enable(ctl != 0)
+		self.Request({"control": { "name": "nassau", "value": ctl}})
+		self.nassauControl = ctl
+			
+		ctl = self.rbCliffControl.GetSelection()
+		self.cbCliffFleet.Enable(ctl == 2)
+		self.cbBankFleet.Enable(ctl != 0)
+		self.cbClivedenFleet.Enable(ctl != 0)
+		self.Request({"control": { "name": "cliff", "value": ctl}})
+		self.cliffControl = ctl
+		
+		ctl = self.rbYardControl.GetSelection()
+		self.cbYardFleet.Enable(ctl != 0)
+		self.Request({"control": { "name": "yard", "value": ctl}})
+
+		ctl = self.rbS4Control.GetSelection()
+		self.Request({"control": { "name": "signal4", "value": ctl}})
+			
+		f = 1 if self.cbCliffFleet.IsChecked() else 0
+		for signm in self.CliffFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "cliff.fleet", "value": f}})
+
+		f = 1 if self.cbLathamFleet.IsChecked() else 0
+		for signm in self.LathamFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "latham.fleet", "value": f}})
+
+		f = 1 if self.cbHydeFleet.IsChecked() else 0
+		for signm in self.HydeFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "hyde.fleet", "value": f}})
+
+		f = 1 if self.cbYardFleet.IsChecked() else 0
+		for signm in self.YardFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "yard.fleet", "value": f}})
+
+		f = 1 if self.cbShoreFleet.IsChecked() else 0
+		for signm in self.ShoreFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "shore.fleet", "value": f}})
+
+		f = 1 if self.cbHydeJctFleet.IsChecked() else 0
+		for signm in self.HydeJctFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "hydejct.fleet", "value": f}})
+			
+		f = 1 if self.cbKrulishFleet.IsChecked() else 0
+		for signm in self.KrulishFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "krulish.fleet", "value": f}})
+
+		f = 1 if self.cbNassauFleet.IsChecked() else 0
+		if self.nassauControl == 1:
+			self.NassauFleetSignals = self.NassauFleetSignalsMain
+		elif self.nassauControl == 2:
+			self.NassauFleetSignals = self.NassauFleetSignalsAll
+		else:
+			print("unknown control value: %d" % self.nassauControl, flush=True)
+			return
+
+		for signm in self.NassauFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "nassau.fleet", "value": f}})
+			
+		f = 1 if self.cbBankFleet.IsChecked() else 0
+		for signm in self.BankFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "bank.fleet", "value": f}})
+
+		f = 1 if self.cbClivedenFleet.IsChecked() else 0
+		for signm in self.ClivedenFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "cliveden.fleet", "value": f}})
+
+		f = 1 if self.cbCarltonFleet.IsChecked() else 0
+		for signm in self.CarltonFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "carlton.fleet", "value": f}})
+			
+
+		f = 1 if self.cbValleyJctFleet.IsChecked() else 0
+		for signm in self.ValleyJctFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "valleyjct.fleet", "value": f}})
+
+		f = 1 if self.cbFossFleet.IsChecked() else 0
+		for signm in self.FossFleetSignals:
+			self.Request({"fleet": { "name": signm, "value": f}})
+		self.Request({"control": {"name": "foss.fleet", "value": f}})
+
 	def OnCBAutoRouter(self, evt):
 		self.AREnabled = self.cbAutoRouter.IsChecked()
 		if self.AREnabled:
@@ -637,9 +737,10 @@ class MainFrame(wx.Frame):
 		self.ATCEnabled = self.cbATC.IsChecked()
 		if self.ATCEnabled:
 			#self.pidATC = 1
-			if self.pidATC is None:			
+			if self.procATC is None or self.procATC.poll() is not None:			
 				atcExec = os.path.join(os.getcwd(), "atc", "main.py")
-				self.pidATC = Popen([sys.executable, atcExec]).pid
+				self.procATC = Popen([sys.executable, atcExec])
+				self.pidATC = self.procATC.pid
 				logging.debug("atc server started as PID %d" % self.pidATC)
 				self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": 1600, "y": 31}}
 				wx.CallLater(750, self.sendPendingATCShow)
@@ -708,19 +809,15 @@ class MainFrame(wx.Frame):
 
 	def OnCBNassauFleet(self, _):
 		f = 1 if self.cbNassauFleet.IsChecked() else 0
-		print("in cb nassau fleet, f = %d" % f)
 		if self.nassauControl == 1:
 			self.NassauFleetSignals = self.NassauFleetSignalsMain
-			print("set to main signals", flush=True)
 		elif self.nassauControl == 2:
 			self.NassauFleetSignals = self.NassauFleetSignalsAll
-			print("set to all signals", flush=True)
 		else:
 			print("unknown control value: %d" % self.nassauControl, flush=True)
 			return
 
 		for signm in self.NassauFleetSignals:
-			print("request fleet %s %d" % (signm, f))
 			self.Request({"fleet": { "name": signm, "value": f}})
 		self.Request({"control": {"name": "nassau.fleet", "value": f}})
 		
@@ -878,7 +975,7 @@ class MainFrame(wx.Frame):
 
 		self.trains = {}
 
-		self.districts.Initialize()
+		#self.districts.Initialize()
 
 		# only set up hot spots on the diagram for dispatchr - not for remote display
 		if self.settings.dispatch:
@@ -1443,6 +1540,9 @@ class MainFrame(wx.Frame):
 				self.cbAdvisor.Enable(True)
 				
 			self.RetrieveData()
+			print("calling districts initialize after subscription")
+			self.districts.Initialize()
+			self.SendControlValues()
 
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()

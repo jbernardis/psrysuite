@@ -14,6 +14,7 @@ class Hyde (District):
 		District.__init__(self, name, frame, screen)
 
 	def Initialize(self):
+		print("Turning on hyde power")
 		District.Initialize(self)
 
 		self.buttons["HydeWestPower"].TurnOn(refresh=True)
@@ -24,7 +25,7 @@ class Hyde (District):
 
 		for bname in ["HydeEastPower", "HydeWestPower" ]:
 			onFlag = 1 if self.buttons[bname].IsOn() else 0
-			self.indicators[bname].SetValue(onFlag)
+			self.indicators[bname].SetValue(onFlag, force=True)
 
 	def DetermineRoute(self, blocks):
 		self.FindTurnoutCombinations(blocks, [

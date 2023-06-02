@@ -108,6 +108,10 @@ class Train:
 		return True
 		
 	def IsContiguous(self):
+		if self.GetName().startswith("??"):
+			# do not test for trains with temporary names
+			return True
+		
 		bnames = list(self.blocks.keys())
 		countBlocks = len(bnames)
 		if countBlocks <= 1:
@@ -148,7 +152,7 @@ class Train:
 			logging.info(adjStr)
 			logging.info(blkAdj)
 			logging.info("=============================================")
-			return False
+			return True # - disabling for now, but let's track the tests to see where the faults are  False
 		
 		return True
 			

@@ -32,12 +32,23 @@ siding unlock levers from all tower panels - cliff
 
 fleet levers from cliff
 
-should C18RA/RB/L be included with bank fleeting and 14R/LA/LB be included with cliveden?  Right now they are not affected by fleeting.
-
-
 
 why was a single car train being reported as non-contiguous??
 
 what happened when we lost detection
 
-Need a way to initiate/terminate ATC from a display process
+
+from first session testing:
+
+
+
+
+Why couldn't I throw switches at times - in nassau, I believe it was because I didn't clear switch locks.  I think this is done - needs to be tested
+
+I think server periodically crashes or has i/o errors that it can't recover from - why
+
+train contiguous - do not show message is ?? train - disabled for now until we can figure out what's going on
+
+verify all signal lights and turnout lights on all panels - 
+
+verify proper panel operation

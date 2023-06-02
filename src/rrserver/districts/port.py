@@ -18,9 +18,9 @@ class Port(District):
 					["PB2R", 3], ["PB2L", 3], ["PB4R", 3], ["PB4L", 3], ["PB12R", 3], ["PB12L", 3], ["PB14R", 3], ["PB14L", 3] ]
 		toNames = [ "PASw1", "PASw3", "PASw5", "PASw7", "PASw9", "PASw11", "PASw13",
 					"PASw15", "PASw17", "PASw19", "PASw21", "PASw23",
-					"PASw27", "PASw29", "PASw31", "PASw33", "PASw35", "PASw37"]
-		hsNames = [ "PBSw5", "PBSw15a", "PBSw15b",
+					"PASw27", "PASw29", "PASw31", "PASw33", "PASw35", "PASw37",
 					"PBSw1", "PBSw3", "PBSw11", "PBSw13" ]
+		hsNames = [ "PBSw5", "PBSw15a", "PBSw15b" ]
 		handswitchNames = [ "PBSw5.hand", "PBSw15a.hand", "PBSw15b.hand" ]
 		#relayNames = [ "P10.srel", "P11.srel", "P20.srel", "P21.srel",
 		relayNames = [ "P10.srel", "P11.srel", "P20.srel",

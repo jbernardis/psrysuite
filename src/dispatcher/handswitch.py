@@ -25,6 +25,9 @@ class HandSwitch:
 
 	def GetBlock(self):
 		return self.block
+	
+	def GetBlockName(self):
+		return self.block.GetName()
 
 	def IsBlockBusy(self):
 		return self.block.IsBusy()

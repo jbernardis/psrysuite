@@ -2,8 +2,6 @@ import wx
 import logging
 from rrserver.rrobjects import BlockInput, SubBlockInput
 
-import traceback
-
 
 class RadioDlg (wx.Dialog):
 	def __init__(self, parent, title, choices, value):

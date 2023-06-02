@@ -61,8 +61,8 @@ class Railroad(wx.Notebook):
 
 	def Initialize(self):
 		# TODO:  put all of these in an ini file
-		self.SetControlOption("nassau", 2)
-		self.SetControlOption("cliff", 2)
+		self.SetControlOption("nassau", 0)
+		self.SetControlOption("cliff", 0)
 		self.SetControlOption("yard", 0)
 		self.SetControlOption("signal4", 0)
 		self.SetControlOption("bank.fleet", 0)
@@ -166,12 +166,12 @@ class Railroad(wx.Notebook):
 			return None
 
 	def GetCurrentValues(self):
-		for ip, district, itype in self.inputs.values():
+		for ip, _, _ in self.inputs.values():
 			m = ip.GetEventMessage()
 			if m is not None:
 				yield m
 
-		for op, district, itype in self.outputs.values():
+		for op, _, _ in self.outputs.values():
 			m = op.GetEventMessage()
 			if m is not None:
 				yield m
@@ -186,10 +186,6 @@ class Railroad(wx.Notebook):
 
 		for signm, flag in self.fleetedSignals.items():
 			m = {"fleet": [{ "name": signm, "value": flag}]}
-			yield m
-
-		for name, value in self.controlOptions.items():
-			m = {"control": [{ "name": name, "value": value}]}
 			yield m
 
 	def SetControlOption(self, name, value):
@@ -208,21 +204,21 @@ class Railroad(wx.Notebook):
 		if blknm not in self.inputs:
 			logging.warning("No input defined for block %s" % blknm)
 			return
-		ip, district, itype = self.inputs[blknm]
+		_, district, _ = self.inputs[blknm]
 		district.PlaceTrain(blknm)
 
 	def RemoveTrain(self, blknm):
 		if blknm not in self.inputs:
 			logging.warning("No input defined for block %s" % blknm)
 			return
-		ip, district, itype = self.inputs[blknm]
+		_, district, _ = self.inputs[blknm]
 		district.RemoveTrain(blknm)
 
 	def SetAspect(self, signame, aspect):
 		if signame not in self.outputs:
 			logging.warning("No output defined for signal %s" % signame)
 			return
-		op, district, otype = self.outputs[signame]
+		op, district, _ = self.outputs[signame]
 		op.SetAspect(aspect)
 		district.DetermineSignalLevers()
 		district.RefreshOutput(signame)
@@ -231,7 +227,7 @@ class Railroad(wx.Notebook):
 		if signame not in self.outputs:
 			logging.warning("No output defined for signal %s" % signame)
 			return
-		op, district, otype = self.outputs[signame]
+		op, district, _ = self.outputs[signame]
 		op.SetLock(lock)
 		district.RefreshOutput(signame)
 
@@ -242,21 +238,21 @@ class Railroad(wx.Notebook):
 		if block not in self.inputs:
 			logging.warning("No input defined for block %s" % block)
 			return
-		ip, district, itype = self.inputs[block]
+		ip, _, _ = self.inputs[block]
 		ip.SetDirection(direction)
 
 	def SetBlockClear(self, block, clear):
 		if block not in self.inputs:
 			logging.warning("No input defined for block %s" % block)
 			return
-		ip, district, itype = self.inputs[block]
+		ip, _, _ = self.inputs[block]
 		ip.SetClear(clear)
 
 	def SetIndicator(self, indname, state):
 		if indname not in self.outputs:
 			logging.warning("no output defined for indicator %s" % indname)
 			return
-		op, district, otype = self.outputs[indname]
+		op, district, _ = self.outputs[indname]
 		op.SetStatus(state != 0)
 		district.UpdateIndicator(indname)
 
@@ -264,7 +260,7 @@ class Railroad(wx.Notebook):
 		if relayname not in self.outputs:
 			logging.warning("no output defined for relay %s" % relayname)
 			return
-		op, district, otype = self.outputs[relayname]
+		op, district, _ = self.outputs[relayname]
 		op.SetStatus(state != 0)
 		district.UpdateRelay(relayname)
 
@@ -272,7 +268,7 @@ class Railroad(wx.Notebook):
 		if hsname not in self.outputs:
 			logging.warning("no output defined for handswitch %s" % hsname)
 			return
-		op, district, otype = self.outputs[hsname]
+		op, district, _ = self.outputs[hsname]
 		op.SetStatus(state != 0)
 		district.UpdateHandSwitch(hsname)
 
@@ -281,7 +277,7 @@ class Railroad(wx.Notebook):
 		if toname not in self.outputs:
 			logging.warning("no output defined for turnout %s" % toname)
 			return
-		op, district, otype = self.outputs[toname]
+		op, district, _ = self.outputs[toname]
 		op.SetLock(state)
 		district.RefreshOutput(toname)
 
@@ -304,7 +300,7 @@ class Railroad(wx.Notebook):
 		if oname not in self.outputs:
 			logging.warning("no pulsed output defined for %s" % oname)
 			return
-		op, district, otype = self.outputs[oname]
+		op, district, _ = self.outputs[oname]
 		op.SetOutPulseTo(state)
 		district.RefreshOutput(oname)
 
@@ -312,7 +308,7 @@ class Railroad(wx.Notebook):
 		if oname not in self.outputs:
 			logging.warning("no pulsed output defined for %s" % oname)
 			return
-		op, district, otype = self.outputs[oname]
+		op, district, _ = self.outputs[oname]
 		op.SetOutPulseNXB()
 		district.RefreshOutput(oname)
 
@@ -354,7 +350,7 @@ class Railroad(wx.Notebook):
 		district.EvaluateNXButton(btn)
 
 	def allIO(self):
-		for dname, d in self.districts.items():
+		for _, d in self.districts.items():
 			d.OutIn()
 
 		self.ReleasePendingEvents()
@@ -370,14 +366,14 @@ class Railroad(wx.Notebook):
 		
 	def GetBlockInfo(self):
 		blocks = []
-		for iput, district, itype in self.inputs.values():
+		for iput, _, itype in self.inputs.values():
 			if itype == District.block:				
 				blocks.append([iput.GetName(), 1 if iput.GetEast() else 0])
 		return sorted(blocks)
 
 	def GetSubBlockInfo(self):
 		self.subblocks = {}
-		for iput, district, itype in self.inputs.values():
+		for iput, _, itype in self.inputs.values():
 			if itype == District.block:
 				self.subblocks.update(iput.ToJson())
 		return self.subblocks

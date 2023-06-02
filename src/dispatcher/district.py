@@ -262,7 +262,7 @@ class District:
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
 		if osblk.IsBusy():
 			if not silent:
-				self.frame.PopupEvent("Block is busy")
+				self.frame.PopupEvent("Block %s is busy" % osblk.GetName())
 			return None
 
 		sigE = sig.GetEast()
@@ -278,7 +278,7 @@ class District:
 
 		exitBlk = self.frame.blocks[exitBlkNm]
 		if exitBlk.IsOccupied():
-			self.frame.PopupEvent("Block is busy")
+			self.frame.PopupEvent("Block %s is busy" % exitBlk.GetName())
 			return None
 
 		crossEW = self.CrossingEastWestBoundary(osblk, exitBlk)
@@ -288,7 +288,7 @@ class District:
 				return None
 
 		if exitBlk.AreHandSwitchesSet():
-			self.frame.PopupEvent("Block is locked")
+			self.frame.PopupEvent("Block %s is locked" % exitBlk.GetName())
 			return None
 
 		if exitBlk.GetEast() != osblk.GetEast():
@@ -472,7 +472,7 @@ class District:
 			# currently unlocked - trying to lock
 
 			if hs.IsBlockCleared():
-				self.frame.PopupEvent("Block is cleared")
+				self.frame.PopupEvent("Block %s is cleared" % hs.GetBlockName())
 				return
 
 			stat = 1
@@ -560,6 +560,11 @@ class District:
 			if rt:
 				tolist = rt.GetLockTurnouts()
 				self.LockTurnouts(signm, tolist, aspect != STOP)
+				
+		self.EvaluateDistrictLocks(sig)
+		
+	def EvaluateDistrictLocks(self, sig):
+		pass
 
 	def DoSignalLeverAction(self, signame, state):
 		sigPrefix = signame.split(".")[0]
@@ -676,13 +681,13 @@ class District:
 		return {}
 
 	def ReportBlockBusy(self, blknm):
-		self.frame.PopupEvent("Block is busy")
+		self.frame.PopupEvent("Block %s is busy" % blknm)
 
-	def ReportOSBusy(self):
-		self.frame.PopupEvent("Block is busy")
+	def ReportOSBusy(self, osnm):
+		self.frame.PopupEvent("Block %s is busy" % osnm)
 
 	def ReportTurnoutLocked(self, tonm):
-		self.frame.PopupEvent("Turnout is locked")
+		self.frame.PopupEvent("Turnout %s is locked" % tonm)
 
 	def GenerateRouteInformation(self):
 		routes = {}

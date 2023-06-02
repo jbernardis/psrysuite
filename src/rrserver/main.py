@@ -135,9 +135,6 @@ class MainFrame(wx.Frame):
 			dlg.ShowModal()
 			dlg.Destroy()
 			exit(1)
-			
-		#self.rrMonitor.start()
-		logging.info("Railroad monitor thread created - starting HTTP server")
 
 		try:
 			self.dispServer = HTTPServer(self.ip, self.settings.serverport, self.dispCommandReceipt)
@@ -168,6 +165,8 @@ class MainFrame(wx.Frame):
 		
 	def DelayedStartup(self):
 		self.rrMonitor.start()
+		logging.info("Railroad monitor thread created")
+		
 		if not self.settings.simulation:
 			pname = os.path.join(os.getcwd(), "dccsniffer", "main.py")
 			pid = Popen([sys.executable, pname]).pid
@@ -756,6 +755,14 @@ class MainFrame(wx.Frame):
 			self.Shutdown()
 
 	def onClose(self, _):
+		if self.clientList.Count() != 0:
+			dlg = wx.MessageDialog(self, "There are connected clients.\n\nAre you sure you want to exit",
+					"Active Clients", wx.YES_NO | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+			rc = dlg.ShowModal()
+			dlg.Destroy()
+			if rc != wx.ID_YES:
+				return 
+			
 		self.Shutdown()
 
 	def Shutdown(self):

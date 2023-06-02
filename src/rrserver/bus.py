@@ -3,7 +3,7 @@ import serial
 import time
 import logging
 
-MAXTRIES = 3
+MAXTRIES = 5
 THRESHOLD = 2
 
 def setBit(obyte, obit, val):

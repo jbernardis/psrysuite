@@ -15,8 +15,8 @@ class Indicator:
 	def GetValue(self):
 		return self.value
 
-	def SetValue(self, val):
-		if val == self.value:
+	def SetValue(self, val, force=False):
+		if val == self.value and not force:
 			return
 		self.value = val
 		self.frame.Request({"indicator": { "name": self.name, "value": self.value}})

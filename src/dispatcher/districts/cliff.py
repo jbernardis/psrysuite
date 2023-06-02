@@ -711,47 +711,47 @@ class Cliff (District):
 		self.signals = {}
 
 		sigList = [
-			[ "C2RD", RegAspects,    True,  "right",     (145, 27) ],
-			[ "C2RC", RegAspects,    True,  "right",     (145, 29) ],
-			[ "C2RB", RegAspects,    True,  "rightlong", (145, 31) ],
-			[ "C2RA", SloAspects,    True,  "right",     (145, 33)],
+			[ "C2LD", RegAspects,    True,  "right",     (145, 27) ],
+			[ "C2LC", RegAspects,    True,  "right",     (145, 29) ],
+			[ "C2LB", RegAspects,    True,  "rightlong", (145, 31) ],
+			[ "C2LA", SloAspects,    True,  "right",     (145, 33)],
 
-			[ "C2L",  RegSloAspects, False, "leftlong",  (151, 29)],
+			[ "C2R",  RegSloAspects, False, "leftlong",  (151, 29)],
 
-			[ "C4R",  RegSloAspects, True,  "rightlong", (119, 31) ],
+			[ "C4L",  RegSloAspects, True,  "rightlong", (119, 31) ],
 
-			[ "C4LD", RegAspects,    False, "left",      (126, 27) ],
-			[ "C4LC", RegAspects,    False, "leftlong",  (126, 29) ],
-			[ "C4LB", SloAspects,    False, "left",      (126, 31) ],
-			[ "C4LA", SloAspects,    False, "left",      (126, 33) ],
+			[ "C4RD", RegAspects,    False, "left",      (126, 27) ],
+			[ "C4RC", RegAspects,    False, "leftlong",  (126, 29) ],
+			[ "C4RB", SloAspects,    False, "left",      (126, 31) ],
+			[ "C4RA", SloAspects,    False, "left",      (126, 33) ],
 
-			[ "C6RF", RegAspects,    True,  "right",     (143, 4) ],
-			[ "C6RE", RegAspects,    True,  "right",     (143, 6) ],
-			[ "C6RD", RegAspects,    True,  "right",     (143, 8) ],
-			[ "C6RC", RegAspects,    True,  "right",     (143, 10) ],
-			[ "C6RB", RegAspects,    True,  "right",     (138, 12) ],
-			[ "C6RA", RegAspects,    True,  "right",     (138, 14) ],
-			[ "C6RG", RegAspects,    True,  "right",     (138, 16) ],
-			[ "C6RH", RegAspects,    True,  "right",     (132, 18) ],
-			[ "C6RJ", RegAspects,    True,  "right",     (132, 20) ],
-			[ "C6RK", RegAspects,    True,  "right",     (132, 22) ],
-			[ "C6RL", RegAspects,    True,  "right",     (132, 24) ],
+			[ "C6LF", RegAspects,    True,  "right",     (143, 4) ],
+			[ "C6LE", RegAspects,    True,  "right",     (143, 6) ],
+			[ "C6LD", RegAspects,    True,  "right",     (143, 8) ],
+			[ "C6LC", RegAspects,    True,  "right",     (143, 10) ],
+			[ "C6LB", RegAspects,    True,  "right",     (138, 12) ],
+			[ "C6LA", RegAspects,    True,  "right",     (138, 14) ],
+			[ "C6LG", RegAspects,    True,  "right",     (138, 16) ],
+			[ "C6LH", RegAspects,    True,  "right",     (132, 18) ],
+			[ "C6LJ", RegAspects,    True,  "right",     (132, 20) ],
+			[ "C6LK", RegAspects,    True,  "right",     (132, 22) ],
+			[ "C6LL", RegAspects,    True,  "right",     (132, 24) ],
 
-			[ "C6L",  RegAspects,    False, "leftlong",  (154, 2) ],
+			[ "C6R",  RegAspects,    False, "leftlong",  (154, 2) ],
 
-			[ "C8R",  RegAspects,    True,  "rightlong", (106, 14) ],
+			[ "C8L",  RegAspects,    True,  "rightlong", (106, 14) ],
 
-			[ "C8LF", RegAspects,    False, "left",      (118, 2) ],
-			[ "C8LE", RegAspects,    False, "left",      (118, 4) ],
-			[ "C8LD", RegAspects,    False, "left",      (118, 6) ],
-			[ "C8LC", RegAspects,    False, "left",      (118, 8) ],
-			[ "C8LB", RegAspects,    False, "left",      (118, 10) ],
-			[ "C8LA", RegAspects,    False, "left",      (118, 12) ],
-			[ "C8LG", RegAspects,    False, "left",      (118, 14) ],
-			[ "C8LH", RegAspects,    False, "left",      (124, 16) ],
-			[ "C8LJ", RegAspects,    False, "left",      (124, 18) ],
-			[ "C8LK", RegAspects,    False, "left",      (124, 20) ],
-			[ "C8LL", RegAspects,    False, "left",      (124, 22) ],
+			[ "C8RF", RegAspects,    False, "left",      (118, 2) ],
+			[ "C8RE", RegAspects,    False, "left",      (118, 4) ],
+			[ "C8RD", RegAspects,    False, "left",      (118, 6) ],
+			[ "C8RC", RegAspects,    False, "left",      (118, 8) ],
+			[ "C8RB", RegAspects,    False, "left",      (118, 10) ],
+			[ "C8RA", RegAspects,    False, "left",      (118, 12) ],
+			[ "C8RG", RegAspects,    False, "left",      (118, 14) ],
+			[ "C8RH", RegAspects,    False, "left",      (124, 16) ],
+			[ "C8RJ", RegAspects,    False, "left",      (124, 18) ],
+			[ "C8RK", RegAspects,    False, "left",      (124, 20) ],
+			[ "C8RL", RegAspects,    False, "left",      (124, 22) ],
 		]
 
 		self.sigLeverMap = {
@@ -769,24 +769,24 @@ class Cliff (District):
 
 		blockSigs = {
 			# # which signals govern blocks, west and east
-			"C10": ("C4LC",  "C2RB"),
-			"C20": ("C2L",   "C6L"),
-			"C21": ("C8LA",  "C6RA"),
-			"C30": ("C4LB",  "C2RA"),
-			"C31": ("C4LA",  None),
-			"C40": ("C8LB",  "C6RB"),
-			"C41": ("C8LC",  "C6RC"),
-			"C42": ("C8LD",  "C6RD"),
-			"C43": ("C8LE",  "C6RE"),
-			"C44": ("C8LF",  "C6RF"),
-			"C50": ("C8LG",  "C6RG"),
-			"C51": ("C8LH",  "C6RH"),
-			"C52": ("C8LJ",  "C6RJ"),
-			"C53": ("C8LK",  "C6RK"),
-			"C54": ("C8LL",  "C6RL"),
-			"G10": (None,    "C2RC"),
-			"G12": (None,    "C2RD"),
-			"G21": ("C4LD",  None),
+			"C10": ("C4RC",  "C2LB"),
+			"C20": ("C2R",   "C6L"),
+			"C21": ("C8RA",  "C6LA"),
+			"C30": ("C4RB",  "C2LA"),
+			"C31": ("C4RA",  None),
+			"C40": ("C8RB",  "C6LB"),
+			"C41": ("C8RC",  "C6LC"),
+			"C42": ("C8RD",  "C6LD"),
+			"C43": ("C8RE",  "C6LE"),
+			"C44": ("C8RF",  "C6LF"),
+			"C50": ("C8RG",  "C6LG"),
+			"C51": ("C8RH",  "C6LH"),
+			"C52": ("C8RJ",  "C6LJ"),
+			"C53": ("C8RK",  "C6LK"),
+			"C54": ("C8RL",  "C6LL"),
+			"G10": (None,    "C2LC"),
+			"G12": (None,    "C2LD"),
+			"G21": ("C4RD",  None),
 		}
 
 		for blknm, siglist in blockSigs.items():
@@ -797,99 +797,99 @@ class Cliff (District):
 
 		# Green Mountain West
 		block = self.blocks["COSGMW"]
-		self.routes["CRtC11G21"] = Route(self.screen, block, "CRtC11G21", "C11", [ (119, 30), (120, 30), (121, 29), (122, 28), (123, 28), (124, 28), (125, 28) ], "G21", [RESTRICTING, RESTRICTING], ["CSw41:R"], ["C4R", "C4LD"])
-		self.routes["CRtC11C10"] = Route(self.screen, block, "CRtC11C10", "C11", [ (119, 30), (120, 30), (121, 30), (122, 30), (123, 30), (124, 30), (125, 30) ], "C10", [MAIN, MAIN], ["CSw39:N", "CSw41:N"], ["C4R", "C4LC"])
-		self.routes["CRtC11C30"] = Route(self.screen, block, "CRtC11C30", "C11", [ (119, 30), (120, 30), (121, 30), (122, 31), (123, 32), (124, 32), (125, 32) ], "C30", [SLOW, SLOW], ["CSw37:R", "CSw39:R", "CSw41:N"], ["C4R", "C4LB"])
-		self.routes["CRtC11C31"] = Route(self.screen, block, "CRtC11C31", "C11", [ (119, 30), (120, 30), (121, 30), (122, 31), (123, 32), (124, 33), (125, 34) ], "C31", [RESTRICTING, SLOW], ["CSw37:N", "CSw39:R", "CSw41:N"], ["C4R", "C4LA"])
+		self.routes["CRtC11G21"] = Route(self.screen, block, "CRtC11G21", "C11", [ (119, 30), (120, 30), (121, 29), (122, 28), (123, 28), (124, 28), (125, 28) ], "G21", [RESTRICTING, RESTRICTING], ["CSw41:R"], ["C4L", "C4RD"])
+		self.routes["CRtC11C10"] = Route(self.screen, block, "CRtC11C10", "C11", [ (119, 30), (120, 30), (121, 30), (122, 30), (123, 30), (124, 30), (125, 30) ], "C10", [MAIN, MAIN], ["CSw39:N", "CSw41:N"], ["C4L", "C4RC"])
+		self.routes["CRtC11C30"] = Route(self.screen, block, "CRtC11C30", "C11", [ (119, 30), (120, 30), (121, 30), (122, 31), (123, 32), (124, 32), (125, 32) ], "C30", [SLOW, SLOW], ["CSw37:R", "CSw39:R", "CSw41:N"], ["C4L", "C4RB"])
+		self.routes["CRtC11C31"] = Route(self.screen, block, "CRtC11C31", "C11", [ (119, 30), (120, 30), (121, 30), (122, 31), (123, 32), (124, 33), (125, 34) ], "C31", [RESTRICTING, SLOW], ["CSw37:N", "CSw39:R", "CSw41:N"], ["C4L", "C4RA"])
 
-		self.signals["C4R"].AddPossibleRoutes("COSGMW", [ "CRtC11G21", "CRtC11C10", "CRtC11C30", "CRtC11C31" ])
-		self.signals["C4LD"].AddPossibleRoutes("COSGMW", [ "CRtC11G21" ])
-		self.signals["C4LC"].AddPossibleRoutes("COSGMW", [ "CRtC11C10" ])
-		self.signals["C4LB"].AddPossibleRoutes("COSGMW", [ "CRtC11C30" ])
-		self.signals["C4LA"].AddPossibleRoutes("COSGMW", [ "CRtC11C31" ])
+		self.signals["C4L"].AddPossibleRoutes("COSGMW", [ "CRtC11G21", "CRtC11C10", "CRtC11C30", "CRtC11C31" ])
+		self.signals["C4RD"].AddPossibleRoutes("COSGMW", [ "CRtC11G21" ])
+		self.signals["C4RC"].AddPossibleRoutes("COSGMW", [ "CRtC11C10" ])
+		self.signals["C4RB"].AddPossibleRoutes("COSGMW", [ "CRtC11C30" ])
+		self.signals["C4RA"].AddPossibleRoutes("COSGMW", [ "CRtC11C31" ])
 
-		self.osSignals["COSGMW"] = [ "C4R", "C4LA", "C4LB", "C4LC", "C4LD" ]
+		self.osSignals["COSGMW"] = [ "C4L", "C4RA", "C4RB", "C4RC", "C4RD" ]
 
 		# Green Mountain East
 		block = self.blocks["COSGME"]
-		self.routes["CRtG12C20"] = Route(self.screen, block, "CRtG12C20", "G12", [ (146, 26), (147, 27), (148, 28), (149, 29), (150, 30), (151, 30) ], "C20", [RESTRICTING, RESTRICTING], ["CSw31:R", "CSw35:N"], ["C2RD", "C2L"])
-		self.routes["CRtG10C20"] = Route(self.screen, block, "CRtG10C20", "G10", [ (146, 28), (147, 28), (148, 28), (149, 29), (150, 30), (151, 30) ], "C20", [RESTRICTING, RESTRICTING], ["CSw31:R", "CSw35:R"], ["C2RC", "C2L"])
-		self.routes["CRtC10C20"] = Route(self.screen, block, "CRtC10C20", "C10", [ (146, 30), (147, 30), (148, 30), (149, 30), (150, 30), (151, 30) ], "C20", [MAIN, MAIN], ["CSw31:N", "CSw33:N"], ["C2RB", "C2L"])
-		self.routes["CRtC30C20"] = Route(self.screen, block, "CRtC30C20", "C30", [ (146, 32), (147, 32), (148, 31), (149, 30), (150, 30), (151, 30) ], "C20", [SLOW, SLOW], ["CSw31:N", "CSw33:R"], ["C2RA", "C2L"])
+		self.routes["CRtG12C20"] = Route(self.screen, block, "CRtG12C20", "G12", [ (146, 26), (147, 27), (148, 28), (149, 29), (150, 30), (151, 30) ], "C20", [RESTRICTING, RESTRICTING], ["CSw31:R", "CSw35:N"], ["C2LD", "C2R"])
+		self.routes["CRtG10C20"] = Route(self.screen, block, "CRtG10C20", "G10", [ (146, 28), (147, 28), (148, 28), (149, 29), (150, 30), (151, 30) ], "C20", [RESTRICTING, RESTRICTING], ["CSw31:R", "CSw35:R"], ["C2LC", "C2R"])
+		self.routes["CRtC10C20"] = Route(self.screen, block, "CRtC10C20", "C10", [ (146, 30), (147, 30), (148, 30), (149, 30), (150, 30), (151, 30) ], "C20", [MAIN, MAIN], ["CSw31:N", "CSw33:N"], ["C2LB", "C2R"])
+		self.routes["CRtC30C20"] = Route(self.screen, block, "CRtC30C20", "C30", [ (146, 32), (147, 32), (148, 31), (149, 30), (150, 30), (151, 30) ], "C20", [SLOW, SLOW], ["CSw31:N", "CSw33:R"], ["C2LA", "C2R"])
 
-		self.signals["C2RD"].AddPossibleRoutes("COSGME", [ "CRtG12C20" ])
-		self.signals["C2RC"].AddPossibleRoutes("COSGME", [ "CRtG10C20" ])
-		self.signals["C2RB"].AddPossibleRoutes("COSGME", [ "CRtC10C20" ])
-		self.signals["C2RA"].AddPossibleRoutes("COSGME", [ "CRtC30C20" ])
-		self.signals["C2L"].AddPossibleRoutes("COSGME", [ "CRtG12C20", "CRtG10C20", "CRtC10C20", "CRtC30C20" ])
+		self.signals["C2LD"].AddPossibleRoutes("COSGME", [ "CRtG12C20" ])
+		self.signals["C2LC"].AddPossibleRoutes("COSGME", [ "CRtG10C20" ])
+		self.signals["C2LB"].AddPossibleRoutes("COSGME", [ "CRtC10C20" ])
+		self.signals["C2LA"].AddPossibleRoutes("COSGME", [ "CRtC30C20" ])
+		self.signals["C2R"].AddPossibleRoutes("COSGME", [ "CRtG12C20", "CRtG10C20", "CRtC10C20", "CRtC30C20" ])
 
-		self.osSignals["COSGME"] = [ "C2RA", "C2RB", "C2RC", "C2RD", "C2L" ]
+		self.osSignals["COSGME"] = [ "C2LA", "C2LB", "C2LC", "C2LD", "C2R" ]
 
 		# Sheffield Yard East
 		block = self.blocks["COSSHE"]
-		self.routes["CRtC20C44"] = Route(self.screen, block, "CRtC20C44", "C20", [ (144, 3), (145, 3), (146, 3), (147, 3), (148, 3), (149, 3), (150, 3), (151, 3), (152, 3), (153, 3), (154, 3)  ], "C44", [SLOW, SLOW], ["CSw43:N", "CSw49:N"], ["C6L", "C6RF"])
-		self.routes["CRtC20C43"] = Route(self.screen, block, "CRtC20C43", "C20", [ (144, 5), (145, 5), (146, 5), (147, 5), (148, 5), (149, 4), (150, 3), (151, 3), (152, 3), (153, 3), (154, 3)  ], "C43", [SLOW, SLOW], ["CSw43:N", "CSw49:R"], ["C6L", "C6RE"])
-		self.routes["CRtC20C42"] = Route(self.screen, block, "CRtC20C42", "C20", [ (144, 7), (145, 7), (146, 7), (147, 7), (148, 7), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C42", [SLOW, SLOW], ["CSw43:R", "CSw45:N", "CSw51:N"], ["C6L", "C6RD"])
-		self.routes["CRtC20C41"] = Route(self.screen, block, "CRtC20C41", "C20", [ (144, 9), (145, 8), (146, 7), (147, 7), (148, 7), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C41", [SLOW, SLOW], ["CSw43:R", "CSw45:N", "CSw51:R"], ["C6L", "C6RC"])
-		self.routes["CRtC20C40"] = Route(self.screen, block, "CRtC20C40", "C20", [ (139, 11), (140, 11), (141, 11), (142, 11), (143, 11), (144, 11), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C40", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:N"], ["C6L", "C6RB"])
-		self.routes["CRtC20C21"] = Route(self.screen, block, "CRtC20C21", "C20", [ (139, 13), (140, 13), (141, 13), (142, 13), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C21", [MAIN, MAIN], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:R"], ["C6L", "C6RA"])
-		self.routes["CRtC20C50"] = Route(self.screen, block, "CRtC20C50", "C20", [ (139, 15), (140, 15), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C50", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:N", "CSw65:R"], ["C6L", "C6RG"])
+		self.routes["CRtC20C44"] = Route(self.screen, block, "CRtC20C44", "C20", [ (144, 3), (145, 3), (146, 3), (147, 3), (148, 3), (149, 3), (150, 3), (151, 3), (152, 3), (153, 3), (154, 3)  ], "C44", [SLOW, SLOW], ["CSw43:N", "CSw49:N"], ["C6R", "C6LF"])
+		self.routes["CRtC20C43"] = Route(self.screen, block, "CRtC20C43", "C20", [ (144, 5), (145, 5), (146, 5), (147, 5), (148, 5), (149, 4), (150, 3), (151, 3), (152, 3), (153, 3), (154, 3)  ], "C43", [SLOW, SLOW], ["CSw43:N", "CSw49:R"], ["C6R", "C6LE"])
+		self.routes["CRtC20C42"] = Route(self.screen, block, "CRtC20C42", "C20", [ (144, 7), (145, 7), (146, 7), (147, 7), (148, 7), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C42", [SLOW, SLOW], ["CSw43:R", "CSw45:N", "CSw51:N"], ["C6R", "C6LD"])
+		self.routes["CRtC20C41"] = Route(self.screen, block, "CRtC20C41", "C20", [ (144, 9), (145, 8), (146, 7), (147, 7), (148, 7), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C41", [SLOW, SLOW], ["CSw43:R", "CSw45:N", "CSw51:R"], ["C6R", "C6LC"])
+		self.routes["CRtC20C40"] = Route(self.screen, block, "CRtC20C40", "C20", [ (139, 11), (140, 11), (141, 11), (142, 11), (143, 11), (144, 11), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C40", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:N"], ["C6R", "C6LB"])
+		self.routes["CRtC20C21"] = Route(self.screen, block, "CRtC20C21", "C20", [ (139, 13), (140, 13), (141, 13), (142, 13), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C21", [MAIN, MAIN], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:R"], ["C6R", "C6LA"])
+		self.routes["CRtC20C50"] = Route(self.screen, block, "CRtC20C50", "C20", [ (139, 15), (140, 15), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C50", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:N", "CSw65:R"], ["C6R", "C6LG"])
 		self.routes["CRtC20C51"] = Route(self.screen, block, "CRtC20C51", "C20",
-				[ (133, 17), (134, 17), (135, 17), (136, 17), (137, 17), (138, 17), (139, 17), (140, 16), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C51", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:N", "CSw65:N", "CSw67:R", "CSw69:N"], ["C6L", "C6RH"])
+				[ (133, 17), (134, 17), (135, 17), (136, 17), (137, 17), (138, 17), (139, 17), (140, 16), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C51", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:N", "CSw65:N", "CSw67:R", "CSw69:N"], ["C6R", "C6LH"])
 		self.routes["CRtC20C52"] = Route(self.screen, block, "CRtC20C52", "C20",
-				[ (133, 19), (134, 19), (135, 18), (136, 17), (137, 17), (138, 17), (139, 17), (140, 16), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C52", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:N", "CSw65:N", "CSw67:R", "CSw69:R"], ["C6L", "C6RJ"])
+				[ (133, 19), (134, 19), (135, 18), (136, 17), (137, 17), (138, 17), (139, 17), (140, 16), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C52", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:N", "CSw65:N", "CSw67:R", "CSw69:R"], ["C6R", "C6LJ"])
 		self.routes["CRtC20C53"] = Route(self.screen, block, "CRtC20C53", "C20",
-				[ (133, 21), (134, 21), (135, 21), (136, 20), (137, 19), (138, 18), (139, 17), (140, 16), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C53", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:N", "CSw65:N", "CSw67:N", "CSw71:R"], ["C6L", "C6RK"])
+				[ (133, 21), (134, 21), (135, 21), (136, 20), (137, 19), (138, 18), (139, 17), (140, 16), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C53", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:N", "CSw65:N", "CSw67:N", "CSw71:R"], ["C6R", "C6LK"])
 		self.routes["CRtC20C54"] = Route(self.screen, block, "CRtC20C54", "C20",
-				[ (133, 23), (134, 22), (135, 21), (136, 20), (137, 19), (138, 18), (139, 17), (140, 16), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C54", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:N", "CSw65:N", "CSw67:N", "CSw71:N"], ["C6L", "C6RL"])
+				[ (133, 23), (134, 22), (135, 21), (136, 20), (137, 19), (138, 18), (139, 17), (140, 16), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C54", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw63:N", "CSw65:N", "CSw67:N", "CSw71:N"], ["C6R", "C6LL"])
 
-		self.signals["C6L"].AddPossibleRoutes("COSSHE", [ "CRtC20C44", "CRtC20C43", "CRtC20C42", "CRtC20C41", "CRtC20C40", "CRtC20C21", "CRtC20C50", "CRtC20C51", "CRtC20C52", "CRtC20C53", "CRtC20C54" ])
-		self.signals["C6RA"].AddPossibleRoutes("COSSHE", [ "CRtC20C21" ])
-		self.signals["C6RB"].AddPossibleRoutes("COSSHE", [ "CRtC20C40" ])
-		self.signals["C6RC"].AddPossibleRoutes("COSSHE", [ "CRtC20C41" ])
-		self.signals["C6RD"].AddPossibleRoutes("COSSHE", [ "CRtC20C42" ])
-		self.signals["C6RE"].AddPossibleRoutes("COSSHE", [ "CRtC20C43" ])
-		self.signals["C6RF"].AddPossibleRoutes("COSSHE", [ "CRtC20C44" ])
-		self.signals["C6RG"].AddPossibleRoutes("COSSHE", [ "CRtC20C50" ])
-		self.signals["C6RH"].AddPossibleRoutes("COSSHE", [ "CRtC20C51" ])
-		self.signals["C6RJ"].AddPossibleRoutes("COSSHE", [ "CRtC20C52" ])
-		self.signals["C6RK"].AddPossibleRoutes("COSSHE", [ "CRtC20C53" ])
-		self.signals["C6RL"].AddPossibleRoutes("COSSHE", [ "CRtC20C54" ])
+		self.signals["C6R"].AddPossibleRoutes("COSSHE", [ "CRtC20C44", "CRtC20C43", "CRtC20C42", "CRtC20C41", "CRtC20C40", "CRtC20C21", "CRtC20C50", "CRtC20C51", "CRtC20C52", "CRtC20C53", "CRtC20C54" ])
+		self.signals["C6LA"].AddPossibleRoutes("COSSHE", [ "CRtC20C21" ])
+		self.signals["C6LB"].AddPossibleRoutes("COSSHE", [ "CRtC20C40" ])
+		self.signals["C6LC"].AddPossibleRoutes("COSSHE", [ "CRtC20C41" ])
+		self.signals["C6LD"].AddPossibleRoutes("COSSHE", [ "CRtC20C42" ])
+		self.signals["C6LE"].AddPossibleRoutes("COSSHE", [ "CRtC20C43" ])
+		self.signals["C6LF"].AddPossibleRoutes("COSSHE", [ "CRtC20C44" ])
+		self.signals["C6LG"].AddPossibleRoutes("COSSHE", [ "CRtC20C50" ])
+		self.signals["C6LH"].AddPossibleRoutes("COSSHE", [ "CRtC20C51" ])
+		self.signals["C6LJ"].AddPossibleRoutes("COSSHE", [ "CRtC20C52" ])
+		self.signals["C6LK"].AddPossibleRoutes("COSSHE", [ "CRtC20C53" ])
+		self.signals["C6LL"].AddPossibleRoutes("COSSHE", [ "CRtC20C54" ])
 
-		self.osSignals["COSSHE"] = [ "C6RA", "C6RB", "C6RC", "C6RD", "C6RE", "C6RF", "C6RG", "C6RH", "C6RJ", "C6RK", "C6RL", "C6L" ]
+		self.osSignals["COSSHE"] = [ "C6LA", "C6LB", "C6LC", "C6LD", "C6LE", "C6LF", "C6LG", "C6LH", "C6LJ", "C6LK", "C6LL", "C6R" ]
 
 		# Sheffield Yard West
 		block = self.blocks["COSSHW"]
-		self.routes["CRtC44C22"] = Route(self.screen, block, "CRtC44C22", "C44", [ (106, 13), (107, 13), (108, 12), (109, 11), (110, 10), (111, 9), (112, 8), (113, 7), (114, 6), (115, 5), (116, 4), (117, 3)  ], "C22", [SLOW, SLOW], ["CSw57:N", "CSw59:N", "CSw61:R"], ["C8LF", "C8R"])
-		self.routes["CRtC43C22"] = Route(self.screen, block, "CRtC43C22", "C43", [ (106, 13), (107, 13), (108, 12), (109, 11), (110, 10), (111, 9), (112, 8), (113, 7), (114, 6), (115, 5), (116, 5), (117, 5)  ], "C22", [SLOW, SLOW], ["CSw57:R", "CSw59:N", "CSw61:R"], ["C8LE", "C8R"])
-		self.routes["CRtC42C22"] = Route(self.screen, block, "CRtC42C22", "C42", [ (106, 13), (107, 13), (108, 12), (109, 11), (110, 10), (111, 9), (112, 9), (113, 9), (114, 9), (115, 8), (116, 7), (117, 7)  ], "C22", [SLOW, SLOW], ["CSw53:R", "CSw59:R", "CSw61:R"], ["C8LD", "C8R"])
-		self.routes["CRtC41C22"] = Route(self.screen, block, "CRtC41C22", "C41", [ (106, 13), (107, 13), (108, 12), (109, 11), (110, 10), (111, 9), (112, 9), (113, 9), (114, 9), (115, 9), (116, 9), (117, 9)  ], "C22", [SLOW, SLOW], ["CSw53:N", "CSw59:R", "CSw61:R"], ["C8LC", "C8R"])
-		self.routes["CRtC40C22"] = Route(self.screen, block, "CRtC40C22", "C40", [ (106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 12), (112, 11), (113, 11), (114, 11), (115, 11), (116, 11), (117, 11)  ], "C22", [SLOW, SLOW], ["CSw55:R", "CSw61:N"], ["C8LB", "C8R"])
-		self.routes["CRtC21C22"] = Route(self.screen, block, "CRtC21C22", "C21", [ (106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 13), (115, 13), (116, 13), (117, 13)  ], "C22", [MAIN, DIVERGING], ["CSw55:N", "CSw61:N", "CSw73:N"], ["C8LA", "C8R"])
-		self.routes["CRtC50C22"] = Route(self.screen, block, "CRtC50C22", "C50", [ (106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 15), (117, 15)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:R"], ["C8LG", "C8R"])
+		self.routes["CRtC44C22"] = Route(self.screen, block, "CRtC44C22", "C44", [ (106, 13), (107, 13), (108, 12), (109, 11), (110, 10), (111, 9), (112, 8), (113, 7), (114, 6), (115, 5), (116, 4), (117, 3)  ], "C22", [SLOW, SLOW], ["CSw57:N", "CSw59:N", "CSw61:R"], ["C8RF", "C8L"])
+		self.routes["CRtC43C22"] = Route(self.screen, block, "CRtC43C22", "C43", [ (106, 13), (107, 13), (108, 12), (109, 11), (110, 10), (111, 9), (112, 8), (113, 7), (114, 6), (115, 5), (116, 5), (117, 5)  ], "C22", [SLOW, SLOW], ["CSw57:R", "CSw59:N", "CSw61:R"], ["C8RE", "C8L"])
+		self.routes["CRtC42C22"] = Route(self.screen, block, "CRtC42C22", "C42", [ (106, 13), (107, 13), (108, 12), (109, 11), (110, 10), (111, 9), (112, 9), (113, 9), (114, 9), (115, 8), (116, 7), (117, 7)  ], "C22", [SLOW, SLOW], ["CSw53:R", "CSw59:R", "CSw61:R"], ["C8RD", "C8L"])
+		self.routes["CRtC41C22"] = Route(self.screen, block, "CRtC41C22", "C41", [ (106, 13), (107, 13), (108, 12), (109, 11), (110, 10), (111, 9), (112, 9), (113, 9), (114, 9), (115, 9), (116, 9), (117, 9)  ], "C22", [SLOW, SLOW], ["CSw53:N", "CSw59:R", "CSw61:R"], ["C8RC", "C8L"])
+		self.routes["CRtC40C22"] = Route(self.screen, block, "CRtC40C22", "C40", [ (106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 12), (112, 11), (113, 11), (114, 11), (115, 11), (116, 11), (117, 11)  ], "C22", [SLOW, SLOW], ["CSw55:R", "CSw61:N"], ["C8RB", "C8L"])
+		self.routes["CRtC21C22"] = Route(self.screen, block, "CRtC21C22", "C21", [ (106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 13), (115, 13), (116, 13), (117, 13)  ], "C22", [MAIN, DIVERGING], ["CSw55:N", "CSw61:N", "CSw73:N"], ["C8RA", "C8L"])
+		self.routes["CRtC50C22"] = Route(self.screen, block, "CRtC50C22", "C50", [ (106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 15), (117, 15)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:R"], ["C8RG", "C8L"])
 		self.routes["CRtC51C22"] = Route(self.screen, block, "CRtC51C22", "C51", [
-				(106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 16), (117, 17), (118, 17), (119, 17), (120, 17), (121, 17), (122, 17), (123, 17)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:N", "CSw77:R", "CSw79:N"], ["C8LH", "C8R"])
+				(106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 16), (117, 17), (118, 17), (119, 17), (120, 17), (121, 17), (122, 17), (123, 17)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:N", "CSw77:R", "CSw79:N"], ["C8RH", "C8L"])
 		self.routes["CRtC52C22"] = Route(self.screen, block, "CRtC52C22", "C52", [
-				(106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 16), (117, 17), (118, 17), (119, 17), (120, 17), (121, 18), (122, 19), (123, 19)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:N", "CSw77:R", "CSw79:R"], ["C8LJ", "C8R"])
+				(106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 16), (117, 17), (118, 17), (119, 17), (120, 17), (121, 18), (122, 19), (123, 19)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:N", "CSw77:R", "CSw79:R"], ["C8RJ", "C8L"])
 		self.routes["CRtC53C22"] = Route(self.screen, block, "CRtC53C22", "C53", [
-				(106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 16), (117, 17), (118, 18), (119, 19), (120, 20), (121, 21), (122, 21), (123, 21)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:N", "CSw77:N", "CSw81:R"], ["C8LK", "C8R"])
+				(106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 16), (117, 17), (118, 18), (119, 19), (120, 20), (121, 21), (122, 21), (123, 21)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:N", "CSw77:N", "CSw81:R"], ["C8RK", "C8L"])
 		self.routes["CRtC54C22"] = Route(self.screen, block, "CRtC54C22", "C54", [
-				(106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 16), (117, 17), (118, 18), (119, 19), (120, 20), (121, 21), (122, 22), (123, 23)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:N", "CSw77:N", "CSw81:N"], ["C8LL", "C8R"])
+				(106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 16), (117, 17), (118, 18), (119, 19), (120, 20), (121, 21), (122, 22), (123, 23)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:N", "CSw77:N", "CSw81:N"], ["C8RL", "C8L"])
 
-		self.signals["C8R"].AddPossibleRoutes("COSSHW", [ "CRtC44C22", "CRtC43C22", "CRtC42C22", "CRtC41C22", "CRtC40C22", "CRtC21C22", "CRtC50C22", "CRtC51C22", "CRtC52C22", "CRtC53C22", "CRtC54C22" ])
-		self.signals["C8LA"].AddPossibleRoutes("COSSHW", [ "CRtC21C22" ])
-		self.signals["C8LB"].AddPossibleRoutes("COSSHW", [ "CRtC40C22" ])
-		self.signals["C8LC"].AddPossibleRoutes("COSSHW", [ "CRtC41C22" ])
-		self.signals["C8LD"].AddPossibleRoutes("COSSHW", [ "CRtC42C22" ])
-		self.signals["C8LE"].AddPossibleRoutes("COSSHW", [ "CRtC43C22" ])
-		self.signals["C8LF"].AddPossibleRoutes("COSSHW", [ "CRtC44C22" ])
-		self.signals["C8LG"].AddPossibleRoutes("COSSHW", [ "CRtC50C22" ])
-		self.signals["C8LH"].AddPossibleRoutes("COSSHW", [ "CRtC51C22" ])
-		self.signals["C8LJ"].AddPossibleRoutes("COSSHW", [ "CRtC52C22" ])
-		self.signals["C8LK"].AddPossibleRoutes("COSSHW", [ "CRtC53C22" ])
-		self.signals["C8LL"].AddPossibleRoutes("COSSHW", [ "CRtC54C22" ])
+		self.signals["C8L"].AddPossibleRoutes("COSSHW", [ "CRtC44C22", "CRtC43C22", "CRtC42C22", "CRtC41C22", "CRtC40C22", "CRtC21C22", "CRtC50C22", "CRtC51C22", "CRtC52C22", "CRtC53C22", "CRtC54C22" ])
+		self.signals["C8RA"].AddPossibleRoutes("COSSHW", [ "CRtC21C22" ])
+		self.signals["C8RB"].AddPossibleRoutes("COSSHW", [ "CRtC40C22" ])
+		self.signals["C8RC"].AddPossibleRoutes("COSSHW", [ "CRtC41C22" ])
+		self.signals["C8RD"].AddPossibleRoutes("COSSHW", [ "CRtC42C22" ])
+		self.signals["C8RE"].AddPossibleRoutes("COSSHW", [ "CRtC43C22" ])
+		self.signals["C8RF"].AddPossibleRoutes("COSSHW", [ "CRtC44C22" ])
+		self.signals["C8RG"].AddPossibleRoutes("COSSHW", [ "CRtC50C22" ])
+		self.signals["C8RH"].AddPossibleRoutes("COSSHW", [ "CRtC51C22" ])
+		self.signals["C8RJ"].AddPossibleRoutes("COSSHW", [ "CRtC52C22" ])
+		self.signals["C8RK"].AddPossibleRoutes("COSSHW", [ "CRtC53C22" ])
+		self.signals["C8RL"].AddPossibleRoutes("COSSHW", [ "CRtC54C22" ])
 
-		self.osSignals["COSSHW"] = [ "C8R", "C8LA", "C8LB", "C8LC", "C8LD", "C8LE", "C8LF", "C8LG", "C8LH", "C8LJ", "C8LK", "C8LL" ]
+		self.osSignals["COSSHW"] = [ "C8L", "C8RA", "C8RB", "C8RC", "C8RD", "C8RE", "C8RF", "C8RG", "C8RH", "C8RJ", "C8RK", "C8RL" ]
 
 		return self.signals
 

@@ -18,7 +18,7 @@ class Shore (District):
 		if signm not in ["S8L", "S8R"]:
 			if signm in ["S12R", "S12LA", "S12LB", "S12LC", "S4R", "S4LA", "S4LB", "S4LC" ]:
 				if osblk.IsBusy():
-					self.ReportOSBusy()
+					self.ReportOSBusy(osblk.GetName())
 					return
 			District.PerformSignalAction(self, sig)
 			return
@@ -28,7 +28,7 @@ class Shore (District):
 		movement = aspect == 0  # do we want the signal to allow movement
 		if movement:
 			if osblk.IsBusy() or self.blocks["SOSW"].IsBusy() or self.blocks["SOSE"].IsBusy():
-				self.ReportOSBusy()
+				self.ReportOSBusy(osblk.GetName())
 				return
 			aspect = RESTRICTING
 		else:  # stopping

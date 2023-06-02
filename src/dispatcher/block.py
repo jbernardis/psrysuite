@@ -1,5 +1,4 @@
 import logging
-import json
 
 from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, BLOCK, OVERSWITCH, STOPPINGBLOCK, MAIN, STOP
 
@@ -744,12 +743,6 @@ class OverSwitch (Block):
 
 		return self.route.GetEntryBlock(reverse)
 
- # def SetSBSignals(self, signms):
- # 	pass # does not apply to OS blocks
- #
- # def GetSBSignals(self):
- # 	return None, None # does not apply to OS blocks
-
 	def GetRoute(self):
 		return self.route
 
@@ -819,6 +812,9 @@ class OverSwitch (Block):
 				self.frame.Request({"signal": { "name": signm, "aspect": STOP}})
 				self.district.LockTurnoutsForSignal(self.GetName(), self.entrySignal, False)
 				self.entrySignal = None
+		else:
+			if self.route and self.entrySignal is not None:
+				self.district.EvaluateDistrictLocks(self.entrySignal)
 		
 	def GetTileInRoute(self, screen, pos):
 		if self.route is None:

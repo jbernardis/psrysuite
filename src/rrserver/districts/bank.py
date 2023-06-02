@@ -10,9 +10,9 @@ class Bank(District):
 	def __init__(self, parent, name, settings):
 		District.__init__(self, parent, name, settings)
 
-		sigNames =  [ ["C18RA", 1], ["C18RB", 3], ["C18L", 3],
-						["C22R", 1], ["C22L", 3],
-						["C24R", 3], ["C24L", 3] ]
+		sigNames =  [ ["C18LA", 1], ["C18LB", 3], ["C18R", 3],
+						["C22L", 1], ["C22R", 3],
+						["C24L", 3], ["C24R", 3] ]
 		toNames = [ "CSw17", "CSw23" ]
 		hsNames = [ "CSw19", "CSw21a", "CSw21b" ]
 		handswitchNames = [ "CSw19.hand", "CSw21a.hand", "CSw21b.hand" ]
@@ -45,9 +45,9 @@ class Bank(District):
 	def OutIn(self):
 		outbc = 4
 		outb = [0 for _ in range(outbc)]
-		asp = self.rr.GetOutput("C22R").GetAspectBits()
+		asp = self.rr.GetOutput("C22L").GetAspectBits()
 		outb[0] = setBit(outb[0], 0, asp[0])   # Bank West eastbound signals
-		asp = self.rr.GetOutput("C24R").GetAspectBits()
+		asp = self.rr.GetOutput("C24L").GetAspectBits()
 		outb[0] = setBit(outb[0], 1, asp[0])  
 		outb[0] = setBit(outb[0], 2, asp[1])
 		outb[0] = setBit(outb[0], 3, asp[2])
@@ -55,18 +55,18 @@ class Bank(District):
 		outb[0] = setBit(outb[0], 4, asp[0]) 
 		outb[0] = setBit(outb[0], 5, asp[1])
 		outb[0] = setBit(outb[0], 6, asp[2])
-		asp = self.rr.GetOutput("C22L").GetAspectBits() 
+		asp = self.rr.GetOutput("C22R").GetAspectBits() 
 		outb[0] = setBit(outb[0], 7, asp[0]) 
 
 		outb[1] = setBit(outb[1], 0, asp[1])
 		outb[1] = setBit(outb[1], 1, asp[2])
-		asp = self.rr.GetOutput("C18RA").GetAspectBits()
+		asp = self.rr.GetOutput("C18LA").GetAspectBits()
 		outb[1] = setBit(outb[1], 2, asp[0])   # Bank East eastbound signals
-		asp = self.rr.GetOutput("C18RB").GetAspectBits() 
+		asp = self.rr.GetOutput("C18LB").GetAspectBits() 
 		outb[1] = setBit(outb[1], 3, asp[0]) 
 		outb[1] = setBit(outb[1], 4, asp[1])
 		outb[1] = setBit(outb[1], 5, asp[2])
-		asp = self.rr.GetOutput("C18L").GetAspectBits()         #@ westbound signal
+		asp = self.rr.GetOutput("C18R").GetAspectBits()         #@ westbound signal
 		outb[1] = setBit(outb[1], 6, asp[0]) 
 		outb[1] = setBit(outb[1], 7, asp[1])
 

@@ -189,15 +189,15 @@ class Cliveden (District):
 		self.signals = {}
 	
 		sigList = [
-			[ "C14R",   RegAspects, True,    "rightlong", (82, 14) ],
-			[ "C14LB",  RegAspects, False,   "leftlong", (86, 12) ],
-			[ "C14LA",  RegAspects, False,   "leftlong", (86, 14) ],
+			[ "C14L",   RegAspects, True,    "rightlong", (82, 14) ],
+			[ "C14RB",  RegAspects, False,   "leftlong", (86, 12) ],
+			[ "C14RA",  RegAspects, False,   "leftlong", (86, 14) ],
 
-			[ "C12R",   RegAspects, True,    "rightlong", (95, 16) ],
-			[ "C12L",   RegAspects, False,   "leftlong", (99, 14) ],
+			[ "C12L",   RegAspects, True,    "rightlong", (95, 16) ],
+			[ "C12R",   RegAspects, False,   "leftlong", (99, 14) ],
 
-			[ "C10R",   RegAspects, True,    "rightlong", (95, 14) ],
-			[ "C10L",   RegAspects, False,   "leftlong", (99, 12) ],
+			[ "C10L",   RegAspects, True,    "rightlong", (95, 14) ],
+			[ "C10R",   RegAspects, False,   "leftlong", (99, 12) ],
 		]
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
@@ -213,9 +213,9 @@ class Cliveden (District):
 
 		blockSbSigs = {
 			# # which signals govern stopping sections, west and east
-			"C13": ("C18L",  "C14R"),
-			"C23": ("C14LB", None),
-			"C12": ("C14LA", None),
+			"C13": ("C18R",  "C14L"),
+			"C23": ("C14RB", None),
+			"C12": ("C14RA", None),
 		}
 
 		for blknm, siglist in blockSbSigs.items():
@@ -223,11 +223,11 @@ class Cliveden (District):
 
 		blockSigs = {
 			# # which signals govern blocks, west and east
-			"C11": ("C12L",  "C4R"),
-			"C12": ("C14LA", "C12R"),
-			"C13": ("C18L",  "C14R"),
-			"C22": ("C10L",  "C8R"),
-			"C23": ("C14LB", "C10R"),
+			"C11": ("C12R",  "C4L"),
+			"C12": ("C14RA", "C12L"),
+			"C13": ("C18R",  "C14L"),
+			"C22": ("C10R",  "C8L"),
+			"C23": ("C14RB", "C10L"),
 		}
 
 		for blknm, siglist in blockSigs.items():
@@ -237,30 +237,30 @@ class Cliveden (District):
 		self.osSignals = {}
 
 		block = self.blocks["COSCLW"]
-		self.routes["CRtC13C23"] = Route(self.screen, block, "CRtC13C23", "C23", [ (82, 13), (83, 13), (84, 13), (85, 13), (86, 13) ], "C13", [MAIN, MAIN], ["CSw13:N"], ["C14LB", "C14R"])
-		self.routes["CRtC13C12"] = Route(self.screen, block, "CRtC13C12", "C12", [ (82, 13), (83, 13), (84, 14), (85, 15), (86, 15) ], "C13", [DIVERGING, DIVERGING], ["CSw13:R"], ["C14LA", "C14R"])
+		self.routes["CRtC13C23"] = Route(self.screen, block, "CRtC13C23", "C23", [ (82, 13), (83, 13), (84, 13), (85, 13), (86, 13) ], "C13", [MAIN, MAIN], ["CSw13:N"], ["C14RB", "C14L"])
+		self.routes["CRtC13C12"] = Route(self.screen, block, "CRtC13C12", "C12", [ (82, 13), (83, 13), (84, 14), (85, 15), (86, 15) ], "C13", [DIVERGING, DIVERGING], ["CSw13:R"], ["C14RA", "C14L"])
 
 		block=self.blocks["COSCLEW"]
-		self.routes["CRtC23C22"] = Route(self.screen, block, "CRtC23C22", "C22", [ (95, 13), (96, 13), (97, 13), (98, 13), (99, 13) ], "C23", [MAIN, MAIN], ["CSw9:N"], ["C10L", "C10R"])
+		self.routes["CRtC23C22"] = Route(self.screen, block, "CRtC23C22", "C22", [ (95, 13), (96, 13), (97, 13), (98, 13), (99, 13) ], "C23", [MAIN, MAIN], ["CSw9:N"], ["C10R", "C10L"])
 
 		block=self.blocks["COSCLEE"]
-		self.routes["CRtC12C11"] = Route(self.screen, block, "CRtC12C11", "C12", [ (95, 15), (96, 15), (97, 15), (98, 15), (99, 15) ], "C11", [MAIN, MAIN], ["CSw9:N"], ["C12R", "C12L"])
-		self.routes["CRtC23C11"] = Route(self.screen, block, "CRtC23C11", "C23", [ (95, 13), (96, 13), (97, 14), (98, 15), (99, 15) ], "C11", [DIVERGING, DIVERGING], ["CSw9:R"], ["C10R", "C12L"])
+		self.routes["CRtC12C11"] = Route(self.screen, block, "CRtC12C11", "C12", [ (95, 15), (96, 15), (97, 15), (98, 15), (99, 15) ], "C11", [MAIN, MAIN], ["CSw9:N"], ["C12L", "C12R"])
+		self.routes["CRtC23C11"] = Route(self.screen, block, "CRtC23C11", "C23", [ (95, 13), (96, 13), (97, 14), (98, 15), (99, 15) ], "C11", [DIVERGING, DIVERGING], ["CSw9:R"], ["C10L", "C12R"])
 
-		self.signals["C14R"].AddPossibleRoutes("COSCLW", [ "CRtC13C23", "CRtC13C12" ])
-		self.signals["C14LA"].AddPossibleRoutes("COSCLW", [ "CRtC13C12" ])
-		self.signals["C14LB"].AddPossibleRoutes("COSCLW", [ "CRtC13C23" ])
+		self.signals["C14L"].AddPossibleRoutes("COSCLW", [ "CRtC13C23", "CRtC13C12" ])
+		self.signals["C14RA"].AddPossibleRoutes("COSCLW", [ "CRtC13C12" ])
+		self.signals["C14RB"].AddPossibleRoutes("COSCLW", [ "CRtC13C23" ])
 
-		self.signals["C12R"].AddPossibleRoutes("COSCLEE", [ "CRtC12C11" ])
-		self.signals["C12L"].AddPossibleRoutes("COSCLEE", [ "CRtC12C11", "CRtC23C11" ])
+		self.signals["C12L"].AddPossibleRoutes("COSCLEE", [ "CRtC12C11" ])
+		self.signals["C12R"].AddPossibleRoutes("COSCLEE", [ "CRtC12C11", "CRtC23C11" ])
 
-		self.signals["C10R"].AddPossibleRoutes("COSCLEW", [ "CRtC23C22" ])
-		self.signals["C10R"].AddPossibleRoutes("COSCLEE", [ "CRtC23C11" ])
 		self.signals["C10L"].AddPossibleRoutes("COSCLEW", [ "CRtC23C22" ])
+		self.signals["C10L"].AddPossibleRoutes("COSCLEE", [ "CRtC23C11" ])
+		self.signals["C10R"].AddPossibleRoutes("COSCLEW", [ "CRtC23C22" ])
 
-		self.osSignals["COSCLW"] =  [ "C14R", "C14LA", "C14LB" ]
-		self.osSignals["COSCLEW"] = [ "C10R", "C10L", "C12L" ]
-		self.osSignals["COSCLEE"] = [ "C12R", "C12L", "C10R" ]
+		self.osSignals["COSCLW"] =  [ "C14L", "C14RA", "C14RB" ]
+		self.osSignals["COSCLEW"] = [ "C10L", "C10R", "C12R" ]
+		self.osSignals["COSCLEE"] = [ "C12L", "C12R", "C10L" ]
 
 		return self.signals
 

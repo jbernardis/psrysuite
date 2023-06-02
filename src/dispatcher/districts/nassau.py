@@ -48,6 +48,9 @@ class Nassau (District):
 
 		if not District.PerformSignalAction(self, sig):
 			return
+		#self.EvaluateDistrictLocks(sig)
+		
+	def EvaluateDistrictLocks(self, sig):
 		currentMovement = sig.GetAspect() != 0  # does the CURRENT signal status allow movement
 		rt, osblk = self.FindRoute(sig)
 		osblknm = osblk.GetName()
@@ -55,7 +58,7 @@ class Nassau (District):
 
 		if osblknm in ["NWOSCY", "NWOSTY", "NWOSW", "NWOSE"]:
 			lock = [False, False, False, False]
-			if not currentMovement:
+			if currentMovement:
 				for s in sigs:
 					if s.startswith("N20"):
 						lock[0] = True
@@ -73,9 +76,10 @@ class Nassau (District):
 				lock[2] = True
 			lv = [1 if x else 0 for x in lock]
 			self.frame.Request({"districtlock": { "name": "NWSL", "value": lv }})
+			
 		elif osblknm in ["NEOSRH", "NEOSW", "NEOSE"]:
 			lock = [False, False, False]
-			if not currentMovement:
+			if currentMovement:
 				for s in sigs:
 					if s.startswith("N28"):
 						lock[0] = True

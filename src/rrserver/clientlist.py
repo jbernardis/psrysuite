@@ -62,6 +62,9 @@ class ClientList(wx.ListCtrl):
 				return self.GetItemText(i, 0)
 			
 		return None
+	
+	def Count(self):
+		return len(self.clientList)
 
 	def DelClient(self, addr):
 		logging.info("Removing client with address %s:%s" % (addr[0], addr[1]))
