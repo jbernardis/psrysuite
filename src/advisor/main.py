@@ -266,14 +266,16 @@ class MainUnit:
 		osnm = routeRequest.GetOS()
 		osblk = self.osList[osnm]			
 		actRt = osblk.GetActiveRoute()
+		
+		neededRt = routeRequest.GetRoute()
+		entryBlkNm = routeRequest.GetEntryBlock()
+		exitBlkNm = neededRt.GetOtherEnd(entryBlkNm)
+		signalNm = neededRt.GetSignalForEnd(entryBlkNm)
+		aspect = self.signals[signalNm].GetAspect()
+			
 		if actRt is not None:
 			actRtNm = actRt.GetName()
 			
-			neededRt = routeRequest.GetRoute()
-			entryBlkNm = routeRequest.GetEntryBlock()
-			exitBlkNm = neededRt.GetOtherEnd(entryBlkNm)
-			signalNm = neededRt.GetSignalForEnd(entryBlkNm)
-			aspect = self.signals[signalNm].GetAspect()
 			if actRtNm == routeRequest.GetName() and aspect != 0:
 				logging.info("already set to the active route with a signal")
 				return
