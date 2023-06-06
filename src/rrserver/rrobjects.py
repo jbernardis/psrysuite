@@ -1,5 +1,4 @@
 import logging
-import sys
 
 class Input:
 	def __init__(self, name, district):

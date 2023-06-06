@@ -2,7 +2,6 @@ import threading
 import socket
 import select
 import json
-import time
 
 
 class SktServer (threading.Thread):
