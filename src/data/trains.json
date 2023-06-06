@@ -15,7 +15,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -23,7 +23,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -31,7 +31,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -39,7 +39,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -119,7 +119,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2L",
+        "signal": "Y2R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -127,7 +127,7 @@
         "block": "Y30",
         "os": "YOSEJW",
         "route": "YRtY30Y11",
-        "signal": "Y8L",
+        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -203,7 +203,7 @@
         "block": "Y20",
         "os": "YOSKL1",
         "route": "YRtY20Y51",
-        "signal": "Y26RB",
+        "signal": "Y26LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -211,7 +211,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -219,7 +219,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -299,7 +299,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -307,7 +307,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -315,7 +315,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -323,7 +323,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -331,7 +331,7 @@
         "block": "C30",
         "os": "COSGMW",
         "route": "CRtC11C30",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -339,7 +339,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC30C20",
-        "signal": "C2RA",
+        "signal": "C2LA",
         "time": 5000,
         "trigger": "Front"
       }
@@ -415,7 +415,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -423,7 +423,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -431,7 +431,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -439,7 +439,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -519,7 +519,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2L",
+        "signal": "Y2R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -527,7 +527,7 @@
         "block": "Y30",
         "os": "YOSEJW",
         "route": "YRtY30Y11",
-        "signal": "Y8L",
+        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -535,7 +535,7 @@
         "block": "Y50",
         "os": "YOSKL4",
         "route": "YRtY30Y50",
-        "signal": "Y34R",
+        "signal": "Y34L",
         "time": 5000,
         "trigger": "Front"
       }
@@ -611,7 +611,7 @@
         "block": "Y20",
         "os": "YOSKL1",
         "route": "YRtY20Y50",
-        "signal": "Y26RA",
+        "signal": "Y26LA",
         "time": 5000,
         "trigger": "Front"
       },
@@ -619,7 +619,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -627,7 +627,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -707,7 +707,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -715,7 +715,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -723,7 +723,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -731,7 +731,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -739,7 +739,7 @@
         "block": "C30",
         "os": "COSGMW",
         "route": "CRtC11C30",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -747,7 +747,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC30C20",
-        "signal": "C2RA",
+        "signal": "C2LA",
         "time": 5000,
         "trigger": "Front"
       }
@@ -1069,7 +1069,7 @@
         "block": "C11",
         "os": "COSGMW",
         "route": "CRtC11C31",
-        "signal": "C4LA",
+        "signal": "C4RA",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1077,7 +1077,7 @@
         "block": "C23",
         "os": "COSCLEE",
         "route": "CRtC23C11",
-        "signal": "C12L",
+        "signal": "C12R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1085,7 +1085,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1093,7 +1093,7 @@
         "block": "B21",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1101,7 +1101,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B21",
-        "signal": "C24L",
+        "signal": "C24R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1173,7 +1173,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1181,7 +1181,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1189,7 +1189,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1197,7 +1197,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1205,7 +1205,7 @@
         "block": "C31",
         "os": "COSGMW",
         "route": "CRtC11C31",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       }
@@ -1261,7 +1261,7 @@
         "block": "Y20",
         "os": "YOSKL3",
         "route": "YRtY20Y60",
-        "signal": "Y22R",
+        "signal": "Y22L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1269,7 +1269,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1277,7 +1277,7 @@
         "block": "P50",
         "os": "YOSCJE",
         "route": "YRtY21P50",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1460,7 +1460,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11P50",
-        "signal": "Y4LA",
+        "signal": "Y4RA",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1468,7 +1468,7 @@
         "block": "Y10",
         "os": "YOSEJW",
         "route": "YRtY10Y11",
-        "signal": "Y8L",
+        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1476,7 +1476,7 @@
         "block": "Y60",
         "os": "YOSKL3",
         "route": "YRtY10Y60",
-        "signal": "Y22L",
+        "signal": "Y22R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -1761,7 +1761,7 @@
         "block": "Y20",
         "os": "YOSKL1",
         "route": "YRtY20Y52",
-        "signal": "Y24RA",
+        "signal": "Y24LA",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1769,7 +1769,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -1777,7 +1777,7 @@
         "block": "P50",
         "os": "YOSCJE",
         "route": "YRtY21P50",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -2337,7 +2337,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -2345,7 +2345,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -2353,7 +2353,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -2361,7 +2361,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -2565,7 +2565,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -2573,7 +2573,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -2581,7 +2581,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -2589,7 +2589,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -2597,7 +2597,7 @@
         "block": "C30",
         "os": "COSGMW",
         "route": "CRtC11C30",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -2605,7 +2605,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC30C20",
-        "signal": "C2RA",
+        "signal": "C2LA",
         "time": 5000,
         "trigger": "Front"
       }
@@ -3110,7 +3110,7 @@
         "block": "Y20",
         "os": "YOSKL1",
         "route": "YRtY20Y52",
-        "signal": "Y24RA",
+        "signal": "Y24LA",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3118,7 +3118,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3126,7 +3126,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3448,7 +3448,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3456,7 +3456,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3464,7 +3464,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3472,7 +3472,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3552,7 +3552,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2L",
+        "signal": "Y2R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3560,7 +3560,7 @@
         "block": "Y87",
         "os": "YOSEJW",
         "route": "YRtY87Y11",
-        "signal": "Y8L",
+        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -3632,7 +3632,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3640,7 +3640,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3648,7 +3648,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3656,7 +3656,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3736,7 +3736,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2L",
+        "signal": "Y2R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3744,7 +3744,7 @@
         "block": "Y87",
         "os": "YOSEJW",
         "route": "YRtY87Y11",
-        "signal": "Y8L",
+        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -3816,7 +3816,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3824,7 +3824,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3832,7 +3832,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3840,7 +3840,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3920,7 +3920,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2L",
+        "signal": "Y2R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -3928,7 +3928,7 @@
         "block": "Y87",
         "os": "YOSEJW",
         "route": "YRtY87Y11",
-        "signal": "Y8L",
+        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -3999,7 +3999,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4007,7 +4007,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4015,7 +4015,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4023,7 +4023,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4163,7 +4163,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4171,7 +4171,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4179,7 +4179,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4187,7 +4187,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4267,7 +4267,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2L",
+        "signal": "Y2R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -4344,7 +4344,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4352,7 +4352,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4360,7 +4360,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4368,7 +4368,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4448,7 +4448,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2L",
+        "signal": "Y2R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4456,7 +4456,7 @@
         "block": "Y30",
         "os": "YOSEJW",
         "route": "YRtY30Y11",
-        "signal": "Y8L",
+        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -4528,7 +4528,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4536,7 +4536,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4544,7 +4544,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4552,7 +4552,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4632,7 +4632,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2L",
+        "signal": "Y2R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4640,7 +4640,7 @@
         "block": "Y30",
         "os": "YOSEJW",
         "route": "YRtY30Y11",
-        "signal": "Y8L",
+        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -4712,7 +4712,7 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10L",
+        "signal": "C10R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4720,7 +4720,7 @@
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14LB",
+        "signal": "C14RB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4728,7 +4728,7 @@
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18L",
+        "signal": "C18R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4736,7 +4736,7 @@
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22L",
+        "signal": "C22R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4816,7 +4816,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2L",
+        "signal": "Y2R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -4824,7 +4824,7 @@
         "block": "Y30",
         "os": "YOSEJW",
         "route": "YRtY30Y11",
-        "signal": "Y8L",
+        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -5864,7 +5864,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -5872,7 +5872,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -5880,7 +5880,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -5888,7 +5888,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -5896,7 +5896,7 @@
         "block": "C10",
         "os": "COSGMW",
         "route": "CRtC11C10",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -5904,7 +5904,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC10C20",
-        "signal": "C2RB",
+        "signal": "C2LB",
         "time": 5000,
         "trigger": "Front"
       }
@@ -6104,7 +6104,7 @@
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2L",
+        "signal": "Y2R",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6112,7 +6112,7 @@
         "block": "Y87",
         "os": "YOSEJW",
         "route": "YRtY87Y11",
-        "signal": "Y8L",
+        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -6493,7 +6493,7 @@
         "block": "Y20",
         "os": "YOSKL1",
         "route": "YRtY20Y70",
-        "signal": "Y26RC",
+        "signal": "Y26LC",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6501,7 +6501,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6509,7 +6509,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6589,7 +6589,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6597,7 +6597,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6605,7 +6605,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6613,7 +6613,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6621,7 +6621,7 @@
         "block": "C30",
         "os": "COSGMW",
         "route": "CRtC11C30",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6629,7 +6629,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC30C20",
-        "signal": "C2RA",
+        "signal": "C2LA",
         "time": 5000,
         "trigger": "Front"
       }
@@ -6705,7 +6705,7 @@
         "block": "Y20",
         "os": "YOSKL1",
         "route": "YRtY20Y70",
-        "signal": "Y26RC",
+        "signal": "Y26LC",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6713,7 +6713,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6721,7 +6721,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6801,7 +6801,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6809,7 +6809,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6817,7 +6817,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6825,7 +6825,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6833,7 +6833,7 @@
         "block": "C10",
         "os": "COSGMW",
         "route": "CRtC11C10",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6841,7 +6841,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC10C20",
-        "signal": "C2RB",
+        "signal": "C2LB",
         "time": 5000,
         "trigger": "Front"
       }
@@ -6917,7 +6917,7 @@
         "block": "Y20",
         "os": "YOSKL1",
         "route": "YRtY20Y70",
-        "signal": "Y26RC",
+        "signal": "Y26LC",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6925,7 +6925,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -6933,7 +6933,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7065,7 +7065,7 @@
         "block": "Y20",
         "os": "YOSKL1",
         "route": "YRtY20Y70",
-        "signal": "Y26RC",
+        "signal": "Y26LC",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7073,7 +7073,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7081,7 +7081,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7161,7 +7161,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7169,7 +7169,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7177,7 +7177,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7185,7 +7185,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7193,7 +7193,7 @@
         "block": "C10",
         "os": "COSGMW",
         "route": "CRtC11C10",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7201,7 +7201,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC10C20",
-        "signal": "C2RB",
+        "signal": "C2LB",
         "time": 5000,
         "trigger": "Front"
       }
@@ -7231,7 +7231,7 @@
         "block": "Y20",
         "os": "YOSKL1",
         "route": "YRtY20Y70",
-        "signal": "Y26RC",
+        "signal": "Y26LC",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7239,7 +7239,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7247,7 +7247,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7327,7 +7327,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7335,7 +7335,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7343,7 +7343,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7351,7 +7351,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7359,7 +7359,7 @@
         "block": "C10",
         "os": "COSGMW",
         "route": "CRtC11C10",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7367,7 +7367,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC10C20",
-        "signal": "C2RB",
+        "signal": "C2LB",
         "time": 5000,
         "trigger": "Front"
       }
@@ -7398,7 +7398,7 @@
         "block": "Y20",
         "os": "YOSKL1",
         "route": "YRtY20Y70",
-        "signal": "Y26RC",
+        "signal": "Y26LC",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7406,7 +7406,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7414,7 +7414,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7494,7 +7494,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7502,7 +7502,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7510,7 +7510,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7518,7 +7518,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7526,7 +7526,7 @@
         "block": "C10",
         "os": "COSGMW",
         "route": "CRtC11C10",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7534,7 +7534,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC10C20",
-        "signal": "C2RB",
+        "signal": "C2LB",
         "time": 5000,
         "trigger": "Front"
       }
@@ -7611,7 +7611,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7619,7 +7619,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7699,7 +7699,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7707,7 +7707,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7715,7 +7715,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7723,7 +7723,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7731,7 +7731,7 @@
         "block": "C30",
         "os": "COSGMW",
         "route": "CRtC11C30",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7739,7 +7739,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC30C20",
-        "signal": "C2RA",
+        "signal": "C2LA",
         "time": 5000,
         "trigger": "Front"
       }
@@ -7816,7 +7816,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7824,7 +7824,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7904,7 +7904,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7912,7 +7912,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7920,7 +7920,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7928,7 +7928,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7936,7 +7936,7 @@
         "block": "C30",
         "os": "COSGMW",
         "route": "CRtC11C30",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -7944,7 +7944,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC30C20",
-        "signal": "C2RA",
+        "signal": "C2LA",
         "time": 5000,
         "trigger": "Front"
       }
@@ -8021,7 +8021,7 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10R",
+        "signal": "Y10L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -8029,7 +8029,7 @@
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4R",
+        "signal": "Y4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -8109,7 +8109,7 @@
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24R",
+        "signal": "C24L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -8117,7 +8117,7 @@
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18RA",
+        "signal": "C18LB",
         "time": 5000,
         "trigger": "Front"
       },
@@ -8125,7 +8125,7 @@
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14R",
+        "signal": "C14L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -8133,7 +8133,7 @@
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12R",
+        "signal": "C12L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -8141,7 +8141,7 @@
         "block": "C30",
         "os": "COSGMW",
         "route": "CRtC11C30",
-        "signal": "C4R",
+        "signal": "C4L",
         "time": 5000,
         "trigger": "Front"
       },
@@ -8149,7 +8149,7 @@
         "block": "C20",
         "os": "COSGME",
         "route": "CRtC30C20",
-        "signal": "C2RA",
+        "signal": "C2LA",
         "time": 5000,
         "trigger": "Front"
       }

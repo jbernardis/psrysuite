@@ -696,7 +696,7 @@
       "sbwest": null
     },
     "R10": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "R10.W"
     },
@@ -967,8 +967,8 @@
       ],
       "os": "BOSWW",
       "signals": [
-        "C22L",
-        "C22R"
+        "C22R",
+        "C22L"
       ],
       "turnouts": [
         [
@@ -984,8 +984,8 @@
       ],
       "os": "BOSWW",
       "signals": [
-        "C24L",
-        "C22R"
+        "C24R",
+        "C22L"
       ],
       "turnouts": [
         [
@@ -1001,8 +1001,8 @@
       ],
       "os": "BOSE",
       "signals": [
-        "C18RA",
-        "C18L"
+        "C18LA",
+        "C18R"
       ],
       "turnouts": [
         [
@@ -1018,8 +1018,8 @@
       ],
       "os": "BOSWE",
       "signals": [
-        "C24L",
-        "C24R"
+        "C24R",
+        "C24L"
       ],
       "turnouts": [
         [
@@ -1035,8 +1035,8 @@
       ],
       "os": "BOSE",
       "signals": [
-        "C18RB",
-        "C18L"
+        "C18LB",
+        "C18R"
       ],
       "turnouts": [
         [
@@ -1052,8 +1052,8 @@
       ],
       "os": "COSGME",
       "signals": [
-        "C2RB",
-        "C2L"
+        "C2LB",
+        "C2R"
       ],
       "turnouts": [
         [
@@ -1073,8 +1073,8 @@
       ],
       "os": "COSGMW",
       "signals": [
-        "C4R",
-        "C4LC"
+        "C4L",
+        "C4RC"
       ],
       "turnouts": [
         [
@@ -1094,8 +1094,8 @@
       ],
       "os": "COSGMW",
       "signals": [
-        "C4R",
-        "C4LB"
+        "C4L",
+        "C4RB"
       ],
       "turnouts": [
         [
@@ -1119,8 +1119,8 @@
       ],
       "os": "COSGMW",
       "signals": [
-        "C4R",
-        "C4LA"
+        "C4L",
+        "C4RA"
       ],
       "turnouts": [
         [
@@ -1144,8 +1144,8 @@
       ],
       "os": "COSGMW",
       "signals": [
-        "C4R",
-        "C4LD"
+        "C4L",
+        "C4RD"
       ],
       "turnouts": [
         [
@@ -1161,8 +1161,8 @@
       ],
       "os": "COSCLEE",
       "signals": [
-        "C12R",
-        "C12L"
+        "C12L",
+        "C12R"
       ],
       "turnouts": [
         [
@@ -1178,8 +1178,8 @@
       ],
       "os": "COSCLW",
       "signals": [
-        "C14LA",
-        "C14R"
+        "C14RA",
+        "C14L"
       ],
       "turnouts": [
         [
@@ -1195,8 +1195,8 @@
       ],
       "os": "COSCLW",
       "signals": [
-        "C14LB",
-        "C14R"
+        "C14RB",
+        "C14L"
       ],
       "turnouts": [
         [
@@ -1212,8 +1212,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RA"
+        "C6R",
+        "C6LA"
       ],
       "turnouts": [
         [
@@ -1222,11 +1222,11 @@
         ],
         [
           "CSw45",
-          "N"
+          "R"
         ],
         [
           "CSw47",
-          "N"
+          "R"
         ],
         [
           "CSw63",
@@ -1241,8 +1241,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RB"
+        "C6R",
+        "C6LB"
       ],
       "turnouts": [
         [
@@ -1251,11 +1251,11 @@
         ],
         [
           "CSw45",
-          "N"
+          "R"
         ],
         [
           "CSw47",
-          "R"
+          "N"
         ]
       ]
     },
@@ -1266,8 +1266,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RC"
+        "C6R",
+        "C6LC"
       ],
       "turnouts": [
         [
@@ -1276,7 +1276,7 @@
         ],
         [
           "CSw45",
-          "R"
+          "N"
         ],
         [
           "CSw51",
@@ -1291,8 +1291,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RD"
+        "C6R",
+        "C6LD"
       ],
       "turnouts": [
         [
@@ -1301,7 +1301,7 @@
         ],
         [
           "CSw45",
-          "R"
+          "N"
         ],
         [
           "CSw51",
@@ -1316,8 +1316,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RE"
+        "C6R",
+        "C6LE"
       ],
       "turnouts": [
         [
@@ -1337,8 +1337,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RF"
+        "C6R",
+        "C6LF"
       ],
       "turnouts": [
         [
@@ -1358,8 +1358,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RG"
+        "C6R",
+        "C6LG"
       ],
       "turnouts": [
         [
@@ -1368,11 +1368,11 @@
         ],
         [
           "CSw45",
-          "N"
+          "R"
         ],
         [
           "CSw47",
-          "N"
+          "R"
         ],
         [
           "CSw63",
@@ -1391,8 +1391,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RH"
+        "C6R",
+        "C6LH"
       ],
       "turnouts": [
         [
@@ -1401,11 +1401,11 @@
         ],
         [
           "CSw45",
-          "N"
+          "R"
         ],
         [
           "CSw47",
-          "N"
+          "R"
         ],
         [
           "CSw63",
@@ -1432,8 +1432,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RJ"
+        "C6R",
+        "C6LJ"
       ],
       "turnouts": [
         [
@@ -1442,11 +1442,11 @@
         ],
         [
           "CSw45",
-          "N"
+          "R"
         ],
         [
           "CSw47",
-          "N"
+          "R"
         ],
         [
           "CSw63",
@@ -1473,8 +1473,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RK"
+        "C6R",
+        "C6LK"
       ],
       "turnouts": [
         [
@@ -1483,11 +1483,11 @@
         ],
         [
           "CSw45",
-          "N"
+          "R"
         ],
         [
           "CSw47",
-          "N"
+          "R"
         ],
         [
           "CSw63",
@@ -1514,8 +1514,8 @@
       ],
       "os": "COSSHE",
       "signals": [
-        "C6L",
-        "C6RL"
+        "C6R",
+        "C6LL"
       ],
       "turnouts": [
         [
@@ -1524,11 +1524,11 @@
         ],
         [
           "CSw45",
-          "N"
+          "R"
         ],
         [
           "CSw47",
-          "N"
+          "R"
         ],
         [
           "CSw63",
@@ -1555,8 +1555,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LA",
-        "C8R"
+        "C8RA",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1580,8 +1580,8 @@
       ],
       "os": "COSCLEE",
       "signals": [
-        "C10R",
-        "C12L"
+        "C10L",
+        "C12R"
       ],
       "turnouts": [
         [
@@ -1597,8 +1597,8 @@
       ],
       "os": "COSCLEW",
       "signals": [
-        "C10L",
-        "C10R"
+        "C10R",
+        "C10L"
       ],
       "turnouts": [
         [
@@ -1614,8 +1614,8 @@
       ],
       "os": "COSGME",
       "signals": [
-        "C2RA",
-        "C2L"
+        "C2LA",
+        "C2R"
       ],
       "turnouts": [
         [
@@ -1635,8 +1635,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LB",
-        "C8R"
+        "C8RB",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1656,8 +1656,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LC",
-        "C8R"
+        "C8RC",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1681,8 +1681,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LD",
-        "C8R"
+        "C8RD",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1706,8 +1706,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LE",
-        "C8R"
+        "C8RE",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1731,8 +1731,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LF",
-        "C8R"
+        "C8RF",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1756,8 +1756,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LG",
-        "C8R"
+        "C8RG",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1785,8 +1785,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LH",
-        "C8R"
+        "C8RH",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1822,8 +1822,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LJ",
-        "C8R"
+        "C8RJ",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1859,8 +1859,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LK",
-        "C8R"
+        "C8RK",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1896,8 +1896,8 @@
       ],
       "os": "COSSHW",
       "signals": [
-        "C8LL",
-        "C8R"
+        "C8RL",
+        "C8L"
       ],
       "turnouts": [
         [
@@ -1933,8 +1933,8 @@
       ],
       "os": "COSGME",
       "signals": [
-        "C2RC",
-        "C2L"
+        "C2LC",
+        "C2R"
       ],
       "turnouts": [
         [
@@ -1954,8 +1954,8 @@
       ],
       "os": "COSGME",
       "signals": [
-        "C2RD",
-        "C2L"
+        "C2LD",
+        "C2R"
       ],
       "turnouts": [
         [
@@ -6793,8 +6793,8 @@
       ],
       "os": "YOSEJW",
       "signals": [
-        "Y8L",
-        "Y8RA"
+        "Y8R",
+        "Y8LA"
       ],
       "turnouts": [
         [
@@ -6814,8 +6814,8 @@
       ],
       "os": "YOSEJE",
       "signals": [
-        "Y8RA",
-        "Y10L"
+        "Y8LA",
+        "Y10R"
       ],
       "turnouts": [
         [
@@ -6835,8 +6835,8 @@
       ],
       "os": "YOSKL2",
       "signals": [
-        "Y22L",
-        "Y26RA"
+        "Y22R",
+        "Y26LA"
       ],
       "turnouts": [
         [
@@ -6864,8 +6864,8 @@
       ],
       "os": "YOSKL2",
       "signals": [
-        "Y22L",
-        "Y26RB"
+        "Y22R",
+        "Y26LB"
       ],
       "turnouts": [
         [
@@ -6897,8 +6897,8 @@
       ],
       "os": "YOSKL2",
       "signals": [
-        "Y22L",
-        "Y24RA"
+        "Y22R",
+        "Y24LA"
       ],
       "turnouts": [
         [
@@ -6930,8 +6930,8 @@
       ],
       "os": "YOSKL2",
       "signals": [
-        "Y22L",
-        "Y24RB"
+        "Y22R",
+        "Y24LB"
       ],
       "turnouts": [
         [
@@ -6963,8 +6963,8 @@
       ],
       "os": "YOSKL3",
       "signals": [
-        "Y22L",
-        "Y22R"
+        "Y22R",
+        "Y22L"
       ],
       "turnouts": [
         [
@@ -6988,8 +6988,8 @@
       ],
       "os": "YOSKL2",
       "signals": [
-        "Y22L",
-        "Y26RC"
+        "Y22R",
+        "Y26LC"
       ],
       "turnouts": [
         [
@@ -7021,8 +7021,8 @@
       ],
       "os": "YOSCJW",
       "signals": [
-        "Y2L",
-        "Y2R"
+        "Y2R",
+        "Y2L"
       ],
       "turnouts": [
         [
@@ -7038,8 +7038,8 @@
       ],
       "os": "YOSCJW",
       "signals": [
-        "Y4LB",
-        "Y2R"
+        "Y4RB",
+        "Y2L"
       ],
       "turnouts": [
         [
@@ -7059,8 +7059,8 @@
       ],
       "os": "YOSCJW",
       "signals": [
-        "Y4LA",
-        "Y2R"
+        "Y4RA",
+        "Y2L"
       ],
       "turnouts": [
         [
@@ -7080,8 +7080,8 @@
       ],
       "os": "YOSEJE",
       "signals": [
-        "Y10R",
-        "Y10L"
+        "Y10L",
+        "Y10R"
       ],
       "turnouts": [
         [
@@ -7097,8 +7097,8 @@
       ],
       "os": "YOSKL1",
       "signals": [
-        "Y26RA",
-        "Y26L"
+        "Y26LA",
+        "Y26R"
       ],
       "turnouts": [
         [
@@ -7126,8 +7126,8 @@
       ],
       "os": "YOSKL1",
       "signals": [
-        "Y26RB",
-        "Y26L"
+        "Y26LB",
+        "Y26R"
       ],
       "turnouts": [
         [
@@ -7159,8 +7159,8 @@
       ],
       "os": "YOSKL1",
       "signals": [
-        "Y24RA",
-        "Y26L"
+        "Y24LA",
+        "Y26R"
       ],
       "turnouts": [
         [
@@ -7188,8 +7188,8 @@
       ],
       "os": "YOSKL1",
       "signals": [
-        "Y24RB",
-        "Y26L"
+        "Y24LB",
+        "Y26R"
       ],
       "turnouts": [
         [
@@ -7218,7 +7218,7 @@
       "os": "YOSKL3",
       "signals": [
         "Y26L",
-        "Y22R"
+        "Y22L"
       ],
       "turnouts": [
         [
@@ -7242,8 +7242,8 @@
       ],
       "os": "YOSKL1",
       "signals": [
-        "Y26RC",
-        "Y26L"
+        "Y26LC",
+        "Y26R"
       ],
       "turnouts": [
         [
@@ -7275,8 +7275,8 @@
       ],
       "os": "YOSCJE",
       "signals": [
-        "Y4R",
-        "Y4LB"
+        "Y4L",
+        "Y4RB"
       ],
       "turnouts": [
         [
@@ -7296,8 +7296,8 @@
       ],
       "os": "YOSCJE",
       "signals": [
-        "Y4R",
-        "Y4LA"
+        "Y4L",
+        "Y4RA"
       ],
       "turnouts": [
         [
@@ -7317,8 +7317,8 @@
       ],
       "os": "YOSEJW",
       "signals": [
-        "Y8L",
-        "Y8RC"
+        "Y8R",
+        "Y8LC"
       ],
       "turnouts": [
         [
@@ -7342,8 +7342,8 @@
       ],
       "os": "YOSEJE",
       "signals": [
-        "Y8RC",
-        "Y10L"
+        "Y8LC",
+        "Y10R"
       ],
       "turnouts": [
         [
@@ -7367,8 +7367,8 @@
       ],
       "os": "YOSKL4",
       "signals": [
-        "Y34R",
-        "Y34LA"
+        "Y34L",
+        "Y34RA"
       ],
       "turnouts": [
         [
@@ -7384,8 +7384,8 @@
       ],
       "os": "YOSKL4",
       "signals": [
-        "Y34R",
-        "Y34LB"
+        "Y34L",
+        "Y34RB"
       ],
       "turnouts": [
         [
@@ -7401,8 +7401,8 @@
       ],
       "os": "YOSWYW",
       "signals": [
-        "Y40LA",
-        "Y40R"
+        "Y40RA",
+        "Y40L"
       ],
       "turnouts": [
         [
@@ -7422,8 +7422,8 @@
       ],
       "os": "YOSWYW",
       "signals": [
-        "Y40LB",
-        "Y40R"
+        "Y40RB",
+        "Y40L"
       ],
       "turnouts": [
         [
@@ -7447,8 +7447,8 @@
       ],
       "os": "YOSWYW",
       "signals": [
-        "Y40LC",
-        "Y40R"
+        "Y40RC",
+        "Y40L"
       ],
       "turnouts": [
         [
@@ -7472,8 +7472,8 @@
       ],
       "os": "YOSWYW",
       "signals": [
-        "Y40LD",
-        "Y40R"
+        "Y40RD",
+        "Y40L"
       ],
       "turnouts": [
         [
@@ -7489,8 +7489,8 @@
       ],
       "os": "YOSEJW",
       "signals": [
-        "Y8L",
-        "Y8RB"
+        "Y8R",
+        "Y8LB"
       ],
       "turnouts": [
         [
@@ -7514,8 +7514,8 @@
       ],
       "os": "YOSEJE",
       "signals": [
-        "Y8RB",
-        "Y10L"
+        "Y8LB",
+        "Y10R"
       ],
       "turnouts": [
         [
@@ -7539,8 +7539,8 @@
       ],
       "os": "YOSWYE",
       "signals": [
-        "Y42RA",
-        "Y42L"
+        "Y42LA",
+        "Y42R"
       ],
       "turnouts": [
         [
@@ -7560,8 +7560,8 @@
       ],
       "os": "YOSWYE",
       "signals": [
-        "Y42RB",
-        "Y42L"
+        "Y42LB",
+        "Y42R"
       ],
       "turnouts": [
         [
@@ -7585,8 +7585,8 @@
       ],
       "os": "YOSWYE",
       "signals": [
-        "Y42RC",
-        "Y42L"
+        "Y42LC",
+        "Y42R"
       ],
       "turnouts": [
         [
@@ -7610,8 +7610,8 @@
       ],
       "os": "YOSWYE",
       "signals": [
-        "Y42RD",
-        "Y42L"
+        "Y42LD",
+        "Y42R"
       ],
       "turnouts": [
         [
