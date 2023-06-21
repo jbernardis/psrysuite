@@ -1271,6 +1271,30 @@ class MainFrame(wx.Frame):
 						if rc == wx.ID_OK:
 							trainid, locoid, atc, ar = dlg.GetResults()
 						dlg.Destroy()
+						
+						if rc == wx.ID_CUT:
+							newTr = Train()
+							newName = newTr.GetName()
+							newLoco = newTr.GetLoco()
+
+							tr.RemoveFromBlock(blk)
+							newTr.AddToBlock(blk)
+							blk.SetTrain(newTr)
+							
+							self.trains[newName] = newTr
+							newTr.SetEast(blk.GetEast()) # train takes on the direction of the block
+							
+							self.Request({"settrain": { "block": blk.GetName()}})
+							self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco}})
+
+
+							if self.IsDispatcher():
+								self.CheckTrainsInBlock(blk.GetName(), None)
+							
+							tr.Draw()
+							newTr.Draw()
+							return 
+						
 						if rc != wx.ID_OK:
 							return
 	
@@ -1700,6 +1724,10 @@ class MainFrame(wx.Frame):
 						hs = self.handswitches[hsName]
 					except:
 						hs = None
+						
+					print("processing handswitch %s %s" % (hsName, str(hs)))
+					if hs:
+						print("value=%s" % str(hs.GetValue()))
 
 					if hs is not None and state != hs.GetValue():
 						district = hs.GetDistrict()

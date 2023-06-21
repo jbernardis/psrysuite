@@ -1,5 +1,6 @@
 import wx
 import logging
+import time
 
 from rrserver.districts.hyde import Hyde
 from rrserver.districts.yard import Yard
@@ -350,10 +351,14 @@ class Railroad(wx.Notebook):
 		district.EvaluateNXButton(btn)
 
 	def allIO(self):
+		st = time.monotonic_ns()
 		for _, d in self.districts.items():
 			d.OutIn()
 
 		self.ReleasePendingEvents()
+		et = time.monotonic_ns()
+		d = (et-st)/1000000
+		print("IO duration: %d-%d = %f" % (et, st, d))
 
 	def RailroadEvent(self, event):
 		self.pendingEvents.append(event)

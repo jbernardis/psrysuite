@@ -430,23 +430,66 @@ class Block:
 
 	def IdentifyTrain(self):
 		if self.east:
+			'''
+			first look west, then east, then create a new train
+			'''
 			if self.blkWest:
 				if self.blkWest.GetName() in ["KOSN10S11", "KOSN20S21"]:
 					blkWest = self.blkWest.blkWest
-					return None if blkWest is None else blkWest.GetTrain()
-
-				return self.blkWest.GetTrain()
-			else:
-				return None
-		else:
+					if blkWest:
+						tr = blkWest.GetTrain()
+						if tr:
+							return tr
+				else:
+					tr = self.blkWest.GetTrain()
+					if tr:
+						return tr
+			
 			if self.blkEast:
 				if self.blkEast.GetName() in ["KOSN10S11", "KOSN20S21"]:
 					blkEast = self.blkEast.blkEast
-					return None if blkEast is None else blkEast.GetTrain()
+					if blkEast:
+						tr = blkEast.GetTrain()
+						if tr:
+							return tr
 
-				return self.blkEast.GetTrain()
-			else:
-				return None
+				else:
+					tr = self.blkEast.GetTrain()
+					if tr:
+						return tr
+			
+			return None
+		
+		else:
+			'''
+			first look east, then west, then create a new train
+			'''
+			if self.blkEast:
+				if self.blkEast.GetName() in ["KOSN10S11", "KOSN20S21"]:
+					blkEast = self.blkEast.blkEast
+					if blkEast:
+						tr = blkEast.GetTrain()
+						if tr:
+							return tr
+
+				else:
+					tr = self.blkEast.GetTrain()
+					if tr:
+						return tr
+					
+			if self.blkWest:
+				if self.blkWest.GetName() in ["KOSN10S11", "KOSN20S21"]:
+					blkWest = self.blkWest.blkWest
+					if blkWest:
+						tr = blkWest.GetTrain()
+						if tr:
+							return tr
+				else:
+					tr = self.blkWest.GetTrain()
+					if tr:
+						return tr		
+				
+			return None
 
 	def SetCleared(self, cleared=True, refresh=False):
 		if cleared and self.occupied:

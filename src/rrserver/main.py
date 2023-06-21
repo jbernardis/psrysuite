@@ -375,7 +375,6 @@ class MainFrame(wx.Frame):
 			except (IndexError, KeyError):
 				loco = None
 			block = evt.data["block"][0]
-			# train information is always echoed back to all listeners
 
 			if trn and trn.startswith("??"):
 				# this is an unknown train - see if we have a known train in the same block

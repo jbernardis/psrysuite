@@ -114,13 +114,18 @@ class EditTrainDlg(wx.Dialog):
 		self.bOK = wx.Button(self, wx.ID_ANY, "OK")
 		self.bOK.SetDefault()
 		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+		self.bSever = wx.Button(self, wx.ID_ANY, "Sever")
+		self.bSever.SetToolTipString("Sever this block from the rest of the train")
 
 		bsz.Add(self.bOK)
 		bsz.AddSpacer(30)
 		bsz.Add(self.bCancel)
+		bsz.AddSpacer(30)
+		bsz.Add(self.bSever)
 
 		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
 		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
+		self.Bind(wx.EVT_BUTTON, self.onSever, self.bSever)
 
 		vsz.Add(bsz, 0, wx.ALIGN_CENTER)
 
@@ -219,6 +224,9 @@ class EditTrainDlg(wx.Dialog):
 				return
 
 		self.EndModal(wx.ID_OK)
+		
+	def onSever(self, _):
+		self.EndModal(wx.ID_CUT)
 
 	def GetResults(self):
 		t = self.chosenTrain

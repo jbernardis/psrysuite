@@ -1,7 +1,7 @@
 import wx
 
 breakerNames = {
-	"CBClivedon":       "Clivedon",
+	"CBCliveden":       "Cliveden",
 	"CBLatham":         "Latham",
 	"CBCornellJct":     "Cornell Junction",
 	"CBParsonsJct":     "Parson's Junction",
