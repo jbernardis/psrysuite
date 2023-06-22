@@ -1,8 +1,8 @@
 import serial
 import time
 
-MAXTRIES = 3
-
+MAXTRIES = 5
+THRESHOLD = 2
 
 def setBit(obyte, obit, val):
 	if val != 0:
@@ -19,11 +19,21 @@ def getBit(ibyte, ibit):
 	b = int(ibyte.hex(), 16)
 	return 1 if b & mask != 0 else 0
 
+def getBitInverted(ibyte, ibit):
+	if ibit < 0 or ibit > 7:
+		# bit index is out of range
+		return 0
+	mask = 1 << (7-ibit)
+	b = int(ibyte.hex(), 16)
+	return 0 if b & mask != 0 else 1
+
 
 class Bus:
 	def __init__(self, tty):
 		self.initialized = False
 		self.tty = tty
+		self.byteTally = {}
+		self.lastUsed = {}
 		try:
 			self.port = serial.Serial(port=self.tty,
 					baudrate=19200,
@@ -34,7 +44,6 @@ class Bus:
 
 		except serial.SerialException:
 			self.port = None
-			print("Unable to Connect to serial port %s" % tty)
 			return
 
 		self.initialized = True
@@ -43,11 +52,20 @@ class Bus:
 		return self.port is not None
 
 	def close(self):
+		if self.port is None:
+			return 
+		
 		self.port.close()
 
-	def sendRecv(self, address, outbuf, nbytes):
+	def sendRecv(self, address, outbuf, nbytes, threshold=1):
 		if not self.initialized:
-			return None, 0
+			return None
+		
+		try:
+			lastused = self.lastUsed[address]
+		except:
+			lastused = [None for _ in range(nbytes)]
+			self.lastUsed[address] = lastused
 
 		sendBuffer = []
 		sendBuffer.append(address)
@@ -56,9 +74,7 @@ class Bus:
 
 		sendBuffer.extend(outbuf)
 		
-		nb = self.port.write(sendBuffer)
-		if nb != (nbytes+1):
-			pass #print("expected %d byte(s) written, got %d" % (nbytes+1, nb))
+		self.port.write(sendBuffer)
 
 		tries = 0
 		inbuf = []
@@ -67,14 +83,14 @@ class Bus:
 			b = self.port.read(remaining)
 			if len(b) == 0:
 				tries += 1
-				time.sleep(0.001)
+				time.sleep(0.0001)
 			else:
 				tries = 0
 				inbuf.extend([bytes([b[i]]) for i in range(len(b))])
 				remaining = nbytes-len(inbuf)
 				
 		if len(inbuf) != nbytes:
-			# print("incomplete read.  Expecting %d characters, got %d" % (nbytes, len(inbuf)))
-			return [], 0
-
-		return inbuf, nbytes
+			return None #[b'\x00']*nbytes
+		else:
+			# make sure that if a byte is different, that it is at least different for "threshold" cycles before we accept it
+			return inbuf

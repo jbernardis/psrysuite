@@ -114,8 +114,8 @@ class Port(District):
 		outb[2] = setBit(outb[2], 4, asp[0])
 		inp = self.rr.GetInput("P10")
 		clr10w = inp.GetClear() and not inp.GetEast()
-		outb[5] = setBit(outb[2], 5, 1 if clr10w else 0)  # semaphore signal
-		outb[5] = setBit(outb[2], 6, 1 if clr10w else 0)  # should be using RstrW
+		outb[2] = setBit(outb[2], 5, 1 if clr10w else 0)  # semaphore signal
+		outb[2] = setBit(outb[2], 6, 1 if clr10w else 0)  # should be using RstrW
 		st = self.rr.GetInput("PA4.lvr").GetState()   # Signal indicators
 		outb[2] = setBit(outb[2], 7, 1 if st == "L" else 0)
 
@@ -183,8 +183,8 @@ class Port(District):
 		outb[8] = setBit(outb[8], 2, self.rr.GetOutput("P31.srel").GetStatus())
 		inp = self.rr.GetInput("P40")
 		clr40w = inp.GetClear() and not inp.GetEast()
-		outb[8] = setBit(outb[2], 5, 1 if clr40w else 0)  # semaphore signal
-		outb[8] = setBit(outb[2], 6, 1 if clr40w else 0)  # should be using RstrW
+		outb[8] = setBit(outb[8], 5, 1 if clr40w else 0)  # semaphore signal
+		outb[8] = setBit(outb[8], 6, 1 if clr40w else 0)  # should be using RstrW
 
 		otext = formatOText(outb, outbc)
 		#logging.debug("Port A: Output bytes: %s" % otext)
