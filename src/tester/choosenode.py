@@ -5,6 +5,7 @@ from glob import glob
 class ChooseNodeDlg(wx.Dialog):
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "Choose Node")
+        self.CenterOnScreen()
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
         
         style = wx.CB_DROPDOWN | wx.CB_READONLY    

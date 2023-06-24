@@ -1,16 +1,30 @@
 import wx
-#import os
 
 import json
+import os
+import sys
+
+cmdFolder = os.getcwd()
+if cmdFolder not in sys.path:
+    sys.path.insert(0, cmdFolder)
 
 from tester.bus import Bus
 from tester.outbyte import OutByte, EVT_OUTPUTCHANGE
 from tester.inbyte import InByte
 from tester.choosenode import ChooseNodeDlg
 
+ofp = open(os.path.join(os.getcwd(), "output", "tester.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "tester.err"), "w")
+
+sys.stdout = ofp
+sys.stderr = efp
+
 class MyFrame(wx.Frame):
-    def __init__(self):
-        wx.Frame.__init__(self, None, -1, "", size=(300, 300))
+    def __init__(self, rl):
+        self.reloader = rl
+        
+        wx.Frame.__init__(self, None, -1, "", size=(1, 1))
+        self.CenterOnScreen()
         
         dlg = ChooseNodeDlg(self)
         rc = dlg.ShowModal()
@@ -137,15 +151,26 @@ class MyFrame(wx.Frame):
         self.stFailed.SetLabel("  0")
 
         bsz.AddSpacer(20)
+        
+        self.bReload = wx.Button(self, wx.ID_ANY, "New Node", size=(100, 46))
+        self.Bind(wx.EVT_BUTTON, self.onReload, self.bReload)
+        
+        bsz.Add(self.bReload)
+
+        bsz.AddSpacer(20)
         sz.Add(bsz, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         
         sz.AddSpacer(20)
         
         self.SetSizer(sz)
         self.Fit()
+       
+        sx, sy = self.GetSize()
+        px, py = self.GetPosition()
+        self.SetPosition((px-int(sx/2), py-int(sy/2)))
         
         self.Show()
- 
+  
         self.Bind(wx.EVT_TIMER, self.onTicker)
         self.ticker = wx.Timer(self)
         
@@ -198,8 +223,13 @@ class MyFrame(wx.Frame):
             if self.sendCount <= 0:
                 self.ticker.Stop()
                 self.bSend.Enable(True)
+                
+    def onReload(self, evt):
+        self.reloader.setReload(True)
+        self.shutdown()
         
     def onClose(self, evt):
+        self.reloader.setReload(False)
         self.shutdown()
         
     def shutdown(self):
@@ -214,7 +244,24 @@ class MyFrame(wx.Frame):
             pass
             
 
+class reloader:
+    def __init__(self):
+        self.reload = False
+        
+    def setReload(self, flag):
+        self.reload = flag
+        
+    def getReload(self):
+        return self.reload
+
+
+rl = reloader()
+
 app = wx.App()
-frame = MyFrame()
-frame.Show(True)
-app.MainLoop()
+while True:  
+    rl.setReload(False)  
+    frame = MyFrame(rl)
+    frame.Show(True)
+    app.MainLoop()
+    if not rl.getReload():
+        break
