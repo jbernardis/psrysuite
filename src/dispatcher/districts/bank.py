@@ -184,7 +184,7 @@ class Bank (District):
 		blockSigs = {
 			# # which signals govern blocks, west and east - not needed for OS and stopping blocks
 			"B11": ("C22R",  "C18LA"),
-			"B20": ("N24R",  "C24L"),
+			"B20": ("N24L",  "C24L"),
 			"B21": ("C24R",  "C18LB"),
 		}
 

@@ -152,7 +152,7 @@ class MyFrame(wx.Frame):
 
         bsz.AddSpacer(20)
         
-        self.bReload = wx.Button(self, wx.ID_ANY, "New Node", size=(100, 46))
+        self.bReload = wx.Button(self, wx.ID_ANY, "Change Node", size=(100, 46))
         self.Bind(wx.EVT_BUTTON, self.onReload, self.bReload)
         
         bsz.Add(self.bReload)

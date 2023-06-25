@@ -1042,7 +1042,7 @@ class Nassau (District):
 			"N32": ("N18LA",  "N26RA"),
 			"N41": ("N14LB",  "N24RB"),
 			"N42": ("N14LC",  "N24RC"),
-			"B10": ("N26L",   "C22R"),
+			"B10": ("N26L",   "C22L"),
 			"R10": ("N28L",   None),
 			"T12": (None,     "N20R"),
 			"W10": ("N20L",   None),

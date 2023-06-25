@@ -547,13 +547,22 @@ class StoppingBlock (Block):
 		if not self.occupied:
 			self.Activate(False)
 			return
+		
+		mainBlk = self.block
+		district = self.block.GetDistrict()
 
 		if self.block.east and self.eastend:
-			signm = self.block.sbSigEast
 			blk = self.block.blkEast
+			if district.CrossingEastWestBoundary(blk, mainBlk):
+				signm = self.block.sbSigWest
+			else:
+				signm = self.block.sbSigEast
 		elif (not self.block.east) and (not self.eastend):
-			signm = self.block.sbSigWest
 			blk = self.block.blkWest
+			if district.CrossingEastWestBoundary(blk, mainBlk):
+				signm = self.block.sbSigEast
+			else:
+				signm = self.block.sbSigWest
 		else:
 			return
 		
@@ -579,6 +588,7 @@ class StoppingBlock (Block):
 			self.lastBlockEmpty = not blkOccupied
 
 	def Activate(self, flag=True):
+		print("activate %s" % flag)
 		if flag == self.active:
 			return
 		

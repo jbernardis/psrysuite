@@ -343,7 +343,7 @@ class Latham (District):
 
 		blockSbSigs = {
 			# which signals govern stopping sections, west and east
-			"L10": ("Y2L",  None),
+			"L10": ("Y2R",  None),
 			"L11": ("L8L",  None),
 			"L20": (None, "L6RA"),
 			"L21": ("L6L",  "L16R"),
@@ -355,9 +355,9 @@ class Latham (District):
 
 		blockSigs = {
 			# which signals govern blocks, west and east
-			"L10": ("Y2L",  "L8R"),
+			"L10": ("Y2R",  "L8R"),
 			"L11": ("L8L",  "L18R"),
-			"L20": ("Y4LB", "L6RA"),
+			"L20": ("Y4RB", "L6RA"),
 			"L21": ("L6L",  "L16R"),
 			"L31": ("L4L",  "L14R")
 		}

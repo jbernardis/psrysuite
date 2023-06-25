@@ -15,7 +15,7 @@ else:
 
 ofp = open(os.path.join(os.getcwd(), "output", "%s.out" % fn), "w")
 efp = open(os.path.join(os.getcwd(), "output", "%s.err" % fn), "w")
-#
+
 sys.stdout = ofp
 sys.stderr = efp
 
