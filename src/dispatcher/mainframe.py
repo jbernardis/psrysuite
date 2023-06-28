@@ -80,6 +80,7 @@ class MainFrame(wx.Frame):
 		self.pidATC	= None
 		self.procATC = None
 		self.pidAdvisor = None
+		self.OSSLocks = True
 		
 		self.shift = False
 		self.shiftXOffset = 0
@@ -470,7 +471,7 @@ class MainFrame(wx.Frame):
 		self.widgetMap[LaKr].append(self.cbHydeJctFleet)
 		self.HydeJctFleetSignals = ["S20R", "S18R", "S16R", "S20L", "S18LA", "S18LB", "S16L"]
 
-		self.cbKrulishFleet = wx.CheckBox(self, -1, "Krulish Fleeting", (2200, voffset+10))
+		self.cbKrulishFleet = wx.CheckBox(self, -1, "Krulish Fleeting", (2100, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBKrulishFleet, self.cbKrulishFleet)
 		self.cbKrulishFleet.Hide()
 		self.widgetMap[LaKr].append(self.cbKrulishFleet)
@@ -525,6 +526,10 @@ class MainFrame(wx.Frame):
 		self.widgetMap[HyYdPt].append(self.cbHydeFleet)
 		self.HydeFleetSignals = [ "H4R", "H4LA", "H4LB", "H4LC", "H4LD", "H6R", "H6LA", "H6LB", "H6LC", "H6LD", "H8R", "H8L",
 					"H10L", "H10RA", "H10RB", "H10RC", "H10RD", "H10RE", "H12L", "H12RA", "H12RB", "H12RC", "H12RD", "H12RE"  ]
+		
+		self.cbOSSLocks = wx.CheckBox(self, -1, "OSS Locks", (2300, voffset+10))
+		self.Bind(wx.EVT_CHECKBOX, self.OnCBOSSLocks, self.cbOSSLocks)
+		self.cbOSSLocks.SetValue(self.OSSLocks)
 
 	def GetFleetMap(self, signm):
 		siglists = [
@@ -723,6 +728,8 @@ class MainFrame(wx.Frame):
 		for signm in self.FossFleetSignals:
 			self.Request({"fleet": { "name": signm, "value": f}})
 		self.Request({"control": {"name": "foss.fleet", "value": f}})
+		
+		self.SendOSSLocks()
 
 	def OnCBAutoRouter(self, evt):
 		self.AREnabled = self.cbAutoRouter.IsChecked()
@@ -749,6 +756,13 @@ class MainFrame(wx.Frame):
 
 		else:
 			self.Request({"atc": { "action": "hide", "x": 1600, "y": 31}})
+
+	def OnCBOSSLocks(self, evt):
+		self.SendOSSLocks()
+		
+	def SendOSSLocks(self):
+		self.OSSLocks = self.cbOSSLocks.IsChecked()		
+		self.Request({"control": {"name": "osslocks", "value": 1 if self.OSSLocks else 0}})
 
 	def OnCBAdvisor(self, evt):
 		self.AdvisorEnabled = self.cbAdvisor.IsChecked()
@@ -1564,7 +1578,6 @@ class MainFrame(wx.Frame):
 				self.cbAdvisor.Enable(True)
 				
 			self.RetrieveData()
-			print("calling districts initialize after subscription")
 			self.districts.Initialize()
 			self.SendControlValues()
 
@@ -1724,10 +1737,6 @@ class MainFrame(wx.Frame):
 						hs = self.handswitches[hsName]
 					except:
 						hs = None
-						
-					print("processing handswitch %s %s" % (hsName, str(hs)))
-					if hs:
-						print("value=%s" % str(hs.GetValue()))
 
 					if hs is not None and state != hs.GetValue():
 						district = hs.GetDistrict()

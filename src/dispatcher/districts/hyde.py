@@ -14,7 +14,6 @@ class Hyde (District):
 		District.__init__(self, name, frame, screen)
 
 	def Initialize(self):
-		print("Turning on hyde power")
 		District.Initialize(self)
 
 		self.buttons["HydeWestPower"].TurnOn(refresh=True)

@@ -588,7 +588,6 @@ class StoppingBlock (Block):
 			self.lastBlockEmpty = not blkOccupied
 
 	def Activate(self, flag=True):
-		print("activate %s" % flag)
 		if flag == self.active:
 			return
 		

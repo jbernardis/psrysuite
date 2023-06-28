@@ -12,7 +12,7 @@
         "used": true
       },
       {
-        "label": "(bad)",
+        "label": "(bad - see bit 2:2)",
         "used": false
       },
       {
@@ -80,11 +80,11 @@
         "used": true
       },
       {
-        "label": "LSw3.N",
+        "label": "LSw3.N (see bit 0:2)",
         "used": true
       },
       {
-        "label": "",
+        "label": "(unused)",
         "used": false
       },
       {
@@ -150,6 +150,26 @@
       {
         "label": "P50.srel",
         "used": true
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
       }
     ]
   ],
@@ -298,6 +318,30 @@
       {
         "label": "CBReverserC22C23",
         "used": true
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
       }
     ]
   ]

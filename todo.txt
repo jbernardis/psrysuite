@@ -1,4 +1,5 @@
-how to use release - yard nassau and cliff (I think nassau and yard are done)
+how to use release - yard, nassau, cliff and port 
+		(I think cliff, nassau, yard and port are done)
 
 call on signals - I think it refers to JUST lighting the signal with no route clearing etc
 
@@ -53,4 +54,8 @@ verify all signal lights and turnout lights on all panels -
 
 verify proper panel operation
 
-build a port-only tester and verify operation of that node
+continue to add nodes to new tester - many more to go
+
+continue to develop newserver
+
+continue to add to monitor program to allow visibility into new server

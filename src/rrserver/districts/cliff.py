@@ -119,9 +119,14 @@ class Cliff(District):
 
 	def OutIn(self):
 		optControl = self.rr.GetControlOption("cliff")  # 0 => Cliff, 1 => Dispatcher bank/cliveden, 2 => Dispatcher All
-		optBankFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
-		optClivedenFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
+		# optBankFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
+		# optClivedenFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
 		optCliffFleet = self.rr.GetControlOption("cliff.fleet")  # 0 => no fleeting, 1 => fleeting
+		optOssLocks = self.rr.GetControlOption("osslocks")
+		cRelease = self.rr.GetInput("crelease").GetState()
+		
+		setSwitchLocks = optOssLocks == 1 and cRelease == 0
+		
 		# Green Mountain
 		outbc = 3		
 		outb = [0 for _ in range(outbc)]
@@ -275,14 +280,14 @@ class Cliff(District):
 		outb[5] = setBit(outb[5], 6, self.rr.GetInput("CBReverserC22C23").GetInvertedValue())
 		outb[5] = setBit(outb[5], 6, self.rr.GetInput("CBBank").GetInvertedValue())
 
-		outb[6] = setBit(outb[6], 0, 1 if self.rr.GetSwitchLock("CSw31") else 0)
-		outb[6] = setBit(outb[6], 1, 1 if self.rr.GetSwitchLock("CSw41") else 0)
-		outb[6] = setBit(outb[6], 2, 1 if self.rr.GetSwitchLock("CSw43") else 0)
-		outb[6] = setBit(outb[6], 3, 1 if self.rr.GetSwitchLock("CSw61") else 0)
-		outb[6] = setBit(outb[6], 4, 1 if self.rr.GetSwitchLock("CSw9") else 0)
-		outb[6] = setBit(outb[6], 5, 1 if self.rr.GetSwitchLock("CSw13") else 0)
-		outb[6] = setBit(outb[6], 6, 1 if self.rr.GetSwitchLock("CSw17") else 0)
-		outb[6] = setBit(outb[6], 7, 1 if self.rr.GetSwitchLock("CSw23") else 0)
+		outb[6] = setBit(outb[6], 0, 1 if self.rr.GetSwitchLock("CSw31") and setSwitchLocks else 0)
+		outb[6] = setBit(outb[6], 1, 1 if self.rr.GetSwitchLock("CSw41") and setSwitchLocks else 0)
+		outb[6] = setBit(outb[6], 2, 1 if self.rr.GetSwitchLock("CSw43") and setSwitchLocks else 0)
+		outb[6] = setBit(outb[6], 3, 1 if self.rr.GetSwitchLock("CSw61") and setSwitchLocks else 0)
+		outb[6] = setBit(outb[6], 4, 1 if self.rr.GetSwitchLock("CSw9")  and setSwitchLocks else 0)
+		outb[6] = setBit(outb[6], 5, 1 if self.rr.GetSwitchLock("CSw13") and setSwitchLocks else 0)
+		outb[6] = setBit(outb[6], 6, 1 if self.rr.GetSwitchLock("CSw17") and setSwitchLocks else 0)
+		outb[6] = setBit(outb[6], 7, 1 if self.rr.GetSwitchLock("CSw23") and setSwitchLocks else 0)
 
 		outb[7] - setBit(outb[7], 0, 1 if self.rr.GetInput("CSw21a").GetValue() == "R" else 0)  # remote hand switch indications
 		outb[7] - setBit(outb[7], 1, 1 if self.rr.GetInput("CSw21b").GetValue() == "R" else 0)

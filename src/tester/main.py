@@ -12,6 +12,7 @@ from tester.bus import Bus
 from tester.outbyte import OutByte, EVT_OUTPUTCHANGE
 from tester.inbyte import InByte
 from tester.choosenode import ChooseNodeDlg
+from tester.settings import Settings
 
 ofp = open(os.path.join(os.getcwd(), "output", "tester.out"), "w")
 efp = open(os.path.join(os.getcwd(), "output", "tester.err"), "w")
@@ -22,6 +23,7 @@ sys.stderr = efp
 class MyFrame(wx.Frame):
     def __init__(self, rl):
         self.reloader = rl
+        self.settings = Settings()
         
         wx.Frame.__init__(self, None, -1, "", size=(1, 1))
         self.CenterOnScreen()
@@ -46,9 +48,7 @@ class MyFrame(wx.Frame):
         self.obytes = []
         self.ibytes = []
         
-        self.tty = "COM4"
-        
-        self.bus = Bus(self.tty)
+        self.bus = Bus(self.settings.rrtty)
         
         with open(fn, "r") as jfp:
             node = json.load(jfp)
@@ -175,7 +175,7 @@ class MyFrame(wx.Frame):
         self.ticker = wx.Timer(self)
         
         if not self.bus.isOpen():
-            dlg = wx.MessageDialog(self, "Unable to open serial port %s to railroad" % self.tty,
+            dlg = wx.MessageDialog(self, "Unable to open serial port %s to railroad" % self.settings.rrtty,
                                    "Serial Port Exception",
                                    wx.OK | wx.ICON_ERROR)
             dlg.ShowModal()

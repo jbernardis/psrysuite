@@ -163,10 +163,12 @@ class Nassau(District):
 		else:
 			optFleet = self.rr.GetControlOption("nassau.fleet")  # otherwise get the fleeting state from the check box
 
-		release = self.rr.GetInput("nrelease").GetState()
+		nRelease = self.rr.GetInput("nrelease").GetState()
+		optOssLocks = self.rr.GetControlOption("osslocks")
+
 		NESL = self.rr.GetDistrictLock("NESL")
 		NWSL = self.rr.GetDistrictLock("NWSL")
-		if release == 1:
+		if nRelease == 1 or optOssLocks == 0:
 			# don't set any switch locks if release button is being pressed
 			NESL = [0 for _ in range(len(NESL))]
 			NWSL = [0 for _ in range(len(NWSL))]

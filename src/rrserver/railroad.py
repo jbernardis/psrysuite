@@ -79,6 +79,8 @@ class Railroad(wx.Notebook):
 		self.SetControlOption("shore.fleet", 0)
 		self.SetControlOption("valleyjct.fleet", 0)
 		self.SetControlOption("yard.fleet", 0)
+		
+		self.SetControlOption("osslocks", 1)
 
 		for _, dobj in self.districts.items():
 			dobj.SendIO(False)
@@ -190,6 +192,8 @@ class Railroad(wx.Notebook):
 			yield m
 
 	def SetControlOption(self, name, value):
+		print("set control option %s to %s" % (name, value))
+		print(type(value))
 		self.controlOptions[name] = value
 
 	def GetControlOption(self, name):
@@ -358,7 +362,7 @@ class Railroad(wx.Notebook):
 		self.ReleasePendingEvents()
 		et = time.monotonic_ns()
 		d = (et-st)/1000000
-		print("IO duration: %d-%d = %f" % (et, st, d))
+		#print("IO duration: %d-%d = %f" % (et, st, d))
 
 	def RailroadEvent(self, event):
 		self.pendingEvents.append(event)

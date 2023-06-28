@@ -60,6 +60,13 @@ class Port(District):
 		ix = self.AddInputs(toggleNames, ToggleInput, District.toggle, ix)
 
 	def OutIn(self):
+		optOssLocks = self.rr.GetControlOption("osslocks")
+		paRelease = self.rr.GetInput("parelease").GetState()
+		pbRelease = self.rr.GetInput("pbrelease").GetState()
+		
+		setASwitchLocks = optOssLocks == 1 and paRelease == 0
+		setBSwitchLocks = optOssLocks == 1 and pbRelease == 0
+
 		P40M = self.rr.GetInput("P40").GetValue() != 0
 		P40E = self.rr.GetInput("P40.E").GetValue() != 0
 		if P40M and not self.PBE:
@@ -162,22 +169,22 @@ class Port(District):
 		outb[6] = setBit(outb[6], 1, self.rr.GetInput("CBParsonsJct").GetInvertedValue())  # Circuit breakers
 		outb[6] = setBit(outb[6], 2, self.rr.GetInput("CBSouthport").GetInvertedValue())
 		outb[6] = setBit(outb[6], 3, self.rr.GetInput("CBLavinYard").GetInvertedValue())
-		outb[6] = setBit(outb[6], 4, 1 if self.rr.GetSwitchLock("PASw1") else 0)  # Switch Locks
-		outb[6] = setBit(outb[6], 5, 1 if self.rr.GetSwitchLock("PASw3") else 0)
-		outb[6] = setBit(outb[6], 6, 1 if self.rr.GetSwitchLock("PASw5") else 0)
-		outb[6] = setBit(outb[6], 7, 1 if self.rr.GetSwitchLock("PASw7") else 0)
+		outb[6] = setBit(outb[6], 4, 1 if self.rr.GetSwitchLock("PASw1") and setASwitchLocks else 0)  # Switch Locks
+		outb[6] = setBit(outb[6], 5, 1 if self.rr.GetSwitchLock("PASw3") and setASwitchLocks else 0)
+		outb[6] = setBit(outb[6], 6, 1 if self.rr.GetSwitchLock("PASw5") and setASwitchLocks else 0)
+		outb[6] = setBit(outb[6], 7, 1 if self.rr.GetSwitchLock("PASw7") and setASwitchLocks else 0)
 
-		outb[7] = setBit(outb[7], 0, 1 if self.rr.GetSwitchLock("PASw9") else 0)
-		outb[7] = setBit(outb[7], 1, 1 if self.rr.GetSwitchLock("PASw11") else 0)  # also locks 13
-		outb[7] = setBit(outb[7], 2, 1 if self.rr.GetSwitchLock("PASw15") else 0)  # also locks 17
-		outb[7] = setBit(outb[7], 3, 1 if self.rr.GetSwitchLock("PASw19") else 0)
-		outb[7] = setBit(outb[7], 4, 1 if self.rr.GetSwitchLock("PASw21") else 0)
-		outb[7] = setBit(outb[7], 5, 1 if self.rr.GetSwitchLock("PASw23") else 0)
-		outb[7] = setBit(outb[7], 6, 1 if self.rr.GetSwitchLock("PASw31") else 0)  # also locks 27 and 29
-		outb[7] = setBit(outb[7], 7, 1 if self.rr.GetSwitchLock("PASw33") else 0)
+		outb[7] = setBit(outb[7], 0, 1 if self.rr.GetSwitchLock("PASw9") and setASwitchLocks else 0)
+		outb[7] = setBit(outb[7], 1, 1 if self.rr.GetSwitchLock("PASw11") and setASwitchLocks else 0)  # also locks 13
+		outb[7] = setBit(outb[7], 2, 1 if self.rr.GetSwitchLock("PASw15") and setASwitchLocks else 0)  # also locks 17
+		outb[7] = setBit(outb[7], 3, 1 if self.rr.GetSwitchLock("PASw19") and setASwitchLocks else 0)
+		outb[7] = setBit(outb[7], 4, 1 if self.rr.GetSwitchLock("PASw21") and setASwitchLocks else 0)
+		outb[7] = setBit(outb[7], 5, 1 if self.rr.GetSwitchLock("PASw23") and setASwitchLocks else 0)
+		outb[7] = setBit(outb[7], 6, 1 if self.rr.GetSwitchLock("PASw31") and setASwitchLocks else 0)  # also locks 27 and 29
+		outb[7] = setBit(outb[7], 7, 1 if self.rr.GetSwitchLock("PASw33") and setASwitchLocks else 0)
 
-		outb[8] = setBit(outb[8], 0, 1 if self.rr.GetSwitchLock("PASw35") else 0)
-		outb[8] = setBit(outb[8], 1, 1 if self.rr.GetSwitchLock("PASw37") else 0)
+		outb[8] = setBit(outb[8], 0, 1 if self.rr.GetSwitchLock("PASw35") and setASwitchLocks else 0)
+		outb[8] = setBit(outb[8], 1, 1 if self.rr.GetSwitchLock("PASw37") and setASwitchLocks else 0)
 		outb[8] = setBit(outb[8], 2, self.rr.GetOutput("P10.srel").GetStatus())	      # Stop relays
 		outb[8] = setBit(outb[8], 2, self.rr.GetOutput("P40.srel").GetStatus())
 		outb[8] = setBit(outb[8], 2, self.rr.GetOutput("P31.srel").GetStatus())
@@ -499,12 +506,12 @@ class Port(District):
 		outb[5] = setBit(outb[5], 3, 1 if clr42e else 0)  # Hyde Jct signal
 		outb[5] = setBit(outb[5], 4, self.rr.GetInput("CBSouthJct").GetInvertedValue())  # Circuit breakers
 		outb[5] = setBit(outb[5], 5, self.rr.GetInput("CBCircusJct").GetInvertedValue())
-		outb[5] = setBit(outb[5], 6, 1 if self.rr.GetSwitchLock("PBSw1") else 0)  # Switch Locks
-		outb[5] = setBit(outb[5], 7, 1 if self.rr.GetSwitchLock("PBSw3") else 0)
+		outb[5] = setBit(outb[5], 6, 1 if self.rr.GetSwitchLock("PBSw1") and setBSwitchLocks else 0)  # Switch Locks
+		outb[5] = setBit(outb[5], 7, 1 if self.rr.GetSwitchLock("PBSw3") and setBSwitchLocks else 0)
 
 		outb[6] = setBit(outb[6], 0, 0 if self.rr.GetOutput("PBSw5.hand").GetStatus() != 0 else 1)
-		outb[6] = setBit(outb[6], 1, 1 if self.rr.GetSwitchLock("PBSw11") else 0)
-		outb[6] = setBit(outb[6], 2, 1 if self.rr.GetSwitchLock("PBSw13") else 0)
+		outb[6] = setBit(outb[6], 1, 1 if self.rr.GetSwitchLock("PBSw11") and setBSwitchLocks else 0)
+		outb[6] = setBit(outb[6], 2, 1 if self.rr.GetSwitchLock("PBSw13") and setBSwitchLocks else 0)
 		outb[6] = setBit(outb[6], 3, 0 if psw15 != 0 else 1)  # hand switch unlock
 		outb[6] = setBit(outb[6], 4, self.rr.GetOutput("P32.srel").GetStatus())	      # Stop relays
 		outb[6] = setBit(outb[6], 5, self.rr.GetOutput("P41.srel").GetStatus())

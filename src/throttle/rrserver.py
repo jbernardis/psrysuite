@@ -23,7 +23,7 @@ class RRServer(object):
 			return None
 		
 		if r.status_code >= 400:
-			logging.error("HTTP Error %d" % r.return_code)
+			logging.error("HTTP Error %d" % r.status_code)
 			return None
 		
 		return r.json()

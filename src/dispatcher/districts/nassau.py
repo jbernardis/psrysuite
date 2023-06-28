@@ -11,6 +11,8 @@ from dispatcher.constants import LaKr, SloAspects, SLOW, RESTRICTING, SLIPSWITCH
 class Nassau (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
+		self.NWBlocks = ["NWOSCY", "NWOSTY", "NWOSW", "NWOSE"]
+		self.NEBlocks = ["NEOSRH", "NEOSW", "NEOSE"]
 
 	def PerformSignalAction(self, sig):
 		controlOpt = self.frame.rbNassauControl.GetSelection()
@@ -51,44 +53,61 @@ class Nassau (District):
 		#self.EvaluateDistrictLocks(sig)
 		
 	def EvaluateDistrictLocks(self, sig):
-		currentMovement = sig.GetAspect() != 0  # does the CURRENT signal status allow movement
 		rt, osblk = self.FindRoute(sig)
 		osblknm = osblk.GetName()
-		sigs = rt.GetSignals()
 
-		if osblknm in ["NWOSCY", "NWOSTY", "NWOSW", "NWOSE"]:
+		if osblknm in self.NWBlocks:
 			lock = [False, False, False, False]
-			if currentMovement:
-				for s in sigs:
-					if s.startswith("N20"):
-						lock[0] = True
-					elif s.startswith("N18"):
-						lock[1] = True
-					elif s.startswith("N16"):
-						lock[2] = True
-					elif s.startswith("N14"):
-						lock[3] = True
-			if lock[0] and lock[3]:
-				lock[1] = lock[2] = True
-			elif lock[0] and lock[2]:
-				lock[1] = True
-			elif lock[1] and lock[3]:
-				lock[2] = True
+			for blknm in self.NWBlocks:
+				blk = self.frame.blocks[blknm]
+				rt = blk.GetRoute()
+				if rt is None:
+					continue
+				sigs = rt.GetSignals()
+				bLock = [False, False, False, False]
+				if blk.IsCleared():
+					for s in sigs:
+						if s.startswith("N20"):
+							bLock[0] = True
+						elif s.startswith("N18"):
+							bLock[1] = True
+						elif s.startswith("N16"):
+							bLock[2] = True
+						elif s.startswith("N14"):
+							bLock[3] = True
+					if bLock[0] and bLock[3]:
+						bLock[1] = bLock[2] = True
+					elif bLock[0] and bLock[2]:
+						bLock[1] = True
+					elif bLock[1] and bLock[3]:
+						bLock[2] = True
+				lock = [a or b for a, b in zip(lock, bLock)]
+				
 			lv = [1 if x else 0 for x in lock]
 			self.frame.Request({"districtlock": { "name": "NWSL", "value": lv }})
 			
-		elif osblknm in ["NEOSRH", "NEOSW", "NEOSE"]:
+		elif osblknm in self.NEBlocks:
 			lock = [False, False, False]
-			if currentMovement:
-				for s in sigs:
-					if s.startswith("N28"):
-						lock[0] = True
-					elif s.startswith("N26"):
-						lock[1] = True
-					elif s.startswith("N24"):
-						lock[2] = True
-			if lock[0] and lock[2]:
-				lock[1] = True
+			for blknm in self.NEBlocks:
+				blk = self.frame.blocks[blknm]
+				rt = blk.GetRoute()
+				if rt is None:
+					continue
+				sigs = rt.GetSignals()
+				bLock = [False, False, False]
+				if blk.IsCleared():
+					for s in sigs:
+						if s.startswith("N28"):
+							bLock[0] = True
+						elif s.startswith("N26"):
+							bLock[1] = True
+						elif s.startswith("N24"):
+							bLock[2] = True
+				if bLock[0] and bLock[2]:
+					bLock[1] = True
+					
+				lock = [a or b for a, b in zip(lock, bLock)]
+
 			lv = [1 if x else 0 for x in lock]
 			self.frame.Request({"districtlock": { "name": "NESL", "value": lv }})
 

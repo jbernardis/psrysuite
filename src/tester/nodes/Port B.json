@@ -208,7 +208,7 @@
     ],
     [
       {
-        "label": "PBSw5.lck",
+        "label": "PBSw5.hslck",
         "used": true
       },
       {
@@ -234,6 +234,10 @@
       {
         "label": "PBX0",
         "used": true
+      },
+      {
+        "label": "(unused)",
+        "used": false
       }
     ]
   ],
@@ -384,11 +388,11 @@
         "used": true
       },
       {
-        "label": "PB4.Rlvr",
+        "label": "PB4.Llvr",
         "used": true
       },
       {
-        "label": "PBSw5.lck",
+        "label": "PBSw5.hand",
         "used": true
       },
       {
@@ -418,12 +422,28 @@
         "used": true
       },
       {
-        "label": "PBSw15.lck",
+        "label": "PBSw15.hand",
         "used": true
       },
       {
         "label": "PBRelease",
         "used": true
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
       }
     ]
   ]
