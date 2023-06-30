@@ -36,11 +36,6 @@ verify signal lever functionality and signal indicators for cliff/yard
 what is supposed to happen when the operator presses the red buttons on their panels
 siding unlock levers from all tower panels - cliff
 
-continue to add nodes to new tester - still to do:
-	Cliff (8)
-	Sheffield (4)
-	Hyde (5)
-
 continue to develop newserver
 
 continue to add to monitor program to allow visibility into new server
