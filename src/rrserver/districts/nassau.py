@@ -380,6 +380,7 @@ class Nassau(District):
 					self.rr.GetInput("N20.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 					lvrR = getBit(inb[5], 6)
 					lvrCallOn = getBit(inb[5], 7)
+					
 					lvrL = getBit(inb[6], 0)
 					self.rr.GetInput("N28.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
 	

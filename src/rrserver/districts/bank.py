@@ -51,7 +51,7 @@ class Bank(District):
 		outb[0] = setBit(outb[0], 1, asp[0])  
 		outb[0] = setBit(outb[0], 2, asp[1])
 		outb[0] = setBit(outb[0], 3, asp[2])
-		asp = self.rr.GetOutput("C24L").GetAspectBits()          # westbound signals
+		asp = self.rr.GetOutput("C24R").GetAspectBits()          # westbound signals
 		outb[0] = setBit(outb[0], 4, asp[0]) 
 		outb[0] = setBit(outb[0], 5, asp[1])
 		outb[0] = setBit(outb[0], 6, asp[2])

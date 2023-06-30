@@ -1,11 +1,8 @@
-how to use release - yard, nassau, cliff and port 
-		(I think cliff, nassau, yard and port are done)
 
 call on signals - I think it refers to JUST lighting the signal with no route clearing etc
 
-how to use wos1norm in yard
+how to use wos1norm in yard - I think we're going to skip it
 
-verify signal lever functionality and signal indicators for cliff/yard
 
 verify the correct sequencing of subblocks
     S11: S11A, S11B
@@ -29,32 +26,20 @@ tracker:
 	backup/restore - need a backup/restore for the entire suite - not in tracker
 	reports - the only thing we really need is train cards, and this is not in tracker, but in train editor
 
-siding unlock levers from all tower panels - cliff
-
-fleet levers from cliff
-
-
-why was a single car train being reported as non-contiguous??
-
-what happened when we lost detection
-
-
-from first session testing:
-
-
-
-
-Why couldn't I throw switches at times - in nassau, I believe it was because I didn't clear switch locks.  I think this is done - needs to be tested
-
 I think server periodically crashes or has i/o errors that it can't recover from - why
 
+why was a single car train being reported as non-contiguous??
 train contiguous - do not show message is ?? train - disabled for now until we can figure out what's going on
 
-verify all signal lights and turnout lights on all panels - 
+verify all signal lights and turnout lights on all panels - verify proper panel operation.  Verify lever operation and indicators
+verify signal lever functionality and signal indicators for cliff/yard
+what is supposed to happen when the operator presses the red buttons on their panels
+siding unlock levers from all tower panels - cliff
 
-verify proper panel operation
-
-continue to add nodes to new tester - many more to go
+continue to add nodes to new tester - still to do:
+	Cliff (8)
+	Sheffield (4)
+	Hyde (5)
 
 continue to develop newserver
 

@@ -1,9 +1,10 @@
 import wx
 import os
 from glob import glob
+import json
 
 class ChooseNodeDlg(wx.Dialog):
-    def __init__(self, parent):
+    def __init__(self, parent, refOnly):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "Choose Node")
         self.CenterOnScreen()
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
@@ -12,7 +13,7 @@ class ChooseNodeDlg(wx.Dialog):
             
         self.GetFiles()                
         
-        cb = wx.ComboBox(self, 500, "", size=(160, -1), choices=self.files, style=style)
+        cb = wx.ComboBox(self, 500, "", size=(160, -1), choices=sorted(self.files.keys()), style=style)
         self.cbItems = cb
         
         vszr = wx.BoxSizer(wx.VERTICAL)
@@ -22,6 +23,11 @@ class ChooseNodeDlg(wx.Dialog):
         else:
             self.cbItems.SetSelection(wx.NOT_FOUND)
         
+        vszr.AddSpacer(20)
+        
+        self.cbReferenceOnly = wx.CheckBox(self, wx.ID_ANY, "Reference Only")
+        vszr.Add(self.cbReferenceOnly, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        self.cbReferenceOnly.SetValue(refOnly)
         vszr.AddSpacer(20)
         
         btnszr = wx.BoxSizer(wx.HORIZONTAL)
@@ -48,14 +54,23 @@ class ChooseNodeDlg(wx.Dialog):
         
     def GetFiles(self):
         fxp = os.path.join(os.getcwd(), "tester", "nodes", "*.json")
-        self.files = [os.path.splitext(os.path.split(x)[1])[0] for x in glob(fxp)]
-        
+        fnames = glob(fxp)
+        self.files = {}
+        for fn in fnames:
+            with open(fn, "r") as jfp:
+                j = json.load(jfp)
+                self.files["%2x: %s" % (j["address"], j["description"])] = os.path.splitext(os.path.split(fn)[1])[0]                               
+                
     def GetValue(self):
-        fn = self.cbItems.GetValue()
-        if fn is None or fn == "":
+        fnk = self.cbItems.GetValue()
+        if fnk is None or fnk == "":
             return None
         
-        return os.path.join(os.getcwd(), "tester", "nodes", fn+".json")
+        fn = self.files[fnk]
+        
+        refOnly = self.cbReferenceOnly.IsChecked()
+        
+        return os.path.join(os.getcwd(), "tester", "nodes", fn+".json"), refOnly
  
     def OnBOK(self, _):
         self.EndModal(wx.ID_OK)

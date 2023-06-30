@@ -104,8 +104,7 @@ class Bus:
 					lastused[i] = inbuf[i]
 				else:
 					inbuf[i] = lastused[i]
-					
-					
+										
 			return inbuf
 		
 	def verifyChange(self, address, bx, threshold):

@@ -92,5 +92,31 @@ class Bus:
 		if len(inbuf) != nbytes:
 			return None #[b'\x00']*nbytes
 		else:
-			# make sure that if a byte is different, that it is at least different for "threshold" cycles before we accept it
+			if threshold != 0:
+				'''
+				we're not using raw input - make sure that if a byte is different,
+				that it is at least different for "threshold" cycles before we accept it
+				'''
+				for i in range(nbytes):
+					if lastused[i] is None:
+						lastused[i] = inbuf[i]
+					elif inbuf[i] == lastused[i]:
+						self.byteTally[(address, i)] = 0
+					elif self.verifyChange(address, i, threshold):
+						lastused[i] = inbuf[i]
+					else:
+						inbuf[i] = lastused[i]
+					
 			return inbuf
+	
+	def verifyChange(self, address, bx, threshold):
+		try:
+			self.byteTally[(address, bx)] += 1
+		except KeyError:
+			self.byteTally[(address, bx)] = 1
+			
+		if self.byteTally[(address, bx)] > threshold:
+			self.byteTally[(address, bx)] = 0
+			return True
+		
+		return False

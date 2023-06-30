@@ -1,102 +1,68 @@
 {
-  "address": 33,
-  "description": "Parsons Jct",
+  "address": 145,
+  "description": "Cliveden",
   "obytes": [
     [
       {
-        "label": "PA34LB(0)",
+        "label": "C14L(0)",
         "used": true
       },
       {
-        "label": "PA34LB(1)",
+        "label": "C14L(1)",
         "used": true
       },
       {
-        "label": "PA34LB(2)",
+        "label": "C14L(2)",
         "used": true
       },
       {
-        "label": "PA32L",
+        "label": "C14RA(0)",
         "used": true
       },
       {
-        "label": "PA34LA(0)",
+        "label": "C14RA(1)",
         "used": true
       },
       {
-        "label": "PA34LA(1)",
+        "label": "C14RA(2)",
         "used": true
       },
       {
-        "label": "PA34LA(2)",
+        "label": "C14RB(0)",
         "used": true
       },
       {
-        "label": "PA34RD(0)",
+        "label": "C14RB(1)",
         "used": true
       }
     ],
     [
       {
-        "label": "PA34RD(1)",
+        "label": "C14RB(2)",
         "used": true
       },
       {
-        "label": "PA34RD(2)",
+        "label": "C12L(0)",
         "used": true
       },
       {
-        "label": "PA34RC",
+        "label": "C12L(1)",
         "used": true
       },
       {
-        "label": "PA32RA(0)",
+        "label": "C12L(2)",
         "used": true
       },
       {
-        "label": "PA32RA(1)",
+        "label": "C10L(0)",
         "used": true
       },
       {
-        "label": "PA32RA(2)",
+        "label": "C10L(1)",
         "used": true
       },
       {
-        "label": "PA34RB",
-        "used": true
-      },
-      {
-        "label": "P32RB(0)",
-        "used": true
-      }
-    ],
-    [
-      {
-        "label": "PA32RB(1)",
-        "used": true
-      },
-      {
-        "label": "PA32RB(2)",
-        "used": true
-      },
-      {
-        "label": "PA34RA",
-        "used": true
-      },
-      {
-        "label": "P20.srel",
-        "used": true
-      },
-      {
-        "label": "P30.srel",
-        "used": true
-      },
-      {
-        "label": "P50.srel",
-        "used": true
-      },
-      {
-        "label": "P11.srel",
+        "label": "C10L(2)",
         "used": true
       },
       {
@@ -106,32 +72,66 @@
     ],
     [
       {
-        "label": "(unused)",
+        "label": "C12R(0)",
+        "used": true
+      },
+      {
+        "label": "C12R(1)",
+        "used": true
+      },
+      {
+        "label": "C12R(2)",
+        "used": true
+      },
+      {
+        "label": "C10R(0)",
+        "used": true
+      },
+      {
+        "label": "C10R(1)",
+        "used": true
+      },
+      {
+        "label": "C10R(2)",
+        "used": true
+      },
+      {
+        "label": "CSw11.hslck",
+        "used": true
+      },
+      {
+        "label": "CSw13.N",
+        "used": true
+      }
+    ],
+    [
+      {
+        "label": "CSw13.R",
+        "used": true
+      },
+      {
+        "label": "CSw9.N",
+        "used": true
+      },
+      {
+        "label": "(bad bit - see 3:6)",
         "used": false
       },
       {
-        "label": "(unused)",
-        "used": false
+        "label": "C13.srel",
+        "used": true
       },
       {
-        "label": "(unused)",
-        "used": false
+        "label": "C23.srel",
+        "used": true
       },
       {
-        "label": "(unused)",
-        "used": false
+        "label": "C12.srel",
+        "used": true
       },
       {
-        "label": "(unused)",
-        "used": false
-      },
-      {
-        "label": "(unused)",
-        "used": false
-      },
-      {
-        "label": "(unused)",
-        "used": false
+        "label": "CSw9.R (from 3:2)",
+        "used": true
       },
       {
         "label": "(unused)",
@@ -142,109 +142,83 @@
   "ibytes": [
     [
       {
-        "label": "PASw27.N",
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "(unused)",
+        "used": false
+      },
+      {
+        "label": "CSw13.N",
         "used": true
       },
       {
-        "label": "PASw27.R",
+        "label": "CSw13.R",
         "used": true
       },
       {
-        "label": "PASw29.N",
+        "label": "CSw11.N",
         "used": true
       },
       {
-        "label": "PASw29.R",
+        "label": "CSw11.R",
         "used": true
       },
       {
-        "label": "PASw31.N",
+        "label": "CSw9.N",
         "used": true
       },
       {
-        "label": "PASw31.R",
-        "used": true
-      },
-      {
-        "label": "PASw33.N",
-        "used": true
-      },
-      {
-        "label": "PASw33.R",
+        "label": "CSw9.R",
         "used": true
       }
     ],
     [
       {
-        "label": "PASw35.N",
+        "label": "C13.W",
         "used": true
       },
       {
-        "label": "PASw35.R",
+        "label": "C13",
         "used": true
       },
       {
-        "label": "PASw37.N",
+        "label": "C13.E",
         "used": true
       },
       {
-        "label": "PASw37.R",
+        "label": "COSCLW",
         "used": true
       },
       {
-        "label": "P20",
+        "label": "C12.W",
         "used": true
       },
       {
-        "label": "P20.E",
+        "label": "C12",
         "used": true
       },
       {
-        "label": "P30.W",
+        "label": "C23.W",
         "used": true
       },
       {
-        "label": "P30",
-        "used": true
-      }
-    ],
-    [
-      {
-        "label": "P30.E",
-        "used": true
-      },
-      {
-        "label": "POSPJ1",
-        "used": true
-      },
-      {
-        "label": "POSPJ2",
-        "used": true
-      },
-      {
-        "label": "P50.W",
-        "used": true
-      },
-      {
-        "label": "P50",
-        "used": true
-      },
-      {
-        "label": "P50.E",
-        "used": true
-      },
-      {
-        "label": "P11.W",
-        "used": true
-      },
-      {
-        "label": "P11",
+        "label": "C23",
         "used": true
       }
     ],
     [
       {
-        "label": "P11.E",
+        "label": "COSCLEW",
+        "used": true
+      },
+      {
+        "label": "COSCLEE",
+        "used": true
+      },
+      {
+        "label": "C22",
         "used": true
       },
       {
@@ -252,16 +226,42 @@
         "used": false
       },
       {
-        "label": "(unused)",
-        "used": false
+        "label": "CBGreenMtnStn",
+        "used": true
       },
       {
-        "label": "(unused)",
-        "used": false
+        "label": "CBSheffieldA",
+        "used": true
       },
       {
-        "label": "(unused)",
-        "used": false
+        "label": "CBGreenMtnYd",
+        "used": true
+      },
+      {
+        "label": "CBHydeJct",
+        "used": true
+      }
+    ],
+    [
+      {
+        "label": "CBHydeWest",
+        "used": true
+      },
+      {
+        "label": "CBHydeEast",
+        "used": true
+      },
+      {
+        "label": "CBSouthportJct",
+        "used": true
+      },
+      {
+        "label": "CBCarlton",
+        "used": true
+      },
+      {
+        "label": "CBSheffieldB",
+        "used": true
       },
       {
         "label": "(unused)",

@@ -28,27 +28,29 @@ class MyFrame(wx.Frame):
         wx.Frame.__init__(self, None, -1, "", size=(1, 1))
         self.CenterOnScreen()
         
-        dlg = ChooseNodeDlg(self)
+        dlg = ChooseNodeDlg(self, rl.getReference())
         rc = dlg.ShowModal()
         if rc == wx.ID_OK:
-            fn = dlg.GetValue()
+            fn, refOnly = dlg.GetValue()
             
         dlg.Destroy()
         if rc != wx.ID_OK:
             self.shutdown()
             return
-        
-        self.ShowMainWindow(fn)
+
+        self.reloader.setReference(refOnly)        
+        self.ShowMainWindow(fn, refOnly)
 
         
-    def ShowMainWindow(self, fn):      
+    def ShowMainWindow(self, fn, refOnly):      
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Bind(EVT_OUTPUTCHANGE, self.onOutputChange)
         
         self.obytes = []
         self.ibytes = []
         
-        self.bus = Bus(self.settings.rrtty)
+        if not refOnly:
+            self.bus = Bus(self.settings.rrtty)
         
         with open(fn, "r") as jfp:
             node = json.load(jfp)
@@ -106,52 +108,66 @@ class MyFrame(wx.Frame):
         bsz = wx.BoxSizer(wx.HORIZONTAL)
         bsz.AddSpacer(20)
         
-        self.bSend = wx.Button(self, wx.ID_ANY, "Send", size=(100, 46))
-        self.Bind(wx.EVT_BUTTON, self.onSend, self.bSend)
-        
-        bsz.Add(self.bSend)
-        
-        bsz.AddSpacer(30)
-        
-        self.scCount = wx.SpinCtrl(self, wx.ID_ANY, "")
-        self.scCount.SetRange(1,50)
-        self.scCount.SetValue(1)
-        
-        bsz.Add(self.scCount, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
-        
-        st = wx.StaticText(self, wx.ID_ANY, "Count")
-        st.SetFont(font)
-        bsz.AddSpacer(10)
-        bsz.Add(st, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
-        
-        bsz.AddSpacer(20)
-
-        self.cbContinuous = wx.CheckBox(self, wx.ID_ANY, "Continuous")
-        self.cbContinuous.SetFont(font)
-        bsz.Add(self.cbContinuous, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
-        
-        bsz.AddSpacer(100)
-        st = wx.StaticText(self, wx.ID_ANY, "Successful:")
-        st.SetFont(font)
-        bsz.Add(st, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
-        
-        self.stSuccess = wx.StaticText(self, wx.ID_ANY, "000")
-        self.stSuccess.SetFont(font)
-        bsz.Add(self.stSuccess, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
-        self.stSuccess.SetLabel("  0")
-        
-        bsz.AddSpacer(20)
-        st = wx.StaticText(self, wx.ID_ANY, "Failed:")
-        st.SetFont(font)
-        bsz.Add(st, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
-        
-        self.stFailed = wx.StaticText(self, wx.ID_ANY, "000")
-        self.stFailed.SetFont(font)
-        bsz.Add(self.stFailed, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
-        self.stFailed.SetLabel("  0")
-
-        bsz.AddSpacer(20)
-        
+        if not refOnly:
+            self.bSend = wx.Button(self, wx.ID_ANY, "Send", size=(100, 46))
+            self.Bind(wx.EVT_BUTTON, self.onSend, self.bSend)
+            
+            bsz.Add(self.bSend)
+            
+            bsz.AddSpacer(30)
+            
+            self.scCount = wx.SpinCtrl(self, wx.ID_ANY, "1")
+            self.scCount.SetRange(1,50)
+            self.scCount.SetValue(1)
+            
+            bsz.Add(self.scCount, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
+            
+            st = wx.StaticText(self, wx.ID_ANY, "Count")
+            st.SetFont(font)
+            bsz.AddSpacer(10)
+            bsz.Add(st, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
+            
+            bsz.AddSpacer(20)
+    
+            self.cbContinuous = wx.CheckBox(self, wx.ID_ANY, "Continuous")
+            self.cbContinuous.SetFont(font)
+            bsz.Add(self.cbContinuous, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
+            
+            bsz.AddSpacer(20)
+    
+            self.scThreshold = wx.SpinCtrl(self, wx.ID_ANY, "1")
+            self.scThreshold.SetFont(font)
+            self.scThreshold.SetRange(0, 5)
+            self.scThreshold.SetValue(1)
+            bsz.Add(self.scThreshold, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
+    
+            st = wx.StaticText(self, wx.ID_ANY, "Threshold")
+            st.SetFont(font)
+            bsz.AddSpacer(10)
+            bsz.Add(st, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
+            
+            bsz.AddSpacer(100)
+            st = wx.StaticText(self, wx.ID_ANY, "Successful:")
+            st.SetFont(font)
+            bsz.Add(st, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
+            
+            self.stSuccess = wx.StaticText(self, wx.ID_ANY, "000")
+            self.stSuccess.SetFont(font)
+            bsz.Add(self.stSuccess, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
+            self.stSuccess.SetLabel("  0")
+            
+            bsz.AddSpacer(20)
+            st = wx.StaticText(self, wx.ID_ANY, "Failed:")
+            st.SetFont(font)
+            bsz.Add(st, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
+            
+            self.stFailed = wx.StaticText(self, wx.ID_ANY, "000")
+            self.stFailed.SetFont(font)
+            bsz.Add(self.stFailed, 0, wx.ALIGN_CENTRE_VERTICAL, 0)
+            self.stFailed.SetLabel("  0")
+    
+            bsz.AddSpacer(20)
+            
         self.bReload = wx.Button(self, wx.ID_ANY, "Change Node", size=(100, 46))
         self.Bind(wx.EVT_BUTTON, self.onReload, self.bReload)
         
@@ -170,16 +186,17 @@ class MyFrame(wx.Frame):
         self.SetPosition((px-int(sx/2), py-int(sy/2)))
         
         self.Show()
-  
-        self.Bind(wx.EVT_TIMER, self.onTicker)
-        self.ticker = wx.Timer(self)
-        
-        if not self.bus.isOpen():
-            dlg = wx.MessageDialog(self, "Unable to open serial port %s to railroad" % self.settings.rrtty,
-                                   "Serial Port Exception",
-                                   wx.OK | wx.ICON_ERROR)
-            dlg.ShowModal()
-            dlg.Destroy()
+
+        if not refOnly:
+            self.Bind(wx.EVT_TIMER, self.onTicker)
+            self.ticker = wx.Timer(self)
+            
+            if not self.bus.isOpen():
+                dlg = wx.MessageDialog(self, "Unable to open serial port %s to railroad" % self.settings.rrtty,
+                                       "Serial Port Exception",
+                                       wx.OK | wx.ICON_ERROR)
+                dlg.ShowModal()
+                dlg.Destroy()
             
         
     def onOutputChange(self, evt):
@@ -204,7 +221,8 @@ class MyFrame(wx.Frame):
         self.SendOnce()
         
     def SendOnce(self):
-        inbytes = self.bus.sendRecv(self.address, self.outb, self.nobytes)
+        threshold = self.scThreshold.GetValue()
+        inbytes = self.bus.sendRecv(self.address, self.outb, self.nobytes, threshold=threshold)
         if inbytes is None:
             self.failedReads += 1
             self.stFailed.SetLabel("%3d" % self.failedReads)
@@ -247,12 +265,19 @@ class MyFrame(wx.Frame):
 class reloader:
     def __init__(self):
         self.reload = False
+        self.referenceOnly = False
         
     def setReload(self, flag):
         self.reload = flag
         
     def getReload(self):
         return self.reload
+        
+    def setReference(self, flag):
+        self.referenceOnly = flag
+        
+    def getReference(self):
+        return self.referenceOnly
 
 
 rl = reloader()
