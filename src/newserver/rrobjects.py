@@ -392,7 +392,7 @@ class SignalLever:
     def LeverBits(self):
         return self.bits
     
-    def SetLeverState(self, lbit, cbit, rbit):
+    def SetLeverState(self, rbit, cbit, lbit):
         nstate = self.state
         if lbit != 0:
             nstate = "L"
@@ -421,7 +421,7 @@ class SignalLever:
                 node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'R' else 0)
        
     def GetEventMessage(self):
-        return {"siglever": [{ "name": self.name, "state": self.state}]}
+        return {"siglever": [{ "name": self.name+".lvr", "state": self.state}]}
 
 
 class RouteIn:

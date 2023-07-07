@@ -103,17 +103,6 @@ class Dell(District):
 			self.rr.AddBlock("R11",       self, n, DELL, [(1, 7)]) 
 			
 			self.rr.AddBlock("R12",       self, n, DELL, [(2, 0)]) 
-			
-			self.rr.GetBlock("D21A").SetMainBlock("D21")
-			self.rr.GetBlock("D21B").SetMainBlock("D21")
-			
-			self.rr.GetBlock("S10A").SetMainBlock("S10")
-			self.rr.GetBlock("S10B").SetMainBlock("S10")
-			self.rr.GetBlock("S10C").SetMainBlock("S10")
-			
-			self.rr.GetBlock("R10A").SetMainBlock("R10")
-			self.rr.GetBlock("R10B").SetMainBlock("R10")
-			self.rr.GetBlock("R10C").SetMainBlock("R10")
 
 		
 	def OutIn(self):

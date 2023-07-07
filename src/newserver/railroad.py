@@ -86,6 +86,10 @@ class Railroad():
 			self.nodes[name] = self.districts[name].GetNodes()
 			self.addrList.extend([[addr, self.districts[name], node] for addr, node, in self.districts[name].GetNodes().items()])
 
+		for main, subs in self.subBlocks.items():
+			for sub in subs:			
+				self.GetBlock(sub).SetMainBlock(main)
+
 			
 	def dump(self):
 		print("================================SIGNALS")
@@ -1071,8 +1075,8 @@ class Railroad():
 					if obj.Name() not in skiplist: # bypass levers that are skipped because of control option
 						bt = obj.Bits()
 						if len(bt) > 0:
-							lbit, cbit, rbit = node.GetInputBits(bt)
-							if obj.SetLeverState(lbit, cbit, rbit):
+							rbit, cbit, lbit = node.GetInputBits(bt)
+							if obj.SetLeverState(rbit, cbit, lbit):
 								self.RailroadEvent(obj.GetEventMessage())
 								obj.UpdateLed()
 

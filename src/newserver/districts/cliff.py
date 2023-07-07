@@ -258,7 +258,6 @@ class Cliff(District):
 			self.rr.AddBlock("C52", self, n, addr, [(1, 4)])
 			self.rr.AddBlock("C53", self, n, addr, [(1, 5)])
 			self.rr.AddBlock("C54", self, n, addr, [(1, 6)])
-			
 
 		self.routeMap = {
 			"CG21W":  [ ["CSw41", "R"] ],
@@ -349,6 +348,9 @@ class Cliff(District):
 
 		for toName, status in tolist:
 			self.rr.GetInput(toName).SetState(status)
+			
+	def CheckTurnoutPosition(self, tout):
+		self.rr.RailroadEvent({"turnout": [{"name": tout.Name(), "state": "N" if tout.IsNormal() else "R"}]})
 
 	def DetermineSignalLevers(self):
 		self.sigLever["C2"] = self.DetermineSignalLever(["C2L"], ["C2RA", "C2RB", "C2RC", "C2RD"])  # signal indicators

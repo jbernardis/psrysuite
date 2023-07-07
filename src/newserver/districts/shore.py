@@ -108,18 +108,6 @@ class Shore(District):
 			self.rr.AddBlock("H30A",  self, n, SHORE, [(4, 5)]) 
 			self.rr.AddBlock("H10A",  self, n, SHORE, [(4, 6)]) 
 			
-			self.rr.GetBlock("S11A").SetMainBlock("S11")
-			self.rr.GetBlock("S11B").SetMainBlock("S11")
-			
-			self.rr.GetBlock("S20A").SetMainBlock("S20")
-			self.rr.GetBlock("S20B").SetMainBlock("S20")
-			self.rr.GetBlock("S20C").SetMainBlock("S20")
-			
-			self.rr.GetBlock("H10A").SetMainBlock("H10")
-			self.rr.GetBlock("H10B").SetMainBlock("H10")
-			
-			self.rr.GetBlock("H30A").SetMainBlock("H30")
-			self.rr.GetBlock("H30B").SetMainBlock("H30")
 
 		with self.nodes[HYDEJCT] as n:
 			#outputs

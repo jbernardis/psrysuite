@@ -63,6 +63,23 @@ class Port(District):
 			self.rr.AddBreakerInd("CBSouthport",  self, n, addr, [(6, 2)])
 			self.rr.AddBreakerInd("CBLavinYard",  self, n, addr, [(6, 3)])
 		
+			# virtual turnouts - we do not control these, so no output bits
+			self.rr.AddTurnout("PASw1",  self, n, addr, [])
+			self.rr.AddTurnout("PASw3",  self, n, addr, [])
+			self.rr.AddTurnout("PASw5",  self, n, addr, [])
+			self.rr.AddTurnout("PASw7",  self, n, addr, [])
+			self.rr.AddTurnout("PASw9",  self, n, addr, [])
+			self.rr.AddTurnout("PASw11", self, n, addr, [])
+			self.rr.AddTurnout("PASw13", self, n, addr, [])
+			self.rr.AddTurnout("PASw15", self, n, addr, [])
+			self.rr.AddTurnout("PASw19", self, n, addr, [])
+			self.rr.AddTurnout("PASw21", self, n, addr, [])
+			self.rr.AddTurnout("PASw23", self, n, addr, [])
+			self.rr.AddTurnout("PASw31", self, n, addr, [])
+			self.rr.AddTurnout("PASw33", self, n, addr, [])
+			self.rr.AddTurnout("PASw35", self, n, addr, [])
+			self.rr.AddTurnout("PASw37", self, n, addr, [])
+			
 			self.rr.AddTurnoutLock("PASw1", self, n, addr, [(6, 4)])
 			self.rr.AddTurnoutLock("PASw3", self, n, addr, [(6, 5)])
 			self.rr.AddTurnoutLock("PASw5", self, n, addr, [(6, 6)])
@@ -136,6 +153,14 @@ class Port(District):
 			self.rr.AddStopRelay("P50.srel", self, n, addr, [(2, 5)])
 			self.rr.AddStopRelay("P11.srel", self, n, addr, [(2, 6)])
 
+			# virtual turnouts - we do not control these, so no output bits
+			self.rr.AddTurnout("PASw27", self, n, addr, [])
+			self.rr.AddTurnout("PASw29", self, n, addr, [])
+			self.rr.AddTurnout("PASw31", self, n, addr, [])
+			self.rr.AddTurnout("PASw33", self, n, addr, [])
+			self.rr.AddTurnout("PASw35", self, n, addr, [])
+			self.rr.AddTurnout("PASw37", self, n, addr, [])
+
 			# Inputs
 			self.rr.AddTurnoutPosition("PASw27", self, n, addr, [(0, 0), (0, 1)])
 			self.rr.AddTurnoutPosition("PASw29", self, n, addr, [(0, 2), (0, 3)])
@@ -199,6 +224,12 @@ class Port(District):
 			self.rr.AddStopRelay("P32.srel", self, n, addr, [(6, 4)])
 			self.rr.AddStopRelay("P41.srel", self, n, addr, [(6, 5)])
 	
+			# virtual turnouts - we do not control these, so no output bits
+			self.rr.AddTurnout("PBSw1",  self, n, addr, [])
+			self.rr.AddTurnout("PBSw3",  self, n, addr, [])
+			self.rr.AddTurnout("PBSw11", self, n, addr, [])
+			self.rr.AddTurnout("PBSw13", self, n, addr, [])
+
 			# Inputs
 			self.rr.AddTurnoutPosition("PBSw1",  self, n, addr, [(0, 0), (0, 1)])
 			self.rr.AddTurnoutPosition("PBSw3",  self, n, addr, [(0, 2), (0, 3)])
