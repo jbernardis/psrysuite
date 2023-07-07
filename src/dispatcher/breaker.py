@@ -17,7 +17,6 @@ breakerNames = {
 	"CBKrulishYd":		"Krulish Yard",
 	"CBNassauW":		"Nassau West",
 	"CBNassauE":		"Nassau East",
-	"CBSptJct":			"Southport Junction",
 	"CBWilson":			"Wilson City",
 	"CBThomas":			"Thomas Yard",
 	"CBFoss":			"Foss",
@@ -32,15 +31,14 @@ breakerNames = {
 	"CBHarpersFerry":	"Harpers Ferry",
 	"CBBlockY30":		"Block Y30",
 	"CBBlockY81":		"Block Y81",
-	"CBGreenMtnStn":	"Green Mountain Station",
-	"CBSheffieldA":		"Sheffield A",
-	"CBGreenMtnYd":		"Green Mountain Yard",
+	"CBGreenMtn":		"Green Mountain",
+	"CBSheffield":		"Sheffield",
+	"CBBank":			"Bank",
 	"CBHydeJct":		"Hyde Junction",
 	"CBHydeWest":		"Hyde West",
 	"CBHydeEast":		"Hyde East",
 	"CBSouthportJct":	"Southport Junction",
 	"CBCarlton":		"Carlton",
-	"CBSheffieldB":		"Sheffield B",
 }
 
 def BreakerName(iname):

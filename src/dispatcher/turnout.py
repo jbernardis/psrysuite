@@ -127,7 +127,6 @@ class Turnout:
 				self.pairedTurnout.SetNormal(refresh)
 			else:
 				self.pairedTurnout.SetReverse(refresh)
-
 		self.district.DetermineRoute(self.blockList)
 
 		if refresh:

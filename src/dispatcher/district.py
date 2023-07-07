@@ -164,7 +164,7 @@ class District:
 
 	def FindTurnoutCombinations(self, blocks, turnouts):
 		# This maps OS name to new route.  Initially assume None for all OSes
-		rteMap = {os.GetName(): None for os in blocks}
+		rteMap = {os.GetName(): None for os in blocks if os.GetBlockType() == OVERSWITCH}
 		toMap = [[x, 'N' if self.turnouts[x].IsNormal() else 'R'] for x in turnouts]
 
 		for rte in self.routes.values():

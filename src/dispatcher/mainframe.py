@@ -1633,7 +1633,7 @@ class MainFrame(wx.Frame):
 						to = self.turnouts[turnout]
 					except KeyError:
 						to = None
-
+						
 					if to is not None and state != to.GetStatus():
 						district = to.GetDistrict()
 						st = REVERSE if state == "R" else NORMAL

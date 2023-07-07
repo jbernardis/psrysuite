@@ -486,6 +486,40 @@
         "used": true
       },
       {
+        "label": "CBKrulishYd",
+        "used": true
+      },
+      {
+        "label": "CBThomas",
+        "used": true
+      },
+      {
+        "label": "CBWilson",
+        "used": true
+      },
+      {
+        "label": "CBKrulish",
+        "used": true
+      },
+      {
+        "label": "CBNassauW",
+        "used": true
+      },
+      {
+        "label": "CBNassauE",
+        "used": true
+      },
+      {
+        "label": "CBFoss",
+        "used": true
+      }
+    ],
+    [
+      {
+        "label": "CBFoss",
+        "used": true
+      },
+      {
         "label": "(unused)",
         "used": false
       },

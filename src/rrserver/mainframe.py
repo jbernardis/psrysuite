@@ -307,11 +307,14 @@ class MainFrame(wx.Frame):
 		for cmd, parms in evt.data.items():
 			if cmd == "refreshoutput":
 				for oname in parms:
+					print("refresh output %s" % oname)
 					self.rr.RefreshOutput(oname)
 			elif cmd == "refreshinput":
 				for iname in parms:
+					print("refresh input %s" % iname)
 					self.rr.RefreshInput(iname)
 			else:
+				print("sending: %s" % str(evt.data))
 				self.socketServer.sendToAll(evt.data)
 
 	def dispCommandReceipt(self, cmd): # thread context
@@ -320,6 +323,7 @@ class MainFrame(wx.Frame):
 
 	def onHTTPMessageEvent(self, evt):
 		#logging.info("HTTP Request: %s" % json.dumps(evt.data))
+		print("HTTP Request: %s" % json.dumps(evt.data))
 		verb = evt.data["cmd"][0]
 
 		if verb == "signal":

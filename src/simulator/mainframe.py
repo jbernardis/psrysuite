@@ -266,6 +266,7 @@ class MainFrame(wx.Frame):
 			return False
 
 	def BlockOccupied(self, block):
+		print("checking block occupied %s" % block, flush=True)
 		blist = block.split(",")
 		for b in blist:
 			if self.blocks[b][0] != 0:
@@ -303,6 +304,7 @@ class MainFrame(wx.Frame):
 					if block in self.blocks:
 						self.blocks[block][0] = state
 					else:
+						print("adding block %s" % block)
 						self.blocks[block] = [ state, 'E']
 				self.CheckResumeScripts()
 
@@ -314,6 +316,7 @@ class MainFrame(wx.Frame):
 						self.blocks[block][1] = direction
 					else:
 						self.blocks[block] = [ 0, direction]
+						print("adding block %s" % block)
 				self.CheckResumeScripts()
 					
 			elif cmd == "signal":
