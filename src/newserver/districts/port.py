@@ -305,15 +305,15 @@ class Port(District):
 		
 		District.OutIn(self)
 
-	def SetHandSwitch(self, hsname, state):
+	def SetHandswitch(self, hsname, state):
 		print("Port evaluating handswitch %s at state %s" % (hsname, state))
 		if hsname in ["PBSw15a", "PBSw15b"]:
-			hsa = self.rr.GetHandSwitch("PBSw15a")
-			hsb = self.rr.GetHandSwitch("PSw15b")
+			hsa = self.rr.GetHandswitch("PBSw15a")
+			hsb = self.rr.GetHandswitch("PSw15b")
 			locked = hsa.IsLocked() or hsb.IsLocked()
 			print("%s or %s = %s" % (hsa.IsLocked(), hsb.IsLocked(), locked))
 			
-			hs = self.rr.GetHandSwitch("PBSw15ab")
+			hs = self.rr.GetHandswitch("PBSw15ab")
 			if hs.Lock(locked):
 				print("changes - updating indicators")
 				hs.UpdateIndicators()

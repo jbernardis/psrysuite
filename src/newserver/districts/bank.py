@@ -72,15 +72,15 @@ class Bank(District):
 			self.rr.AddBreaker("CBBlockY30",     self, n, addr, [(3, 4)])
 			self.rr.AddBreaker("CBBlockY81",     self, n, addr, [(3, 5)])
 
-	def SetHandSwitch(self, hsname, state):
+	def SetHandswitch(self, hsname, state):
 		print("Bank evaluating handswitch %s at state %s" % (hsname, state))
 		if hsname in ["CSw21a", "CSw21b"]:
-			hsa = self.rr.GetHandSwitch("CSw21a")
-			hsb = self.rr.GetHandSwitch("CSw21b")
+			hsa = self.rr.GetHandswitch("CSw21a")
+			hsb = self.rr.GetHandswitch("CSw21b")
 			locked = hsa.IsLocked() or hsb.IsLocked()
 			print("%s or %s = %s" % (hsa.IsLocked(), hsb.IsLocked(), locked))
 			
-			hs = self.rr.GetHandSwitch("CSw21ab")
+			hs = self.rr.GetHandswitch("CSw21ab")
 			if hs.Lock(locked):
 				print("changes - updating indicators")
 				hs.UpdateIndicators()

@@ -352,7 +352,7 @@ class ServerMain:
 		hsname = cmd["name"][0]
 		stat = int(cmd["status"][0])
 
-		self.rr.SetHandSwitch(hsname, stat)
+		self.rr.SetHandswitch(hsname, stat)
 
 	def DoSetRoute(self, cmd):
 		blknm = cmd["block"][0]

@@ -156,6 +156,7 @@ class Breaker:
      
     def SetStatus(self, flag):
         if self.status == flag:
+            print("breaker set status, breaker (%s) already has value %s" % (self.name, self.status), flush=True)
             return False
         
         self.status = flag
@@ -273,7 +274,6 @@ class Signal:
         self.aspect = 0
         self.bits = []
         self.led = []
-        self.leverBits = []
         self.locked = False
         self.lockBits = []
         self.indicators = []
@@ -305,12 +305,6 @@ class Signal:
     
     def Name(self):
         return self.name
-    
-    def SetLeverBits(self, bits):
-        self.leverBits = bits
-        
-    def LeverBits(self):
-        return self.leverBits
     
     def SetLockBits(self, bits):
         self.lockBits = bits
@@ -345,7 +339,7 @@ class Signal:
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)
         print("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
-        print("     LED: %s   lever: %s   locked: %s/%s" % (str(self.led), str(self.leverBits), str(self.locked), str(self.lockBits)))
+        print("     LED: %s   locked: %s/%s" % (str(self.led), str(self.locked), str(self.lockBits)))
         if self.district is None:
             print("<===== NULL SIGNAL DEFINITION")
 
@@ -387,6 +381,7 @@ class SignalLever:
      
     def SetLed(self, bits, district, node, addr):
         self.led = [bits, district, node, addr]
+        self.UpdateLed()
         
     def LedBits(self):
         return self.led
@@ -525,6 +520,7 @@ class Turnout:
     
     def SetLed(self, bits, district, node, addr):
         self.led = [bits, district, node, addr]
+        self.UpdateLed()
         
     def LedBits(self):
         return self.led
@@ -557,6 +553,7 @@ class Turnout:
     
     def SetPosition(self, bits, district, node, addr):
         self.position = [bits, district, node, addr]
+        node.SetInputBit(bits[0][0], bits[0][1], 1)
         
     def Position(self):
         return self.position
@@ -666,6 +663,7 @@ class Handswitch:
     
     def AddIndicator(self, district, node, addr, bits):
         self.indicators.append([district, node, addr, bits])
+        self.UpdateIndicators()
    
     def UpdateIndicators(self):
         if len(self.indicators) == 0:
@@ -686,14 +684,15 @@ class Handswitch:
    
     def AddReverseIndicator(self, district, node, addr, bits):
         self.reverseIndicators.append([district, node, addr, bits])
+        self.UpdateReverseIndicators()
    
     def UpdateReverseIndicators(self):
         if len(self.reverseIndicators) == 0:
             return False
-        for ind in self.reverseIdicators:
+        for ind in self.reverseIndicators:
             district, node, address, bits = ind
             if len(bits) == 1:
-                node.SetOutputBit(bits[0][0], bits[0][1], 1 if not self.reversed else 0)
+                node.SetOutputBit(bits[0][0], bits[0][1], 1 if not self.normal else 0)
             
         return True
   
@@ -705,6 +704,7 @@ class Handswitch:
 
     def SetBits(self, bits):
         self.bits = bits  # the position is where we read the switch position
+        self.node.SetInputBit(bits[0][0], bits[0][1], 1)
         
     def Bits(self):
         return self.bits

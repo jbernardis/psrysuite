@@ -69,6 +69,17 @@ class Railroad():
 		
 		self.addrList = []
 
+		self.subBlocks = {
+			"D11": [ "D11A", "D11B" ],
+			"D21": [ "D21A", "D21B" ],
+			"H10": [ "H10A", "H10B" ],
+			"H30": [ "H30A", "H30B" ],
+			"S10": [ "S10A", "S10B", "S10C" ],
+			"S11": [ "S11A", "S11B" ],
+			"S20": [ "S20A", "S20B", "S20C" ],
+			"R10": [ "R10A", "R10B", "R10C" ],
+		}		
+
 		for dclass, name in self.districtList:
 			logging.debug("Creating District %s" % name)
 			self.districts[name] = dclass(self, name, self.settings)
@@ -150,16 +161,21 @@ class Railroad():
 		'''
 		this method is solely for simulation - to set a block as occupied or not
 		'''
+		
 		print("in railroad occupy simulate")
 		try:
-			blk = self.blocks[blknm]
+			blist = [ self.blocks[blknm] ]
 		except KeyError:
-			logging.warning("Ignoring occupy command - unknown block name: %s" % blknm)
-			print("unknown block %s" % blknm)
-			return
+			try:
+				blist = [self.rr.GetBlock(x) for x in self.subBlocks[blknm]]
+			except KeyError:
+				logging.warning("Ignoring occupy command - unknown block name: %s" % blknm)
+				print("unknown block %s" % blknm)
+				return
 		
-		vbyte, vbit = blk.Bits()[0]
-		blk.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
+		for blk in blist:
+			vbyte, vbit = blk.Bits()[0]
+			blk.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
 		
 	def SetTurnoutPos(self, tonm, normal):
 		'''
@@ -189,6 +205,7 @@ class Railroad():
 		'''
 		this method is solely for simulation - to set a breaker as on or not
 		'''
+		print("set breaker %s = %d" % (brkrnm, state))
 		try:
 			brkr = self.breakers[brkrnm]
 		except KeyError:
@@ -201,8 +218,11 @@ class Railroad():
 		except IndexError:
 			print("Breaker definition incomplete - ignoring breaker command")
 			return 
+
+		print("calling set input bit %d:%d = %d" % (vbyte, vbit, 1 if  state == 0 else 0))		
+		brkr.node.SetInputBit(vbyte, vbit, 1 if state == 0 else 0)
 		
-		brkr.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
+		print("breaker current ststus = %s" % brkr.status)
 		
 	def SetInputBit(self, distName, vbyte, vbit, val):
 		pass
@@ -433,7 +453,7 @@ class Railroad():
 		print("parsing (%s)" % sig.Name())
 		r = self.reSigName.findall(sig.Name())
 		print("results: (%s)" % str(r))
-		print(len(r), flush=True)
+		print("LEDS for switch %s: %d" % (sig.Name(), len(r)), flush=True)
 		if len(r) != 1 or len(r[0]) != 2:
 			return 
 		
@@ -477,7 +497,7 @@ class Railroad():
 		if sig.Lock(lock):
 			self.RailroadEvent(sig.GetEventMessage(lock=True))
 			
-	def SetHandSwitch(self, hsname, state):
+	def SetHandswitch(self, hsname, state):
 		hsnameKey = hsname.split(".")[0] # strip off the ".hand suffix
 
 		try:
@@ -489,7 +509,7 @@ class Railroad():
 		if hs.Lock(state == 1):
 			self.RailroadEvent(hs.GetEventMessage(lock=True))
 			if not hs.UpdateIndicators():
-				hs.District().SetHandSwitch(hsnameKey, state)
+				hs.District().SetHandswitch(hsnameKey, state)
 
 	def SetSignalFleet(self, signame, flag):
 		self.fleetedSignals[signame] = flag
@@ -940,9 +960,15 @@ class Railroad():
 		except KeyError:
 			return None
 
-	def GetHandSwitch(self, hsnm):
+	def GetHandswitch(self, hsnm):
 		try:
 			return self.handswitches[hsnm]
+		except KeyError:
+			return None
+
+	def GetIndicator(self, indnm):
+		try:
+			return self.indicators[indnm]
 		except KeyError:
 			return None
 
@@ -999,7 +1025,6 @@ class Railroad():
 			for node, vbyte, vbit, objparms, newval in changedBits:
 				obj = objparms[0]
 				objType = obj.InputType()
-				print(objType, flush=True)
 				if objType == INPUT_BLOCK:
 					if obj.SetOccupied(newval != 0):
 						self.RailroadEvent(obj.GetEventMessage())
@@ -1030,13 +1055,17 @@ class Railroad():
 								obj.district.TurnoutLeverChange(obj)
 						
 				elif objType == INPUT_BREAKER:
-					if obj.SetStatus(newval == 0):
+					print("breaker in examine inputs: %s: %s" % (obj.Name(), newval))
+					if obj.SetStatus(newval != 0):
+						print("updated")
 						obj.UpdateIndicators()
 						if obj.HasProxy():
 							# use the proxy to show updated breaker status
 							obj.district.ShowBreakerState(obj)
 						else:
 							self.RailroadEvent(obj.GetEventMessage())
+					else:
+						print("no change")
 	
 				elif objType == INPUT_SIGNALLEVER:
 					if obj.Name() not in skiplist: # bypass levers that are skipped because of control option
