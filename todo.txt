@@ -36,6 +36,38 @@ verify signal lever functionality and signal indicators for cliff/yard
 what is supposed to happen when the operator presses the red buttons on their panels
 siding unlock levers from all tower panels - cliff
 
-continue to develop newserver
+
+
+
 
 continue to add to monitor program to allow visibility into new server
+
+
+
+
+
+new server:
+cliff fleeting - how to reconcile there being only 1 fleet lever on the panel, but 3 checkboxes on the screen
+fleeting in yard
+
+deal with reverse indicators in cliff - CSw21a, 21b, 19, 15, 11
+
+
+
+
+audit data structures
+
+	SignalLever
+	Handswitch
+	StopRelay
+	RouteIn
+	OutNXButton
+	Indicator
+	ODevice
+	Lock
+	Block   <== done
+	Breaker     <== done
+	Signal  <== done
+	Turnout <== done
+
+test, test, test

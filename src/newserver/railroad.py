@@ -1075,8 +1075,8 @@ class Railroad():
 					if obj.Name() not in skiplist: # bypass levers that are skipped because of control option
 						bt = obj.Bits()
 						if len(bt) > 0:
-							rbit, cbit, lbit = node.GetInputBits(bt)
-							if obj.SetLeverState(rbit, cbit, lbit):
+							lbit, cbit, rbit = node.GetInputBits(bt)
+							if obj.SetLeverState(lbit, cbit, rbit):
 								self.RailroadEvent(obj.GetEventMessage())
 								obj.UpdateLed()
 

@@ -21,7 +21,8 @@ class Nassau(District):
 		self.S11AB = None
 		self.entryButton = None
 		self.currentCoachRoute = None
-		self.optFleet = None
+		self.fleetPanel = None
+		self.fleetDispatch = None
 		self.released = False
 
 		addr = NASSAUW
@@ -222,6 +223,20 @@ class Nassau(District):
 			
 		self.coachRoutes = ["NSw60A", "NSw60B", "NSw60C", "NSw60D"]
 		
+		'''
+		which signals are affected by fleeting, for each of the control options
+		This indicates the effect for the dispatcher program.
+		
+		0 => Nassau, 1 => Dispatcher Main, 2 => Dispatcher All
+		'''
+		self.fleetedSignals = [
+			[],
+			["N26L", "N26RB", "N26RC", "N24L", "N24RA", "N24RB", "N14R", "N14LA", "N14LB", "N16R", "N16L", "N18LB"],
+			["N26L", "N26RA", "N26RB", "N26RC", "N24L", "N24RA", "N24RB", "N24RC", "N24RD", 
+				"N14R", "N14LA", "N14LB", "N14LC", "N14LD", "N16R", "N16L", 
+				"N18R", "N18LA", "N18LB", "N20R", "N20L", "N28R", "N28L"]
+		]
+		
 		self.routeMap = {
 			"NSw60A": [["NSw13", "N"], ["NSw15", "R"], ["NSw17", "R"]],
 			"NSw60B": [["NSw13", "R"], ["NSw15", "N"], ["NSw17", "R"]],
@@ -386,15 +401,47 @@ class Nassau(District):
 
 	def OutIn(self):		
 		self.control = self.rr.GetControlOption("nassau")  # 0 => Nassau, 1 => Dispatcher Main, 2 => Dispatcher All
-		if self.control == 0:
-			optFleet = self.nodes[NASSAUW].GetInputBit(3, 3) # get the state of the lever on the panel
+		if self.control in [0, 1]:
+			fleetPanel = self.nodes[NASSAUW].GetInputBit(3, 3) # get the state of the lever on the panel
 		else:
-			optFleet = self.rr.GetControlOption("nassau.fleet")  # otherwise get the fleeting state from the check box
+			fleetPanel = 0
+			
+		fleetDispatch = self.rr.GetControlOption("nassau.fleet")  # otherwise get the fleeting state from the check box
 
-		if optFleet != self.optFleet:
-			self.optFleet = optFleet
-			self.nodes[NASSAUW].SetOutputBit(3, 2, optFleet)			
-			self.nodes[NASSAUW].SetOutputBit(3, 3, 1-optFleet)
+		dispatchList = self.fleetedSignals[self.control]
+		panelList = [x for x in self.fleetedSignals[2] if x not in dispatchList]
+		
+
+		if self.control in [0, 1]: 
+			if self.fleetPanel != fleetPanel:
+				print("panel  fleetpanel = %d   fleetdispatch = %s" % (fleetPanel, fleetDispatch))
+				print("control = %d" % self.control)
+				self.fleetPanel = fleetPanel
+				self.nodes[NASSAUW].SetOutputBit(3, 2, fleetPanel)			
+				self.nodes[NASSAUW].SetOutputBit(3, 3, 1-fleetPanel)
+				print("output bits set")
+				print("siglist: %s" % str(panelList))
+				for signame in panelList:
+					resp = {"fleet": [{"name": signame, "value": fleetPanel}]}
+					print("sending (%s)" % resp)
+					self.rr.RailroadEvent(resp)
+
+		if self.control in [1, 2]:
+			if self.fleetDispatch != fleetDispatch:
+				self.fleetDispatch = fleetDispatch
+				if self.control == 2: # only update the panel LEDs if the panel has no local control
+					self.nodes[NASSAUW].SetOutputBit(3, 2, fleetDispatch)			
+					self.nodes[NASSAUW].SetOutputBit(3, 3, 1-fleetDispatch)
+				print("output bits set")
+				print("siglist: %s" % str(dispatchList))
+				for signame in dispatchList:
+					resp = {"fleet": [{"name": signame, "value": fleetDispatch}]}
+					print("sending (%s)" % resp)
+					self.rr.RailroadEvent(resp)
+
+		
+		
+		
 					
 		rlReq = self.nodes[NASSAUW].GetInputBit(3, 2) == 1
 			

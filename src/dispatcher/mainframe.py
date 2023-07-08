@@ -1645,8 +1645,10 @@ class MainFrame(wx.Frame):
 					try:
 						value = int(p["value"])
 					except:
+						print("vale defaulting to 0")
 						value = 0
 
+					print("fleet %s %d" % (signm, value))
 					sig = self.signals[signm]
 					sig.EnableFleeting(value == 1)
 					self.FleetCheckBoxes(signm)
