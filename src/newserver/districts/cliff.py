@@ -398,8 +398,10 @@ class Cliff(District):
 				ind = self.rr.GetIndicator(tout)
 				bits = ind.Bits()
 				if bits is None or len(bits) < 1:
+					print("no bits")
 					continue
-				self.nodes[CLIFF].SetOutputBit(bits[0][1], bits[0][1], 0 if norm else 1)
+				print("setting CLIFF output bit %d:%d to %s" % (bits[0][0], bits[0][1], 0 if norm else 1))
+				self.nodes[CLIFF].SetOutputBit(bits[0][0], bits[0][1], 0 if norm else 1)
 			
 		self.rr.UpdateDistrictTurnoutLocks(self.name, self.released)
 		
