@@ -92,9 +92,10 @@ class Railroad():
 
 			
 	def dump(self):
-		print("================================SIGNALS")
-		for s in self.signals.values():
-			s.dump()
+		pass
+  # print("================================SIGNALS")
+  # for s in self.signals.values():
+  # 	s.dump()
 			
   # print("================================BLOCKS")
   # for b in self.blocks.values():
@@ -165,8 +166,6 @@ class Railroad():
 		'''
 		this method is solely for simulation - to set a block as occupied or not
 		'''
-		
-		print("in railroad occupy simulate")
 		try:
 			blist = [ self.blocks[blknm] ]
 		except KeyError:
@@ -174,7 +173,6 @@ class Railroad():
 				blist = [self.rr.GetBlock(x) for x in self.subBlocks[blknm]]
 			except KeyError:
 				logging.warning("Ignoring occupy command - unknown block name: %s" % blknm)
-				print("unknown block %s" % blknm)
 				return
 		
 		for blk in blist:
@@ -193,12 +191,11 @@ class Railroad():
 
 			except KeyError:			
 				logging.warning("Ignoring turnoutpos command - unknown turnoutname: %s" % tonm)
-				print("unknown turnout %s" % tonm)
 				return
 	
 		pos = tout.Position()
 		if pos is None:
-			print("Turnout definition does not have position - ignoring turnoutpos command")
+			logging.warning("Turnout definition does not have position - ignoring turnoutpos command")
 			return 
 		
 		bits, district, node, addr = pos
@@ -214,19 +211,15 @@ class Railroad():
 			brkr = self.breakers[brkrnm]
 		except KeyError:
 			logging.warning("Ignoring breaker command - unknown breaker name: %s" % brkrnm)
-			print("unknown breaker %s" % brkrnm)
 			return
 		
 		try:
 			vbyte, vbit = brkr.Bits()[0]
 		except IndexError:
-			print("Breaker definition incomplete - ignoring breaker command")
+			logging.warning("Breaker definition incomplete - ignoring breaker command")
 			return 
 
-		print("calling set input bit %d:%d = %d" % (vbyte, vbit, 1 if  state == 0 else 0))		
 		brkr.node.SetInputBit(vbyte, vbit, 1 if state == 0 else 0)
-		
-		print("breaker current ststus = %s" % brkr.status)
 		
 	def SetInputBit(self, distName, vbyte, vbit, val):
 		pass
@@ -240,7 +233,6 @@ class Railroad():
 			ind = self.indicators[indname]
 		except KeyError:
 			logging.warning("Ignoring indicator command - unknown indicator: %s" % indname)
-			print("unknown indicator %s" % indname)
 			return
 		
 		if state == ind.IsOn():
@@ -259,7 +251,6 @@ class Railroad():
 			od = self.odevices[odname]
 		except KeyError:
 			logging.warning("Ignoring output device command - unknown output device: %s" % odname)
-			print("unknown output device %s" % odname)
 			return
 		
 		vbyte, vbit = od.Bits()[0]
@@ -273,7 +264,6 @@ class Railroad():
 			r = self.stopRelays[relayname]
 		except KeyError:
 			logging.warning("Ignoring stoprelay command - unknown relay: %s" % relayname)
-			print("unknown relay %s" % relayname)
 			return
 		
 		vbyte, vbit = r.Bits()[0]
@@ -295,35 +285,26 @@ class Railroad():
 		'''
 		this method is solely for simulation - to set the current inbound route
 		'''
-		print("in railroad route in simulate")
 		try:
 			rt = self.routesIn[rtnm]
 		except KeyError:
 			logging.warning("Ignoring route in command - unknown route name: %s" % rtnm)
-			print("unknown route name %s" % rtnm)
 			return
 		
-		print("calling select route")
 		offRts = rt.district.SelectRouteIn(rt)
-		print("returned list: %s" % str(offRts))
 		if offRts is None:
 			return 
 
-		print("set route in:")		
 		for rtenm in offRts:
-			print("clearing route %s" % rtenm)
 			rte = self.routesIn[rtenm]
 			bt = rte.Bits()
 			rte.node.SetInputBit(bt[0][0], bt[0][1], 0)
 			
 		bt = rt.Bits()
-		print("setting final bit for route %s to 1" % rtnm)
 		rt.node.SetInputBit(bt[0][0], bt[0][1], 1)
 		
 	def ClearAllRoutes(self, rtList):
-		print("clear all routes")
 		for rtenm in rtList:
-			print("clearing route %s" % rtenm)
 			rte = self.routesIn[rtenm]
 			bt = rte.Bits()
 			rte.node.SetInputBit(bt[0][0], bt[0][1], 0)
@@ -343,7 +324,9 @@ class Railroad():
 			try:
 				Nbyte, Nbit = bits[0]
 			except IndexError:
-				print("index error on turnout %s" % toname, flush=True)
+				logging.error("index error on turnout %s" % toname)
+				return
+			
 			Rbyte, Rbit = bits[1]
 			pbyte = Nbyte if Nval == 1 else Rbyte
 			pbit =  Nbit  if Nval == 1 else Rbit
@@ -402,12 +385,10 @@ class Railroad():
 		return False
 
 	def SetTurnoutLock(self, toname, state):
-		print("turnout lock %s %d" % (toname, state))
 		try:
 			tout = self.turnouts[toname]
 		except KeyError:
 			logging.warning("Attempt to change lock state on unknown turnout: %s" % toname)
-			print("unknown turnout")
 			return
 
 		release = tout.district.Released()			
@@ -416,7 +397,6 @@ class Railroad():
 			self.RailroadEvent(tout.GetEventMessage(lock=True))
 		
 	def SetAspect(self, signame, aspect):
-		print("===========================================set aspect")
 		try:
 			sig = self.signals[signame]
 		except KeyError:
@@ -424,13 +404,10 @@ class Railroad():
 			return
 		
 		if not sig.SetAspect(aspect):
-			print("set aspect had no change")
 			return 
 
-		print("update indicators")		
 		sig.UpdateIndicators() # make sure all indicators reflect this change
 			
-		print("setting output bits")
 		bits = sig.Bits()
 		lb = len(bits)
 		if lb != 0:	
@@ -441,31 +418,25 @@ class Railroad():
 			elif lb == 3:
 				vals = [aspect & 0x01, aspect & 0x02, aspect & 0x04] 
 			else:
-				print("Unknown bits length for signal %s: %d" % (signame, len(bits)))
+				logging.warning("Unknown bits length for signal %s: %d" % (signame, len(bits)))
 				return
 			
 			for (vbyte, vbit), val in zip(bits, vals):
 				sig.node.SetOutputBit(vbyte, vbit, 1 if val != 0 else 0)
 
-		print("calling update levedleds")				
 		self.UpdateSignalLeverLEDs(sig, aspect)
-		print("back from update levedleds")				
 
 		self.RailroadEvent(sig.GetEventMessage())
 		
 	def UpdateSignalLeverLEDs(self, sig, aspect):
-		print("parsing (%s)" % sig.Name())
 		r = self.reSigName.findall(sig.Name())
-		print("results: (%s)" % str(r))
-		print("LEDS for switch %s: %d" % (sig.Name(), len(r)), flush=True)
 		if len(r) != 1 or len(r[0]) != 2:
 			return 
 		
-		print("signal lever: %s  direction: %s" % (r[0][0], r[0][1]))
 		try:
 			sl = self.signalLevers[r[0][0]]
 		except KeyError:
-			print("Unknown signal lever: %s" % r[0][0])
+			logging.warning("Unknown signal lever: %s" % r[0][0])
 			return
 
 		if aspect == 0:
@@ -485,12 +456,10 @@ class Railroad():
 		sl.UpdateLed()
 		
 	def SetSignalLock(self, signame, lock):
-		print("signal lock %s %s" % (signame, str(lock)))
 		try:
 			sig = self.signals[signame]
 		except KeyError:
 			logging.warning("Ignoring set signal lock - unknown signal name: %s" % signame)
-			print("unknown signal %s" % signame)
 			return
 		
 		b = sig.LockBits()
@@ -533,24 +502,20 @@ class Railroad():
 			return 0
 		
 	def SetBlockDirection(self, blknm, direction):
-		print("set block direction %s %s" % (blknm, str(direction)))
 		try:
 			blk = self.blocks[blknm]
 		except KeyError:
 			logging.warning("ignoring block direction - unknown block: %s" % blknm)
-			print("unknown block")
 			return 
 		
 		if blk.SetDirection(direction == "E"):
 			self.RailroadEvent(blk.GetEventMessage(direction=True))
 
 	def SetBlockClear(self, blknm, clear):
-		print("set block clear %s %s" % (blknm, str(clear)))
 		try:
 			blk = self.blocks[blknm]
 		except KeyError:
 			logging.warning("ignoring block clear - unknown block: %s" % blknm)
-			print("unknown block")
 			return 
 		
 		if blk.SetCleared(clear):
@@ -893,11 +858,8 @@ class Railroad():
 		for s in self.breakers.values():
 			if not s.HasProxy(): # skip breakers that use a proxy
 				m = s.GetEventMessage()
-				print("GCV: %s" % str(m))
 				if m is not None:
 					yield m
-			else:
-				print("GCV: %s has a proxy" % s.Name())
 
 		for osblk, rtinfo in self.osRoutes.items():
 			rt = rtinfo[0]
@@ -1059,17 +1021,13 @@ class Railroad():
 								obj.district.TurnoutLeverChange(obj)
 						
 				elif objType == INPUT_BREAKER:
-					print("breaker in examine inputs: %s: %s" % (obj.Name(), newval))
 					if obj.SetStatus(newval != 0):
-						print("updated")
 						obj.UpdateIndicators()
 						if obj.HasProxy():
 							# use the proxy to show updated breaker status
 							obj.district.ShowBreakerState(obj)
 						else:
 							self.RailroadEvent(obj.GetEventMessage())
-					else:
-						print("no change")
 	
 				elif objType == INPUT_SIGNALLEVER:
 					if obj.Name() not in skiplist: # bypass levers that are skipped because of control option

@@ -226,7 +226,6 @@ class Hyde(District):
 		for simulation only - if a turnut without position bits is selected, see if there should be a 
 		route selected instead
 		'''
-		print("In Hyde Check turnout position for %s normal: %s" % (tout.Name(), tout.IsNormal()))
 		tonm = tout.Name()
 		if tonm not in self.toPos:
 			return 
@@ -246,56 +245,36 @@ class Hyde(District):
 			self.toPos["HSw11"] = self.toPos["HSw13"]
 			self.rr.turnouts["HSw11"].SetNormal(tout.IsNormal())
 
-		gnum = 0		
 		for g in self.routeGroups:
-			print("group %d" % gnum)
-			gnum += 1
-
 			routeForGroup = False			
 			for r in g:
 				match = True
-				if gnum == 1:
-					print("checking route %s" % r)
-					print(str(self.routeNeeded[r]))
 				for to, status in self.routeNeeded[r]:
 					st = True if status == "N" else False
-					if gnum == 1:
-						print("TO: %s stat: %s  need: %s" % (to, self.toPos[to], st))
 					if self.toPos[to] != st:
 						match = False
-						if gnum == 1:
-							print("nope")
 						break
 					
 				if match:
-					if gnum == 1:
-						print("Route %s is indicated" % r)
 					self.rr.SetRouteIn(r)
 					routeForGroup = True
 					break
-				else:
-					if gnum == 1:
-						print("no matching route")
+
 			if not routeForGroup:
 				self.rr.ClearAllRoutes(g)
-			if gnum == 1:
-				print("========================", flush=True)
 		
 		
 	def SelectRouteIn(self, rt):
 		rtnm = rt.Name()
-		print("Hyde Select route in: %s" % rtnm)
 		
 		for gp in self.routeGroups:
 			if rtnm in gp:
-				print(str([x for x in gp if x != rtnm]))
 				return [x for x in gp if x != rtnm]
 			
 		return None
 
 	def RouteIn(self, rt, stat):
 		rtNm = rt.Name()
-		print("Hyde Route IN: %s %d" % (rtNm, stat))
 		if stat == 0:
 			return 
 		
@@ -309,12 +288,10 @@ class Hyde(District):
 			try:
 				self.rr.turnouts[tonm].SetNormal(state == "N")
 			except KeyError:
-				print("turnout %s unknown" % tonm)
+				logging.warning("turnout %s unknown" % tonm)
 					
 			
-		resp = {"turnout": [{"name": x[0], "state": x[1]} for x in tolist] }
-		print(str(resp))
-		self.rr.RailroadEvent(resp)
+		self.rr.RailroadEvent({"turnout": [{"name": x[0], "state": x[1]} for x in tolist] })
 
 
 

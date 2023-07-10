@@ -122,18 +122,14 @@ class DCCHTTPServer:
 
 		except serial.SerialException:
 			self.port = None
-			print("Unable to Connect to serial port %s" % self.tty)
+			logging.error("Unable to Connect to serial port %s" % self.tty)
 			# sys.exit()
 
-		logging.info("calling DCCThread constructor")
 		self.server = DCCThreadingHTTPServer((ip, port), DCCHandler)
-		logging.info("Back from constructor")
 		self.server.setApp(self)
-		logging.info("Creating DCC thread")
 		self.thread = Thread(target=self.server.serve_dcc)
-		logging.info("starting DCC thread")
 		self.thread.start()
-		logging.info("DCC thread started")
+		logging.info("DCC server started")
 	
 	def IsConnected(self):
 		return self.port is not None
@@ -159,7 +155,7 @@ class DCCHTTPServer:
 			pass
 		
 	def ProcessDCCCommand(self, cmdString):
-		print("DCC Command receipt: (%s)" % str(cmdString))
+		logging.info("DCC Command receipt: (%s)" % str(cmdString))
 		cmd = cmdString["cmd"][0].lower()
 
 		if cmd == "throttle":
@@ -169,7 +165,7 @@ class DCCHTTPServer:
 				locoid = None
 				
 			if locoid is None:
-				print("unable to parse locomotive ID: %s" % cmdString["loco"][0])
+				logging.error("unable to parse locomotive ID: %s" % cmdString["loco"][0])
 				return
 				
 			try:
@@ -191,7 +187,7 @@ class DCCHTTPServer:
 				locoid = None
 				
 			if locoid is None:
-				print("unable to parse locomotive ID: %s" % cmdString["loco"][0])
+				logging.error("unable to parse locomotive ID: %s" % cmdString["loco"][0])
 				return
 				
 			try:
@@ -232,7 +228,6 @@ class DCCHTTPServer:
 		self.SendDCC(outb)
 		
 	def SetFunction(self, lid, headlight=None, horn=None, bell=None):
-		print("set func %s %s %s %s" % (lid, headlight, horn, bell))
 		try:
 			loco = self.locos[lid]
 		except KeyError:
@@ -263,14 +258,13 @@ class DCCHTTPServer:
 		self.SendDCC(outb)
 		
 	def SendDCC(self, outb):
-		print("Trying to output: %s" % str(outb))
 		if self.port is None:
-			print("port not open")
+			logging.error("DCC port not open")
 			return False
 		
 		n = self.port.write(bytes(outb))
 		if n != len(outb):
-			print("incomplete write.  expected to send %d bytes, but sent %d" % (len(outb), n))
+			logging.error("incomplete write.  expected to send %d bytes, but sent %d" % (len(outb), n))
 		
 		tries = 0
 		inbuf = []

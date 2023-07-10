@@ -343,18 +343,16 @@ class Nassau(District):
 		this is only called when in simulation - it turns the outbount button push
 		into a series of turnout position input bits
 		'''
-		print("Nassau press button: %s" % btn.Name())
 		if self.entryButton is None:
 			self.entryButton = btn
 			return 
 		
 		tolist = self.EvaluateNXButtons(self.entryButton.Name(), btn.Name())
 		for toName, status in tolist:
-			print("button => setting input position bit for %s:%s" % (toName, status), flush=True)
 			tout = self.rr.GetTurnout(toName)
 			pos = tout.Position()
 			if pos is None:
-				print("Skipping unknown turnout %s in NX button route" % toName)
+				logging.warning("Skipping unknown turnout %s in NX button route" % toName)
 			else:
 				Nval = 0 if status == "R" else 1
 				Rval = 1 if status == "R" else 0
@@ -378,7 +376,6 @@ class Nassau(District):
 
 	
 	def SelectRouteIn(self, rt):
-		print("in nassau select toute: %s" % rt.Name())
 		if rt.Name() in self.coachRoutes:		
 			offRtList = [x for x in self.coachRoutes if x != rt.Name()]
 			return offRtList
@@ -386,14 +383,12 @@ class Nassau(District):
 		return None
 	
 	def RouteIn(self, rt, stat):
-		print("routein: %s %s" % (rt.Name(), stat))
 		if stat == 1:
 			if rt.name == self.currentCoachRoute:
 				return 
 			
 			self.currentCoachRoute = rt.name
-			resp = {"turnout": [{"name": x[0], "state": x[1]} for x in self.routeMap[rt.name]] }
-			self.rr.RailroadEvent(resp)
+			self.rr.RailroadEvent({"turnout": [{"name": x[0], "state": x[1]} for x in self.routeMap[rt.name]] })
 			
 		else:
 			if rt.name == self.currentCoachRoute:
@@ -414,17 +409,11 @@ class Nassau(District):
 
 		if self.control in [0, 1]: 
 			if self.fleetPanel != fleetPanel:
-				print("panel  fleetpanel = %d   fleetdispatch = %s" % (fleetPanel, fleetDispatch))
-				print("control = %d" % self.control)
 				self.fleetPanel = fleetPanel
 				self.nodes[NASSAUW].SetOutputBit(3, 2, fleetPanel)			
 				self.nodes[NASSAUW].SetOutputBit(3, 3, 1-fleetPanel)
-				print("output bits set")
-				print("siglist: %s" % str(panelList))
 				for signame in panelList:
-					resp = {"fleet": [{"name": signame, "value": fleetPanel}]}
-					print("sending (%s)" % resp)
-					self.rr.RailroadEvent(resp)
+					self.rr.RailroadEvent({"fleet": [{"name": signame, "value": fleetPanel}]})
 
 		if self.control in [1, 2]:
 			if self.fleetDispatch != fleetDispatch:
@@ -432,17 +421,9 @@ class Nassau(District):
 				if self.control == 2: # only update the panel LEDs if the panel has no local control
 					self.nodes[NASSAUW].SetOutputBit(3, 2, fleetDispatch)			
 					self.nodes[NASSAUW].SetOutputBit(3, 3, 1-fleetDispatch)
-				print("output bits set")
-				print("siglist: %s" % str(dispatchList))
 				for signame in dispatchList:
-					resp = {"fleet": [{"name": signame, "value": fleetDispatch}]}
-					print("sending (%s)" % resp)
-					self.rr.RailroadEvent(resp)
+					self.rr.RailroadEvent({"fleet": [{"name": signame, "value": fleetDispatch}]})
 
-		
-		
-		
-					
 		rlReq = self.nodes[NASSAUW].GetInputBit(3, 2) == 1
 			
 		ossLocks = self.rr.GetControlOption("osslocks") == 1

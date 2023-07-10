@@ -311,23 +311,19 @@ class Cliff(District):
 
 
 	def PressButton(self, btn):
-		print("cliff - press button %s" % btn.Name())
 		self.rr.SetRouteIn(btn.Name())
 		
 	def SelectRouteIn(self, rt):
 		rtnm = rt.Name()
-		print("Select route in: %s" % rtnm)
 		
 		for gp in self.routeGroups:
 			if rtnm in gp:
-				print(str([x for x in gp if x != rtnm]))
 				return [x for x in gp if x != rtnm]
 			
 		return None
 			
 	def RouteIn(self, rt, stat):
 		rtNm = rt.Name()
-		print("Cliff Route IN: %s %d" % (rtNm, stat))
 		if stat == 0:
 			return 
 		
@@ -336,9 +332,7 @@ class Cliff(District):
 		except KeyError:
 			return 
 		
-		resp = {"turnout": [{"name": x[0], "state": x[1]} for x in tolist] }
-		print(str(resp))
-		self.rr.RailroadEvent(resp)
+		self.rr.RailroadEvent({"turnout": [{"name": x[0], "state": x[1]} for x in tolist] })
 
 	def EvaluateNXButton(self, btn):
 		if btn not in self.routeMap:
@@ -398,9 +392,7 @@ class Cliff(District):
 				ind = self.rr.GetIndicator(tout)
 				bits = ind.Bits()
 				if bits is None or len(bits) < 1:
-					print("no bits")
 					continue
-				print("setting CLIFF output bit %d:%d to %s" % (bits[0][0], bits[0][1], 0 if norm else 1))
 				self.nodes[CLIFF].SetOutputBit(bits[0][0], bits[0][1], 0 if norm else 1)
 			
 		self.rr.UpdateDistrictTurnoutLocks(self.name, self.released)

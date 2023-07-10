@@ -156,7 +156,6 @@ class Breaker:
      
     def SetStatus(self, flag):
         if self.status == flag:
-            print("breaker set status, breaker (%s) already has value %s" % (self.name, self.status), flush=True)
             return False
         
         self.status = flag
@@ -293,7 +292,6 @@ class Signal:
         return self.bits
     
     def SetAspect(self, aspect):
-        print("sig %s trying to change aspect from %d to %d" % (self.name, self.aspect, aspect))
         if self.aspect == aspect:
             return False
         
@@ -401,7 +399,6 @@ class SignalLever:
         elif lbit == 0 and rbit == 0:
             nstate = "N"
 
-        print("set lever state to %s" % nstate)           
         if nstate != self.state:
             self.state = nstate
             return True
@@ -409,20 +406,16 @@ class SignalLever:
         return False
     
     def UpdateLed(self):
-        print("update led, state = %s" % self.state)
         if self.led is not None:
             bits, district, node, addr = self.led
             bt = bits[0]
             if bt:
-                print("bits 0 = %d" % (1 if self.state == 'L' else 0))
                 node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'L' else 0)
             bt = bits[1]
             if bt:
-                print("bits 1 = %d" %  (1 if self.state not in ["L", "R"] else 0))
                 node.SetOutputBit(bt[0], bt[1], 1 if self.state not in ["L", "R"] else 0)
             bt = bits[2]
             if bt:
-                print("bits 2 = %d" % (1 if self.state == 'R' else 0))
                 node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'R' else 0)
        
     def GetEventMessage(self):

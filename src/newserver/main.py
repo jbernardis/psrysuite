@@ -3,11 +3,11 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-# ofp = open(os.path.join(os.getcwd(), "output", "rrserver.out"), "w")
-# efp = open(os.path.join(os.getcwd(), "output", "rrserver.err"), "w")
-#
-# sys.stdout = ofp
-# sys.stderr = efp
+ofp = open(os.path.join(os.getcwd(), "output", "rrserver.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "rrserver.err"), "w")
+
+sys.stdout = ofp
+sys.stderr = efp
 
 import logging
 logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "rrserver.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
@@ -73,6 +73,7 @@ class ServerMain:
 		try:
 			self.dispServer = HTTPServer(self.ip, self.settings.serverport, self.dispCommandReceipt, self, self.rr)
 		except Exception as e:
+			logging.error("Unable to Create HTTP server for IP address %s (%s)" % (self.ip, str(e)))
 			print("Unable to Create HTTP server for IP address %s (%s)" % (self.ip, str(e)))
 			self.Shutdown()
 			
@@ -91,8 +92,6 @@ class ServerMain:
 		self.rr.Initialize()
 		
 	def DelayedStartup(self, _):
-		print("delayed startup")
-
 		if not self.settings.simulation:
 			pname = os.path.join(os.getcwd(), "dccsniffer", "main.py")
 			pid = Popen([sys.executable, pname]).pid
@@ -106,7 +105,7 @@ class ServerMain:
 			#exit(1)
 
 	def socketEventReceipt(self, cmd):
-		print("received socket connection request: %s" % str(cmd))
+		logging.info("received socket connection request: %s" % str(cmd))
 		self.cmdQ.put(cmd)
 
 	def NewClient(self, cmd):
@@ -200,30 +199,25 @@ class ServerMain:
 		self.socketServer.sendToOne(skt, addr, {"end": {"type": "layout"}})
 
 	def sendTrainInfo(self, addr, skt):
-		print("send trtain info")
 		for m in self.trainList.GetSetTrainCmds():
 			self.socketServer.sendToOne(skt, addr, m)
-		print("sending end trains")
 		self.socketServer.sendToOne(skt, addr, {"end": {"type": "trains"}})
-		print("back")
 
 	def sendRouteDefs(self, addr, skt):
-		print("send route defs")
 		for rte in self.routeDefs.values():
 			self.socketServer.sendToOne(skt, addr, rte.FormatRoute())
 		self.socketServer.sendToOne(skt, addr, {"end": {"type": "routes"}})
 		
 	def sendSubBlocks(self, addr, skt):
-		print("send sub blocks")
 		subs = self.rr.GetSubBlockInfo()
 		self.socketServer.sendToOne(skt, addr, {"subblocks": subs})
 
 	def rrEventReceipt(self, cmd):
-		print("RR Event receipt: %s" % str(cmd))
+		logging.info("RR Event receipt: %s" % str(cmd))
 		self.socketServer.sendToAll(cmd)
 
 	def dispCommandReceipt(self, cmd): # thread context
-		print("HTTP Event: %s" % str(cmd))
+		logging.info("HTTP Event: %s" % str(cmd))
 		self.cmdQ.put(cmd)
 		
 	def CreateDispatchTable(self):					
@@ -295,12 +289,12 @@ class ServerMain:
 			except:
 				jstr = str(cmd)
 			logging.info("Command receipt: %s" % jstr)
-			print(verb)
 		
 		try:
 			self.dispatch[verb](cmd)
 		except KeyError:
-			print("Command not yet supported: %s" % verb)
+			logging.error("Unknown command: %s" % verb)
+			print("Unknown command: %s" % verb)
 			
 	def DoInterval(self, _):
 		self.rr.OutIn()
@@ -614,7 +608,6 @@ class ServerMain:
 		return self.trainList.GetTrainList()
 
 	def DoRenameTrain(self, cmd):
-		#print("Incoming HTTP Request: %s" % json.dumps(evt.data), flush=True)
 		try:
 			oname = cmd["oldname"][0]
 		except (IndexError, KeyError):
@@ -742,18 +735,18 @@ class ServerMain:
 		try:
 			self.dispServer.close()
 		except Exception as e:
-			print("exception %s terminating http server" % str(e))
+			logging.error("exception %s terminating http server" % str(e))
 		
 		try:
 			self.socketServer.kill()
 		except Exception as e:
-			print("exception %s terminating socket server" % str(e))
+			logging.error("exception %s terminating socket server" % str(e))
 		
 		if not self.settings.simulation:
 			try:
 				self.DCCServer.close()
 			except Exception as e:
-				print("exception %s terminating DCC server" % str(e))
+				logging.error("exception %s terminating DCC server" % str(e))
 			
 		logging.info("completed - continuing with shutdown")
 		
