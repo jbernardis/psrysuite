@@ -7,6 +7,8 @@ import json
 import os
 import logging
 
+import pprint
+
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		app = self.server.getApp()
@@ -156,12 +158,13 @@ class HTTPServer:
 				return 400, str(e)
 
 		elif verb == "setinbit":
+			pprint.pprint(cmd)
 			try:
 				addr = int(cmd["address"][0], 16)
-				vbyte = int(cmd["byte"][0])
-				vbit = int(cmd["bit"][0])
-				val = int(cmd["value"][0])
-				self.rr.SetInputBitByAddr(addr, vbyte, vbit, val)
+				vbytes = int(cmd["byte"])
+				vbits = int(cmd["bit"])
+				vals = int(cmd["value"])
+				self.rr.SetInputBitByAddr(addr, vbytes, vbits, vals)
 				return 200, "Command received"
 			except Exception as e:
 				logging.info("Unknown error: %s" % str(e))

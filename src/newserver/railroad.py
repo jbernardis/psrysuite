@@ -954,13 +954,14 @@ class Railroad():
 			
 		return 0, [], []
 
-	def SetInputBitByAddr(self, addr, vbyte, vbit, val):
+	def SetInputBitByAddr(self, addr, vbytes, vbits, vals):
 		'''
 		this routine handles the setinbit command from HTTP server
 		'''
 		for dnodes in self.nodes.values():
 			if addr in dnodes:
-				dnodes[addr].SetInputBit(vbyte, vbit, 1 if val != 0 else 0)
+				for i in range(len(vbytes)):
+					dnodes[addr].SetInputBit(vbytes[i], vbits[i], 1 if vals[i] != 0 else 0)
 
 	def OutIn(self):
 		delList = []

@@ -21,6 +21,7 @@ import threading
 from subprocess import Popen
 
 from settings import Settings
+from bus import Bus
 from railroad import Railroad
 from httpserver import HTTPServer
 from sktserver import SktServer
@@ -40,8 +41,8 @@ class ServerMain:
 		
 		self.pidAR = None
 		self.pidADV = None
-		self.pidDispatch = None
-		self.pidDCC = None
+		self.DCCSniffer = None
+		self.pidDCCSniffer = None
 		self.timeValue = None
 		
 		self.cmdQ = queue.Queue()
@@ -93,8 +94,11 @@ class ServerMain:
 		
 	def DelayedStartup(self, _):
 		if not self.settings.simulation:
+			self.rrBus = Bus(self.settings.rrtty)
+			self.rr.setBus(self.rrBus)
 			pname = os.path.join(os.getcwd(), "dccsniffer", "main.py")
-			pid = Popen([sys.executable, pname]).pid
+			self.DCCSniffer = Popen([sys.executable, pname])
+			pid = self.DCCSniffer.pid
 			logging.info("started DCC sniffer process as PID %d" % pid)
 
 	def StartDCCServer(self):
@@ -744,9 +748,19 @@ class ServerMain:
 		
 		if not self.settings.simulation:
 			try:
+				self.DCCSniffer.kill()
+			except Exception as e:
+				logging.error("exception %s terminating DCC Sniffer process" % str(e))
+				
+			try:
 				self.DCCServer.close()
 			except Exception as e:
 				logging.error("exception %s terminating DCC server" % str(e))
+		
+			try:
+				self.rrBus.close()
+			except Exception as e:
+				logging.error("exception %s closing Railroad Bus port" % str(e))
 			
 		logging.info("completed - continuing with shutdown")
 		

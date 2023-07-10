@@ -47,15 +47,36 @@ class Bus:
 
 		sendBuffer.extend(outbuf)
 		
-		nb = self.port.write(sendBuffer)
-		if nb != (nbytes+1):
-			logging.error("expected %d byte(s) written, got %d for address %x" % (nbytes+1, nb, address))
+		retries = 3;
+		while retries > 0:
+			try:
+				retries -= 1		
+				nb = self.port.write(sendBuffer)
+			except Exception as e:
+				logging.error("Exception %s when trying to write to address %x" % (str(e), address))
+				nb = 0
+			else:
+				if nb != (nbytes+1):
+					logging.error("expected %d byte(s) written, got %d for address %x" % (nbytes+1, nb, address))
+				else:
+					break
+					
+			time.sleep(0.0001)
+
+		if retries <= 0:
+			# failed to write - don't even try to read
+			return None
 
 		tries = 0
 		inbuf = []
 		remaining = nbytes
 		while tries < MAXTRIES and remaining > 0:
-			b = self.port.read(remaining)
+			try:
+				b = self.port.read(remaining)
+			except Exception as e:
+				logging.error("Exception %s when trying to read from address %s" % (str(e), address))
+				b = ""
+				
 			if len(b) == 0:
 				tries += 1
 				time.sleep(0.0001)
