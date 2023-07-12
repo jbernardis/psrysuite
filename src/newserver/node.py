@@ -68,7 +68,7 @@ class Node:
             inb = self.rrBus.sendRecv(self.address, self.outb, self.bcount)
             if inb is not None:
                 for i in range(self.bcount):
-                    self.inb[i] = inb[i]
+                    self.inb[i] = int.from_bytes(inb[i], "big")
                     
     def GetChangedInputs(self):
         results = []
@@ -76,6 +76,7 @@ class Node:
             new = self.inb[b]
             old = self.lastinb[b]
             mask = new ^ old
+
             if mask != 0:
                 for i in range(8):
                     if mask & (1 << (7-i)) != 0:

@@ -278,7 +278,6 @@ class Nassau(District):
 		otext = formatOText(outb, outbc)
 		#logging.debug("Nassau West: Output bytes: %s" % otext)
 
-		print("Nassau West output bytes: %x" % outb[0])
 		inbc = outbc			
 		if self.settings.simulation:
 			itext = None

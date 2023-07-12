@@ -158,12 +158,11 @@ class HTTPServer:
 				return 400, str(e)
 
 		elif verb == "setinbit":
-			pprint.pprint(cmd)
 			try:
 				addr = int(cmd["address"][0], 16)
-				vbytes = int(cmd["byte"])
-				vbits = int(cmd["bit"])
-				vals = int(cmd["value"])
+				vbytes = [int(x) for x in cmd["byte"]]
+				vbits = [int(x) for x in cmd["bit"]]
+				vals = [int(x) for x in cmd["value"]]
 				self.rr.SetInputBitByAddr(addr, vbytes, vbits, vals)
 				return 200, "Command received"
 			except Exception as e:

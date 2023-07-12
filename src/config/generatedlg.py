@@ -78,6 +78,14 @@ class GenerateDlg(wx.Dialog):
         self.bGenConfig = wx.Button(genBox, wx.ID_ANY, "Configuration Utility", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenConfig, self.bGenConfig)
         vsz.Add(self.bGenConfig, 0, wx.ALL, 10)
+                     
+        self.bGenMonitor = wx.Button(genBox, wx.ID_ANY, "Server Monitor", size=GENBTNSZ)
+        self.Bind(wx.EVT_BUTTON, self.OnBGenMonitor, self.bGenMonitor)
+        vsz.Add(self.bGenMonitor, 0, wx.ALL, 10)
+                     
+        self.bGenNewServer = wx.Button(genBox, wx.ID_ANY, "New Server", size=GENBTNSZ)
+        self.Bind(wx.EVT_BUTTON, self.OnBGenNewServer, self.bGenNewServer)
+        vsz.Add(self.bGenNewServer, 0, wx.ALL, 10)
         
         hsz.Add(vsz)
         
@@ -201,6 +209,16 @@ class GenerateDlg(wx.Dialog):
             "icon": "editor.ico"
         }
         self.generator(module, self.cbStartMenu.IsChecked())
+        
+    def OnBGenMonitor(self, _):
+        module = {
+            "name": "PSRY Monitor for Server",
+            "dir":  "monitor",
+            "main": "main.py",
+            "desc": "Monitor for Server",
+            "icon": "editor.ico"
+        }
+        self.generator(module, self.cbStartMenu.IsChecked())
 
     def OnBGenTester(self, _):
         module = {
@@ -228,6 +246,16 @@ class GenerateDlg(wx.Dialog):
             "dir":  "config",
             "main": "main.py",
             "desc": "Configuration Tool",
+            "icon": "config.ico"
+        }
+        self.generator(module, self.cbStartMenu.IsChecked())
+       
+    def OnBGenNewServer(self, _):
+        module = {
+            "name": "PSRY New Server",
+            "dir":  "newserver",
+            "main": "main.py",
+            "desc": "New Server",
             "icon": "config.ico"
         }
         self.generator(module, self.cbStartMenu.IsChecked())

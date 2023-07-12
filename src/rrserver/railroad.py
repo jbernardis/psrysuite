@@ -192,8 +192,6 @@ class Railroad(wx.Notebook):
 			yield m
 
 	def SetControlOption(self, name, value):
-		print("set control option %s to %s" % (name, value))
-		print(type(value))
 		self.controlOptions[name] = value
 
 	def GetControlOption(self, name):

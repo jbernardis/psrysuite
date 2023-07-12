@@ -127,7 +127,7 @@ class Breaker:
         self.node = node
         self.address = address
         self.bits = []
-        self.status = False  # not tripped
+        self.status = True  # not tripped
         self.indicators = []
         self.proxy = None   # proxy - this breaker shows its status via a proxy breaker
         
@@ -168,10 +168,10 @@ class Breaker:
         return self.proxy is not None
     
     def IsTripped(self):
-        return self.status
+        return not self.status
         
     def IsOK(self):
-        return not self.status
+        return self.status
     
     def AddIndicator(self, district, node, address, bits):
         self.indicators.append((district, node, address, bits))
@@ -182,11 +182,11 @@ class Breaker:
         
         for ind in self.indicators:
             district, node, address, bits = ind
-            node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.status else 0)
+            node.SetOutputBit(bits[0][0], bits[0][1], 0 if self.status else 1)
         return True
 
     def GetEventMessage(self):
-        return {"breaker": [{ "name": self.name, "value": 0 if self.status else 1}]}
+        return {"breaker": [{ "name": self.name, "value": 1 if self.status else 0}]}
        
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)

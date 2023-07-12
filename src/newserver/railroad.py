@@ -958,6 +958,7 @@ class Railroad():
 		'''
 		this routine handles the setinbit command from HTTP server
 		'''
+		print("set in by addr: bytes: %s   bits: %s   values: %s" % (str(vbytes), str(vbits), str(vals)))
 		for dnodes in self.nodes.values():
 			if addr in dnodes:
 				for i in range(len(vbytes)):
@@ -1022,7 +1023,7 @@ class Railroad():
 								obj.district.TurnoutLeverChange(obj)
 						
 				elif objType == INPUT_BREAKER:
-					if obj.SetStatus(newval != 0):
+					if obj.SetStatus(newval != 1):
 						obj.UpdateIndicators()
 						if obj.HasProxy():
 							# use the proxy to show updated breaker status
