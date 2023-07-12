@@ -390,7 +390,8 @@ class SignalLever:
     def LeverBits(self):
         return self.bits
     
-    def SetLeverState(self, lbit, cbit, rbit):
+    def SetLeverState(self, rbit, cbit, lbit):
+        print("lever state, RCL = %d %d %d" % (rbit, cbit, lbit))
         nstate = self.state
         if lbit != 0:
             nstate = "L"
@@ -398,6 +399,8 @@ class SignalLever:
             nstate = "R"
         elif lbit == 0 and rbit == 0:
             nstate = "N"
+            
+        print("new state = %s" % nstate)
 
         if nstate != self.state:
             self.state = nstate
@@ -410,13 +413,13 @@ class SignalLever:
             bits, district, node, addr = self.led
             bt = bits[0]
             if bt:
-                node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'L' else 0)
+                node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'R' else 0)
             bt = bits[1]
             if bt:
                 node.SetOutputBit(bt[0], bt[1], 1 if self.state not in ["L", "R"] else 0)
             bt = bits[2]
             if bt:
-                node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'R' else 0)
+                node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'L' else 0)
        
     def GetEventMessage(self):
         return {"siglever": [{ "name": self.name+".lvr", "state": self.state}]}

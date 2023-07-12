@@ -991,6 +991,7 @@ class Railroad():
 			skiplist = district.GetControlOption()
 			changedBits = node.GetChangedInputs()
 			for node, vbyte, vbit, objparms, newval in changedBits:
+				print("changed bit: %d:%d %d %s" % (vbyte, vbit, newval, str(objparms)))
 				obj = objparms[0]
 				objType = obj.InputType()
 				if objType == INPUT_BLOCK:
@@ -1035,8 +1036,9 @@ class Railroad():
 					if obj.Name() not in skiplist: # bypass levers that are skipped because of control option
 						bt = obj.Bits()
 						if len(bt) > 0:
-							lbit, cbit, rbit = node.GetInputBits(bt)
-							if obj.SetLeverState(lbit, cbit, rbit):
+							rbit, cbit, lbit = node.GetInputBits(bt)
+							print("signal lever: %d %d %d" % (rbit, cbit, lbit))
+							if obj.SetLeverState(rbit, cbit, lbit):
 								self.RailroadEvent(obj.GetEventMessage())
 								obj.UpdateLed()
 
