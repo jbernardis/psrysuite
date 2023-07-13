@@ -391,16 +391,13 @@ class SignalLever:
         return self.bits
     
     def SetLeverState(self, rbit, cbit, lbit):
-        print("lever state, RCL = %d %d %d" % (rbit, cbit, lbit))
         nstate = self.state
-        if lbit != 0:
+        if lbit is not None and lbit != 0:
             nstate = "L"
-        elif rbit != 0:
+        elif rbit is not None and rbit != 0:
             nstate = "R"
-        elif lbit == 0 and rbit == 0:
+        elif (lbit is None or lbit == 0) and (rbit is None or rbit == 0):
             nstate = "N"
-            
-        print("new state = %s" % nstate)
 
         if nstate != self.state:
             self.state = nstate

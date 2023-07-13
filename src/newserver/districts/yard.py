@@ -316,6 +316,7 @@ class Yard(District):
 		return self.released
 		
 	def OutIn(self):
+		self.lastControl = self.control
 		self.control = self.rr.GetControlOption("yard")  # 0 => Yard, 1 => Dispatcher
 		if self.control == 0: #yard local control allows the panel release button
 			rlReq = self.nodes[YARD].GetInputBit(3, 1)
@@ -336,6 +337,14 @@ class Yard(District):
 		
 	def GetControlOption(self):
 		if self.control == 1:  # dispatcher control
-			return ["Y2", "Y4", "Y8", "Y10", "Y22", "Y24", "Y26", "Y34"]			
+			skiplist = ["Y2", "Y4", "Y8", "Y10", "Y22", "Y24", "Y26", "Y34"]
+			resumelist = []
+						
 		else:  # assume local control
-			return []
+			skiplist = []
+			if self.lastControl == 1:
+				resumelist = ["Y2", "Y4", "Y8", "Y10", "Y22", "Y24", "Y26", "Y34"]
+			else:
+				resumelist = []
+				
+		return skiplist, resumelist

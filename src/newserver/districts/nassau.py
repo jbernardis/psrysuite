@@ -24,6 +24,7 @@ class Nassau(District):
 		self.fleetPanel = None
 		self.fleetDispatch = None
 		self.released = False
+		self.control = 2
 
 		addr = NASSAUW
 		with self.nodes[addr] as n:
@@ -394,7 +395,8 @@ class Nassau(District):
 			if rt.name == self.currentCoachRoute:
 				self.currentCoachRoute = None
 
-	def OutIn(self):		
+	def OutIn(self):	
+		self.lastControl = self.control	
 		self.control = self.rr.GetControlOption("nassau")  # 0 => Nassau, 1 => Dispatcher Main, 2 => Dispatcher All
 		if self.control in [0, 1]:
 			fleetPanel = self.nodes[NASSAUW].GetInputBit(3, 3) # get the state of the lever on the panel
@@ -462,9 +464,26 @@ class Nassau(District):
 		return self.released
 		
 	def GetControlOption(self):
-		if self.control == 2:  # dispatcher ALL control
-			return ["N14", "N16", "N18", "N24", "N26"]
-		elif self.control == 1: # dispatcher MAIN control			
-			return ["N14", "N16", "N18", "N24", "N26", "N20", "N28"]
-		else:  # assume local control
-			return []
+		if self.control == 2:  # dispatcher ALL control - ignore all signal levers
+			skiplist = ["N14", "N16", "N18", "N24", "N26", "N20", "N28"]
+			resumelist = []
+			
+		elif self.control == 1: # dispatcher MAIN control - ignore signal levers dealing with the main tracks		
+			skiplist =  ["N14", "N16", "N18", "N24", "N26"]
+			if self.lastControl == 2:
+				resumelist = ["N20", "N28"]
+			elif self.lastControl == 0:
+				resumelist = []
+			else:
+				resumelist = []
+				
+		else:  # assume local control - ignore nothing
+			skiplist = []
+			if self.lastControl == 2:
+				resumelist = ["N14", "N16", "N18", "N24", "N26", "N20", "N28"]
+			elif self.lastControl == 1:
+				resumelist = ["N14", "N16", "N18", "N24", "N26"]
+			else:
+				resumelist = []
+				
+		return skiplist, resumelist

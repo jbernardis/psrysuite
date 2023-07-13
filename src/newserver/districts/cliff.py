@@ -23,6 +23,7 @@ class Cliff(District):
 		self.currentCoachRoute = None
 		self.optFleet = None
 		self.released = False
+		self.control = 2
 		
 		self.revCSw21a = None
 		self.revCSw21b = None
@@ -364,6 +365,7 @@ class Cliff(District):
 
 
 	def OutIn(self):
+		self.lastControl = self.control
 		self.control = self.rr.GetControlOption("cliff")  # 0 => Cliff, 1 => Dispatcher bank/cliveden, 2 => Dispatcher All
 		if self.control == 0: 
 			optFleet = self.nodes[CLIFF].GetInputBit(5, 1)
@@ -402,11 +404,30 @@ class Cliff(District):
 	def Released(self):
 		return self.released
 
-	def GetControlOptions(self):
+	def GetControlOption(self):
 		if self.control == 2: # Dispatcher ALL
-			return ["C2", "C4", "c6", "C8", "C10", "C12", "C14", "C18", "C22", "C24",
+			skiplist = ["C2", "C4", "C6", "C8", "C10", "C12", "C14", "C18", "C22", "C24",
 					"CSw3", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b"]
+			resumelist = []
+			
 		elif self.control == 1: # dispatcher runs bank/cliveden
-			return ["C2", "C4", "c6", "C8"]
+			skiplist = ["C2", "C4", "C6", "C8"]
+			if self.lastControl == 2:
+				resumelist = ["C10", "C12", "C14", "C18", "C22", "C24",
+					"CSw3", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b"]
+			elif self.lastControl == 0:
+				resumelist = []
+			else:
+				resumelist = []
+				
 		else:
-			return []
+			skiplist = []
+			if self.lastControl == 2:
+				resumelist = ["C2", "C4", "C6", "C8", "C10", "C12", "C14", "C18", "C22", "C24",
+					"CSw3", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b"]
+			elif self.lastControl == 1:
+				resumelist = ["C2", "C4", "C6", "C8"]
+			else:
+				resumelist= []
+				
+		return skiplist, resumelist

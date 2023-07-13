@@ -22,7 +22,7 @@ class District:
 		pass
 			
 	def GetControlOption(self):
-		return []
+		return [], []
 		
 	def GetNodes(self):
 		return self.nodes

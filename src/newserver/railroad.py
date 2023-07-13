@@ -988,10 +988,9 @@ class Railroad():
 		
 	def ExamineInputs(self):
 		for addr, district, node in self.addrList:
-			skiplist = district.GetControlOption()
+			skiplist, resumelist = district.GetControlOption()
 			changedBits = node.GetChangedInputs()
 			for node, vbyte, vbit, objparms, newval in changedBits:
-				print("changed bit: %d:%d %d %s" % (vbyte, vbit, newval, str(objparms)))
 				obj = objparms[0]
 				objType = obj.InputType()
 				if objType == INPUT_BLOCK:
@@ -1037,7 +1036,6 @@ class Railroad():
 						bt = obj.Bits()
 						if len(bt) > 0:
 							rbit, cbit, lbit = node.GetInputBits(bt)
-							print("signal lever: %d %d %d" % (rbit, cbit, lbit))
 							if obj.SetLeverState(rbit, cbit, lbit):
 								self.RailroadEvent(obj.GetEventMessage())
 								obj.UpdateLed()
@@ -1072,6 +1070,15 @@ class Railroad():
 					if len(bt) > 0:
 						stat = node.GetInputBit(bt[0][0], bt[0][1])
 						obj.district.RouteIn(obj, stat)
+						
+			for o in resumelist:
+				obj = self.signalLevers[o]
+				bt = obj.Bits()
+				if len(bt) > 0:
+					rbit, cbit, lbit = obj.node.GetInputBits(bt)
+					if obj.SetLeverState(rbit, cbit, lbit):
+						self.RailroadEvent(obj.GetEventMessage())
+						obj.UpdateLed()
 			
 
 	def RailroadEvent(self, event):
