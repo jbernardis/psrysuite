@@ -708,7 +708,7 @@ class Handswitch:
         return self.bits
         
     def Position(self):
-        return [self.bits, self.district, self.node, self.address]
+        return [self.district, self.node, self.address, self.bits]
     
     def Lock(self, locked):
         if self.locked == locked:

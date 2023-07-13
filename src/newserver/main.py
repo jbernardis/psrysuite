@@ -295,10 +295,13 @@ class ServerMain:
 			logging.info("Command receipt: %s" % jstr)
 		
 		try:
-			self.dispatch[verb](cmd)
+			handler = self.dispatch[verb]
 		except KeyError:
 			logging.error("Unknown command: %s" % verb)
 			print("Unknown command: %s" % verb)
+		
+		else:
+			handler(cmd)
 			
 	def DoInterval(self, _):
 		self.rr.OutIn()

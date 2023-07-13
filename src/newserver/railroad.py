@@ -991,6 +991,8 @@ class Railroad():
 			skiplist, resumelist = district.GetControlOption()
 			changedBits = node.GetChangedInputs()
 			for node, vbyte, vbit, objparms, newval in changedBits:
+				print("Bit %x-%d:%d has changed to %d" % (node.address, vbyte, vbit, newval))
+				print("skiplist = %s" % str(skiplist))
 				obj = objparms[0]
 				objType = obj.InputType()
 				if objType == INPUT_BLOCK:
@@ -1043,17 +1045,18 @@ class Railroad():
 				elif objType == INPUT_HANDSWITCH:
 					dataType = objparms[1]
 					if dataType == "L":
-						unlock = obj.GetUnlock()
-						if unlock:
-							bits, district, node, address = unlock
-							uflag = node.GetInputBit(bits[0][0], bits[0][1])
-							if obj.Lock(uflag == 1):
-								self.RailroadEvent(obj.GetEventMessage(lock=True))
+						if obj.Name() not in skiplist:
+							unlock = obj.GetUnlock()
+							if unlock:
+								district, node, addr, bits = unlock
+								uflag = node.GetInputBit(bits[0][0], bits[0][1])
+								if obj.Lock(uflag == 1):
+									self.RailroadEvent(obj.GetEventMessage(lock=True))
 					
 					else:
 						pos = obj.Position()
 						if pos:
-							bits, district, node, address = pos
+							district, node, address, bits = pos
 							nflag = node.GetInputBit(bits[0][0], bits[0][1])
 							rflag = node.GetInputBit(bits[1][0], bits[1][1])
 							if obj.IsNormal():
@@ -1071,14 +1074,36 @@ class Railroad():
 						stat = node.GetInputBit(bt[0][0], bt[0][1])
 						obj.district.RouteIn(obj, stat)
 						
+			'''
+			The resume list is a list on objects - signal levers, or handswitch unlocks - that have been ignored because of the
+			control setting for this district, but now need to be considered because the control value has changed.  We need to 
+			react to the current value of these objects as if they was just now set to their current value
+			'''
 			for o in resumelist:
-				obj = self.signalLevers[o]
-				bt = obj.Bits()
-				if len(bt) > 0:
-					rbit, cbit, lbit = obj.node.GetInputBits(bt)
-					if obj.SetLeverState(rbit, cbit, lbit):
-						self.RailroadEvent(obj.GetEventMessage())
-						obj.UpdateLed()
+				try:
+					obj = self.signalLevers[o]
+				except KeyError:
+					try:
+						obj = self.handswitches[o]
+					except KeyError:
+						print("Unknown object name: %s in resume list" % o)
+						#print(str(sorted(self.turnouts.keys())))
+						
+					else:
+						unlock = obj.GetUnlock()
+						if unlock:
+							district, node, addr, bits = unlock
+							uflag = node.GetInputBit(bits[0][0], bits[0][1])
+							if obj.Lock(uflag == 1):
+								self.RailroadEvent(obj.GetEventMessage(lock=True))
+						
+				else:
+					bt = obj.Bits()
+					if len(bt) > 0:
+						rbit, cbit, lbit = obj.node.GetInputBits(bt)
+						if obj.SetLeverState(rbit, cbit, lbit):
+							self.RailroadEvent(obj.GetEventMessage())
+							obj.UpdateLed()
 			
 
 	def RailroadEvent(self, event):
