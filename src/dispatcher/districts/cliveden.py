@@ -11,6 +11,15 @@ from dispatcher.constants import MAIN, DIVERGING, RegAspects
 class Cliveden (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
+		
+	def PerformHandSwitchAction(self, hs):
+		controlOpt = self.frame.rbCliffControl.GetSelection()
+		if controlOpt == 0:  # cliff local control or limited to bank/cliveden (handled in those districts)
+			msg = "Cliff control is local"
+			self.frame.PopupEvent(msg)
+			return
+
+		District.PerformHandSwitchAction(self, hs)
 
 	def PerformTurnoutAction(self, turnout, force=False):
 		controlOpt = self.frame.rbCliffControl.GetSelection()

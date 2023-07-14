@@ -12,6 +12,18 @@ from dispatcher.constants import RESTRICTING, MAIN, DIVERGING, SLOW, RegAspects,
 class Cliff (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
+		
+	def PerformHandSwitchAction(self, hs):
+		controlOpt = self.frame.rbCliffControl.GetSelection()
+		if controlOpt != 2:  # cliff local control or limited to bank/cliveden (handled in those districts)
+			if controlOpt == 0:
+				msg = "Cliff control is local"
+			else:
+				msg = "Cliff control is Bank/Cliveden only"
+			self.frame.PopupEvent(msg)
+			return
+
+		District.PerformHandSwitchAction(self, hs)
 
 	def PerformSignalAction(self, sig):
 		controlOpt = self.frame.rbCliffControl.GetSelection()

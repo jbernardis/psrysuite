@@ -39,6 +39,9 @@ class District:
 	def SetHandswitch(self, nm, st):
 		pass
 	
+	def SetHandswitchIn(self, obj, newval):
+		pass
+	
 	def CheckTurnoutPosition(self, turnout):
 		pass
 		

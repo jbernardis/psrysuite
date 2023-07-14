@@ -38,7 +38,7 @@ siding unlock levers from all tower panels - cliff
 
 
 
-
+button on dispatcher and display to start throttle
 
 continue to add to monitor program to allow visibility into new server
 
@@ -52,7 +52,10 @@ fleeting in yard
 
 deal with reverse indicators in cliff - CSw21a, 21b, 19, 15, 11
 
+handle handswithc Cs21ab in examine inputs
 
+
+need to bring newserver up in a terminal window
 
 
 audit data structures

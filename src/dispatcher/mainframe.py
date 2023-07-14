@@ -402,6 +402,11 @@ class MainFrame(wx.Frame):
 	def OnServerHideShow(self, _):
 		self.serverHidden = not self.serverHidden
 		self.Request( {"server": {"action": "hide" if self.serverHidden else "show"}}, force=True)	
+		
+		throttleExec = os.path.join(os.getcwd(), "throttle", "main.py")
+		throttleProc = Popen([sys.executable, throttleExec])
+		print("throttle started as PID %d" % throttleProc.pid)
+
 
 	def DefineWidgets(self, voffset):
 		if not self.IsDispatcher():

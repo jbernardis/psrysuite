@@ -664,15 +664,20 @@ class Handswitch:
         self.UpdateIndicators()
    
     def UpdateIndicators(self):
+        print("in update indicators for %s, n=%d, locked = %s" % (self.name, len(self.indicators), str(self.locked)))
         if len(self.indicators) == 0:
             return False
         # indicators with one bit: simple on/off led to show lock status
         # indicators with 2 bits: panel indicators with one being the inverted value of the other
         for ind in self.indicators:
             district, node, address, bits = ind
+            print("indicator for district %s address %x" % (district.Name(), address))
             if len(bits) == 1:
                 node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.locked else 0)
+                print("single indicator at bit %d:%d" % (bits[0][0], bits[0][1]))
             elif len(bits) == 2:
+                print("first  indicator at bit %d:%d" % (bits[0][0], bits[0][1]))
+                print("second indicator at bit %d:%d" % (bits[1][0], bits[1][1]))
                 node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.locked else 0)
                 node.SetOutputBit(bits[1][0], bits[1][1], 0 if self.locked else 1)
             else:

@@ -994,7 +994,9 @@ class Railroad():
 				print("Bit %x-%d:%d has changed to %d" % (node.address, vbyte, vbit, newval))
 				print("skiplist = %s" % str(skiplist))
 				obj = objparms[0]
+				print("object name: %s" % obj.Name())
 				objType = obj.InputType()
+				print("object type = %d/%d" % (objType, INPUT_HANDSWITCH))
 				if objType == INPUT_BLOCK:
 					if obj.SetOccupied(newval != 0):
 						self.RailroadEvent(obj.GetEventMessage())
@@ -1044,14 +1046,33 @@ class Railroad():
 
 				elif objType == INPUT_HANDSWITCH:
 					dataType = objparms[1]
+					print("handswitch data type = (%s)" % dataType)
 					if dataType == "L":
-						if obj.Name() not in skiplist:
-							unlock = obj.GetUnlock()
-							if unlock:
-								district, node, addr, bits = unlock
-								uflag = node.GetInputBit(bits[0][0], bits[0][1])
-								if obj.Lock(uflag == 1):
-									self.RailroadEvent(obj.GetEventMessage(lock=True))
+						objnm = obj.Name()
+						if objnm == "CSw21ab":
+							print("21ab")
+							if objnm not in skiplist:
+								print("not in skiplist")
+								if obj.Lock(newval != 0):
+									obj.UpdateIndicators()
+								unlock = obj.GetUnlock()
+								print("unlock: %s" % str(unlock))
+								if unlock:
+									district, node, addr, bits = unlock
+									print("calling set handswitch for district %s" % district.Name())
+									district.SetHandswitchIn(obj, newval)
+						else:
+							if objnm not in skiplist:
+								unlock = obj.GetUnlock()
+								print(str(unlock))
+								if unlock:
+									district, node, addr, bits = unlock
+									uflag = node.GetInputBit(bits[0][0], bits[0][1])
+									print("not 21ab %d %d" % (uflag, newval))
+									if obj.Lock(uflag != 0):
+										self.RailroadEvent(obj.GetEventMessage(lock=True))
+										print("calling update indicators for %s" % objnm)
+										obj.UpdateIndicators()
 					
 					else:
 						pos = obj.Position()

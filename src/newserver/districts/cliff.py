@@ -360,8 +360,17 @@ class Cliff(District):
 		self.sigLever["C24"] = self.DetermineSignalLever(["C24L"], ["C24R"])
 
 
-
-
+	def SetHandswitchIn(self, hs, state):
+		print("cliff set handswitchin(%s, %s)" % (hs.Name(), str(state)))
+		hsname = hs.Name()
+		if hsname == "CSw21ab":
+			hsa = self.rr.GetHandswitch("CSw21a")
+			if hsa.Lock(state != 0):
+				self.rr.RailroadEvent(hsa.GetEventMessage(lock=True))
+				
+			hsb = self.rr.GetHandswitch("CSw21b")
+			if hsb.Lock(state != 0):
+				self.rr.RailroadEvent(hsb.GetEventMessage(lock=True))
 
 
 	def OutIn(self):

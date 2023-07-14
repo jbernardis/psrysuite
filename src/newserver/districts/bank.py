@@ -76,7 +76,14 @@ class Bank(District):
 		if hsname in ["CSw21a", "CSw21b"]:
 			hsa = self.rr.GetHandswitch("CSw21a")
 			hsb = self.rr.GetHandswitch("CSw21b")
-			locked = hsa.IsLocked() or hsb.IsLocked()
+			if hsname == "CSw21a":
+				locked = hsa.IsLocked()
+				hsb.Lock(locked)
+				self.rr.RailroadEvent(hsb.GetEventMessage(lock=True))
+			else:
+				locked = hsb.IsLocked()
+				hsa.Lock(locked)
+				self.rr.RailroadEvent(hsa.GetEventMessage(lock=True))
 			
 			hs = self.rr.GetHandswitch("CSw21ab")
 			if hs.Lock(locked):
