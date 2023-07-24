@@ -89,6 +89,7 @@ class Shore(District):
 			self.rr.AddBlock("SOSW",   self, n, SHORE, [(2, 3)]) 
 			self.rr.AddBlock("SOSE",   self, n, SHORE, [(2, 4)]) 
 			self.rr.AddBlock("S11.W",  self, n, SHORE, [(2, 5)]) 
+			self.rr.AddBlock("S11",    self, n, SHORE, [])  # virtual definition for S11
 			self.rr.AddBlock("S11B",   self, n, SHORE, [(2, 6)]) 
 			self.rr.AddBlock("S11.E",  self, n, SHORE, [(2, 7)]) 
 			self.rr.AddBlock("H30.W",  self, n, SHORE, [(3, 0)]) 
@@ -132,8 +133,9 @@ class Shore(District):
 			self.rr.AddTurnoutPosition("SSw17", self, n, HYDEJCT, [(0, 2), (0, 3)])
 			self.rr.AddTurnoutPosition("SSw19", self, n, HYDEJCT, [(0, 4), (0, 5)])
 
-			self.rr.AddBlock("H20",    self, n, HYDEJCT, [(0, 6)]) 
-			self.rr.AddBlock("H20.E",  self, n, HYDEJCT, [(0, 7)]) 
+			b = self.rr.AddBlock("H20",    self, n, HYDEJCT, [(0, 6)]) 
+			sb = self.rr.AddBlock("H20.E",  self, n, HYDEJCT, [(0, 7)]) 
+			b.AddStoppingBlock(sb)
 			
 			self.rr.AddBlock("P42.W",  self, n, HYDEJCT, [(1, 0)]) 
 			self.rr.AddBlock("P42",    self, n, HYDEJCT, [(1, 1)]) 

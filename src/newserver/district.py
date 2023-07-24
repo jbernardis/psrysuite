@@ -53,6 +53,9 @@ class District:
 	
 	def SelectRouteIn(self, _):
 		return None
+	
+	def VerifyAspect(self, signame, aspect):
+		return aspect
 			
 	def setBus(self, bus):
 		self.rrBus = bus

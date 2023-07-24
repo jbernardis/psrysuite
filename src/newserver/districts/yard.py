@@ -12,6 +12,10 @@ class Yard(District):
 		self.name = name
 		self.released = False
 		self.control = 0
+		
+		self.Y20D = None
+		self.Y20H = None
+		
 		self.nodeAddresses = [ CORNELL, EASTJCT, KALE, YARD, YARDSW ]
 		self.nodes = {
 			CORNELL: Node(self, rr, CORNELL, 2, settings),
@@ -43,8 +47,9 @@ class Yard(District):
 			self.rr.AddBlock("Y21.E",   self, n, addr, [(0, 6)])
 			self.rr.AddBlock("YOSCJW",  self, n, addr, [(0, 7)]) #  CJOS1	
 			self.rr.AddBlock("YOSCJE",  self, n, addr, [(1, 0)]) #  CJOS2
-			self.rr.AddBlock("L10.W",   self, n, addr, [(1, 1)])
-			self.rr.AddBlock("L10",     self, n, addr, [(1, 2)])
+			sb = self.rr.AddBlock("L10.W",   self, n, addr, [(1, 1)])
+			b = self.rr.AddBlock("L10",     self, n, addr, [(1, 2)])
+			b.AddStoppingBlock(sb)
 		
 		
 		# eastend jct node
@@ -90,8 +95,6 @@ class Yard(District):
 
 			self.rr.AddSignal("Y26R", self, n, addr, [(1, 0)])
 			self.rr.AddSignal("Y22R", self, n, addr, [(1, 1), (1, 2)]) # 
-											# 1,1 = 1 if asp == 0b101 else 0)  # Approach
-											# 1,2 = 1 if asp == 0b001 else 0)  # Restricting
 
 			# inputs
 			self.rr.AddTurnoutPosition("YSw17", self, n, addr, [(0, 0), (0, 1)])
@@ -241,7 +244,16 @@ class Yard(District):
 				"Y83E": [ ["YSw131", "N"], ["YSw132","R"], ["YSw134", "N"] ],
 				"Y84E": [ ["YSw131", "N"], ["YSw132","N"], ["YSw134", "R"] ],
 		}
-
+	
+	def VerifyAspect(self, signame, aspect):
+		if signame == "Y22R":
+			print("verify y22r, original aspect = %x" % aspect)
+			b0 = 1 if aspect == 0b101 else 0  # Approach
+			b1 = 2 if aspect == 0b100 else 0  # Restricting ?? 0b001
+			print("new aspect = %x" % (b0+b1))
+			return b0+b1
+			
+		return aspect
 
 
 
@@ -334,6 +346,17 @@ class Yard(District):
 		optFleet = self.rr.GetControlOption("yard.fleet")  # 0 => no fleeting, 1 => fleeting
 
 		District.OutIn(self)
+		
+		Y20  = self.rr.GetBlock("Y20")
+		Y20E = self.rr.GetBlock("Y20.E")
+		Y20H = (not Y20.IsOccupied()) and (not Y20E.IsOccupied()) and Y20.IsEast()
+		Y20D = Y20H and Y20.IsCleared() 
+		if Y20H != self.Y20H or Y20D != self.Y20D:
+			self.Y20H = Y20H
+			self.Y20D = Y20D
+			print("set Y20H/D to %s %s" % (str(Y20H), str(Y20D)))
+			self.rr.SetAspect("Y20H", 1 if Y20H else 0)
+			self.rr.SetAspect("Y20D", 1 if Y20D else 0)
 		
 	def GetControlOption(self):
 		if self.control == 1:  # dispatcher control

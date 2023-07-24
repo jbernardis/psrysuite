@@ -71,6 +71,10 @@
       }
     ],
     [
+       {
+        "label": "(bad bit)",
+        "used": false
+      },
       {
         "label": "R10.srel",
         "used": true
@@ -90,10 +94,6 @@
       {
         "label": "R10W(2)",
         "used": true
-      },
-      {
-        "label": "(unused)",
-        "used": false
       },
       {
         "label": "(unused)",

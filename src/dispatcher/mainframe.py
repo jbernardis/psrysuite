@@ -1678,7 +1678,9 @@ class MainFrame(wx.Frame):
 
 					stat = OCCUPIED if state == 1 else EMPTY
 					if blk is not None:
+						print("block command %s %s %s %s" % (block, blk.GetName(), blockend, state))
 						if blk.GetStatus(blockend) != stat:
+							print("status changed")
 							district = blk.GetDistrict()
 							district.DoBlockAction(blk, blockend, stat)
 							if self.IsDispatcher():

@@ -63,10 +63,8 @@ class Dell(District):
 			self.rr.AddBlock("D11.W",    self, n, DELL, [(2, 2)]) 
 			self.rr.AddBlock("D11A",     self, n, DELL, [(2, 3)]) 
 			self.rr.AddBlock("D11B",     self, n, DELL, [(2, 4)]) 
+			self.rr.AddBlock("D11",      self, n, DELL, [])  # virtual definition for D11 
 			self.rr.AddBlock("D11.E",    self, n, DELL, [(2, 5)]) 
-			
-			self.rr.GetBlock("D11A").SetMainBlock("D11")
-			self.rr.GetBlock("D11B").SetMainBlock("D11")
 
 		with self.nodes[FOSS] as n:
 			# outputs
@@ -87,6 +85,7 @@ class Dell(District):
 			self.rr.AddBlock("D21.W",     self, n, DELL, [(0, 0)]) 
 			self.rr.AddBlock("D21A",      self, n, DELL, [(0, 1)]) 
 			self.rr.AddBlock("D21B",      self, n, DELL, [(0, 2)]) 
+			self.rr.AddBlock("D21",       self, n, DELL, []) # virtual definition for D21
 			self.rr.AddBlock("D21.E",     self, n, DELL, [(0, 3)]) 
 			self.rr.AddBlock("DOSFOW",    self, n, DELL, [(0, 4)]) 
 			self.rr.AddBlock("DOSFOE",    self, n, DELL, [(0, 5)]) 
@@ -133,18 +132,37 @@ class Dell(District):
 			self.rr.SetODevice("DXO", self.DXO)
 				
 		# determine the state of the crossing gate at rocky hill
-		r10b = self.rr.GetBlock("R10B").IsOccupied()
-		r10c = self.rr.GetBlock("R10C").IsOccupied()
-		if r10b and not self.RXW:
+		r10b = self.rr.GetBlock("R10B")
+		r10bo = r10b.IsOccupied()
+		r10c = self.rr.GetBlock("R10C")
+		r10co = r10c.IsOccupied()
+		if r10bo and not self.RXW:
 			self.RXE = True
-		if r10c and not self.RXE:
+		if r10co and not self.RXE:
 			self.RXW = True
-		if not r10b and not r10c:
+		if not r10bo and not r10co:
 			self.RXE = self.RXW = False
 		
-		RXO = (r10b and self.RXE) or (r10c and self.RXW)
+		RXO = (r10bo and self.RXE) or (r10co and self.RXW)
 		if RXO != self.RXO:
 			self.RXO = RXO
 			self.rr.SetODevice("RXO", self.RXO)
+			
+		# determine the state of signal R10W
+		r10a = self.rr.GetBlock("R10A")
+		r10w = self.rr.GetBlock("R10.W")
+		clr = (not r10a.IsOccupied()) and (not r10w.IsOccupied())
+		neosrh = self.rr.GetBlock("NEOSRH")
+		nxtclr = neosrh.IsCleared()
+		
+		if clr and nxtclr:
+			aspect = 0b110
+		elif clr and  not nxtclr:
+			aspect = 0b001
+		else:
+			aspect = 0
+
+		sig = self.rr.GetSignal("R10W")
+		self.rr.ChangeSignal(sig, aspect)			
 
 		District.OutIn(self)

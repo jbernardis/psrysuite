@@ -651,6 +651,8 @@ class District:
 		pass
 
 	def CrossingEastWestBoundary(self, osblk, blk):
+		if osblk is None or blk is None:
+			return False
 		blkNm = blk.GetName()
 		osNm = osblk.GetName()
 		return [osNm, blkNm] in EWCrossoverPoints

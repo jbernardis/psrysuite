@@ -14,6 +14,10 @@ class Block:
         self.occupied = False
         self.indicators = []
         self.mainBlock = None
+        self.mainBlockName = None
+        self.subBlocks = []
+        self.stoppingBlocks = []
+        self.stoppedBlock = None
    
     def Name(self):
         return self.name
@@ -39,8 +43,24 @@ class Block:
         self.node = node
         self.address = address
         
-    def SetMainBlock(self, bname):
-        self.mainBlock = bname
+    def SetMainBlock(self, bname, blk):
+        print("set main block: %s %s" % (str(bname), str(blk)), flush=True)
+        self.mainBlockName = bname
+        self.mainBlock = blk
+        blk.AddSubBlock(self)
+        
+    def AddSubBlock(self, blk):
+        self.subBlocks.append(blk)
+        
+    def SubBlocks(self):
+        return self.subBlocks
+        
+    def AddStoppingBlock(self, sb):
+        self.stoppingBlocks.append(sb)
+        sb.SetStoppedBlock(self)
+        
+    def SetStoppedBlock(self, blk):
+        self.stoppedBlock = blk
         
     def SetBits(self, bits):
         self.bits = bits
@@ -83,18 +103,47 @@ class Block:
         self.indicators.append((district, node, address, bits))
         
     def UpdateIndicators(self):
-        for ind in self.indicators:
-            district, node, address, bits = ind
-            node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.occupied else 0)
+        '''
+        make indicators show the status of this and any stoppingBlocks
+        '''
+        print("update indicators for block %s" % self.name)
+        if self.stoppedBlock is not None:
+            print("handing off to stopped block")
+            self.stoppedBlock.UpdateIndicators()
+        else:
+            occ = 1 if self.occupied else 0
+            print("update indicators for mainblock %s %d" % (self.name, occ))
+            
+            for sub in self.stoppingBlocks:
+                occ = 1 if sub.IsOccupied() else occ
+                print("stoppingblock: %s, occ now is %d" % (sub.Name(), occ))
+                    
+            for ind in self.indicators:
+                district, node, address, bits = ind
+                node.SetOutputBit(bits[0][0], bits[0][1], occ)
 
     def GetEventMessage(self, clear=False, direction=False):
-        bname = self.name if self.mainBlock is None else self.mainBlock
+        if self.mainBlockName is not None:
+            bname = self.mainBlockName
+            blk = self.mainBlock
+            print("Main block: %s" % bname)
+            occ = 0
+            clr = 0
+            for b in blk.subBlocks:
+                occ = 1 if b.IsOccupied() else occ
+                clr = 1 if b.IsCleared() else clr
+        else:
+            bname = self.name
+            clr = 1 if self.cleared else 0
+            occ = 1 if self.occupied else 0
+            
+
         if clear:
-            return {"blockclear": [{ "block": bname, "clear": 1 if self.cleared else 0}]}
+            return {"blockclear": [{ "block": bname, "clear": clr}]}
         if direction:
             return {"blockdir": [{ "block": bname, "dir": "E" if self.east else "W"}]}
         else:
-            return {"block": [{ "name": bname, "state": 1 if self.occupied else 0}]}
+            return {"block": [{ "name": bname, "state": occ}]}
         
 class StopRelay:
     def __init__(self, name, district, node, address):

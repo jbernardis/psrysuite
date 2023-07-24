@@ -86,9 +86,10 @@ class Railroad():
 			self.nodes[name] = self.districts[name].GetNodes()
 			self.addrList.extend([[addr, self.districts[name], node] for addr, node, in self.districts[name].GetNodes().items()])
 
+		print(str(sorted(list(self.blocks.keys()))))
 		for main, subs in self.subBlocks.items():
 			for sub in subs:			
-				self.GetBlock(sub).SetMainBlock(main)
+				self.GetBlock(sub).SetMainBlock(main, self.GetBlock(main))
 
 			
 	def dump(self):
@@ -170,14 +171,28 @@ class Railroad():
 			blist = [ self.blocks[blknm] ]
 		except KeyError:
 			try:
-				blist = [self.rr.GetBlock(x) for x in self.subBlocks[blknm]]
+				blist = [self.GetBlock(x) for x in self.subBlocks[blknm]]
 			except KeyError:
 				logging.warning("Ignoring occupy command - unknown block name: %s" % blknm)
 				return
 		
 		for blk in blist:
-			vbyte, vbit = blk.Bits()[0]
-			blk.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
+			if len(blk.Bits()) > 0:
+				vbyte, vbit = blk.Bits()[0]
+				blk.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
+			else:
+				'''
+				block has sub blocks - occupy all of them as per state
+				'''
+				print("occupying subblocks of %s" % blk.Name())
+				sbl = blk.SubBlocks()
+				for sb in sbl:
+					if len(sb.Bits()) > 0:
+						vbyte, vbit = sb.Bits()[0]
+						sb.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
+						print("set input bit for subblock %s" % sb.Name())
+					else:
+						print("subblock %s has no location bits" % sb.Name())
 		
 	def SetTurnoutPos(self, tonm, normal):
 		'''
@@ -402,14 +417,21 @@ class Railroad():
 		except KeyError:
 			logging.warning("Ignoring set aspect - unknown signal name: %s" % signame)
 			return
+
+		aspect = sig.district.VerifyAspect(signame, aspect)	
+		self.ChangeSignal(sig, aspect)
 		
+	def ChangeSignal(self, sig, aspect):
 		if not sig.SetAspect(aspect):
 			return 
+
+		print("setting aspect of signal %s to %d" % (sig.Name(), aspect))	
 
 		sig.UpdateIndicators() # make sure all indicators reflect this change
 			
 		bits = sig.Bits()
 		lb = len(bits)
+		print("bits = %s, len = %d" % (str(bits), lb))
 		if lb != 0:	
 			if lb == 1:
 				vals = [1 if aspect != 0 else 0] 
@@ -418,10 +440,12 @@ class Railroad():
 			elif lb == 3:
 				vals = [aspect & 0x01, aspect & 0x02, aspect & 0x04] 
 			else:
-				logging.warning("Unknown bits length for signal %s: %d" % (signame, len(bits)))
+				logging.warning("Unknown bits length for signal %s: %d" % (sig.Name(), len(bits)))
 				return
-			
+
+			print("vals = %s" % str(vals))			
 			for (vbyte, vbit), val in zip(bits, vals):
+				print("bit %d:%d set to %d" % (vbyte, vbit, val))
 				sig.node.SetOutputBit(vbyte, vbit, 1 if val != 0 else 0)
 
 		self.UpdateSignalLeverLEDs(sig, aspect)
@@ -547,7 +571,8 @@ class Railroad():
 				
 		b.SetBits(bits)
 		self.blocks[name] = b
-		node.AddInputToMap(bits[0], [b])
+		if len(bits) > 0:
+			node.AddInputToMap(bits[0], [b])
 		return b
 					
 	def AddBlockInd(self, name, district, node, address, bits):
@@ -996,11 +1021,15 @@ class Railroad():
 				obj = objparms[0]
 				print("object name: %s" % obj.Name())
 				objType = obj.InputType()
-				print("object type = %d/%d" % (objType, INPUT_HANDSWITCH))
+				print("object type = %d/%d" % (objType, INPUT_BLOCK))
 				if objType == INPUT_BLOCK:
 					if obj.SetOccupied(newval != 0):
+						print("set occupied indicates a change")
+						print(str(obj.GetEventMessage()))
 						self.RailroadEvent(obj.GetEventMessage())
 						obj.UpdateIndicators()
+					else:
+						print("set occupied does NOT indicate a change")
 			
 				elif objType == INPUT_TURNOUTPOS:
 					pos = obj.Position()
