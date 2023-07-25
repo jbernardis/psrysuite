@@ -42,22 +42,26 @@ class Block:
         self.district = district
         self.node = node
         self.address = address
-        
-    def SetMainBlock(self, bname, blk):
-        print("set main block: %s %s" % (str(bname), str(blk)), flush=True)
-        self.mainBlockName = bname
+    
+    def SetMainBlock(self, blk):
+        self.mainBlockName = blk.Name()
         self.mainBlock = blk
-        blk.AddSubBlock(self)
         
-    def AddSubBlock(self, blk):
-        self.subBlocks.append(blk)
+    def AddSubBlocks(self, blkl):
+        self.subBlocks.extend(blkl)
+        for b in blkl:
+            b.SetMainBlock(self)
         
     def SubBlocks(self):
         return self.subBlocks
         
-    def AddStoppingBlock(self, sb):
-        self.stoppingBlocks.append(sb)
-        sb.SetStoppedBlock(self)
+    def AddStoppingBlocks(self, sbl):
+        self.stoppingBlocks.extend(sbl)
+        for sb in sbl:
+            sb.SetStoppedBlock(self)
+            
+    def StoppingBlocks(self):
+        return self.stoppingBlocks
         
     def SetStoppedBlock(self, blk):
         self.stoppedBlock = blk
@@ -86,8 +90,18 @@ class Block:
         return True
 
         
-    def IsOccupied(self):
-        return self.occupied
+    def IsOccupied(self, recurse=True):
+        if recurse and self.mainBlock is not None:
+            return self.mainBlock.IsOccupied(recurse=False)
+        
+        '''
+        for a block that is subdivided into subblocks, occupied reflects the status of all subblocks or'ed together
+        '''
+        occ = self.occupied
+        for b in self.subBlocks:
+            occ = True if b.IsOccupied(recurse=False) else occ
+            
+        return occ
     
     def SetCleared(self, flag):
         if self.cleared == flag:
@@ -96,54 +110,61 @@ class Block:
         self.cleared = flag
         return True
         
-    def IsCleared(self):
-        return self.cleared
+    def IsCleared(self, recurse=True):
+        if recurse and self.mainBlock is not None:
+            return self.mainBlock.IsCleared(recurse=False)
+        '''
+        for a block that is subdivided into subblocks, cleared reflects the status of all subblocks or'ed together
+        '''
+        clr = self.cleared
+        for b in self.subBlocks:
+            clr = True if b.IsCleared(recurse=False) else clr
+            
+        return clr
     
     def AddIndicator(self, district, node, address, bits):
         self.indicators.append((district, node, address, bits))
         
     def UpdateIndicators(self):
         '''
-        make indicators show the status of this and any stoppingBlocks
+        make indicators show the status of this and any stoppingBlocks all or'ed together
         '''
-        print("update indicators for block %s" % self.name)
+        print("in update indicators for block %s" % self.Name())
+        
+        parentBlk = self
         if self.stoppedBlock is not None:
-            print("handing off to stopped block")
-            self.stoppedBlock.UpdateIndicators()
+            parentBlk = self.stoppedBlock
+            print("using stopped block")
+        elif self.mainBlock is not None:
+            parentBlk = self.mainBlock
+            print("using main block")
         else:
-            occ = 1 if self.occupied else 0
-            print("update indicators for mainblock %s %d" % (self.name, occ))
+            print("using this block")
             
-            for sub in self.stoppingBlocks:
-                occ = 1 if sub.IsOccupied() else occ
-                print("stoppingblock: %s, occ now is %d" % (sub.Name(), occ))
-                    
-            for ind in self.indicators:
-                district, node, address, bits = ind
-                node.SetOutputBit(bits[0][0], bits[0][1], occ)
+        occ = parentBlk.IsOccupied() # the occupancy status of the block and all sublocks
+        print("starting occupancy value for %s and subblocks = %s" % (parentBlk.Name(), occ))
+            
+        for sb in parentBlk.StoppingBlocks():
+            occ = True if sb.IsOccupied(recurse=False) else occ
+            print("occ after block %s = %s" % (sb.Name(), occ))
+
+        print("parent block has %d indicators defined" % len(parentBlk.indicators))            
+        for ind in parentBlk.indicators:
+            district, node, address, bits = ind
+            print("indicator at location %d: %d" % (bits[0][0], bits[0][1]))
+            node.SetOutputBit(bits[0][0], bits[0][1], occ)
+            
+        print("=====================================", flush=True)
 
     def GetEventMessage(self, clear=False, direction=False):
-        if self.mainBlockName is not None:
-            bname = self.mainBlockName
-            blk = self.mainBlock
-            print("Main block: %s" % bname)
-            occ = 0
-            clr = 0
-            for b in blk.subBlocks:
-                occ = 1 if b.IsOccupied() else occ
-                clr = 1 if b.IsCleared() else clr
-        else:
-            bname = self.name
-            clr = 1 if self.cleared else 0
-            occ = 1 if self.occupied else 0
-            
+        bname = self.mainBlockName if self.mainBlockName is not None else self.name
 
         if clear:
-            return {"blockclear": [{ "block": bname, "clear": clr}]}
+            return {"blockclear": [{ "block": bname, "clear": self.IsCleared()}]}
         if direction:
             return {"blockdir": [{ "block": bname, "dir": "E" if self.east else "W"}]}
         else:
-            return {"block": [{ "name": bname, "state": occ}]}
+            return {"block": [{ "name": bname, "state": self.IsOccupied()}]}
         
 class StopRelay:
     def __init__(self, name, district, node, address):

@@ -86,10 +86,10 @@ class Railroad():
 			self.nodes[name] = self.districts[name].GetNodes()
 			self.addrList.extend([[addr, self.districts[name], node] for addr, node, in self.districts[name].GetNodes().items()])
 
-		print(str(sorted(list(self.blocks.keys()))))
-		for main, subs in self.subBlocks.items():
-			for sub in subs:			
-				self.GetBlock(sub).SetMainBlock(main, self.GetBlock(main))
+  # print(str(sorted(list(self.blocks.keys()))))
+  # for main, subs in self.subBlocks.items():
+  # 	for sub in subs:			
+  # 		self.GetBlock(sub).SetMainBlock(main, self.GetBlock(main))
 
 			
 	def dump(self):
@@ -186,7 +186,9 @@ class Railroad():
 				'''
 				print("occupying subblocks of %s" % blk.Name())
 				sbl = blk.SubBlocks()
+				print("length of subblocks = %d" % len(sbl))
 				for sb in sbl:
+					print("subblock %s" % sb.Name())
 					if len(sb.Bits()) > 0:
 						vbyte, vbit = sb.Bits()[0]
 						sb.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)

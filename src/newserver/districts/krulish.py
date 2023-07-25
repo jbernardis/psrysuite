@@ -40,11 +40,11 @@ class Krulish(District):
 	
 			# bits 1:0 and 1:1 are unused
 			self.rr.AddBlock("N10.W",  self, n, addr, [(1, 2)])
-			self.rr.AddBlock("N10",    self, n, addr, [(1, 2)])
-			self.rr.AddBlock("N10.E",  self, n, addr, [(1, 2)])
-			self.rr.AddBlock("N20.W",  self, n, addr, [(1, 2)])
-			self.rr.AddBlock("N20",    self, n, addr, [(1, 2)])
-			self.rr.AddBlock("N20.E",  self, n, addr, [(1, 2)])
+			self.rr.AddBlock("N10",    self, n, addr, [(1, 3)])
+			self.rr.AddBlock("N10.E",  self, n, addr, [(1, 4)])
+			self.rr.AddBlock("N20.W",  self, n, addr, [(1, 5)])
+			self.rr.AddBlock("N20",    self, n, addr, [(1, 6)])
+			self.rr.AddBlock("N20.E",  self, n, addr, [(1, 7)])
 			self.rr.AddBlock("KOSW",   self, n, addr, [(2, 0)])
 			self.rr.AddBlock("KOSM",   self, n, addr, [(2, 1)])
 			self.rr.AddBlock("KOSE",   self, n, addr, [(2, 2)])

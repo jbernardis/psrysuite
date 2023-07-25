@@ -47,9 +47,9 @@ class Yard(District):
 			self.rr.AddBlock("Y21.E",   self, n, addr, [(0, 6)])
 			self.rr.AddBlock("YOSCJW",  self, n, addr, [(0, 7)]) #  CJOS1	
 			self.rr.AddBlock("YOSCJE",  self, n, addr, [(1, 0)]) #  CJOS2
-			sb = self.rr.AddBlock("L10.W",   self, n, addr, [(1, 1)])
+			sbw = self.rr.AddBlock("L10.W",   self, n, addr, [(1, 1)])
 			b = self.rr.AddBlock("L10",     self, n, addr, [(1, 2)])
-			b.AddStoppingBlock(sb)
+			b.AddStoppingBlocks([sbw])
 		
 		
 		# eastend jct node

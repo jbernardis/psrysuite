@@ -53,8 +53,9 @@ class Latham(District):
 			self.rr.AddTurnoutPosition("LSw9", self, n, addr, [(1, 0), (1, 1)])
 			
 			b = self.rr.AddBlock("L20",      self, n, addr, [(1, 2)])
-			sb = self.rr.AddBlock("L20.E",    self, n, addr, [(1, 3)])
-			b.AddStoppingBlock(sb)
+			sbe = self.rr.AddBlock("L20.E",    self, n, addr, [(1, 3)])
+			b.AddStoppingBlocks([sbe])
+			
 			self.rr.AddBlock("P21",      self, n, addr, [(1, 4)])
 			self.rr.AddBlock("P21.E",    self, n, addr, [(1, 5)])
 			self.rr.AddBlock("LOSLAW",   self, n, addr, [(1, 6)]) #LOS1
@@ -114,8 +115,8 @@ class Latham(District):
 			self.rr.AddTurnoutPosition("LSw17", self, n, addr, [(0, 6), (0, 7)])
 
 			b = self.rr.AddBlock("L31",      self, n, addr, [(1, 0)]) 
-			sb = self.rr.AddBlock("L31.E",    self, n, addr, [(1, 1)]) 
-			b.AddStoppingBlock(sb)
+			sbe = self.rr.AddBlock("L31.E",    self, n, addr, [(1, 1)]) 
+			b.AddStoppingBlocks([sbe])
 
 			self.rr.AddBlock("LOSCAW",   self, n, addr, [(1, 2)]) 
 			self.rr.AddBlock("LOSCAM",   self, n, addr, [(1, 3)]) 
@@ -123,11 +124,11 @@ class Latham(District):
 			self.rr.AddBlock("D10.W",    self, n, addr, [(1, 5)]) 
 			self.rr.AddBlock("D10",      self, n, addr, [(1, 6)]) 
 	
-			sb = self.rr.AddBlock("S21.W",    self, n, addr, [(2, 0)]) 
+			sbw = self.rr.AddBlock("S21.W",    self, n, addr, [(2, 0)]) 
 			b = self.rr.AddBlock("S21",      self, n, addr, [(2, 1)]) 
-			b.AddStoppingBlock(sb)
-			sb = self.rr.AddBlock("S21.E",    self, n, addr, [(2, 2)]) 
-			b.AddStoppingBlock(sb)
+			sbe = self.rr.AddBlock("S21.E",    self, n, addr, [(2, 2)]) 
+			b.AddStoppingBlocks([sbe, sbw])
+			
 			self.rr.AddBlock("N25.W",    self, n, addr, [(2, 3)]) 
 			self.rr.AddBlock("N25",      self, n, addr, [(2, 4)]) 
 			self.rr.AddBlock("N25.E",    self, n, addr, [(2, 5)]) 

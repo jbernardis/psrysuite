@@ -60,11 +60,13 @@ class Dell(District):
 
 			self.rr.AddBlock("DOSVJW",   self, n, DELL, [(2, 0)]) 
 			self.rr.AddBlock("DOSVJE",   self, n, DELL, [(2, 1)]) 
-			self.rr.AddBlock("D11.W",    self, n, DELL, [(2, 2)]) 
-			self.rr.AddBlock("D11A",     self, n, DELL, [(2, 3)]) 
-			self.rr.AddBlock("D11B",     self, n, DELL, [(2, 4)]) 
-			self.rr.AddBlock("D11",      self, n, DELL, [])  # virtual definition for D11 
-			self.rr.AddBlock("D11.E",    self, n, DELL, [(2, 5)]) 
+			sbw = self.rr.AddBlock("D11.W",    self, n, DELL, [(2, 2)]) 
+			sba = self.rr.AddBlock("D11A",     self, n, DELL, [(2, 3)]) 
+			sbb = self.rr.AddBlock("D11B",     self, n, DELL, [(2, 4)]) 
+			b = self.rr.AddBlock("D11",      self, n, DELL, [])  # virtual definition for D11 
+			sbe = self.rr.AddBlock("D11.E",    self, n, DELL, [(2, 5)]) 
+			b.AddStoppingBlocks([sbe, sbw])
+			b.AddSubBlocks([sba, sbb])
 
 		with self.nodes[FOSS] as n:
 			# outputs
@@ -82,23 +84,34 @@ class Dell(District):
 			self.rr.AddSignal("R10W", self, n, FOSS, [(2, 3), (2, 4), (2, 5)])
 
 			#inputs	
-			self.rr.AddBlock("D21.W",     self, n, DELL, [(0, 0)]) 
-			self.rr.AddBlock("D21A",      self, n, DELL, [(0, 1)]) 
-			self.rr.AddBlock("D21B",      self, n, DELL, [(0, 2)]) 
-			self.rr.AddBlock("D21",       self, n, DELL, []) # virtual definition for D21
-			self.rr.AddBlock("D21.E",     self, n, DELL, [(0, 3)]) 
+			sbw = self.rr.AddBlock("D21.W",     self, n, DELL, [(0, 0)]) 
+			sba = self.rr.AddBlock("D21A",      self, n, DELL, [(0, 1)]) 
+			sbb = self.rr.AddBlock("D21B",      self, n, DELL, [(0, 2)]) 
+			b = self.rr.AddBlock("D21",       self, n, DELL, []) # virtual definition for D21
+			sbe = self.rr.AddBlock("D21.E",     self, n, DELL, [(0, 3)]) 
+			b.AddStoppingBlocks([sbe, sbw])
+			b.AddSubBlocks([sba, sbb])
+			
 			self.rr.AddBlock("DOSFOW",    self, n, DELL, [(0, 4)]) 
 			self.rr.AddBlock("DOSFOE",    self, n, DELL, [(0, 5)]) 
-			self.rr.AddBlock("S10.W",     self, n, DELL, [(0, 6)]) 
-			self.rr.AddBlock("S10A",      self, n, DELL, [(0, 7)]) 
+			sbw = self.rr.AddBlock("S10.W",     self, n, DELL, [(0, 6)]) 
+			sba = self.rr.AddBlock("S10A",      self, n, DELL, [(0, 7)]) 
 
-			self.rr.AddBlock("S10B",      self, n, DELL, [(1, 0)]) 
-			self.rr.AddBlock("S10C",      self, n, DELL, [(1, 1)]) 
-			self.rr.AddBlock("S10.E",     self, n, DELL, [(1, 2)]) 
-			self.rr.AddBlock("R10.W",     self, n, DELL, [(1, 3)]) 
-			self.rr.AddBlock("R10A",      self, n, DELL, [(1, 4)]) 
-			self.rr.AddBlock("R10B",      self, n, DELL, [(1, 5)]) 
-			self.rr.AddBlock("R10C",      self, n, DELL, [(1, 6)]) 
+			sbb = self.rr.AddBlock("S10B",      self, n, DELL, [(1, 0)]) 
+			sbc = self.rr.AddBlock("S10C",      self, n, DELL, [(1, 1)]) 
+			sbe = self.rr.AddBlock("S10.E",     self, n, DELL, [(1, 2)]) 
+			b = self.rr.AddBlock("S10",       self, n, DELL, []) # virtual definition for S10
+			b.AddStoppingBlocks([sbe, sbw])
+			b.AddSubBlocks([sba, sbb, sbc])
+			
+			sbw = self.rr.AddBlock("R10.W",     self, n, DELL, [(1, 3)]) 
+			sba = self.rr.AddBlock("R10A",      self, n, DELL, [(1, 4)]) 
+			sbb = self.rr.AddBlock("R10B",      self, n, DELL, [(1, 5)]) 
+			sbc = self.rr.AddBlock("R10C",      self, n, DELL, [(1, 6)]) 
+			b = self.rr.AddBlock("R10",       self, n, DELL, []) 
+			b.AddStoppingBlocks([sbw])
+			b.AddSubBlocks([sba, sbb, sbc])
+			
 			self.rr.AddBlock("R11",       self, n, DELL, [(1, 7)]) 
 			
 			self.rr.AddBlock("R12",       self, n, DELL, [(2, 0)]) 

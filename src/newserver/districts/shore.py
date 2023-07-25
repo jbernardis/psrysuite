@@ -81,21 +81,39 @@ class Shore(District):
 			self.rr.AddTurnoutPosition("SSw11", self, n, SHORE, [(1, 2), (1, 3)])
 			self.rr.AddTurnoutPosition("SSw13", self, n, SHORE, [(1, 4), (1, 5)])
 	
-			self.rr.AddBlock("S20.W",  self, n, SHORE, [(1, 6)]) 
-			self.rr.AddBlock("S20A",   self, n, SHORE, [(1, 7)]) 
-			self.rr.AddBlock("S20C",   self, n, SHORE, [(2, 0)]) # C and B are wired backwards
-			self.rr.AddBlock("S20B",   self, n, SHORE, [(2, 1)]) 
-			self.rr.AddBlock("S20.E",  self, n, SHORE, [(2, 2)]) 
+			sbw = self.rr.AddBlock("S20.W",  self, n, SHORE, [(1, 6)]) 
+			sba = self.rr.AddBlock("S20A",   self, n, SHORE, [(1, 7)]) 
+			sbc = self.rr.AddBlock("S20C",   self, n, SHORE, [(2, 0)]) # C and B are wired backwards
+			sbb = self.rr.AddBlock("S20B",   self, n, SHORE, [(2, 1)]) 
+			sbe = self.rr.AddBlock("S20.E",  self, n, SHORE, [(2, 2)]) 
+			b = self.rr.AddBlock("S20",  self, n, SHORE, []) 
+			b.AddStoppingBlocks([sbe, sbw])
+			b.AddSubBlocks([sba, sbb, sbc])
+			
 			self.rr.AddBlock("SOSW",   self, n, SHORE, [(2, 3)]) 
 			self.rr.AddBlock("SOSE",   self, n, SHORE, [(2, 4)]) 
-			self.rr.AddBlock("S11.W",  self, n, SHORE, [(2, 5)]) 
-			self.rr.AddBlock("S11",    self, n, SHORE, [])  # virtual definition for S11
-			self.rr.AddBlock("S11B",   self, n, SHORE, [(2, 6)]) 
-			self.rr.AddBlock("S11.E",  self, n, SHORE, [(2, 7)]) 
-			self.rr.AddBlock("H30.W",  self, n, SHORE, [(3, 0)]) 
-			self.rr.AddBlock("H30B",   self, n, SHORE, [(3, 1)]) 
-			self.rr.AddBlock("H10.W",  self, n, SHORE, [(3, 2)]) 
-			self.rr.AddBlock("H10B",   self, n, SHORE, [(3, 3)]) 
+			sbw = self.rr.AddBlock("S11.W",  self, n, SHORE, [(2, 5)]) 
+			sba = self.rr.AddBlock("S11A",  self, n, SHORE, [(4, 4)]) 
+			sbb = self.rr.AddBlock("S11B",   self, n, SHORE, [(2, 6)]) 
+			sbe = self.rr.AddBlock("S11.E",  self, n, SHORE, [(2, 7)]) 
+			b = self.rr.AddBlock("S11",    self, n, SHORE, [])  # virtual definition for S11
+			b.AddStoppingBlocks([sbe, sbw])
+			b.AddSubBlocks([sba, sbb])
+			
+			sbw = self.rr.AddBlock("H30.W",  self, n, SHORE, [(3, 0)]) 
+			sba = self.rr.AddBlock("H30A",   self, n, SHORE, [(4, 5)]) 
+			sbb = self.rr.AddBlock("H30B",   self, n, SHORE, [(3, 1)]) 
+			b = self.rr.AddBlock("H30",    self, n, SHORE, []) 
+			b.AddStoppingBlocks([sbw])
+			b.AddSubBlocks([sba, sbb])
+						
+			sbw = self.rr.AddBlock("H10.W",  self, n, SHORE, [(3, 2)]) 
+			sba = self.rr.AddBlock("H10A",   self, n, SHORE, [(4, 6)]) 
+			sbb = self.rr.AddBlock("H10B",   self, n, SHORE, [(3, 3)]) 
+			b = self.rr.AddBlock("H10",    self, n, SHORE, [])
+			b.AddStoppingBlocks([sbw])
+			b.AddSubBlocks([sba, sbb])
+
 			self.rr.AddBlock("F10",    self, n, SHORE, [(3, 4)]) 
 			self.rr.AddBlock("F10.E",  self, n, SHORE, [(3, 5)]) 
 			self.rr.AddBlock("SOSHF",  self, n, SHORE, [(3, 6)]) 
@@ -105,9 +123,6 @@ class Shore(District):
 
 			self.rr.AddHandswitch("CSw15", self, n, SHORE, [(4, 2), (4, 3)])
 
-			self.rr.AddBlock("S11A",  self, n, SHORE, [(4, 4)]) 
-			self.rr.AddBlock("H30A",  self, n, SHORE, [(4, 5)]) 
-			self.rr.AddBlock("H10A",  self, n, SHORE, [(4, 6)]) 
 			
 
 		with self.nodes[HYDEJCT] as n:
@@ -134,8 +149,8 @@ class Shore(District):
 			self.rr.AddTurnoutPosition("SSw19", self, n, HYDEJCT, [(0, 4), (0, 5)])
 
 			b = self.rr.AddBlock("H20",    self, n, HYDEJCT, [(0, 6)]) 
-			sb = self.rr.AddBlock("H20.E",  self, n, HYDEJCT, [(0, 7)]) 
-			b.AddStoppingBlock(sb)
+			sbe = self.rr.AddBlock("H20.E",  self, n, HYDEJCT, [(0, 7)]) 
+			b.AddStoppingBlocks([sbe])
 			
 			self.rr.AddBlock("P42.W",  self, n, HYDEJCT, [(1, 0)]) 
 			self.rr.AddBlock("P42",    self, n, HYDEJCT, [(1, 1)]) 
