@@ -220,15 +220,15 @@
         "used": true
       },
       {
-        "label": "CBSptJct",
+        "label": "CBSptJct.ind",
         "used": true
       },
       {
-        "label": "CBWilson",
+        "label": "CBWilson.ind",
         "used": true
       },
       {
-        "label": "CNThomas",
+        "label": "CBThomas.ind",
         "used": true
       },
       {
@@ -516,7 +516,7 @@
     ],
     [
       {
-        "label": "CBFoss",
+        "label": "CBDell",
         "used": true
       },
       {

@@ -39,6 +39,10 @@ class Krulish (District):
 			else:
 				bmp = self.misctiles["indicator"].getBmp(None, "green")
 			self.frame.DrawTile(self.screen, (124, 24), bmp)
+			
+		if signm in [ "K2R", "K4R", "K8R" ]:
+			self.CheckBlockSignals("N11", "N11W", False)
+			self.CheckBlockSignals("N21", "N21W", False)
 	
 	def DoBlockAction(self, blk, blockend, state):
 		blknm = blk.GetName()
@@ -49,6 +53,8 @@ class Krulish (District):
 
 		District.DoBlockAction(self, blk, blockend, state)
 
+		if blknm == "N11":
+			self.CheckBlockSignals("N11", "N11W", False)
 
 	def DetermineRoute(self, blocks):
 		s3 = 'N' if self.turnouts["KSw3"].IsNormal() else 'R'
@@ -176,33 +182,6 @@ class Krulish (District):
 		self.blocks["N11"].AddTrainLoc(self.screen, (154, 11))
 		self.blocks["N11"].AddTrainLoc(NaCl, (2, 11))
 
-		self.blocks["N21"] = Block(self, self.frame, "N21",
-			[
-				(self.tiles["horiznc"], self.screen, (153, 13), False),
-				(self.tiles["horiz"],   self.screen, (154, 13), False),
-				(self.tiles["horiznc"], self.screen, (155, 13), False),
-				(self.tiles["horiz"],   self.screen, (156, 13), False),
-				(self.tiles["horiznc"], self.screen, (157, 13), False),
-				(self.tiles["horiz"],   self.screen, (158, 13), False),
-				(self.tiles["horiznc"], NaCl,        (0, 13), False),
-				(self.tiles["horiz"],   NaCl,        (1, 13), False),
-				(self.tiles["horiznc"], NaCl,        (2, 13), False),
-				(self.tiles["horiz"],   NaCl,        (3, 13), False),
-				(self.tiles["horiznc"], NaCl,        (4, 13), False),
-			], True)
-		self.blocks["N21"].AddStoppingBlock([
-				(self.tiles["eobleft"], self.screen, (150, 13), False),
-				(self.tiles["horiznc"], self.screen, (151, 13), False),
-				(self.tiles["horiz"],   self.screen, (152, 13), False),
-			], False)
-		self.blocks["N21"].AddStoppingBlock([
-				(self.tiles["horiz"],   NaCl,        (5, 13), False),
-				(self.tiles["horiznc"], NaCl,        (6, 13), False),
-				(self.tiles["horiz"],   NaCl,        (7, 13), False),
-			], True)
-		self.blocks["N21"].AddTrainLoc(self.screen, (154, 13))
-		self.blocks["N21"].AddTrainLoc(NaCl, (2, 13))
-
 		self.blocks["K10"] = Block(self, self.frame, "K10",
 			[
 				(self.tiles["houtline"],  self.screen, (150, 9), False),
@@ -321,7 +300,6 @@ class Krulish (District):
 			"N10": ("N10W",  "K8R"),
 			"N11": ("K8LB",  "N16R"),
 			"N20": ("N20W",  "K2R"),
-			"N21": ("K2L",   "N14R"),
 			"N25": ("S16L",  "K4R")
 		}
 

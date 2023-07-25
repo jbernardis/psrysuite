@@ -42,7 +42,7 @@ class Nassau(District):
 			self.rr.AddSignal("N11W",  self, n, addr,[(2, 1), (2, 2), (2, 3)])
 			self.rr.AddSignal("N21W",  self, n, addr,[(2, 4), (2, 5), (2, 6)])
 
-			self.rr.AddIndicator("S11AB", self, n, addr, [(2, 1)]) # Shore approach indicator
+			self.rr.AddIndicator("S11AB", self, n, addr, [(2, 7)]) # Shore approach indicator
 			self.rr.AddBlockInd("R10",    self, n, addr, [(3, 0)]) # Shore approach indicator
 			self.rr.AddBlockInd("B20",    self, n, addr, [(3, 1)]) # Bank approach indicator
 
@@ -186,8 +186,9 @@ class Nassau(District):
 			self.rr.AddBlock("NEOSRH",  self, n, addr, [(2, 3)])
 			self.rr.AddBlock("NEOSW",   self, n, addr, [(2, 4)])
 			self.rr.AddBlock("NEOSE",   self, n, addr, [(2, 5)])
-			self.rr.AddBlock("B10.W",   self, n, addr, [(2, 6)])
-			self.rr.AddBlock("B10",     self, n, addr, [(2, 7)])
+			sbw = self.rr.AddBlock("B10.W",   self, n, addr, [(2, 6)])
+			b = self.rr.AddBlock("B10",     self, n, addr, [(2, 7)])
+			b.AddStoppingBlocks([sbw])
 	
 			self.rr.AddTurnoutPosition("NSw39", self, n, addr, [(3, 0), (3, 1)])	
 			
@@ -450,8 +451,9 @@ class Nassau(District):
 		for i in range(len(NWSL)):
 			lnm = "NWSL%d" % i
 			self.rr.SetLock(lnm, NWSL[i])
-
+		
 		S11AB = self.rr.GetBlock("S11A").IsOccupied() or self.rr.GetBlock("S11B").IsOccupied()
+		
 		if S11AB != self.S11AB:
 			self.S11AB = S11AB
 			self.rr.SetIndicator("S11AB", S11AB)

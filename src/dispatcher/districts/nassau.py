@@ -151,29 +151,22 @@ class Nassau (District):
 			self.DoEntryExitButtons(btn, "NOSW", sendButtons=True)
 		elif bname in self.eastGroup["NOSE"] + self.westGroup["NOSE"]:
 			self.DoEntryExitButtons(btn, "NOSE", sendButtons=True)
-
-	def CheckBlockSignals(self, sig, aspect, blk, rev, rType, nbStatus, nbRType, nnbClear):
-		if blk is None:
-			return
-
-		blkNm = blk.GetName()
-		east = blk.GetEast(reverse=rev)
-
-		if blkNm == "N21" and not east:
-			signm = "N21W"
-			atype = RegAspects
-
-		elif blkNm == "N11" and not east:
-			signm = "N11W"
-			atype = RegAspects
-
-		else:
-			return
-
-		if aspect != 0:
-			aspect = self.GetBlockAspect(atype, rType, nbStatus, nbRType, nnbClear)
-
-		self.frame.Request({"signal": { "name": signm, "aspect": aspect }})
+			
+	def DoBlockAction(self, blk, blockend, state):
+		print("in do block action for block %s" % blk.GetName())
+		District.DoBlockAction(self, blk, blockend, state)
+		if blk.GetName() == "N21":
+			self.CheckBlockSignals("N21", "N21W", False)
+			
+	def DoSignalAction(self, sig, aspect):
+		print("in do signal action for signal %s" % sig.GetName())
+		District.DoSignalAction(self, sig, aspect)
+		signame = sig.GetName()
+		if signame in [ "N14LA", "N14LB", "N14LC", "N14LD", "N16L", "N18LA", "N18LB", "N20L" ]:
+			self.CheckBlockSignals("N11", "N11W", False)
+			self.CheckBlockSignals("N21", "N21W", False)
+		elif signame in [ "N28R", "N26RA", "N26RB", "N26RC", "N24RA", "N24RB", "N24RC", "N24RD" ]:
+			self.CheckBlockSignalsAdv("B20", "B21", "B20E", True)
 
 	def DoTurnoutAction(self, turnout, state, force=False):
 		tn = turnout.GetName()
@@ -242,6 +235,7 @@ class Nassau (District):
 			trnout = self.turnouts["NSw45"]
 			trnout.UpdateStatus()
 			trnout.Draw()
+
 
 	def DetermineRoute(self, blocks):
 		# block N60 - coach yard - is treated separately, so handle it here if it is in the list of blocks

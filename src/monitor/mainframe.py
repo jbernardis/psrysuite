@@ -40,6 +40,7 @@ Nodes = [
 ]
 
 breakerNames = {
+	"CBBank":           "Bank",
 	"CBCliveden":       "Cliveden",
 	"CBLatham":         "Latham",
 	"CBCornellJct":     "Cornell Junction",

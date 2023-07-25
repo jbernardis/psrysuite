@@ -43,9 +43,11 @@ class Cliveden(District):
 			
 			self.rr.AddTurnoutPosition("CSw9",  self, n, addr, [(0, 6), (0, 7)])
 
-			self.rr.AddBlock("C13.W",   self, n, addr, [(1, 0)])
-			self.rr.AddBlock("C13",     self, n, addr, [(1, 1)])
-			self.rr.AddBlock("C13.E",   self, n, addr, [(1, 2)])
+			sbw = self.rr.AddBlock("C13.W",   self, n, addr, [(1, 0)])
+			b = self.rr.AddBlock("C13",     self, n, addr, [(1, 1)])
+			sbe = self.rr.AddBlock("C13.E",   self, n, addr, [(1, 2)])
+			b.AddStoppingBlocks([sbe, sbw])
+			
 			self.rr.AddBlock("COSCLW",  self, n, addr, [(1, 3)])
 			self.rr.AddBlock("C12.W",   self, n, addr, [(1, 4)])
 			self.rr.AddBlock("C12",     self, n, addr, [(1, 5)])

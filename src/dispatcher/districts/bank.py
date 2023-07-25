@@ -247,3 +247,18 @@ class Bank (District):
 		self.handswitches["CSw19.hand"] = hs
 
 		return self.handswitches
+	
+	def DoBlockAction(self, blk, blockend, state):
+		print("in do block action for block %s" % blk.GetName())
+		District.DoBlockAction(self, blk, blockend, state)
+		blknm = blk.GetName()
+		if blknm in [ "B20", "B21" ]:
+			self.CheckBlockSignalsAdv("B20", "B21", "B20E", True)
+			
+	def DoSignalAction(self, sig, aspect):
+		print("in do signal action for signal %s" % sig.GetName())
+		District.DoSignalAction(self, sig, aspect)
+		signame = sig.GetName()
+		if signame in [ "C18R", "C22R", "C24R", "C22L", "C24L" ]:
+			self.CheckBlockSignalsAdv("B20", "B21", "B20E", True)
+

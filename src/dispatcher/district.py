@@ -329,9 +329,115 @@ class District:
 
 		aspect = self.GetAspect(sig.GetAspectType(), rType, nbStatus, nbRType, nnbClear)
 
-		self.CheckBlockSignals(sig, aspect, exitBlk, doReverseExit, rType, nbStatus, nbRType, nnbClear)
+		#self.CheckBlockSignals(sig, aspect, exitBlk, doReverseExit, rType, nbStatus, nbRType, nnbClear)
 
 		return aspect
+
+	def CheckBlockSignals(self, blkNm, sigNm, blkEast):
+		print("check block signals for block/signal %s/%s" % (blkNm, sigNm))
+
+		blk = self.frame.blocks[blkNm]
+		clear = not blk.IsOccupied()
+			
+		east = blk.GetEast()
+		print("Block East = %s, we want %s" % (east, blkEast))
+
+		if east == blkEast:		
+			blkNxt = blk.blkEast
+		else:
+			blkNxt = blk.blkWest
+		
+		if blkNxt is None:
+			print("no block next")
+			nxtclr = False
+			nxtrte = None
+		
+		else:	
+			nxtclr = blkNxt.IsCleared()		
+			print("block west = %s" % blkNxt.GetName())
+			rt = blkNxt.GetRoute()
+			if rt is None:
+				print("no route beyoud OS")
+				nxtrte = None
+			else:
+				nxtrte = rt.rtype[0 if blkEast else 1] # get next route type
+				print("nxt routeTypes = %d" % nxtrte)
+		
+		if east != blkEast:
+			aspect = 0	
+		elif clear and nxtclr and (nxtrte == MAIN):
+			aspect = 0b011   # clear
+		elif clear and nxtclr and (nxtrte == DIVERGING):
+			aspect = 0b010   # approach medium
+		elif clear and nxtclr and (nxtrte == SLOW):
+			aspect = 0b110   # approach slow
+		elif clear and not nxtclr:
+			aspect = 0b001   # approach
+		else:
+			aspect = 0       # stop
+		
+		print("calculated aspect for clear: %s east: %s, nxtclr: %s, nxtrte: %s = %d" % (clear, east, nxtclr, str(nxtrte), aspect))
+		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect }})
+
+
+	def CheckBlockSignalsAdv(self, blkNm, blkNxtNm, sigNm, blkEast):
+		print("check block advanced signals for block/signal %s/%s/%s" % (blkNm, blkNxtNm, sigNm))
+
+		blk = self.frame.blocks[blkNm]
+		clear = not blk.IsOccupied()
+			
+		east = blk.GetEast()
+		print("Block East = %s, we want %s" % (east, blkEast))
+		
+		if east == blkEast:		
+			blkNxt = blk.blkEast
+		else:
+			blkNxt = blk.blkWest
+		
+		if blkNxt is None:
+			print("no block next")
+			nxtclr = False
+			nxtrte = None
+		
+		else:	
+			nxtclr = blkNxt.IsCleared()		
+			print("block west = %s" % blkNxt.GetName())
+			rt = blkNxt.GetRoute()
+			if rt is None:
+				print("no route beyoud OS")
+				nxtrte = None
+			else:
+				nxtrte = rt.rtype[0 if blkEast else 1] # get next route type
+				print("nxt routeTypes = %d" % nxtrte)
+
+		try:
+			blknxt = self.frame.blocks[blkNxtNm]
+		except KeyError:
+			nxtclradv = False
+			nxtEast = None
+		else:
+			nxtEast = blknxt.GetEast()
+			if nxtEast != blkEast:
+				nxtclradv = False
+			else:
+				nxtclradv = blknxt.IsCleared()
+		
+		if east != blkEast or nxtEast != blkEast:
+			aspect = 0	
+		elif clear and nxtclr and (nxtrte == MAIN) and nxtclradv:
+			aspect = 0b011  # clear
+		elif clear and nxtclr and (nxtrte == MAIN) and (not nxtclradv):
+			aspect = 0b110   # advance approach
+		elif clear and nxtclr and (nxtrte == DIVERGING):
+			aspect = 0b010   # approach medium
+		elif clear and not nxtclr:
+			aspect = 0b001   # approach
+		else:
+			aspect = 0       # stop
+		
+		print("calculated adv aspect for clear: %s east: %s, nxtclr: %s/%s, nxtrte: %s = %d" % (clear, east, nxtclr, nxtclradv, str(nxtrte), aspect))
+		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect }})
+
 
 	def GetRouteDefinitions(self):
 		return [r.GetDefinition() for r in self.routes.values()]
@@ -345,9 +451,6 @@ class District:
 				rv = True
 
 		return rv
-
-	def CheckBlockSignals(self, sig, aspect, blk, rev, rType, nbStatus, nbRType, nnbClear):
-		pass
 
 	def GetAspect(self, atype, rtype, nbstatus, nbrtype, nnbclear):
 		#print("Get aspect.  Aspect type = %s, route type %s nextblockstatus %s next block route type %s nextnextclear %s" %
