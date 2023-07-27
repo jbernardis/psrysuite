@@ -20,7 +20,7 @@ class Settings:
 	def __init__(self):
 		self.datafolder = os.path.join(os.getcwd(), "data")
 		self.inifile = os.path.join(self.datafolder, INIFILE)
-		self.section = "rrserver"	
+		self.section = "oldserver"	
 		
 		self.simulation = False
 		self.ipaddr = None

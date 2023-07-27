@@ -1,74 +1,343 @@
 import logging
 
-from rrserver.district import District, leverState, PORTA, PORTB, PARSONS, formatIText, formatOText
-from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, ToggleInput, SignalLeverInput, BlockInput, TurnoutInput, \
-		IndicatorOutput, HandswitchLeverInput
-from rrserver.bus import setBit, getBit
-
+from rrserver.district import District
+from rrserver.constants import PORTA, PORTB, PARSONS
+from rrserver.node import Node
 
 class Port(District):
-	def __init__(self, parent, name, settings):
-		District.__init__(self, parent, name, settings)
+	def __init__(self, rr, name, settings):
+		District.__init__(self, rr, name, settings)
+		logging.info("creating district Port")
+		self.rr = rr
+		self.name = name
+		self.releasedA = False
+		self.releasedB = False
+		self.n25occ = None
+		self.nodeAddresses = [ PORTA, PORTB, PARSONS]
+		self.nodes = {
+			PORTA:    Node(self, rr, PORTA,   9, settings),
+			PORTB:    Node(self, rr, PORTB,   7, settings),
+			PARSONS:  Node(self, rr, PARSONS, 4, settings)
+		}
+
 		self.PBE = False
 		self.PBW = False
+		self.PBXO = None
+		self.clr10w = None
+		self.clr50w = None
+		self.clr11e = None
+		self.clr21e = None
+		self.clr40w = None
+		self.clr32w = None
+		self.clr42e = None
 
-		sigNames = [ ["PA12R", 2], ["PA12LA", 1], ["PA12LB", 1], ["PA12LC", 1], ["PA10RA", 2], ["PA10RB", 2], ["PA10L", 1],
-					["PA8R", 2], ["PA8L", 1], ["PA6R", 2], ["PA6LA", 1], ["PA6LB", 1], ["PA6LC", 1], ["PA4RA", 2], ["PA4RB", 2], ["PA4L", 1],
-					["PA34RA", 1], ["PA34RB", 1], ["PA34RC", 1], ["PA34RD", 3], ["PA34LA", 3], ["PA34LB", 3], ["PA32RA", 3], ["PA32RB", 3], ["PA32L", 1],
-					["PB2R", 3], ["PB2L", 3], ["PB4R", 3], ["PB4L", 3], ["PB12R", 3], ["PB12L", 3], ["PB14R", 3], ["PB14L", 3] ]
-		toNames = [ "PASw1", "PASw3", "PASw5", "PASw7", "PASw9", "PASw11", "PASw13",
-					"PASw15", "PASw17", "PASw19", "PASw21", "PASw23",
-					"PASw27", "PASw29", "PASw31", "PASw33", "PASw35", "PASw37",
-					"PBSw1", "PBSw3", "PBSw11", "PBSw13" ]
-		hsNames = [ "PBSw5", "PBSw15a", "PBSw15b" ]
-		handswitchNames = [ "PBSw5.hand", "PBSw15a.hand", "PBSw15b.hand" ]
-		#relayNames = [ "P10.srel", "P11.srel", "P20.srel", "P21.srel",
-		relayNames = [ "P10.srel", "P11.srel", "P20.srel",
-					"P30.srel", "P31.srel", "P32.srel", "P40.srel", "P41.srel", "P42.srel" ]
-		indNames = [ "CBParsonsJct", "CBSouthport", "CBLavinYard", "CBSouthJct", "CBCircusJct" ]
+		# Port A - Southport
+		addr = PORTA
+		with self.nodes[PORTA] as n:
+			self.rr.AddSignal("PA12R",  self, n, addr, [(0, 0), (0, 1)])
+			self.rr.AddSignal("PA10RA", self, n, addr, [(0, 2), (0, 3)])
+			self.rr.AddSignal("PA12LA", self, n, addr, [(0, 4)])
+			self.rr.AddSignal("PA10RB", self, n, addr, [(0, 5), (0, 6)])
+			self.rr.AddSignal("PA8R",   self, n, addr, [(0, 7), (1, 0)])
+			self.rr.AddSignal("PA12LB", self, n, addr, [(1, 1)])
+			self.rr.AddSignal("PA6R",   self, n, addr, [(1, 2), (1, 3)])
+			self.rr.AddSignal("PA4RA",  self, n, addr, [(1, 4), (1, 5)])
+			self.rr.AddSignal("PA12LC", self, n, addr, [(1, 6)])
+			self.rr.AddSignal("PA4RB",  self, n, addr, [(1, 7), (2, 0)])
+			self.rr.AddSignal("PA8L",   self, n, addr, [(2, 1)])
+			self.rr.AddSignal("PA6LA",  self, n, addr, [(2, 2)])
+			self.rr.AddSignal("PA6LB",  self, n, addr, [(2, 3)])
+			self.rr.AddSignal("PA6LC",  self, n, addr, [(2, 4)])
+			self.rr.AddOutputDevice("P10.clrw",  self, n, addr, [2, 5]) # semaphore for P10
+			self.rr.AddOutputDevice("P10.rstw",  self, n, addr, [2, 6])
+			self.rr.AddSignal("PA4L",   self, n, addr, [])  # virtual signals for semaphores
+			self.rr.AddSignal("PA10L",  self, n, addr, [])
+		
+			self.rr.AddSignalLED("PA4",  self, n, addr, [(2, 7), (3, 0), (3, 1)])
+			self.rr.AddSignalLED("PA6",  self, n, addr, [(3, 2), (3, 3), (3, 4)])
+			self.rr.AddSignalLED("PA8",  self, n, addr, [(3, 5), (3, 6), (3, 7)])
+			self.rr.AddSignalLED("PA10", self, n, addr, [(4, 0), (4, 1), (4, 2)])
+			self.rr.AddSignalLED("PA12", self, n, addr, [(4, 3), (4, 4), (4, 5)])
+			self.rr.AddSignalLED("PA32", self, n, addr, [(4, 6), (4, 7), (5, 0)])
+			self.rr.AddSignalLED("PA34", self, n, addr, [(5, 1), (5, 2), (5, 3)])
+		
+			self.rr.AddBlockInd("P21", self, n, addr, [(5, 4)])
+			self.rr.AddBlockInd("P40", self, n, addr, [(5, 5)])
+			
+			
+			
+			'''
+			don't know what these 3are - they may be related to semaphores
+			
+			self.rr.AddBlockInd("P50", self, n, addr, [(5, 6)])
+			self.rr.AddBlockInd("P11", self, n, addr, [(5, 7)])
+			self.rr.AddBlockInd("P21", self, n, addr, [(6, 0)])
+			
+			'''
+			
+			
+			
+			self.rr.AddBreakerInd("CBParsonsJct", self, n, addr, [(6, 1)])
+			self.rr.AddBreakerInd("CBSouthport",  self, n, addr, [(6, 2)])
+			self.rr.AddBreakerInd("CBLavinYard",  self, n, addr, [(6, 3)])
+		
+			# virtual turnouts - we do not control these, so no output bits
+			self.rr.AddTurnout("PASw1",  self, n, addr, [])
+			self.rr.AddTurnout("PASw3",  self, n, addr, [])
+			self.rr.AddTurnout("PASw5",  self, n, addr, [])
+			self.rr.AddTurnout("PASw7",  self, n, addr, [])
+			self.rr.AddTurnout("PASw9",  self, n, addr, [])
+			self.rr.AddTurnout("PASw11", self, n, addr, [])
+			self.rr.AddTurnout("PASw13", self, n, addr, [])
+			self.rr.AddTurnout("PASw15", self, n, addr, [])
+			self.rr.AddTurnout("PASw17", self, n, addr, [])
+			self.rr.AddTurnout("PASw19", self, n, addr, [])
+			self.rr.AddTurnout("PASw21", self, n, addr, [])
+			self.rr.AddTurnout("PASw23", self, n, addr, [])
+			
+			self.rr.AddTurnoutLock("PASw1", self, n, addr, [(6, 4)])
+			self.rr.AddTurnoutLock("PASw3", self, n, addr, [(6, 5)])
+			self.rr.AddTurnoutLock("PASw5", self, n, addr, [(6, 6)])
+			self.rr.AddTurnoutLock("PASw7", self, n, addr, [(6, 7)])
+			self.rr.AddTurnoutLock("PASw9", self, n, addr, [(7, 0)])
+			self.rr.AddTurnoutLock("PASw11", self, n, addr, [(7, 1)])
+			self.rr.AddTurnoutLock("PASw15", self, n, addr, [(7, 2)])
+			self.rr.AddTurnoutLock("PASw19", self, n, addr, [(7, 3)])
+			self.rr.AddTurnoutLock("PASw21", self, n, addr, [(7, 4)])
+			self.rr.AddTurnoutLock("PASw23", self, n, addr, [(7, 5)])
+			self.rr.AddTurnoutLock("PASw31", self, n, addr, [(7, 6)])
+			self.rr.AddTurnoutLock("PASw33", self, n, addr, [(7, 7)])
+			self.rr.AddTurnoutLock("PASw35", self, n, addr, [(8, 0)])
+			self.rr.AddTurnoutLock("PASw37", self, n, addr, [(8, 1)])
+			
+			self.rr.AddStopRelay("P10.srel", self, n, addr, [(8, 2)])
+			self.rr.AddStopRelay("P40.srel", self, n, addr, [(8, 3)])
+			self.rr.AddStopRelay("P31.srel", self, n, addr, [(8, 4)])
+			self.rr.AddOutputDevice("P40.clrw",  self, n, addr, [8, 5]) # semaphore for P40
+			self.rr.AddOutputDevice("P40.rstw",  self, n, addr, [8, 6])
 
-		ix = 0
-		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
-		for sig, bits in sigNames:
-			self.rr.GetOutput(sig).SetBits(bits)
-		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
-		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
-		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
-		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
+			# inputs
+			self.rr.AddTurnoutPosition("PASw1",  self, n, addr, [(0, 0), (0, 1)])
+			self.rr.AddTurnoutPosition("PASw3",  self, n, addr, [(0, 2), (0, 3)])
+			self.rr.AddTurnoutPosition("PASw5",  self, n, addr, [(0, 4), (0, 5)])
+			self.rr.AddTurnoutPosition("PASw7",  self, n, addr, [(0, 6), (0, 7)])
+			self.rr.AddTurnoutPosition("PASw9",  self, n, addr, [(1, 0), (1, 1)])
+			self.rr.AddTurnoutPosition("PASw11", self, n, addr, [(1, 2), (1, 3)])
+			self.rr.AddTurnoutPosition("PASw13", self, n, addr, [(1, 4), (1, 5)])
+			self.rr.AddTurnoutPosition("PASw15", self, n, addr, [(1, 6), (1, 7)])
+			self.rr.AddTurnoutPosition("PASw17", self, n, addr, [(2, 0), (2, 1)])
+			self.rr.AddTurnoutPosition("PASw19", self, n, addr, [(2, 2), (2, 3)])
+			self.rr.AddTurnoutPosition("PASw21", self, n, addr, [(2, 4), (2, 5)])
+			self.rr.AddTurnoutPosition("PASw23", self, n, addr, [(2, 6), (2, 7)])
 
-		for n in toNames:
-			self.SetTurnoutPulseLen(n, settings.topulselen, settings.topulsect)
+			self.rr.AddBlock("P1",     self, n, addr, [(3, 0)])
+			self.rr.AddBlock("P2",     self, n, addr, [(3, 1)])
+			self.rr.AddBlock("P3",     self, n, addr, [(3, 2)])
+			self.rr.AddBlock("P4",     self, n, addr, [(3, 3)])
+			self.rr.AddBlock("P5",     self, n, addr, [(3, 4)])
+			self.rr.AddBlock("P6",     self, n, addr, [(3, 5)])
+			self.rr.AddBlock("P7",     self, n, addr, [(3, 6)])
+			self.rr.AddBlock("POSSP1", self, n, addr, [(3, 7)])
+			self.rr.AddBlock("POSSP2", self, n, addr, [(4, 0)])
+			self.rr.AddBlock("POSSP3", self, n, addr, [(4, 1)])
+			self.rr.AddBlock("POSSP4", self, n, addr, [(4, 2)])
+			self.rr.AddBlock("POSSP5", self, n, addr, [(4, 3)])
+			self.rr.AddBlock("P10",    self, n, addr, [(4, 4)])
+			self.rr.AddBlock("P10.E",  self, n, addr, [(4, 5)])
 
-		#				"P10", "P10.E", "P11.W", "P11", "P11.E", "P20", "P20.E", "P21", "P21.E",
-		blockNames = [ "P1", "P2", "P3", "P4", "P5", "P6", "P7",
-						"P10", "P10.E", "P11.W", "P11", "P11.E", "P20", "P20.E",
-						"P30.W", "P30", "P30.E", "P31.W", "P31", "P31.E", "P32.W", "P32", "P32.E",
-						"P40", "P40.E", "P41.W", "P41", "P41.E", "P42.W", "P42", "P42.E", "P50.W", "P50", "P50.E",
-						"P60", "P61", "P62", "P63", "P64", "V10", "V11",
-						"POSCJ1", "POSCJ2", "POSSJ1", "POSSJ2", "POSPJ1", "POSPJ2",
-						"POSSP1", "POSSP2", "POSSP3", "POSSP4", "POSSP5" ]
-		signalLeverNames = [ "PA4.lvr", "PA6.lvr", "PA8.lvr", "PA10.lvr", "PA12.lvr", "PA32.lvr", "PA34.lvr",
-						"PB2.lvr", "PB4.lvr", "PB12.lvr", "PB14.lvr" ]
-		hsLeverNames = [ "PBSw5.lvr", "PBSw15a.lvr", "PBSw15b.lvr" ]
-		toggleNames = [ "parelease", "pbrelease" ]
+			self.rr.AddSignalLever("PA4",  self, n, addr, [(4, 6), (4, 7), (5, 0)])
+			self.rr.AddSignalLever("PA6",  self, n, addr, [(5, 1), (5, 2), (5, 3)])
+			self.rr.AddSignalLever("PA8",  self, n, addr, [(5, 4), (5, 5), (5, 6)])			
+			self.rr.AddSignalLever("PA10", self, n, addr, [(5, 7), (6, 0), (6, 1)])
+			self.rr.AddSignalLever("PA12", self, n, addr, [(6, 2), (6, 3), (6, 4)])
+			self.rr.AddSignalLever("PA32", self, n, addr, [(6, 5), (6, 6), (6, 7)])
+			self.rr.AddSignalLever("PA34", self, n, addr, [(7, 0), (7, 1), (7, 2)])
 
-		ix = 0
-		ix = self.AddInputs(blockNames, BlockInput, District.block, ix)
-		ix = self.AddInputs(toNames+hsNames, TurnoutInput, District.turnout, ix)
-		ix = self.AddInputs(signalLeverNames, SignalLeverInput, District.slever, ix)
-		ix = self.AddInputs(hsLeverNames, HandswitchLeverInput, District.hslever, ix)
-		ix = self.AddInputs(toggleNames, ToggleInput, District.toggle, ix)
+		addr = PARSONS	
+		with self.nodes[PARSONS] as n:
+			#outputs
+			self.rr.AddSignal("PA34LB", self, n, addr, [(0, 0), (0, 1), (0, 2)])
+			self.rr.AddSignal("PA32L",  self, n, addr, [(0, 3)])
+			self.rr.AddSignal("PA34LA", self, n, addr, [(0, 4), (0, 5), (0, 6)])
+			self.rr.AddSignal("PA34RD", self, n, addr, [(0, 7), (1, 0), (1, 1)])
+			self.rr.AddSignal("PA34RC", self, n, addr, [(1, 2)])
+			self.rr.AddSignal("PA32RA", self, n, addr, [(1, 3), (1, 4), (1, 5)])
+			self.rr.AddSignal("PA34RB", self, n, addr, [(1, 6)])
+			self.rr.AddSignal("PA32RB", self, n, addr, [(1, 7), (2, 0), (2, 1)])
+			self.rr.AddSignal("PA34RA", self, n, addr, [(2, 2)])
+
+			self.rr.AddStopRelay("P20.srel", self, n, addr, [(2, 3)])
+			self.rr.AddStopRelay("P30.srel", self, n, addr, [(2, 4)])
+			self.rr.AddStopRelay("P50.srel", self, n, addr, [(2, 5)])
+			self.rr.AddStopRelay("P11.srel", self, n, addr, [(2, 6)])
+
+			# virtual turnouts - we do not control these, so no output bits
+			self.rr.AddTurnout("PASw27", self, n, addr, [])
+			self.rr.AddTurnout("PASw29", self, n, addr, [])
+			self.rr.AddTurnout("PASw31", self, n, addr, [])
+			self.rr.AddTurnout("PASw33", self, n, addr, [])
+			self.rr.AddTurnout("PASw35", self, n, addr, [])
+			self.rr.AddTurnout("PASw37", self, n, addr, [])
+
+			# Inputs
+			self.rr.AddTurnoutPosition("PASw27", self, n, addr, [(0, 0), (0, 1)])
+			self.rr.AddTurnoutPosition("PASw29", self, n, addr, [(0, 2), (0, 3)])
+			self.rr.AddTurnoutPosition("PASw31", self, n, addr, [(0, 4), (0, 5)])
+			self.rr.AddTurnoutPosition("PASw33", self, n, addr, [(0, 6), (0, 7)])
+			self.rr.AddTurnoutPosition("PASw35", self, n, addr, [(1, 0), (1, 1)])
+			self.rr.AddTurnoutPosition("PASw37", self, n, addr, [(1, 2), (1, 3)])
+			
+			self.rr.AddBlock("P20",    self, n, addr, [(1, 4)])
+			self.rr.AddBlock("P20.E",  self, n, addr, [(1, 5)])
+			self.rr.AddBlock("P30.W",  self, n, addr, [(1, 6)])
+			self.rr.AddBlock("P30",    self, n, addr, [(1, 7)])				
+			self.rr.AddBlock("P30.E",  self, n, addr, [(2, 0)])
+			self.rr.AddBlock("POSPJ1", self, n, addr, [(2, 1)])
+			self.rr.AddBlock("POSPJ2", self, n, addr, [(2, 2)])
+			sbw = self.rr.AddBlock("P50.W",  self, n, addr, [(2, 3)])
+			b = self.rr.AddBlock("P50",    self, n, addr, [(2, 4)])
+			sbe = self.rr.AddBlock("P50.E",  self, n, addr, [(2, 5)])
+			b.AddStoppingBlocks([sbe, sbw])
+			
+			sbw = self.rr.AddBlock("P11.W",  self, n, addr, [(2, 6)])
+			b = self.rr.AddBlock("P11",    self, n, addr, [(2, 7)])
+			sbe = self.rr.AddBlock("P11.E",  self, n, addr, [(3, 0)])
+			b.AddStoppingBlocks([sbe, sbw])
+
+		addr = PORTB
+		with self.nodes[PORTB] as n:
+			#outputs
+			self.rr.AddSignal("PB2R",  self, n, addr, [(0, 0), (0, 1), (0, 2)])
+			self.rr.AddSignal("PB4R",  self, n, addr, [(0, 3), (0, 4), (0, 5)])
+			self.rr.AddSignal("PB2L",  self, n, addr, [(0, 6), (0, 7), (1, 0)])
+			self.rr.AddSignal("PB4L",  self, n, addr, [(1, 1), (1, 2), (1, 3)])
+			self.rr.AddSignal("PB12L", self, n, addr, [(1, 4), (1, 5), (1, 6)])
+			self.rr.AddSignal("PB14L", self, n, addr, [(1, 7), (2, 0), (2, 1)])
+			self.rr.AddSignal("PB12R", self, n, addr, [(2, 2), (2, 3), (2, 4)])
+			self.rr.AddSignal("PB14R", self, n, addr, [(2, 5), (2, 6), (2, 7)])
+
+			self.rr.AddSignalLED("PB2",  self, n, addr, [(3, 0), (3, 1), (3, 2)])
+			self.rr.AddSignalLED("PB4",  self, n, addr, [(3, 3), (3, 4), (3, 5)])
+
+			self.rr.AddHandswitchInd("PBSw5",  self, n, addr, [(3, 6), (3, 7)])
+
+			self.rr.AddSignalLED("PB12",  self, n, addr, [(4, 0), (4, 1), (4, 2)])
+			self.rr.AddSignalLED("PB14",  self, n, addr, [(4, 3), (4, 4), (4, 5)])
+
+			self.rr.AddHandswitchInd("PBSw15ab",  self, n, addr, [(4, 6), (4, 7)])
+			
+			self.rr.AddBlockInd("P30", self, n, addr, [(5, 0)])
+			self.rr.AddBlockInd("P42", self, n, addr, [(5, 1)])
+			
+			self.rr.AddBreakerInd("CBSouthJct",  self, n, addr, [(5, 4)])
+			self.rr.AddBreakerInd("CBCircusJct", self, n, addr, [(5, 5)])
+
+			self.rr.AddTurnoutLock("PBSw1", self, n, addr, [(5, 6)])
+			self.rr.AddTurnoutLock("PBSw3", self, n, addr, [(5, 7)])
+
+			self.rr.AddHandswitchInd("PBSw5", self, n, addr, [(6, 0)])
+			
+			self.rr.AddTurnoutLock("PBSw11", self, n, addr, [(6, 1)])
+			self.rr.AddTurnoutLock("PBSw13", self, n, addr, [(6, 2)])
+	
+			self.rr.AddHandswitchInd("PBSw15ab",  self, n, addr, [(6, 3)])
+			
+			self.rr.AddStopRelay("P32.srel", self, n, addr, [(6, 4)])
+			self.rr.AddStopRelay("P41.srel", self, n, addr, [(6, 5)])
+	
+			# virtual turnouts - we do not control these, so no output bits
+			self.rr.AddTurnout("PBSw1",  self, n, addr, [])
+			self.rr.AddTurnout("PBSw3",  self, n, addr, [])
+			self.rr.AddTurnout("PBSw11", self, n, addr, [])
+			self.rr.AddTurnout("PBSw13", self, n, addr, [])
+
+			# Inputs
+			self.rr.AddTurnoutPosition("PBSw1",  self, n, addr, [(0, 0), (0, 1)])
+			self.rr.AddTurnoutPosition("PBSw3",  self, n, addr, [(0, 2), (0, 3)])
+			self.rr.AddTurnoutPosition("PBSw11", self, n, addr, [(0, 4), (0, 5)])
+			self.rr.AddTurnoutPosition("PBSw13", self, n, addr, [(0, 6), (0, 7)])
+	
+			self.rr.AddHandswitch("PBSw5",   self, n, addr, [(1, 0), (1, 1)])
+			self.rr.AddHandswitch("PBSw15a", self, n, addr, [(1, 2), (1, 3)])
+			self.rr.AddHandswitch("PBSw15b", self, n, addr, [(1, 4), (1, 5)])
+
+			b = self.rr.AddBlock("P40",    self, n, addr, [(1, 6)])	
+			sbe = self.rr.AddBlock("P40.E",  self, n, addr, [(1, 7)])	
+			b.AddStoppingBlocks([sbe])
+
+			self.rr.AddBlock("POSSJ2", self, n, addr, [(2, 0)])	
+			self.rr.AddBlock("POSSJ1", self, n, addr, [(2, 1)])	
+			self.rr.AddBlock("P31.W",  self, n, addr, [(2, 2)])	
+			self.rr.AddBlock("P31",    self, n, addr, [(2, 3)])	
+			self.rr.AddBlock("P31.E",  self, n, addr, [(2, 4)])	
+			sbw = self.rr.AddBlock("P32.W",  self, n, addr, [(2, 5)])	
+			b = self.rr.AddBlock("P32",    self, n, addr, [(2, 6)])	
+			sbe = self.rr.AddBlock("P32.E",  self, n, addr, [(2, 7)])	
+			b.AddStoppingBlocks([sbe, sbw])
+			self.rr.AddBlock("POSCJ2", self, n, addr, [(3, 0)])	
+			self.rr.AddBlock("POSCJ1", self, n, addr, [(3, 1)])	
+			self.rr.AddBlock("P41.W",  self, n, addr, [(3, 2)])	
+			self.rr.AddBlock("P41",    self, n, addr, [(3, 3)])	
+			self.rr.AddBlock("P41.E",  self, n, addr, [(3, 4)])	
+				
+				
+			self.rr.AddSignalLever("PB2",  self, n, addr, [(3, 5), (3, 6), (3, 7)])
+			self.rr.AddSignalLever("PB4",  self, n, addr, [(4, 0), (4, 1), (4, 2)])
+				
+			self.rr.AddHandswitchUnlock("PBSw5",    self, n, addr, [(4, 3)])
+				
+			self.rr.AddSignalLever("PB12",  self, n, addr, [(4, 4), (4, 5), (4, 6)])
+			self.rr.AddSignalLever("PB14",  self, n, addr, [(4, 7), (5, 0), (5, 1)])
+				
+			self.rr.AddHandswitchUnlock("PBSw15ab",    self, n, addr, [(5, 2)])
+
+	def SetAspect(self, sig, aspect):
+		print("port set aspect for signal %s" % sig.Name())
+		sig.SetAspect(aspect)		
+		if sig.Name() == "PA4L":
+			pb4La = aspect != 0 # clear
+			pb4Lb = aspect == 4 # restricting
+			for od, flag in [(self.rr.GetOutputDevice("P40.clrw"), pb4La), (self.rr.GetOutputDevice("P40.rstw"), pb4Lb)]:
+				if od.SetOn(flag):
+					bt = od.Bits()
+					self.nodes[PORTA].SetOutputBit(bt[0], bt[1], 1 if flag else 0)
+			print("set semaphore P4 flags to %s %s" % (pb4La, pb4Lb))
+			return True
+		elif sig.Name() == "PA10L":
+			pb10La = aspect != 0 # clear
+			pb10Lb = aspect == 4 # restricting
+			for od, flag in [(self.rr.GetOutputDevice("P10.clrw"), pb10La), (self.rr.GetOutputDevice("P10.rstw"), pb10Lb)]:
+				if od.SetOn(flag):
+					bt = od.Bits()
+					self.nodes[PORTA].SetOutputBit(bt[0], bt[1], 1 if flag else 0)
+			print("set semaphore P10 flags to %s %s" % (pb10La, pb10Lb))
+			return True
+		
+		return False
+	
+	def VerifyAspect(self, signame, aspect):
+		if signame in [ "PA4RA", "PA4RB", "PA6R", "PA8R", "PA10RA", "PA10RB", "PA12R" ]:
+			if aspect > 4:
+				return aspect-4
+			elif aspect == 4:
+				return 0b10
+			else:
+				return aspect
+			
+		return aspect
+
 
 	def OutIn(self):
-		optOssLocks = self.rr.GetControlOption("osslocks")
-		paRelease = self.rr.GetInput("parelease").GetState()
-		pbRelease = self.rr.GetInput("pbrelease").GetState()
-		
-		setASwitchLocks = optOssLocks == 1 and paRelease == 0
-		setBSwitchLocks = optOssLocks == 1 and pbRelease == 0
+		rlReqA = self.nodes[PORTA].GetInputBit(7, 3) == 1
+		rlReqB = self.nodes[PORTB].GetInputBit(5, 3) == 1
+		ossLocks = self.rr.GetControlOption("osslocks") == 1
 
-		P40M = self.rr.GetInput("P40").GetValue() != 0
-		P40E = self.rr.GetInput("P40.E").GetValue() != 0
+		# release controls if requested by operator or if osslocks are turned off by dispatcher			
+		self.releasedA = rlReqA or not ossLocks
+		self.releasedB = rlReqB or not ossLocks
+
+		P40M = self.rr.GetBlock("P40").IsOccupied()
+		P40E = self.rr.GetBlock("P40.E").IsOccupied()
 		if P40M and not self.PBE:
 			self.PBW = True
 		if P40E and not self.PBW:
@@ -76,541 +345,70 @@ class Port(District):
 		if not P40M and not P40E:
 			self.PBE = self.PBW = False
 		PBXO = (P40E and self.PBE) or (P40M and self.PBW)
-
-		# Port A
-		#
-		# Southport
-		outbc = 9
-		outb = [0 for _ in range(outbc)]
-		asp = self.rr.GetOutput("PA12R").GetAspectBits(2)
-		outb[0] = setBit(outb[0], 0, asp[0])  # signals
-		outb[0] = setBit(outb[0], 1, asp[1])
-		asp = self.rr.GetOutput("PA10RA").GetAspectBits(2)
-		outb[0] = setBit(outb[0], 2, asp[0])
-		outb[0] = setBit(outb[0], 3, asp[1])
-		asp = self.rr.GetOutput("PA12LA").GetAspectBits(1)
-		outb[0] = setBit(outb[0], 4, asp[0])
-		asp = self.rr.GetOutput("PA10RB").GetAspectBits(2)
-		outb[0] = setBit(outb[0], 5, asp[0])
-		outb[0] = setBit(outb[0], 6, asp[1])
-		asp = self.rr.GetOutput("PA8R").GetAspectBits(2)
-		outb[0] = setBit(outb[0], 7, asp[0])
-
-		outb[1] = setBit(outb[1], 0, asp[1])
-		asp = self.rr.GetOutput("PA12LB").GetAspectBits(1)
-		outb[1] = setBit(outb[1], 1, asp[0])
-		asp = self.rr.GetOutput("PA6R").GetAspectBits(2)
-		outb[1] = setBit(outb[1], 2, asp[0])
-		outb[1] = setBit(outb[1], 3, asp[1])
-		asp = self.rr.GetOutput("PA4RA").GetAspectBits(2)
-		outb[1] = setBit(outb[1], 4, asp[0])
-		outb[1] = setBit(outb[1], 5, asp[1])
-		asp = self.rr.GetOutput("PA12LC").GetAspectBits(1)
-		outb[1] = setBit(outb[1], 6, asp[0])
-		asp = self.rr.GetOutput("PA4RB").GetAspectBits(2)
-		outb[1] = setBit(outb[1], 7, asp[0])
-
-		outb[2] = setBit(outb[2], 0, asp[1])
-		asp = self.rr.GetOutput("PA8L").GetAspectBits(1)
-		outb[2] = setBit(outb[2], 1, asp[0])
-		asp = self.rr.GetOutput("PA6LA").GetAspectBits(1)
-		outb[2] = setBit(outb[2], 2, asp[0])
-		asp = self.rr.GetOutput("PA6LB").GetAspectBits(1)
-		outb[2] = setBit(outb[2], 3, asp[0])
-		asp = self.rr.GetOutput("PA6LC").GetAspectBits(1)
-		outb[2] = setBit(outb[2], 4, asp[0])
-		inp = self.rr.GetInput("P10")
-		clr10w = inp.GetClear() and not inp.GetEast()
-		outb[2] = setBit(outb[2], 5, 1 if clr10w else 0)  # semaphore signal
-		outb[2] = setBit(outb[2], 6, 1 if clr10w else 0)  # should be using RstrW
-		st = self.rr.GetInput("PA4.lvr").GetState()   # Signal indicators
-		outb[2] = setBit(outb[2], 7, 1 if st == "L" else 0)
-
-		outb[3] = setBit(outb[3], 0, 1 if st == "N" else 0)
-		outb[3] = setBit(outb[3], 1, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PA6.lvr").GetState()
-		outb[3] = setBit(outb[3], 2, 1 if st == "L" else 0)
-		outb[3] = setBit(outb[3], 3, 1 if st == "N" else 0)
-		outb[3] = setBit(outb[3], 4, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PA8.lvr").GetState()
-		outb[3] = setBit(outb[3], 5, 1 if st == "L" else 0)
-		outb[3] = setBit(outb[3], 6, 1 if st == "N" else 0)
-		outb[3] = setBit(outb[3], 7, 1 if st == "R" else 0)
-
-		st = self.rr.GetInput("PA10.lvr").GetState()
-		outb[4] = setBit(outb[4], 0, 1 if st == "L" else 0)
-		outb[4] = setBit(outb[4], 1, 1 if st == "N" else 0)
-		outb[4] = setBit(outb[4], 2, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PA12.lvr").GetState()
-		outb[4] = setBit(outb[4], 3, 1 if st == "L" else 0)
-		outb[4] = setBit(outb[4], 4, 1 if st == "N" else 0)
-		outb[4] = setBit(outb[4], 5, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PA32.lvr").GetState()
-		outb[4] = setBit(outb[4], 6, 1 if st == "L" else 0)
-		outb[4] = setBit(outb[4], 7, 1 if st == "N" else 0)
-
-		outb[5] = setBit(outb[5], 0, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PA34.lvr").GetState()
-		outb[5] = setBit(outb[5], 1, 1 if st == "L" else 0)
-		outb[5] = setBit(outb[5], 2, 1 if st == "N" else 0)
-		outb[5] = setBit(outb[5], 3, 1 if st == "R" else 0)
-		outb[5] = setBit(outb[5], 4, self.rr.GetInput("P21").GetValue())  # Block indicators
-		outb[5] = setBit(outb[5], 5, self.rr.GetInput("P40").GetValue())
-		inp = self.rr.GetInput("P50")
-		clr50w = inp.GetClear() and not inp.GetEast()
-		outb[5] = setBit(outb[5], 6, 1 if clr50w else 0)  # Yard signal
-		inp = self.rr.GetInput("P11")
-		clr11e = inp.GetClear() and inp.GetEast()
-		outb[5] = setBit(outb[5], 7, 1 if clr11e else 0)  # latham signals
-
-		inp = self.rr.GetInput("P21")
-		clr21e = inp.GetClear() and inp.GetEast()
-		outb[6] = setBit(outb[6], 0, 1 if clr21e else 0)
-		outb[6] = setBit(outb[6], 1, self.rr.GetInput("CBParsonsJct").GetInvertedValue())  # Circuit breakers
-		outb[6] = setBit(outb[6], 2, self.rr.GetInput("CBSouthport").GetInvertedValue())
-		outb[6] = setBit(outb[6], 3, self.rr.GetInput("CBLavinYard").GetInvertedValue())
-		outb[6] = setBit(outb[6], 4, 1 if self.rr.GetSwitchLock("PASw1") and setASwitchLocks else 0)  # Switch Locks
-		outb[6] = setBit(outb[6], 5, 1 if self.rr.GetSwitchLock("PASw3") and setASwitchLocks else 0)
-		outb[6] = setBit(outb[6], 6, 1 if self.rr.GetSwitchLock("PASw5") and setASwitchLocks else 0)
-		outb[6] = setBit(outb[6], 7, 1 if self.rr.GetSwitchLock("PASw7") and setASwitchLocks else 0)
-
-		outb[7] = setBit(outb[7], 0, 1 if self.rr.GetSwitchLock("PASw9") and setASwitchLocks else 0)
-		outb[7] = setBit(outb[7], 1, 1 if self.rr.GetSwitchLock("PASw11") and setASwitchLocks else 0)  # also locks 13
-		outb[7] = setBit(outb[7], 2, 1 if self.rr.GetSwitchLock("PASw15") and setASwitchLocks else 0)  # also locks 17
-		outb[7] = setBit(outb[7], 3, 1 if self.rr.GetSwitchLock("PASw19") and setASwitchLocks else 0)
-		outb[7] = setBit(outb[7], 4, 1 if self.rr.GetSwitchLock("PASw21") and setASwitchLocks else 0)
-		outb[7] = setBit(outb[7], 5, 1 if self.rr.GetSwitchLock("PASw23") and setASwitchLocks else 0)
-		outb[7] = setBit(outb[7], 6, 1 if self.rr.GetSwitchLock("PASw31") and setASwitchLocks else 0)  # also locks 27 and 29
-		outb[7] = setBit(outb[7], 7, 1 if self.rr.GetSwitchLock("PASw33") and setASwitchLocks else 0)
-
-		outb[8] = setBit(outb[8], 0, 1 if self.rr.GetSwitchLock("PASw35") and setASwitchLocks else 0)
-		outb[8] = setBit(outb[8], 1, 1 if self.rr.GetSwitchLock("PASw37") and setASwitchLocks else 0)
-		outb[8] = setBit(outb[8], 2, self.rr.GetOutput("P10.srel").GetStatus())	      # Stop relays
-		outb[8] = setBit(outb[8], 2, self.rr.GetOutput("P40.srel").GetStatus())
-		outb[8] = setBit(outb[8], 2, self.rr.GetOutput("P31.srel").GetStatus())
-		inp = self.rr.GetInput("P40")
-		clr40w = inp.GetClear() and not inp.GetEast()
-		outb[8] = setBit(outb[8], 5, 1 if clr40w else 0)  # semaphore signal
-		outb[8] = setBit(outb[8], 6, 1 if clr40w else 0)  # should be using RstrW
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Port A: Output bytes: %s" % otext)
-
-		inbc = outbc			
-		if self.settings.simulation:
-			itext = None
-		else:
-			inb = self.rrBus.sendRecv(PORTA, outb, outbc)
-			if inb is None:
-				itext = "Read Error"
-			else:
-				itext = formatIText(inb, inbc)
-				#logging.debug("Port A: Input Bytes: %s" % itext)
-	
-				ip = self.rr.GetInput("PASw1")  # Switch positions
-				nb = getBit(inb[0], 0)
-				rb = getBit(inb[0], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw3")
-				nb = getBit(inb[0], 2)
-				rb = getBit(inb[0], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw5")
-				nb = getBit(inb[0], 4)
-				rb = getBit(inb[0], 5)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw7")
-				nb = getBit(inb[0], 6)
-				rb = getBit(inb[0], 7)
-				ip.SetTOState(nb, rb)
-	
-				ip = self.rr.GetInput("PASw9")
-				nb = getBit(inb[1], 0)
-				rb = getBit(inb[1], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw11")
-				nb = getBit(inb[1], 2)
-				rb = getBit(inb[1], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw13")
-				nb = getBit(inb[1], 4)
-				rb = getBit(inb[1], 5)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw15")
-				nb = getBit(inb[1], 6)
-				rb = getBit(inb[1], 7)
-				ip.SetTOState(nb, rb)
-	
-				ip = self.rr.GetInput("PASw17")
-				nb = getBit(inb[2], 0)
-				rb = getBit(inb[2], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw19")
-				nb = getBit(inb[2], 2)
-				rb = getBit(inb[2], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw21")
-				nb = getBit(inb[2], 4)
-				rb = getBit(inb[2], 5)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw23")
-				nb = getBit(inb[2], 6)
-				rb = getBit(inb[2], 7)
-				ip.SetTOState(nb, rb)
-	
-				ip = self.rr.GetInput("P1")
-				ip.SetValue(getBit(inb[3], 0))   # detection
-				ip = self.rr.GetInput("P2")
-				ip.SetValue(getBit(inb[3], 1))
-				ip = self.rr.GetInput("P3")
-				ip.SetValue(getBit(inb[3], 2))
-				ip = self.rr.GetInput("P4")
-				ip.SetValue(getBit(inb[3], 3))
-				ip = self.rr.GetInput("P5")
-				ip.SetValue(getBit(inb[3], 4))
-				ip = self.rr.GetInput("P6")
-				ip.SetValue(getBit(inb[3], 5))
-				ip = self.rr.GetInput("P7")
-				ip.SetValue(getBit(inb[3], 6))
-				ip = self.rr.GetInput("POSSP1")
-				ip.SetValue(getBit(inb[3], 7))  # PAOS1
-	
-				ip = self.rr.GetInput("POSSP2")
-				ip.SetValue(getBit(inb[4], 0))  # PAOS2
-				ip = self.rr.GetInput("POSSP3")
-				ip.SetValue(getBit(inb[4], 1))  # PAOS3
-				ip = self.rr.GetInput("POSSP4")
-				ip.SetValue(getBit(inb[4], 2))  # PAOS4
-				ip = self.rr.GetInput("POSSP5")
-				ip.SetValue(getBit(inb[4], 3))  # PAOS5
-				ip = self.rr.GetInput("P10")
-				ip.SetValue(getBit(inb[4], 4))
-				ip = self.rr.GetInput("P10.E")
-				ip.SetValue(getBit(inb[4], 5))
-	
-				lvrR = getBit(inb[4], 6)       # signal levers
-				lvrCallOn = getBit(inb[4], 7)
-	
-				lvrL = getBit(inb[5], 0)
-				self.rr.GetInput("PA4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[5], 1)
-				lvrCallOn = getBit(inb[5], 2)
-				lvrL = getBit(inb[5], 3)
-				self.rr.GetInput("PA6.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[5], 4)
-				lvrCallOn = getBit(inb[5], 5)
-				lvrL = getBit(inb[5], 6)
-				self.rr.GetInput("PA8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[5], 7)
-	
-				lvrCallOn = getBit(inb[6], 0)
-				lvrL = getBit(inb[6], 1)
-				self.rr.GetInput("PA10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[6], 2)
-				lvrCallOn = getBit(inb[6], 3)
-				lvrL = getBit(inb[6], 4)
-				self.rr.GetInput("PA12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[6], 5)
-				lvrCallOn = getBit(inb[6], 6)
-				lvrL = getBit(inb[6], 7)
-				self.rr.GetInput("PA32.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-	
-				lvrR = getBit(inb[7], 0)
-				lvrCallOn = getBit(inb[7], 1)
-				lvrL = getBit(inb[7], 2)
-				self.rr.GetInput("PA34.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				release = getBit(inb[7], 3)
-				self.rr.GetInput("parelease").SetState(release)  # Port A Release switch
+		if PBXO != self.PBXO:
+			self.PBXO = PBXO
+			self.nodes[PORTB].SetOutputBit(6, 6, 1 if PBXO else 0)
 		
-		if self.sendIO:
-			self.rr.ShowText("PrtA", PORTA, otext, itext, 0, 3)
-
-		# Parsons Junction
-		outbc = 4
-		outb = [0 for _ in range(outbc)]
-		asp = self.rr.GetOutput("PA34LB").GetAspectBits(3)
-		outb[0] = setBit(outb[0], 0, asp[0])  # westward signals
-		outb[0] = setBit(outb[0], 1, asp[1])
-		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("PA32L").GetAspectBits(1)
-		outb[0] = setBit(outb[0], 3, asp[0])
-		asp = self.rr.GetOutput("PA34LA").GetAspectBits(3)
-		outb[0] = setBit(outb[0], 4, asp[0])
-		outb[0] = setBit(outb[0], 5, asp[1])
-		outb[0] = setBit(outb[0], 6, asp[2])
-		asp = self.rr.GetOutput("PA34RD").GetAspectBits(3)
-		outb[0] = setBit(outb[0], 7, asp[0])  # eastward signals
-
-		outb[1] = setBit(outb[1], 0, asp[1])
-		outb[1] = setBit(outb[1], 1, asp[2])
-		asp = self.rr.GetOutput("PA34RC").GetAspectBits(1)
-		outb[1] = setBit(outb[1], 2, asp[0])  # eastward signals
-		asp = self.rr.GetOutput("PA32RA").GetAspectBits(3)
-		outb[1] = setBit(outb[1], 3, asp[0])
-		outb[1] = setBit(outb[1], 4, asp[1])
-		outb[1] = setBit(outb[1], 5, asp[2])
-		asp = self.rr.GetOutput("PA34RB").GetAspectBits(1)
-		outb[1] = setBit(outb[1], 6, asp[0])  # eastward signals
-		asp = self.rr.GetOutput("PA32RB").GetAspectBits(3)
-		outb[1] = setBit(outb[1], 7, asp[0])
-
-		outb[2] = setBit(outb[2], 0, asp[1])
-		outb[2] = setBit(outb[2], 1, asp[2])
-		asp = self.rr.GetOutput("PA34RA").GetAspectBits(1)
-		outb[2] = setBit(outb[2], 2, asp[0])  # eastward signals
-		outb[2] = setBit(outb[2], 3, self.rr.GetOutput("P20.srel").GetStatus())	      # Stop relays
-		outb[2] = setBit(outb[2], 4, self.rr.GetOutput("P30.srel").GetStatus())
-		outb[2] = setBit(outb[2], 5, self.rr.GetOutput("P50.srel").GetStatus())
-		outb[2] = setBit(outb[2], 6, self.rr.GetOutput("P11.srel").GetStatus())
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Parsons: Output bytes: %s" % otext)
-
-		inbc = outbc			
-		if self.settings.simulation:
-			itext = None
+		blk = self.rr.GetBlock("P50")
+		clr50w = blk.IsCleared() and not blk.IsEast()
+		if clr50w != self.clr50w:
+			self.clr50w = clr50w
+			self.nodes[PORTA].SetOutputBit(5, 6, 1 if clr50w else 0) # yard signal
+		
+		blk = self.rr.GetBlock("P11")
+		clr11e = blk.IsCleared() and blk.IsEast()
+		if clr11e != self.clr11e:
+			self.clr11e = clr11e
+			self.nodes[PORTA].SetOutputBit(5, 7, 1 if clr11e else 0) # latham signals
+		
+		blk = self.rr.GetBlock("P21")
+		clr21e = blk.IsCleared() and blk.IsEast()
+		if clr21e != self.clr21e:
+			self.clr21e = clr21e
+			self.nodes[PORTA].SetOutputBit(6, 0, 1 if clr21e else 0) 
+			
+		blk = self.rr.GetBlock("P32")
+		clr32w = blk.IsCleared() and not blk.IsEast()
+		if clr32w != self.clr32w:
+			self.clr32w = clr32w
+			self.nodes[PORTB].SetOutputBit(5, 2, 1 if clr32w else 0)
+		
+		blk = self.rr.GetBlock("P42")
+		clr42e = blk.IsCleared() and blk.IsEast()
+		if clr42e != self.clr42e:
+			self.clr42e = clr42e
+			self.nodes[PORTB].SetOutputBit(5, 3, 1 if clr42e else 0)
+		
+		self.rr.UpdateDistrictTurnoutLocksByNode(self.name, self.releasedA, [PORTA, PARSONS])
+		self.rr.UpdateDistrictTurnoutLocksByNode(self.name, self.releasedB, [PORTB])
+		
+		District.OutIn(self)
+		
+	def Released(self, tout):
+		addr = tout.address
+		if addr in [PORTA, PARSONS]:
+			return self.releasedA
 		else:
-			inb = self.rrBus.sendRecv(PARSONS, outb, outbc)
-			if inb is None:
-				itext = "Read Error"
-			else:
-				itext = formatIText(inb, inbc)
-				#logging.debug("Parsons: Input Bytes: %s" % itext)
-	
-				ip = self.rr.GetInput("PASw27")  # Switch positions
-				nb = getBit(inb[0], 0)
-				rb = getBit(inb[0], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw29")
-				nb = getBit(inb[0], 2)
-				rb = getBit(inb[0], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw31")
-				nb = getBit(inb[0], 4)
-				rb = getBit(inb[0], 5)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw33")
-				nb = getBit(inb[0], 6)
-				rb = getBit(inb[0], 7)
-				ip.SetTOState(nb, rb)
-	
-				ip = self.rr.GetInput("PASw35")
-				nb = getBit(inb[1], 0)
-				rb = getBit(inb[1], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("PASw37")
-				nb = getBit(inb[1], 2)
-				rb = getBit(inb[1], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("P20")
-				ip.SetValue(getBit(inb[1], 4))   # detection
-				ip = self.rr.GetInput("P20.E")
-				ip.SetValue(getBit(inb[1], 5))
-				ip = self.rr.GetInput("P30.W")
-				ip.SetValue(getBit(inb[1], 6))
-				ip = self.rr.GetInput("P30")
-				ip.SetValue(getBit(inb[1], 7))
-	
-				ip = self.rr.GetInput("P30.E")
-				ip.SetValue(getBit(inb[2], 0))
-				ip = self.rr.GetInput("POSPJ1")  # PJOS1
-				ip.SetValue(getBit(inb[2], 1))
-				ip = self.rr.GetInput("POSPJ2")  # PJOS2
-				ip.SetValue(getBit(inb[2], 2))
-				ip = self.rr.GetInput("P50.W")
-				ip.SetValue(getBit(inb[2], 3))
-				ip = self.rr.GetInput("P50")
-				ip.SetValue(getBit(inb[2], 4))
-				ip = self.rr.GetInput("P50.E")
-				ip.SetValue(getBit(inb[2], 5))
-				ip = self.rr.GetInput("P11.W")
-				ip.SetValue(getBit(inb[2], 6))
-				ip = self.rr.GetInput("P11")
-				ip.SetValue(getBit(inb[2], 7))
-	
-				ip = self.rr.GetInput("P11.E")
-				ip.SetValue(getBit(inb[3], 0))
+			return self.releasedB
+
+	def SetHandswitchIn(self, hs, state):
+		hsname = hs.Name()
+		if hsname == "PBSw15ab":
+			hsa = self.rr.GetHandswitch("PBSw15a")
+			if hsa.Lock(state != 0):
+				self.rr.RailroadEvent(hsa.GetEventMessage(lock=True))
 				
-		if self.sendIO:
-			self.rr.ShowText("PJct", PARSONS, otext, itext, 1, 3)
+			hsb = self.rr.GetHandswitch("PBSw15b")
+			if hsb.Lock(state != 0):
+				self.rr.RailroadEvent(hsb.GetEventMessage(lock=True))
 
-		#  Port B
-		outbc = 7
-		outb = [0 for _ in range(outbc)]
-		asp = self.rr.GetOutput("PB2R").GetAspectBits(3)
-		outb[0] = setBit(outb[0], 0, asp[0])  # South Jct Eastward signals
-		outb[0] = setBit(outb[0], 1, asp[1])
-		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("PB4R").GetAspectBits(3)
-		outb[0] = setBit(outb[0], 3, asp[0])
-		outb[0] = setBit(outb[0], 4, asp[1])
-		outb[0] = setBit(outb[0], 5, asp[2])
-		asp = self.rr.GetOutput("PB2L").GetAspectBits(3)
-		outb[0] = setBit(outb[0], 6, asp[0])  # South Jct Westward signals
-		outb[0] = setBit(outb[0], 7, asp[1])
-
-		outb[1] = setBit(outb[1], 0, asp[2])
-		asp = self.rr.GetOutput("PB4L").GetAspectBits(3)
-		outb[1] = setBit(outb[1], 1, asp[0])
-		outb[1] = setBit(outb[1], 2, asp[1])
-		outb[1] = setBit(outb[1], 3, asp[2])
-		asp = self.rr.GetOutput("PB12L").GetAspectBits(3)
-		outb[1] = setBit(outb[1], 4, asp[0])  # Circus Jct Eastward signals
-		outb[1] = setBit(outb[1], 5, asp[1])
-		outb[1] = setBit(outb[1], 6, asp[2])
-		asp = self.rr.GetOutput("PB14L").GetAspectBits(3)
-		outb[1] = setBit(outb[1], 7, asp[0])
-
-		outb[2] = setBit(outb[2], 0, asp[1])
-		outb[2] = setBit(outb[2], 1, asp[2])
-		asp = self.rr.GetOutput("PB12R").GetAspectBits(3)
-		outb[2] = setBit(outb[2], 2, asp[0])  # Circus Jct Westward signals
-		outb[2] = setBit(outb[2], 3, asp[1])
-		outb[2] = setBit(outb[2], 4, asp[2])
-		asp = self.rr.GetOutput("PB14R").GetAspectBits(3)
-		outb[2] = setBit(outb[2], 5, asp[0])
-		outb[2] = setBit(outb[2], 6, asp[1])
-		outb[2] = setBit(outb[2], 7, asp[2])
-
-		st = self.rr.GetInput("PB2.lvr").GetState()
-		outb[3] = setBit(outb[3], 0, 1 if st == "L" else 0)  # Signal indicators
-		outb[3] = setBit(outb[3], 1, 1 if st == "N" else 0)
-		outb[3] = setBit(outb[3], 2, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PB4.lvr").GetState()
-		outb[3] = setBit(outb[3], 3, 1 if st == "L" else 0)
-		outb[3] = setBit(outb[3], 4, 1 if st == "N" else 0)
-		outb[3] = setBit(outb[3], 5, 1 if st == "R" else 0)
-		psw5 = self.rr.GetInput("PBSw5.lvr").GetState()  # Hand switch unlock indicators
-		outb[3] = setBit(outb[3], 6, 0 if psw5 != 0 else 1)
-		outb[3] = setBit(outb[3], 7, 0 if psw5 == 0 else 1)
-
-		st = self.rr.GetInput("PB12.lvr").GetState()
-		outb[4] = setBit(outb[4], 0, 1 if st == "L" else 0)  # Signal indicators
-		outb[4] = setBit(outb[4], 1, 1 if st == "N" else 0)
-		outb[4] = setBit(outb[4], 2, 1 if st == "R" else 0)
-		st = self.rr.GetInput("PB14.lvr").GetState()
-		outb[4] = setBit(outb[4], 3, 1 if st == "L" else 0)
-		outb[4] = setBit(outb[4], 4, 1 if st == "N" else 0)
-		outb[4] = setBit(outb[4], 5, 1 if st == "R" else 0)
-		psw15 = self.rr.GetInput("PBSw15a.lvr").GetState() + self.rr.GetInput("PBSw15b.lvr").GetState()
-		outb[4] = setBit(outb[4], 6, 0 if psw15 != 0 else 1)  # hand switch unlocks
-		outb[4] = setBit(outb[4], 7, 0 if psw15 == 0 else 1)
-
-		outb[5] = setBit(outb[5], 0, self.rr.GetInput("P30").GetValue())
-		outb[5] = setBit(outb[5], 1, self.rr.GetInput("P42").GetValue())
-		inp = self.rr.GetInput("P32")
-		clr32w = inp.GetClear() and not inp.GetEast()
-		outb[5] = setBit(outb[5], 2, 1 if clr32w else 0)  # Shore signal
-		inp = self.rr.GetInput("P42")
-		clr42e = inp.GetClear() and inp.GetEast()
-		outb[5] = setBit(outb[5], 3, 1 if clr42e else 0)  # Hyde Jct signal
-		outb[5] = setBit(outb[5], 4, self.rr.GetInput("CBSouthJct").GetInvertedValue())  # Circuit breakers
-		outb[5] = setBit(outb[5], 5, self.rr.GetInput("CBCircusJct").GetInvertedValue())
-		outb[5] = setBit(outb[5], 6, 1 if self.rr.GetSwitchLock("PBSw1") and setBSwitchLocks else 0)  # Switch Locks
-		outb[5] = setBit(outb[5], 7, 1 if self.rr.GetSwitchLock("PBSw3") and setBSwitchLocks else 0)
-
-		outb[6] = setBit(outb[6], 0, 0 if self.rr.GetOutput("PBSw5.hand").GetStatus() != 0 else 1)
-		outb[6] = setBit(outb[6], 1, 1 if self.rr.GetSwitchLock("PBSw11") and setBSwitchLocks else 0)
-		outb[6] = setBit(outb[6], 2, 1 if self.rr.GetSwitchLock("PBSw13") and setBSwitchLocks else 0)
-		outb[6] = setBit(outb[6], 3, 0 if psw15 != 0 else 1)  # hand switch unlock
-		outb[6] = setBit(outb[6], 4, self.rr.GetOutput("P32.srel").GetStatus())	      # Stop relays
-		outb[6] = setBit(outb[6], 5, self.rr.GetOutput("P41.srel").GetStatus())
-		outb[6] = setBit(outb[6], 6, 1 if PBXO else 0)  # Crossing signal
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Port  B: Output bytes: %s" % otext)
-	
-		inbc = outbc		
-		if self.settings.simulation:
-			itext = None
-		else:
-			inb = self.rrBus.sendRecv(PORTB, outb, outbc)
-			if inb is None:
-				itext = "Read Error"
-			else:
-				itext = formatIText(inb, inbc)
-				#logging.debug("Port B: Input Bytes: %s" % itext)
-	
-				nb = getBit(inb[0], 0)  # Switch Positions
-				rb = getBit(inb[0], 1)
-				self.rr.GetInput("PBSw1").SetTOState(nb, rb)
-				nb = getBit(inb[0], 2)
-				rb = getBit(inb[0], 3)
-				self.rr.GetInput("PBSw3").SetTOState(nb, rb)
-				nb = getBit(inb[0], 4)
-				rb = getBit(inb[0], 5)
-				self.rr.GetInput("PBSw11").SetTOState(nb, rb)
-				nb = getBit(inb[0], 6)
-				rb = getBit(inb[0], 7)
-				self.rr.GetInput("PBSw13").SetTOState(nb, rb)
-	
-				nb = getBit(inb[1], 0)
-				rb = getBit(inb[1], 1)
-				self.rr.GetInput("PBSw5").SetTOState(nb, rb)
-				nb = getBit(inb[1], 2)
-				rb = getBit(inb[1], 3)
-				self.rr.GetInput("PBSw15a").SetTOState(nb, rb)
-				nb = getBit(inb[1], 4)
-				rb = getBit(inb[1], 5)
-				self.rr.GetInput("PBSw15b").SetTOState(nb, rb)
-				ip = self.rr.GetInput("P40")    # South Jct Detection
-				ip.SetValue(getBit(inb[1], 6))
-				ip = self.rr.GetInput("P40.E")
-				ip.SetValue(getBit(inb[1], 7))
-	
-				ip = self.rr.GetInput("POSSJ2")  # PBOS1
-				ip.SetValue(getBit(inb[2], 0))
-				ip = self.rr.GetInput("POSSJ1")  # PBOS2
-				ip.SetValue(getBit(inb[2], 1))
-				ip = self.rr.GetInput("P31.W")
-				ip.SetValue(getBit(inb[2], 2))
-				ip = self.rr.GetInput("P31")
-				ip.SetValue(getBit(inb[2], 3))
-				ip = self.rr.GetInput("P31.E")
-				ip.SetValue(getBit(inb[2], 4))
-				ip = self.rr.GetInput("P32.W")  # Circus Jct Detection
-				ip.SetValue(getBit(inb[2], 5))
-				ip = self.rr.GetInput("P32")
-				ip.SetValue(getBit(inb[2], 6))
-				ip = self.rr.GetInput("P32.E")
-				ip.SetValue(getBit(inb[2], 7))
-	
-				ip = self.rr.GetInput("POSCJ2")  # PBOS3
-				ip.SetValue(getBit(inb[3], 0))
-				ip = self.rr.GetInput("POSCJ1")  # PBOS4
-				ip.SetValue(getBit(inb[3], 1))
-				ip = self.rr.GetInput("P41.W")
-				ip.SetValue(getBit(inb[3], 2))
-				ip = self.rr.GetInput("P41")
-				ip.SetValue(getBit(inb[3], 3))
-				ip = self.rr.GetInput("P41.E")
-				ip.SetValue(getBit(inb[3], 4))
-				lvrR = getBit(inb[3], 5)       # signal levers
-				lvrCallOn = getBit(inb[3], 6)
-				lvrL = getBit(inb[3], 7)
-				self.rr.GetInput("PB2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-	
-				lvrR = getBit(inb[4], 0)
-				lvrCallOn = getBit(inb[4], 1)
-				lvrL = getBit(inb[4], 2)
-				self.rr.GetInput("PB4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				self.rr.GetInput("PBSw5.lvr").SetState(getBit(inb[4], 3))  # handswitch unlocking
-				lvrR = getBit(inb[4], 4)
-				lvrCallOn = getBit(inb[4], 5)
-				lvrL = getBit(inb[4], 6)
-				self.rr.GetInput("PB12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[4], 7)
-	
-				lvrCallOn = getBit(inb[5], 0)
-				lvrL = getBit(inb[5], 1)
-				self.rr.GetInput("PB14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				st = getBit(inb[5], 2)
-				self.rr.GetInput("PBSw15a.lvr").SetState(st)
-				self.rr.GetInput("PBSw15b.lvr").SetState(st)
-				release = getBit(inb[5], 3)
-				self.rr.GetInput("pbrelease").SetState(release)  # Port B Release switch
-				
-		if self.sendIO:
-			self.rr.ShowText("PrtB", PORTB, otext, itext, 2, 3)
-
+	def SetHandswitch(self, hsname, state):
+		if hsname in ["PBSw15a", "PBSw15b"]:
+			hsa = self.rr.GetHandswitch("PBSw15a")
+			hsb = self.rr.GetHandswitch("PSw15b")
+			locked = hsa.IsLocked() or hsb.IsLocked()
+			
+			hs = self.rr.GetHandswitch("PBSw15ab")
+			if hs.Lock(locked):
+				hs.UpdateIndicators()
 

@@ -191,7 +191,7 @@ class MainFrame(wx.Frame):
 			"dir":  "config",
 			"main": "main.py",
 			"desc": "Configuration Tool",
-			"icon": "config.ico"
+			"icon": "config.ico",
 		}
 		self.GenShortcut(module, True)
 		

@@ -34,25 +34,25 @@ class SktServer (threading.Thread):
 			self.sendToOne(skt, addr, msg)
 			
 	def sendToOne(self, skt, addr, msg):
-		try:
-			m = json.dumps(msg).encode()
-		except:
 			try:
-				m = msg.encode()
+				m = json.dumps(msg).encode()
 			except:
-				m = msg
-		try:
-			nbytes = len(m).to_bytes(2, "little")
-			skt.send(nbytes)
-			skt.send(m)
-		except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
-			self.deleteSocket(addr)
+				try:
+					m = msg.encode()
+				except:
+					m = msg
+			try:
+				nbytes = len(m).to_bytes(2, "little")
+				skt.send(nbytes)
+				skt.send(m)
+			except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
+				self.deleteSocket(addr)
 
 	def deleteSocket(self, addr):
 		with self.socketLock:
 			for i in range(len(self.sockets)):
 				if self.sockets[i][1] == addr:
-					self.cbEvent({"cmd": ["delclient"], "addr": addr})
+					self.cbEvent({"delclient": {"addr": addr}})
 					self.sockets[i][0].close()
 					del(self.sockets[i])
 					return
@@ -76,7 +76,7 @@ class SktServer (threading.Thread):
 				skt, addr = s.accept()
 				with self.socketLock:
 					self.sockets.append((skt, addr))
-					self.cbEvent({"cmd": ["newclient"], "socket": skt, "addr": addr, "SID": self.sessionID})
+					self.cbEvent({"newclient": {"socket": skt, "addr": addr, "SID": self.sessionID}})
 				self.sessionID += 1
 			else:
 				pass #time.sleep(0.0001) # yield to other threads

@@ -4,10 +4,9 @@ from socketserver import ThreadingMixIn
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import json
+import html
 import os
 import logging
-
-import pprint
 
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
@@ -57,14 +56,12 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 		self.haltServer = True
 
 class HTTPServer:
-	def __init__(self, ip, port, cbCommand, main, railroad):
+	def __init__(self, ip, port, cbCommand):
 		self.server = ThreadingHTTPServer((ip, port), Handler)
 		self.server.setApp(self)
 		self.cbCommand = cbCommand
 		self.thread = Thread(target=self.server.serve_railroad)
 		self.thread.start()
-		self.main = main
-		self.rr = railroad
 
 	def getThread(self):
 		return self.thread
@@ -146,48 +143,6 @@ class HTTPServer:
 			logging.info("Returning %d bytes" % len(jstr))
 			return 200, jstr
 
-		elif verb == "getbits":
-			try:
-				address = int(cmd["address"][0], 16)
-				n, ob, ib = self.rr.GetNodeBits(address)
-				resp = {"count": n, "out": ob, "in": ib}
-				jstr = json.dumps(resp)
-				return 200, jstr
-			except Exception as e:
-				logging.info("Unknown error: %s" % str(e))
-				return 400, str(e)
-
-		elif verb == "setinbit":
-			try:
-				addr = int(cmd["address"][0], 16)
-				vbytes = [int(x) for x in cmd["byte"]]
-				vbits = [int(x) for x in cmd["bit"]]
-				vals = [int(x) for x in cmd["value"]]
-				self.rr.SetInputBitByAddr(addr, vbytes, vbits, vals)
-				return 200, "Command received"
-			except Exception as e:
-				logging.info("Unknown error: %s" % str(e))
-				return 400, str(e)
-				
-		elif verb == "activetrains":
-			tl = self.main.GetTrainList()
-			if tl is None:
-				logging.info("Unknown error")
-				return 400, "Unable to retrieve train list"
-			else:
-				jstr = json.dumps(tl)
-				return 200, jstr
-		
-				
-		elif verb == "sessions":
-			tl = self.main.GetSessions()
-			if tl is None:
-				logging.info("Unknown error")
-				return 400, "Unable to retrieve train list"
-			else:
-				jstr = json.dumps(tl)
-				return 200, jstr
-		
 		else:
 			self.cbCommand(cmd)
 		

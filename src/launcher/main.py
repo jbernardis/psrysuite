@@ -4,11 +4,14 @@ if cmdFolder not in sys.path:
     sys.path.insert(0, cmdFolder)
  
 
-from subprocess import Popen
-import time
+from subprocess import Popen, STARTUPINFO, STARTF_USESHOWWINDOW, DEVNULL
    
 from launcher.settings import Settings
-from launcher.rrserver import RRServer
+
+SW_MINIMIZE = 6
+infoMinimize = STARTUPINFO()
+infoMinimize.dwFlags = STARTF_USESHOWWINDOW
+infoMinimize.wShowWindow = SW_MINIMIZE
 
 np = len(sys.argv)
 
@@ -26,10 +29,8 @@ sys.stderr = efp
 
 settings = Settings()
 
-rrServer = RRServer()
-rrServer.SetServerAddress(settings.ipaddr, settings.serverport)
-
 interpreter = sys.executable.replace("python.exe", "pythonw.exe")
+interpfg    = sys.executable.replace("pythonw.exe", "python.exe")
  
 for i in range(len(sys.argv)):
     print("%d: %s" % (i, sys.argv[i]))
@@ -41,16 +42,8 @@ if mode == "remotedispatcher":
     settings.SetDispatcher(True)
     
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-    dispProc = Popen([sys.executable, dispExec])
+    dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
- 
-    dispActive = True   
-    while dispActive:
-        time.sleep(1)
-            
-        if dispActive and dispProc.poll() is not None:
-            print("Dispatcher has terminated")
-            dispActive = False
  
 elif mode == "dispatcher":
     print("Launch mode: dispatcher suite")
@@ -59,110 +52,58 @@ elif mode == "dispatcher":
     settings.SetDispatcher(True)
     
     svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
-    svrProc = Popen([sys.executable, svrExec])
+    svrProc = Popen([interpfg, svrExec], startupinfo=infoMinimize)
     print("server started as PID %d" % svrProc.pid)
     
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-    dispProc = Popen([sys.executable, dispExec])
+    dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
  
-    svrActive = True
-    dispActive = True   
-    while svrActive or dispActive:
-        time.sleep(1)
-        if svrActive and svrProc.poll() is not None:
-            print("Server has terminated")
-            svrActive = False
-            
-        if dispActive and dispProc.poll() is not None:
-            print("Dispatcher has terminated")
-            dispActive = False
-            rrServer.SendRequest( {"server": {"action": "show"}})    
-
 elif mode == "simulation":
     print("launch mode: simulation")
     settings.SetDispatcher(True)
     settings.SetSimulation(True)
     
     svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
-    svrProc = Popen([sys.executable, svrExec])
+    svrProc = Popen([interpfg, svrExec], startupinfo=infoMinimize)
     print("server started as PID %d" % svrProc.pid)
     
     simExec = os.path.join(os.getcwd(), "simulator", "main.py")
-    simProc = Popen([sys.executable, simExec])
+    simProc = Popen([interpreter, simExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("simulator started as PID %d" % simProc.pid)
     
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-    dispProc = Popen([sys.executable, dispExec])
+    dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
- 
-    svrActive = True
-    simActive = True
-    dispActive = True   
-    while svrActive or dispActive or simActive:
-        time.sleep(1)
-        if svrActive and svrProc.poll() is not None:
-            print("Server has terminated")
-            svrActive = False
-            
-        if simActive and simProc.poll() is not None:
-            print("Simulator has terminated")
-            simActive = False
-            
-        if dispActive and dispProc.poll() is not None:
-            print("Dispatcher has terminated")
-            dispActive = False
-            rrServer.SendRequest( {"server": {"action": "show"}})    
 
 elif mode == "display":
     print("launch mode: display")
     settings.SetDispatcher(False)
     
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-    dispProc = Popen([sys.executable, dispExec])
+    dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
- 
-    dispActive = True   
-    while dispActive:
-        time.sleep(1)
-            
-        if dispActive and dispProc.poll() is not None:
-            print("Dispatcher has terminated")
-            dispActive = False
             
 elif mode == "dispatcheronly":
     print("launch mode: dispatcher only")
     settings.SetDispatcher(True)
     
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-    dispProc = Popen([sys.executable, dispExec])
+    dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
- 
-    dispActive = True   
-    while dispActive:
-        time.sleep(1)
-            
-        if dispActive and dispProc.poll() is not None:
-            print("Dispatcher has terminated")
-            dispActive = False
-            
+             
 elif mode == "serveronly":
     print("launch mode: server only")
     settings.SetSimulation(False)
     
     svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
-    svrProc = Popen([sys.executable, svrExec])
+    svrProc = Popen([interpfg, svrExec], startupinfo=infoMinimize)
     print("server started as PID %d" % svrProc.pid)
- 
-    svrActive = True   
-    while svrActive:
-        time.sleep(1)
-            
-        if svrActive and svrProc.poll() is not None:
-            print("Server has terminated")
-            svrActive = False
             
 else:
     print("Unknown mode.  Must specify either 'dispatcher', 'remote dispatch', 'simulation', 'display', 'dispatcheronly', 'serveronly")
+    
+print("launcher exiting")  
+
  
 

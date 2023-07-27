@@ -99,7 +99,7 @@ class MainFrame(wx.Frame):
 		self.settings = settings
 			
 		logging.info("%s process starting" % "dispatcher" if self.settings.dispatch else "display")
-		
+
 		icon = wx.Icon()
 		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "dispatch.ico"), wx.BITMAP_TYPE_ANY))
 		self.SetIcon(icon)
@@ -550,6 +550,7 @@ class MainFrame(wx.Frame):
 			[ self.ClivedenFleetSignals,  self.cbClivedenFleet ],
 			[ self.HydeFleetSignals,      self.cbHydeFleet ],
 			[ self.YardFleetSignals,      self.cbYardFleet ],
+			[ self.CliffFleetSignals,      self.cbCliffFleet ],
 		]
 		for siglist, checkbox in siglists:
 			if signm in siglist:
@@ -1653,7 +1654,6 @@ class MainFrame(wx.Frame):
 						print("vale defaulting to 0")
 						value = 0
 
-					print("fleet %s %d" % (signm, value))
 					sig = self.signals[signm]
 					sig.EnableFleeting(value == 1)
 					self.FleetCheckBoxes(signm)

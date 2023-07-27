@@ -1,8 +1,34 @@
+import threading
 import serial
 import time
 import logging
 
 MAXTRIES = 5
+THRESHOLD = 2
+
+def setBit(obyte, obit, val):
+	if val != 0:
+		return (obyte | (1 << obit)) & 0xff
+	else:
+		return obyte
+
+
+def getBit(ibyte, ibit):
+	if ibit < 0 or ibit > 7:
+		# bit index is out of range
+		return 0
+	mask = 1 << (7-ibit)
+	b = int(ibyte.hex(), 16)
+	return 1 if b & mask != 0 else 0
+
+def getBitInverted(ibyte, ibit):
+	if ibit < 0 or ibit > 7:
+		# bit index is out of range
+		return 0
+	mask = 1 << (7-ibit)
+	b = int(ibyte.hex(), 16)
+	return 0 if b & mask != 0 else 1
+
 
 class Bus:
 	def __init__(self, tty):
@@ -46,7 +72,7 @@ class Bus:
 		outbuf = list(reversed(outbuf))
 
 		sendBuffer.extend(outbuf)
-		
+
 		retries = 3;
 		while retries > 0:
 			try:
@@ -76,7 +102,7 @@ class Bus:
 			except Exception as e:
 				logging.error("Exception %s when trying to read from address %s" % (str(e), address))
 				b = ""
-				
+
 			if len(b) == 0:
 				tries += 1
 				time.sleep(0.0001)
@@ -99,8 +125,7 @@ class Bus:
 					lastused[i] = inbuf[i]
 				else:
 					inbuf[i] = lastused[i]
-					
-					
+										
 			return inbuf
 		
 	def verifyChange(self, address, bx, threshold):
@@ -114,3 +139,41 @@ class Bus:
 			return True
 		
 		return False
+
+
+class RailroadMonitor(threading.Thread):
+	def __init__(self, ttyDevice, rr, settings):
+		threading.Thread.__init__(self)
+		self.simulation = settings.simulation
+		self.initialized = False
+		self.tty = ttyDevice
+		self.rr = rr
+		if self.simulation:
+			self.rrBus = None
+		else:
+			self.rrbus = Bus(self.tty)
+			if not self.rrbus.initialized:
+				return
+			self.rr.setBus(self.rrbus)
+
+		self.pollInterval = settings.busInterval * 1000000000  # convert s to ns
+
+		self.isRunning = False
+		self.initialized = True
+
+	def kill(self):
+		self.isRunning = False
+
+	def run(self):
+		self.isRunning = True
+		lastPoll = time.monotonic_ns() - self.pollInterval
+		while self.isRunning:
+			current = time.monotonic_ns()
+			elapsed = current - lastPoll
+			if self.isRunning and elapsed > self.pollInterval:
+				#logging.debug("Starting all io")
+				self.rr.allIO()
+				#logging.debug("all io finished")
+				lastPoll = current
+			else:
+				time.sleep(0.0001) # yield to other threads

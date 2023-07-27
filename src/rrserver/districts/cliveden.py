@@ -1,140 +1,98 @@
 import logging
 
-from rrserver.district import District, CLIVEDEN, formatIText, formatOText
-from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, SignalLeverInput, BreakerInput, BlockInput, TurnoutInput
-from rrserver.bus import setBit, getBit
-
+from rrserver.district import District
+from rrserver.constants import CLIVEDEN
+from rrserver.node import Node
 
 class Cliveden(District):
-	def __init__(self, parent, name, settings):
-		District.__init__(self, parent, name, settings)
+	def __init__(self, rr, name, settings):
+		District.__init__(self, rr, name, settings)
+		logging.info("creating district Cliveden")
+		self.rr = rr
+		self.name = name
+		self.nodeAddresses = [ CLIVEDEN ]
+		self.nodes = {
+			CLIVEDEN:  Node(self, rr, CLIVEDEN,  4, settings)
+		}
 
-		sigNames = [ ["C14L", 3], ["C14RA", 3], ["C14RB", 3],
-						["C12L", 3], ["C12R", 3],
-						["C10L", 3], ["C10R", 3] ]
-		toNames = [ "CSw9", "CSw13" ]
-		handswitchNames = [ "CSw15.hand", "CSw11.hand" ]
-		hsNames = [ "CSw15", "CSw11" ]
-		relayNames = [ "C13.srel", "C23.srel", "C12.srel" ]
-		# indNames = [ "CBBank" ]
+		addr = CLIVEDEN
+		with self.nodes[addr] as n:
+			#outputs
+			self.rr.AddSignal("C14L",  self, n, addr, [(0, 0), (0, 1), (0, 2)])
+			self.rr.AddSignal("C14RA", self, n, addr, [(0, 3), (0, 4), (0, 5)])
+			self.rr.AddSignal("C14RB", self, n, addr, [(0, 6), (0, 7), (1, 0)])		
+			self.rr.AddSignal("C12L",  self, n, addr, [(1, 1), (1, 2), (1, 3)])
+			self.rr.AddSignal("C10L",  self, n, addr, [(1, 4), (1, 5), (1, 6)])
+			# bit 1:7 unused
+			self.rr.AddSignal("C12R",  self, n, addr, [(2, 0), (2, 1), (2, 2)])
+			self.rr.AddSignal("C10R",  self, n, addr, [(2, 3), (2, 4), (2, 5)])
 
-		ix = 0
-		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
-		for sig, bits in sigNames:
-			self.rr.GetOutput(sig).SetBits(bits)
-		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
-		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
-		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
-		# ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
-
-		for n in toNames:
-			self.SetTurnoutPulseLen(n, settings.topulselen, settings.topulsect)
-
-		brkrNames = sorted(["CBGreenMtnStn", "CBSheffieldA", "CBGreenMtnYd", "CBHydeJct",
-					"CBHydeWest", "CBHydeEast", "CBSouthportJct", "CBCarlton", "CBSheffieldB" ])
-		blockNames = [ "C13.W", "C13", "C13.E", "COSCLW", "C23.W", "C23", "C12.W", "C12", "COSCLEW", "COSCLEE", "C22", "C11" ]
-		leverNames = [ "C10.lvr", "C12.lvr", "C14.lvr" ]
-
-		ix = 0
-		ix = self.AddInputs(blockNames, BlockInput, District.block, ix)
-		ix = self.AddInputs(toNames+hsNames, TurnoutInput, District.turnout, ix)
-		ix = self.AddInputs(leverNames, SignalLeverInput, District.slever, ix)
-		ix = self.AddInputs(brkrNames, BreakerInput, District.breaker, ix)
-
-	def OutIn(self):
-		outbc = 4
-		outb = [0 for _ in range(outbc)]
-
-		asp = self.rr.GetOutput("C14L").GetAspectBits()
-		outb[0] = setBit(outb[0], 0, asp[0])  # signals
-		outb[0] = setBit(outb[0], 1, asp[1])
-		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("C14RA").GetAspectBits()
-		outb[0] = setBit(outb[0], 3, asp[0]) 
-		outb[0] = setBit(outb[0], 4, asp[1])
-		outb[0] = setBit(outb[0], 5, asp[2])
-		asp = self.rr.GetOutput("C14RB").GetAspectBits()
-		outb[0] = setBit(outb[0], 6, asp[0]) 
-		outb[0] = setBit(outb[0], 7, asp[1])
-
-		outb[1] = setBit(outb[1], 0, asp[2])
-		asp = self.rr.GetOutput("C12L").GetAspectBits()
-		outb[1] = setBit(outb[1], 1, asp[0]) 
-		outb[1] = setBit(outb[1], 2, asp[1])
-		outb[1] = setBit(outb[1], 3, asp[2])
-		asp = self.rr.GetOutput("C10L").GetAspectBits()
-		outb[1] = setBit(outb[1], 4, asp[0]) 
-		outb[1] = setBit(outb[1], 5, asp[1])
-		outb[1] = setBit(outb[1], 6, asp[2])
-		# bit 7 unused
-
-		asp = self.rr.GetOutput("C12R").GetAspectBits()
-		outb[2] = setBit(outb[2], 0, asp[0])
-		outb[2] = setBit(outb[2], 1, asp[1])
-		outb[2] = setBit(outb[2], 2, asp[2])
-		asp = self.rr.GetOutput("C10R").GetAspectBits()
-		outb[2] = setBit(outb[2], 3, asp[0]) 
-		outb[2] = setBit(outb[2], 4, asp[1])
-		outb[2] = setBit(outb[2], 5, asp[2])
-		outb[2] = setBit(outb[2], 6, 0 if self.rr.GetOutput("CSw11.hand").GetStatus() != 0 else 1) # hand switch unlocks
-		op = self.rr.GetOutput("CSw13").GetOutPulse()
-		outb[2] = setBit(outb[2], 7, 1 if op > 0 else 0)     # switches
-		
-		outb[3] = setBit(outb[3], 0, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("CSw9").GetOutPulse()
-		outb[3] = setBit(outb[3], 1, 1 if op > 0 else 0)    	
-		outb[3] = setBit(outb[3], 6, 1 if op < 0 else 0) # bit 2 is bad - use bit 6
-		outb[3] = setBit(outb[3], 3, self.rr.GetOutput("C13.srel").GetStatus())	# Stop relays
-		outb[3] = setBit(outb[3], 4, self.rr.GetOutput("C23.srel").GetStatus())
-		outb[3] = setBit(outb[3], 5, self.rr.GetOutput("C12.srel").GetStatus())
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Cliveden: Output bytes: %s" % otext)
-
-		inbc = outbc			
-		if self.settings.simulation:
-			itext = None
-		else:
-			inb = self.rrBus.sendRecv(CLIVEDEN, outb, outbc)
-			if inb is None:
-				itext = "Read Error"
-			else:
-				itext = formatIText(inb, inbc)
-				#logging.debug("CLIVEDEN: Input Bytes: %s" % itext)
-	
-				nb = getBit(inb[0], 2)  # Switch positions
-				rb = getBit(inb[0], 3)
-				self.rr.GetInput("CSw13").SetTOState(nb, rb)
-				nb = getBit(inb[0], 4) 
-				rb = getBit(inb[0], 5)
-				self.rr.GetInput("CSw11").SetTOState(nb, rb)
-				nb = getBit(inb[0], 6) 
-				rb = getBit(inb[0], 7)
-				self.rr.GetInput("CSw9").SetTOState(nb, rb)
-	
-				self.rr.GetInput("C13.W").SetValue(getBit(inb[1], 0))  # Detection
-				self.rr.GetInput("C13").SetValue(getBit(inb[1], 1))
-				self.rr.GetInput("C13.E").SetValue(getBit(inb[1], 2))
-				self.rr.GetInput("COSCLW").SetValue(getBit(inb[1], 3))
-				self.rr.GetInput("C12.W").SetValue(getBit(inb[1], 4)) 
-				self.rr.GetInput("C12").SetValue(getBit(inb[1], 5))
-				self.rr.GetInput("C23.W").SetValue(getBit(inb[1], 6)) 
-				self.rr.GetInput("C23").SetValue(getBit(inb[1], 7))
-	
-				self.rr.GetInput("COSCLEW").SetValue(getBit(inb[2], 0)) 
-				self.rr.GetInput("COSCLEE").SetValue(getBit(inb[2], 1))
-				self.rr.GetInput("C22").SetValue(getBit(inb[2], 2))
-				self.rr.GetInput("CBGreenMtnStn").SetValue(getBit(inb[2], 4))  # Breakers
-				self.rr.GetInput("CBSheffieldA").SetValue(getBit(inb[2], 5))
-				self.rr.GetInput("CBGreenMtnYd").SetValue(getBit(inb[2], 6))
-				self.rr.GetInput("CBHydeJct").SetValue(getBit(inb[2], 7))
-	
-				self.rr.GetInput("CBHydeWest").SetValue(getBit(inb[3], 0))
-				self.rr.GetInput("CBHydeEast").SetValue(getBit(inb[3], 1))
-				self.rr.GetInput("CBSouthportJct").SetValue(getBit(inb[3], 2))
-				self.rr.GetInput("CBCarlton").SetValue(getBit(inb[3], 3))
-				self.rr.GetInput("CBSheffieldB").SetValue(getBit(inb[3], 4))
+			self.rr.AddHandswitchInd("CSw11", self, n, addr, [(2, 6)])
 			
-		if self.sendIO:
-			self.rr.ShowText("Cliv", CLIVEDEN, otext, itext, 0, 1)
+			self.rr.AddTurnout("CSw13", self, n, addr, [(2, 7), (3, 0)])
+			self.rr.AddTurnout("CSw9",  self, n, addr, [(3, 1), (3, 6)]) # bit 3:2 is bad
+			
+			self.rr.AddStopRelay("C13.srel", self, n, addr, [(3, 3)])
+			self.rr.AddStopRelay("C23.srel", self, n, addr, [(3, 4)])
+			self.rr.AddStopRelay("C12.srel", self, n, addr, [(3, 5)])
+			
+			# Inputs
+			self.rr.AddTurnoutPosition("CSw13", self, n, addr, [(0, 2), (0, 3)])
+			
+			self.rr.AddHandswitch("CSw11", self, n, addr, [(0, 4), (0, 5)])
+			
+			self.rr.AddTurnoutPosition("CSw9",  self, n, addr, [(0, 6), (0, 7)])
 
+			sbw = self.rr.AddBlock("C13.W",   self, n, addr, [(1, 0)])
+			b = self.rr.AddBlock("C13",     self, n, addr, [(1, 1)])
+			sbe = self.rr.AddBlock("C13.E",   self, n, addr, [(1, 2)])
+			b.AddStoppingBlocks([sbe, sbw])
+			
+			self.rr.AddBlock("COSCLW",  self, n, addr, [(1, 3)])
+			self.rr.AddBlock("C12.W",   self, n, addr, [(1, 4)])
+			self.rr.AddBlock("C12",     self, n, addr, [(1, 5)])
+			self.rr.AddBlock("C23.W",   self, n, addr, [(1, 6)])
+			self.rr.AddBlock("C23",     self, n, addr, [(1, 7)])
+			self.rr.AddBlock("COSCLEW", self, n, addr, [(2, 0)])
+			self.rr.AddBlock("COSCLEE", self, n, addr, [(2, 1)])
+			self.rr.AddBlock("C22",     self, n, addr, [(2, 2)])
+			
+			b = self.rr.AddBreaker("CBGreenMtnStn",  self, n, addr, [(2, 4)])
+			b.SetProxy("CBGreenMtn")
+			b = self.rr.AddBreaker("CBSheffieldA",   self, n, addr, [(2, 5)])
+			b.SetProxy("CBSheffield")
+			b = self.rr.AddBreaker("CBGreenMtnYd",   self, n, addr, [(2, 6)])
+			b.SetProxy("CBGreenMtn")
+			self.rr.AddBreaker("CBHydeJct",      self, n, addr, [(2, 7)])
+			self.rr.AddBreaker("CBHydeWest",     self, n, addr, [(3, 0)])
+			self.rr.AddBreaker("CBHydeEast",     self, n, addr, [(3, 1)])
+			self.rr.AddBreaker("CBSouthportJct", self, n, addr, [(3, 2)])
+			self.rr.AddBreaker("CBCarlton",      self, n, addr, [(3, 3)])
+			b = self.rr.AddBreaker("CBSheffieldB",   self, n, addr, [(3, 4)])
+			b.SetProxy("CBSheffield")
+			
+			# virtual breakers:
+			#    CBSheffield combines the state of SheffieldA and SheffieldB
+			#    CBGreenMtn combines the state of GreenMtnStn and GreenMtnYd
+			self.rr.AddBreaker("CBSheffield",  self, n, addr, [])
+			self.rr.AddBreaker("CBGreenMtn",   self, n, addr, [])
+
+	'''
+	special processing for Sheffield and Green Mountain breakers - each of these combines the status of two other breakers
+	'''
+	def ShowBreakerState(self, brkr):
+		for blist, bname in [ [("CBSheffieldA", "CBSheffieldB"), "CBSheffield"], [("CBGreenMtnStn", "CBGreenMtnYd"), "CBGreenMtn"] ]:
+			if brkr.Name() in blist:
+				# the combined status is only OK if BOTH are OK.  If either has tripped, signal a trip
+				stat = self.rr.GetBreaker(blist[0]).IsTripped() or self.rr.GetBreaker(blist[1]).IsTripped()
+				cbrkr = self.rr.GetBreaker(bname)
+				if cbrkr.SetTripped(stat):
+					cbrkr.UpdateIndicators()
+					# if we change the state of the breaker, notify everyone
+					self.rr.RailroadEvent(cbrkr.GetEventMessage())
+			
+			
+			
+			
+			
+			

@@ -1,29 +1,281 @@
 import logging
 
-from rrserver.district import District, leverState, formatIText, formatOText, GREENMTN, CLIFF, SHEFFIELD
-from rrserver.rrobjects import SignalOutput, NXButtonOutput, HandSwitchOutput, BlockInput, TurnoutInput, RouteInput, \
-	FleetLeverInput, SignalLeverInput, HandswitchLeverInput, ToggleInput, IndicatorOutput
-from rrserver.bus import setBit, getBit
+from rrserver.district import District
+from rrserver.constants import  CLIFF, GREENMTN, SHEFFIELD
+from rrserver.node import Node
 
 
 class Cliff(District):
-	def __init__(self, parent, name, settings):
-		District.__init__(self, parent, name, settings)
+	def __init__(self, rr, name, settings):
+		District.__init__(self, rr, name, settings)
+		logging.info("creating district Cliff")
+		self.rr = rr
+		self.name = name
+		self.nodeAddresses = [ GREENMTN, CLIFF, SHEFFIELD ]
+		
+		self.nodes = {
+			GREENMTN:   Node(self, rr, GREENMTN,  3, settings),
+			CLIFF:      Node(self, rr, CLIFF,     8, settings),
+			SHEFFIELD:  Node(self, rr, SHEFFIELD, 4, settings)
+		}
+		self.entryButton = None
+		self.currentCoachRoute = None
+		self.optFleet = None
+		self.released = False
+		self.control = 2
+		
+		self.revCSw21a = None
+		self.revCSw21b = None
+		self.revCSw19  = None
+		self.revCSw15  = None
+		self.revCSw11  = None
+		
+		self.revIndicators = [ "CSw21a", "CSw21b", "CSw19", "CSw15", "CSw11" ]
+		self.norm = { ind: None for ind in self.revIndicators }
 
-		sigNames =  [
-			["C2LA", 2], ["C2LB", 3], ["C2LC", 1], ["C2LD", 1], ["C2R", 3],
-			["C4L", 3], ["C4RA", 2], ["C4RB", 2], ["C4RC", 3], ["C4RD", 1],
-			["C6LA", 1], ["C6LB", 1], ["C6LC", 1], ["C6LD", 1], ["C6LE", 1], ["C6LF", 1], ["C6LG", 1], ["C6LH", 1], ["C6LJ", 1], ["C6LK", 1], ["C6LL", 1], ["C6R", 1],
-			["C8L", 1], ["C8RA", 1], ["C8RB", 1], ["C8RC", 1], ["C8RD", 1], ["C8RE", 1], ["C8RF", 1], ["C8RG", 1], ["C8RH", 1], ["C8RJ", 1], ["C8RK", 1], ["C8RL", 1],
+		addr = GREENMTN
+		with self.nodes[addr] as n:
+			# outputs
+			self.rr.AddSignal("C2LB", self, n, addr, [(0, 0), (0, 1), (0, 2)])
+			self.rr.AddSignal("C2LD", self, n, addr, [(0, 3)])
+			self.rr.AddSignal("C2R",  self, n, addr, [(0, 4), (0, 5), (0, 6)])
+			self.rr.AddSignal("C2LA", self, n, addr, [(0, 7), (1, 0)])
+			self.rr.AddSignal("C2LC", self, n, addr, [(1, 1)])
+			self.rr.AddSignal("C4RA", self, n, addr, [(1, 2), (1, 3)])
+			self.rr.AddSignal("C4RB", self, n, addr, [(1, 4), (1, 5)])
+			self.rr.AddSignal("C4RC", self, n, addr, [(1, 6), (1, 7), (2, 0)])
+			self.rr.AddSignal("C4RD", self, n, addr, [(2, 1)])
+			self.rr.AddSignal("C4L",  self, n, addr, [(2, 2), (2, 3), (2, 4)])
+
+			self.rr.AddHandswitchInd("CSw3", self, n, addr, [(2, 5)])
+			
+			# virtual turnouts - these are managed by the CLIFF panel - no output bits
+			self.rr.AddTurnout("CSw31", self, n, addr, [])
+			self.rr.AddTurnout("CSw33", self, n, addr, [])
+			self.rr.AddTurnout("CSw35", self, n, addr, [])
+			self.rr.AddTurnout("CSw37", self, n, addr, [])
+			self.rr.AddTurnout("CSw39", self, n, addr, [])
+			self.rr.AddTurnout("CSw41", self, n, addr, [])
+
+			# inpits
+			self.rr.AddRouteIn("CC30E", self, n, addr, [(0, 0)])	
+			self.rr.AddRouteIn("CC10E", self, n, addr, [(0, 1)])	
+			self.rr.AddRouteIn("CG10E", self, n, addr, [(0, 2)])	
+			self.rr.AddRouteIn("CG12E", self, n, addr, [(0, 3)])	
+			self.rr.AddRouteIn("CC31W", self, n, addr, [(0, 4)])	
+			self.rr.AddRouteIn("CC30W", self, n, addr, [(0, 5)])	
+			self.rr.AddRouteIn("CC10W", self, n, addr, [(0, 6)])	
+			self.rr.AddRouteIn("CG21W", self, n, addr, [(0, 7)])	
+			
+			self.rr.AddHandswitch("CSw3", self, n, addr, [(1, 0), (1, 1)])
+
+			self.rr.AddBlock("C11", self, n, addr, [(1, 2)])
+			self.rr.AddBlock("COSGMW", self, n, addr, [(1, 3)])
+			self.rr.AddBlock("C10", self, n, addr, [(1, 4)])
+			self.rr.AddBlock("C30", self, n, addr, [(1, 5)])
+			self.rr.AddBlock("C31", self, n, addr, [(1, 6)])
+			self.rr.AddBlock("COSGME", self, n, addr, [(1, 7)])
+			self.rr.AddBlock("C20", self, n, addr, [(2, 0)])
+
+		addr = CLIFF
+		with self.nodes[addr] as n:
+			# outputs
+			self.rr.AddSignalLED("C2",  self, n, addr, [(0, 0), (0, 1), (0, 2)])
+			self.rr.AddSignalLED("C4",  self, n, addr, [(0, 3), (0, 4), (0, 5)])
+			self.rr.AddSignalLED("C6",  self, n, addr, [(0, 6), (0, 7), (1, 0)])
+			self.rr.AddSignalLED("C8",  self, n, addr, [(1, 1), (1, 2), (1, 3)])
+			self.rr.AddSignalLED("C10", self, n, addr, [(1, 4), (1, 5), (1, 6)])
+			self.rr.AddSignalLED("C12", self, n, addr, [(1, 7), (2, 0), (2, 1)])
+			self.rr.AddSignalLED("C14", self, n, addr, [(2, 2), (2, 3), (2, 4)])
+			self.rr.AddSignalLED("C18", self, n, addr, [(2, 7), (3, 0), (3, 1)])
+			self.rr.AddSignalLED("C22", self, n, addr, [(3, 2), (3, 3), (3, 4)])
+			self.rr.AddSignalLED("C24", self, n, addr, [(3, 5), (3, 6), (3, 7)])
+
+			self.rr.AddHandswitchInd("CSw3",  self, n, addr, [(4, 0), (4, 1)])
+			self.rr.AddHandswitchInd("CSw11", self, n, addr, [(4, 2), (4, 3)])
+			self.rr.AddHandswitchInd("CSw15", self, n, addr, [(4, 4), (4, 5)])
+			self.rr.AddHandswitchInd("CSw19", self, n, addr, [(4, 6), (4, 7)])
+			self.rr.AddHandswitchInd("CSw21ab", self, n, addr, [(5, 0), (5, 1)])
+			
+			self.rr.AddBlockInd("B10", self, n, addr, [(5, 2)])
+			
+			self.rr.AddBreakerInd("CBGreenMtn",        self, n, addr, [(5, 3)]) # combines GreenMtnStn and GreenMtnYd
+			self.rr.AddBreakerInd("CBSheffield",       self, n, addr, [(5, 4)]) # combines SheffieldA and SheffieldB
+			self.rr.AddBreakerInd("CBCliveden",        self, n, addr, [(5, 5)])
+			self.rr.AddBreakerInd("CBReverserC22C23",  self, n, addr, [(5, 6)])
+			self.rr.AddBreakerInd("CBBank",            self, n, addr, [(5, 7)])
+			
+			self.rr.AddTurnoutLock("CSw31", self, n, addr, [(6, 0)])
+			self.rr.AddTurnoutLock("CSw41", self, n, addr, [(6, 1)])
+			self.rr.AddTurnoutLock("CSw43", self, n, addr, [(6, 2)])
+			self.rr.AddTurnoutLock("CSw61", self, n, addr, [(6, 3)])
+			self.rr.AddTurnoutLock("CSw9",  self, n, addr, [(6, 4)])
+			self.rr.AddTurnoutLock("CSw13", self, n, addr, [(6, 5)])
+			self.rr.AddTurnoutLock("CSw17", self, n, addr, [(6, 6)])
+			self.rr.AddTurnoutLock("CSw23", self, n, addr, [(6, 7)])
+			
+			self.rr.AddIndicator("CSw21a", self, n, addr, [(7, 0)])
+			self.rr.AddIndicator("CSw21b", self, n, addr, [(7, 1)])
+			self.rr.AddIndicator("CSw19",  self, n, addr, [(7, 2)])
+			self.rr.AddIndicator("CSw15",  self, n, addr, [(7, 3)])
+			self.rr.AddIndicator("CSw11",  self, n, addr, [(7, 4)])
+
+			# Inputs
+			self.rr.AddRouteIn("CC21E",  self, n, addr, [(0, 0)])
+			self.rr.AddRouteIn("CC40E",  self, n, addr, [(0, 1)])
+			self.rr.AddRouteIn("CC44E",  self, n, addr, [(0, 2)])
+			self.rr.AddRouteIn("CC43E",  self, n, addr, [(0, 3)])
+			self.rr.AddRouteIn("CC42E",  self, n, addr, [(0, 4)])
+			self.rr.AddRouteIn("CC41E",  self, n, addr, [(0, 5)])
+			self.rr.AddRouteIn("CC41W",  self, n, addr, [(0, 6)])
+			self.rr.AddRouteIn("CC42W",  self, n, addr, [(0, 7)])			
+			self.rr.AddRouteIn("CC21W",  self, n, addr, [(1, 0)])
+			self.rr.AddRouteIn("CC40W",  self, n, addr, [(1, 1)])
+			self.rr.AddRouteIn("CC44W",  self, n, addr, [(1, 2)])
+			self.rr.AddRouteIn("CC43W",  self, n, addr, [(1, 3)])
+			
+			self.rr.AddBlock("COSSHE", self, n, addr, [(1, 4)])
+			self.rr.AddBlock("C21",    self, n, addr, [(1, 5)])
+			self.rr.AddBlock("C40",    self, n, addr, [(1, 6)])
+			self.rr.AddBlock("C41",    self, n, addr, [(1, 7)])
+			self.rr.AddBlock("C42",    self, n, addr, [(2, 0)])
+			self.rr.AddBlock("C43",    self, n, addr, [(2, 1)])
+			self.rr.AddBlock("C44",    self, n, addr, [(2, 2)])
+			self.rr.AddBlock("COSSHW", self, n, addr, [(2, 3)])
+			
+			self.rr.AddSignalLever("C2",  self, n, addr, [(2, 4), (2, 5), (2, 6)])
+			self.rr.AddSignalLever("C4",  self, n, addr, [(2, 7), (3, 0), (3, 1)])
+			self.rr.AddSignalLever("C6",  self, n, addr, [(3, 2), (3, 3), (3, 4)])
+			self.rr.AddSignalLever("C8",  self, n, addr, [(3, 5), (3, 6), (3, 7)])
+			self.rr.AddSignalLever("C10", self, n, addr, [(4, 0), (4, 1), (4, 2)])
+			self.rr.AddSignalLever("C12", self, n, addr, [(4, 3), (4, 4), (4, 5)])
+			self.rr.AddSignalLever("C14", self, n, addr, [(4, 6), (4, 7), (5, 0)])
+			self.rr.AddSignalLever("C18", self, n, addr, [(5, 2), (5, 3), (5, 4)])
+			self.rr.AddSignalLever("C22", self, n, addr, [(5, 5), (5, 6), (5, 7)])
+			self.rr.AddSignalLever("C24", self, n, addr, [(6, 0), (6, 1), (6, 2)])
+			
+			self.rr.AddHandswitchUnlock("CSw3",    self, n, addr, [(6, 4)])
+			self.rr.AddHandswitchUnlock("CSw11",   self, n, addr, [(6, 5)])
+			self.rr.AddHandswitchUnlock("CSw15",   self, n, addr, [(6, 6)])
+			self.rr.AddHandswitchUnlock("CSw19",   self, n, addr, [(6, 7)])
+			self.rr.AddHandswitchUnlock("CSw21ab", self, n, addr, [(7, 0)])
+
+		addr = SHEFFIELD
+		with self.nodes[addr] as n:
+			# outputs
+			self.rr.AddOutNXButton("CC54E", self, n, addr, [(0, 0)])
+			self.rr.AddOutNXButton("CC53E", self, n, addr, [(0, 1)])
+			self.rr.AddOutNXButton("CC52E", self, n, addr, [(0, 2)])
+			self.rr.AddOutNXButton("CC51E", self, n, addr, [(0, 3)])
+			self.rr.AddOutNXButton("CC50E", self, n, addr, [(0, 4)])
+			self.rr.AddOutNXButton("CC21E", self, n, addr, [(0, 5)])
+			self.rr.AddOutNXButton("CC40E", self, n, addr, [(0, 6)])
+			self.rr.AddOutNXButton("CC41E", self, n, addr, [(0, 7)])
+			self.rr.AddOutNXButton("CC42E", self, n, addr, [(1, 0)])
+			self.rr.AddOutNXButton("CC43E", self, n, addr, [(1, 1)])
+			self.rr.AddOutNXButton("CC44E", self, n, addr, [(1, 2)])
+			self.rr.AddOutNXButton("CC54W", self, n, addr, [(1, 3)])
+			self.rr.AddOutNXButton("CC53W", self, n, addr, [(1, 4)])
+			self.rr.AddOutNXButton("CC52W", self, n, addr, [(1, 5)])
+			self.rr.AddOutNXButton("CC51W", self, n, addr, [(1, 6)])
+			self.rr.AddOutNXButton("CC50W", self, n, addr, [(1, 7)])
+			self.rr.AddOutNXButton("CC21W", self, n, addr, [(2, 0)])
+			self.rr.AddOutNXButton("CC40W", self, n, addr, [(2, 1)])
+			self.rr.AddOutNXButton("CC41W", self, n, addr, [(2, 2)])
+			self.rr.AddOutNXButton("CC42W", self, n, addr, [(2, 3)])
+			self.rr.AddOutNXButton("CC43W", self, n, addr, [(2, 4)])
+			self.rr.AddOutNXButton("CC44W", self, n, addr, [(2, 5)])
+			self.rr.AddOutNXButton("CC30E", self, n, addr, [(2, 6)])
+			self.rr.AddOutNXButton("CC10E", self, n, addr, [(2, 7)])			
+			self.rr.AddOutNXButton("CG10E", self, n, addr, [(3, 0)])
+			self.rr.AddOutNXButton("CG12E", self, n, addr, [(3, 1)])
+			self.rr.AddOutNXButton("CC30W", self, n, addr, [(3, 2)])
+			self.rr.AddOutNXButton("CC31W", self, n, addr, [(3, 3)])
+			self.rr.AddOutNXButton("CC10W", self, n, addr, [(3, 4)])
+			self.rr.AddOutNXButton("CG21W", self, n, addr, [(3, 5)])
+			
+			# virtual signals - these do not physically exist so no output bits
+			self.rr.AddSignal("C6R", self, n, addr, [])
+			self.rr.AddSignal("C6LA", self, n, addr, [])
+			self.rr.AddSignal("C6LB", self, n, addr, [])
+			self.rr.AddSignal("C6LC", self, n, addr, [])
+			self.rr.AddSignal("C6LD", self, n, addr, [])
+			self.rr.AddSignal("C6LE", self, n, addr, [])
+			self.rr.AddSignal("C6LF", self, n, addr, [])
+			self.rr.AddSignal("C6LG", self, n, addr, [])
+			self.rr.AddSignal("C6LH", self, n, addr, [])
+			self.rr.AddSignal("C6LJ", self, n, addr, [])
+			self.rr.AddSignal("C6LK", self, n, addr, [])
+			self.rr.AddSignal("C6LL", self, n, addr, [])
+			self.rr.AddSignal("C8L", self, n, addr, [])
+			self.rr.AddSignal("C8RA", self, n, addr, [])
+			self.rr.AddSignal("C8RB", self, n, addr, [])
+			self.rr.AddSignal("C8RC", self, n, addr, [])
+			self.rr.AddSignal("C8RD", self, n, addr, [])
+			self.rr.AddSignal("C8RE", self, n, addr, [])
+			self.rr.AddSignal("C8RF", self, n, addr, [])
+			self.rr.AddSignal("C8RG", self, n, addr, [])
+			self.rr.AddSignal("C8RH", self, n, addr, [])
+			self.rr.AddSignal("C8RJ", self, n, addr, [])
+			self.rr.AddSignal("C8RK", self, n, addr, [])
+			self.rr.AddSignal("C8RL", self, n, addr, [])
+		
+			# virtual turnouts - these are managed by the CLIFF panel - no output bits
+			self.rr.AddTurnout("CSw43", self, n, addr, [])
+			self.rr.AddTurnout("CSw45", self, n, addr, [])
+			self.rr.AddTurnout("CSw47", self, n, addr, [])
+			self.rr.AddTurnout("CSw49", self, n, addr, [])
+			self.rr.AddTurnout("CSw51", self, n, addr, [])
+			self.rr.AddTurnout("CSw53", self, n, addr, [])
+			self.rr.AddTurnout("CSw55", self, n, addr, [])
+			self.rr.AddTurnout("CSw57", self, n, addr, [])
+			self.rr.AddTurnout("CSw59", self, n, addr, [])
+			self.rr.AddTurnout("CSw61", self, n, addr, [])
+			self.rr.AddTurnout("CSw63", self, n, addr, [])
+			self.rr.AddTurnout("CSw65", self, n, addr, [])
+			self.rr.AddTurnout("CSw67", self, n, addr, [])
+			self.rr.AddTurnout("CSw69", self, n, addr, [])
+			self.rr.AddTurnout("CSw71", self, n, addr, [])
+			self.rr.AddTurnout("CSw73", self, n, addr, [])
+			self.rr.AddTurnout("CSw75", self, n, addr, [])
+			self.rr.AddTurnout("CSw77", self, n, addr, [])
+			self.rr.AddTurnout("CSw79", self, n, addr, [])
+			self.rr.AddTurnout("CSw81", self, n, addr, [])
+
+			# inputs
+			self.rr.AddRouteIn("CC50E", self, n, addr, [(0, 0)])
+			self.rr.AddRouteIn("CC51E", self, n, addr, [(0, 1)])
+			self.rr.AddRouteIn("CC52E", self, n, addr, [(0, 2)])
+			self.rr.AddRouteIn("CC53E", self, n, addr, [(0, 3)])
+			self.rr.AddRouteIn("CC54E", self, n, addr, [(0, 4)])
+			self.rr.AddRouteIn("CC50W", self, n, addr, [(0, 5)])
+			self.rr.AddRouteIn("CC51W", self, n, addr, [(0, 6)])
+			self.rr.AddRouteIn("CC52W", self, n, addr, [(0, 7)])		
+			self.rr.AddRouteIn("CC53W", self, n, addr, [(1, 0)])
+			self.rr.AddRouteIn("CC54W", self, n, addr, [(1, 1)])
+			
+			self.rr.AddBlock("C50", self, n, addr, [(1, 2)])
+			self.rr.AddBlock("C51", self, n, addr, [(1, 3)])
+			self.rr.AddBlock("C52", self, n, addr, [(1, 4)])
+			self.rr.AddBlock("C53", self, n, addr, [(1, 5)])
+			self.rr.AddBlock("C54", self, n, addr, [(1, 6)])
+
+		'''
+		which signals are affected by fleeting, for each of the control options
+		This indicates the effect for the dispatcher program.
+		
+		0 => Cliff, 1 => Dispatcher Cliveden/Bank, 2 => Dispatcher All
+		'''
+		self.fleetedSignals = [
+			[],
+			["C10L", "C10R", "C12L", "C12R", "C14L", "C14RA", "C14RB",
+				"C18R", "C18LA", "C18LB", "C22L", "C22R", "C24L", "C24R" ],
+			["C8L", "C8RA", "C8RB", "C8RC", "C8RD", "C8RE", "C8RF", "C8RG", "C8RH", "C8RJ", "C8RK", "C8RL", 
+				"C6R", "C6LA", "C6LB", "C6LC", "C6LD", "C6LE", "C6LF", "C6LG", "C6LH", "C6LJ", "C6LK", "C6LL", 
+				"C4L", "C4RA", "C4RB", "C4RC", "C4RD", "C2R", "C2LA", "C2LB", "C2LC", "C2LD",
+				"C10L", "C10R", "C12L", "C12R", "C14L", "C14RA", "C14RB",
+				"C18R", "C18LA", "C18LB", "C22L", "C22R", "C24L", "C24R" ]
 		]
-		toNames = [ "CSw31", "CSw33", "CSw35", "CSw37", "CSw39",
-					"CSw41", "CSw43", "CSw45", "CSw47", "CSw49",
-					"CSw51", "CSw53", "CSw55", "CSw57", "CSw59",
-					"CSw61", "CSw63", "CSw65", "CSw67", "CSw69",
-					"CSw71", "CSw73", "CSw75", "CSw77", "CSw79",
-					"CSw81"]
-		hsNames = [ "CSw3" ]
-		handswitchNames = [ "CSw3.hand" ]
 
 		self.routeMap = {
 			"CG21W":  [ ["CSw41", "R"] ],
@@ -36,7 +288,7 @@ class Cliff(District):
 			"CC10E":  [ ["CSw31", "N"], ["CSw33", "N"] ],
 			"CC30E":  [ ["CSw31", "N"], ["CSw33", "R"] ],
 
-			"CC44E":  [ ["", "N"], ["CSw45", "N"], ["CSw49", "N"] ],
+			"CC44E":  [ ["CSw43", "N"], ["CSw45", "N"], ["CSw49", "N"] ],
 			"CC43E":  [ ["CSw43", "N"], ["CSw45", "R"], ["CSw49", "R"] ],			
 			"CC42E":  [ ["CSw43", "R"], ["CSw45", "N"], ["CSw47", "N"], ["CSw51", "N"] ],			
 			"CC41E":  [ ["CSw43", "R"], ["CSw45", "N"], ["CSw47", "R"], ["CSw51", "R"] ],
@@ -60,41 +312,45 @@ class Cliff(District):
 			"CC53W":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "N"], ["CSw77", "N"], ["CSw79", "N"], ["CSw81", "R"] ],
 			"CC54W":  [ ["CSw55", "N"], ["CSw61", "N"], ["CSw53", "N"], ["CSw73", "R"], ["CSw75", "N"], ["CSw77", "N"], ["CSw79", "R"], ["CSw81", "N"] ],			
 		}
-		ix = 0
+		
+		self.routeGroups = [
+			["CG21W", "CC10W", "CC30W", "CC31W"],
+			["CG12E", "CG10E", "CC10E", "CC30E"],
+			["CC44W", "CC43W", "CC42W", "CC41W", "CC40W", "CC21W", "CC50W", "CC51W", "CC52W", "CC53W", "CC54W"],
+			["CC44E", "CC43E", "CC42E", "CC41E", "CC40E", "CC21E", "CC50E", "CC51E", "CC52E", "CC53E", "CC54E"]
+		]
+
 		nxButtons = [
 			"CG21W", "CC10W", "CC30W", "CC31W",
 			"CG12E", "CG10E", "CC10E", "CC30E",
 			"CC44E", "CC43E", "CC42E", "CC41E", "CC40E", "CC21E", "CC50E", "CC51E", "CC52E", "CC53E", "CC54E",
 			"CC44W", "CC43W", "CC42W", "CC41W", "CC40W", "CC21W", "CC50W", "CC51W", "CC52W", "CC53W", "CC54W",
 		]
-		signalLeverNames = [ "C2.lvr", "C4.lvr", "C6.lvr", "C8.lvr"]
-		fleetlLeverNames = [ "cliff.fleet" ]
-		hsLeverNames = [ "CSw3.lvr", "CSw11.lvr", "CSw15.lvr", "CSw19.lvr", "CSw21.lvr", "CSw21a.lvr", "CSw21b.lvr"]
-		toggleNames = [ "crelease" ]
-		indNames = ["CBGreenMtnStn", "CBSheffield", "CBCliveden", "CBReverserC22C23"]
 
-		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
-		for sig, bits in sigNames:
-			self.rr.GetOutput(sig).SetBits(bits)
-		ix = self.AddOutputs(nxButtons, NXButtonOutput, District.nxbutton, ix)
-		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
-		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
 
-		for n in nxButtons:
-			self.SetNXButtonPulseLen(n, settings.nxbpulselen, settings.nxbpulsect)
-
-		blockNames = [ "G21", "C10", "C30", "C31", "COSGMW", "G10", "G12", "C20", "COSGME",
-					"C44", "C43", "C42", "C41", "C40", "C21", "C50", "C51", "C52", "C53", "C54", "COSSHE", "COSSHW"]
-
-		ix = 0
-		# each NX button corresponds to a route
-		ix = self.AddInputs(nxButtons, RouteInput, District.route, ix)
-		ix = self.AddInputs(blockNames, BlockInput, District.block, ix)
-		ix = self.AddInputs(toNames+hsNames, TurnoutInput, District.turnout, ix)
-		ix = self.AddInputs(signalLeverNames, SignalLeverInput, District.slever, ix)
-		ix = self.AddInputs(fleetlLeverNames, FleetLeverInput, District.flever, ix)
-		ix = self.AddInputs(hsLeverNames, HandswitchLeverInput, District.hslever, ix)
-		ix = self.AddInputs(toggleNames, ToggleInput, District.toggle, ix)
+	def PressButton(self, btn):
+		self.rr.SetRouteIn(btn.Name())
+		
+	def SelectRouteIn(self, rt):
+		rtnm = rt.Name()
+		
+		for gp in self.routeGroups:
+			if rtnm in gp:
+				return [x for x in gp if x != rtnm]
+			
+		return None
+			
+	def RouteIn(self, rt, stat):
+		rtNm = rt.Name()
+		if stat == 0:
+			return 
+		
+		try:
+			tolist = self.routeMap[rtNm]
+		except KeyError:
+			return 
+		
+		self.rr.RailroadEvent({"turnout": [{"name": x[0], "state": x[1]} for x in tolist] })
 
 	def EvaluateNXButton(self, btn):
 		if btn not in self.routeMap:
@@ -104,6 +360,9 @@ class Cliff(District):
 
 		for toName, status in tolist:
 			self.rr.GetInput(toName).SetState(status)
+			
+	def CheckTurnoutPosition(self, tout):
+		self.rr.RailroadEvent({"turnout": [{"name": tout.Name(), "state": "N" if tout.IsNormal() else "R"}]})
 
 	def DetermineSignalLevers(self):
 		self.sigLever["C2"] = self.DetermineSignalLever(["C2L"], ["C2RA", "C2RB", "C2RC", "C2RD"])  # signal indicators
@@ -117,383 +376,97 @@ class Cliff(District):
 		self.sigLever["C22"] = self.DetermineSignalLever(["C22L"], ["C22R"])
 		self.sigLever["C24"] = self.DetermineSignalLever(["C24L"], ["C24R"])
 
+
+	def SetHandswitchIn(self, hs, state):
+		hsname = hs.Name()
+		if hsname == "CSw21ab":
+			hsa = self.rr.GetHandswitch("CSw21a")
+			if hsa.Lock(state != 0):
+				self.rr.RailroadEvent(hsa.GetEventMessage(lock=True))
+				
+			hsb = self.rr.GetHandswitch("CSw21b")
+			if hsb.Lock(state != 0):
+				self.rr.RailroadEvent(hsb.GetEventMessage(lock=True))
+
+
 	def OutIn(self):
-		optControl = self.rr.GetControlOption("cliff")  # 0 => Cliff, 1 => Dispatcher bank/cliveden, 2 => Dispatcher All
-		# optBankFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
-		# optClivedenFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
-		optCliffFleet = self.rr.GetControlOption("cliff.fleet")  # 0 => no fleeting, 1 => fleeting
-		optOssLocks = self.rr.GetControlOption("osslocks")
-		cRelease = self.rr.GetInput("crelease").GetState()
-		
-		setSwitchLocks = optOssLocks == 1 and cRelease == 0
-		
-		# Green Mountain
-		outbc = 3		
-		outb = [0 for _ in range(outbc)]
-		asp = self.rr.GetOutput("C2LB").GetAspectBits()
-		outb[0] = setBit(outb[0], 0, asp[0])  # east end signals
-		outb[0] = setBit(outb[0], 1, asp[1])
-		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("C2LD").GetAspectBits()
-		outb[0] = setBit(outb[0], 3, asp[0])
-		asp = self.rr.GetOutput("C2R").GetAspectBits(3)
-		outb[0] = setBit(outb[0], 4, asp[0])
-		outb[0] = setBit(outb[0], 5, asp[1])
-		outb[0] = setBit(outb[0], 6, asp[2])
-		asp = self.rr.GetOutput("C2LA").GetAspectBits()
-		outb[0] = setBit(outb[0], 7, asp[0])
-
-		outb[1] = setBit(outb[1], 0, asp[1])
-		asp = self.rr.GetOutput("C2LC").GetAspectBits()
-		outb[1] = setBit(outb[1], 1, asp[0])
-		asp = self.rr.GetOutput("C4RA").GetAspectBits()
-		outb[1] = setBit(outb[1], 2, asp[0])	  # west end signals
-		outb[1] = setBit(outb[1], 3, asp[1])
-		asp = self.rr.GetOutput("C4RB").GetAspectBits()
-		outb[1] = setBit(outb[1], 4, asp[0])
-		outb[1] = setBit(outb[1], 5, asp[1])
-		asp = self.rr.GetOutput("C4RC").GetAspectBits()
-		outb[1] = setBit(outb[1], 6, asp[0])
-		outb[1] = setBit(outb[1], 7, asp[1])
-
-		outb[2] = setBit(outb[2], 0, asp[2])
-		asp = self.rr.GetOutput("C4RD").GetAspectBits()
-		outb[2] = setBit(outb[2], 1, asp[0])
-		asp = self.rr.GetOutput("C4L").GetAspectBits()
-		outb[2] = setBit(outb[2], 2, asp[0])
-		outb[2] = setBit(outb[2], 3, asp[1])
-		outb[2] = setBit(outb[2], 4, asp[2])
-		outb[2] = setBit(outb[2], 5, 0 if self.rr.GetOutput("CSw3.hand").GetStatus() == 0 else 1)  # hand switch 3
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Green Mountain: Output bytes: %s" % otext)
-
-		inbc = outbc			
-		if self.settings.simulation:
-			itext = None
-		else:
-			inb = self.rrBus.sendRecv(GREENMTN, outb, outbc, threshold=2)
-			if inb is None:
-				itext = "Read Error"
+		self.lastControl = self.control
+		self.control = self.rr.GetControlOption("cliff")  # 0 => Cliff, 1 => Dispatcher bank/cliveden, 2 => Dispatcher All
+		if self.control in [ 0, 1 ]: 
+			optFleet = self.nodes[CLIFF].GetInputBit(5, 1)
+			if self.control == 1:
+				optBankFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
+				optClivedenFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
 			else:
-				itext = formatIText(inb, inbc)
-				#logging.debug("Green Mountain: Input Bytes: %s" % itext)
-	
-				self.rr.GetInput("CC30E").SetValue(getBit(inb[0], 0))   # Routes
-				self.rr.GetInput("CC10E").SetValue(getBit(inb[0], 1))
-				self.rr.GetInput("CG10E").SetValue(getBit(inb[0], 2))
-				self.rr.GetInput("CG12E").SetValue(getBit(inb[0], 3))
-				self.rr.GetInput("CC31W").SetValue(getBit(inb[0], 4))
-				self.rr.GetInput("CC30W").SetValue(getBit(inb[0], 5))
-				self.rr.GetInput("CC10W").SetValue(getBit(inb[0], 6))
-				self.rr.GetInput("CG21W").SetValue(getBit(inb[0], 7))
-	
-				nb = getBit(inb[1], 0)  # Switch positions
-				rb = getBit(inb[1], 1)
-				self.rr.GetInput("CSw3").SetTOState(nb, rb)
-				self.rr.GetInput("C11").SetValue(getBit(inb[1], 2))  # Detection
-				self.rr.GetInput("COSGMW").SetValue(getBit(inb[1], 3))  # COS1
-				self.rr.GetInput("C10").SetValue(getBit(inb[1], 4))
-				self.rr.GetInput("C30").SetValue(getBit(inb[1], 5))
-				self.rr.GetInput("C31").SetValue(getBit(inb[1], 6))
-				self.rr.GetInput("COSGME").SetValue(getBit(inb[1], 7))  # COS2
-	
-				self.rr.GetInput("C20").SetValue(getBit(inb[2], 0))
-			
-		if self.sendIO:
-			self.rr.ShowText("GMtn", GREENMTN, otext, itext, 0, 3)
-
-
-		# Cliff
-		outbc = 8
-		outb = [0 for _ in range(outbc)]
-		sigl = self.sigLever["C2"]  # signal indicators
-		outb[0] = setBit(outb[0], 0, 1 if sigl == "L" else 0)
-		outb[0] = setBit(outb[0], 1, 1 if sigl == "N" else 0)
-		outb[0] = setBit(outb[0], 2, 1 if sigl == "R" else 0)
-		sigl = self.sigLever["C4"]
-		outb[0] = setBit(outb[0], 3, 1 if sigl == "L" else 0)
-		outb[0] = setBit(outb[0], 4, 1 if sigl == "N" else 0)
-		outb[0] = setBit(outb[0], 5, 1 if sigl == "R" else 0)
-		sigl = self.sigLever["C6"]
-		outb[0] = setBit(outb[0], 6, 1 if sigl == "L" else 0)
-		outb[0] = setBit(outb[0], 7, 1 if sigl == "N" else 0)
-
-		outb[1] = setBit(outb[1], 0, 1 if sigl == "R" else 0)
-		sigl = self.sigLever["C8"]
-		outb[1] = setBit(outb[1], 1, 1 if sigl == "L" else 0)
-		outb[1] = setBit(outb[1], 2, 1 if sigl == "N" else 0)
-		outb[1] = setBit(outb[1], 3, 1 if sigl == "R" else 0)
-		sigl = self.sigLever["C10"]
-		outb[1] = setBit(outb[1], 4, 1 if sigl == "L" else 0)
-		outb[1] = setBit(outb[1], 5, 1 if sigl == "N" else 0)
-		outb[1] = setBit(outb[1], 6, 1 if sigl == "R" else 0)
-		sigl = self.sigLever["C12"]
-		outb[1] = setBit(outb[1], 7, 1 if sigl == "L" else 0)
-
-		outb[2] = setBit(outb[2], 0, 1 if sigl == "N" else 0)
-		outb[2] = setBit(outb[2], 1, 1 if sigl == "R" else 0)
-		sigl = self.sigLever["C14"]
-		outb[2] = setBit(outb[2], 2, 1 if sigl == "L" else 0)
-		outb[2] = setBit(outb[2], 3, 1 if sigl == "N" else 0)
-		outb[2] = setBit(outb[2], 4, 1 if sigl == "R" else 0)
-		outb[2] = setBit(outb[2], 5, optCliffFleet)                    # fleet indicator
-		outb[2] = setBit(outb[2], 6, 1-optCliffFleet)
-		sigl = self.sigLever["C18"]
-		outb[2] = setBit(outb[2], 7, 1 if sigl == "L" else 0)
-
-		outb[3] = setBit(outb[3], 0, 1 if sigl == "N" else 0)
-		outb[3] = setBit(outb[3], 1, 1 if sigl == "R" else 0)
-		sigl = self.sigLever["C22"]
-		outb[3] = setBit(outb[3], 2, 1 if sigl == "L" else 0)
-		outb[3] = setBit(outb[3], 3, 1 if sigl == "N" else 0)
-		outb[3] = setBit(outb[3], 4, 1 if sigl == "R" else 0)
-		sigl = self.sigLever["C24"]
-		outb[3] = setBit(outb[3], 5, 1 if sigl == "L" else 0)
-		outb[3] = setBit(outb[3], 6, 1 if sigl == "N" else 0)
-		outb[3] = setBit(outb[3], 7, 1 if sigl == "R" else 0)
-
-		locked = self.rr.GetOutput("CSw3.hand").GetStatus() != 0  # Hand switch unlock indicators
-		outb[4] = setBit(outb[4], 0, 0 if locked else 1)
-		outb[4] = setBit(outb[4], 1, 1 if locked else 0)
-		locked = self.rr.GetOutput("CSw11.hand").GetStatus() != 0
-		outb[4] = setBit(outb[4], 2, 0 if locked else 1)
-		outb[4] = setBit(outb[4], 3, 1 if locked else 0)
-		locked = self.rr.GetOutput("CSw15.hand").GetStatus() != 0
-		outb[4] = setBit(outb[4], 4, 0 if locked else 1)
-		outb[4] = setBit(outb[4], 5, 1 if locked else 0)
-		locked = self.rr.GetOutput("CSw19.hand").GetStatus() != 0
-		outb[4] = setBit(outb[4], 6, 0 if locked else 1)
-		outb[4] = setBit(outb[4], 7, 1 if locked else 0)
-
-		lockeda = self.rr.GetOutput("CSw21a.hand").GetStatus() != 0
-		lockedb = self.rr.GetOutput("CSw21b.hand").GetStatus() != 0
-		locked = lockeda or lockedb
-		outb[5] = setBit(outb[5], 0, 0 if locked else 1)
-		outb[5] = setBit(outb[5], 1, 1 if locked else 0)
-		outb[5] = setBit(outb[5], 2, self.rr.GetInput("B10").GetValue())    # block indicators
-		CBGM = self.rr.GetInput("CBGreenMtnStn").GetInvertedValue() + self.rr.GetInput("CBGreenMtnYd").GetInvertedValue()  # Circuit Breakers
-		outb[5] = setBit(outb[5], 3, 1 if CBGM != 0 else 0)
-		CBSheffield = self.rr.GetInput("CBSheffieldA").GetInvertedValue() + self.rr.GetInput("CBSheffieldB").GetInvertedValue()  # Circuit Breakers
-		outb[5] = setBit(outb[5], 4, 1 if CBSheffield != 0 else 0)
-		outb[5] = setBit(outb[5], 5, self.rr.GetInput("CBCliveden").GetInvertedValue())
-		outb[5] = setBit(outb[5], 6, self.rr.GetInput("CBReverserC22C23").GetInvertedValue())
-		outb[5] = setBit(outb[5], 6, self.rr.GetInput("CBBank").GetInvertedValue())
-
-		outb[6] = setBit(outb[6], 0, 1 if self.rr.GetSwitchLock("CSw31") and setSwitchLocks else 0)
-		outb[6] = setBit(outb[6], 1, 1 if self.rr.GetSwitchLock("CSw41") and setSwitchLocks else 0)
-		outb[6] = setBit(outb[6], 2, 1 if self.rr.GetSwitchLock("CSw43") and setSwitchLocks else 0)
-		outb[6] = setBit(outb[6], 3, 1 if self.rr.GetSwitchLock("CSw61") and setSwitchLocks else 0)
-		outb[6] = setBit(outb[6], 4, 1 if self.rr.GetSwitchLock("CSw9")  and setSwitchLocks else 0)
-		outb[6] = setBit(outb[6], 5, 1 if self.rr.GetSwitchLock("CSw13") and setSwitchLocks else 0)
-		outb[6] = setBit(outb[6], 6, 1 if self.rr.GetSwitchLock("CSw17") and setSwitchLocks else 0)
-		outb[6] = setBit(outb[6], 7, 1 if self.rr.GetSwitchLock("CSw23") and setSwitchLocks else 0)
-
-		outb[7] - setBit(outb[7], 0, 1 if self.rr.GetInput("CSw21a").GetValue() == "R" else 0)  # remote hand switch indications
-		outb[7] - setBit(outb[7], 1, 1 if self.rr.GetInput("CSw21b").GetValue() == "R" else 0)
-		outb[7] - setBit(outb[7], 2, 1 if self.rr.GetInput("CSw19").GetValue() == "R" else 0)
-		outb[7] - setBit(outb[7], 3, 1 if self.rr.GetInput("CSw15").GetValue() == "R" else 0)
-		outb[7] - setBit(outb[7], 4, 1 if self.rr.GetInput("CSw11").GetValue() == "R" else 0)
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Cliff: Output bytes: %s" % otext)
-
-		inbc = outbc
-		if self.settings.simulation:
-			itext = None
+				optBankFleet = 0
+				optClivedenFleet = 0
 		else:
-			inb = self.rrBus.sendRecv(CLIFF, outb, outbc, threshold=2)
-			if inb is None:
-				itext = "Read Error"
-
-			itext = formatIText(inb, 7)
-			#logging.debug("Cliff: Input Bytes: %s" % itext)
-
-			self.rr.GetInput("CC21E").SetValue(getBit(inb[0], 0))  # Routes
-			self.rr.GetInput("CC40E").SetValue(getBit(inb[0], 1))
-			self.rr.GetInput("CC44E").SetValue(getBit(inb[0], 2))
-			self.rr.GetInput("CC43E").SetValue(getBit(inb[0], 3))
-			self.rr.GetInput("CC42E").SetValue(getBit(inb[0], 4))
-			self.rr.GetInput("CC41E").SetValue(getBit(inb[0], 5))
-			self.rr.GetInput("CC41W").SetValue(getBit(inb[0], 6))
-			self.rr.GetInput("CC42W").SetValue(getBit(inb[0], 7))
-
-			self.rr.GetInput("CC21W").SetValue(getBit(inb[1], 0))
-			self.rr.GetInput("CC40W").SetValue(getBit(inb[1], 1))
-			self.rr.GetInput("CC44W").SetValue(getBit(inb[1], 2))
-			self.rr.GetInput("CC43W").SetValue(getBit(inb[1], 3))
-			self.rr.GetInput("COSSHE").SetValue(getBit(inb[1], 4))  # Detection (COS3)
-			self.rr.GetInput("C21").SetValue(getBit(inb[1], 5))
-			self.rr.GetInput("C40").SetValue(getBit(inb[1], 6))
-			self.rr.GetInput("C41").SetValue(getBit(inb[1], 7))
-
-			self.rr.GetInput("C42").SetValue(getBit(inb[2], 0))
-			self.rr.GetInput("C43").SetValue(getBit(inb[2], 1))
-			self.rr.GetInput("C44").SetValue(getBit(inb[2], 2))
-			self.rr.GetInput("COSSHW").SetValue(getBit(inb[2], 3))  # COS4
-			if optControl != 2:  # NOT Dispatcher: ALL
-				lvrR = getBit(inb[2], 4)       # signal levers
-				lvrCallOn = getBit(inb[2], 5)
-				lvrL = getBit(inb[2], 6)
-				self.rr.GetInput("C2.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[2], 7)
-
-				lvrCallOn = getBit(inb[3], 0)
-				lvrL = getBit(inb[3], 1)
-				self.rr.GetInput("C4.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[3], 2)
-				lvrCallOn = getBit(inb[3], 3)
-				lvrL = getBit(inb[3], 4)
-				self.rr.GetInput("C6.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[3], 5)
-				lvrCallOn = getBit(inb[3], 6)
-				lvrL = getBit(inb[3], 7)
-				self.rr.GetInput("C8.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-
-			if optControl == 0:  # Cliff local control
-				lvrR = getBit(inb[4], 0)
-				lvrCallOn = getBit(inb[4], 1)
-				lvrL = getBit(inb[4], 2)
-				self.rr.GetInput("C10.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[4], 3)
-				lvrCallOn = getBit(inb[4], 4)
-				lvrL = getBit(inb[4], 5)
-				self.rr.GetInput("C12.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[4], 6)
-				lvrCallOn = getBit(inb[4], 7)
-
-				lvrL = getBit(inb[5], 0)
-				self.rr.GetInput("C14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				fleet = getBit(inb[5], 1)
-				self.rr.GetInput("cliff.fleet").SetState(fleet)  # fleet
-				lvrR = getBit(inb[5], 2)
-				lvrCallOn = getBit(inb[5], 3)
-				lvrL = getBit(inb[5], 4)
-				self.rr.GetInput("C18.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				lvrR = getBit(inb[5], 5)
-				lvrCallOn = getBit(inb[5], 6)
-				lvrL = getBit(inb[5], 7)
-				self.rr.GetInput("C22.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-
-				lvrR = getBit(inb[6], 0)
-				lvrCallOn = getBit(inb[6], 1)
-				lvrL = getBit(inb[6], 2)
-				self.rr.GetInput("C24.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-				release = getBit(inb[6], 3)
-				self.rr.GetInput("crelease").SetState(release)  # C Release switch
-				self.rr.GetInput("CSw3.lvr").SetState(getBit(inb[6], 4))  # handswitch unlocking
-				self.rr.GetInput("CSw11.lvr").SetState(getBit(inb[6], 5))
-				self.rr.GetInput("CSw15.lvr").SetState(getBit(inb[6], 6))
-				self.rr.GetInput("CSw19.lvr").SetState(getBit(inb[6], 7))
-
-				st = getBit(inb[7], 0)
-				self.rr.GetInput("CSw21a.lvr").SetState(st)
-				self.rr.GetInput("CSw21b.lvr").SetState(st)
-				
-		if self.sendIO:
-			self.rr.ShowText("Clff", CLIFF, otext, itext, 1, 3)
-
-		# Sheffield
-		outbc = 4
-		outb = [0 for _ in range(4)]
-		op = self.rr.GetOutput("CC54E").GetOutPulse()  # Switch button outputs - Sheffield
-		outb[0] = setBit(outb[0], 0, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC53E").GetOutPulse()
-		outb[0] = setBit(outb[0], 1, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC52E").GetOutPulse()
-		outb[0] = setBit(outb[0], 2, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC51E").GetOutPulse()
-		outb[0] = setBit(outb[0], 3, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC50E").GetOutPulse()
-		outb[0] = setBit(outb[0], 4, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC21E").GetOutPulse()
-		outb[0] = setBit(outb[0], 5, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC40E").GetOutPulse()
-		outb[0] = setBit(outb[0], 6, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC41E").GetOutPulse()
-		outb[0] = setBit(outb[0], 7, 1 if op != 0 else 0)
-
-		op = self.rr.GetOutput("CC42E").GetOutPulse()
-		outb[1] = setBit(outb[1], 0, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC43E").GetOutPulse()
-		outb[1] = setBit(outb[1], 1, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC44E").GetOutPulse()
-		outb[1] = setBit(outb[1], 2, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC54W").GetOutPulse()
-		outb[1] = setBit(outb[1], 3, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC53W").GetOutPulse()
-		outb[1] = setBit(outb[1], 4, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC52W").GetOutPulse()
-		outb[1] = setBit(outb[1], 5, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC51W").GetOutPulse()
-		outb[1] = setBit(outb[1], 6, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC50W").GetOutPulse()
-		outb[1] = setBit(outb[1], 7, 1 if op != 0 else 0)
-
-		op = self.rr.GetOutput("CC21W").GetOutPulse()
-		outb[2] = setBit(outb[2], 0, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC40W").GetOutPulse()
-		outb[2] = setBit(outb[2], 1, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC41W").GetOutPulse()
-		outb[2] = setBit(outb[2], 2, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC42W").GetOutPulse()
-		outb[2] = setBit(outb[2], 3, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC43W").GetOutPulse()
-		outb[2] = setBit(outb[2], 4, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC44W").GetOutPulse()
-		outb[2] = setBit(outb[2], 5, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC30E").GetOutPulse()  # Switch buttons - green mountain
-		outb[2] = setBit(outb[2], 6, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC10E").GetOutPulse()
-		outb[2] = setBit(outb[2], 7, 1 if op != 0 else 0)
-
-		op = self.rr.GetOutput("CG10E").GetOutPulse()
-		outb[3] = setBit(outb[3], 0, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CG12E").GetOutPulse()
-		outb[3] = setBit(outb[3], 1, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC30W").GetOutPulse()
-		outb[3] = setBit(outb[3], 2, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC31W").GetOutPulse()
-		outb[3] = setBit(outb[3], 3, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CC10W").GetOutPulse()
-		outb[3] = setBit(outb[3], 4, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("CG21W").GetOutPulse()
-		outb[3] = setBit(outb[3], 5, 1 if op != 0 else 0)
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Sheffield: Output bytes: %s" % otext)
+			optBankFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
+			optClivedenFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
+			optFleet = self.rr.GetControlOption("cliff.fleet")  # 0 => no fleeting, 1 => fleeting
+			
+			
+		dispatchList = self.fleetedSignals[self.control]
+		panelList = [x for x in self.fleetedSignals[2] if x not in dispatchList]
 		
-		inbc = outbc
-		if self.settings.simulation:
-			itext = None
+		if optFleet != self.optFleet:
+			self.optFleet = optFleet
+			self.nodes[CLIFF].SetOutputBit(2, 5, optFleet)   # fleet indicator
+			self.nodes[CLIFF].SetOutputBit(2, 6, 1-optFleet)   # fleet indicator
+		if self.control in [0, 1]:  # the only control options that have local fleeting ability
+			for signame in panelList:
+				self.rr.RailroadEvent({"fleet": [{"name": signame, "value": optFleet}]})
+			
+
+		rlReq = self.nodes[CLIFF].GetInputBit(6, 3)
+			
+		ossLocks = self.rr.GetControlOption("osslocks") == 1
+
+		# release controls if requested by operator or if osslocks are turned off by dispatcher			
+		self.released = rlReq or not ossLocks
+
+		# see if any of the reverse indicators need to be updated
+		for tout in self.revIndicators:	
+			norm = self.rr.GetHandswitch(tout).IsNormal()
+			if norm != self.norm[tout]:
+				self.norm[tout] = norm
+				ind = self.rr.GetIndicator(tout)
+				bits = ind.Bits()
+				if bits is None or len(bits) < 1:
+					continue
+				self.nodes[CLIFF].SetOutputBit(bits[0][0], bits[0][1], 0 if norm else 1)
+			
+		self.rr.UpdateDistrictTurnoutLocks(self.name, self.released)
+		
+		District.OutIn(self)
+		
+	def Released(self, _):
+		return self.released
+
+	def GetControlOption(self):
+		if self.control == 2: # Dispatcher ALL
+			skiplist = ["C2", "C4", "C6", "C8", "C10", "C12", "C14", "C18", "C22", "C24",
+					"CSw3", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
+			resumelist = []
+			
+		elif self.control == 1: # dispatcher runs bank/cliveden
+			skiplist = ["C2", "C4", "C6", "C8", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
+			if self.lastControl == 2:
+				resumelist = ["C10", "C12", "C14", "C18", "C22", "C24",
+					"CSw3"]
+			elif self.lastControl == 0:
+				resumelist = []
+			else:
+				resumelist = []
+				
 		else:
-			inb = self.rrBus.sendRecv(SHEFFIELD, outb, outbc, threshold=2)
-			
-			if inb is None:
-				itext = "Read Error"
+			skiplist = []
+			if self.lastControl == 2:
+				resumelist = ["C2", "C4", "C6", "C8", "C10", "C12", "C14", "C18", "C22", "C24",
+					"CSw3", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
+			elif self.lastControl == 1:
+				resumelist = ["C2", "C4", "C6", "C8", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
+			else:
+				resumelist= []
 				
-			itext = formatIText(inb, inbc)
-			#logging.debug("Sheffield: Input Bytes: %s" % itext)
-
-			self.rr.GetInput("CC50E").SetValue(getBit(inb[0], 0))  # Routes
-			self.rr.GetInput("CC51E").SetValue(getBit(inb[0], 1))
-			self.rr.GetInput("CC52E").SetValue(getBit(inb[0], 2))
-			self.rr.GetInput("CC53E").SetValue(getBit(inb[0], 3))
-			self.rr.GetInput("CC54E").SetValue(getBit(inb[0], 4))
-			self.rr.GetInput("CC50W").SetValue(getBit(inb[0], 5))
-			self.rr.GetInput("CC51W").SetValue(getBit(inb[0], 6))
-			self.rr.GetInput("CC52W").SetValue(getBit(inb[0], 7))
-
-			self.rr.GetInput("CC53W").SetValue(getBit(inb[1], 0))
-			self.rr.GetInput("CC54W").SetValue(getBit(inb[1], 1))
-			self.rr.GetInput("C50").SetValue(getBit(inb[1], 2))  # Detection
-			self.rr.GetInput("C51").SetValue(getBit(inb[1], 3))
-			self.rr.GetInput("C52").SetValue(getBit(inb[1], 4))
-			self.rr.GetInput("C53").SetValue(getBit(inb[1], 5))
-			self.rr.GetInput("C54").SetValue(getBit(inb[1], 6))
-				
-			
-		if self.sendIO:
-			self.rr.ShowText("Shfd", SHEFFIELD, otext, itext, 2, 3)
-
-
+		return skiplist, resumelist

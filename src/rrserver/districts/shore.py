@@ -1,59 +1,175 @@
 import logging
 
-from rrserver.district import District, SHORE, HYDEJCT, formatIText, formatOText
-from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, BlockInput, TurnoutInput, IndicatorOutput
-from rrserver.bus import setBit, getBit
+from rrserver.district import District
+from rrserver.constants import SHORE, HYDEJCT
+from rrserver.node import Node
 
 
 class Shore(District):
-	def __init__(self, parent, name, settings):
-		District.__init__(self, parent, name, settings)
-
+	def __init__(self, rr, name, settings):
+		District.__init__(self, rr, name, settings)
+			
 		self.S1E = self.S1W = False
 		self.S2E = self.S2W = False
+		self.SXG = None
+		self.BX = None
+		self.F10H = self.F10D = None
 
-		sigNames =  [ ["S4LA", 1], ["S4LB", 3], ["S4LC", 3], ["S4R", 3],
-						["S8L", 1], ["S8R", 1],
-						["S12LA", 3], ["S12LB", 1], ["S12LC", 3], ["S12R", 3],
-						["S16L", 3], ["S16R", 3],
-						["S18LA", 1], ["S18LB", 1], ["S18R", 3],
-						["S20L", 3], ["S20R", 1] ]
-		toNames = [ "SSw3", "SSw5", "SSw7", "SSw9", "SSw11", "SSw13", "SSw15", "SSw17", "SSw19" ]
-		hsNames = [ "SSw1" ]
-		handswitchNames = [ "SSw1.hand" ]
-		relayNames = [ "S20.srel", "S11.srel", "H30.srel", "H10.srel", "F10.srel", "F11.srel", "H20.srel", "H11.srel" ]
-		indNames = [ "CBShore", "CNHarpersFerry" ]
+		logging.info("creating district Shore")
+		self.rr = rr
+		self.name = name
+		self.released = False
+		self.control = 0
+		self.nodeAddresses = [ SHORE, HYDEJCT ]
+		self.nodes = {
+			SHORE:   Node(self, rr, SHORE,   7, settings),
+			HYDEJCT: Node(self, rr, HYDEJCT, 3, settings)
+		}
 
-		ix = 0
-		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
-		for sig, bits in sigNames:
-			self.rr.GetOutput(sig).SetBits(bits)
-		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
-		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
-		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
-		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
+		with self.nodes[SHORE] as n:
+			#outputs
+			self.rr.AddSignal("S4R",   self, n, SHORE, [(0, 0), (0, 1), (0, 2)])
+			self.rr.AddSignal("S12R",  self, n, SHORE, [(0, 3), (0, 4), (0, 5)])
+			self.rr.AddSignal("S4LA",  self, n, SHORE, [(0, 6)])
+			self.rr.AddSignal("S4LB",  self, n, SHORE, [(0, 7), (1, 0), (1, 1)])
+			self.rr.AddSignal("S4LC",  self, n, SHORE, [(1, 2), (1, 3), (1, 4)])
+			self.rr.AddSignal("S12LA", self, n, SHORE, [(1, 5), (1, 6), (1, 7)])
+			self.rr.AddSignal("S12LB", self, n, SHORE, [(2, 0)])
+			self.rr.AddSignal("S12LC", self, n, SHORE, [(2, 1), (2, 2), (2, 3)])
 
-		for n in toNames:
-			self.SetTurnoutPulseLen(n, settings.topulselen, settings.topulsect)
+			self.rr.AddSignal("F10H",  self, n, SHORE, [(2, 4)])  # Branch signals
+			self.rr.AddSignal("F10D",  self, n, SHORE, [(2, 5)])
+			self.rr.AddSignal("S8R",   self, n, SHORE, [(2, 6)])
+			self.rr.AddSignal("S8L",   self, n, SHORE, [(2, 7)])
 
-		ix = 0
-		ix = self.AddInputs(["S20.W"], BlockInput, District.block, ix)
-		ix = self.AddSubBlocks("S20", ["S20A", "S20B", "S20C"], ix)
-		ix = self.AddInputs(["S20.E", "SOSW", "SOSE", "S11.W"], BlockInput, District.block, ix)
-		ix = self.AddSubBlocks("S11", ["S11A", "S11B"], ix)
-		ix = self.AddInputs(["S11.E", "H30.W"], BlockInput, District.block, ix)
-		ix = self.AddSubBlocks("H30", ["H30A", "H30B"], ix)
-		ix = self.AddInputs(["H10.W"], BlockInput, District.block, ix)
-		ix = self.AddSubBlocks("H10", ["H10A", "H10B"], ix)
-		ix = self.AddInputs(["F10", "F10.E", "SOSHF", "F11.W", "F11", "H20", "H20.E", "SOSHJW", "SOSHJM", "SOSHJE", "H11", "H11.W"], BlockInput, District.block, ix)
+			# bortell crossing animation being managed by local circuit 
+			# bits 3:0 and 3:1 are no loinger used
+			self.rr.AddBlockInd("S10", self, n, SHORE, [(3, 2)])
+			self.rr.AddBlockInd("H20", self, n, SHORE, [(3, 3)])
+			self.rr.AddBlockInd("S21", self, n, SHORE, [(3, 4)])
+			self.rr.AddBlockInd("P32", self, n, SHORE, [(3, 5)])
+			
+			self.rr.AddBreakerInd("CBShore", self, n, SHORE, [(3, 6)])
+			self.rr.AddBreakerInd("CBHarpersFerry", self, n, SHORE, [(3, 7)])
 
-		ix = self.AddInputs(toNames+hsNames, TurnoutInput, District.turnout, ix)
+			self.rr.AddHandswitchInd("SSw1", self, n, SHORE, [(4, 0)])
+			
+			self.rr.AddTurnout("SSw3",  self, n, SHORE, [(4, 1), (4, 2)])
+			self.rr.AddTurnout("SSw5",  self, n, SHORE, [(4, 3), (4, 4)])
+			self.rr.AddTurnout("SSw7",  self, n, SHORE, [(4, 5), (4, 6)])
+			self.rr.AddTurnout("SSw9",  self, n, SHORE, [(4, 7), (5, 0)])
+			self.rr.AddTurnout("SSw11", self, n, SHORE, [(5, 1), (5, 2)])
+			self.rr.AddTurnout("SSw13", self, n, SHORE, [(5, 3), (5, 4)])
+			self.rr.AddOutputDevice("BX", self, n, SHORE, [(5, 5)]) # diamopnd crossing power relay
 
+			self.rr.AddStopRelay("S20.srel", self, n, SHORE, [(5, 6)])
+			self.rr.AddStopRelay("S11.srel", self, n, SHORE, [(5, 7)])
+			self.rr.AddStopRelay("H30.srel", self, n, SHORE, [(6, 0)])
+			self.rr.AddStopRelay("H10.srel", self, n, SHORE, [(6, 1)])
+			self.rr.AddStopRelay("F10.srel", self, n, SHORE, [(6, 2)])
+			self.rr.AddStopRelay("F11.srel", self, n, SHORE, [(6, 3)])
+
+			self.rr.AddHandswitchInd("CSw15", self, n, SHORE, [(6, 4)])
+			self.rr.AddOutputDevice("SXG", self, n, SHORE, [(6, 5)]) # bortell crossing gate
+
+			#inputs	
+			self.rr.AddHandswitch("SSw1",  self, n, SHORE, [(0, 0), (0, 1)])
+			self.rr.AddTurnoutPosition("SSw3",  self, n, SHORE, [(0, 2), (0, 3)])
+			self.rr.AddTurnoutPosition("SSw5",  self, n, SHORE, [(0, 4), (0, 5)])
+			self.rr.AddTurnoutPosition("SSw7",  self, n, SHORE, [(0, 6), (0, 7)])
+			self.rr.AddTurnoutPosition("SSw9",  self, n, SHORE, [(1, 0), (1, 1)])
+			self.rr.AddTurnoutPosition("SSw11", self, n, SHORE, [(1, 2), (1, 3)])
+			self.rr.AddTurnoutPosition("SSw13", self, n, SHORE, [(1, 4), (1, 5)])
+	
+			sbw = self.rr.AddBlock("S20.W",  self, n, SHORE, [(1, 6)]) 
+			sba = self.rr.AddBlock("S20A",   self, n, SHORE, [(1, 7)]) 
+			sbc = self.rr.AddBlock("S20C",   self, n, SHORE, [(2, 0)]) # C and B are wired backwards
+			sbb = self.rr.AddBlock("S20B",   self, n, SHORE, [(2, 1)]) 
+			sbe = self.rr.AddBlock("S20.E",  self, n, SHORE, [(2, 2)]) 
+			b = self.rr.AddBlock("S20",  self, n, SHORE, []) 
+			b.AddStoppingBlocks([sbe, sbw])
+			b.AddSubBlocks([sba, sbb, sbc])
+			
+			self.rr.AddBlock("SOSW",   self, n, SHORE, [(2, 3)]) 
+			self.rr.AddBlock("SOSE",   self, n, SHORE, [(2, 4)]) 
+			sbw = self.rr.AddBlock("S11.W",  self, n, SHORE, [(2, 5)]) 
+			sba = self.rr.AddBlock("S11A",  self, n, SHORE, [(4, 4)]) 
+			sbb = self.rr.AddBlock("S11B",   self, n, SHORE, [(2, 6)]) 
+			sbe = self.rr.AddBlock("S11.E",  self, n, SHORE, [(2, 7)]) 
+			b = self.rr.AddBlock("S11",    self, n, SHORE, [])  # virtual definition for S11
+			b.AddStoppingBlocks([sbe, sbw])
+			b.AddSubBlocks([sba, sbb])
+			
+			sbw = self.rr.AddBlock("H30.W",  self, n, SHORE, [(3, 0)]) 
+			sba = self.rr.AddBlock("H30A",   self, n, SHORE, [(4, 5)]) 
+			sbb = self.rr.AddBlock("H30B",   self, n, SHORE, [(3, 1)]) 
+			b = self.rr.AddBlock("H30",    self, n, SHORE, []) 
+			b.AddStoppingBlocks([sbw])
+			b.AddSubBlocks([sba, sbb])
+						
+			sbw = self.rr.AddBlock("H10.W",  self, n, SHORE, [(3, 2)]) 
+			sba = self.rr.AddBlock("H10A",   self, n, SHORE, [(4, 6)]) 
+			sbb = self.rr.AddBlock("H10B",   self, n, SHORE, [(3, 3)]) 
+			b = self.rr.AddBlock("H10",    self, n, SHORE, [])
+			b.AddStoppingBlocks([sbw])
+			b.AddSubBlocks([sba, sbb])
+
+			self.rr.AddBlock("F10",    self, n, SHORE, [(3, 4)]) 
+			self.rr.AddBlock("F10.E",  self, n, SHORE, [(3, 5)]) 
+			self.rr.AddBlock("SOSHF",  self, n, SHORE, [(3, 6)]) 
+			self.rr.AddBlock("F11.W",  self, n, SHORE, [(3, 7)]) 
+			self.rr.AddBlock("F11",    self, n, SHORE, [(4, 0)]) 
+			# 		SXON  = SIn[4].bit.b1;	//Crossing gate off normal - no londer needed
+
+			self.rr.AddHandswitch("CSw15", self, n, SHORE, [(4, 2), (4, 3)])
+
+			
+
+		with self.nodes[HYDEJCT] as n:
+			#outputs
+			self.rr.AddSignal("S16R",  self, n, HYDEJCT, [(0, 0), (0, 1), (0, 2)])
+			self.rr.AddSignal("S18R",  self, n, HYDEJCT, [(0, 3), (0, 4), (0, 5)])
+			self.rr.AddSignal("S20R",  self, n, HYDEJCT, [(0, 6)])
+			self.rr.AddSignal("S16L",  self, n, HYDEJCT, [(0, 7), (1, 0), (1, 1)])
+			self.rr.AddSignal("S18LB", self, n, HYDEJCT, [(1, 2)])
+			self.rr.AddSignal("S18LA", self, n, HYDEJCT, [(1, 3)])
+			self.rr.AddSignal("S20L",  self, n, HYDEJCT, [(1, 4), (1, 5), (1, 6)])
+			
+			self.rr.AddTurnout("SSw15", self, n, HYDEJCT, [(1, 7), (2, 0)])
+			self.rr.AddTurnout("SSw17", self, n, HYDEJCT, [(2, 1), (2, 2)])
+			self.rr.AddTurnout("SSw19", self, n, HYDEJCT, [(2, 3), (2, 4)])
+
+			self.rr.AddStopRelay("H20.srel", self, n, HYDEJCT, [(2, 5)])
+			self.rr.AddStopRelay("P42.srel", self, n, HYDEJCT, [(2, 6)])
+			self.rr.AddStopRelay("H11.srel", self, n, HYDEJCT, [(2, 7)])
+			
+			# inputs
+			self.rr.AddTurnoutPosition("SSw15", self, n, HYDEJCT, [(0, 0), (0, 1)])
+			self.rr.AddTurnoutPosition("SSw17", self, n, HYDEJCT, [(0, 2), (0, 3)])
+			self.rr.AddTurnoutPosition("SSw19", self, n, HYDEJCT, [(0, 4), (0, 5)])
+
+			b = self.rr.AddBlock("H20",    self, n, HYDEJCT, [(0, 6)]) 
+			sbe = self.rr.AddBlock("H20.E",  self, n, HYDEJCT, [(0, 7)]) 
+			b.AddStoppingBlocks([sbe])
+			
+			self.rr.AddBlock("P42.W",  self, n, HYDEJCT, [(1, 0)]) 
+			self.rr.AddBlock("P42",    self, n, HYDEJCT, [(1, 1)]) 
+			self.rr.AddBlock("P42.E",  self, n, HYDEJCT, [(1, 2)]) 
+			self.rr.AddBlock("SOSHJW", self, n, HYDEJCT, [(1, 3)]) 
+			self.rr.AddBlock("SOSHJM", self, n, HYDEJCT, [(1, 4)]) 
+			self.rr.AddBlock("SOSHJE", self, n, HYDEJCT, [(1, 5)]) 
+			self.rr.AddBlock("H11.W",  self, n, HYDEJCT, [(1, 6)]) 
+			self.rr.AddBlock("H11",    self, n, HYDEJCT, [(1, 7)]) 
+			
+
+
+		
 	def OutIn(self):
-		S10B = self.rr.GetInput("S10B").GetValue() != 0
-		S10C = self.rr.GetInput("S10C").GetValue() != 0
-		S20B = self.rr.GetInput("S20B").GetValue() != 0
-		S20C = self.rr.GetInput("S20C").GetValue() != 0
+		# determine whether or not the bortell gate should be activated
+		S10B = self.rr.GetBlock("S10B").IsOccupied()
+		S10C = self.rr.GetBlock("S10C").IsOccupied()
+		S20B = self.rr.GetBlock("S20B").IsOccupied()
+		S20C = self.rr.GetBlock("S20C").IsOccupied()
 		if S10B and  not self.S1W:
 			self.S1E = True
 		if S10C and not self.S1E:
@@ -66,243 +182,35 @@ class Shore(District):
 			self.S2W = True
 		if not S20B and not S20C:
 			self.S2E = self.S2W = False
-
+		
 		SXG = (self.S1E and S10B) or (self.S1W and S10C) or (self.S2E and S20B) or (self.S2W and S20C)
-		BX = 0
+		if self.SXG != SXG:
+			self.SXG = SXG
+			self.rr.SetODevice("SXG", self.SXG)
 
-		asp8l = self.rr.GetOutput("S8L").GetAspect()
-		asp8r = self.rr.GetOutput("S8R").GetAspect()
-		f10occ = self.rr.GetInput("F10").GetValue()
+		# determine if we need to power the harper's ferry crossing diamond		
+		asp = self.rr.GetSignal("S8R").Aspect()
+		BX = asp		
+		asp = self.rr.GetSignal("S8L").Aspect()
+		BX += asp
+		if self.BX != BX:
+			self.BX = BX
+			self.rr.SetODevice("BX", self.BX)
+
+		# determine how we need to set the branch signals		
+		asp8l = self.rr.GetSignal("S8L").Aspect()
+		asp8r = self.rr.GetSignal("S8R").Aspect()
+		f10occ = self.rr.GetBlock("F10").IsOccupied()
 		F10H = asp8l == 0 and f10occ == 0
 		F10D = F10H and (asp8r != 0)
-
-		outbc = 8
-		outb = [0 for _ in range(outbc)]
-		asp = self.rr.GetOutput("S4R").GetAspectBits()
-		outb[0] = setBit(outb[0], 0, asp[0])  # Main Signals
-		outb[0] = setBit(outb[0], 1, asp[1])
-		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("S12R").GetAspectBits()
-		outb[0] = setBit(outb[0], 3, asp[0])
-		outb[0] = setBit(outb[0], 4, asp[1])
-		outb[0] = setBit(outb[0], 5, asp[2])
-		asp = self.rr.GetOutput("S4LA").GetAspectBits()
-		outb[0] = setBit(outb[0], 6, asp[0])
-		asp = self.rr.GetOutput("S4LB").GetAspectBits()
-		outb[0] = setBit(outb[0], 7, asp[0])
-
-		outb[1] = setBit(outb[1], 0, asp[1])
-		outb[1] = setBit(outb[1], 1, asp[2])
-		asp = self.rr.GetOutput("S4LC").GetAspectBits()
-		outb[1] = setBit(outb[1], 2, asp[0])
-		outb[1] = setBit(outb[1], 3, asp[1])
-		outb[1] = setBit(outb[1], 4, asp[2])
-		asp = self.rr.GetOutput("S12LA").GetAspectBits()
-		outb[1] = setBit(outb[1], 5, asp[0])
-		outb[1] = setBit(outb[1], 6, asp[1])
-		outb[1] = setBit(outb[1], 7, asp[2])
-
-		asp = self.rr.GetOutput("S12LB").GetAspectBits()
-		outb[2] = setBit(outb[2], 0, asp[0])
-		asp = self.rr.GetOutput("S12LC").GetAspectBits()
-		outb[2] = setBit(outb[2], 1, asp[0])
-		outb[2] = setBit(outb[2], 2, asp[1])
-		outb[2] = setBit(outb[2], 3, asp[2])
-		outb[2] = setBit(outb[2], 4, 1 if F10H else 0)  # Branch signals
-		outb[2] = setBit(outb[2], 5, 1 if F10D else 0)
-		asp = self.rr.GetOutput("S8R").GetAspect()
-		BX += asp
-		outb[2] = setBit(outb[2], 6, 1 if asp != 0 else 0)
-		asp = self.rr.GetOutput("S8L").GetAspect()
-		BX += asp
-		outb[2] = setBit(outb[2], 7, 1 if asp != 0 else 0)
-
-		# bortell crossing animation being managed by local circuit - these 2 outputs are unnecessary
-		# outb[3] = setBit(outb[3], 0, 1 if SXL1 else 0)  # bortelll crossing signal
-		# outb[3] = setBit(outb[3], 1, 1 if SXL2 else 0) 
-		outb[3] = setBit(outb[3], 2, self.rr.GetInput("S10").GetValue())  #block occupancy indicators
-		outb[3] = setBit(outb[3], 3, self.rr.GetInput("H20").GetValue())
-		outb[3] = setBit(outb[3], 4, self.rr.GetInput("S21").GetValue())
-		outb[3] = setBit(outb[3], 5, self.rr.GetInput("P32").GetValue())
-		outb[3] = setBit(outb[3], 6, self.rr.GetInput("CBShore").GetInvertedValue())
-		outb[3] = setBit(outb[3], 7, self.rr.GetInput("CBHarpersFerry").GetInvertedValue())
-
-		outb[4] = setBit(outb[4], 0, 0 if self.rr.GetOutput("SSw1.hand").GetStatus() == 0 else 1) # hand switch unlocks
-		op = self.rr.GetOutput("SSw3").GetOutPulse()
-		outb[4] = setBit(outb[4], 1, 1 if op > 0 else 0)   # Switch outputs
-		outb[4] = setBit(outb[4], 2, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("SSw5").GetOutPulse()
-		outb[4] = setBit(outb[4], 3, 1 if op > 0 else 0) 
-		outb[4] = setBit(outb[4], 4, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("SSw7").GetOutPulse()
-		outb[4] = setBit(outb[4], 5, 1 if op > 0 else 0) 
-		outb[4] = setBit(outb[4], 6, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("SSw9").GetOutPulse()
-		outb[4] = setBit(outb[4], 7, 1 if op > 0 else 0) 
-
-		outb[5] = setBit(outb[5], 0, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("SSw11").GetOutPulse()
-		outb[5] = setBit(outb[5], 1, 1 if op > 0 else 0) 
-		outb[5] = setBit(outb[5], 2, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("SSw13").GetOutPulse()
-		outb[5] = setBit(outb[5], 3, 1 if op > 0 else 0) 
-		outb[5] = setBit(outb[5], 4, 1 if op < 0 else 0)
-		outb[5] = setBit(outb[5], 5, 1 if BX != 0 else 0)  # Diamond crossing power relay - power if EITHER S8L or S8L is not STOP
-		outb[5] = setBit(outb[5], 6, self.rr.GetOutput("S20.srel").GetStatus())	# Stop relays
-		outb[5] = setBit(outb[5], 7, self.rr.GetOutput("S11.srel").GetStatus())
-
-		outb[6] = setBit(outb[6], 0, self.rr.GetOutput("H30.srel").GetStatus())
-		outb[6] = setBit(outb[6], 1, self.rr.GetOutput("H10.srel").GetStatus())
-		outb[6] = setBit(outb[6], 2, self.rr.GetOutput("F10.srel").GetStatus())
-		outb[6] = setBit(outb[6], 3, self.rr.GetOutput("F11.srel").GetStatus())
-		outb[6] = setBit(outb[6], 4, 0 if self.rr.GetOutput("CSw15.hand").GetStatus() != 0 else 1) # spikes peak hand switch
-		outb[6] = setBit(outb[6], 5, 1 if SXG else 0)  # Bortell crossing gates
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Shore: Output bytes: %s" % otext)
-	
-		inbc = outbc		
-		if self.settings.simulation:
-			itext = None
-		else:
-			inb = self.rrBus.sendRecv(SHORE, outb, outbc)
-			if inb is None:
-				itext = "Read Error"
-			else:
-				itext = formatIText(inb, inbc)
-				#logging.debug("Shore: Input Bytes: %s" % itext)
-	
-				nb = getBit(inb[0], 0)  # Switch positions
-				rb = getBit(inb[0], 1)
-				self.rr.GetInput("SSw1").SetTOState(nb, rb)
-				nb = getBit(inb[0], 2) 
-				rb = getBit(inb[0], 3)
-				self.rr.GetInput("SSw3").SetTOState(nb, rb)
-				nb = getBit(inb[0], 4) 
-				rb = getBit(inb[0], 5)
-				self.rr.GetInput("SSw5").SetTOState(nb, rb)
-				nb = getBit(inb[0], 6) 
-				rb = getBit(inb[0], 7)
-				self.rr.GetInput("SSw7").SetTOState(nb, rb)
-	
-				nb = getBit(inb[1], 0)
-				rb = getBit(inb[1], 1)
-				self.rr.GetInput("SSw9").SetTOState(nb, rb)
-				nb = getBit(inb[1], 2)
-				rb = getBit(inb[1], 3)
-				self.rr.GetInput("SSw11").SetTOState(nb, rb)
-				nb = getBit(inb[1], 4)
-				rb = getBit(inb[1], 5)
-				self.rr.GetInput("SSw13").SetTOState(nb, rb)
-				self.rr.GetInput("S20.W").SetValue(getBit(inb[1], 6))  # Shore Detection
-				self.rr.GetInput("S20A").SetValue(getBit(inb[1], 7))
-	
-				self.rr.GetInput("S20C").SetValue(getBit(inb[2], 0)) # intentional B and C seem to be reversed
-				self.rr.GetInput("S20B").SetValue(getBit(inb[2], 1))
-				self.rr.GetInput("S20.E").SetValue(getBit(inb[2], 2))
-				self.rr.GetInput("SOSW").SetValue(getBit(inb[2], 3))
-				self.rr.GetInput("SOSE").SetValue(getBit(inb[2], 4))
-				self.rr.GetInput("S11.W").SetValue(getBit(inb[2], 5))
-				self.rr.GetInput("S11B").SetValue(getBit(inb[2], 6))
-				self.rr.GetInput("S11.E").SetValue(getBit(inb[2], 7))
-	
-				self.rr.GetInput("H30.W").SetValue(getBit(inb[3], 0))
-				self.rr.GetInput("H30B").SetValue(getBit(inb[3], 1))
-				self.rr.GetInput("H10.W").SetValue(getBit(inb[3], 2))
-				self.rr.GetInput("H10B").SetValue(getBit(inb[3], 3))
-				self.rr.GetInput("F10").SetValue(getBit(inb[3], 4))  # Harpers detection
-				self.rr.GetInput("F10.E").SetValue(getBit(inb[3], 5))
-				self.rr.GetInput("SOSHF").SetValue(getBit(inb[3], 6))
-				self.rr.GetInput("F11.W").SetValue(getBit(inb[3], 7))
-	
-				self.rr.GetInput("F11").SetValue(getBit(inb[4], 0))
-				# 		SXON  = SIn[4].bit.b1;	//Crossing gate off normal - no londer needed
-				nb = getBit(inb[4], 2) 
-				rb = getBit(inb[4], 3)
-				self.rr.GetInput("CSw15").SetTOState(nb, rb)
-				self.rr.GetInput("S11A").SetValue(getBit(inb[4], 4))
-				self.rr.GetInput("H30A").SetValue(getBit(inb[4], 5))
-				self.rr.GetInput("H10A").SetValue(getBit(inb[4], 6))
-				
-		if self.sendIO:
-			self.rr.ShowText("Shor", SHORE, otext, itext, 0, 2)
-
-
-		#  Hyde Junction
-		outbc = 3
-		outb = [0 for _ in range(outbc)]
-		asp = self.rr.GetOutput("S16R").GetAspectBits()
-		outb[0] = setBit(outb[0], 0, asp[0])  # signals
-		outb[0] = setBit(outb[0], 1, asp[1])
-		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("S18R").GetAspectBits()
-		outb[0] = setBit(outb[0], 3, asp[0])
-		outb[0] = setBit(outb[0], 4, asp[1])
-		outb[0] = setBit(outb[0], 5, asp[2])
-		asp = self.rr.GetOutput("S20R").GetAspectBits()
-		outb[0] = setBit(outb[0], 6, asp[0])
-		asp = self.rr.GetOutput("S16L").GetAspectBits()
-		outb[0] = setBit(outb[0], 7, asp[0])
-
-		outb[1] = setBit(outb[1], 0, asp[1])
-		outb[1] = setBit(outb[1], 1, asp[2])
-		asp = self.rr.GetOutput("S18LB").GetAspectBits()
-		outb[1] = setBit(outb[1], 2, asp[0])
-		asp = self.rr.GetOutput("S18LA").GetAspectBits()
-		outb[1] = setBit(outb[1], 3, asp[0])
-		asp = self.rr.GetOutput("S20L").GetAspectBits()
-		outb[1] = setBit(outb[1], 4, asp[0])
-		outb[1] = setBit(outb[1], 5, asp[1])
-		outb[1] = setBit(outb[1], 6, asp[2])
-		op = self.rr.GetOutput("SSw15").GetOutPulse()  # switches
-		outb[1] = setBit(outb[1], 7, 1 if op > 0 else 0)
-
-		outb[2] = setBit(outb[2], 0, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("SSw17").GetOutPulse()
-		outb[2] = setBit(outb[2], 1, 1 if op > 0 else 0)
-		outb[2] = setBit(outb[2], 2, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("SSw19").GetOutPulse()
-		outb[2] = setBit(outb[2], 3, 1 if op > 0 else 0)
-		outb[2] = setBit(outb[2], 4, 1 if op < 0 else 0)
-		outb[2] = setBit(outb[2], 5, self.rr.GetOutput("H20.srel").GetStatus())	# Stop relays
-		outb[2] = setBit(outb[2], 6, self.rr.GetOutput("P42.srel").GetStatus())
-		outb[2] = setBit(outb[2], 7, self.rr.GetOutput("H11.srel").GetStatus())	
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Hyde Jct: Output bytes: %s" % otext)
-
-		inbc = outbc			
-		if self.settings.simulation:
-			itext = None
-		else:
-			inb = self.rrBus.sendRecv(HYDEJCT, outb, outbc)
-			if inb is None:
-				itext = "Read Error"
-			else:
-				itext = formatIText(inb, inbc)
-				#logging.debug("Hyde Jct: Input Bytes: %s" % itext)
-	
-				nb = getBit(inb[0], 0)  # Switch positions
-				rb = getBit(inb[0], 1)
-				self.rr.GetInput("SSw15").SetTOState(nb, rb)
-				nb = getBit(inb[0], 2) 
-				rb = getBit(inb[0], 3)
-				self.rr.GetInput("SSw17").SetTOState(nb, rb)
-				nb = getBit(inb[0], 4) 
-				rb = getBit(inb[0], 5)
-				self.rr.GetInput("SSw19").SetTOState(nb, rb)
-				self.rr.GetInput("H20").SetValue(getBit(inb[0], 6))  # Detection
-				self.rr.GetInput("H20.E").SetValue(getBit(inb[0], 7)) 
-	
-				self.rr.GetInput("P42.W").SetValue(getBit(inb[1], 0)) 
-				self.rr.GetInput("P42").SetValue(getBit(inb[1], 1)) 
-				self.rr.GetInput("P42.E").SetValue(getBit(inb[1], 2)) 
-				self.rr.GetInput("SOSHJW").SetValue(getBit(inb[1], 3)) # HOS1
-				self.rr.GetInput("SOSHJM").SetValue(getBit(inb[1], 4)) # HOS2
-				self.rr.GetInput("SOSHJE").SetValue(getBit(inb[1], 5)) # HOS3
-				self.rr.GetInput("H11.W").SetValue(getBit(inb[1], 6)) 
-				self.rr.GetInput("H11").SetValue(getBit(inb[1], 7)) 
-						
-		if self.sendIO:
-			self.rr.ShowText("HJct", HYDEJCT, otext, itext, 1, 2)
+		
+		if F10H != self.F10H:
+			self.F10H = F10H
+			self.rr.SetAspect("F10H", 1 if F10H else 0)
+		
+		if F10D != self.F10D:
+			self.F10D = F10D
+			self.rr.SetAspect("F10D", 1 if F10D else 0)
+		
+		District.OutIn(self)
 

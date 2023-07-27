@@ -198,6 +198,11 @@ class MainFrame(wx.Frame):
 			hsz.Add(self.cbBreaker, 0, wx.TOP, 15)
 			
 			hsz.AddSpacer(20)
+			self.bClearAll = wx.Button(self, wx.ID_ANY, "Clear All", size=(100, 46))
+			self.Bind(wx.EVT_BUTTON, self.OnClearBreakers, self.bClearAll)
+			hsz.Add(self.bClearAll)
+			
+			hsz.AddSpacer(20)
 			
 			vsz.Add(hsz)
 			
@@ -240,6 +245,7 @@ class MainFrame(wx.Frame):
 		if self.settings.simulation:
 			self.bOccupy.Enable(flag)
 			self.bBreaker.Enable(flag)
+			self.bClearAll.Enable(flag)
 			self.bQuit.Enable(flag)
 			self.bTurnoutPos.Enable(flag)
 			self.bSetInputBit.Enable(flag)
@@ -266,7 +272,11 @@ class MainFrame(wx.Frame):
 		chx = self.chBreaker.GetSelection()
 		if chx == wx.NOT_FOUND:
 			return
-		self.rrServer.SendRequest({"simulate": {"action": "breaker", "breaker": self.chBreaker.GetString(chx), "state": 1 if self.cbBreaker.IsChecked() else 0}})
+		self.rrServer.SendRequest({"simulate": {"action": "breaker", "breaker": self.chBreaker.GetString(chx), "state": 0 if self.cbBreaker.IsChecked() else 1}})
+		
+	def OnClearBreakers(self, _):
+		for brkrname in breakerNames.keys():
+			self.rrServer.SendRequest({"simulate": {"action": "breaker", "breaker": brkrname, "state": 0}})
 		
 	def OnTurnoutPos(self, _):
 		chx = self.chTurnout.GetSelection()

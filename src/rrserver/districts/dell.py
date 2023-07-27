@@ -1,249 +1,182 @@
 import logging
 
-from rrserver.district import District, DELL, FOSS, formatIText, formatOText
-from rrserver.rrobjects import SignalOutput, TurnoutOutput, HandSwitchOutput, RelayOutput, BlockInput, TurnoutInput
-from rrserver.bus import setBit, getBit
+from rrserver.district import District
+from rrserver.constants import  DELL, FOSS
+from rrserver.node import Node
 
 class Dell(District):
-	def __init__(self, parent, name, settings):
-		District.__init__(self, parent, name, settings)
+	def __init__(self, rr, name, settings):
+		District.__init__(self, rr, name, settings)
+		logging.info("creating district Latham")
+		
+		self.DXO = None
+		self.RXO = None
+		
+		self.rr = rr
+		self.name = name
+		self.nodeAddresses = [ DELL, FOSS ]
+		self.nodes = {
+			DELL:  Node(self, rr, DELL,  5, settings),
+			FOSS:  Node(self, rr, FOSS,  3, settings)
+		}
 
-		self.D1W = self.D1E = self.D2W = self.D2E = False
-		self.RXW = self.RXE = False
+		with self.nodes[DELL] as n:
+			# outputs
+			self.rr.AddSignal("D4RA", self, n, DELL, [(0, 0), (0, 1), (0, 2)])
+			self.rr.AddSignal("D4RB", self, n, DELL, [(0, 3), (0, 4), (0, 5)])
+			self.rr.AddSignal("D6RA", self, n, DELL, [(0, 6)])
+			self.rr.AddSignal("D6RB", self, n, DELL, [(0, 7)])
+	
+			self.rr.AddSignal("D4L",  self, n, DELL, [(1, 0), (1, 1), (1, 2)])
+			self.rr.AddSignal("D6L",  self, n, DELL, [(1, 3), (1, 4), (1, 5)])
+			self.rr.AddOutputDevice("DXO", self, n, DELL, [(1, 6)]) # laport crossing signal/gate
+			self.rr.AddBlockInd("H13", self, n, DELL, [(1, 7)])
+	
+			self.rr.AddBlockInd("D10", self, n, DELL, [(2, 0)])
+			self.rr.AddBlockInd("S20", self, n, DELL, [(2, 1)])
+			self.rr.AddHandswitchInd("DSw9", self, n, DELL, [(2, 2)])
+			self.rr.AddTurnout("DSw1", self, n, DELL, [(2, 3), (2, 4)])
+			self.rr.AddTurnout("DSw3", self, n, DELL, [(2, 5), (2, 6)])
+			self.rr.AddTurnout("DSw5", self, n, DELL, [(2, 7), (3, 0)])
 
-		sigNames =  [ ["D4RA", 3], ["D4RB", 3], ["D4L", 3],
-						["D6RA", 1], ["D6RB", 1], ["D6L", 3],
-						["DXO", 1], 
-						["D10R", 3], ["D10L", 3],
-						["D12R", 3], ["D12L", 3],
-						["RXO", 1], ["R10W", 3]
-						]
-		toNames = [ "DSw1", "DSw3", "DSw5", "DSw7", "DSw11" ]
-		hsNames = [ "DSw9" ]
-		handswitchNames = [ "DSw9.hand" ]
-		relayNames = [ "H23.srel", "D11.srel", "D20.srel", "D21.srel", "S10.srel", "R10.srel" ]
+			self.rr.AddTurnout("DSw7",  self, n, DELL, [(3, 1), (3, 2)])
+			self.rr.AddTurnout("DSw11", self, n, DELL, [(3, 3), (3, 4)])
+			self.rr.AddStopRelay("D20.srel", self, n, DELL, [(3, 5)])
+			self.rr.AddStopRelay("H23.srel", self, n, DELL, [(3, 6)])
+			self.rr.AddStopRelay("D11.srel", self, n, DELL, [(3, 7)])
 
-		ix = 0
-		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
-		for sig, bits in sigNames:
-			self.rr.GetOutput(sig).SetBits(bits)
-		ix = self.AddOutputs(toNames, TurnoutOutput, District.turnout, ix)
-		ix = self.AddOutputs(handswitchNames, HandSwitchOutput, District.handswitch, ix)
-		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
+			# inputs	
+			self.rr.AddTurnoutPosition("DSw1", self, n, DELL, [(0, 0), (0, 1)])
+			self.rr.AddTurnoutPosition("DSw3", self, n, DELL, [(0, 2), (0, 3)])
+			self.rr.AddTurnoutPosition("DSw5", self, n, DELL, [(0, 4), (0, 5)])
+			self.rr.AddTurnoutPosition("DSw7", self, n, DELL, [(0, 6), (0, 7)])
 
-		for n in toNames:
-			self.SetTurnoutPulseLen(n, settings.topulselen, settings.topulsect)
+			self.rr.AddHandswitch("DSw9", self, n, DELL, [(1, 0), (1, 1)])
+			self.rr.AddTurnoutPosition("DSw11", self, n, DELL, [(1, 2), (1, 3)])
+			self.rr.AddBlock("D20",      self, n, DELL, [(1, 4)]) 
+			self.rr.AddBlock("D20.E",    self, n, DELL, [(1, 5)]) 
+			b = self.rr.AddBlock("H23",      self, n, DELL, [(1, 6)]) 
+			sbe = self.rr.AddBlock("H23.E",    self, n, DELL, [(1, 7)]) 
+			b.AddStoppingBlocks([sbe])
 
-		ix = 0
-		ix = self.AddInputs(["D20", "D20.E", "H23", "H23.E", "DOSVJW", "DOSVJE", "D11.W"], BlockInput, District.block, ix)
-		ix = self.AddSubBlocks("D11", ["D11A", "D11B"], ix)
-		ix = self.AddInputs(["D11.E", "D21.W"], BlockInput, District.block, ix)
-		ix = self.AddSubBlocks("D21", ["D21A", "D21B"], ix)
-		ix = self.AddInputs(["D21.E", "DOSFOW", "DOSFOE", "S10.W"], BlockInput, District.block, ix)
-		ix = self.AddSubBlocks("S10", ["S10A", "S10B", "S10C"], ix)
-		ix = self.AddInputs(["S10.E"], BlockInput, District.block, ix)
-		ix = self.AddInputs(["R11", "R12"], BlockInput, District.block, ix)
+			self.rr.AddBlock("DOSVJW",   self, n, DELL, [(2, 0)]) 
+			self.rr.AddBlock("DOSVJE",   self, n, DELL, [(2, 1)]) 
+			sbw = self.rr.AddBlock("D11.W",    self, n, DELL, [(2, 2)]) 
+			sba = self.rr.AddBlock("D11A",     self, n, DELL, [(2, 3)]) 
+			sbb = self.rr.AddBlock("D11B",     self, n, DELL, [(2, 4)]) 
+			b = self.rr.AddBlock("D11",      self, n, DELL, [])  # virtual definition for D11 
+			sbe = self.rr.AddBlock("D11.E",    self, n, DELL, [(2, 5)]) 
+			b.AddStoppingBlocks([sbe, sbw])
+			b.AddSubBlocks([sba, sbb])
 
-		ix = self.AddInputs(toNames+hsNames, TurnoutInput, District.turnout, ix)
+		with self.nodes[FOSS] as n:
+			# outputs
+			self.rr.AddSignal("D10R", self, n, FOSS, [(0, 0), (0, 1), (0, 2)])
+			self.rr.AddSignal("D12R", self, n, FOSS, [(0, 3), (0, 4), (0, 5)])
+	
+			self.rr.AddSignal("D10L", self, n, FOSS, [(1, 0), (1, 1), (1, 2)])
+			self.rr.AddSignal("D12L", self, n, FOSS, [(1, 3), (1, 4), (1, 5)])
+			self.rr.AddStopRelay("D21.srel", self, n, FOSS, [(1, 6)])
+			self.rr.AddStopRelay("S10.srel", self, n, FOSS, [(1, 7)])
+	
+			# bit 2:0 is bad
+			self.rr.AddStopRelay("R10.srel", self, n, FOSS, [(2, 1)])
+			self.rr.AddOutputDevice("RXO", self, n, FOSS, [(2, 2)]) # rocky hill crossing gate/signal
+			self.rr.AddSignal("R10W", self, n, FOSS, [(2, 3), (2, 4), (2, 5)])
 
+			#inputs	
+			sbw = self.rr.AddBlock("D21.W",     self, n, DELL, [(0, 0)]) 
+			sba = self.rr.AddBlock("D21A",      self, n, DELL, [(0, 1)]) 
+			sbb = self.rr.AddBlock("D21B",      self, n, DELL, [(0, 2)]) 
+			b = self.rr.AddBlock("D21",       self, n, DELL, []) # virtual definition for D21
+			sbe = self.rr.AddBlock("D21.E",     self, n, DELL, [(0, 3)]) 
+			b.AddStoppingBlocks([sbe, sbw])
+			b.AddSubBlocks([sba, sbb])
+			
+			self.rr.AddBlock("DOSFOW",    self, n, DELL, [(0, 4)]) 
+			self.rr.AddBlock("DOSFOE",    self, n, DELL, [(0, 5)]) 
+			sbw = self.rr.AddBlock("S10.W",     self, n, DELL, [(0, 6)]) 
+			sba = self.rr.AddBlock("S10A",      self, n, DELL, [(0, 7)]) 
+
+			sbb = self.rr.AddBlock("S10B",      self, n, DELL, [(1, 0)]) 
+			sbc = self.rr.AddBlock("S10C",      self, n, DELL, [(1, 1)]) 
+			sbe = self.rr.AddBlock("S10.E",     self, n, DELL, [(1, 2)]) 
+			b = self.rr.AddBlock("S10",       self, n, DELL, []) # virtual definition for S10
+			b.AddStoppingBlocks([sbe, sbw])
+			b.AddSubBlocks([sba, sbb, sbc])
+			
+			sbw = self.rr.AddBlock("R10.W",     self, n, DELL, [(1, 3)]) 
+			sba = self.rr.AddBlock("R10A",      self, n, DELL, [(1, 4)]) 
+			sbb = self.rr.AddBlock("R10B",      self, n, DELL, [(1, 5)]) 
+			sbc = self.rr.AddBlock("R10C",      self, n, DELL, [(1, 6)]) 
+			b = self.rr.AddBlock("R10",       self, n, DELL, []) 
+			b.AddStoppingBlocks([sbw])
+			b.AddSubBlocks([sba, sbb, sbc])
+			
+			self.rr.AddBlock("R11",       self, n, DELL, [(1, 7)]) 
+			
+			self.rr.AddBlock("R12",       self, n, DELL, [(2, 0)]) 
+
+		
 	def OutIn(self):
 		# determine the state of the crossing gate at laporte
-		dos1 = self.rr.GetInput("DOSVJW").GetValue() != 0
-		d11w = self.rr.GetInput("D11.W").GetValue() != 0
-		d11a = self.rr.GetInput("D11A").GetValue() != 0
+		dos1 = self.rr.GetBlock("DOSVJW").IsOccupied()
+		d11w = self.rr.GetBlock("D11.W").IsOccupied()
+		d11a = self.rr.GetBlock("D11A").IsOccupied()
 		if dos1 and not self.D1W:
 			self.D1E = True
 		if (d11w or d11a) and not self.D1E:
 			self.D1W = True
 		if not dos1 and not (d11w or d11a):
 			self.D1E = self.D1W = False
-
-		dos2 = self.rr.GetInput("DOSVJE").GetValue() != 0
-		d21w = self.rr.GetInput("D21.W").GetValue() != 0
-		d21a = self.rr.GetInput("D21A").GetValue() != 0
+		
+		dos2 = self.rr.GetBlock("DOSVJE").IsOccupied()
+		d21w = self.rr.GetBlock("D21.W").IsOccupied()
+		d21a = self.rr.GetBlock("D21A").IsOccupied()
 		if dos2 and not self.D2W:
 			self.D2E = True
 		if (d21w or d21a) and not self.D2E:
 			self.D2W = True
 		if not dos2 and not (d21w or d21a):
 			self.D2E = self.D2W = False
-
-		DXO = (self.D1E and dos1) or (self.D1W and (d11w or d11a)) or (self.D2E and dos2) or (self.D2W and (d21w or d21a))
-
-		# determine the state of the crossing gate at rocky hill
-		r10b = self.rr.GetInput("R10B").GetValue() != 0
-		r10c = self.rr.GetInput("R10C").GetValue() != 0
-		if r10b and not self.RXW:
-			self.RXE = True
-		if r10c and not self.RXE:
-			self.RXW = True
-		if not r10b and not r10c:
-			self.RXE = self.RXW = False
-
-		RXO = (r10b and self.RXE) or (r10c and self.RXW)
-
-		#Dell
-		outbc = 5
-		outb = [0 for _ in range(outbc)]
-		asp = self.rr.GetOutput("D4RA").GetAspectBits()
-		outb[0] = setBit(outb[0], 0, asp[0])  # eastbound signals
-		outb[0] = setBit(outb[0], 1, asp[1])
-		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("D4RB").GetAspectBits()
-		outb[0] = setBit(outb[0], 3, asp[0]) 
-		outb[0] = setBit(outb[0], 4, asp[1])
-		outb[0] = setBit(outb[0], 5, asp[2])
-		asp = self.rr.GetOutput("D6RA").GetAspectBits()
-		outb[0] = setBit(outb[0], 6, asp[0])
-		asp = self.rr.GetOutput("D6RB").GetAspectBits()
-		outb[0] = setBit(outb[0], 7, asp[0])
-
-		asp = self.rr.GetOutput("D4L").GetAspectBits()
-		outb[1] = setBit(outb[1], 0, asp[0])  # westbound signals
-		outb[1] = setBit(outb[1], 1, asp[1])
-		outb[1] = setBit(outb[1], 2, asp[2])
-		asp = self.rr.GetOutput("D6L").GetAspectBits()
-		outb[1] = setBit(outb[1], 3, asp[0]) 
-		outb[1] = setBit(outb[1], 4, asp[1])
-		outb[1] = setBit(outb[1], 5, asp[2])
-		outb[1] = setBit(outb[1], 6, 1 if DXO else 0) # laporte crossing signal
-		outb[1] = setBit(outb[1], 7, self.rr.GetInput("H13").GetValue())  #block indicators
-
-		outb[2] = setBit(outb[2], 0, self.rr.GetInput("D10").GetValue())
-		outb[2] = setBit(outb[2], 1, self.rr.GetInput("S20").GetValue())
-		outb[2] = setBit(outb[2], 2, 0 if self.rr.GetOutput("DSw9.hand").GetStatus() == 0 else 1) 
-		op = self.rr.GetOutput("DSw1").GetOutPulse()
-		outb[2] = setBit(outb[2], 3, 1 if op > 0 else 0)                   # switches
-		outb[2] = setBit(outb[2], 4, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("DSw3").GetOutPulse()
-		outb[2] = setBit(outb[2], 5, 1 if op > 0 else 0)
-		outb[2] = setBit(outb[2], 6, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("DSw5").GetOutPulse()
-		outb[2] = setBit(outb[2], 7, 1 if op > 0 else 0) 
-
-		outb[3] = setBit(outb[3], 0, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("DSw7").GetOutPulse()
-		outb[3] = setBit(outb[3], 1, 1 if op > 0 else 0)
-		outb[3] = setBit(outb[3], 2, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("DSw11").GetOutPulse()
-		outb[3] = setBit(outb[3], 3, 1 if op > 0 else 0)
-		outb[3] = setBit(outb[3], 4, 1 if op < 0 else 0)
-		outb[3] = setBit(outb[3], 5, self.rr.GetOutput("D20.srel").GetStatus())	# Stop relays
-		outb[3] = setBit(outb[3], 6, self.rr.GetOutput("H23.srel").GetStatus())
-		outb[3] = setBit(outb[3], 7, self.rr.GetOutput("D11.srel").GetStatus())
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Dell: Output bytes: %s" % otext)
-
-		inbc = outbc			
-		if self.settings.simulation:
-			itext = None
-		else:
-			inb = self.rrBus.sendRecv(DELL, outb, outbc)
-			if inb is None:
-				itext = "Read Error"
-			else:
-				itext = formatIText(inb, 3)
-				#logging.debug("Dell: Input Bytes: %s" % itext)
-	
-				nb = getBit(inb[0], 0)  # Switch positions
-				rb = getBit(inb[0], 1)
-				self.rr.GetInput("DSw1").SetTOState(nb, rb)
-				nb = getBit(inb[0], 2) 
-				rb = getBit(inb[0], 3)
-				self.rr.GetInput("DSw3").SetTOState(nb, rb)
-				nb = getBit(inb[0], 4) 
-				rb = getBit(inb[0], 5)
-				self.rr.GetInput("DSw5").SetTOState(nb, rb)
-				nb = getBit(inb[0], 6) 
-				rb = getBit(inb[0], 7)
-				self.rr.GetInput("DSw7").SetTOState(nb, rb)
-	
-				nb = getBit(inb[1], 0)  
-				rb = getBit(inb[1], 1)
-				self.rr.GetInput("DSw9").SetTOState(nb, rb)
-				nb = getBit(inb[1], 2)  
-				rb = getBit(inb[1], 3)
-				self.rr.GetInput("DSw11").SetTOState(nb, rb)
-				self.rr.GetInput("D20").SetValue(getBit(inb[1], 4))  # Detection
-				self.rr.GetInput("D20.E").SetValue(getBit(inb[1], 5))
-				self.rr.GetInput("H23").SetValue(getBit(inb[1], 6)) 
-				self.rr.GetInput("H23.E").SetValue(getBit(inb[1], 7))
-	
-				self.rr.GetInput("DOSVJW").SetValue(getBit(inb[2], 0)) #DOS1
-				self.rr.GetInput("DOSVJE").SetValue(getBit(inb[2], 1)) #DOS2
-				self.rr.GetInput("D11.W").SetValue(getBit(inb[2], 2))
-				self.rr.GetInput("D11A").SetValue(getBit(inb[2], 3))
-				self.rr.GetInput("D11B").SetValue(getBit(inb[2], 4))
-				self.rr.GetInput("D11.E").SetValue(getBit(inb[2], 5))
-				
-		if self.sendIO:
-			self.rr.ShowText("Dell", DELL, otext, itext, 0, 2)
-
-		# Foss
-		outbc = 3
-		outb = [0 for _ in range(outbc)]
-		asp = self.rr.GetOutput("D10R").GetAspectBits()
-		outb[0] = setBit(outb[0], 0, asp[0])  # eastbound signals
-		outb[0] = setBit(outb[0], 1, asp[1])
-		outb[0] = setBit(outb[0], 2, asp[2])
-		asp = self.rr.GetOutput("D12R").GetAspectBits()
-		outb[0] = setBit(outb[0], 3, asp[0]) 
-		outb[0] = setBit(outb[0], 4, asp[1])
-		outb[0] = setBit(outb[0], 5, asp[2])
-
-		asp = self.rr.GetOutput("D10L").GetAspectBits()
-		outb[1] = setBit(outb[1], 0, asp[0])  # westbound signals
-		outb[1] = setBit(outb[1], 1, asp[1])
-		outb[1] = setBit(outb[1], 2, asp[2])
-		asp = self.rr.GetOutput("D12L").GetAspectBits()
-		outb[1] = setBit(outb[1], 3, asp[0]) 
-		outb[1] = setBit(outb[1], 4, asp[1])
-		outb[1] = setBit(outb[1], 5, asp[2])
-		outb[1] = setBit(outb[1], 6, self.rr.GetOutput("D21.srel").GetStatus())	# Stop relays
-		outb[1] = setBit(outb[1], 7, self.rr.GetOutput("S10.srel").GetStatus())
-
-		# bit 2:0 is bad
-		outb[2] = setBit(outb[2], 1, self.rr.GetOutput("R10.srel").GetStatus())
-		outb[2] = setBit(outb[2], 2, 1 if RXO else 0)  # rocky hill crossing signal
-		asp = self.rr.GetOutput("R10W").GetAspectBits()
-		outb[2] = setBit(outb[2], 3, asp[0])  # rocky hill distant for nassau
-		outb[2] = setBit(outb[2], 4, asp[1])
-		outb[2] = setBit(outb[2], 5, asp[2])
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Foss: Output bytes: %s" % otext)
-			
-		inbc = outbc
-		if self.settings.simulation:
-			itext = None
-		else:
-			inb = self.rrBus.sendRecv(FOSS, outb, outbc)
-			if inb is None:
-				itext = "Read Error"
-			else:
-				itext = formatIText(inb, inbc)
-				#logging.debug("FOSS: Input Bytes: %s" % itext)
-	
-				self.rr.GetInput("D21.W").SetValue(getBit(inb[0], 0))  # Detection
-				self.rr.GetInput("D21A").SetValue(getBit(inb[0], 1))
-				self.rr.GetInput("D21B").SetValue(getBit(inb[0], 2))
-				self.rr.GetInput("D21.E").SetValue(getBit(inb[0], 3))
-				self.rr.GetInput("DOSFOW").SetValue(getBit(inb[0], 4)) #MFOS1
-				self.rr.GetInput("DOSFOE").SetValue(getBit(inb[0], 5)) #MFOS2
-				self.rr.GetInput("S10.W").SetValue(getBit(inb[0], 6))
-				self.rr.GetInput("S10A").SetValue(getBit(inb[0], 7))
-	
-				self.rr.GetInput("S10B").SetValue(getBit(inb[1], 0))
-				self.rr.GetInput("S10C").SetValue(getBit(inb[1], 1))
-				self.rr.GetInput("S10.E").SetValue(getBit(inb[1], 2))
-				self.rr.GetInput("R10.W").SetValue(getBit(inb[1], 3))
-				self.rr.GetInput("R10A").SetValue(getBit(inb[1], 4)) 
-				self.rr.GetInput("R10B").SetValue(getBit(inb[1], 5)) 
-				self.rr.GetInput("R10C").SetValue(getBit(inb[1], 6))
-				self.rr.GetInput("R11").SetValue(getBit(inb[1], 7))
-	
-				self.rr.GetInput("R12").SetValue(getBit(inb[2], 0))
 		
-		if self.sendIO:
-			self.rr.ShowText("Foss", FOSS, otext, itext, 1, 2)
+		DXO = (self.D1E and dos1) or (self.D1W and (d11w or d11a)) or (self.D2E and dos2) or (self.D2W and (d21w or d21a))
+		if DXO != self.DXO:
+			self.DXO = DXO
+			self.rr.SetODevice("DXO", self.DXO)
+				
+		# determine the state of the crossing gate at rocky hill
+		r10b = self.rr.GetBlock("R10B")
+		r10bo = r10b.IsOccupied()
+		r10c = self.rr.GetBlock("R10C")
+		r10co = r10c.IsOccupied()
+		if r10bo and not self.RXW:
+			self.RXE = True
+		if r10co and not self.RXE:
+			self.RXW = True
+		if not r10bo and not r10co:
+			self.RXE = self.RXW = False
+		
+		RXO = (r10bo and self.RXE) or (r10co and self.RXW)
+		if RXO != self.RXO:
+			self.RXO = RXO
+			self.rr.SetODevice("RXO", self.RXO)
+			
+		# determine the state of signal R10W
+		r10a = self.rr.GetBlock("R10A")
+		r10w = self.rr.GetBlock("R10.W")
+		clr = (not r10a.IsOccupied()) and (not r10w.IsOccupied())
+		neosrh = self.rr.GetBlock("NEOSRH")
+		nxtclr = neosrh.IsCleared()
+		
+		if clr and nxtclr:
+			aspect = 0b110
+		elif clr and  not nxtclr:
+			aspect = 0b001
+		else:
+			aspect = 0
+
+		sig = self.rr.GetSignal("R10W")
+		self.rr.ChangeSignal(sig, aspect)			
+
+		District.OutIn(self)

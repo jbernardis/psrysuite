@@ -1,8 +1,6 @@
-import wx
 import logging
-import time
+import re
 
-from rrserver.districts.hyde import Hyde
 from rrserver.districts.yard import Yard
 from rrserver.districts.latham import Latham
 from rrserver.districts.dell import Dell
@@ -12,56 +10,111 @@ from rrserver.districts.nassau import Nassau
 from rrserver.districts.bank import Bank
 from rrserver.districts.cliveden import Cliveden
 from rrserver.districts.cliff import Cliff
+from rrserver.districts.hyde import Hyde
 from rrserver.districts.port import Port
 
-from rrserver.district import District
+from rrserver.constants import INPUT_BLOCK, INPUT_TURNOUTPOS, INPUT_BREAKER, INPUT_SIGNALLEVER,\
+	INPUT_HANDSWITCH, INPUT_ROUTEIN
 
+from rrserver.rrobjects import Block, StopRelay, Signal, SignalLever, RouteIn, Turnout,\
+			OutNXButton, Handswitch, Breaker, Indicator, ODevice, Lock
 
-class Railroad(wx.Notebook):
-	def __init__(self, frame, cbEvent, settings):
-		wx.Notebook.__init__(self, frame, wx.ID_ANY, style=wx.BK_DEFAULT)
-		self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.pageChanged)
-		self.frame = frame
+class Railroad():
+	def __init__(self, parent, cbEvent, settings):
 		self.cbEvent = cbEvent
 		self.settings = settings
-		self.pendingEvents = []
+		self.districts = {}
+		self.nodes = {}
 
 		self.districtList = [
-			[ "Yard", Yard ],
-			[ "Latham", Latham ],
-			[ "Dell", Dell ],
-			[ "Shore", Shore ],
-			[ "Krulish", Krulish ],
-			[ "Nassau", Nassau ],
-			[ "Bank", Bank ],
-			[ "Cliveden", Cliveden ],
-			[ "Cliff", Cliff ],
-			[ "Port", Port ],
-			[ "Hyde", Hyde ],
+			[ Yard, "Yard" ],
+   			[ Latham, "Latham" ],
+   			[ Dell, "Dell" ],
+   			[ Shore, "Shore" ],
+   			[ Krulish, "Krulish" ],
+   			[ Nassau, "Nassau" ],
+   			[ Bank, "Bank" ],
+   			[ Cliveden, "Cliveden" ],
+   			[ Cliff, "Cliff" ],
+   			[ Hyde, "Hyde" ],
+   			[ Port, "Port" ],
 		]
-
-		self.controlOptions = {
-		}
-
-		self.districts = {}
-		self.outputs = {}
-		self.inputs = {}
+		
+		self.controlOptions = {}
+		self.signals = {}
+		self.signalLevers = {}
+		self.blocks = {}
+		self.turnouts = {}
+		self.handswitches = {}
+		self.breakers = {}
+		self.stopRelays = {}
+		self.outNxButtons = {}
+		self.routesIn = {}
 		self.osRoutes = {}
-		self.switchLock = {}
+		self.indicators = {}
+		self.odevices = {}
+		self.locks = {}
+		self.reSigName = re.compile("([A-Z][0-9]*)([A-Z])")
+		
+		self.pulsedOutputs = {} 
+		self.topulselen = self.settings.topulselen
+		self.topulsect = self.settings.topulsect
+		self.nxbpulselen = self.settings.nxbpulselen
+		self.nxbpulsect = self.settings.nxbpulsect
+		
+		
 		self.fleetedSignals = {}
 		self.districtLock = {"NWSL": [0, 0, 0, 0], "NESL": [0, 0, 0]}
 		self.enableSendIO = True
+		
+		self.addrList = []
 
-		for dname, dclass in self.districtList:
-			logging.debug("Creating district %s" % dname)
-			p = dclass(self, dname, self.settings)
-			self.AddPage(p, dname)
-			self.districts[dname] = p
+		self.subBlocks = {
+			"D11": [ "D11A", "D11B" ],
+			"D21": [ "D21A", "D21B" ],
+			"H10": [ "H10A", "H10B" ],
+			"H30": [ "H30A", "H30B" ],
+			"S10": [ "S10A", "S10B", "S10C" ],
+			"S11": [ "S11A", "S11B" ],
+			"S20": [ "S20A", "S20B", "S20C" ],
+			"R10": [ "R10A", "R10B", "R10C" ],
+		}		
 
-		self.SetPageText(0, "* " + self.districtList[0][0] + " *")
+		for dclass, name in self.districtList:
+			logging.debug("Creating District %s" % name)
+			self.districts[name] = dclass(self, name, self.settings)
+			self.nodes[name] = self.districts[name].GetNodes()
+			self.addrList.extend([[addr, self.districts[name], node] for addr, node, in self.districts[name].GetNodes().items()])
 
-	def Initialize(self):
-		# TODO:  put all of these in an ini file
+  # print(str(sorted(list(self.blocks.keys()))))
+  # for main, subs in self.subBlocks.items():
+  # 	for sub in subs:			
+  # 		self.GetBlock(sub).SetMainBlock(main, self.GetBlock(main))
+
+			
+	def dump(self):
+		pass
+  # print("================================SIGNALS")
+  # for s in self.signals.values():
+  # 	s.dump()
+			
+  # print("================================BLOCKS")
+  # for b in self.blocks.values():
+  # 	b.dump()
+  
+  # print("==============================TURNOUTS")
+  # for t in self.turnouts.values():
+  # 	t.dump()
+  
+  # print("==============================BREAKERS")
+  # for b in self.breakers.values():
+  # 	b.dump()
+			
+	def Initialize(self):	
+		
+		for d in self.districts.values():
+			d.Initialize()
+			
 		self.SetControlOption("nassau", 0)
 		self.SetControlOption("cliff", 0)
 		self.SetControlOption("yard", 0)
@@ -79,105 +132,767 @@ class Railroad(wx.Notebook):
 		self.SetControlOption("shore.fleet", 0)
 		self.SetControlOption("valleyjct.fleet", 0)
 		self.SetControlOption("yard.fleet", 0)
-		
 		self.SetControlOption("osslocks", 1)
-
-		for _, dobj in self.districts.items():
-			dobj.SendIO(False)
-			dobj.DetermineSignalLevers()
-
-		self.currentDistrict = self.districts["Yard"]
-		self.currentDistrict.SendIO(self.settings.viewiobits and not self.settings.hide)
 		
-		self.GetSubBlockInfo()
+		self.dump()
 
-	def EnableSendIO(self, flag):
-		self.enableSendIO = flag
-		self.currentDistrict.SendIO(flag)
+		#for _, dobj in self.districts.items():
+			#dobj.SendIO(False)
+			#dobj.DetermineSignalLevers()
+
+		#self.currentDistrict = self.districts["Yard"]
+		#self.currentDistrict.SendIO(self.settings.viewiobits and not self.settings.hide)
+  # for block in jlayout["blocks"]:
+  # 	print("Block %s" % block)
+  # 	if not block in self.blocks:
+  # 		jdata = jlayout["blocks"][block]
+  # 		self.blocks[block] = Block(block, jdata)
+  # 		if "sbeast" in jdata and jdata["sbeast"] is not None and jdata["sbeast"] not in self.blocks:
+  # 			self.blocks[jdata["sbeast"]] = Block(jdata["sbeast"], {"east": jdata["east"]})
+  # 		if "sbwest" in jdata and jdata["sbwest"] is not None and jdata["sbwest"] not in self.blocks:
+  # 			self.blocks[jdata["sbwest"]] = Block(jdata["sbwest"], {"east": jdata["east"]})
+  #
+  # for route in jlayout["routes"]:
+  # 	print("route %s" % route)
+  # 	if route not in self.osRoutes:
+  # 		jdata = jlayout["routes"][route]
+  # 		self.osRoutes[route] = Route(route, jdata)
+  #
+  #
+  # self.GetSubBlockInfo()
+		return True
+
+			
+	def OccupyBlock(self, blknm, state):
+		'''
+		this method is solely for simulation - to set a block as occupied or not
+		'''
+		try:
+			blist = [ self.blocks[blknm] ]
+		except KeyError:
+			print("no blist for %s" % blknm)
+			try:
+				blist = [self.GetBlock(x) for x in self.subBlocks[blknm]]
+			except KeyError:
+				print("no subblocks for %s" % blknm)
+				logging.warning("Ignoring occupy command - unknown block name: %s" % blknm)
+				return
+		
+		for blk in blist:
+			print("occupying block %s" % blk.Name())
+			if len(blk.Bits()) > 0:
+				vbyte, vbit = blk.Bits()[0]
+				blk.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
+			else:
+				'''
+				block has sub blocks - occupy all of them as per state
+				'''
+				print("occupying subblocks of %s" % blk.Name())
+				sbl = blk.SubBlocks()
+				print("length of subblocks = %d" % len(sbl))
+				for sb in sbl:
+					print("subblock %s" % sb.Name())
+					if len(sb.Bits()) > 0:
+						vbyte, vbit = sb.Bits()[0]
+						sb.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
+						print("set input bit for subblock %s" % sb.Name())
+					else:
+						print("subblock %s has no location bits" % sb.Name())
+		
+	def SetTurnoutPos(self, tonm, normal):
+		'''
+		this method is for simulation - to set a turnout to normal or reverse position - this is also used for handswitches
+		'''
+		try:
+			tout = self.turnouts[tonm]
+		except KeyError:
+			try:
+				tout = self.handswitches[tonm]
+
+			except KeyError:			
+				logging.warning("Ignoring turnoutpos command - unknown turnoutname: %s" % tonm)
+				return
+	
+		pos = tout.Position()
+		if pos is None:
+			logging.warning("Turnout definition does not have position - ignoring turnoutpos command")
+			return 
+		
+		bits, district, node, addr = pos
+		node.SetInputBit(bits[0][0], bits[0][1], 1 if normal else 0)
+		node.SetInputBit(bits[1][0], bits[1][1], 0 if normal else 1)
+			
+	def SetBreaker(self, brkrnm, state):
+		'''
+		this method is solely for simulation - to set a breaker as on or not
+		'''
+		try:
+			brkr = self.breakers[brkrnm]
+		except KeyError:
+			logging.warning("Ignoring breaker command - unknown breaker name: %s" % brkrnm)
+			return
+		
+		try:
+			vbyte, vbit = brkr.Bits()[0]
+		except IndexError:
+			logging.warning("Breaker definition incomplete - ignoring breaker command")
+			return 
+
+		brkr.node.SetInputBit(vbyte, vbit, 1 if state == 0 else 0)
+		
+	def SetInputBit(self, distName, vbyte, vbit, val):
+		pass
+
+#============================================================================================
+	def SetIndicator(self, indname, state):
+		'''
+		turn an indicator on/off
+		'''
+		try:
+			ind = self.indicators[indname]
+		except KeyError:
+			logging.warning("Ignoring indicator command - unknown indicator: %s" % indname)
+			return
+		
+		if state == ind.IsOn():
+			return False
+	
+		ind.SetOn(state)	
+		vbyte, vbit = ind.Bits()[0]
+		ind.node.SetOutputBit(vbyte, vbit, 1 if state else 0)
+		return True
+
+	def SetODevice(self, odname, state):
+		'''
+		turn an output device on/off
+		'''
+		try:
+			od = self.odevices[odname]
+		except KeyError:
+			logging.warning("Ignoring output device command - unknown output device: %s" % odname)
+			return
+		
+		vbyte, vbit = od.Bits()[0]
+		od.node.SetOutputBit(vbyte, vbit, 1 if state != 0 else 0)
+
+	def SetRelay(self, relayname, state):
+		'''
+		turn a stopping relay on/off
+		'''
+		print("in set relay %s %s" % (relayname, state))
+		try:
+			r = self.stopRelays[relayname]
+		except KeyError:
+			logging.warning("Ignoring stoprelay command - unknown relay: %s" % relayname)
+			print("unknown relay")
+			return
+		
+		vbyte, vbit = r.Bits()[0]
+		print("setting output bit %d:%d to %d" % (vbyte, vbit, state))
+		r.node.SetOutputBit(vbyte, vbit, 1 if state != 0 else 0)
+		
+	def GetRouteIn(self, rtnm):
+		try:
+			return self.routesIn[rtnm]
+		except KeyError:
+			return None
+		
+	def GetBreaker(self, brknm):
+		try:
+			return self.breakers[brknm]
+		except KeyError:
+			return None
+			
+	def SetRouteIn(self, rtnm):
+		'''
+		this method is solely for simulation - to set the current inbound route
+		'''
+		try:
+			rt = self.routesIn[rtnm]
+		except KeyError:
+			logging.warning("Ignoring route in command - unknown route name: %s" % rtnm)
+			return
+		
+		offRts = rt.district.SelectRouteIn(rt)
+		if offRts is None:
+			return 
+
+		for rtenm in offRts:
+			rte = self.routesIn[rtenm]
+			bt = rte.Bits()
+			rte.node.SetInputBit(bt[0][0], bt[0][1], 0)
+			
+		bt = rt.Bits()
+		rt.node.SetInputBit(bt[0][0], bt[0][1], 1)
+		
+	def ClearAllRoutes(self, rtList):
+		for rtenm in rtList:
+			rte = self.routesIn[rtenm]
+			bt = rte.Bits()
+			rte.node.SetInputBit(bt[0][0], bt[0][1], 0)
+
+	def SetOutPulseTo(self, toname, state):
+		try:
+			turnout = self.turnouts[toname]
+		except KeyError:
+			logging.warning("Attempt to change state on unknown turnout: %s" % toname)
+			return		
+			
+		Nval = 0 if state == "R" else 1
+		Rval = 1 if state == "R" else 0
+
+		bits = turnout.Bits()
+		if len(bits) > 0:
+			try:
+				Nbyte, Nbit = bits[0]
+			except IndexError:
+				logging.error("index error on turnout %s" % toname)
+				return
+			
+			Rbyte, Rbit = bits[1]
+			pbyte = Nbyte if Nval == 1 else Rbyte
+			pbit =  Nbit  if Nval == 1 else Rbit
 				
-	def SendIOEnabled(self):
-		return self.enableSendIO
+			self.pulsedOutputs[toname] = PulseCounter(pbyte, pbit, self.topulsect, self.topulselen, turnout.node)
+			
+			turnout.node.SetOutputBit(Nbyte, Nbit, Nval)
+			turnout.node.SetOutputBit(Rbyte, Rbit, Rval)
+		
+		if self.settings.simulation:
+			'''
+			if simulation, set the corresponding input bits to show switch position change
+			if there is no position information, defer to the district logic
+			'''
+			pos = turnout.Position()
+			if pos is None:
+				turnout.SetNormal(state == "N")
+				turnout.district.CheckTurnoutPosition(turnout)
+			else:
+				bits, district, node, addr = pos
+				node.SetInputBit(bits[0][0], bits[0][1], Nval)
+				node.SetInputBit(bits[1][0], bits[1][1], Rval)
+			
+	def SetOutPulseNXB(self, bname):
+		try:
+			btn = self.outNxButtons[bname]
+		except KeyError:
+			logging.warning("Attempt to change state on unknown button: %s" % bname)
+			return
 
+		bits = btn.Bits()
+		Bbyte, Bbit = bits[0]
+			
+		self.pulsedOutputs[bname] = PulseCounter(Bbyte, Bbit, self.nxbpulsect, self.nxbpulselen, btn.node)
+		
+		btn.node.SetOutputBit(Bbyte, Bbit, 1)
+		if self.settings.simulation:
+			'''
+			let the district code determine the course of action to simulate the route
+			'''
+			btn.district.PressButton(btn)
+
+	def SetLock(self, lname, state):
+		try:
+			lk = self.locks[lname]
+		except KeyError:
+			logging.warning("Attempt to change lock state on unknown lock: %s" % lname)
+			print("unknown lock %s" % lname)
+			return False
+			
+		if lk.SetOn(state):
+			bits = lk.Bits()
+			lk.node.SetOutputBit(bits[0][0], bits[0][1], 1 if state else 0)
+			return True
+			
+		return False
+
+	def SetTurnoutLock(self, toname, state):
+		try:
+			tout = self.turnouts[toname]
+		except KeyError:
+			logging.warning("Attempt to change lock state on unknown turnout: %s" % toname)
+			return
+
+		release = tout.district.Released(tout)			
+		if tout.Lock(state == 1):
+			tout.UpdateLockBits(release=release)
+			self.RailroadEvent(tout.GetEventMessage(lock=True))
+		
+	def SetAspect(self, signame, aspect):
+		try:
+			sig = self.signals[signame]
+		except KeyError:
+			logging.warning("Ignoring set aspect - unknown signal name: %s" % signame)
+			return
+		
+		aspect = sig.district.VerifyAspect(signame, aspect)	
+		if sig.IsVirtual():
+			sig.district.SetAspect(sig, aspect)
+			self.UpdateSignalLeverLEDs(sig, aspect)
+			self.RailroadEvent(sig.GetEventMessage())
+			
+		else:
+			self.ChangeSignal(sig, aspect)
+		
+	def ChangeSignal(self, sig, aspect):
+		if not sig.SetAspect(aspect):
+			return 
+
+		sig.UpdateIndicators() # make sure all indicators reflect this change
+			
+		bits = sig.Bits()
+		lb = len(bits)
+		if lb != 0:	
+			if lb == 1:
+				vals = [1 if aspect != 0 else 0] 
+			elif lb == 2:
+				vals = [aspect & 0x01, aspect & 0x02] 
+			elif lb == 3:
+				vals = [aspect & 0x01, aspect & 0x02, aspect & 0x04] 
+			else:
+				logging.warning("Unknown bits length for signal %s: %d" % (sig.Name(), len(bits)))
+				return
+
+			for (vbyte, vbit), val in zip(bits, vals):
+				sig.node.SetOutputBit(vbyte, vbit, 1 if val != 0 else 0)
+
+		self.UpdateSignalLeverLEDs(sig, aspect)
+
+		self.RailroadEvent(sig.GetEventMessage())
+		
+	def UpdateSignalLeverLEDs(self, sig, aspect):
+		r = self.reSigName.findall(sig.Name())
+		if len(r) != 1 or len(r[0]) != 2:
+			return 
+		
+		try:
+			sl = self.signalLevers[r[0][0]]
+		except KeyError:
+			logging.warning("Unknown signal lever: %s" % r[0][0])
+			return
+
+		if aspect == 0:
+			lbit = 0
+			rbit = 0
+		elif r[0][1] == "L":
+			lbit = 1
+			rbit = 0
+		elif r[0][1] == "R":
+			lbit = 0
+			rbit = 1
+		else:
+			lbit = 0
+			rbit = 0
+					
+		sl.SetLeverState(lbit, 0, rbit)
+		sl.UpdateLed()
+		
+	def SetSignalLock(self, signame, lock):
+		try:
+			sig = self.signals[signame]
+		except KeyError:
+			logging.warning("Ignoring set signal lock - unknown signal name: %s" % signame)
+			return
+		
+		b = sig.LockBits()
+		if len(b) > 0:
+			for vbyte, vbit in b:
+				sig.node.SetOutputBit(vbyte, vbit, lock)
+		
+		if sig.Lock(lock):
+			self.RailroadEvent(sig.GetEventMessage(lock=True))
+			
+	def SetHandswitch(self, hsname, state):
+		hsnameKey = hsname.split(".")[0] # strip off the ".hand suffix
+
+		try:
+			hs = self.handswitches[hsnameKey]
+		except KeyError:
+			logging.warning("Ignoring set handswitch- unknown switch name: %s" % hsname)
+			return
+		
+		if hs.Lock(state == 1):
+			self.RailroadEvent(hs.GetEventMessage(lock=True))
+			if not hs.UpdateIndicators():
+				hs.District().SetHandswitch(hsnameKey, state)
+
+	def SetSignalFleet(self, signame, flag):
+		self.fleetedSignals[signame] = flag
+
+	def SetOSRoute(self, blknm, rtname, ends, signals):
+		self.osRoutes[blknm] = [rtname, ends, signals]
+		
+	def SetControlOption(self, name, value):
+		self.controlOptions[name] = value
+		if name == "osslocks":
+			self.osslocks = value == 1
+
+	def GetControlOption(self, name):
+		try:
+			return self.controlOptions[name]
+		except IndexError:
+			return 0
+		
+	def SetBlockDirection(self, blknm, direction):
+		try:
+			blk = self.blocks[blknm]
+		except KeyError:
+			logging.warning("ignoring block direction - unknown block: %s" % blknm)
+			return 
+		
+		if blk.SetDirection(direction == "E"):
+			self.RailroadEvent(blk.GetEventMessage(direction=True))
+
+	def SetBlockClear(self, blknm, clear):
+		try:
+			blk = self.blocks[blknm]
+		except KeyError:
+			logging.warning("ignoring block clear - unknown block: %s" % blknm)
+			return 
+		
+		if blk.SetCleared(clear):
+			self.RailroadEvent(blk.GetEventMessage(clear=True))
+		
+	def SetDistrictLock(self, name, value):
+		self.districtLock[name] = value
+		
+		
+		
+		
+		
+
+	def AddBlock(self, name, district, node, address, bits):
+		try:
+			b = self.blocks[name]
+				
+		except KeyError:
+			# this is the normal scenario
+			b = None
+			
+		if b is None:
+			b = Block(name, district, node, address)
+		else:
+			if b.IsNullBlock():
+				b.SetBlockAddress(district, node, address)
+			else:
+				logging.warning("Potential duplicate block: %s" % name)
+				
+		b.SetBits(bits)
+		self.blocks[name] = b
+		if len(bits) > 0:
+			node.AddInputToMap(bits[0], [b])
+		return b
+					
+	def AddBlockInd(self, name, district, node, address, bits):
+		try:
+			b = self.blocks[name]
+		except KeyError:
+			b = Block(name, None, None, None)
+			self.blocks[name] = b
+			
+		b.AddIndicator(district, node, address, bits)
+		return b
+
+	def AddIndicator(self, name, district, node, address, bits):
+		if name in self.indicators:
+			logging.warning("Duplicate definition for indicator %s" % name)
+			return self.indicators[name]
+			
+		i = Indicator(name, district, node, address)
+		i.SetBits(bits)
+		self.indicators[name] = i
+		return i
+
+	def AddOutputDevice(self, name, district, node, address, bits):
+		if name in self.odevices:
+			logging.warning("Duplicate definition for output device %s" % name)
+			return self.odevices[name]
+			
+		i = ODevice(name, district, node, address)
+		i.SetBits(bits)
+		self.odevices[name] = i
+		return i
+
+	def AddLock(self, name, district, node, address, bits):
+		if name in self.locks:
+			logging.warning("Duplicate definition for lock%s" % name)
+			return self.odevices[name]
+			
+		i = Lock(name, district, node, address)
+		i.SetBits(bits)
+		self.locks[name] = i
+		return i
+
+	def AddStopRelay(self, name, district, node, address, bits):
+		if name in self.stopRelays:
+			logging.warning("Duplicate definition for stopping relay %s" % name)
+			return self.stopRelays[name]
+			
+		r = StopRelay(name, district, node, address)
+		r.SetBits(bits)
+		self.stopRelays[name] = r
+		return r
+	
+	def AddSignal(self, name, district, node, address, bits):
+		try:
+			s = self.signals[name]
+				
+		except KeyError:
+			# this is the normal scenario
+			s = None
+			
+		if s is None:
+			s = Signal(name, district, node, address)
+		else:
+			if s.IsNullSignal():
+				s.SetSignalAddress(district, node, address)
+			else:
+				logging.warning("Potential duplicate signal: %s" % name)
+				
+		s.SetBits(bits)
+		self.signals[name] = s
+		return s
+
+	def AddSignalInd(self, name, district, node, address, bits):
+		try:
+			s = self.signals[name]
+		except KeyError:
+			s = Signal(name, None, None, None)
+			self.signals[name] = s
+				
+		s.AddIndicator(district, node, address, bits)
+		return s
+
+	def AddSignalLever(self, name, district, node, address, bits):
+		try:
+			s = self.signalLevers[name]
+				
+		except KeyError:
+			# this is the normal scenario
+			s = None
+			
+		if s is None:
+			s = SignalLever(name, district, node, address)
+		else:
+			if s.IsNullLever():
+				s.SetLeverAddress(district, node, address)
+			else:
+				logging.warning("Potential duplicate signal lever: %s" % name)
+				
+		s.SetBits(bits)
+		self.signalLevers[name] = s
+		if bits[0] is not None:
+			node.AddInputToMap(bits[0], [s, 'R'])
+		if bits[1] is not None:
+			node.AddInputToMap(bits[1], [s, 'C'])
+		if bits[2] is not None:
+			node.AddInputToMap(bits[2], [s, 'L'])
+		return s
+
+	def AddSignalLED(self, name, district, node, address, bits):
+		try:
+			s = self.signalLevers[name]
+		except KeyError:
+			s = SignalLever(name, None, None, None)
+			self.signalLevers[name] = s
+				
+		s.SetLed(bits, district, node, address)
+		return s
+		
+	def AddTurnout(self, name, district, node, address, bits):
+		try:
+			t = self.turnouts[name]
+				
+		except KeyError:
+			# this is the normal scenario
+			t = None
+			
+		if t is None:
+			t = Turnout(name, district, node, address)
+		else:
+			if t.IsNullTurnout():
+				t.SetTurnoutAddress(district, node, address)
+			else:
+				logging.warning("Potential duplicate turnout: %s" % name)
+				
+		t.SetBits(bits)
+		self.turnouts[name] = t
+		return t
+
+	def AddTurnoutPosition(self, name, district, node, address, bits):
+		try:
+			t = self.turnouts[name]
+		except KeyError:
+			t = Turnout(name, None, None, None)
+			self.turnouts[name] = t
+				
+		t.SetPosition(bits, district, node, address)
+		node.AddInputToMap(bits[0], [t, 'N'])
+		node.AddInputToMap(bits[1], [t, 'R'])
+		return t
+
+	def AddTurnoutLock(self, name, district, node, address, bits):
+		try:
+			t = self.turnouts[name]
+		except KeyError:
+			t = Turnout(name, None, None, None)
+			self.turnouts[name] = t
+				
+		t.SetLockBits(bits, district, node, address)
+		return t
+
+	def AddTurnoutLever(self, name, district, node, address, bits):
+		try:
+			t = self.turnouts[name]
+		except KeyError:
+			t = Turnout(name, None, None, None)
+			self.turnouts[name] = t
+				
+		t.SetLever(bits, district, node, address)
+		return t
+
+	def AddTurnoutLED(self, name, district, node, address, bits):
+		try:
+			t = self.turnouts[name]
+		except KeyError:
+			t = Turnout(name, None, None, None)
+			self.turnouts[name] = t
+				
+		t.SetLed(bits, district, node, address)
+		return t
+		
+					
+	def AddOutNXButton(self, name, district, node, address, bits):
+		if name in self.outNxButtons:
+			logging.warning("Duplicate definition for Out NX Button %s" % name)
+			return self.outNxButtons[name]
+
+		b = OutNXButton(name, district, node, address)
+		self.outNxButtons[name] = b			
+		b.SetBits(bits)
+		return b
+	
+	def AddHandswitch(self, name, district, node, address, bits):
+		try:
+			t = self.handswitches[name]
+				
+		except KeyError:
+			# this is the normal scenario
+			t = None
+			
+		if t is None:
+			t = Handswitch(name, district, node, address)
+		else:
+			if t.IsNullHandswitch():
+				t.SetHandswitchAddress(district, node, address)
+			else:
+				logging.warning("Potential duplicate handset: %s" % name)
+
+		self.handswitches[name] = t		
+		t.SetBits(bits)
+		node.AddInputToMap(bits[0], [t, 'N'])
+		node.AddInputToMap(bits[1], [t, 'R'])
+		return t
+					
+	def AddHandswitchInd(self, name, district, node, address, bits):
+		try:
+			s = self.handswitches[name]
+		except KeyError:
+			s = Handswitch(name, None, None, None)
+			self.handswitches[name] = s
+			
+		s.AddIndicator(district, node, address, bits)
+		return s
+					
+	def AddHandswitchReverseInd(self, name, district, node, address, bits):
+		try:
+			s = self.handswitches[name]
+		except KeyError:
+			s = Handswitch(name, None, None, None)
+			self.handswitches[name] = s
+			
+		s.AddReverseIndicator(district, node, address, bits)
+		return s
+					
+	def AddHandswitchUnlock(self, name, district, node, address, bits):
+		try:
+			s = self.handswitches[name]
+		except KeyError:
+			s = Handswitch(name, None, None, None)
+			self.handswitches[name] = s
+			
+		s.AddUnlock(district, node, address, bits)
+		node.AddInputToMap(bits[0], [s, 'L'])
+		return s
+					
+	def AddRouteIn(self, name, district, node, address, bits):
+		if name in self.routesIn:
+			logging.warning("Duplicate definition for Route In %s" % name)
+			return self.routesIn[name]
+
+		b = RouteIn(name, district, node, address)
+		self.routesIn[name] = b		
+		b.SetBits(bits)
+		node.AddInputToMap(bits[0], [b])
+		
+		return b
+
+	def AddBreaker(self, name, district, node, address, bits):
+		try:
+			b = self.breakers[name]
+				
+		except KeyError:
+			# this is the normal scenario
+			b = None
+			
+		if b is None:
+			b = Breaker(name, district, node, address)
+		else:
+			if b.IsNullBreaker():
+				b.SetBreakerAddress(district, node, address)
+			else:
+				logging.warning("Potential duplicate breaker: %s" % name)
+				
+		b.SetBits(bits)
+		self.breakers[name] = b
+		if len(bits) > 0:
+			node.AddInputToMap(bits[0], [b])
+			
+		return b
+					
+	def AddBreakerInd(self, name, district, node, address, bits):
+		try:
+			b = self.breakers[name]
+		except KeyError:
+			b = Breaker(name, None, None, None)
+			self.breakers[name] = b
+			
+		b.AddIndicator(district, node, address, bits)
+		return b
+	
+	
+	
+	
+	
+		
+	
 	def setBus(self, bus):
 		self.rrBus = bus
 		for _, dobj in self.districts.items():
 			dobj.setBus(bus)
 
-	def pageChanged(self, evt):
-		opx = evt.GetOldSelection()
-		if opx != wx.NOT_FOUND:
-			self.SetPageText(opx, self.districtList[opx][0])
-			odistrict = self.districts[self.districtList[opx][0]]
-			odistrict.SendIO(False)
-		px = evt.GetSelection()
-		if px != wx.NOT_FOUND:
-			self.SetPageText(px, "* " + self.districtList[px][0] + " *")
-			district = self.districts[self.districtList[px][0]]
-			district.SendIO(True)
-			self.currentDistrict = district
-
-	def ClearIO(self):
-		self.frame.ClearIO()
-
-	def ShowText(self, name, addr, otext, itext, line, lines):
-		self.frame.ShowText(name, addr, otext, itext, line, lines)
-
-	def AddOutput(self, output, district, otype):
-		output.SetRailRoad(self)
-		oname = output.GetName()
-		if oname in self.outputs:
-			logging.warning("Output (%s) duplicate definition" % oname)
-			return
-
-		self.outputs[oname] = [output, district, otype]
-
-	def AddInput(self, iput, district, itype):
-		iput.SetRailRoad(self)
-		iname = iput.GetName()
-		if iname in self.inputs:
-			logging.warning("Input (%s) duplicate definitionb" % iname)
-			return
-
-		self.inputs[iname] = [iput, district, itype]
-
-	def GetOutput(self, oname):
-		try:
-			return self.outputs[oname][0]
-		except KeyError:
-			logging.warning("No output found for name \"%s\"" % oname)
-			return None
-
-	def GetOutputInfo(self, oname):
-		try:
-			return self.outputs[oname]
-		except KeyError:
-			logging.warning("No output found for name \"%s\"" % oname)
-			return None
-
-	def GetInput(self, iname):
-		try:
-			return self.inputs[iname][0]
-		except KeyError:
-			logging.warning("No input found for name \"%s\"" % iname)
-			return None
-
-	def GetInputInfo(self, iname):
-		try:
-			return self.inputs[iname]
-		except KeyError:
-			logging.warning("No input found for name \"%s\"" % iname)
-			return None
-
 	def GetCurrentValues(self):
-		for ip, _, _ in self.inputs.values():
-			m = ip.GetEventMessage()
-			if m is not None:
-				yield m
-
-		for op, _, _ in self.outputs.values():
-			m = op.GetEventMessage()
-			if m is not None:
-				yield m
+		for l in [self.signals, self.signalLevers, self.turnouts, self.blocks, self.stopRelays]:
+			for s in l.values():
+				m = s.GetEventMessage()
+				if m is not None:
+					yield m
+					
+		for s in self.breakers.values():
+			if not s.HasProxy(): # skip breakers that use a proxy
+				m = s.GetEventMessage()
+				if m is not None:
+					yield m
 
 		for osblk, rtinfo in self.osRoutes.items():
 			rt = rtinfo[0]
@@ -191,196 +906,286 @@ class Railroad(wx.Notebook):
 			m = {"fleet": [{ "name": signm, "value": flag}]}
 			yield m
 
-	def SetControlOption(self, name, value):
-		self.controlOptions[name] = value
-
-	def GetControlOption(self, name):
-		try:
-			return self.controlOptions[name]
-		except IndexError:
-			return 0
-
-	def SetOSRoute(self, blknm, rtname, ends, signals):
-		self.osRoutes[blknm] = [rtname, ends, signals]
-
 	def PlaceTrain(self, blknm):
-		if blknm not in self.inputs:
-			logging.warning("No input defined for block %s" % blknm)
+		try:
+			blk = self.blocks[blknm]
+		except KeyError:
+			logging.warning("Skipping train placement for block %s: unknown block" % blknm)
 			return
-		_, district, _ = self.inputs[blknm]
-		district.PlaceTrain(blknm)
+
+		if blk.SetOccupied(True):
+			self.RailroadEvent(blk.GetEventMessage())
+
 
 	def RemoveTrain(self, blknm):
-		if blknm not in self.inputs:
-			logging.warning("No input defined for block %s" % blknm)
+		try:
+			blk = self.blocks[blknm]
+		except KeyError:
+			logging.warning("Skipping remove train for block %s: unknown block" % blknm)
 			return
-		_, district, _ = self.inputs[blknm]
-		district.RemoveTrain(blknm)
 
-	def SetAspect(self, signame, aspect):
-		if signame not in self.outputs:
-			logging.warning("No output defined for signal %s" % signame)
-			return
-		op, district, _ = self.outputs[signame]
-		op.SetAspect(aspect)
-		district.DetermineSignalLevers()
-		district.RefreshOutput(signame)
+		if blk.SetOccupied(False):
+			self.RailroadEvent(blk.GetEventMessage())
 
-	def SetSignalLock(self, signame, lock):
-		if signame not in self.outputs:
-			logging.warning("No output defined for signal %s" % signame)
-			return
-		op, district, _ = self.outputs[signame]
-		op.SetLock(lock)
-		district.RefreshOutput(signame)
 
-	def SetSignalFleet(self, signame, flag):
-		self.fleetedSignals[signame] = flag
 
-	def SetBlockDirection(self, block, direction):
-		if block not in self.inputs:
-			logging.warning("No input defined for block %s" % block)
-			return
-		ip, _, _ = self.inputs[block]
-		ip.SetDirection(direction)
 
-	def SetBlockClear(self, block, clear):
-		if block not in self.inputs:
-			logging.warning("No input defined for block %s" % block)
-			return
-		ip, _, _ = self.inputs[block]
-		ip.SetClear(clear)
 
-	def SetIndicator(self, indname, state):
-		if indname not in self.outputs:
-			logging.warning("no output defined for indicator %s" % indname)
-			return
-		op, district, _ = self.outputs[indname]
-		op.SetStatus(state != 0)
-		district.UpdateIndicator(indname)
 
-	def SetRelay(self, relayname, state):
-		if relayname not in self.outputs:
-			logging.warning("no output defined for relay %s" % relayname)
-			return
-		op, district, _ = self.outputs[relayname]
-		op.SetStatus(state != 0)
-		district.UpdateRelay(relayname)
 
-	def SetHandSwitch(self, hsname, state):
-		if hsname not in self.outputs:
-			logging.warning("no output defined for handswitch %s" % hsname)
-			return
-		op, district, _ = self.outputs[hsname]
-		op.SetStatus(state != 0)
-		district.UpdateHandSwitch(hsname)
 
-	def SetSwitchLock(self, toname, state):
-		self.switchLock[toname] = state
-		if toname not in self.outputs:
-			logging.warning("no output defined for turnout %s" % toname)
-			return
-		op, district, _ = self.outputs[toname]
-		op.SetLock(state)
-		district.RefreshOutput(toname)
 
-	def GetSwitchLock(self, toname):
+	def GetSwitchLock(self, toname):  # only used by port - reserve judgement until then
 		if toname in self.switchLock:
 			return self.switchLock[toname]
 		else:
 			return False
 
-	def SetDistrictLock(self, name, value):
-		self.districtLock[name] = value
-
-	def GetDistrictLock(self, name):
+	def GetDistrictLock(self, name):  # only used in nassau - reserve judgement til then
 		if name in self.districtLock:
 			return self.districtLock[name]
 
 		return None
 
-	def SetOutPulseTo(self, oname, state):
-		if oname not in self.outputs:
-			logging.warning("no pulsed output defined for %s" % oname)
-			return
-		op, district, _ = self.outputs[oname]
-		op.SetOutPulseTo(state)
-		district.RefreshOutput(oname)
+	def GetBlock(self, blknm):
+		try:
+			return self.blocks[blknm]
+		except KeyError:
+			return None
 
-	def SetOutPulseNXB(self, oname):
-		if oname not in self.outputs:
-			logging.warning("no pulsed output defined for %s" % oname)
-			return
-		op, district, _ = self.outputs[oname]
-		op.SetOutPulseNXB()
-		district.RefreshOutput(oname)
+	def GetTurnout(self, tonm):
+		try:
+			return self.turnouts[tonm]
+		except KeyError:
+			return None
 
-	def RefreshOutput(self, oname):
-		if oname not in self.outputs:
-			logging.warning("no output defined for %s" % oname)
-			return
-		district = self.outputs[oname][1]
-		district.RefreshOutput(oname)
+	def GetHandswitch(self, hsnm):
+		try:
+			return self.handswitches[hsnm]
+		except KeyError:
+			return None
 
-	def RefreshInput(self, iname):
-		if iname in self.inputs:
-			district, itype = self.inputs[iname][1:3]
-			district.RefreshInput(iname, itype)
+	def GetIndicator(self, indnm):
+		try:
+			return self.indicators[indnm]
+		except KeyError:
+			return None
 
-		else:
-			logging.warning("No input defined for %s" % iname)
-			return
+	def GetSignal(self, signm):
+		try:
+			return self.signals[signm]
+		except KeyError:
+			return None
 
-	def xRefreshInput(self, iname):
-		if iname not in self.inputs:
-			logging.warning("No input defined for %s" % iname)
-			return
-		district, itype = self.inputs[iname][1:3]
-		district.RefreshInput(iname, itype)
+	def GetOutputDevice(self, onm):
+		try:
+			return self.odevices[onm]
+		except KeyError:
+			return None
+			
+	def GetNodeBits(self, addr):
+		'''
+		this routine handles the getbits command from HTTP server
+		'''
+		for dnodes in self.nodes.values():
+			if addr in dnodes:
+				return dnodes[addr].GetAllBits()
+			
+		return 0, [], []
 
-	def EvaluateNXButtons(self, bEntry, bExit):
-		if bEntry not in self.outputs:
-			logging.warning("No output defined for %s" % bEntry)
-			return
-		district = self.outputs[bEntry][1]
-		district.EvaluateNXButtons(bEntry, bExit)
+	def SetInputBitByAddr(self, addr, vbytes, vbits, vals):
+		'''
+		this routine handles the setinbit command from HTTP server
+		'''
+		print("set in by addr: bytes: %s   bits: %s   values: %s" % (str(vbytes), str(vbits), str(vals)))
+		for dnodes in self.nodes.values():
+			if addr in dnodes:
+				for i in range(len(vbytes)):
+					dnodes[addr].SetInputBit(vbytes[i], vbits[i], 1 if vals[i] != 0 else 0)
 
-	def EvaluateNXButton(self, btn):
-		if btn not in self.outputs:
-			logging.warning("No output defined for %s" % btn)
-			return
-		district = self.outputs[btn][1]
-		district.EvaluateNXButton(btn)
+	def OutIn(self):
+		delList = []
+		for toname, ctr in self.pulsedOutputs.items():
+			if not ctr.tally():
+				delList.append(toname)
+				
+		for toname in delList:
+			del self.pulsedOutputs[toname]				
+			
+		for district in self.districts.values():
+			district.OutIn()
+			
+		self.ExamineInputs()
+		
+	def UpdateDistrictTurnoutLocksByNode(self, districtName, released, addressList):
+		for t in self.turnouts.values():
+			if t.district is None:
+				continue
+			
+			if t.district.Name() == districtName and t.address in addressList:
+				t.UpdateLockBits(released)
+		
+	def UpdateDistrictTurnoutLocks(self, districtName, released):
+		for t in self.turnouts.values():
+			if t.district is None:
+				continue
+			
+			if t.district.Name() == districtName:
+				t.UpdateLockBits(released)
+		
+	def ExamineInputs(self):
+		for addr, district, node in self.addrList:
+			skiplist, resumelist = district.GetControlOption()
+			changedBits = node.GetChangedInputs()
+			for node, vbyte, vbit, objparms, newval in changedBits:
+				obj = objparms[0]
+				objType = obj.InputType()
 
-	def allIO(self):
-		st = time.monotonic_ns()
-		for _, d in self.districts.items():
-			d.OutIn()
+				if objType == INPUT_BLOCK:
+					if obj.SetOccupied(newval != 0):
+						self.RailroadEvent(obj.GetEventMessage())
+						obj.UpdateIndicators()
+			
+				elif objType == INPUT_TURNOUTPOS:
+					pos = obj.Position()
+					if pos:
+						bits, district, node, address = pos
+						nflag = node.GetInputBit(bits[0][0], bits[0][1])
+						rflag = node.GetInputBit(bits[1][0], bits[1][1])
+						if obj.IsNormal():
+							if nflag == 0 and rflag == 1:
+								if obj.SetNormal(False):
+									self.RailroadEvent(obj.GetEventMessage())
+									obj.UpdateLed()
+						else:
+							if nflag == 1 and rflag == 0:
+								if obj.SetNormal(True):
+									self.RailroadEvent(obj.GetEventMessage())
+									obj.UpdateLed()
+								
+					if obj.HasLever():
+						bt = obj.Bits()
+						if len(bt) > 0:
+							nbit, rbit = node.GetInputBits(bt)
+							if obj.SetLeverState('R' if nbit == 0 else 'N'):
+								obj.district.TurnoutLeverChange(obj)
+						
+				elif objType == INPUT_BREAKER:
+					if obj.SetStatus(newval == 1):
+						if obj.HasProxy():
+							# use the proxy to show updated breaker status
+							obj.district.ShowBreakerState(obj)
+						else:
+							obj.UpdateIndicators()
+							self.RailroadEvent(obj.GetEventMessage())
+	
+				elif objType == INPUT_SIGNALLEVER:
+					if obj.Name() not in skiplist: # bypass levers that are skipped because of control option
+						bt = obj.Bits()
+						if len(bt) > 0:
+							rbit, cbit, lbit = node.GetInputBits(bt)
+							if obj.SetLeverState(rbit, cbit, lbit):
+								self.RailroadEvent(obj.GetEventMessage())
+								obj.UpdateLed()
 
-		self.ReleasePendingEvents()
-		et = time.monotonic_ns()
-		d = (et-st)/1000000
-		#print("IO duration: %d-%d = %f" % (et, st, d))
+				elif objType == INPUT_HANDSWITCH:
+					dataType = objparms[1]
+					if dataType == "L":
+						objnm = obj.Name()
+						if objnm in [ "CSw21ab", "PBSw15ab" ]:
+							if objnm not in skiplist:
+								if obj.Lock(newval != 0):
+									obj.UpdateIndicators()
+								unlock = obj.GetUnlock()
+								if unlock:
+									district, node, addr, bits = unlock
+									district.SetHandswitchIn(obj, newval)
+						else:
+							if objnm not in skiplist:
+								unlock = obj.GetUnlock()
+								if unlock:
+									district, node, addr, bits = unlock
+									uflag = node.GetInputBit(bits[0][0], bits[0][1])
+									if obj.Lock(uflag != 0):
+										self.RailroadEvent(obj.GetEventMessage(lock=True))
+										obj.UpdateIndicators()
+					
+					else:
+						pos = obj.Position()
+						if pos:
+							district, node, address, bits = pos
+							nflag = node.GetInputBit(bits[0][0], bits[0][1])
+							rflag = node.GetInputBit(bits[1][0], bits[1][1])
+							if obj.IsNormal():
+								if nflag == 0 and rflag == 1:
+									if obj.SetNormal(False):
+										self.RailroadEvent(obj.GetEventMessage())
+							else:
+								if nflag == 1 and rflag == 0:
+									if obj.SetNormal(True):
+										self.RailroadEvent(obj.GetEventMessage())
+		
+				elif objType == INPUT_ROUTEIN:
+					bt = obj.Bits()
+					if len(bt) > 0:
+						stat = node.GetInputBit(bt[0][0], bt[0][1])
+						obj.district.RouteIn(obj, stat)
+						
+			'''
+			The resume list is a list of objects - signal levers, or handswitch unlocks - that have been ignored because of the
+			control setting for this district, but now need to be considered because the control value has changed.  We need to 
+			react to the current value of these objects as if they was just now set to their current value
+			'''
+			for o in resumelist:
+				try:
+					obj = self.signalLevers[o]
+				except KeyError:
+					try:
+						obj = self.handswitches[o]
+					except KeyError:
+						print("Unknown object name: %s in resume list" % o)
+						#print(str(sorted(self.turnouts.keys())))
+						
+					else:
+						unlock = obj.GetUnlock()
+						if unlock:
+							district, node, addr, bits = unlock
+							uflag = node.GetInputBit(bits[0][0], bits[0][1])
+							if obj.Lock(uflag == 1):
+								self.RailroadEvent(obj.GetEventMessage(lock=True))
+						
+				else:
+					bt = obj.Bits()
+					if len(bt) > 0:
+						rbit, cbit, lbit = obj.node.GetInputBits(bt)
+						if obj.SetLeverState(rbit, cbit, lbit):
+							self.RailroadEvent(obj.GetEventMessage())
+							obj.UpdateLed()
+			
 
 	def RailroadEvent(self, event):
-		self.pendingEvents.append(event)
+		self.cbEvent(event)
 
-	def ReleasePendingEvents(self):
-		for event in self.pendingEvents:
-			self.cbEvent(event)
+class PulseCounter:
+	def __init__(self, vbyte, vbit, pct, plen, node):
+		self.vbyte = vbyte
+		self.vbit = vbit
+		self.count = pct
+		self.length = plen
+		self.resetLength = plen
+		self.node = node
 		
-		self.pendingEvents = []
-		
-	def GetBlockInfo(self):
-		blocks = []
-		for iput, _, itype in self.inputs.values():
-			if itype == District.block:				
-				blocks.append([iput.GetName(), 1 if iput.GetEast() else 0])
-		return sorted(blocks)
+	def tally(self):
+		if self.length == 0:
+			self.count -= 1
+			if self.count == 0:
+				return False
+				
+			self.length = self.resetLength
+			sendBit = 1
+		else:
+			self.length -= 1
+			sendBit = 0 if self.length == 0 else 1
 
-	def GetSubBlockInfo(self):
-		self.subblocks = {}
-		for iput, _, itype in self.inputs.values():
-			if itype == District.block:
-				self.subblocks.update(iput.ToJson())
-		return self.subblocks
+		self.node.SetOutputBit(self.vbyte, self.vbit, sendBit)
+		return True

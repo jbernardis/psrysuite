@@ -13,11 +13,11 @@ if settings.dispatch:
 else:
 	fn = "display"
 
-# ofp = open(os.path.join(os.getcwd(), "output", "%s.out" % fn), "w")
-# efp = open(os.path.join(os.getcwd(), "output", "%s.err" % fn), "w")
-#
-# sys.stdout = ofp
-# sys.stderr = efp
+ofp = open(os.path.join(os.getcwd(), "output", "%s.out" % fn), "w")
+efp = open(os.path.join(os.getcwd(), "output", "%s.err" % fn), "w")
+
+sys.stdout = ofp
+sys.stderr = efp
 
 import logging
 logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "%s.log" % fn), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)

@@ -42,6 +42,14 @@ button on dispatcher and display to start throttle
 
 continue to add to monitor program to allow visibility into new server
 
+still have to test port A on the new server
+
+improve monitor/tester
+
+better integration of monitor/tester into config/launcher
+
+better icons
+
 
 
 

@@ -29,6 +29,7 @@ class Node:
         self.topulsect = settings.topulsect
         self.nxbpulselen = settings.nxbpulselen
         self.nxbpulsect = settings.nxbpulsect
+        self.first = True
         
         self.inputMap = {}
         
@@ -75,8 +76,11 @@ class Node:
         for b in range(len(self.inb)):
             new = self.inb[b]
             old = self.lastinb[b]
-            mask = new ^ old
-
+            if self.first:
+                mask = 0b11111111
+            else:
+                mask = new ^ old
+  
             if mask != 0:
                 for i in range(8):
                     if mask & (1 << (7-i)) != 0:
@@ -84,12 +88,14 @@ class Node:
                         try:
                             o = self.inputMap[(b, i)]
                         except KeyError:
-                            logging.warning("input for location %x:%d:%d not found" % (self.address, b, i))
+                            if not self.first:
+                                logging.warning("input for location %x:%d:%d not found" % (self.address, b, i))
                             o = None
                         if o:
                             results.append([self, b, i, o, v])
                             
         self.lastinb = [x for x in self.inb]
+        self.first = False
         return results
 
                 

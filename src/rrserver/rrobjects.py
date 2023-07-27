@@ -1,549 +1,802 @@
 import logging
 
-class Input:
-	def __init__(self, name, district):
-		self.name = name
-		self.district = district
-		self.value = 0
-		self.rr = None
+from rrserver.constants import INPUT_BLOCK, INPUT_BREAKER, INPUT_SIGNALLEVER, INPUT_ROUTEIN, INPUT_HANDSWITCH, INPUT_TURNOUTPOS
+from pickle import FALSE
+
+class Block:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.east = True
+        self.bits = []
+        self.cleared = False
+        self.occupied = False
+        self.indicators = []
+        self.mainBlock = None
+        self.mainBlockName = None
+        self.subBlocks = []
+        self.stoppingBlocks = []
+        self.stoppedBlock = None
+   
+    def Name(self):
+        return self.name
+        
+    def Address(self):
+        return self.address
+    
+    def InputType(self):
+        return INPUT_BLOCK
+               
+    def dump(self):
+        addr = "None" if self.address is None else ("%x" % self.address)
+        print("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
+        print("     east: %s   occupied: %s   cleared: %s  indicators: %s" % (str(self.east), str(self.occupied), str(self.cleared), str(self.indicators)))
+        if self.district is None:
+            print("<===== NULL BLOCK DEFINITION")
+
+    def IsNullBlock(self):
+        return self.district is None
+    
+    def SetBlockAddress(self, district, node, address):
+        self.district = district
+        self.node = node
+        self.address = address
+    
+    def SetMainBlock(self, blk):
+        self.mainBlockName = blk.Name()
+        self.mainBlock = blk
+        
+    def AddSubBlocks(self, blkl):
+        self.subBlocks.extend(blkl)
+        for b in blkl:
+            b.SetMainBlock(self)
+        
+    def SubBlocks(self):
+        return self.subBlocks
+        
+    def AddStoppingBlocks(self, sbl):
+        self.stoppingBlocks.extend(sbl)
+        for sb in sbl:
+            sb.SetStoppedBlock(self)
+            
+    def StoppingBlocks(self):
+        return self.stoppingBlocks
+        
+    def SetStoppedBlock(self, blk):
+        self.stoppedBlock = blk
+        
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+    
+    def SetDirection(self, east):
+        if self.east == east:
+            return False
+        
+        self.east = east
+        return True
+        
+    def IsEast(self):
+        return self.east
+    
+    def SetOccupied(self, flag):
+        if self.occupied == flag:
+            return False
+        
+        self.occupied = flag
+        return True
+
+        
+    def IsOccupied(self, recurse=True):
+        if recurse and self.mainBlock is not None:
+            return self.mainBlock.IsOccupied(recurse=False)
+        
+        '''
+        for a block that is subdivided into subblocks, occupied reflects the status of all subblocks or'ed together
+        '''
+        occ = self.occupied
+        for b in self.subBlocks:
+            occ = True if b.IsOccupied(recurse=False) else occ
+            
+        return occ
+    
+    def SetCleared(self, flag):
+        if self.cleared == flag:
+            return False
+        
+        self.cleared = flag
+        return True
+        
+    def IsCleared(self, recurse=True):
+        if recurse and self.mainBlock is not None:
+            return self.mainBlock.IsCleared(recurse=False)
+        '''
+        for a block that is subdivided into subblocks, cleared reflects the status of all subblocks or'ed together
+        '''
+        clr = self.cleared
+        for b in self.subBlocks:
+            clr = True if b.IsCleared(recurse=False) else clr
+            
+        return clr
+    
+    def AddIndicator(self, district, node, address, bits):
+        self.indicators.append((district, node, address, bits))
+        
+    def UpdateIndicators(self):
+        '''
+        make indicators show the status of this and any stoppingBlocks all or'ed together
+        '''
+        parentBlk = self
+        if self.stoppedBlock is not None:
+            parentBlk = self.stoppedBlock
+        elif self.mainBlock is not None:
+            parentBlk = self.mainBlock
+             
+        occ = parentBlk.IsOccupied() # the occupancy status of the block and all sublocks
+             
+        for sb in parentBlk.StoppingBlocks():
+            occ = True if sb.IsOccupied(recurse=False) else occ
+ 
+        for ind in parentBlk.indicators:
+            district, node, address, bits = ind
+            node.SetOutputBit(bits[0][0], bits[0][1], occ)
+ 
+    def GetEventMessage(self, clear=False, direction=False):
+        bname = self.mainBlockName if self.mainBlockName is not None else self.name
+
+        if clear:
+            return {"blockclear": [{ "block": bname, "clear": self.IsCleared()}]}
+        if direction:
+            return {"blockdir": [{ "block": bname, "dir": "E" if self.east else "W"}]}
+        else:
+            return {"block": [{ "name": bname, "state": self.IsOccupied()}]}
+        
+class StopRelay:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.activated = False
+         
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+        
+    def Activate(self, flag):
+        self.activated = flag
+        
+    def IsActivated(self):
+        return self.activated
+    
+    def GetEventMessage(self):
+        return {"relay": [{ "name": self.name, "state": 1 if self.activated else 0}]}
+       
+
+class Breaker:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.bits = []
+        self.status = True  # not tripped
+        self.indicators = []
+        self.proxy = None   # proxy - this breaker shows its status via a proxy breaker
+        
+    def Name(self):
+        return self.name
+        
+    def Address(self):
+        return self.address
+    
+    def InputType(self):
+        return INPUT_BREAKER
+        
+    def IsNullBreaker(self):
+        return self.district is None
+    
+    def SetBreakerAddress(self, district, node, address):
+        self.district = district
+        self.node = node
+        self.address = address
+        
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+     
+    def SetStatus(self, flag):
+        if self.status == flag:
+            return False
+        
+        self.status = flag
+        return True
+    
+    def SetTripped(self, flag):
+        return self.SetStatus(not flag)
+    
+    def SetOK(self, flag):
+        return self.SetStatus(flag)
+   
+    def SetProxy(self, bname):
+        self.proxy = bname
+        
+    def HasProxy(self):
+        return self.proxy is not None
+    
+    def IsTripped(self):
+        return not self.status
+        
+    def IsOK(self):
+        return self.status
+    
+    def AddIndicator(self, district, node, address, bits):
+        self.indicators.append((district, node, address, bits))
+       
+    def UpdateIndicators(self):
+        if len(self.indicators) == 0:
+            return False
+        
+        for ind in self.indicators:
+            district, node, address, bits = ind
+            node.SetOutputBit(bits[0][0], bits[0][1], 0 if self.status else 1)
+        return True
+
+    def GetEventMessage(self):
+        return {"breaker": [{ "name": self.name, "value": 1 if self.status else 0}]}
+       
+    def dump(self):
+        addr = "None" if self.address is None else ("%x" % self.address)
+        print("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
+        print("     status: %s " % (str(self.status)))
+        print("     # indicators:    %d" % len(self.indicators))
+        if self.district is None:
+            print("<===== NULL BREAKER DEFINITION")
+
+class Indicator:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.status = False
+         
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+        
+    def SetOn(self, flag):
+        self.status = flag
+        
+    def IsOn(self):
+        return self.status
+    
+    def GetEventMessage(self):
+        return {"indicator": [{ "name": self.name, "state": 1 if self.status else 0}]}
+    
+class ODevice:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.status = False
+         
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+        
+    def SetOn(self, flag):
+        if self.status == flag:
+            return False
+    
+        self.status = flag
+        return True
+        
+    def IsOn(self):
+        return self.status
+    
+class Lock:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.status = False
+         
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+        
+    def SetOn(self, flag):
+        if self.status == flag:
+            return False
+        
+        self.status = flag
+        return True
+        
+    def IsOn(self):
+        return self.status
+    
+
+class Signal:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.aspect = 0
+        self.bits = []
+        self.led = []
+        self.locked = False
+        self.lockBits = []
+        self.indicators = []
+
+    def IsNullSignal(self):
+        return self.district is None
+    
+    def IsVirtual(self):
+        return len(self.bits) == 0
+    
+    def SetSignalAddress(self, district, node, address):
+        self.district = district
+        self.node = node
+        self.address = address
+        
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+    
+    def SetAspect(self, aspect):
+        if self.aspect == aspect:
+            return False
+        
+        self.aspect = aspect
+        return True
+        
+    def Aspect(self):
+        return self.aspect
+    
+    def Name(self):
+        return self.name
+    
+    def SetLockBits(self, bits):
+        self.lockBits = bits
+        
+    def LockBits(self):
+        return self.lockBits
+
+    def Lock(self, locked):
+        if self.locked == locked:
+            return False
+        
+        self.locked = locked
+        return True
+        
+    def IsLocked(self):
+        return self.locked
+    
+    def AddIndicator(self, district, node, address, bits):
+        self.indicators.append((district, node, address, bits))
+        
+    def UpdateIndicators(self):
+        for ind in self.indicators:
+            district, node, address, bits = ind
+            node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.aspect != 0 else 0)
+    
+    def GetEventMessage(self, lock=False):
+        if lock:
+            return {"signallock": [{ "name": self.name, "state": 1 if self.locked else 0}]}
+        else:
+            return {"signal": [{ "name": self.name, "aspect": self.aspect}]}
+        
+    def dump(self):
+        addr = "None" if self.address is None else ("%x" % self.address)
+        print("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
+        print("     LED: %s   locked: %s/%s" % (str(self.led), str(self.locked), str(self.lockBits)))
+        if self.district is None:
+            print("<===== NULL SIGNAL DEFINITION")
+
+'''
+signal lever is a separate class because there is only 1 signal lever for each grouping of Lx and Rx signals
+'''
+class SignalLever:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.led = None
+        self.state = "N"
+        self.bits = []
+
+    def IsNullLever(self):
+        return self.district is None
+    
+    def SetLeverAddress(self, district, node, address):
+        self.district = district
+        self.node = node
+        self.address = address
+    
+    def Name(self):
+        return self.name
+        
+    def Address(self):
+        return self.address
+    
+    def InputType(self):
+        return INPUT_SIGNALLEVER
+          
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+     
+    def SetLed(self, bits, district, node, addr):
+        self.led = [bits, district, node, addr]
+        self.UpdateLed()
+        
+    def LedBits(self):
+        return self.led
+    
+    def SetLever(self, bits):
+        self.bits = bits
+        
+    def LeverBits(self):
+        return self.bits
+    
+    def SetLeverState(self, rbit, cbit, lbit):
+        nstate = self.state
+        if lbit is not None and lbit != 0:
+            nstate = "L"
+        elif rbit is not None and rbit != 0:
+            nstate = "R"
+        elif (lbit is None or lbit == 0) and (rbit is None or rbit == 0):
+            nstate = "N"
+
+        if nstate != self.state:
+            self.state = nstate
+            return True
+        
+        return False
+    
+    def UpdateLed(self):
+        if self.led is not None:
+            bits, district, node, addr = self.led
+            bt = bits[0]
+            if bt:
+                node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'R' else 0)
+            bt = bits[1]
+            if bt:
+                node.SetOutputBit(bt[0], bt[1], 1 if self.state not in ["L", "R"] else 0)
+            bt = bits[2]
+            if bt:
+                node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'L' else 0)
+       
+    def GetEventMessage(self):
+        return {"siglever": [{ "name": self.name+".lvr", "state": self.state}]}
+
+
+class RouteIn:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.state = False
+   
+    def Name(self):
+        return self.name
+        
+    def Address(self):
+        return self.address
+    
+    def InputType(self):
+        return INPUT_ROUTEIN
+    
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+     
+    def SetState(self, state):
+        self.state = state
+        
+    def GetState(self):
+        return self.state
+    
+    def GetEventMessage(self):
+        return None
+
+ 
+class Turnout:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.normal = True
+        self.lastReadNormal = None
+        self.bits = []
+        self.led = None
+        self.lever = []
+        self.position = None
+        self.leverState = 'N'
+        self.locked = False
+        self.lockBits = []
+        self.force = False
+        self.lockBitValue = 0
+   
+    def Name(self):
+        return self.name
+        
+    def Address(self):
+        return self.address
+    
+    def InputType(self):
+        return INPUT_TURNOUTPOS
+        
+    def dump(self):
+        addr = "None" if self.address is None else ("%x" % self.address)
+        print("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
+        print("     normal: %s   locked: %s/%s" % (str(self.normal), self.locked, str(self.lockBits)))
+        print("     led:    %s" % str(self.led))
+        print("     lever:  %s/%s" % (self.leverState, str(self.lever)))
+        print("     pos:    %s" % self.position)
+        if self.district is None:
+            print("<===== NULL TURNOUT DEFINITION")
+
+    def IsNullTurnout(self):
+        return self.district is None
+    
+    def SetTurnoutAddress(self, district, node, address):
+        self.district = district
+        self.node = node
+        self.address = address
+        
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+    
+    def SetNormal(self, normal):
+        if self.normal == normal:
+            return False
+        
+        self.normal = normal
+        return True
+        
+    def IsNormal(self):
+        return self.normal
+    
+    def SetLed(self, bits, district, node, addr):
+        self.led = [bits, district, node, addr]
+        self.UpdateLed()
+        
+    def LedBits(self):
+        return self.led
+     
+    def UpdateLed(self):
+        if self.led is not None:
+            bits, district, node, addr = self.led
+            bt = bits[0]
+            if bt:
+                node.SetOutputBit(bt[0], bt[1], 1 if self.normal else 0)
+            bt = bits[1]
+            if bt:
+                node.SetOutputBit(bt[0], bt[1], 0 if self.normal else 1)
+   
+    def SetLever(self, bits, district, node, addr):
+        self.lever = [bits, district, node, addr]
+        
+    def LeverBits(self):
+        return self.lever
+    
+    def HasLever(self):
+        return len(self.lever) > 0
+    
+    def SetLeverState(self, state):
+        if state != self.leverState:
+            self.leverState = state
+            return True
+        
+        return False
+    
+    def SetPosition(self, bits, district, node, addr):
+        self.position = [bits, district, node, addr]
+        node.SetInputBit(bits[0][0], bits[0][1], 1)
+        
+    def Position(self):
+        return self.position
+    
+    def SetLockBits(self, bits, district, node, addr):
+        self.lockBits = [bits, district, node, addr]
+        
+    def UpdateLockBits(self, release=False):
+        if len(self.lockBits) == 0:
+            return
+        bits, district, node, addr = self.lockBits
+        
+        newLockBit = 0 if release else 1 if self.locked else 0
+        if newLockBit != self.lockBitValue:
+            node.SetOutputBit(bits[0][0], bits[0][1], newLockBit)
+            self.lockBitValue = newLockBit
+      
+    def LockBits(self):
+        return self.lockBits
+    
+    def Lock(self, locked):
+        if self.locked == locked:
+            return False
+        
+        self.locked = locked
+        return True
+        
+    def IsLocked(self):
+        return self.locked
+        
+    def GetEventMessage(self, lock=False):
+        if lock:
+            return {"turnoutlock": [{ "name": self.name, "state": 1 if self.locked else 0}]}
+        else:
+            return {"turnout": [{ "name": self.name, "state": "N" if self.normal else "R", "force": self.force}]}
+ 
+class OutNXButton:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.bits = []
+        
+    def Name(self):
+        return self.name
+        
+    def SetBits(self, bits):
+        self.bits = bits
+        
+    def Bits(self):
+        return self.bits
+   
+class Handswitch:
+    def __init__(self, name, district, node, address):
+        self.name = name
+        self.district = district
+        self.node = node
+        self.address = address
+        self.normal = True
+        self.bits = []
+        self.indicators = []
+        self.locked = False
+        self.reverseIndicators = []
+        self.unlock = None
+   
+    def Name(self):
+        return self.name
+        
+    def Address(self):
+        return self.address
+    
+    def District(self):
+        return self.district
+    
+    def InputType(self):
+        return INPUT_HANDSWITCH
+        
+    def dump(self):
+        addr = "None" if self.address is None else ("%x" % self.address)
+        print("%s: district: %s  addr: %s" % (self.name, "None" if self.district is None else self.district.name, addr))
+        print("     normal: %s   locked: %s/%s" % (str(self.normal), self.locked, str(self.lockBits)))
+        print("     ind:    %s" % str(self.indBits))
+        print("     pos:    %s" % self.bits)
+
+        if self.district is None:
+            print("<===== NULL HANDSWITCH DEFINITION")
+
+    def IsNullHandswitch(self):
+        return self.district is None
+    
+    def SetHandswitchAddress(self, district, node, address):
+        self.district = district
+        self.node = node
+        self.address = address
+    
+    def SetNormal(self, normal):
+        if self.normal == normal:
+            return False
+        
+        self.normal = normal
+        self.UpdateReverseIndicators()
+        return True
+        
+    def IsNormal(self):
+        return self.normal
+    
+    def AddIndicator(self, district, node, addr, bits):
+        self.indicators.append([district, node, addr, bits])
+        self.UpdateIndicators()
+   
+    def UpdateIndicators(self):
+        if len(self.indicators) == 0:
+            return False
+        # indicators with one bit: simple on/off led to show lock status
+        # indicators with 2 bits: panel indicators with one being the inverted value of the other
+        for ind in self.indicators:
+            district, node, address, bits = ind
+            if len(bits) == 1:
+                node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.locked else 0)
+            elif len(bits) == 2:
+                node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.locked else 0)
+                node.SetOutputBit(bits[1][0], bits[1][1], 0 if self.locked else 1)
+            else:
+                logging.warning("Hand switch indicator for %s has an unexpected number of bits")
+            
+        return True
+   
+    def AddReverseIndicator(self, district, node, addr, bits):
+        self.reverseIndicators.append([district, node, addr, bits])
+        self.UpdateReverseIndicators()
+   
+    def UpdateReverseIndicators(self):
+        if len(self.reverseIndicators) == 0:
+            return False
+        for ind in self.reverseIndicators:
+            district, node, address, bits = ind
+            if len(bits) == 1:
+                node.SetOutputBit(bits[0][0], bits[0][1], 1 if not self.normal else 0)
+            
+        return True
+  
+    def AddUnlock(self, district, node, addr, bits):
+        self.unlock = [district, node, addr, bits]
+        
+    def GetUnlock(self):
+        return self.unlock
+
+    def SetBits(self, bits):
+        self.bits = bits  # the position is where we read the switch position
+        self.node.SetInputBit(bits[0][0], bits[0][1], 1)
+        
+    def Bits(self):
+        return self.bits
+        
+    def Position(self):
+        return [self.district, self.node, self.address, self.bits]
+    
+    def Lock(self, locked):
+        if self.locked == locked:
+            return False
+        
+        self.locked = locked
+        return True
+        
+    def IsLocked(self):
+        return self.locked
+        
+    def GetEventMessage(self, lock=False):
+        if lock:
+            return {"handswitch": [{ "name": self.name+".hand", "state": 1 if self.locked else 0}]}
+        else:
+            return {"turnout": [{ "name": self.name, "state": "N" if self.normal else "R"}]}
+ 
 
-	def SetRailRoad(self, rr):
-		self.rr = rr
 
-	def SetDistrict(self, d):
-		self.district = d
-
-	def GetName(self):
-		return self.name
-
-	def SetValue(self, v):
-		self.value = v
-
-	def GetValue(self):
-		return self.value
-	
-	def GetInvertedValue(self):
-		return 1 if self.value == 0 else 0
-
-	def GetEventMessage(self):
-		return None
-
-
-class BreakerInput(Input):
-	def __init__(self, name, district):
-		Input.__init__(self, name, district)
-		self.value = 1
-
-	def SetValue(self, nv):
-		if nv == self.value:
-			return
-		self.value = nv
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-		self.rr.RailroadEvent(self.GetEventMessage())
-
-	def GetEventMessage(self):
-		return {"breaker": [{ "name": self.name, "value": self.value}]}
-
-
-class RouteInput(Input):
-	def __init__(self, name, district):
-		Input.__init__(self, name, district)
-
-	def SetValue(self, nv):
-		if nv == self.value:
-			return
-		self.value = nv
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-		logging.info("Route input %s = %d" % (self.name, nv))
-		if nv == 1:
-			self.district.MapRouteToTurnouts(self.name)
-
-	def GetEventMessage(self):
-		# Route inputs are communicated indirectly by sending the values for the underlying turnouts
-		# this is done by the MapRouteToTurnouts method in district called above
-		return None
-
-
-class BlockInput(Input):
-	def __init__(self, name, district):
-		Input.__init__(self, name, district)
-		self.subBlocks = []
-		self.east = True
-		self.clear = False
-
-	def SetValue(self, nv):
-		if nv == self.value:
-			return
-		self.value = nv
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-		self.rr.RailroadEvent(self.GetEventMessage())
-
-	def SetDirection(self, direction):
-		nv = direction == 'E'
-		if self.east == nv:
-			return
-		self.east = nv
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-		self.rr.RailroadEvent(self.GetEventMessage(direction=True))
-		if len(self.subBlocks) != 0:
-			for sb in self.subBlocks:
-				sb.SetDirection(direction)
-
-	def SetClear(self, clear):
-		if self.clear == clear:
-			return
-		self.clear = clear
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-		self.rr.RailroadEvent(self.GetEventMessage(clear=True))
-		if len(self.subBlocks) != 0:
-			for sb in self.subBlocks:
-				sb.SetClear(clear)
-
-	def GetValue(self):
-		return self.value
-
-	def GetEast(self):
-		return self.east
-
-	def GetClear(self):
-		return self.clear
-
-	def AddSubBlock(self, sub):
-		self.subBlocks.append(sub)
-
-	def EvaluateSubBlocks(self):
-		nv = 0
-		for sb in self.subBlocks:
-			sv = sb.GetValue()
-			if sv != 0:
-				nv = 1
-				break
-		self.SetValue(nv)
-
-	def GetEventMessage(self, clear=False, direction=False):
-		if clear:
-			return {"blockclear": [{ "block": self.name, "clear": 1 if self.clear else 0}]}
-		if direction:
-			return {"blockdir": [{ "block": self.name, "dir": "E" if self.east else "W"}]}
-		else:
-			# return {"block": [{ "name": self.name, "state": self.value, "dir": "E" if self.east else "W",
-			# 					"clear": 1 if self.clear else 0}]}
-			return {"block": [{ "name": self.name, "state": self.value}]}
-
-	def ToJson(self):
-		sbs = [sb.GetName() for sb in self.subBlocks]
-		if len(sbs) > 0:
-			return {self.name: sbs}
-		else:
-			return {}
-
-
-class SubBlockInput(Input):
-	def __init__(self, name, district):
-		Input.__init__(self, name, district)
-		self.parent = None
-		self.east = True
-		self.clear = False
-	
-	def SetParent(self, parent):
-		self.parent = parent
-		self.parent.AddSubBlock(self)
-		self.east = self.parent.GetEast()
-
-	def SetValue(self, nv):
-		if nv == self.value:
-			return
-		self.value = nv
-		if self.parent:
-			self.parent.EvaluateSubBlocks()
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-
-	def SetClear(self, nv):
-		if nv == self.clear:
-			return
-		self.clear = nv
-		if self.parent:
-			self.parent.EvaluateSubBlocks()
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-
-	def SetDirection(self, direction):
-		self.east = direction == "E"
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-
-	def GetValue(self):
-		return self.value
-
-	def GetClear(self):
-		return self.clear
-
-	def GetEast(self):
-		return self.east
-
-	def GetEventMessage(self):
-		return None
-
-	def ToJson(self):
-		return {}
-
-
-class TurnoutInput(Input):
-	def __init__(self, name, district):
-		Input.__init__(self, name, district)
-		self.state = "N"  # assume normal switch position to start
-		self.force = False
-
-	def SetTOState(self, nb, rb):
-		if nb != 0 and rb == 0:
-			ns = 'N'
-		elif rb != 0 and nb == 0:
-			ns = 'R'
-		else:
-			# erroneous case - just assume normal
-			ns = 'N'
-		self.SetState(ns)
-
-	def SetState(self, ns, force=False):
-		if ns == self.state:
-			return
-		self.state = ns
-		self.force = force
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-		self.rr.RailroadEvent(self.GetEventMessage())
-
-	def GetState(self):
-		return self.state
-		
-	def GetEventMessage(self):
-		return {"turnout": [{ "name": self.name, "state": self.state, "force": self.force}]}
-
-
-class SignalLeverInput (Input):
-	def __init__(self, name, district):
-		Input.__init__(self, name, district)
-		self.state = "N"
-
-	def SetState(self, state):
-		if state == self.state:
-			return
-
-		self.state = state
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-		self.rr.RailroadEvent(self.GetEventMessage())
-
-	def GetState(self):
-		return self.state
-
-	def GetEventMessage(self):
-		return {"siglever": [{ "name": self.name, "state": self.state}]}
-
-
-class FleetLeverInput (Input):
-	def __init__(self, name, district):
-		Input.__init__(self, name, district)
-		self.state = 0
-
-	def SetState(self, state):
-		if state == self.state:
-			return
-
-		self.state = state
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-		self.rr.RailroadEvent(self.GetEventMessage())
-
-	def GetState(self):
-		return self.state
-
-	def GetEventMessage(self):
-		return {"control": [{ "name": self.name, "value": self.state}]}
-
-
-class ToggleInput (Input):
-	def __init__(self, name, district):
-		Input.__init__(self, name, district)
-		self.state = 0
-
-	def SetState(self, state):
-		if state == self.state:
-			return
-
-		self.state = state
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-		self.rr.RailroadEvent(self.GetEventMessage())
-
-	def GetState(self):
-		return self.state
-
-	def GetEventMessage(self):
-		return {"control": [{ "name": self.name, "value": self.state}]}
-
-
-class HandswitchLeverInput (Input):
-	def __init__(self, name, district):
-		Input.__init__(self, name, district)
-		self.state = 0
-
-	def SetState(self, state):
-		if state == self.state:
-			return
-
-		self.state = state
-		self.rr.RailroadEvent({"refreshinput": [self.name]})
-		self.rr.RailroadEvent(self.GetEventMessage())
-
-	def GetState(self):
-		return self.state
-
-	def GetEventMessage(self):
-		hsname = self.name.split(".")[0] + ".hand"
-		return {"handswitch": [{ "name": hsname, "state": self.state}]}
-
-
-class Output:
-	def __init__(self, name, district):
-		self.name = name
-		self.district = district
-		self.value = 0
-		self.rr = None
-
-	def SetRailRoad(self, rr):
-		self.rr = rr
-
-	def GetName(self):
-		return self.name
-
-	def GetEventMessage(self):
-		pass
-
-
-class IndicatorOutput(Output):
-	def __init__(self, name, district):
-		Output.__init__(self, name, district)
-		self.status = False
-
-	def SetStatus(self, flag=True):
-		if self.status == flag:
-			return
-
-		self.status = flag
-		self.rr.RailroadEvent({"refreshoutput": [self.name]})
-
-	def GetEventMessage(self):
-		pass
-
-	def GetStatus(self):
-		return self.status
-
-
-class HandSwitchOutput(IndicatorOutput):
-	def __init__(self, name, district):
-		IndicatorOutput.__init__(self, name, district)
-
-	def GetEventMessage(self):
-		return {"handswitch": [{ "name": self.name, "state": self.status}]}
-
-
-class RelayOutput(IndicatorOutput):
-	def __init__(self, name, district):
-		IndicatorOutput.__init__(self, name, district)
-
-	def GetEventMessage(self):
-		return {"relay": [{ "name": self.name, "state": self.status}]}
-
-
-class SignalOutput(Output):
-	def __init__(self, name, district):
-		Output.__init__(self, name, district)
-		self.aspect = 0
-		self.locked = False
-		self.bits = 1
-		
-	def SetBits(self, bits):
-		if self.bits < 0 or self.bits > 3:
-			return
-		
-		self.bits = bits
-		
-	def GetBits(self):
-		return self.bits
-
-	def SetAspect(self, aspect):
-		if aspect == self.aspect:
-			return
-
-		self.aspect = aspect
-		self.rr.RailroadEvent({"refreshoutput": [self.name]})
-
-	def IsAspectNonZero(self):
-		return self.aspect != 0
-
-	def GetAspect(self):
-		return self.aspect
-
-	def SetLock(self, lock):
-		if self.locked and lock == 1:
-			return
-		if not self.locked and lock == 0:
-			return
-
-		self.locked = lock == 1
-		self.rr.RailroadEvent({"refreshoutput": [self.name]})
-
-	def IsLocked(self):
-		return self.locked
-
-	def GetAspectBit(self, abit):
-		mask = (1 << abit) & 0xff
-		rv = mask & self.aspect
-		return 1 if rv != 0 else 0
-
-	def GetAspectBits(self, nbits=None):
-		if self.bits == 1:
-			return [1 if self.aspect != 0 else 0]
-		elif self.bits == 2:
-			return [1 if self.aspect in [2, 3] else 0, 1 if self.aspect in [1, 3] else 0]
-		elif self.bits == 3:
-			return [1 if self.aspect in [4, 5, 6, 7] else 0, 1 if self.aspect in [2, 3, 6, 7] else 0, 1 if self.aspect in [1, 3, 5, 7] else 0]
-
-	def GetEventMessage(self):
-		return {"signal": [{ "name": self.name, "aspect": self.aspect}]}
-
-
-class PulsedOutput(Output):
-	def __init__(self, name, district, pulseLen=1, pulseCt=1):
-		Output.__init__(self, name, district)
-		self.pulseLen = pulseLen
-		self.pulseCt = pulseCt
-		self.pulseCycle = 0
-
-	def SetPulseLen(self, pulseLen, pulseCt):
-		self.pulseLen = pulseLen
-		self.pulseCt = pulseCt
-
-
-class TurnoutOutput(PulsedOutput):
-	def __init__(self, name, district, pulseLen=1):
-		PulsedOutput.__init__(self, name, district, pulseLen)
-		self.normal = False;
-		self.reverse = False;
-		self.normalPulses = 0;
-		self.reversePulses = 0;
-		self.locked = False
-		self.status = None
-		self.retries = 0
-
-	def GetStatus(self):
-		return self.status
-	
-	def ClearStatus(self):
-		self.status = None
-		self.retries = 0
-		
-	def ShouldRetry(self):
-		self.retries += 1
-		return self.retries <= 3
-
-	def SetLock(self, value):
-		self.locked = value != 0
-
-	def GetLock(self):
-		return self.locked
-	
-	def SetOutPulse(self, op):
-		if op > 0:
-			self.normalPulses = self.pulseCt
-			self.reversePulses = 0
-			self.pulseCycle = self.pulseLen
-			self.status = "N"
-		elif op < 0:
-			self.normalPulses = 0
-			self.reversePulses = self.pulseCt
-			self.pulseCycle = self.pulseLen
-			self.status = "R"
-		else:
-			self.normalPulses = 0
-			self.reversePulses = 0
-			self.pulseCycle = 0
-			self.status = None
-		self.rr.RailroadEvent({"refreshoutput": [self.name]})
-
-	def SetOutPulseTo(self, status):
-		if status == "N":
-			self.normalPulses = self.pulseCt
-			self.reversePulses = 0
-			self.pulseCycle = self.pulseLen
-			self.status = status
-		elif status == "R":
-			self.normalPulses = 0
-			self.reversePulses = self.pulseCt
-			self.pulseCycle = self.pulseLen
-			self.status = status
-		else:
-			self.normalPulses = 0
-			self.reversePulses = 0
-			self.pulseCycle = 0
-			self.status = None
-		self.rr.RailroadEvent({"refreshoutput": [self.name]})
-
-	def GetOutPulseValue(self):
-		if self.normalPulses > 0:
-			return self.normalPulses
-		elif self.reversePulses > 0:
-			return -self.reversePulses
-		else:
-			return 0
-
-	def GetOutPulse(self):
-		if self.normalPulses > 0:
-			rv = 1 if self.pulseCycle != 0 else 0
-			if self.pulseCycle == 0:
-				self.normalPulses -= 1
-				self.pulseCycle = self.pulseLen
-			else:
-				self.pulseCycle -= 1
-			
-		elif self.reversePulses > 0:
-			rv = -1 if self.pulseCycle != 0 else 0
-			if self.pulseCycle == 0:
-				self.reversePulses -= 1
-				self.pulseCycle = self.pulseLen
-			else:
-				self.pulseCycle -= 1
-
-		else:
-			return 0
-
-		self.rr.RailroadEvent({"refreshoutput": [self.name]})
-
-		return rv
-
-class NXButtonOutput(PulsedOutput):
-	def __init__(self, name, district, pulseLen=1):
-		PulsedOutput.__init__(self, name, district, pulseLen)
-		self.pulses = 0;
-		self.status = None
-
-	def GetStatus(self):
-		return self.status
-
-	def SetOutPulseNXB(self):
-		self.pulses = self.pulseCt
-		self.pulseCycle = self.pulseLen
-		self.rr.RailroadEvent({"refreshoutput": [self.name]})
-
-	def GetOutPulseValue(self):
-		return self.pulses
-
-	def GetOutPulse(self):
-		if self.pulses > 0:
-			rv = 1 if self.pulseCycle != 0 else 0
-			if self.pulseCycle == 0:
-				self.pulses -= 1
-				self.pulseCycle = self.pulseLen
-			else:
-				self.pulseCycle -= 1
-		else:
-			return 0
-
-		self.rr.RailroadEvent({"refreshoutput": [self.name]})
-		
-		return rv

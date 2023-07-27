@@ -1,32 +1,250 @@
 import logging
 
-from rrserver.district import District, leverState,  NASSAUE, NASSAUW, NASSAUNX, formatIText, formatOText
-from rrserver.rrobjects import SignalOutput, TurnoutOutput, NXButtonOutput, RelayOutput, BreakerInput, BlockInput, \
-	TurnoutInput, SignalLeverInput, ToggleInput, FleetLeverInput, IndicatorOutput
-from rrserver.bus import setBit, getBit
+from rrserver.district import District
+from rrserver.constants import  NASSAUW, NASSAUE, NASSAUNX
+from rrserver.node import Node
 
 
 class Nassau(District):
-	def __init__(self, parent, name, settings):
-		District.__init__(self, parent, name, settings)
+	def __init__(self, rr, name, settings):
+		District.__init__(self, rr, name, settings)
+		logging.info("creating district Latham")
+		self.rr = rr
+		self.name = name
+		self.nodeAddresses = [ NASSAUW, NASSAUE, NASSAUNX ]
 		
-		self.panelFleet = False
+		self.nodes = {
+			NASSAUW:   Node(self, rr, NASSAUW,  8, settings),
+			NASSAUE:   Node(self, rr, NASSAUE,  4, settings),
+			NASSAUNX:  Node(self, rr, NASSAUNX, 3, settings)
+		}
+		self.S11AB = None
+		self.entryButton = None
+		self.currentCoachRoute = None
+		self.fleetPanel = None
+		self.fleetDispatch = None
+		self.released = False
+		self.control = 2
 
-		sigNames =  [
-			["N20R", 1], ["N20L", 1],
-			["N18R", 1], ["N18LA", 2], ["N18LB", 2],
-			["N16R", 2], ["N16L", 2],
-			["N14R", 2], ["N14LA", 2], ["N14LB", 1], ["N14LC", 1], ["N14LD", 1],
-			["N28R", 1], ["N28L", 2],
-			["N26RA", 1], ["N26RB", 1], ["N26RC", 2], ["N26L", 2],
-			["N24RA", 2], ["N24RB", 2], ["N24RC", 2], ["N24RD", 1], ["N24L", 1],
-			["N11W", 3], ["N21W", 3], ["B20E", 3]
+		addr = NASSAUW
+		with self.nodes[addr] as n:
+			self.rr.AddSignal("N14LC", self, n, addr,[(0, 0)])
+			self.rr.AddSignal("N14LB", self, n, addr,[(0, 1)])
+			self.rr.AddSignal("N20R",  self, n, addr,[(0, 2)])
+			self.rr.AddSignal("N20L",  self, n, addr,[(0, 3)])
+			self.rr.AddSignal("N14LA", self, n, addr,[(0, 4), (0, 5)])
+			self.rr.AddSignal("N16L",  self, n, addr,[(0, 6), (0, 7)])
+			self.rr.AddSignal("N18LB", self, n, addr,[(1, 0), (1, 1)])
+			self.rr.AddSignal("N18LA", self, n, addr,[(1, 2), (1, 3)])
+			self.rr.AddSignal("N16R",  self, n, addr,[(1, 4), (1, 5)])
+			self.rr.AddSignal("N14R",  self, n, addr,[(1, 6), (7, 3)]) # Transferred to byte 7:3: 1:7 bad bit
+			self.rr.AddSignal("N18R",  self, n, addr,[(2, 0)])
+			self.rr.AddSignal("N11W",  self, n, addr,[(2, 1), (2, 2), (2, 3)])
+			self.rr.AddSignal("N21W",  self, n, addr,[(2, 4), (2, 5), (2, 6)])
+
+			self.rr.AddIndicator("S11AB", self, n, addr, [(2, 7)]) # Shore approach indicator
+			self.rr.AddBlockInd("R10",    self, n, addr, [(3, 0)]) # Shore approach indicator
+			self.rr.AddBlockInd("B20",    self, n, addr, [(3, 1)]) # Bank approach indicator
+
+
+			self.rr.AddIndicator("NFleet",  self, n, addr, [(3, 2)])
+			self.rr.AddIndicator("nNFleet", self, n, addr, [(3, 3)]) # negated nassau fleet
+
+			self.rr.AddSignalLED("N14",  self, n, addr, [(3, 4), (3, 5), (3, 6)])
+			self.rr.AddSignalLED("N16",  self, n, addr, [(3, 7), (4, 0), (4, 1)])
+			self.rr.AddSignalLED("N18",  self, n, addr, [(4, 2), (4, 3), (4, 4)])
+			self.rr.AddSignalLED("N20",  self, n, addr, [(4, 5), (4, 6), (4, 7)])
+			
+			self.rr.AddTurnout("KSw1", self, n, addr, [(5, 0), (5, 1)])
+			self.rr.AddTurnout("KSw3", self, n, addr, [(5, 2), (5, 3)])
+			self.rr.AddTurnout("KSw5", self, n, addr, [(5, 4), (5, 5)])
+			self.rr.AddTurnout("KSw7", self, n, addr, [(5, 6), (5, 7)])
+
+			self.rr.AddBreakerInd("CBKrulish", self, n, addr, [(6, 0)])
+			self.rr.AddBreakerInd("CBNassauW", self, n, addr, [(6, 1)])
+			self.rr.AddBreakerInd("CBNassauE", self, n, addr, [(6, 2)])
+			self.rr.AddBreakerInd("CBSouthportJct",  self, n, addr, [(6, 3)])
+			self.rr.AddBreakerInd("CBWilson",  self, n, addr, [(6, 4)])
+			self.rr.AddBreakerInd("CBThomas",  self, n, addr, [(6, 5)])
+			
+			self.rr.AddLock("NWSL0", self, n, addr, [(6, 6)]) # switch locks west
+			self.rr.AddLock("NWSL1", self, n, addr, [(6, 7)])
+			self.rr.AddLock("NWSL2", self, n, addr, [(7, 0)])
+			self.rr.AddLock("NWSL3", self, n, addr, [(7, 1)])
+
+			self.rr.AddStopRelay("N21.srel", self, n, addr, [(7, 2)])
+			# Bit 7:3 used for signal N14R above
+			
+			self.rr.AddSignal("N14LD", self, n, addr, [(7, 4)])
+			self.rr.AddSignal("N24RD", self, n, addr, [(7, 5)])
+
+			# virtual turnouts - no output bits
+			self.rr.AddTurnout("NSw19", self, n, addr, [])	
+			self.rr.AddTurnout("NSw21", self, n, addr, [])	
+			self.rr.AddTurnout("NSw23", self, n, addr, [])	
+			self.rr.AddTurnout("NSw25", self, n, addr, [])	
+			self.rr.AddTurnout("NSw27", self, n, addr, [])	
+			self.rr.AddTurnout("NSw29", self, n, addr, [])	
+			self.rr.AddTurnout("NSw31", self, n, addr, [])	
+			self.rr.AddTurnout("NSw33", self, n, addr, [])
+			self.rr.AddTurnout("NSw35", self, n, addr, [])
+			self.rr.AddTurnout("NSw39", self, n, addr, [])
+			
+			# inputs	
+			self.rr.AddTurnoutPosition("NSw19", self, n, addr, [(0, 0), (0, 1)])	
+			self.rr.AddTurnoutPosition("NSw21", self, n, addr, [(0, 2), (0, 3)])	
+			self.rr.AddTurnoutPosition("NSw23", self, n, addr, [(0, 4), (0, 5)])	
+			self.rr.AddTurnoutPosition("NSw25", self, n, addr, [(0, 6), (0, 7)])	
+			self.rr.AddTurnoutPosition("NSw27", self, n, addr, [(1, 0), (1, 1)])	
+			self.rr.AddTurnoutPosition("NSw29", self, n, addr, [(1, 2), (1, 3)])	
+			self.rr.AddTurnoutPosition("NSw31", self, n, addr, [(1, 4), (1, 5)])	
+			self.rr.AddTurnoutPosition("NSw33", self, n, addr, [(1, 6), (1, 7)])	
+	
+			self.rr.AddBlock("N21.W",   self, n, addr, [(2, 0)])
+			self.rr.AddBlock("N21",     self, n, addr, [(2, 1)])
+			self.rr.AddBlock("N21.E",   self, n, addr, [(2, 2)])
+			self.rr.AddBlock("NWOSTY",  self, n, addr, [(2, 3)])
+			self.rr.AddBlock("NWOSCY",  self, n, addr, [(2, 4)])
+			self.rr.AddBlock("NWOSW",   self, n, addr, [(2, 5)])
+			self.rr.AddBlock("NWOSE",   self, n, addr, [(2, 6)])
+			self.rr.AddBlock("N32",     self, n, addr, [(2, 7)])
+			self.rr.AddBlock("N31",     self, n, addr, [(3, 0)])
+			self.rr.AddBlock("N12",     self, n, addr, [(3, 1)])
+	
+			self.rr.AddSignalLever("N14",  self, n, addr, [(3, 4), (3, 5), (3, 6)])
+			self.rr.AddSignalLever("N16",  self, n, addr, [(3, 7), (4, 0), (4, 1)])
+			self.rr.AddSignalLever("N18",  self, n, addr, [(4, 2), (4, 3), (4, 4)])
+			self.rr.AddSignalLever("N20",  self, n, addr, [(4, 5), (4, 6), (4, 7)])
+			self.rr.AddSignalLever("N24",  self, n, addr, [(5, 0), (5, 1), (5, 2)])
+			self.rr.AddSignalLever("N26",  self, n, addr, [(5, 3), (5, 4), (5, 5)])
+			self.rr.AddSignalLever("N28",  self, n, addr, [(5, 6), (5, 7), (6, 0)])
+
+			self.rr.AddBreaker("CBKrulishYd", self, n, addr, [(6, 1)])	
+			self.rr.AddBreaker("CBThomas", self, n, addr, [(6, 2)])	
+			self.rr.AddBreaker("CBWilson", self, n, addr, [(6, 3)])	
+			self.rr.AddBreaker("CBKrulish", self, n, addr, [(6, 4)])	
+			self.rr.AddBreaker("CBNassauW", self, n, addr, [(6, 5)])	
+			self.rr.AddBreaker("CBNassauE", self, n, addr, [(6, 6)])	
+			self.rr.AddBreaker("CBFoss", self, n, addr, [(6, 7)])	
+			self.rr.AddBreaker("CBDell", self, n, addr, [(7, 0)])	
+
+			self.rr.AddRouteIn("NSw60A", self, n, addr, [(7, 1)])
+			self.rr.AddRouteIn("NSw60B", self, n, addr, [(7, 2)])
+			self.rr.AddRouteIn("NSw60C", self, n, addr, [(7, 3)])
+			self.rr.AddRouteIn("NSw60D", self, n, addr, [(7, 4)])
+				
+			self.rr.AddTurnoutPosition("NSw35", self, n, addr, [(7, 5), (7, 6)])	
+
+		addr = NASSAUE
+		with self.nodes[addr] as n:
+			# outputs
+			self.rr.AddSignal("N24RB",  self, n, addr, [(0, 0), (0, 1)])
+			self.rr.AddSignal("N24RC",  self, n, addr, [(0, 2), (0, 3)])
+			self.rr.AddSignal("N26RC",  self, n, addr, [(0, 4), (0, 5)])
+			self.rr.AddSignal("N24RA",  self, n, addr, [(0, 6), (0, 7)])
+			self.rr.AddSignal("N26RA",  self, n, addr, [(1, 0)])
+			self.rr.AddSignal("N26RB",  self, n, addr, [(1, 1)])
+			self.rr.AddSignal("N28R",   self, n, addr, [(1, 2)])
+			self.rr.AddSignal("B20E",   self, n, addr, [(1, 3), (1, 4), (1, 5)])
+			self.rr.AddSignal("N24L",   self, n, addr, [(1, 6)])
+			self.rr.AddSignal("N26L",   self, n, addr, [(1, 7), (2, 0)])
+			self.rr.AddSignal("N28L",   self, n, addr, [(2, 1), (2, 2)])
+			
+			self.rr.AddLock("NESL0", self, n, addr, [(2, 3)]) # switch locks east
+			self.rr.AddLock("NESL1", self, n, addr, [(2, 4)])
+			self.rr.AddLock("NESL2", self, n, addr, [(2, 5)])
+			
+			self.rr.AddStopRelay("B10.srel", self, n, addr, [(2, 6)])
+			
+			self.rr.AddSignalLED("N24",  self, n, addr, [(2, 7), (3, 0), (3, 1)])
+			self.rr.AddSignalLED("N26",  self, n, addr, [(3, 2), (3, 3), (3, 4)])
+			self.rr.AddSignalLED("N28",  self, n, addr, [(3, 5), (3, 6), (3, 7)])
+			
+			# virtual turnouts - no output bits
+			self.rr.AddTurnout("NSw41", self, n, addr, [])	
+			self.rr.AddTurnout("NSw43", self, n, addr, [])	
+			self.rr.AddTurnout("NSw45", self, n, addr, [])	
+			self.rr.AddTurnout("NSw47", self, n, addr, [])	
+			self.rr.AddTurnout("NSw51", self, n, addr, [])	
+			self.rr.AddTurnout("NSw53", self, n, addr, [])	
+			self.rr.AddTurnout("NSw55", self, n, addr, [])	
+			self.rr.AddTurnout("NSw57", self, n, addr, [])	
+
+			# inputs
+			self.rr.AddTurnoutPosition("NSw41", self, n, addr, [(0, 0), (0, 1)])	
+			self.rr.AddTurnoutPosition("NSw43", self, n, addr, [(0, 2), (0, 3)])	
+			self.rr.AddTurnoutPosition("NSw45", self, n, addr, [(0, 4), (0, 5)])	
+			self.rr.AddTurnoutPosition("NSw47", self, n, addr, [(0, 6), (0, 7)])	
+			self.rr.AddTurnoutPosition("NSw51", self, n, addr, [(1, 0), (1, 1)])	
+			self.rr.AddTurnoutPosition("NSw53", self, n, addr, [(1, 2), (1, 3)])	
+			self.rr.AddTurnoutPosition("NSw55", self, n, addr, [(1, 4), (1, 5)])	
+			self.rr.AddTurnoutPosition("NSw57", self, n, addr, [(1, 6), (1, 7)])	
+	
+			self.rr.AddBlock("N22",     self, n, addr, [(2, 0)])
+			self.rr.AddBlock("N41",     self, n, addr, [(2, 1)])
+			self.rr.AddBlock("N42",     self, n, addr, [(2, 2)])
+			self.rr.AddBlock("NEOSRH",  self, n, addr, [(2, 3)])
+			self.rr.AddBlock("NEOSW",   self, n, addr, [(2, 4)])
+			self.rr.AddBlock("NEOSE",   self, n, addr, [(2, 5)])
+			sbw = self.rr.AddBlock("B10.W",   self, n, addr, [(2, 6)])
+			b = self.rr.AddBlock("B10",     self, n, addr, [(2, 7)])
+			b.AddStoppingBlocks([sbw])
+	
+			self.rr.AddTurnoutPosition("NSw39", self, n, addr, [(3, 0), (3, 1)])	
+			
+		addr = NASSAUNX
+		with self.nodes[addr] as n:
+			# outputs
+			self.rr.AddOutNXButton("NNXBtnT12",  self, n, addr, [(0, 0)])
+			self.rr.AddOutNXButton("NNXBtnN60",  self, n, addr, [(0, 1)])
+			self.rr.AddOutNXButton("NNXBtnN11",  self, n, addr, [(0, 2)])
+			self.rr.AddOutNXButton("NNXBtnN21",  self, n, addr, [(0, 3)])
+			self.rr.AddOutNXButton("NNXBtnW10",  self, n, addr, [(0, 4)])
+			self.rr.AddOutNXButton("NNXBtnN32W", self, n, addr, [(0, 5)])
+			self.rr.AddOutNXButton("NNXBtnN31W", self, n, addr, [(0, 6)])
+			self.rr.AddOutNXButton("NNXBtnN12W", self, n, addr, [(0, 7)])
+			
+			self.rr.AddOutNXButton("NNXBtnN22W", self, n, addr, [(1, 0)])
+			self.rr.AddOutNXButton("NNXBtnN41W", self, n, addr, [(1, 1)])
+			self.rr.AddOutNXButton("NNXBtnN42W", self, n, addr, [(1, 2)])
+			self.rr.AddOutNXButton("NNXBtnW20W", self, n, addr, [(1, 3)])
+			self.rr.AddOutNXButton("NNXBtnW11",  self, n, addr, [(1, 4)])
+			self.rr.AddOutNXButton("NNXBtnN32E", self, n, addr, [(1, 5)])
+			self.rr.AddOutNXButton("NNXBtnN31E", self, n, addr, [(1, 6)])
+			self.rr.AddOutNXButton("NNXBtnN12E", self, n, addr, [(1, 7)])
+				
+			self.rr.AddOutNXButton("NNXBtnN22E", self, n, addr, [(2, 0)])
+			self.rr.AddOutNXButton("NNXBtnN41E", self, n, addr, [(2, 1)])
+			self.rr.AddOutNXButton("NNXBtnN42E", self, n, addr, [(2, 2)])
+			self.rr.AddOutNXButton("NNXBtnW20E", self, n, addr, [(2, 3)])
+			self.rr.AddOutNXButton("NNXBtnR10",  self, n, addr, [(2, 4)])
+			self.rr.AddOutNXButton("NNXBtnB10", self, n, addr, [(2, 5)])
+			self.rr.AddOutNXButton("NNXBtnB20", self, n, addr, [(2, 6)])
+			
+			#inputs - none
+			
+		self.coachRoutes = ["NSw60A", "NSw60B", "NSw60C", "NSw60D"]
+		
+		'''
+		which signals are affected by fleeting, for each of the control options
+		This indicates the effect for the dispatcher program.
+		
+		0 => Nassau, 1 => Dispatcher Main, 2 => Dispatcher All
+		'''
+		self.fleetedSignals = [
+			[],
+			["N26L", "N26RB", "N26RC", "N24L", "N24RA", "N24RB", "N14R", "N14LA", "N14LB", "N16R", "N16L", "N18LB"],
+			["N26L", "N26RA", "N26RB", "N26RC", "N24L", "N24RA", "N24RB", "N24RC", "N24RD", 
+				"N14R", "N14LA", "N14LB", "N14LC", "N14LD", "N16R", "N16L", 
+				"N18R", "N18LA", "N18LB", "N20R", "N20L", "N28R", "N28L"]
 		]
-		toONames = ["NSw13", "NSw15", "NSw17"]
-		toNames = [ "NSw19", "NSw21", "NSw23", "NSw25", "NSw27", "NSw29", "NSw31", "NSw33", "NSw35",
-					"NSw39", "NSw41", "NSw43", "NSw45", "NSw47", "NSw51", "NSw53", "NSw55", "NSw57"]
-		relayNames = [ "N21.srel", "B10.srel" ]
-		indNames =  [ "CBKrulish", "CBNassauW", "CBNassauE", "CBSptJct", "CBWilson", "CBThomas" ]
+		
+		self.routeMap = {
+			"NSw60A": [["NSw13", "N"], ["NSw15", "R"], ["NSw17", "R"]],
+			"NSw60B": [["NSw13", "R"], ["NSw15", "N"], ["NSw17", "R"]],
+			"NSw60C": [["NSw13", "N"], ["NSw15", "R"], ["NSw17", "N"]],
+			"NSw60D": [["NSw13", "R"], ["NSw15", "N"], ["NSw17", "N"]]
+			}
 
 		self.NXMap = {
 			"NNXBtnT12": {
@@ -99,53 +317,12 @@ class Nassau(District):
 			}
 
 		}
-		ix = 0
-		nxButtons = [
-			"NNXBtnT12", "NNXBtnN60", "NNXBtnN11", "NNXBtnN21",
-			"NNXBtnW10", "NNXBtnN32W",	"NNXBtnN31W", "NNXBtnN12W", "NNXBtnN22W", "NNXBtnN41W", "NNXBtnN42W", "NNXBtnW20W",
-			"NNXBtnR10", "NNXBtnB10", "NNXBtnB20",
-			"NNXBtnW11", "NNXBtnN32E", "NNXBtnN31E", "NNXBtnN12E", "NNXBtnN22E", "NNXBtnN41E", "NNXBtnN42E", "NNXBtnW20E"
-		]
-		ix = self.AddOutputs([s[0] for s in sigNames], SignalOutput, District.signal, ix)
-		for sig, bits in sigNames:
-			self.rr.GetOutput(sig).SetBits(bits)
-		ix = self.AddOutputs(toONames+toNames, TurnoutOutput, District.turnout, ix)
-		ix = self.AddOutputs(nxButtons, NXButtonOutput, District.nxbutton, ix)
-		ix = self.AddOutputs(relayNames, RelayOutput, District.relay, ix)
-		ix = self.AddOutputs(indNames, IndicatorOutput, District.indicator, ix)
 
-		for n in nxButtons:
-			self.SetNXButtonPulseLen(n, settings.nxbpulselen, settings.nxbpulsect)
 
-		brkrNames = [ "CBKrulish", "CBKrulishYd", "CBNassauW", "CBNassauE", "CBSptJct", "CBWilson", "CBThomas", "CBFoss", "CBDell" ]
-		blockNames = [ "N21.W", "N21", "N21.E", "NWOSTY", "NWOSCY", "NWOSW", "NWOSE",
-						"N31", "N32", "N12", "N22", "N41", "N42",
-						"NEOSW", "NEOSE", "NEOSRH", "B10.W", "B10",
-						"N60", "T12", "W10", "W11", "W20", "R10.W" ]
-		signalLeverNames = [ "N14.lvr", "N16.lvr", "N18.lvr", "N20.lvr", "N24.lvr", "N26.lvr", "N28.lvr" ]
-		toggleNames = [ "nrelease" ]
-		fleetLeverNames = [ "nassau.fleet" ]
 
-		ix = 0
-		ix = self.AddInputs(blockNames, BlockInput, District.block, ix)
-		ix = self.AddSubBlocks("R10", ["R10A", "R10B", "R10C"], ix)
-		ix = self.AddInputs(toONames+toNames, TurnoutInput, District.turnout, ix)
-		ix = self.AddInputs(brkrNames, BreakerInput, District.breaker, ix)
-		ix = self.AddInputs(signalLeverNames, SignalLeverInput, District.slever, ix)
-		ix = self.AddInputs(fleetLeverNames, FleetLeverInput, District.flever, ix)
-		ix = self.AddInputs(toggleNames, ToggleInput, District.toggle, ix)
 
-	def EvaluateNXButtons(self, bEntry, bExit):
-		try:
-			tolist = self.NXMap[bEntry][bExit]
-		except KeyError:
-			try:
-				tolist = self.NXMap[bExit][bEntry]
-			except KeyError:
-				return
 
-		for toName, status in tolist:
-			self.rr.GetInput(toName).SetState(status)
+
 
 	def DetermineSignalLevers(self):
 		self.sigLever["N14"] = self.DetermineSignalLever(["N14LA", "N14LB", "N14LC"], ["N14R"])
@@ -156,445 +333,159 @@ class Nassau(District):
 		self.sigLever["N26"] = self.DetermineSignalLever(["N26L"], ["N26RA", "N26RB", "N26RC"])
 		self.sigLever["N28"] = self.DetermineSignalLever(["N28L"], ["N28R"])
 
-	def OutIn(self):
-		optControl = self.rr.GetControlOption("nassau")  # 0 => Nassau, 1 => Dispatcher Main, 2 => Dispatcher All
-		if optControl == 0:
-			optFleet = self.rr.GetInput("nassau.fleet").GetState() # get the state of the lever on the panel
-		else:
-			optFleet = self.rr.GetControlOption("nassau.fleet")  # otherwise get the fleeting state from the check box
 
-		nRelease = self.rr.GetInput("nrelease").GetState()
-		optOssLocks = self.rr.GetControlOption("osslocks")
+
+
+
+
+
+
+	def PressButton(self, btn):
+		'''
+		this is only called when in simulation - it turns the outbount button push
+		into a series of turnout position input bits
+		'''
+		if self.entryButton is None:
+			self.entryButton = btn
+			return 
+		
+		tolist = self.EvaluateNXButtons(self.entryButton.Name(), btn.Name())
+		for toName, status in tolist:
+			tout = self.rr.GetTurnout(toName)
+			pos = tout.Position()
+			if pos is None:
+				logging.warning("Skipping unknown turnout %s in NX button route" % toName)
+			else:
+				Nval = 0 if status == "R" else 1
+				Rval = 1 if status == "R" else 0
+				bits, district, node, addr = pos
+				node.SetInputBit(bits[0][0], bits[0][1], Nval)
+				node.SetInputBit(bits[1][0], bits[1][1], Rval)
+			
+		self.entryButton = None
+		return 
+
+	def EvaluateNXButtons(self, bEntry, bExit):
+		try:
+			tolist = self.NXMap[bEntry][bExit]
+		except KeyError:
+			try:
+				tolist = self.NXMap[bExit][bEntry]
+			except KeyError:
+				return []
+		
+		return tolist
+
+	
+	def SelectRouteIn(self, rt):
+		if rt.Name() in self.coachRoutes:		
+			offRtList = [x for x in self.coachRoutes if x != rt.Name()]
+			return offRtList
+		
+		return None
+	
+	def RouteIn(self, rt, stat):
+		if stat == 1:
+			if rt.name == self.currentCoachRoute:
+				return 
+			
+			self.currentCoachRoute = rt.name
+			self.rr.RailroadEvent({"turnout": [{"name": x[0], "state": x[1]} for x in self.routeMap[rt.name]] })
+			
+		else:
+			if rt.name == self.currentCoachRoute:
+				self.currentCoachRoute = None
+
+	def OutIn(self):	
+		self.lastControl = self.control	
+		self.control = self.rr.GetControlOption("nassau")  # 0 => Nassau, 1 => Dispatcher Main, 2 => Dispatcher All
+		if self.control in [0, 1]:
+			fleetPanel = self.nodes[NASSAUW].GetInputBit(3, 3) # get the state of the lever on the panel
+		else:
+			fleetPanel = 0
+			
+		fleetDispatch = self.rr.GetControlOption("nassau.fleet")  # otherwise get the fleeting state from the check box
+
+		dispatchList = self.fleetedSignals[self.control]
+		panelList = [x for x in self.fleetedSignals[2] if x not in dispatchList]
+		
+
+		if self.control in [0, 1]: 
+			if self.fleetPanel != fleetPanel:
+				self.fleetPanel = fleetPanel
+				self.nodes[NASSAUW].SetOutputBit(3, 2, fleetPanel)			
+				self.nodes[NASSAUW].SetOutputBit(3, 3, 1-fleetPanel)
+				for signame in panelList:
+					self.rr.RailroadEvent({"fleet": [{"name": signame, "value": fleetPanel}]})
+
+		if self.control in [1, 2]:
+			if self.fleetDispatch != fleetDispatch:
+				self.fleetDispatch = fleetDispatch
+				if self.control == 2: # only update the panel LEDs if the panel has no local control
+					self.nodes[NASSAUW].SetOutputBit(3, 2, fleetDispatch)			
+					self.nodes[NASSAUW].SetOutputBit(3, 3, 1-fleetDispatch)
+				for signame in dispatchList:
+					self.rr.RailroadEvent({"fleet": [{"name": signame, "value": fleetDispatch}]})
+
+		rlReq = self.nodes[NASSAUW].GetInputBit(3, 2) == 1
+			
+		ossLocks = self.rr.GetControlOption("osslocks") == 1
+
+		# release controls if requested by operator or if osslocks are turned off by dispatcher			
+		self.released = rlReq or not ossLocks
 
 		NESL = self.rr.GetDistrictLock("NESL")
 		NWSL = self.rr.GetDistrictLock("NWSL")
-		if nRelease == 1 or optOssLocks == 0:
+		if self.released:
 			# don't set any switch locks if release button is being pressed
 			NESL = [0 for _ in range(len(NESL))]
 			NWSL = [0 for _ in range(len(NWSL))]
-			if optControl == 1:  # Dispatcher Main only
+			if self.control == 1:  # Dispatcher Main only
 				NESL[0] = 1
 				NWSL[0] = 1
+				
+		for i in range(len(NESL)):
+			lnm = "NESL%d" % i
+			self.rr.SetLock(lnm, NESL[i])
+				
+		for i in range(len(NWSL)):
+			lnm = "NWSL%d" % i
+			self.rr.SetLock(lnm, NWSL[i])
+		
+		S11AB = self.rr.GetBlock("S11A").IsOccupied() or self.rr.GetBlock("S11B").IsOccupied()
+		
+		if S11AB != self.S11AB:
+			self.S11AB = S11AB
+			self.rr.SetIndicator("S11AB", S11AB)
+
+		self.rr.UpdateDistrictTurnoutLocks(self.name, self.released)
+		
+		District.OutIn(self)
+		
+	def Released(self, _):
+		return self.released
+		
+	def GetControlOption(self):
+		if self.control == 2:  # dispatcher ALL control - ignore all signal levers
+			skiplist = ["N14", "N16", "N18", "N24", "N26", "N20", "N28"]
+			resumelist = []
 			
-		# Nassau West
-		outbc = 8
-		outb = [0 for _ in range(outbc)]
-
-		asp = self.rr.GetOutput("N14LC").GetAspectBits()     # signals
-		outb[0] = setBit(outb[0], 0, asp[0])
-		asp = self.rr.GetOutput("N14LB").GetAspectBits()    
-		outb[0] = setBit(outb[0], 1, asp[0])
-		asp = self.rr.GetOutput("N20R").GetAspectBits()    
-		outb[0] = setBit(outb[0], 2, asp[0])
-		asp = self.rr.GetOutput("N20L").GetAspectBits()    
-		outb[0] = setBit(outb[0], 3, asp[0])
-		asp = self.rr.GetOutput("N14LA").GetAspectBits()    
-		outb[0] = setBit(outb[0], 4, asp[0])
-		outb[0] = setBit(outb[0], 5, asp[1])
-		asp = self.rr.GetOutput("N16L").GetAspectBits()    
-		outb[0] = setBit(outb[0], 6, asp[0])
-		outb[0] = setBit(outb[0], 7, asp[1])
-
-		asp = self.rr.GetOutput("N18LB").GetAspectBits()    
-		outb[1] = setBit(outb[1], 0, asp[0])
-		outb[1] = setBit(outb[1], 1, asp[1])
-		asp = self.rr.GetOutput("N18LA").GetAspectBits()    
-		outb[1] = setBit(outb[1], 2, asp[0])
-		outb[1] = setBit(outb[1], 3, asp[1])
-		asp = self.rr.GetOutput("N16R").GetAspectBits()    
-		outb[1] = setBit(outb[1], 4, asp[0])
-		outb[1] = setBit(outb[1], 5, asp[1])
-		asp = self.rr.GetOutput("N14R").GetAspectBits()    
-		outb[1] = setBit(outb[1], 6, asp[0])
-		outb[7] = setBit(outb[7], 3, asp[1])  # Transferred to byte 7:3 because of 1:7 being a Bad output?
-
-		asp = self.rr.GetOutput("N18R").GetAspectBits()    
-		outb[2] = setBit(outb[2], 0, asp[0])
-		asp = self.rr.GetOutput("N11W").GetAspectBits()
-		outb[2] = setBit(outb[2], 1, asp[0])  # Block signals
-		outb[2] = setBit(outb[2], 2, asp[1])
-		outb[2] = setBit(outb[2], 3, asp[2])
-		asp = self.rr.GetOutput("N21W").GetAspectBits()
-		outb[2] = setBit(outb[2], 4, asp[0]) 
-		outb[2] = setBit(outb[2], 5, asp[1])
-		outb[2] = setBit(outb[2], 6, asp[2])
-		v = self.rr.GetInput("S11A").GetValue() + self.rr.GetInput("S11B").GetValue()
-		outb[2] = setBit(outb[2], 6, 1 if v != 0 else 0)  # Shore approach indicator
-
-		v = self.rr.GetInput("R10").GetValue() + self.rr.GetInput("R10.W").GetValue() 
-		outb[3] = setBit(outb[3], 0, 1 if v != 0 else 0 )  				# Rocky Hill approach indicator
-		outb[3] = setBit(outb[3], 1, self.rr.GetInput("B20").GetValue())  # Bank approach indicator
-		outb[3] = setBit(outb[3], 2, 1-optFleet)                    # fleet indicator
-		outb[3] = setBit(outb[3], 3, optFleet)
-		sigL = self.sigLever["N14"]
-		outb[3] = setBit(outb[3], 4, 1 if sigL == "L" else 0)       # Signal Indicators
-		outb[3] = setBit(outb[3], 5, 1 if sigL == "N" else 0)
-		outb[3] = setBit(outb[3], 6, 1 if sigL == "R" else 0)
-		sigL = self.sigLever["N16"]
-		outb[3] = setBit(outb[3], 7, 1 if sigL == "L" else 0) 
-
-		outb[4] = setBit(outb[4], 0, 1 if sigL == "N" else 0)
-		outb[4] = setBit(outb[4], 1, 1 if sigL == "R" else 0)
-		sigL = self.sigLever["N18"]
-		outb[4] = setBit(outb[4], 2, 1 if sigL == "L" else 0)
-		outb[4] = setBit(outb[4], 3, 1 if sigL == "N" else 0)
-		outb[4] = setBit(outb[4], 4, 1 if sigL == "R" else 0)
-		sigL = self.sigLever["N20"]
-		outb[4] = setBit(outb[4], 5, 1 if sigL == "L" else 0) 
-		outb[4] = setBit(outb[4], 6, 1 if sigL == "N" else 0)
-		outb[4] = setBit(outb[4], 7, 1 if sigL == "R" else 0)
-
-		op = self.rr.GetOutput("KSw1").GetOutPulse()
-		outb[5] = setBit(outb[5], 0, 1 if op > 0 else 0)             # Krulish switches
-		outb[5] = setBit(outb[5], 1, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("KSw3").GetOutPulse()
-		outb[5] = setBit(outb[5], 2, 1 if op > 0 else 0)  
-		outb[5] = setBit(outb[5], 3, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("KSw5").GetOutPulse()
-		outb[5] = setBit(outb[5], 4, 1 if op > 0 else 0)  
-		outb[5] = setBit(outb[5], 5, 1 if op < 0 else 0)
-		op = self.rr.GetOutput("KSw7").GetOutPulse()
-		outb[5] = setBit(outb[5], 6, 1 if op > 0 else 0)  
-		outb[5] = setBit(outb[5], 7, 1 if op < 0 else 0)
-
-		outb[6] = setBit(outb[6], 0, self.rr.GetInput("CBKrulish").GetInvertedValue())   # Circuit breakers
-		outb[6] = setBit(outb[6], 1, self.rr.GetInput("CBNassauW").GetInvertedValue()) 
-		outb[6] = setBit(outb[6], 2, self.rr.GetInput("CBNassauE").GetInvertedValue())  
-		outb[6] = setBit(outb[6], 3, self.rr.GetInput("CBSptJct").GetInvertedValue())  
-		outb[6] = setBit(outb[6], 4, self.rr.GetInput("CBWilson").GetInvertedValue())   
-		outb[6] = setBit(outb[6], 5, self.rr.GetInput("CBThomas").GetInvertedValue())
-		outb[6] = setBit(outb[6], 6, NWSL[0])  # switch locks west
-		outb[6] = setBit(outb[6], 7, NWSL[1])
-
-		outb[7] = setBit(outb[7], 0, NWSL[2])
-		outb[7] = setBit(outb[7], 1, NWSL[3])
-		outb[7] = setBit(outb[7], 2, self.rr.GetOutput("N21.srel").GetStatus())	      # Stop relays
-																					# Bit 3 used for signal N14R above
-		asp = self.rr.GetOutput("N14LD").GetAspectBits()    							# dwarf signals for W20
-		outb[7] = setBit(outb[7], 4, asp[0])
-		asp = self.rr.GetOutput("N24RD").GetAspectBits()   
-		outb[7] = setBit(outb[7], 5, asp[0])
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Nassau West: Output bytes: %s" % otext)
-
-		inbc = outbc			
-		if self.settings.simulation:
-			itext = None
-		else:
-			inb = self.rrBus.sendRecv(NASSAUW, outb, outbc)
-			if inb is None:
-				itext = "Read Error"
+		elif self.control == 1: # dispatcher MAIN control - ignore signal levers dealing with the main tracks		
+			skiplist =  ["N14", "N16", "N18", "N24", "N26"]
+			if self.lastControl == 2:
+				resumelist = ["N20", "N28"]
+			elif self.lastControl == 0:
+				resumelist = []
 			else:
-				itext = formatIText(inb, inbc)
-				#logging.debug("Nassau West: Input Bytes: %s" % itext)
-	
-				ip = self.rr.GetInput("NSw19")  #Switch positions
-				nb = getBit(inb[0], 0)
-				rb = getBit(inb[0], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("NSw21") 
-				nb = getBit(inb[0], 2)
-				rb = getBit(inb[0], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("NSw23") 
-				nb = getBit(inb[0], 4)
-				rb = getBit(inb[0], 5)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("NSw25")
-				nb = getBit(inb[0], 6)
-				rb = getBit(inb[0], 7)
-				ip.SetTOState(nb, rb)
-	
-				ip = self.rr.GetInput("NSw27") 
-				nb = getBit(inb[1], 0)
-				rb = getBit(inb[1], 1)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("NSw29") 
-				nb = getBit(inb[1], 2)
-				rb = getBit(inb[1], 3)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("NSw31") 
-				nb = getBit(inb[1], 4)
-				rb = getBit(inb[1], 5)
-				ip.SetTOState(nb, rb)
-				ip = self.rr.GetInput("NSw33")
-				nb = getBit(inb[1], 6)
-				rb = getBit(inb[1], 7)
-				ip.SetTOState(nb, rb)
-	
-				ip = self.rr.GetInput("N21.W") 
-				ip.SetValue(getBit(inb[2], 0))   #detection
-				ip = self.rr.GetInput("N21") 
-				ip.SetValue(getBit(inb[2], 1)) 
-				ip = self.rr.GetInput("N21.E") 
-				ip.SetValue(getBit(inb[2], 2)) 
-				ip = self.rr.GetInput("NWOSTY")  # NWOS1
-				ip.SetValue(getBit(inb[2], 3)) 
-				ip = self.rr.GetInput("NWOSCY")  # NWOS2
-				ip.SetValue(getBit(inb[2], 4)) 
-				ip = self.rr.GetInput("NWOSW")  # NWOS3
-				ip.SetValue(getBit(inb[2], 5)) 
-				ip = self.rr.GetInput("NWOSE")  # NWOS4
-				ip.SetValue(getBit(inb[2], 6)) 
-				ip = self.rr.GetInput("N32") 
-				ip.SetValue(getBit(inb[2], 7)) 
-	
-				ip = self.rr.GetInput("N31") 
-				ip.SetValue(getBit(inb[3], 0)) 
-				ip = self.rr.GetInput("N12") 
-				ip.SetValue(getBit(inb[3], 1)) 
-	
-				if optControl == 0:  # Nassau local control
-					release = getBit(inb[3], 2)
-					self.rr.GetInput("nrelease").SetState(release)  # C Release switch
-					fleet = getBit(inb[3], 3)
-					self.rr.GetInput("nassau.fleet").SetState(fleet)  # fleet
-					lvrR = getBit(inb[3], 4)  # signal levers
-					lvrCallOn = getBit(inb[3], 5)
-					lvrL = getBit(inb[3], 6)
-					self.rr.GetInput("N14.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrR = getBit(inb[3], 7)
-	
-					lvrCallOn = getBit(inb[4], 0)
-					lvrL = getBit(inb[4], 1)
-					self.rr.GetInput("N16.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrR = getBit(inb[4], 2)
-					lvrCallOn = getBit(inb[4], 3)
-					lvrL = getBit(inb[4], 4)
-					self.rr.GetInput("N18.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-	
-					lvrR = getBit(inb[5], 0)
-					lvrCallOn = getBit(inb[5], 1)
-					lvrL = getBit(inb[5], 2)
-					self.rr.GetInput("N24.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrR = getBit(inb[5], 3)
-					lvrCallOn = getBit(inb[5], 4)
-					lvrL = getBit(inb[5], 5)
-					self.rr.GetInput("N26.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-	
-				if optControl != 2:  # NOT dispatcher ALL
-					lvrR = getBit(inb[4], 5)
-					lvrCallOn = getBit(inb[4], 6)
-					lvrL = getBit(inb[4], 7)
-					self.rr.GetInput("N20.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-					lvrR = getBit(inb[5], 6)
-					lvrCallOn = getBit(inb[5], 7)
-					
-					lvrL = getBit(inb[6], 0)
-					self.rr.GetInput("N28.lvr").SetState(leverState(lvrL, lvrCallOn, lvrR))
-	
-				self.rr.GetInput("CBKrulishYd").SetValue(getBit(inb[6], 1)) # Breakers
-				self.rr.GetInput("CBThomas").SetValue(getBit(inb[6], 2))
-				self.rr.GetInput("CBWilson").SetValue(getBit(inb[6], 3))
-				self.rr.GetInput("CBKrulish").SetValue(getBit(inb[6], 4))
-				self.rr.GetInput("CBNassauW").SetValue(getBit(inb[6], 5))
-				self.rr.GetInput("CBNassauE").SetValue(getBit(inb[6], 6))
-				self.rr.GetInput("CBFoss").SetValue(getBit(inb[6], 7))
-	
-				self.rr.GetInput("CBDell").SetValue(getBit(inb[7], 0))
-				NSw60A = getBit(inb[7], 1)  # Switches in coach yard
-				NSw60B = getBit(inb[7], 2)
-				NSw60C = getBit(inb[7], 3)
-				NSw60D = getBit(inb[7], 4)
-				ip13 = self.rr.GetInput("NSw13") 
-				ip15 = self.rr.GetInput("NSw15") 
-				ip17 = self.rr.GetInput("NSw17") 
-				if NSw60A != 0:
-					ip13.SetTOState(0, 1)
-					ip15.SetTOState(0, 1)
-					ip17.SetTOState(0, 1)
-				elif NSw60B != 0:
-					ip13.SetTOState(1, 0)
-					ip15.SetTOState(1, 0)
-					ip17.SetTOState(0, 1)
-				elif NSw60C != 0:
-					ip13.SetTOState(0, 1)
-					ip15.SetTOState(0, 1)
-					ip17.SetTOState(1, 0)
-				elif NSw60D != 0:
-					ip13.SetTOState(1, 0)
-					ip15.SetTOState(1, 0)
-					ip17.SetTOState(1, 0)
-	
-				ip = self.rr.GetInput("NSw35")
-				nb = getBit(inb[7], 5)
-				rb = getBit(inb[7], 6)
-				ip.SetTOState(nb, rb)
-
-		if self.sendIO:
-			self.rr.ShowText("NasW", NASSAUW, otext, itext, 0, 3)
-
-		# Nassau East
-		outbc = 4
-		outb = [0 for _ in range(outbc)]
-
-		asp = self.rr.GetOutput("N24RB").GetAspectBits()             # Signals
-		outb[0] = setBit(outb[0], 0, asp[0])
-		outb[0] = setBit(outb[0], 1, asp[1])
-		asp = self.rr.GetOutput("N24RC").GetAspectBits()    
-		outb[0] = setBit(outb[0], 2, asp[0])
-		outb[0] = setBit(outb[0], 3, asp[1])
-		asp = self.rr.GetOutput("N26RC").GetAspectBits()   
-		outb[0] = setBit(outb[0], 4, asp[0])
-		outb[0] = setBit(outb[0], 5, asp[1])
-		asp = self.rr.GetOutput("N24RA").GetAspectBits()    
-		outb[0] = setBit(outb[0], 6, asp[0])
-		outb[0] = setBit(outb[0], 7, asp[1])
-
-		asp = self.rr.GetOutput("N26RA").GetAspectBits()       
-		outb[1] = setBit(outb[1], 0, asp[0])
-		asp = self.rr.GetOutput("N26RB").GetAspectBits()       
-		outb[1] = setBit(outb[1], 1, asp[0])
-		asp = self.rr.GetOutput("N28R").GetAspectBits()       
-		outb[1] = setBit(outb[1], 2, asp[0])
-		asp = self.rr.GetOutput("B20E").GetAspectBits()
-		outb[1] = setBit(outb[1], 3, asp[0])  # block signal
-		outb[1] = setBit(outb[1], 4, asp[1])
-		outb[1] = setBit(outb[1], 5, asp[2])
-		asp = self.rr.GetOutput("N24L").GetAspectBits()       
-		outb[1] = setBit(outb[1], 6, asp[0])
-		asp = self.rr.GetOutput("N26L").GetAspectBits()       
-		outb[1] = setBit(outb[1], 7, asp[0])
-
-		outb[2] = setBit(outb[2], 0, asp[1])
-		asp = self.rr.GetOutput("N28L").GetAspectBits()       
-		outb[2] = setBit(outb[2], 1, asp[0])
-		outb[2] = setBit(outb[2], 2, asp[1])
-		outb[2] = setBit(outb[2], 3, NESL[0])  # switch locks east
-		outb[2] = setBit(outb[2], 4, NESL[1])
-		outb[2] = setBit(outb[2], 5, NESL[2])
-		outb[2] = setBit(outb[2], 6, self.rr.GetOutput("B10.srel").GetStatus())	# Stop relay
-		sigL = self.sigLever["N24"]
-		outb[2] = setBit(outb[2], 7, 1 if sigL == "L" else 0)       # Signal Indicators
-
-		outb[3] = setBit(outb[3], 0, 1 if sigL == "N" else 0)
-		outb[3] = setBit(outb[3], 1, 1 if sigL == "R" else 0)
-		sigL = self.sigLever["N26"]
-		outb[3] = setBit(outb[3], 2, 1 if sigL == "L" else 0)  
-		outb[3] = setBit(outb[3], 3, 1 if sigL == "N" else 0)
-		outb[3] = setBit(outb[3], 4, 1 if sigL == "R" else 0)
-		sigL = self.sigLever["N28"]
-		outb[3] = setBit(outb[3], 5, 1 if sigL == "L" else 0)  
-		outb[3] = setBit(outb[3], 6, 1 if sigL == "N" else 0)
-		outb[3] = setBit(outb[3], 7, 1 if sigL == "R" else 0)
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Nassau East: Output bytes: %s" % otext)
-
-		inbc = outbc			
-		if self.settings.simulation:
-			itext = None
-		else:
-			inb = self.rrBus.sendRecv(NASSAUE, outb, outbc)
-			if inb is None:
-				itext = "Read Error"
+				resumelist = []
+				
+		else:  # assume local control - ignore nothing
+			skiplist = []
+			if self.lastControl == 2:
+				resumelist = ["N14", "N16", "N18", "N24", "N26", "N20", "N28"]
+			elif self.lastControl == 1:
+				resumelist = ["N14", "N16", "N18", "N24", "N26"]
 			else:
-				itext = formatIText(inb, inbc)
-				#logging.debug("Nassau East: Input Bytes: %s" % itext)
-			
-				nb = getBit(inb[0], 0)  # Switch positions
-				rb = getBit(inb[0], 1)
-				self.rr.GetInput("NSw41").SetTOState(nb, rb)
-				nb = getBit(inb[0], 2) 
-				rb = getBit(inb[0], 3)
-				self.rr.GetInput("NSw43").SetTOState(nb, rb)
-				nb = getBit(inb[0], 4) 
-				rb = getBit(inb[0], 5)
-				self.rr.GetInput("NSw45").SetTOState(nb, rb)
-				nb = getBit(inb[0], 6) 
-				rb = getBit(inb[0], 7)
-				self.rr.GetInput("NSw47").SetTOState(nb, rb)
-	
-				nb = getBit(inb[1], 0) 
-				rb = getBit(inb[1], 1)
-				self.rr.GetInput("NSw51").SetTOState(nb, rb)
-				nb = getBit(inb[1], 2) 
-				rb = getBit(inb[1], 3)
-				self.rr.GetInput("NSw53").SetTOState(nb, rb)
-				nb = getBit(inb[1], 4) 
-				rb = getBit(inb[1], 5)
-				self.rr.GetInput("NSw55").SetTOState(nb, rb)
-				nb = getBit(inb[1], 6) 
-				rb = getBit(inb[1], 7)
-				self.rr.GetInput("NSw57").SetTOState(nb, rb)
-	
-				self.rr.GetInput("N22").SetValue(getBit(inb[2], 0))  # Detection
-				self.rr.GetInput("N41").SetValue(getBit(inb[2], 1))  
-				self.rr.GetInput("N42").SetValue(getBit(inb[2], 2)) 
-				self.rr.GetInput("NEOSRH").SetValue(getBit(inb[2], 3)) # NEOS1 
-				self.rr.GetInput("NEOSW").SetValue(getBit(inb[2], 4))  # NEOS2
-				self.rr.GetInput("NEOSE").SetValue(getBit(inb[2], 5))  # NEOS3 
-				self.rr.GetInput("B10.W").SetValue(getBit(inb[2], 6))  
-				self.rr.GetInput("B10").SetValue(getBit(inb[2], 7))  
-	
-				nb = getBit(inb[3], 0) 
-				rb = getBit(inb[3], 1)
-				self.rr.GetInput("NSw39").SetTOState(nb, rb)
-			
-		if self.sendIO:
-			self.rr.ShowText("NasE", NASSAUE, otext, itext, 1, 3)
-
-		# NX Buttons Output only
-		outbc = 3
-		outb = [0 for _ in range(outbc)]
-
-		op = self.rr.GetOutput("NNXBtnT12").GetOutPulse() # Nassau West
-		outb[0] = setBit(outb[0], 0, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN60").GetOutPulse()
-		outb[0] = setBit(outb[0], 1, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN11").GetOutPulse()
-		outb[0] = setBit(outb[0], 2, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN21").GetOutPulse()
-		outb[0] = setBit(outb[0], 3, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnW10").GetOutPulse()
-		outb[0] = setBit(outb[0], 4, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN32W").GetOutPulse()
-		outb[0] = setBit(outb[0], 5, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN31W").GetOutPulse()
-		outb[0] = setBit(outb[0], 6, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN12W").GetOutPulse()
-		outb[0] = setBit(outb[0], 7, 1 if op != 0 else 0)
-
-		op = self.rr.GetOutput("NNXBtnN22W").GetOutPulse()
-		outb[1] = setBit(outb[1], 0, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN41W").GetOutPulse()
-		outb[1] = setBit(outb[1], 1, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN42W").GetOutPulse()
-		outb[1] = setBit(outb[1], 2, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnW20W").GetOutPulse()
-		outb[1] = setBit(outb[1], 3, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnW11").GetOutPulse()
-		outb[1] = setBit(outb[1], 4, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN32E").GetOutPulse()
-		outb[1] = setBit(outb[1], 5, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN31E").GetOutPulse()
-		outb[1] = setBit(outb[1], 6, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN12E").GetOutPulse()
-		outb[1] = setBit(outb[1], 7, 1 if op != 0 else 0)
-
-		op = self.rr.GetOutput("NNXBtnN22E").GetOutPulse()
-		outb[2] = setBit(outb[2], 0, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN41E").GetOutPulse()
-		outb[2] = setBit(outb[2], 1, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnN42E").GetOutPulse()
-		outb[2] = setBit(outb[2], 2, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnW20E").GetOutPulse()
-		outb[2] = setBit(outb[2], 3, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnR10").GetOutPulse()
-		outb[2] = setBit(outb[2], 4, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnB10").GetOutPulse()
-		outb[2] = setBit(outb[2], 5, 1 if op != 0 else 0)
-		op = self.rr.GetOutput("NNXBtnB20").GetOutPulse()
-		outb[2] = setBit(outb[2], 6, 1 if op != 0 else 0)
-
-		otext = formatOText(outb, outbc)
-		#logging.debug("Nassau NX: Output bytes: %s" % otext)
-
-		if not self.settings.simulation:
-			inb = self.rrBus.sendRecv(NASSAUNX, outb, outbc)
-			
-		if self.sendIO:
-			self.rr.ShowText("NsNX", NASSAUNX, otext, "- no inputs from this node -", 2, 3)
-
-# 	No inputs here
+				resumelist = []
+				
+		return skiplist, resumelist
