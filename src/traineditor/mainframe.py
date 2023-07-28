@@ -1,3 +1,4 @@
+import os
 import wx
 from traineditor.settings import Settings 
 from traineditor.rrserver import RRServer
@@ -12,6 +13,10 @@ class MainFrame(wx.Frame):
 		self.SetTitle("PSRY Train/Locomotive Editor")
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		
+		icon = wx.Icon()
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "editor.ico"), wx.BITMAP_TYPE_ANY))
+		self.SetIcon(icon)
+
 		self.settings = Settings()
 		self.RRServer = RRServer()
 		self.RRServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)

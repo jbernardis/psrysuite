@@ -126,7 +126,7 @@ class GenerateDlg(wx.Dialog):
             "dir":  "launcher",
             "main": "main.py",
             "desc": "Launcher for Local Dispatcher",
-            "icon": "dispatch.ico",
+            "icon": "launcher.ico",
             "parameter": "dispatcher"
         }
         self.generator(module, self.cbStartMenu.IsChecked())
@@ -137,7 +137,7 @@ class GenerateDlg(wx.Dialog):
             "dir":  "launcher",
             "main": "main.py",
             "desc": "Launcher for Remote Dispatcher",
-            "icon": "dispatch.ico",
+            "icon": "launcher.ico",
             "parameter": "remotedispatcher"
         }
         self.generator(module, self.cbStartMenu.IsChecked())
@@ -148,7 +148,7 @@ class GenerateDlg(wx.Dialog):
             "dir":  "launcher",
             "main": "main.py",
             "desc": "Launcher for Simulation",
-            "icon": "dispatch.ico",
+            "icon": "launcher.ico",
             "parameter": "simulation"
         }
         self.generator(module, self.cbStartMenu.IsChecked())
@@ -159,7 +159,7 @@ class GenerateDlg(wx.Dialog):
             "dir":  "launcher",
             "main": "main.py",
             "desc": "Launcher for Display",
-            "icon": "dispatch.ico",
+            "icon": "launcher.ico",
             "parameter": "display"
         }
         self.generator(module, self.cbStartMenu.IsChecked())
@@ -170,7 +170,7 @@ class GenerateDlg(wx.Dialog):
             "dir":  "launcher",
             "main": "main.py",
             "desc": "Railroad Server",
-            "icon": "server.ico",
+            "icon": "launcher.ico",
             "parameter": "serveronly"
         }    
         self.generator(module, self.cbStartMenu.IsChecked())
@@ -181,7 +181,7 @@ class GenerateDlg(wx.Dialog):
             "dir":  "launcher",
             "main": "main.py",
             "desc": "Dispatcher Only",
-            "icon": "dispatch.ico",
+            "icon": "launcher.ico",
             "parameter": "dispatcheronly"
         }    
         self.generator(module, self.cbStartMenu.IsChecked())
@@ -212,7 +212,7 @@ class GenerateDlg(wx.Dialog):
             "dir":  "monitor",
             "main": "main.py",
             "desc": "Monitor for Server",
-            "icon": "editor.ico"
+            "icon": "monitor.ico"
         }
         self.generator(module, self.cbStartMenu.IsChecked())
 

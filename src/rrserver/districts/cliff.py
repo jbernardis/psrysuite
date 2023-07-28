@@ -413,9 +413,9 @@ class Cliff(District):
 			self.optFleet = optFleet
 			self.nodes[CLIFF].SetOutputBit(2, 5, optFleet)   # fleet indicator
 			self.nodes[CLIFF].SetOutputBit(2, 6, 1-optFleet)   # fleet indicator
-		if self.control in [0, 1]:  # the only control options that have local fleeting ability
-			for signame in panelList:
-				self.rr.RailroadEvent({"fleet": [{"name": signame, "value": optFleet}]})
+			if self.control in [0, 1]:  # the only control options that have local fleeting ability
+				for signame in panelList:
+					self.rr.RailroadEvent({"fleet": [{"name": signame, "value": optFleet}]})
 			
 
 		rlReq = self.nodes[CLIFF].GetInputBit(6, 3)

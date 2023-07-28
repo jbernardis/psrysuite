@@ -3,14 +3,23 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-# ofp = open(os.path.join(os.getcwd(), "output", "rrserver.out"), "w")
-# efp = open(os.path.join(os.getcwd(), "output", "rrserver.err"), "w")
-#
-# sys.stdout = ofp
-# sys.stderr = efp
+ofn = os.path.join(os.getcwd(), "output", "rrserver.out")
+efn = os.path.join(os.getcwd(), "output", "rrserver.err")
+lfn = os.path.join(os.getcwd(), "logs", "rrserver.log")
+
+print("PSRY Suite - Railroad server starting")
+print("Redirecting standard output to %s" % ofn)
+print("Redirecting standard error  to %s" % efn)
+print("Redirecting logging output  to %s" % lfn)
+
+ofp = open(ofn, "w")
+efp = open(efn, "w")
+
+sys.stdout = ofp
+sys.stderr = efp
 
 import logging
-logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "rrserver.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename=lfn, filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 import json
 import socket
@@ -35,7 +44,7 @@ class ServerMain:
 	def __init__(self):
 		self.socketServer = None
 		self.dispServer = None
-		logging.info("rr server starting")
+		logging.info("Railroad server starting")
 		
 		self.commandsSeen = []
 		

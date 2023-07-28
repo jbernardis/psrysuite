@@ -27,6 +27,10 @@ class MyFrame(wx.Frame):
         
         wx.Frame.__init__(self, None, -1, "", size=(1, 1))
         self.CenterOnScreen()
+         
+        icon = wx.Icon()
+        icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "tester.ico"), wx.BITMAP_TYPE_ANY))
+        self.SetIcon(icon)
         
         dlg = ChooseNodeDlg(self, rl.getReference())
         rc = dlg.ShowModal()

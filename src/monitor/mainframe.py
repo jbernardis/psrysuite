@@ -1,11 +1,12 @@
+import os
 import wx
 import requests
-
-import pprint
 
 from monitor.getbitsdlg import GetBitsDlg
 from monitor.setinputbitsdlg import SetInputBitsDlg
 from monitor.settings import Settings
+from monitor.sessionsdlg import SessionsDlg
+from monitor.trainsdlg import TrainsDlg
 
 
 '''
@@ -95,6 +96,11 @@ class MainFrame(wx.Frame):
 		
 		self.settings = Settings()
 		
+		icon = wx.Icon()
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "monitor.ico"), wx.BITMAP_TYPE_ANY))
+		self.SetIcon(icon)
+
+		
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(20)
@@ -134,7 +140,7 @@ class MainFrame(wx.Frame):
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20)
 		
-		self.bGetBits = wx.Button(self, wx.ID_ANY, "Get Bits", size=(100, 46))
+		self.bGetBits = wx.Button(self, wx.ID_ANY, "Get O/I Bits", size=(100, 46))
 		self.Bind(wx.EVT_BUTTON, self.OnGetBits, self.bGetBits)
 		hsz.Add(self.bGetBits)
 		
@@ -294,19 +300,20 @@ class MainFrame(wx.Frame):
 		self.dlgSetBits = None
 
 	def OnTrains(self, _):
-		print("trains")
+		dlg = TrainsDlg(self, self.rrServer)
+		dlg.ShowModal()
+		dlg.Destroy()
 				
 	def OnSessions(self, _):
-		r = self.rrServer.Get("sessions", {})
-		print("sessions:")
-		pprint.pprint(r)
+		dlg = SessionsDlg(self, self.rrServer)
+		dlg.ShowModal()
+		dlg.Destroy()
 		
 	def OnQuit(self, _):
 		self.rrServer.SendRequest({"quit": {}})
 		self.connected = False
 		self.EnableButtons(False)			
-			
-		
+				
 	def Initialize(self):
 		self.rrServer = RRServer()
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)

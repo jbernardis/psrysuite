@@ -38,6 +38,10 @@ class MainFrame(wx.Frame):
 		self.startable = []
 		self.stoppable = []
 
+		icon = wx.Icon()
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "simulator.ico"), wx.BITMAP_TYPE_ANY))
+		self.SetIcon(icon)
+
 		self.title = "PSRY Simulator"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		vsz = wx.BoxSizer(wx.VERTICAL)
