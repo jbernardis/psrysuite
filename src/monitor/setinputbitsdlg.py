@@ -1,11 +1,10 @@
 import wx
 
 class SetInputBitsDlg(wx.Dialog):
-    def __init__(self, parent, dlgExit, rrServer, Nodes):
+    def __init__(self, parent, rrServer, Nodes):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "Set Input Bits")
         self.Bind(wx.EVT_CLOSE, self.onCancel)
  
-        self.dlgExit = dlgExit       
         self.rrServer = rrServer
         self.Nodes = Nodes
 
@@ -107,6 +106,6 @@ class SetInputBitsDlg(wx.Dialog):
 
          
     def onCancel(self, _):
-        self.dlgExit()
+        self.Destroy()
     
         

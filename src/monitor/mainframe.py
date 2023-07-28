@@ -91,8 +91,8 @@ class MainFrame(wx.Frame):
 		
 		self.connected = False
 		
-		self.dlgSetBits = None
-		self.dlgGetBits = None
+		self.dlgSessions = None
+		self.dlgTrains = None
 		
 		self.settings = Settings()
 		
@@ -266,13 +266,8 @@ class MainFrame(wx.Frame):
 		self.rrServer.SendRequest({"simulate": {"action": "occupy", "block": self.chBlock.GetString(chx), "state": 1 if self.cbOccupy.IsChecked() else 0}})
 		
 	def OnGetBits(self, _):
-		if self.dlgGetBits is None:
-			self.dlgGetBits = GetBitsDlg(self, self.DlgGetBitsExit, self.rrServer, Nodes)
-			self.dlgGetBits.Show()
-			
-	def DlgGetBitsExit(self):
-		self.dlgGetBits.Destroy()
-		self.dlgGetBits = None
+		dlg = GetBitsDlg(self, self.rrServer, Nodes)
+		dlg.Show()
 		
 	def OnBreaker(self, _):
 		chx = self.chBreaker.GetSelection()
@@ -291,23 +286,26 @@ class MainFrame(wx.Frame):
 		self.rrServer.SendRequest({"simulate": {"action": "turnoutpos", "turnout": self.chTurnout.GetString(chx), "normal": 1 if self.cbNormal.IsChecked() else 0}})
 
 	def OnSetInputBit(self, _):
-		if self.dlgSetBits is None:
-			self.dlgSetBits = SetInputBitsDlg(self, self.DlgSetBitsExit, self.rrServer, Nodes)
-			self.dlgSetBits.Show()
+		dlg = SetInputBitsDlg(self, self.rrServer, Nodes)
+		dlg.Show()
 			
-	def DlgSetBitsExit(self):
-		self.dlgSetBits.Destroy()
-		self.dlgSetBits = None
-
 	def OnTrains(self, _):
-		dlg = TrainsDlg(self, self.rrServer)
-		dlg.ShowModal()
-		dlg.Destroy()
+		if self.dlgTrains is None:
+			self.dlgTrains = TrainsDlg(self, self.DlgTrainsExit, self.rrServer)
+			self.dlgTrains.Show()
+
+	def DlgTrainsExit(self):
+		self.dlgTrains.Destroy()
+		self.dlgTrains = None
 				
 	def OnSessions(self, _):
-		dlg = SessionsDlg(self, self.rrServer)
-		dlg.ShowModal()
-		dlg.Destroy()
+		if self.dlgSessions is None:
+			self.dlgSessions = SessionsDlg(self, self.DlgSessionsExit, self.rrServer)
+			self.dlgSessions.Show()
+
+	def DlgSessionsExit(self):
+		self.dlgSessions.Destroy()
+		self.dlgSessions = None
 		
 	def OnQuit(self, _):
 		self.rrServer.SendRequest({"quit": {}})

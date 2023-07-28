@@ -92,6 +92,8 @@ class MainFrame(wx.Frame):
 		
 		self.eventsList = []
 		self.adviceList = []
+		self.dlgEvents = None
+		self.dlgAdvice = None
 		
 		self.locoList = []
 		self.trainList = []
@@ -182,12 +184,6 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, self.bRefresh)
 		self.bRefresh.Enable(False)
 
-		self.bServerHide = wx.Button(self, wx.ID_ANY, "Hide/Show", pos=(self.centerOffset+100, 75), size=BTNDIM)
-		self.Bind(wx.EVT_BUTTON, self.OnServerHideShow, self.bServerHide)
-		self.serverHidden = self.settings.serverhidden
-		if not self.IsDispatcher():
-			self.bServerHide.Hide()
-
 		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Train IDs", pos=(self.centerOffset+250, 15), size=BTNDIM)
 		self.bLoadTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadTrains, self.bLoadTrains)
@@ -222,7 +218,11 @@ class MainFrame(wx.Frame):
 		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(self.centerOffset+2200, 75), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnResetScreen, self.bResetScreen)
 
-		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 50), size=(400, 40))
+		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 30), size=(400, 40))
+	
+		self.cbOSSLocks = wx.CheckBox(self, -1, "OSS Locks", (int(totalw/2-100/2), 80))
+		self.Bind(wx.EVT_CHECKBOX, self.OnCBOSSLocks, self.cbOSSLocks)
+		self.cbOSSLocks.SetValue(self.OSSLocks)
 
 		self.timeDisplay = LEDNumberCtrl(self, wx.ID_ANY, pos=(self.centerOffset+480, 10), size=(150, 50))
 
@@ -399,10 +399,7 @@ class MainFrame(wx.Frame):
 			self.Request({"clock": { "value": self.timeValue}})
 			
 		
-	def OnServerHideShow(self, _):
-		self.serverHidden = not self.serverHidden
-		self.Request( {"server": {"action": "hide" if self.serverHidden else "show"}}, force=True)	
-		
+	def OnThrottle(self, _):
 		throttleExec = os.path.join(os.getcwd(), "throttle", "main.py")
 		throttleProc = Popen([sys.executable, throttleExec])
 		print("throttle started as PID %d" % throttleProc.pid)
@@ -531,10 +528,6 @@ class MainFrame(wx.Frame):
 		self.widgetMap[HyYdPt].append(self.cbHydeFleet)
 		self.HydeFleetSignals = [ "H4R", "H4LA", "H4LB", "H4LC", "H4LD", "H6R", "H6LA", "H6LB", "H6LC", "H6LD", "H8R", "H8L",
 					"H10L", "H10RA", "H10RB", "H10RC", "H10RD", "H10RE", "H12L", "H12RA", "H12RB", "H12RC", "H12RD", "H12RE"  ]
-		
-		self.cbOSSLocks = wx.CheckBox(self, -1, "OSS Locks", (2300, voffset+10))
-		self.Bind(wx.EVT_CHECKBOX, self.OnCBOSSLocks, self.cbOSSLocks)
-		self.cbOSSLocks.SetValue(self.OSSLocks)
 
 	def GetFleetMap(self, signm):
 		siglists = [
@@ -1528,18 +1521,26 @@ class MainFrame(wx.Frame):
 		self.eventsList.append(message)
 		
 	def OnBEventsLog(self, _):
-		dlg = ListDlg(self, "Events List", self.eventsList)
-		dlg.ShowModal()
-		dlg.Destroy()
+		if self.dlgEvents is None:
+			self.dlgEvents = ListDlg(self, "Events List", self.eventsList, self.DlgEventsExit)
+			self.dlgEvents.Show()
+			
+	def DlgEventsExit(self):
+		self.dlgEvents.Destroy()
+		self.dlgEvents = None
 
 	def PopupAdvice(self, message):
 		self.advice.Append(message)
 		self.adviceList.append(message)
 		
 	def OnBAdviceLog(self, _):
-		dlg = ListDlg(self, "Advice List", self.adviceList)
-		dlg.ShowModal()
-		dlg.Destroy()
+		if self.dlgAdvice is None:
+			self.dlgAdvice = ListDlg(self, "Advice List", self.adviceList, self.DlgAdviceExit)
+			self.dlgAdvice.Show()
+			
+	def DlgAdviceExit(self):
+		self.dlgAdvice.Destroy()
+		self.dlgAdvice = None
 		
 	def OnSubscribe(self, _):
 		if self.subscribed:
@@ -1550,7 +1551,6 @@ class MainFrame(wx.Frame):
 			self.sessionid = None
 			self.bSubscribe.SetLabel("Connect")
 			self.bRefresh.Enable(False)
-			#self.bServerHide.Enable(False)
 			self.bLoadTrains.Enable(False)
 			self.bLoadLocos.Enable(False)
 			self.bSaveTrains.Enable(False)
@@ -1572,7 +1572,6 @@ class MainFrame(wx.Frame):
 			self.subscribed = True
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
-			#self.bServerHide.Enable(True)
 			self.bLoadTrains.Enable(True)
 			self.bLoadLocos.Enable(True)
 			self.bSaveTrains.Enable(True)
@@ -2048,7 +2047,6 @@ class MainFrame(wx.Frame):
 		self.subscribed = False
 		self.bSubscribe.SetLabel("Connect")
 		self.bRefresh.Enable(False)
-		#self.bServerHide.Enable(False)
 		self.bLoadTrains.Enable(False)
 		self.bLoadLocos.Enable(False)
 		self.bSaveTrains.Enable(False)

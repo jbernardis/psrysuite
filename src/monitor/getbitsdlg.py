@@ -4,11 +4,10 @@ def swapbyte(b):
     return int("0b"+"{0:08b}".format(b)[::-1], 2)
 
 class GetBitsDlg(wx.Dialog):
-    def __init__(self, parent, dlgExit, rrServer, Nodes):
+    def __init__(self, parent, rrServer, Nodes):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "Get Bits")
         self.Bind(wx.EVT_CLOSE, self.onCancel)
   
-        self.dlgExit = dlgExit      
         self.rrServer = rrServer
         self.Nodes = Nodes
 
@@ -148,6 +147,12 @@ class GetBitsDlg(wx.Dialog):
                 self.chNodes.Enable(True)
          
     def onCancel(self, _):
-        self.dlgExit()
+        try:
+            self.ticker.Stop()
+        except:
+            pass
+        
+        self.runContinuous = False
+        self.Destroy()
     
         

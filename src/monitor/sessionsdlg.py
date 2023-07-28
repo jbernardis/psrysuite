@@ -1,10 +1,11 @@
 import wx
 
 class SessionsDlg(wx.Dialog):
-    def __init__(self, parent, rrServer):
+    def __init__(self, parent, dlgExit, rrServer):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "Server Sessions")
         self.Bind(wx.EVT_CLOSE, self.OnClose)
-  
+ 
+        self.dlgExit = dlgExit 
         self.rrServer = rrServer
 
         vsz = wx.BoxSizer(wx.VERTICAL)       
@@ -42,7 +43,7 @@ class SessionsDlg(wx.Dialog):
         pass
            
     def OnClose(self, _):
-        self.EndModal(wx.ID_OK)
+        self.dlgExit()
     
         
 

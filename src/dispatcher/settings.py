@@ -31,7 +31,6 @@ class Settings:
 		self.serverport = 9000
 		self.socketport = 9001
 		self.showcameras = False
-		self.serverhidden = False
 		self.allowatcrequests = True #False
 
 		self.cfg = configparser.ConfigParser()
@@ -62,11 +61,6 @@ class Settings:
 
 		else:
 			logging.warning("Missing %s section - assuming defaults" % self.section)
-			
-		if self.cfg.has_section("rrserver"):
-			for opt, value in self.cfg.items("rrserver"):
-				if opt == 'hide':
-					self.serverhidden = parseBoolean(value, False)
 			
 		if self.cfg.has_section("display"):
 			for opt, value in self.cfg.items("display"):

@@ -1,10 +1,12 @@
 import wx
 
 class ListDlg(wx.Dialog):
-    def __init__(self, parent, title, dataList):
-        self.parent = parent
+    def __init__(self, parent, title, dataList, dlgexit):
+        wx.Dialog.__init__(self, parent, style=wx.DEFAULT_FRAME_STYLE)
         
-        wx.Dialog.__init__(self, self.parent, style=wx.DEFAULT_FRAME_STYLE)
+        self.parent = parent
+        self.dlgexit = dlgexit
+        
         self.SetTitle(title)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         
@@ -46,11 +48,11 @@ class ListDlg(wx.Dialog):
         self.DoClose()
         
     def OnBOK(self, _):
-        self.EndModal(wx.ID_OK)
+        self.DoClose()
         
     def OnBExit(self, _):
         self.DoClose()
         
     def DoClose(self):
-        self.EndModal(wx.ID_CANCEL)
+        self.dlgexit()
 
