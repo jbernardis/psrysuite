@@ -417,24 +417,22 @@ class Port (District):
 
 		self.blocks["P32"] = Block(self, self.frame, "P32",
 			[
-				(self.tiles["diagleft"], self.screen, (146, 31), True),
-				(self.tiles["diagleft"], self.screen, (147, 30), True),
-				(self.tiles["turnleftleft"], self.screen, (148, 29), True),
-				(self.tiles["horiznc"],  self.screen, (149, 29), True),
-				(self.tiles["horiz"],    self.screen, (150, 29), True),
-				(self.tiles["horiznc"],  self.screen, (151, 29), True),
-				(self.tiles["horiz"],    self.screen, (152, 29), True),
-				(self.tiles["horiznc"],  self.screen, (153, 29), True),
+				(self.tiles["diagleft"],      self.screen, (146, 31), True),
+				(self.tiles["diagleft"],      self.screen, (147, 30), True),
+				(self.tiles["turnrightdown"], self.screen, (148, 29), True),
+				(self.tiles["verticalnc"],    self.screen, (148, 28), True),
+				(self.tiles["vertical"],      self.screen, (148, 27), True),
+				(self.tiles["verticalnc"],    self.screen, (148, 26), True),
 
-				(self.tiles["horiznc"],  LaKr,        (113, 21), False),
-				(self.tiles["horiz"],    LaKr,        (114, 21), False),
-				(self.tiles["horiznc"],  LaKr,        (115, 21), False),
-				(self.tiles["horiz"],    LaKr,        (116, 21), False),
-				(self.tiles["horiznc"],  LaKr,        (117, 21), False),
-				(self.tiles["horiz"],    LaKr,        (118, 21), False),
-				(self.tiles["horiznc"],  LaKr,        (119, 21), False),
+				(self.tiles["horiznc"],        LaKr,        (113, 21), False),
+				(self.tiles["turnrightright"], LaKr,        (114, 21), False),
+				(self.tiles["turnleftup"],     LaKr,        (115, 22), False),
+				(self.tiles["verticalnc"],     LaKr,        (115, 23), False),
+				(self.tiles["vertical"],       LaKr,        (115, 24), True),
+				(self.tiles["verticalnc"],     LaKr,        (115, 25), False),
+				(self.tiles["vertical"],       LaKr,        (115, 26), True),
 			], False)
-		self.blocks["P32"].AddTrainLoc(self.screen, (149, 29))
+		self.blocks["P32"].AddTrainLoc(self.screen, (147, 29))
 		self.blocks["P32"].AddTrainLoc(LaKr, (113, 21))
 		self.blocks["P32"].AddStoppingBlock([
 				(self.tiles["eobleft"],  self.screen, (143, 33), True),
