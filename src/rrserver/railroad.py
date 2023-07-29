@@ -419,6 +419,7 @@ class Railroad():
 			self.RailroadEvent(tout.GetEventMessage(lock=True))
 		
 	def SetAspect(self, signame, aspect):
+		print("railroad.setaspect %s %d" % (signame, aspect))
 		try:
 			sig = self.signals[signame]
 		except KeyError:
@@ -426,23 +427,15 @@ class Railroad():
 			return
 		
 		aspect = sig.district.VerifyAspect(signame, aspect)	
-		if sig.IsVirtual():
-			sig.district.SetAspect(sig, aspect)
-			self.UpdateSignalLeverLEDs(sig, aspect)
-			self.RailroadEvent(sig.GetEventMessage())
-			
-		else:
-			self.ChangeSignal(sig, aspect)
-		
-	def ChangeSignal(self, sig, aspect):
+		print("verified aspect = %d" % aspect)
 		if not sig.SetAspect(aspect):
 			return 
-
-		sig.UpdateIndicators() # make sure all indicators reflect this change
-			
+		
 		bits = sig.Bits()
 		lb = len(bits)
-		if lb != 0:	
+		if lb == 0:	
+			sig.district.SetAspect(sig, aspect)
+		else:
 			if lb == 1:
 				vals = [1 if aspect != 0 else 0] 
 			elif lb == 2:
@@ -456,8 +449,8 @@ class Railroad():
 			for (vbyte, vbit), val in zip(bits, vals):
 				sig.node.SetOutputBit(vbyte, vbit, 1 if val != 0 else 0)
 
+		sig.UpdateIndicators() # make sure all indicators reflect this change
 		self.UpdateSignalLeverLEDs(sig, aspect)
-
 		self.RailroadEvent(sig.GetEventMessage())
 		
 	def UpdateSignalLeverLEDs(self, sig, aspect):
@@ -1134,7 +1127,7 @@ class Railroad():
 			'''
 			The resume list is a list of objects - signal levers, or handswitch unlocks - that have been ignored because of the
 			control setting for this district, but now need to be considered because the control value has changed.  We need to 
-			react to the current value of these objects as if they was just now set to their current value
+			react to the current value of these objects as if they were just now set to their current value
 			'''
 			for o in resumelist:
 				try:

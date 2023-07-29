@@ -177,6 +177,7 @@ class Dell(District):
 			aspect = 0
 
 		sig = self.rr.GetSignal("R10W")
-		self.rr.ChangeSignal(sig, aspect)			
+		if sig.Aspect() != aspect:
+			self.rr.SetAspect("R10W", aspect)			
 
 		District.OutIn(self)

@@ -318,6 +318,7 @@ class ServerMain:
 	def DoSignal(self, cmd):
 		signame = cmd["name"][0]
 		aspect = int(cmd["aspect"][0])
+		print("DoSignal %s %d" % (signame, aspect))
 		self.rr.SetAspect(signame, aspect)
 
 	def DoSignalLock(self, cmd):			

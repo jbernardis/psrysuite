@@ -1419,6 +1419,8 @@ class MainFrame(wx.Frame):
 				# no signal at the end of this block
 				return 
 			sig = self.GetSignalByName(sigNm)
+			if sig is None:
+				return
 
 		# check for trains in the entry block.  If it is the front of the train, then this signal change applies to that train.
 		for trid, tr in self.trains.items():
@@ -1677,9 +1679,7 @@ class MainFrame(wx.Frame):
 
 					stat = OCCUPIED if state == 1 else EMPTY
 					if blk is not None:
-						print("block command %s %s %s %s" % (block, blk.GetName(), blockend, state))
 						if blk.GetStatus(blockend) != stat:
-							print("status changed")
 							district = blk.GetDistrict()
 							district.DoBlockAction(blk, blockend, stat)
 							if self.IsDispatcher():

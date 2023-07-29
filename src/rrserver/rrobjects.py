@@ -348,10 +348,7 @@ class Signal:
 
     def IsNullSignal(self):
         return self.district is None
-    
-    def IsVirtual(self):
-        return len(self.bits) == 0
-    
+     
     def SetSignalAddress(self, district, node, address):
         self.district = district
         self.node = node

@@ -293,7 +293,6 @@ class Port(District):
 
 	def SetAspect(self, sig, aspect):
 		print("port set aspect for signal %s" % sig.Name())
-		sig.SetAspect(aspect)		
 		if sig.Name() == "PA4L":
 			pb4La = aspect != 0 # clear
 			pb4Lb = aspect == 4 # restricting
