@@ -336,13 +336,10 @@ class District:
 		return aspect
 
 	def CheckBlockSignals(self, blkNm, sigNm, blkEast):
-		print("check block signals for block/signal %s/%s" % (blkNm, sigNm))
-
 		blk = self.frame.blocks[blkNm]
 		clear = not blk.IsOccupied()
 			
 		east = blk.GetEast()
-		print("Block East = %s, we want %s" % (east, blkEast))
 
 		if east == blkEast:		
 			blkNxt = blk.blkEast
@@ -350,20 +347,16 @@ class District:
 			blkNxt = blk.blkWest
 		
 		if blkNxt is None:
-			print("no block next")
 			nxtclr = False
 			nxtrte = None
 		
 		else:	
 			nxtclr = blkNxt.IsCleared()		
-			print("block west = %s" % blkNxt.GetName())
 			rt = blkNxt.GetRoute()
 			if rt is None:
-				print("no route beyoud OS")
 				nxtrte = None
 			else:
 				nxtrte = rt.rtype[0 if blkEast else 1] # get next route type
-				print("nxt routeTypes = %d" % nxtrte)
 		
 		if east != blkEast:
 			aspect = 0	
@@ -378,18 +371,14 @@ class District:
 		else:
 			aspect = 0       # stop
 		
-		print("calculated aspect for clear: %s east: %s, nxtclr: %s, nxtrte: %s = %d" % (clear, east, nxtclr, str(nxtrte), aspect))
 		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect }})
 
 
 	def CheckBlockSignalsAdv(self, blkNm, blkNxtNm, sigNm, blkEast):
-		print("check block advanced signals for block/signal %s/%s/%s" % (blkNm, blkNxtNm, sigNm))
-
 		blk = self.frame.blocks[blkNm]
 		clear = not blk.IsOccupied()
 			
 		east = blk.GetEast()
-		print("Block East = %s, we want %s" % (east, blkEast))
 		
 		if east == blkEast:		
 			blkNxt = blk.blkEast
@@ -397,20 +386,16 @@ class District:
 			blkNxt = blk.blkWest
 		
 		if blkNxt is None:
-			print("no block next")
 			nxtclr = False
 			nxtrte = None
 		
 		else:	
 			nxtclr = blkNxt.IsCleared()		
-			print("block west = %s" % blkNxt.GetName())
 			rt = blkNxt.GetRoute()
 			if rt is None:
-				print("no route beyoud OS")
 				nxtrte = None
 			else:
 				nxtrte = rt.rtype[0 if blkEast else 1] # get next route type
-				print("nxt routeTypes = %d" % nxtrte)
 
 		try:
 			blknxt = self.frame.blocks[blkNxtNm]
@@ -437,9 +422,7 @@ class District:
 		else:
 			aspect = 0       # stop
 		
-		print("calculated adv aspect for clear: %s east: %s, nxtclr: %s/%s, nxtrte: %s = %d" % (clear, east, nxtclr, nxtclradv, str(nxtrte), aspect))
 		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect }})
-
 
 	def GetRouteDefinitions(self):
 		return [r.GetDefinition() for r in self.routes.values()]
@@ -616,7 +599,7 @@ class District:
 					break
 		else:
 			return
-		
+
 		if aspect < 0:
 			aspect = self.CalculateAspect(sig, osblock, self.routes[rname], silent=True)
 			#  report calculated aspect back to the server

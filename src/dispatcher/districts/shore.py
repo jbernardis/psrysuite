@@ -43,33 +43,40 @@ class Shore (District):
 
 	def DoSignalAction(self, sig, aspect):
 		signm = sig.GetName()
-		if signm not in ["S8L", "S8R"]:
-			District.DoSignalAction(self, sig, aspect)
-			self.drawCrossing()
+		if signm in ["S8L", "S8R"]:
+			osblk = self.blocks["SOSHF"]
+			east = signm == "S8R"
+			osblk.SetEast(east)
+			osblk.SetRoute(self.routes["SRtF10F11"])
+			sig.SetAspect(aspect, refresh=True)
+			if aspect == STOP:
+				osblk.SetEntrySignal(None)
+			else:
+				osblk.SetEntrySignal(sig)
+			osblk.SetCleared(aspect != STOP, refresh=True)
+	
+			if osblk.IsBusy() and aspect == STOP:
+				return
+	
+			exitBlk = self.frame.GetBlockByName("F11" if east else "F10")
+			entryBlk = self.frame.GetBlockByName("F10" if east else "F11")
+			if exitBlk.IsOccupied():
+				return
+	
+			exitBlk.SetEast(east)
+			entryBlk.SetEast(east)
+			exitBlk.SetCleared(aspect!=STOP, refresh=True)
 			return
+				
+		elif signm in ["S12R", "S12LA", "S12LB", "S12LC", "S4R", "S4LA", "S4LB", "S4LC" ]:
+			if self.blocks["SOSHF"].IsBusy():
+				print("returning simply because SOSHF is busy")
+				#self.frame.Request({"signal": {"name": signm, "aspect": 0}})
+				return
+			
+		District.DoSignalAction(self, sig, aspect)
+		self.drawCrossing()
 
-		osblk = self.blocks["SOSHF"]
-		east = signm == "S8R"
-		osblk.SetEast(east)
-		osblk.SetRoute(self.routes["SRtF10F11"])
-		sig.SetAspect(aspect, refresh=True)
-		if aspect == STOP:
-			osblk.SetEntrySignal(None)
-		else:
-			osblk.SetEntrySignal(sig)
-		osblk.SetCleared(aspect != STOP, refresh=True)
-
-		if osblk.IsBusy() and aspect == STOP:
-			return
-
-		exitBlk = self.frame.GetBlockByName("F11" if east else "F10")
-		entryBlk = self.frame.GetBlockByName("F10" if east else "F11")
-		if exitBlk.IsOccupied():
-			return
-
-		exitBlk.SetEast(east)
-		entryBlk.SetEast(east)
-		exitBlk.SetCleared(aspect!=STOP, refresh=True)
 		
 	def DoBlockAction(self, blk, blockend, state):
 		blknm = blk.GetName()

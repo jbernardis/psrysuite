@@ -153,13 +153,11 @@ class Nassau (District):
 			self.DoEntryExitButtons(btn, "NOSE", sendButtons=True)
 			
 	def DoBlockAction(self, blk, blockend, state):
-		print("in do block action for block %s" % blk.GetName())
 		District.DoBlockAction(self, blk, blockend, state)
 		if blk.GetName() == "N21":
 			self.CheckBlockSignals("N21", "N21W", False)
 			
 	def DoSignalAction(self, sig, aspect):
-		print("in do signal action for signal %s" % sig.GetName())
 		District.DoSignalAction(self, sig, aspect)
 		signame = sig.GetName()
 		if signame in [ "N14LA", "N14LB", "N14LC", "N14LD", "N16L", "N18LA", "N18LB", "N20L" ]:

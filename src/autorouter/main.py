@@ -348,14 +348,21 @@ class MainUnit:
 		
 		return RouteRequest(train, self.routes[rtName], block)
 
+	def GetActiveRoute(self, osName):
+		if osName in [ "SOSE", "SOSW" ]:
+			for s in [ "S8L", "S8R" ]:
+				if self.signals[s].GetAspect() != 0:
+					return None
+		
+		return self.osList[osName].GetActiveRoute()
+
 	def EvaluateRouteRequest(self, rteRq):
 		logging.info("evaluating routeRequest %s" % rteRq.toString())
 		rname = rteRq.GetName()
 		blkName = rteRq.GetEntryBlock()
 		logging.info("evaluate route %s" % rname)
 		rte = self.routes[rname]
-		os = self.osList[rte.GetOS()]
-		activeRte = os.GetActiveRoute()
+		activeRte = self.GetActiveRoute(rte.GetOS())
 		tolock = []
 		siglock = []
 		if activeRte is None or activeRte.GetName() != rname:
@@ -396,7 +403,7 @@ class MainUnit:
 			if self.signals[sigNm].IsLocked() and self.signals[sigNm].GetAspect() == 0:
 				siglock.append(sigNm)
 
-		if len(tolock) + len(siglock) == 0 and exitBlockAvailable:
+		if len(tolock) + len(siglock) == 0 and exitBlockAvailable and activeRte is not None:
 			logging.info("eval true")
 			return True  # OK to proceed with this route
 		else:

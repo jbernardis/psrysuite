@@ -694,9 +694,6 @@ class MainFrame(wx.Frame):
 			self.NassauFleetSignals = self.NassauFleetSignalsMain
 		elif self.nassauControl == 2:
 			self.NassauFleetSignals = self.NassauFleetSignalsAll
-		else:
-			print("unknown control value: %d" % self.nassauControl, flush=True)
-			return
 
 		for signm in self.NassauFleetSignals:
 			self.Request({"fleet": { "name": signm, "value": f}})
@@ -826,9 +823,6 @@ class MainFrame(wx.Frame):
 			self.NassauFleetSignals = self.NassauFleetSignalsMain
 		elif self.nassauControl == 2:
 			self.NassauFleetSignals = self.NassauFleetSignalsAll
-		else:
-			print("unknown control value: %d" % self.nassauControl, flush=True)
-			return
 
 		for signm in self.NassauFleetSignals:
 			self.Request({"fleet": { "name": signm, "value": f}})
@@ -1652,7 +1646,6 @@ class MainFrame(wx.Frame):
 					try:
 						value = int(p["value"])
 					except:
-						print("vale defaulting to 0")
 						value = 0
 
 					sig = self.signals[signm]
