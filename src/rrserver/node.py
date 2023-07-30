@@ -54,11 +54,9 @@ class Node:
         return rv
     
     def SetInputBit(self, vbyte, vbit, state):
-        #print("in node %x - set input bit %d:%d to %d" % (self.address, vbyte, vbit, state))
         self.inb[vbyte] = setBit(self.inb[vbyte], 7-vbit, state) 
      
     def SetOutputBit(self, vbyte, vbit, state):
-        #print("in node %x - set output bit %d:%d to %d" % (self.address, vbyte, vbit, state))
         self.outb[vbyte] = setBit(self.outb[vbyte], vbit, state)       
         
     def setBus(self, bus):

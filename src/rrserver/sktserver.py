@@ -1,3 +1,5 @@
+import logging
+
 import threading
 import socket
 import select
@@ -27,7 +29,6 @@ class SktServer (threading.Thread):
 		return self.endOfLife
 
 	def sendToAll(self, msg):
-		#print("Outgoing broadcast: %s" % json.dumps(msg))
 		with self.socketLock:
 			tl = [x for x in self.sockets]
 		for skt, addr in tl:
@@ -64,7 +65,7 @@ class SktServer (threading.Thread):
 			s = socket.create_server(addr)
 		except Exception as e:
 			s = None
-			print("Unable to create socket server on address %s: (%s)" % (addr, str(e)))
+			logging.error("Unable to create socket server on address %s: (%s)" % (addr, str(e)))
 			self.isRunning = False
 		else:
 			s.listen()

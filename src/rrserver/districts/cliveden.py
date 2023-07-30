@@ -7,7 +7,6 @@ from rrserver.node import Node
 class Cliveden(District):
 	def __init__(self, rr, name, settings):
 		District.__init__(self, rr, name, settings)
-		logging.info("creating district Cliveden")
 		self.rr = rr
 		self.name = name
 		self.nodeAddresses = [ CLIVEDEN ]

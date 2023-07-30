@@ -7,7 +7,6 @@ from rrserver.node import Node
 class Dell(District):
 	def __init__(self, rr, name, settings):
 		District.__init__(self, rr, name, settings)
-		logging.info("creating district Latham")
 		
 		self.DXO = None
 		self.RXO = None

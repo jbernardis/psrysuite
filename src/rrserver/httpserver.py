@@ -28,12 +28,18 @@ class Handler(BaseHTTPRequestHandler):
 			self.send_response(200)
 			self.send_header("Content-type", "text/plain")
 			self.end_headers()
-			self.wfile.write(body)
+			try:
+				self.wfile.write(body)
+			except ConnectionAbortedError:
+				logging.warning("Connection Aborted Error writing 200 response back to requester - ignoring")
 		else:
 			self.send_response(400)
 			self.send_header("Content-type", "text/plain")
 			self.end_headers()
-			self.wfile.write(body)
+			try:
+				self.wfile.write(body)
+			except ConnectionAbortedError:
+				logging.warning("Connection Aborted Error writing 400 response back to requester - ignoring")
 
 class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 	def serve_railroad(self):

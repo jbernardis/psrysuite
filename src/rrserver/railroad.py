@@ -81,16 +81,10 @@ class Railroad():
 		}		
 
 		for dclass, name in self.districtList:
-			logging.debug("Creating District %s" % name)
+			logging.info("Creating District %s" % name)
 			self.districts[name] = dclass(self, name, self.settings)
 			self.nodes[name] = self.districts[name].GetNodes()
 			self.addrList.extend([[addr, self.districts[name], node] for addr, node, in self.districts[name].GetNodes().items()])
-
-  # print(str(sorted(list(self.blocks.keys()))))
-  # for main, subs in self.subBlocks.items():
-  # 	for sub in subs:			
-  # 		self.GetBlock(sub).SetMainBlock(main, self.GetBlock(main))
-
 			
 	def dump(self):
 		pass
@@ -136,32 +130,7 @@ class Railroad():
 		
 		self.dump()
 
-		#for _, dobj in self.districts.items():
-			#dobj.SendIO(False)
-			#dobj.DetermineSignalLevers()
-
-		#self.currentDistrict = self.districts["Yard"]
-		#self.currentDistrict.SendIO(self.settings.viewiobits and not self.settings.hide)
-  # for block in jlayout["blocks"]:
-  # 	print("Block %s" % block)
-  # 	if not block in self.blocks:
-  # 		jdata = jlayout["blocks"][block]
-  # 		self.blocks[block] = Block(block, jdata)
-  # 		if "sbeast" in jdata and jdata["sbeast"] is not None and jdata["sbeast"] not in self.blocks:
-  # 			self.blocks[jdata["sbeast"]] = Block(jdata["sbeast"], {"east": jdata["east"]})
-  # 		if "sbwest" in jdata and jdata["sbwest"] is not None and jdata["sbwest"] not in self.blocks:
-  # 			self.blocks[jdata["sbwest"]] = Block(jdata["sbwest"], {"east": jdata["east"]})
-  #
-  # for route in jlayout["routes"]:
-  # 	print("route %s" % route)
-  # 	if route not in self.osRoutes:
-  # 		jdata = jlayout["routes"][route]
-  # 		self.osRoutes[route] = Route(route, jdata)
-  #
-  #
-  # self.GetSubBlockInfo()
 		return True
-
 			
 	def OccupyBlock(self, blknm, state):
 		'''
@@ -170,16 +139,13 @@ class Railroad():
 		try:
 			blist = [ self.blocks[blknm] ]
 		except KeyError:
-			print("no blist for %s" % blknm)
 			try:
 				blist = [self.GetBlock(x) for x in self.subBlocks[blknm]]
 			except KeyError:
-				print("no subblocks for %s" % blknm)
 				logging.warning("Ignoring occupy command - unknown block name: %s" % blknm)
 				return
 		
 		for blk in blist:
-			print("occupying block %s" % blk.Name())
 			if len(blk.Bits()) > 0:
 				vbyte, vbit = blk.Bits()[0]
 				blk.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
@@ -187,17 +153,11 @@ class Railroad():
 				'''
 				block has sub blocks - occupy all of them as per state
 				'''
-				print("occupying subblocks of %s" % blk.Name())
 				sbl = blk.SubBlocks()
-				print("length of subblocks = %d" % len(sbl))
 				for sb in sbl:
-					print("subblock %s" % sb.Name())
 					if len(sb.Bits()) > 0:
 						vbyte, vbit = sb.Bits()[0]
 						sb.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
-						print("set input bit for subblock %s" % sb.Name())
-					else:
-						print("subblock %s has no location bits" % sb.Name())
 		
 	def SetTurnoutPos(self, tonm, normal):
 		'''
@@ -279,16 +239,13 @@ class Railroad():
 		'''
 		turn a stopping relay on/off
 		'''
-		print("in set relay %s %s" % (relayname, state))
 		try:
 			r = self.stopRelays[relayname]
 		except KeyError:
 			logging.warning("Ignoring stoprelay command - unknown relay: %s" % relayname)
-			print("unknown relay")
 			return
 		
 		vbyte, vbit = r.Bits()[0]
-		print("setting output bit %d:%d to %d" % (vbyte, vbit, state))
 		r.node.SetOutputBit(vbyte, vbit, 1 if state != 0 else 0)
 		
 	def GetRouteIn(self, rtnm):
@@ -396,7 +353,6 @@ class Railroad():
 			lk = self.locks[lname]
 		except KeyError:
 			logging.warning("Attempt to change lock state on unknown lock: %s" % lname)
-			print("unknown lock %s" % lname)
 			return False
 			
 		if lk.SetOn(state):
@@ -419,7 +375,6 @@ class Railroad():
 			self.RailroadEvent(tout.GetEventMessage(lock=True))
 		
 	def SetAspect(self, signame, aspect):
-		print("railroad.setaspect %s %d" % (signame, aspect))
 		try:
 			sig = self.signals[signame]
 		except KeyError:
@@ -427,7 +382,6 @@ class Railroad():
 			return
 		
 		aspect = sig.district.VerifyAspect(signame, aspect)	
-		print("verified aspect = %d" % aspect)
 		if not sig.SetAspect(aspect):
 			return 
 		
@@ -990,7 +944,6 @@ class Railroad():
 		'''
 		this routine handles the setinbit command from HTTP server
 		'''
-		print("set in by addr: bytes: %s   bits: %s   values: %s" % (str(vbytes), str(vbits), str(vals)))
 		for dnodes in self.nodes.values():
 			if addr in dnodes:
 				for i in range(len(vbytes)):
@@ -1136,8 +1089,7 @@ class Railroad():
 					try:
 						obj = self.handswitches[o]
 					except KeyError:
-						print("Unknown object name: %s in resume list" % o)
-						#print(str(sorted(self.turnouts.keys())))
+						logging.error("Unknown object name: %s in resume list" % o)
 						
 					else:
 						unlock = obj.GetUnlock()

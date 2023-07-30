@@ -7,7 +7,6 @@ from rrserver.node import Node
 class Port(District):
 	def __init__(self, rr, name, settings):
 		District.__init__(self, rr, name, settings)
-		logging.info("creating district Port")
 		self.rr = rr
 		self.name = name
 		self.releasedA = False
@@ -292,7 +291,6 @@ class Port(District):
 			self.rr.AddHandswitchUnlock("PBSw15ab",    self, n, addr, [(5, 2)])
 
 	def SetAspect(self, sig, aspect):
-		print("port set aspect for signal %s" % sig.Name())
 		if sig.Name() == "PA4L":
 			pb4La = aspect != 0 # clear
 			pb4Lb = aspect == 4 # restricting
@@ -300,7 +298,6 @@ class Port(District):
 				if od.SetOn(flag):
 					bt = od.Bits()
 					self.nodes[PORTA].SetOutputBit(bt[0], bt[1], 1 if flag else 0)
-			print("set semaphore P4 flags to %s %s" % (pb4La, pb4Lb))
 			return True
 		elif sig.Name() == "PA10L":
 			pb10La = aspect != 0 # clear
@@ -309,7 +306,6 @@ class Port(District):
 				if od.SetOn(flag):
 					bt = od.Bits()
 					self.nodes[PORTA].SetOutputBit(bt[0], bt[1], 1 if flag else 0)
-			print("set semaphore P10 flags to %s %s" % (pb10La, pb10Lb))
 			return True
 		
 		return False

@@ -50,7 +50,6 @@ class InByte(wx.StaticBox):
         
     def SetValue(self, v):
         self.value = int.from_bytes(v, "little")
-        print("set value to %x" % self.value)
         
         for i in range(8):
             mask = 1 << (7-i)

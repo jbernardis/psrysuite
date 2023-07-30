@@ -8,7 +8,6 @@ from rrserver.node import Node
 class Nassau(District):
 	def __init__(self, rr, name, settings):
 		District.__init__(self, rr, name, settings)
-		logging.info("creating district Latham")
 		self.rr = rr
 		self.name = name
 		self.nodeAddresses = [ NASSAUW, NASSAUE, NASSAUNX ]

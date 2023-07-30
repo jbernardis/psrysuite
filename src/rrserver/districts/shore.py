@@ -15,7 +15,6 @@ class Shore(District):
 		self.BX = None
 		self.F10H = self.F10D = None
 
-		logging.info("creating district Shore")
 		self.rr = rr
 		self.name = name
 		self.released = False

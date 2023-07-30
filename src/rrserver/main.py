@@ -3,23 +3,15 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-ofn = os.path.join(os.getcwd(), "output", "rrserver.out")
-efn = os.path.join(os.getcwd(), "output", "rrserver.err")
 lfn = os.path.join(os.getcwd(), "logs", "rrserver.log")
-
-print("PSRY Suite - Railroad server starting")
-print("Redirecting standard output to %s" % ofn)
-print("Redirecting standard error  to %s" % efn)
-print("Redirecting logging output  to %s" % lfn)
-
-ofp = open(ofn, "w")
-efp = open(efn, "w")
-
-sys.stdout = ofp
-sys.stderr = efp
 
 import logging
 logging.basicConfig(filename=lfn, filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+console = logging.StreamHandler()
+console.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s: %(levelname)-8s %(message)s')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
 
 import json
 import socket
@@ -44,7 +36,8 @@ class ServerMain:
 	def __init__(self):
 		self.socketServer = None
 		self.dispServer = None
-		logging.info("Railroad server starting")
+		logging.info("PSRY Suite - Railroad server starting")
+		logging.info("Sending logging output  to %s" % lfn)
 		
 		self.commandsSeen = []
 		
@@ -84,7 +77,6 @@ class ServerMain:
 			self.dispServer = HTTPServer(self.ip, self.settings.serverport, self.dispCommandReceipt, self, self.rr)
 		except Exception as e:
 			logging.error("Unable to Create HTTP server for IP address %s (%s)" % (self.ip, str(e)))
-			print("Unable to Create HTTP server for IP address %s (%s)" % (self.ip, str(e)))
 			self.Shutdown()
 			
 		logging.info("HTTP Server created")
@@ -114,7 +106,6 @@ class ServerMain:
 		self.DCCServer = DCCHTTPServer(self.settings.ipaddr, self.settings.dccserverport, self.settings.dcctty)
 		if not self.DCCServer.IsConnected():
 			logging.error("Failed to open DCC bus on device %s.  Exiting..." % self.settings.dcctty)
-			print("Failed to open DCC bus on device %s.  Exiting..." % self.settings.dcctty)
 			#exit(1)
 
 	def socketEventReceipt(self, cmd):
@@ -293,8 +284,7 @@ class ServerMain:
 		}
 
 
-	def ProcessCommand(self, cmd):
-			
+	def ProcessCommand(self, cmd):			
 		verb = cmd["cmd"][0]
 		if verb != "interval":
 			try:
@@ -307,7 +297,6 @@ class ServerMain:
 			handler = self.dispatch[verb]
 		except KeyError:
 			logging.error("Unknown command: %s" % verb)
-			print("Unknown command: %s" % verb)
 		
 		else:
 			handler(cmd)
@@ -318,7 +307,6 @@ class ServerMain:
 	def DoSignal(self, cmd):
 		signame = cmd["name"][0]
 		aspect = int(cmd["aspect"][0])
-		print("DoSignal %s %d" % (signame, aspect))
 		self.rr.SetAspect(signame, aspect)
 
 	def DoSignalLock(self, cmd):			

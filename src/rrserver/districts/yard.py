@@ -7,7 +7,6 @@ from rrserver.node import Node
 class Yard(District):
 	def __init__(self, rr, name, settings):
 		District.__init__(self, rr, name, settings)
-		logging.info("creating district Yard")
 		self.rr = rr
 		self.name = name
 		self.released = False
@@ -247,16 +246,11 @@ class Yard(District):
 	
 	def VerifyAspect(self, signame, aspect):
 		if signame == "Y22R":
-			print("verify y22r, original aspect = %x" % aspect)
 			b0 = 1 if aspect == 0b101 else 0  # Approach
 			b1 = 2 if aspect == 0b100 else 0  # Restricting ?? 0b001
-			print("new aspect = %x" % (b0+b1))
 			return b0+b1
 			
 		return aspect
-
-
-
 
 	def DetermineSignalLevers(self):
 		self.sigLever["Y2"] = self.DetermineSignalLever(["Y2L"], ["Y2R"])
@@ -267,10 +261,6 @@ class Yard(District):
 		self.sigLever["Y24"] = self.DetermineSignalLever([], ["Y24RA", "Y24RB"])
 		self.sigLever["Y26"] = self.DetermineSignalLever(["Y26L"], ["Y26RA", "Y26RB", "Y26RC"])
 		self.sigLever["Y34"] = self.DetermineSignalLever(["Y34LA", "Y34LB"], ["Y34R"])
-		
-		
-		
-		
 
 	def PressButton(self, btn):
 		try:

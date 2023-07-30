@@ -184,6 +184,9 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, self.bRefresh)
 		self.bRefresh.Enable(False)
 
+		self.bThrottle = wx.Button(self, wx.ID_ANY, "Throttle", pos=(self.centerOffset+100, 75), size=BTNDIM)
+		self.Bind(wx.EVT_BUTTON, self.OnThrottle, self.bThrottle)
+
 		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Train IDs", pos=(self.centerOffset+250, 15), size=BTNDIM)
 		self.bLoadTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadTrains, self.bLoadTrains)
@@ -397,13 +400,11 @@ class MainFrame(wx.Frame):
 		self.timeDisplay.SetValue("%2d:%02d" % (hours, minutes))
 		if self.subscribed and self.IsDispatcher():
 			self.Request({"clock": { "value": self.timeValue}})
-			
-		
+					
 	def OnThrottle(self, _):
 		throttleExec = os.path.join(os.getcwd(), "throttle", "main.py")
 		throttleProc = Popen([sys.executable, throttleExec])
-		print("throttle started as PID %d" % throttleProc.pid)
-
+		logging.info("Throttle started as PID %d" % throttleProc.pid)
 
 	def DefineWidgets(self, voffset):
 		if not self.IsDispatcher():

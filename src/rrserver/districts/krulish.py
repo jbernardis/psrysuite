@@ -7,7 +7,6 @@ from rrserver.node import Node
 class Krulish(District):
 	def __init__(self, rr, name, settings):
 		District.__init__(self, rr, name, settings)
-		logging.info("creating district Krulish")
 		self.rr = rr
 		self.name = name
 		self.nodeAddresses = [ KRULISH ]

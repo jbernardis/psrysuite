@@ -627,7 +627,7 @@ class TrainTrackerPanel(wx.Panel):
 		wx.QueueEvent(self, evt)
 
 	def onDeliveryEvent(self, evt):
-		print("delivery event: %s" % str(evt.data))
+		logging.info("delivery event: %s" % str(evt.data))
 		for cmd, parms in evt.data.items():
 			if  cmd == "breaker":
 				logging.info("breaker: %s" % parms)

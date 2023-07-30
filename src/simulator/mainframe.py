@@ -3,6 +3,7 @@ import wx.lib.newevent
 
 import os
 import json
+import logging
 
 from simulator.settings import Settings
 
@@ -172,7 +173,7 @@ class MainFrame(wx.Frame):
 		else:
 			self.listener = Listener(self, self.settings.ipaddr, self.settings.socketport)
 			if not self.listener.connect():
-				print("Unable to establish connection with server")
+				logging.error("Unable to establish connection with server")
 				self.listener = None
 				return
 
@@ -270,7 +271,6 @@ class MainFrame(wx.Frame):
 			return False
 
 	def BlockOccupied(self, block):
-		print("checking block occupied %s" % block, flush=True)
 		blist = block.split(",")
 		for b in blist:
 			if self.blocks[b][0] != 0:
@@ -293,7 +293,7 @@ class MainFrame(wx.Frame):
 
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
-			#print("Dispatch: %s: %s" % (cmd, parms))
+			logging.debug("Dispatch: %s: %s" % (cmd, parms))
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]
@@ -308,7 +308,6 @@ class MainFrame(wx.Frame):
 					if block in self.blocks:
 						self.blocks[block][0] = state
 					else:
-						print("adding block %s" % block)
 						self.blocks[block] = [ state, 'E']
 				self.CheckResumeScripts()
 
@@ -320,7 +319,6 @@ class MainFrame(wx.Frame):
 						self.blocks[block][1] = direction
 					else:
 						self.blocks[block] = [ 0, direction]
-						print("adding block %s" % block)
 				self.CheckResumeScripts()
 					
 			elif cmd == "signal":
@@ -380,7 +378,6 @@ class MainFrame(wx.Frame):
 
 	def Request(self, req):
 		if self.subscribed:
-			# print("Outgoing request: %s" % json.dumps(req))
 			self.rrServer.SendRequest(req)
 
 	def onDisconnectEvent(self, _):

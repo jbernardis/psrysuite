@@ -70,8 +70,6 @@ class Shore (District):
 				
 		elif signm in ["S12R", "S12LA", "S12LB", "S12LC", "S4R", "S4LA", "S4LB", "S4LC" ]:
 			if self.blocks["SOSHF"].IsBusy():
-				print("returning simply because SOSHF is busy")
-				#self.frame.Request({"signal": {"name": signm, "aspect": 0}})
 				return
 			
 		District.DoSignalAction(self, sig, aspect)

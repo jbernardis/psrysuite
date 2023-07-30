@@ -226,12 +226,9 @@ class District:
 		return None, None
 
 	def PerformSignalAction(self, sig):
-		print("perform signal action for sig %s" % sig.GetName(), flush=True)
 		currentMovement = sig.GetAspect() != 0  # does the CURRENT signal status allow movement
 		signm = sig.GetName()
 		rt, osblk = self.FindRoute(sig)
-		print("current movement = %s" % str(currentMovement))
-		print("current aspect = %d" % sig.GetAspect(), flush=True)
 
 		if rt is None:
 			self.frame.PopupEvent("No available route")
@@ -244,7 +241,6 @@ class District:
 		# this is a valid signal for the current route	
 		if not currentMovement:  # we are trying to change the signal to allow movement
 			aspect = self.CalculateAspect(sig, osblk, rt)
-			print("trying to change the aspect to %s" % str(aspect))
 			if aspect is None:
 				return False
 
@@ -254,7 +250,6 @@ class District:
 				self.frame.PopupEvent("Incorrect signal for current route")
 				return False
 			aspect = 0
-			print("signal being set to stop")
 
 		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "dbg": 1}})
 		sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
