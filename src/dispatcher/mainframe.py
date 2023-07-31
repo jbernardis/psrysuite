@@ -1771,7 +1771,7 @@ class MainFrame(wx.Frame):
 					if name in self.indicators:
 						ind = self.indicators[name]
 						if val != ind.GetValue():
-							ind.SetValue(val)
+							ind.SetValue(val, silent=True)
 
 			elif cmd == "settrain":
 				for p in parms:

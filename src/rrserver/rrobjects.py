@@ -31,10 +31,10 @@ class Block:
                
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)
-        print("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
-        print("     east: %s   occupied: %s   cleared: %s  indicators: %s" % (str(self.east), str(self.occupied), str(self.cleared), str(self.indicators)))
+        logging.info("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
+        logging.onfo("     east: %s   occupied: %s   cleared: %s  indicators: %s" % (str(self.east), str(self.occupied), str(self.cleared), str(self.indicators)))
         if self.district is None:
-            print("<===== NULL BLOCK DEFINITION")
+            logging.info("<===== NULL BLOCK DEFINITION")
 
     def IsNullBlock(self):
         return self.district is None
@@ -255,11 +255,11 @@ class Breaker:
        
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)
-        print("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
-        print("     status: %s " % (str(self.status)))
-        print("     # indicators:    %d" % len(self.indicators))
+        logging.info("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
+        logging.info("     status: %s " % (str(self.status)))
+        logging.info("     # indicators:    %d" % len(self.indicators))
         if self.district is None:
-            print("<===== NULL BREAKER DEFINITION")
+            logging.info("<===== NULL BREAKER DEFINITION")
 
 class Indicator:
     def __init__(self, name, district, node, address):
@@ -405,10 +405,10 @@ class Signal:
         
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)
-        print("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
-        print("     LED: %s   locked: %s/%s" % (str(self.led), str(self.locked), str(self.lockBits)))
+        logging.info("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
+        logging.info("     LED: %s   locked: %s/%s" % (str(self.led), str(self.locked), str(self.lockBits)))
         if self.district is None:
-            print("<===== NULL SIGNAL DEFINITION")
+            logging.info("<===== NULL SIGNAL DEFINITION")
 
 '''
 signal lever is a separate class because there is only 1 signal lever for each grouping of Lx and Rx signals
@@ -553,13 +553,13 @@ class Turnout:
         
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)
-        print("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
-        print("     normal: %s   locked: %s/%s" % (str(self.normal), self.locked, str(self.lockBits)))
-        print("     led:    %s" % str(self.led))
-        print("     lever:  %s/%s" % (self.leverState, str(self.lever)))
-        print("     pos:    %s" % self.position)
+        logging.info("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
+        logging.info("     normal: %s   locked: %s/%s" % (str(self.normal), self.locked, str(self.lockBits)))
+        logging.info("     led:    %s" % str(self.led))
+        logging.info("     lever:  %s/%s" % (self.leverState, str(self.lever)))
+        logging.info("     pos:    %s" % self.position)
         if self.district is None:
-            print("<===== NULL TURNOUT DEFINITION")
+            logging.info("<===== NULL TURNOUT DEFINITION")
 
     def IsNullTurnout(self):
         return self.district is None

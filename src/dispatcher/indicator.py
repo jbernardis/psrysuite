@@ -15,9 +15,10 @@ class Indicator:
 	def GetValue(self):
 		return self.value
 
-	def SetValue(self, val, force=False):
+	def SetValue(self, val, force=False, silent=False):
 		if val == self.value and not force:
 			return
 		self.value = val
-		self.frame.Request({"indicator": { "name": self.name, "value": self.value}})
+		if not silent:
+			self.frame.Request({"indicator": { "name": self.name, "value": self.value}})
 

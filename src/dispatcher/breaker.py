@@ -21,7 +21,6 @@ breakerNames = {
 	"CBThomas":			"Thomas Yard",
 	"CBFoss":			"Foss",
 	"CBDell":			"Dell",
-	"CBSouthBank":		"Couth Bank",
 	"CBKale":			"Kale",
 	"CBWaterman":		"Waterman Yard",
 	"CBEngineYard":		"Engine Yard",

@@ -87,25 +87,22 @@ class Railroad():
 			self.addrList.extend([[addr, self.districts[name], node] for addr, node, in self.districts[name].GetNodes().items()])
 			
 	def dump(self):
-		pass
-  # print("================================SIGNALS")
-  # for s in self.signals.values():
-  # 	s.dump()
-			
-  # print("================================BLOCKS")
-  # for b in self.blocks.values():
-  # 	b.dump()
-  
-  # print("==============================TURNOUTS")
-  # for t in self.turnouts.values():
-  # 	t.dump()
-  
-  # print("==============================BREAKERS")
-  # for b in self.breakers.values():
-  # 	b.dump()
+		logging.info("================================SIGNALS")
+		for s in self.signals.values():
+			s.dump()
+
+		logging.info("================================BLOCKS")
+		for b in self.blocks.values():
+			b.dump()
+
+		logging.info("==============================TURNOUTS")
+		for t in self.turnouts.values():
+			t.dump()
+		logging.info("==============================BREAKERS")
+		for b in self.breakers.values():
+			b.dump()
 			
 	def Initialize(self):	
-		
 		for d in self.districts.values():
 			d.Initialize()
 			
@@ -128,7 +125,7 @@ class Railroad():
 		self.SetControlOption("yard.fleet", 0)
 		self.SetControlOption("osslocks", 1)
 		
-		self.dump()
+		#self.dump()
 
 		return True
 			
@@ -415,7 +412,6 @@ class Railroad():
 		try:
 			sl = self.signalLevers[r[0][0]]
 		except KeyError:
-			logging.warning("Unknown signal lever: %s" % r[0][0])
 			return
 
 		if aspect == 0:
@@ -816,12 +812,6 @@ class Railroad():
 			
 		b.AddIndicator(district, node, address, bits)
 		return b
-	
-	
-	
-	
-	
-		
 	
 	def setBus(self, bus):
 		self.rrBus = bus
