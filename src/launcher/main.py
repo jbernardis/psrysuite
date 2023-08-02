@@ -75,6 +75,10 @@ elif mode == "simulation":
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
     dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
+    
+    monExec = os.path.join(os.getcwd(), "monitor", "main.py")
+    monProc = Popen([interpreter, monExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
+    print("monitor started as PID %d" % monProc.pid)
 
 elif mode == "display":
     print("launch mode: display")
