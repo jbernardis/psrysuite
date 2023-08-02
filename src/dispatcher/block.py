@@ -597,6 +597,7 @@ class StoppingBlock (Block):
 		else:
 			tname = tr.GetName()
 			tr.SetSBActive(flag)
+			self.frame.activeTrains.UpdateTrain(tname)
 			
 		bname = self.block.GetName()
 		direction = "East" if self.eastend else "West"
@@ -855,8 +856,11 @@ class OverSwitch (Block):
 					exitBlkName = self.route.GetExitBlock()
 					exitBlk = self.frame.GetBlockByName(exitBlkName)
 					exitBlk.SetEntrySignal(self.entrySignal)
+					
 					# lock the entry signal by the exitblock name
-					self.entrySignal.SetLock(exitBlkName, 1)
+
+					#self.entrySignal.SetLock(exitBlkName, 1)
+					self.entrySignal.SetLock(self.name, 1)
 					self.entrySignal.SetFleetPending(self.entrySignal.GetAspect() != 0, exitBlk)
 				else:
 					self.entrySignal.SetFleetPending(False, None)

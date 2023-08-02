@@ -36,7 +36,10 @@ class ServerMain:
 	def __init__(self):
 		self.socketServer = None
 		self.dispServer = None
-		logging.info("PSRY Suite - Railroad server starting")
+		
+		self.settings = Settings()
+		
+		logging.info("PSRY Suite - Railroad server starting %s" % ("" if not self.settings.simulation else " - simulation mode"))
 		logging.info("Sending logging output  to %s" % lfn)
 		
 		self.commandsSeen = []
@@ -57,7 +60,6 @@ class ServerMain:
 
 		self.clients = {}
 
-		self.settings = Settings()
 		
 		if self.settings.ipaddr is not None:
 			if self.ip != self.settings.ipaddr:
@@ -86,11 +88,13 @@ class ServerMain:
 		self.socketServer.start()
 		
 		logging.info("socket server started - starting DCC HTTP Server")
-		
+
 		if not self.settings.simulation:
-			self.StartDCCServer()
-		
-		logging.info("DCC HTTP server successfully started")
+			logging.info("Starting DCC Server")		
+			self.StartDCCServer()		
+			logging.info("DCC HTTP server successfully started")
+		else:
+			logging.info("DCC HTTP Server not started in simulation mode")
 		self.rr.Initialize()
 		
 	def DelayedStartup(self, _):
@@ -106,7 +110,7 @@ class ServerMain:
 		self.DCCServer = DCCHTTPServer(self.settings.ipaddr, self.settings.dccserverport, self.settings.dcctty)
 		if not self.DCCServer.IsConnected():
 			logging.error("Failed to open DCC bus on device %s.  Exiting..." % self.settings.dcctty)
-			#exit(1)
+			exit(1)
 
 	def socketEventReceipt(self, cmd):
 		logging.info("received socket connection request: %s" % str(cmd))

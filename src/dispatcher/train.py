@@ -15,6 +15,7 @@ class Train:
 		self.blockOrder = []
 		self.signal = None
 		self.east = True
+		self.aspect = None
 	
 	@classmethod	
 	def ResetTX(cls):
@@ -33,7 +34,7 @@ class Train:
 		self.east = flag
 
 	def tstring(self):
-		return "%s/%s (%s)" % (self.name, self.loco, str(self.blocks))
+		return "%s/%s (%s)" % (self.name, self.loco, str(self.blockOrder))
 
 	def SetName(self, name):
 		self.name = name
@@ -61,9 +62,10 @@ class Train:
 	
 	def SetSignal(self, sig):
 		self.signal = sig
+		self.aspect = sig.GetAspect()
 	
 	def GetSignal(self):
-		return self.signal
+		return self.signal, self.aspect
 
 	def GetBlockNameList(self):
 		return list(self.blocks.keys())

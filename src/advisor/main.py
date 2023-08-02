@@ -282,7 +282,7 @@ class MainUnit:
 
 		routeRequest.Print()
 		logging.info("Advise: Train %s needs a route to block %s via signal %s" % (routeRequest.GetTrain(), exitBlkNm, signalNm))
-		req = {"advice": {"msg": "Train %s route to %s via signal %s)" % (routeRequest.GetTrain(), exitBlkNm, signalNm)}}
+		req = {"advice": {"msg": "Train %s route to %s via signal %s" % (routeRequest.GetTrain(), exitBlkNm, signalNm)}}
 		self.Request(req)
 
 	def TrainRemoveBlock(self, train, block, blocks):

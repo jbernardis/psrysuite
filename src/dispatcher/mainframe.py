@@ -17,6 +17,7 @@ from dispatcher.district import Districts
 from dispatcher.trackdiagram import TrackDiagram
 from dispatcher.tile import loadTiles
 from dispatcher.train import Train
+from dispatcher.trainlist import ActiveTrainList
 
 from dispatcher.breaker import BreakerDisplay, BreakerName
 from dispatcher.toaster import Toaster
@@ -97,6 +98,7 @@ class MainFrame(wx.Frame):
 		
 		self.locoList = []
 		self.trainList = []
+		self.activeTrains = ActiveTrainList()
 			
 		self.settings = settings
 			
@@ -206,6 +208,9 @@ class MainFrame(wx.Frame):
 		self.bSaveLocos = wx.Button(self, wx.ID_ANY, "Save Loco #s", pos=(self.centerOffset+350, 45), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBSaveLocos, self.bSaveLocos)
 		self.bSaveLocos.Enable(False)
+		
+		self.bActiveTrains = wx.Button(self, wx.ID_ANY, "Active Trains", pos=(self.centerOffset+350, 75), size=BTNDIM)
+		self.Bind(wx.EVT_BUTTON, self.OnBActiveTrains, self.bActiveTrains)
 		
 		if not self.IsDispatcher():
 			self.bLoadTrains.Hide()
@@ -405,6 +410,9 @@ class MainFrame(wx.Frame):
 		throttleExec = os.path.join(os.getcwd(), "throttle", "main.py")
 		throttleProc = Popen([sys.executable, throttleExec])
 		logging.info("Throttle started as PID %d" % throttleProc.pid)
+
+	def OnBActiveTrains(self, _):		
+		self.activeTrains.ShowTrainList(self)
 
 	def DefineWidgets(self, voffset):
 		if not self.IsDispatcher():
@@ -1292,6 +1300,9 @@ class MainFrame(wx.Frame):
 							self.trains[newName] = newTr
 							newTr.SetEast(blk.GetEast()) # train takes on the direction of the block
 							
+							self.activeTrains.AddTrain(newTr)
+							self.activeTrains.UpdateTrain(oldName)
+							
 							self.Request({"settrain": { "block": blk.GetName()}})
 							self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco}})
 
@@ -1312,11 +1323,13 @@ class MainFrame(wx.Frame):
 						if self.IsDispatcher() and atc != oldATC:
 							if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
 								tr.SetATC(atc)
+								self.activeTrains.UpdateTrain(trainid)
 								self.Request({"atc": {"action": "add" if atc else "remove", "train": trainid, "loco": locoid}})
 							
 						if self.IsDispatcher() and ar != oldAR:
 							if self.VerifyTrainID(trainid):
 								tr.SetAR(ar)
+								self.activeTrains.UpdateTrain(trainid)
 								self.Request({"ar": {"action": "add" if ar else "remove", "train": trainid}})
 	
 						tr.Draw()
@@ -1338,6 +1351,7 @@ class MainFrame(wx.Frame):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
 		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
 			self.menuTrain.SetATC(True)
+			self.activeTrains.UpdateTrain(trainid)
 			self.Request({"atc": {"action": "add", "train": trainid, "loco": locoid}})
 			self.menuTrain.Draw()
 
@@ -1350,6 +1364,7 @@ class MainFrame(wx.Frame):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
 		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
 			self.menuTrain.SetATC(False)
+			self.activeTrains.UpdateTrain(trainid)
 			self.Request({"atc": {"action": "remove", "train": trainid, "loco": locoid}})
 			self.menuTrain.Draw()
 							
@@ -1367,6 +1382,7 @@ class MainFrame(wx.Frame):
 		trainid = self.menuTrain.GetName()
 		if self.VerifyTrainID(trainid):
 			self.menuTrain.SetAR(True)
+			self.activeTrains.UpdateTrain(trainid)
 			self.Request({"ar": {"action": "add", "train": trainid}})
 			self.menuTrain.Draw()
 		
@@ -1374,6 +1390,7 @@ class MainFrame(wx.Frame):
 		trainid = self.menuTrain.GetName()
 		if self.VerifyTrainID(trainid):
 			self.menuTrain.SetAR(False)
+			self.activeTrains.UpdateTrain(trainid)
 			self.Request({"ar": {"action": "remove", "train": trainid}})
 			self.menuTrain.Draw()
 
@@ -1422,6 +1439,7 @@ class MainFrame(wx.Frame):
 			if tr.FrontInBlock(blkNm):
 				# we found a train
 				tr.SetSignal(sig)
+				self.activeTrains.UpdateTrain(trid)
 				req = {"trainsignal": { "train": trid, "block": blkNm, "signal": sig.GetName(), "aspect": sig.GetAspect()}}
 				self.Request(req)
 
@@ -1498,6 +1516,7 @@ class MainFrame(wx.Frame):
 		tr = Train(None)
 		name, _ = tr.GetNameAndLoco()
 		self.trains[name] = tr
+		self.activeTrains.AddTrain(tr)
 		return tr
 
 	def ToasterSetup(self):
@@ -1790,6 +1809,7 @@ class MainFrame(wx.Frame):
 						if name is None:
 							if tr:
 								tr.RemoveFromBlock(blk)
+								self.activeTrains.UpdateTrain(tr.GetName())
 								if not tr.IsContiguous():
 									self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
@@ -1797,6 +1817,7 @@ class MainFrame(wx.Frame):
 							for trid, tr in self.trains.items():
 								if tr.IsInBlock(blk):
 									tr.RemoveFromBlock(blk)
+									self.activeTrains.UpdateTrain(tr.GetName())
 									if tr.IsInNoBlocks():
 										delList.append(trid)
 									elif not tr.IsContiguous():
@@ -1804,6 +1825,7 @@ class MainFrame(wx.Frame):
 
 							for trid in delList:
 								try:
+									self.activeTrains.RemoveTrain(trid)
 									del(self.trains[trid])
 								except:
 									logging.warning("can't delete train %s from train list" % trid)
@@ -1825,9 +1847,16 @@ class MainFrame(wx.Frame):
 										bl = {}
 									for blk in bl.values():
 										self.trains[name].AddToBlock(blk)
+									self.activeTrains.UpdateTrain(name)
 								else:
 									tr.SetName(name)
 									self.trains[name] = tr
+									self.activeTrains.RenameTrain(oldName, name)
+
+								try:
+									self.activeTrains.RemoveTrain(oldName)
+								except:
+									logging.warning("can't delete train %s from train list" % oldName)
 
 								try:
 									del(self.trains[oldName])
@@ -1841,6 +1870,7 @@ class MainFrame(wx.Frame):
 							# not there - create a new one")
 							tr = Train(name)
 							self.trains[name] = tr
+							self.activeTrain.AddTrain(tr)
 							
 						tr.AddToBlock(blk)
 						tr.SetEast(blk.GetEast()) # train takes on the direction of the block
@@ -1852,6 +1882,8 @@ class MainFrame(wx.Frame):
 						
 						if loco:
 							tr.SetLoco(loco)
+							
+						self.activeTrains.UpdateTrain(tr.GetName())
 
 						blk.SetTrain(tr)
 						blk.EvaluateStoppingSections()
@@ -1874,10 +1906,12 @@ class MainFrame(wx.Frame):
 						locoid = tr.GetLoco()
 						self.Request({"atc": {"action": "remove", "train": train, "loco": locoid}})
 						tr.SetATC(False)
+						self.activeTrains.UpdateTrain(train)
 						
 					if self.AREnabled and tr.IsOnAR():				
 						tr.SetAR(False)
 						self.Request({"ar": {"action": "remove", "train": train}})
+						self.activeTrains.UpdateTrain(train)
 						
 					tr.Draw()
 					
@@ -1924,6 +1958,7 @@ class MainFrame(wx.Frame):
 				
 				action = parms["action"][0]
 				tr.SetAR(action == "add")
+				self.activeTrains.UpdateTrain(trnm)
 				tr.Draw()
 				
 			elif cmd == "atc":
@@ -1936,6 +1971,7 @@ class MainFrame(wx.Frame):
 				
 				action = parms["action"][0]
 				tr.SetATC(action == "add")
+				self.activeTrains.UpdateTrain(trnm)
 				tr.Draw()
 				
 			elif cmd == "atcrequest":
@@ -1951,6 +1987,7 @@ class MainFrame(wx.Frame):
 					action = parms["action"][0]
 					
 					tr.SetATC(action == "add")
+					self.activeTrains.UpdateTrain(trnm)
 					tr.Draw()
 					
 					trainid, locoid = tr.GetNameAndLoco()
@@ -1973,7 +2010,9 @@ class MainFrame(wx.Frame):
 	
 					self.PopupEvent("Rejected ATC train %s - no script" % trnm)				
 					tr.SetATC(False)
+					self.activeTrains.UpdateTrain(trnm)
 					tr.Draw()
+					
 				elif action in [ "complete", "remove" ]:
 					trnm = parms["train"][0]
 					try:
@@ -1991,6 +2030,8 @@ class MainFrame(wx.Frame):
 					if self.AREnabled and tr.IsOnAR():				
 						tr.SetAR(False)
 						self.Request({"ar": {"action": "remove", "train": trnm}})
+						
+					self.activeTrains.UpdateTrain(trnm)
 			
 					tr.Draw()
 
@@ -2077,6 +2118,7 @@ class MainFrame(wx.Frame):
 			oldname = trid
 			newname = Train.NextName()
 			tr.SetName(newname)
+			self.activeTrains.RenameTrain(oldname, newname)
 			newnames.append([oldname, newname])
 			self.Request({"renametrain": { "oldname": oldname, "newname": newname}}) #, "oldloco": oldLoco, "newloco": locoid}})
 		

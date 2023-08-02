@@ -252,6 +252,7 @@ class District:
 			aspect = 0
 
 		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "dbg": 1}})
+		
 		sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 			
 		return True

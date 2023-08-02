@@ -115,7 +115,7 @@ class EditTrainDlg(wx.Dialog):
 		self.bOK.SetDefault()
 		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
 		self.bSever = wx.Button(self, wx.ID_ANY, "Sever")
-		self.bSever.SetToolTipString("Sever this block from the rest of the train")
+		self.bSever.SetToolTip("Sever this block from the rest of the train")
 
 		bsz.Add(self.bOK)
 		bsz.AddSpacer(30)

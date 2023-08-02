@@ -365,9 +365,14 @@ class MainUnit:
 		activeRte = self.GetActiveRoute(rte.GetOS())
 		tolock = []
 		siglock = []
+		logging.info("active route = %s" % ("None" if activeRte is None else activeRte.GetName()))
 		if activeRte is None or activeRte.GetName() != rname:
+			logging.info("evaluating turnouts for route")
 			for t in rte.GetTurnouts():
+				logging.info("turnout: %s" % t)
 				toname, state = t.split(":")
+				logging.info("Locked: %s  state = %s" % (self.turnouts[toname].IsLocked(), self.turnouts[toname].GetState()))
+				
 				if self.turnouts[toname].IsLocked() and self.turnouts[toname].GetState() != state:
 					#  turnout is locked AND we need to change it
 					tolock.append(toname)
@@ -399,7 +404,9 @@ class MainUnit:
 		
 
 		sigNm = rte.GetSignalForEnd(blkName)
+		logging.info("Evaluating signal: %s" % sigNm)
 		if sigNm is not None:
+			logging.info("Locked: %s  aspect = %s" % (self.signals[sigNm].IsLocked(), self.signals[sigNm].GetAspect()))
 			if self.signals[sigNm].IsLocked() and self.signals[sigNm].GetAspect() == 0:
 				siglock.append(sigNm)
 
@@ -421,8 +428,9 @@ class MainUnit:
 			toname, state = t.split(":")
 			if self.turnouts[toname].GetState() != state:
 				if not toname.startswith("P"):
-					self.ReqQueue.Append({"turnout": {"name": toname, "status": state}})
-					logging.info("command sent")
+					cmd = {"turnout": {"name": toname, "status": state}}
+					self.ReqQueue.Append(cmd)
+					logging.info("command sent: %s" % str(cmd))
 				else:
 					logging.info("skipping this turnout since we do not control Port")
 			else:
@@ -439,8 +447,9 @@ class MainUnit:
 				
 			if aspect == 0:
 				if not sigNm.startswith("P"):
-					self.ReqQueue.Append({"signal": {"name": sigNm, "aspect": -1}})
-					logging.info("command sent")
+					cmd = {"signal": {"name": sigNm, "aspect": -1}}
+					self.ReqQueue.Append(cmd)
+					logging.info("command sent: %s" % str(cmd))
 				else:
 					logging.info("skipping this signal since we do not control Port")
 			else:

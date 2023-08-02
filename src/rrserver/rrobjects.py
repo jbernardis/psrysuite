@@ -32,7 +32,7 @@ class Block:
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)
         logging.info("%s: district: %s  addr: %s, bits: %s" % (self.name, "None" if self.district is None else self.district.name, addr, str(self.bits)))
-        logging.onfo("     east: %s   occupied: %s   cleared: %s  indicators: %s" % (str(self.east), str(self.occupied), str(self.cleared), str(self.indicators)))
+        logging.info("     east: %s   occupied: %s   cleared: %s  indicators: %s" % (str(self.east), str(self.occupied), str(self.cleared), str(self.indicators)))
         if self.district is None:
             logging.info("<===== NULL BLOCK DEFINITION")
 
@@ -701,13 +701,13 @@ class Handswitch:
         
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)
-        print("%s: district: %s  addr: %s" % (self.name, "None" if self.district is None else self.district.name, addr))
-        print("     normal: %s   locked: %s/%s" % (str(self.normal), self.locked, str(self.lockBits)))
-        print("     ind:    %s" % str(self.indBits))
-        print("     pos:    %s" % self.bits)
+        logging.info("%s: district: %s  addr: %s" % (self.name, "None" if self.district is None else self.district.name, addr))
+        logging.info("     normal: %s   locked: %s/%s" % (str(self.normal), self.locked, str(self.lockBits)))
+        logging.info("     ind:    %s" % str(self.indBits))
+        logging.info("     pos:    %s" % self.bits)
 
         if self.district is None:
-            print("<===== NULL HANDSWITCH DEFINITION")
+            logging.info("<===== NULL HANDSWITCH DEFINITION")
 
     def IsNullHandswitch(self):
         return self.district is None
