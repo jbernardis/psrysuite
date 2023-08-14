@@ -200,7 +200,7 @@ class MainFrame(wx.Frame):
 			tr = self.trains.GetTrainById(scr)
 			loco = tr.GetNormalLoco()
 			if loco is None:
-				loco = "0"
+				loco = "??"
 			script = self.scripts[scr]
 			tm = script.GetTimeMultiple()
 			tlen = script.GetTrainLen()

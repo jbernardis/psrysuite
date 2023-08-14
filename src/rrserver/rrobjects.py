@@ -702,7 +702,7 @@ class Handswitch:
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)
         logging.info("%s: district: %s  addr: %s" % (self.name, "None" if self.district is None else self.district.name, addr))
-        logging.info("     normal: %s   locked: %s/%s" % (str(self.normal), self.locked, str(self.lockBits)))
+        logging.info("     normal: %s   locked: %s" % (str(self.normal), self.locked))
         logging.info("     ind:    %s" % str(self.indBits))
         logging.info("     pos:    %s" % self.bits)
 
@@ -728,8 +728,8 @@ class Handswitch:
     def IsNormal(self):
         return self.normal
     
-    def AddIndicator(self, district, node, addr, bits):
-        self.indicators.append([district, node, addr, bits])
+    def AddIndicator(self, district, node, addr, bits, inverted):
+        self.indicators.append([district, node, addr, bits, inverted])
         self.UpdateIndicators()
    
     def UpdateIndicators(self):
@@ -737,13 +737,14 @@ class Handswitch:
             return False
         # indicators with one bit: simple on/off led to show lock status
         # indicators with 2 bits: panel indicators with one being the inverted value of the other
+        lval = 1 if self.locked else 0
         for ind in self.indicators:
-            district, node, address, bits = ind
+            district, node, address, bits, inverted = ind
             if len(bits) == 1:
-                node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.locked else 0)
+                node.SetOutputBit(bits[0][0], bits[0][1], 1-lval if inverted else lval)
             elif len(bits) == 2:
-                node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.locked else 0)
-                node.SetOutputBit(bits[1][0], bits[1][1], 0 if self.locked else 1)
+                node.SetOutputBit(bits[0][0], bits[0][1], 1-lval if inverted else lval)
+                node.SetOutputBit(bits[1][0], bits[1][1], lval if inverted else 1-lval)
             else:
                 logging.warning("Hand switch indicator for %s has an unexpected number of bits")
             

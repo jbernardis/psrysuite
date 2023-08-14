@@ -68,7 +68,7 @@ class Shore(District):
 			self.rr.AddStopRelay("F10.srel", self, n, SHORE, [(6, 2)])
 			self.rr.AddStopRelay("F11.srel", self, n, SHORE, [(6, 3)])
 
-			self.rr.AddHandswitchInd("CSw15", self, n, SHORE, [(6, 4)])
+			self.rr.AddHandswitchInd("CSw15", self, n, SHORE, [(6, 4)], inverted=True)
 			self.rr.AddOutputDevice("SXG", self, n, SHORE, [(6, 5)]) # bortell crossing gate
 
 			#inputs	

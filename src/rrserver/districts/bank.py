@@ -28,8 +28,8 @@ class Bank(District):
 			self.rr.AddBlockInd("B10", self, n, addr, [(2, 1)])
 			self.rr.AddBlockInd("C13", self, n, addr, [(2, 2)])
 
-			self.rr.AddHandswitchInd("CSw21ab", self, n, addr, [(2, 3)])
-			self.rr.AddHandswitchInd("CSw19",   self, n, addr, [(2, 4)])
+			self.rr.AddHandswitchInd("CSw21ab", self, n, addr, [(2, 3)], inverted=True)
+			self.rr.AddHandswitchInd("CSw19",   self, n, addr, [(2, 4)], inverted=True)
 
 			self.rr.AddTurnout("CSw23", self, n, addr, [(2, 5), (2, 6)])
 			self.rr.AddTurnout("CSw17", self, n, addr, [(2, 7), (3, 0)])

@@ -1,5 +1,6 @@
 import wx
 import logging
+from pickle import FALSE
 
 YardBlocks = [
 	"C21", "C31", "C40", "C41", "C42", "C43", "C44", "C50", "C51", "C52", "C53", "C54",
@@ -49,14 +50,47 @@ class ActiveTrainList:
 
 class ActiveTrainsDlg(wx.Dialog):
 	def __init__(self, parent, dlgExit):
-		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Active Trains")
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Active Trains", size=(1000, 500), style=wx.RESIZE_BORDER|wx.CAPTION|wx.CLOSE_BOX)
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
+		self.Bind(wx.EVT_SIZE, self.OnResize)
+		self.Bind(wx.EVT_IDLE,self.OnIdle)
 		self.suppressYards = True
 		self.suppressUnknown = False
+		self.suppressNonATC = False
+		self.resized = False
 
 		self.dlgExit = dlgExit
 
 		vsz = wx.BoxSizer(wx.VERTICAL)	   
+		vsz.AddSpacer(10)
+		
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+
+		hsz.AddSpacer(30)
+		
+		self.cbYardTracks = wx.CheckBox(self, wx.ID_ANY, "Suppress Yard Tracks")
+		self.cbYardTracks.SetValue(self.suppressYards)
+		self.Bind(wx.EVT_CHECKBOX, self.OnSuppressYard, self.cbYardTracks)
+		hsz.Add(self.cbYardTracks)
+		
+		hsz.AddSpacer(30)
+		
+		self.cbUnknown = wx.CheckBox(self, wx.ID_ANY, "Suppress Unknown Trains")
+		self.cbUnknown.SetValue(self.suppressUnknown)
+		self.Bind(wx.EVT_CHECKBOX, self.OnSuppressUnknown, self.cbUnknown)
+		hsz.Add(self.cbUnknown)
+
+		hsz.AddSpacer(30)
+		
+		self.cbATCOnly = wx.CheckBox(self, wx.ID_ANY, "Show only ATC Trains")
+		self.cbATCOnly.SetValue(self.suppressNonATC)
+		self.Bind(wx.EVT_CHECKBOX, self.OnSuppressNonATC, self.cbATCOnly)
+		hsz.Add(self.cbATCOnly)
+
+		hsz.AddSpacer(30)
+		
+		vsz.Add(hsz)
+				
 		vsz.AddSpacer(10)
 	
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
@@ -71,26 +105,9 @@ class ActiveTrainsDlg(wx.Dialog):
 		
 		vsz.AddSpacer(10)
 		
-		hsz = wx.BoxSizer(wx.HORIZONTAL)
-		
-		self.cbYardTracks = wx.CheckBox(self, wx.ID_ANY, "Suppress Yard Tracks")
-		self.cbYardTracks.SetValue(self.suppressYards)
-		self.Bind(wx.EVT_CHECKBOX, self.OnSuppressYard, self.cbYardTracks)
-		hsz.Add(self.cbYardTracks)
-		
-		hsz.AddSpacer(30)
-		
-		self.cbUnknown = wx.CheckBox(self, wx.ID_ANY, "Suppress Unknown Trains")
-		self.cbUnknown.SetValue(self.suppressUnknown)
-		self.Bind(wx.EVT_CHECKBOX, self.OnSuppressUnknown, self.cbUnknown)
-		hsz.Add(self.cbUnknown)
-		
 		self.trCtl.SetSuppressYardTracks(self.suppressYards)
 		self.trCtl.SetSuppressUnknown(self.suppressUnknown)
-
-		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
-				
-		vsz.AddSpacer(10)
+		self.trCtl.SetSuppressNonATC(self.suppressNonATC)
 
 		self.SetSizer(vsz)
 		self.Layout()
@@ -104,6 +121,10 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.suppressUnknown = self.cbUnknown.GetValue()
 		self.trCtl.SetSuppressUnknown(self.suppressUnknown)
 		
+	def OnSuppressNonATC(self, _):
+		self.suppressNonATC = self.cbATCOnly.GetValue()
+		self.trCtl.SetSuppressNonATC(self.suppressNonATC)
+		
 	def AddTrain(self, tr):
 		self.trCtl.AddTrain(tr)
 		
@@ -115,6 +136,16 @@ class ActiveTrainsDlg(wx.Dialog):
 		
 	def RemoveTrain(self, trid):
 		self.trCtl.RemoveTrain(trid)
+		
+	def OnResize(self, evt):
+		self.resized = True
+		
+	def OnIdle(self, evt):
+		if not self.resized:
+			return 
+		
+		self.resized = False
+		self.trCtl.ChangeSize(self.GetSize())
 
 	def OnClose(self, _):
 		self.dlgExit()
@@ -129,6 +160,7 @@ class TrainListCtrl(wx.ListCtrl):
 		
 		self.suppressYards = True
 		self.suppressUnknown = False
+		self.suppressNonATC = False
 		
 		self.SetFont(wx.Font(wx.Font(16, wx.FONTFAMILY_ROMAN, wx.BOLD, wx.NORMAL, faceName="Arial")))
 
@@ -147,6 +179,10 @@ class TrainListCtrl(wx.ListCtrl):
 		self.InsertColumn(6, "Blocks")
 		self.SetColumnWidth(6, 400)
 		self.SetItemCount(0)
+		
+	def ChangeSize(self, sz):
+		self.SetSize(sz[0]-56, sz[1]-84)
+		self.SetColumnWidth(6, sz[0]-466)
 		
 	def AddTrain(self, tr):
 		nm = tr.GetName()
@@ -215,6 +251,14 @@ class TrainListCtrl(wx.ListCtrl):
 		self.SetItemCount(len(self.filtered))	
 		self.RefreshItems(0, len(self.filtered)-1)
 		
+	def SetSuppressNonATC(self, flag):
+		print("set suppress non atc to %s" % flag)
+		self.suppressNonATC = flag
+
+		self.filterTrains()	
+		self.SetItemCount(len(self.filtered))	
+		self.RefreshItems(0, len(self.filtered)-1)
+		
 	def filterTrains(self):
 		self.filtered = []
 		for trid in sorted(self.order):
@@ -224,11 +268,14 @@ class TrainListCtrl(wx.ListCtrl):
 	def suppressed(self, trid):
 		if self.suppressUnknown and trid.startswith("??"):
 			return True
+		
+		tr = self.trains[trid]
+		if self.suppressNonATC and not tr.IsOnATC():
+			return True
 
 		if not self.suppressYards:
 			return False
 		
-		tr = self.trains[trid]
 		blkNms = tr.GetBlockNameList()
 		for bn in blkNms:
 			if bn not in YardBlocks:

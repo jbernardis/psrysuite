@@ -34,21 +34,13 @@ train contiguous - do not show message is ?? train - disabled for now until we c
 verify all signal lights and turnout lights on all panels - verify proper panel operation.  Verify lever operation and indicators
 verify signal lever functionality and signal indicators for cliff/yard
 what is supposed to happen when the operator presses the red buttons on their panels
-siding unlock levers from all tower panels - cliff
+siding unlock levers from all tower panels - cliff, port
 
 
 
 button on dispatcher and display to start throttle
 
-continue to add to monitor program to allow visibility into new server
-
 still have to test port A on the new server
-
-improve monitor/tester
-
-better integration of monitor/tester into config/launcher
-
-better icons
 
 
 
@@ -59,12 +51,6 @@ cliff fleeting - how to reconcile there being only 1 fleet lever on the panel, b
 fleeting in yard
 
 deal with reverse indicators in cliff - CSw21a, 21b, 19, 15, 11
-
-handle handswithc Cs21ab in examine inputs
-
-
-need to bring newserver up in a terminal window
-
 
 audit data structures
 
@@ -82,3 +68,5 @@ audit data structures
 	Turnout <== done
 
 test, test, test
+
+prohibit adding a train to ATC if it does not have a loco ID

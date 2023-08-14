@@ -1258,10 +1258,13 @@ class MainFrame(wx.Frame):
 									self.Bind(wx.EVT_MENU, self.OnATCRemove, id=MENU_ATC_REMOVE)
 									menu.Append( MENU_ATC_STOP, "ATC Stop/Resume Train" )
 									self.Bind(wx.EVT_MENU, self.OnATCStop, id=MENU_ATC_STOP)
+									addedMenuItem = True
 								else:
-									menu.Append( MENU_ATC_ADD, "Add to ATC")
-									self.Bind(wx.EVT_MENU, self.OnATCAdd, id=MENU_ATC_ADD)
-								addedMenuItem = True
+									loco = tr.GetLoco()
+									if loco != "??":
+										menu.Append( MENU_ATC_ADD, "Add to ATC")
+										self.Bind(wx.EVT_MENU, self.OnATCAdd, id=MENU_ATC_ADD)
+										addedMenuItem = True
 								
 							if self.AREnabled:
 								if tr.IsOnAR():

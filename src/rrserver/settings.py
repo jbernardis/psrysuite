@@ -34,8 +34,6 @@ class Settings:
 		self.topulsect = 3
 		self.nxbpulselen = 4
 		self.nxbpulsect = 2
-		self.hide = False
-		self.viewiobits = False
 
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -47,12 +45,6 @@ class Settings:
 			for opt, value in self.cfg.items(self.section):
 				if opt == 'simulation':
 					self.simulation = parseBoolean(value, False)
-
-				elif opt == 'hide':
-					self.hide = parseBoolean(value, False)
-
-				elif opt == 'viewiobits':
-					self.viewiobits = parseBoolean(value, False)
 
 				elif opt == "rrtty":
 					self.rrtty = value

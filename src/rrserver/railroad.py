@@ -737,14 +737,14 @@ class Railroad():
 		node.AddInputToMap(bits[1], [t, 'R'])
 		return t
 					
-	def AddHandswitchInd(self, name, district, node, address, bits):
+	def AddHandswitchInd(self, name, district, node, address, bits, inverted=False):
 		try:
 			s = self.handswitches[name]
 		except KeyError:
 			s = Handswitch(name, None, None, None)
 			self.handswitches[name] = s
 			
-		s.AddIndicator(district, node, address, bits)
+		s.AddIndicator(district, node, address, bits, inverted)
 		return s
 					
 	def AddHandswitchReverseInd(self, name, district, node, address, bits):

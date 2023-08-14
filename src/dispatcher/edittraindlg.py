@@ -68,6 +68,7 @@ class EditTrainDlg(wx.Dialog):
 		vsz.Add(hsz)
 
 		vsz.AddSpacer(20)
+		self.cbATC = None
 		if self.atcFlag or self.arFlag:
 			hsz = wx.BoxSizer(wx.HORIZONTAL)
 			
@@ -76,6 +77,7 @@ class EditTrainDlg(wx.Dialog):
 				self.cbATC.SetFont(font)
 				self.cbATC.SetValue(atc)
 				hsz.Add(self.cbATC)
+				self.cbATC.Enable(self.chosenLoco != "??")
 				
 			if self.atcFlag and self.arFlag:
 				hsz.AddSpacer(20)
@@ -147,6 +149,8 @@ class EditTrainDlg(wx.Dialog):
 		
 	def OnLocoChoice(self, evt):
 		self.chosenLoco = evt.GetString()
+		if self.cbATC is not None:
+			self.cbATC.Enable(self.chosenLoco != "??")
 		self.ShowTrainLocoDesc()
 
 	def OnLocoText(self, evt):
@@ -160,6 +164,8 @@ class EditTrainDlg(wx.Dialog):
 			self.cbLocoID.SetInsertionPoint(pos)
 			
 		self.chosenLoco = lid
+		if self.cbATC is not None:
+			self.cbATC.Enable(self.chosenLoco != "??")
 		self.ShowTrainLocoDesc()
 		evt.Skip()
 		
