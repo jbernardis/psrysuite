@@ -152,6 +152,15 @@ class Port(District):
 			self.rr.AddSignalLever("PA32", self, n, addr, [(6, 5), (6, 6), (6, 7)])
 			self.rr.AddSignalLever("PA34", self, n, addr, [(7, 0), (7, 1), (7, 2)])
 
+			# virtual blocks - they have no detection
+			self.rr.AddBlock("P60",     self, n, addr, [])
+			self.rr.AddBlock("P61",     self, n, addr, [])
+			self.rr.AddBlock("P62",     self, n, addr, [])
+			self.rr.AddBlock("P63",     self, n, addr, [])
+			self.rr.AddBlock("P64",     self, n, addr, [])
+			self.rr.AddBlock("V10",     self, n, addr, [])
+			self.rr.AddBlock("V11",     self, n, addr, [])
+
 		addr = PARSONS	
 		with self.nodes[PARSONS] as n:
 			#outputs

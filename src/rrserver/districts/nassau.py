@@ -133,6 +133,13 @@ class Nassau(District):
 			self.rr.AddRouteIn("NSw60D", self, n, addr, [(7, 4)])
 				
 			self.rr.AddTurnoutPosition("NSw35", self, n, addr, [(7, 5), (7, 6)])	
+			
+			# virtual blocks - have no detection
+			self.rr.AddBlock("T12",     self, n, addr, [])
+			self.rr.AddBlock("W10",     self, n, addr, [])
+			self.rr.AddBlock("W11",     self, n, addr, [])
+			self.rr.AddBlock("W20",     self, n, addr, [])
+			self.rr.AddBlock("N60",     self, n, addr, [])
 
 		addr = NASSAUE
 		with self.nodes[addr] as n:

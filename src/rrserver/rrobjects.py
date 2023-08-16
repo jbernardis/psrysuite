@@ -26,6 +26,9 @@ class Block:
     def Address(self):
         return self.address
     
+    def District(self):
+        return self.district
+    
     def InputType(self):
         return INPUT_BLOCK
                

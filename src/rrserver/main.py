@@ -189,8 +189,6 @@ class ServerMain:
 		blocks["K10"] =       { "east": 0, "sbeast": None, "sbwest": None }
 		blocks["KOSN10S11"] = { "east": 0, "sbeast": None, "sbwest": None }
 		blocks["KOSN20S21"] = { "east": 1, "sbeast": None, "sbwest": None }
-				
-		subblocks = self.rr.GetSubBlockInfo()
 			
 		layout = {"routes": routes, "blocks": blocks, "subblocks": subblocks, "crossover": self.CrossoverPoints}
 		with open(os.path.join(os.getcwd(), "data", "layout.json"), "w") as jfp:
@@ -210,6 +208,9 @@ class ServerMain:
 		for m in self.trainList.GetSetTrainCmds():
 			self.socketServer.sendToOne(skt, addr, m)
 		self.socketServer.sendToOne(skt, addr, {"end": {"type": "trains"}})
+		logging.info("===================== end of trains - should be ok to gen layoutr")
+		self.generateLayoutFile()
+		logging.info("===================== back from genlayout")
 
 	def sendRouteDefs(self, addr, skt):
 		for rte in self.routeDefs.values():
@@ -438,6 +439,7 @@ class ServerMain:
 			self.deleteClients(["AR", "ADVISOR", "ATC"])
 			self.pidAR = None
 			self.pidADV = None
+			logging.info("==== done with dispatcher identify")
 			
 	def DoRouteDef(self, cmd):
 		name = cmd["name"][0]

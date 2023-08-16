@@ -86,6 +86,17 @@ class Railroad():
 			self.nodes[name] = self.districts[name].GetNodes()
 			self.addrList.extend([[addr, self.districts[name], node] for addr, node, in self.districts[name].GetNodes().items()])
 			
+	def GetSubBlockInfo(self):
+		return self.subBlocks
+	
+	def GetBlockInfo(self):
+		blks = []
+		for blknm, blk in self.blocks.items():
+			if blk.District() is not None:
+				blks.append([blknm, 1 if blk.IsEast() else 0])
+		return sorted(blks)
+
+			
 	def dump(self):
 		logging.info("================================SIGNALS")
 		for s in self.signals.values():

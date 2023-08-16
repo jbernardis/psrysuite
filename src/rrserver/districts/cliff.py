@@ -75,6 +75,11 @@ class Cliff(District):
 			self.rr.AddBlock("C31", self, n, addr, [(1, 6)])
 			self.rr.AddBlock("COSGME", self, n, addr, [(1, 7)])
 			self.rr.AddBlock("C20", self, n, addr, [(2, 0)])
+			
+			# virtual blocks with no detection
+			self.rr.AddBlock("G10", self, n, addr, [])
+			self.rr.AddBlock("G12", self, n, addr, [])
+			self.rr.AddBlock("G21", self, n, addr, [])
 
 		addr = CLIFF
 		with self.nodes[addr] as n:

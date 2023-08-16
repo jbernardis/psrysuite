@@ -32,6 +32,8 @@ from autorouter.overswitch import OverSwitch
 from autorouter.train import Train
 from autorouter.route import Route
 
+from traineditor.trainsequences.train import Trains
+
 from autorouter.listener import Listener
 from autorouter.rrserver import RRServer
 
@@ -41,7 +43,8 @@ class MainUnit:
 		self.sessionid = None
 		self.settings = Settings()
 
-		self.triggers = Triggers()
+		self.trainSeq = Trains(os.path.join(os.getcwd(), "data"))
+		self.triggers = Triggers(self.trainSeq)
 
 		self.blocks = {}
 		self.turnouts = {}
@@ -68,6 +71,7 @@ class MainUnit:
 		
 		self.blocks["KOSN10S11"] = Block(self, "KOSN10S11", 0, 'W', True)
 		self.blocks["KOSN20S21"] = Block(self, "KOSN20S21", 0, 'E', True)
+		
 
 		logging.info("finished initialize")
 
@@ -85,6 +89,7 @@ class MainUnit:
 		while self.running:
 			data = self.commandQ.get()
 			jdata = json.loads(data)
+			#logging.info("Inbound message: %s" % data)
 			for cmd, parms in jdata.items():
 				if cmd == "turnout":
 					for p in parms:
@@ -126,6 +131,7 @@ class MainUnit:
 					for p in parms:
 						block = p["block"]
 						clear = p["clear"]
+						logging.info("blockclear: %s %s" % (block, clear))
 						if block not in self.blocks:
 							self.blocks[block] = Block(self, block, 0, 'E', clear != 0)
 						else:
@@ -283,6 +289,7 @@ class MainUnit:
 		logging.info("Adding train %s to AR" % train)
 		if train not in self.ARTrains:
 			self.ARTrains.append(train)
+			self.triggers.AddTrain(train)
 			
 		tr = self.trains[train]
 		block = tr.GetLatestBlock()
@@ -297,6 +304,7 @@ class MainUnit:
 		
 		logging.info("Removing train %s from AR" % train)
 		self.ARTrains.remove(train)
+		self.triggers.RemoveTrain(train)
 		
 		self.DeleteQueuedRequests(train)
 
@@ -348,13 +356,13 @@ class MainUnit:
 		
 		return RouteRequest(train, self.routes[rtName], block)
 
-	def GetActiveRoute(self, osName):
+	def HarpersFerryCrossingCleared(self, osName):
 		if osName in [ "SOSE", "SOSW" ]:
 			for s in [ "S8L", "S8R" ]:
 				if self.signals[s].GetAspect() != 0:
-					return None
+					return True # blocked
 		
-		return self.osList[osName].GetActiveRoute()
+		return False # not blocked
 
 	def EvaluateRouteRequest(self, rteRq):
 		logging.info("evaluating routeRequest %s" % rteRq.toString())
@@ -362,7 +370,19 @@ class MainUnit:
 		blkName = rteRq.GetEntryBlock()
 		logging.info("evaluate route %s" % rname)
 		rte = self.routes[rname]
-		activeRte = self.GetActiveRoute(rte.GetOS())
+		osName = rte.GetOS()
+		activeRte = self.osList[osName].GetActiveRoute()
+		blk = self.blocks[rte.GetOS()]
+		# if the active route is not the one we want, find out if it is cleared
+		# if the wanted route is already cleared, flag nothing - it will just 
+		# go through and allow the route to be setup
+		activeRteCleared = activeRte is not None and blk.GetClear() and activeRte.GetName() != rname
+		
+		# check if harpers ferry crossing is cleared - this trumps the regular active route,
+		# but only for the SHORE OSes
+		if self.HarpersFerryCrossingCleared(osName):
+			activeRteCleared = True
+		
 		tolock = []
 		siglock = []
 		logging.info("active route = %s" % ("None" if activeRte is None else activeRte.GetName()))
@@ -410,7 +430,7 @@ class MainUnit:
 			if self.signals[sigNm].IsLocked() and self.signals[sigNm].GetAspect() == 0:
 				siglock.append(sigNm)
 
-		if len(tolock) + len(siglock) == 0 and exitBlockAvailable and activeRte is not None:
+		if len(tolock) + len(siglock) == 0 and exitBlockAvailable and not activeRteCleared:
 			logging.info("eval true")
 			return True  # OK to proceed with this route
 		else:

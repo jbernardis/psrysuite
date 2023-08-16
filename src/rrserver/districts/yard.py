@@ -195,6 +195,9 @@ class Yard(District):
 			self.rr.AddSignal("Y42LC", self, n, addr, [])
 			self.rr.AddSignal("Y42LD", self, n, addr, [])
 
+			# virtual block - has no detection
+			self.rr.AddBlock("Y60",    self, n, addr, [])
+
 		addr = YARDSW			
 		with self.nodes[addr] as n:
 			#outputs
