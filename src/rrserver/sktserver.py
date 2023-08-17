@@ -1,5 +1,6 @@
 import logging
 
+import sys
 import threading
 import socket
 import select
@@ -65,7 +66,8 @@ class SktServer (threading.Thread):
 			s = socket.create_server(addr)
 		except Exception as e:
 			s = None
-			logging.error("Unable to create socket server on address %s: (%s)" % (addr, str(e)))
+			logging.error("Unable to create socket server on address %s: (%s) - exiting" % (addr, str(e)))
+			self.cbEvent({"cmd": ["failedstart"]})
 			self.isRunning = False
 		else:
 			s.listen()

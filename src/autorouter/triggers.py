@@ -1,6 +1,3 @@
-import json
-import os
-
 from traineditor.generators import GenerateAR
 
 TriggerPointFront = 'F'  # front of train
@@ -10,25 +7,18 @@ TriggerPointRear = 'R'  # rear of train
 class Triggers:
 	def __init__(self, trainSeq):
 		self.trainSeq = trainSeq
-		with open(os.path.join(os.getcwd(), "data", "arscripts.json"), "r") as jfp:
-			self.triggerTable = json.load(jfp)	
+		self.triggerTable = {}
 			
 	def AddTrain(self, trid):
-		print("adding train %s to triggers" % trid)
 		tr = self.trainSeq.GetTrainById(trid)
-		blkseq = tr.GetSteps()
-		print("derived sequence for train %s" % trid)
-		for b in blkseq:
-			print("   %s" % str(b))
 		trid, script = GenerateAR(tr, None)
-		print("-----------------------------------------------------------------")
-		print("train: %s" % trid)
-		print("%s" % json.dumps(script, indent=2))
-		print("=================================================================")
-		print("%s" % json.dumps(self.triggerTable[trid], indent=2))
+		self.triggerTable[trid] = script
 		
 	def RemoveTrain(self, trid):
-		print("removing train %s from triggers" % trid)		
+		try:
+			del self.triggerTable[trid]
+		except:
+			pass	
 
 	def GetRoute(self, train, block):
 		if train not in self.triggerTable:

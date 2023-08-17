@@ -38,15 +38,24 @@ siding unlock levers from all tower panels - cliff, port
 
 
 
-button on dispatcher and display to start throttle
 
-still have to test port A on the new server
+
+4. algorithm for a more robust way of handling loss of detection
+
+1. where is the extra set signal to green coming from when running through a block that is already green with autorouter
+
+2a. finish ATC script generation in real time for ATC and SIM
+
+2b. remove generate script from train editor, and add a validation button.  REemove the ARscripts and simscripts files from data dir
+
+3. unify representation of handswitches and their indicators, etc
 
 
 
 
 
 new server:
+still have to test port A on the new server
 cliff fleeting - how to reconcile there being only 1 fleet lever on the panel, but 3 checkboxes on the screen
 fleeting in yard
 

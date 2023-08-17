@@ -91,11 +91,16 @@ class ServerMain:
 
 		if not self.settings.simulation:
 			logging.info("Starting DCC Server")		
-			self.StartDCCServer()		
-			logging.info("DCC HTTP server successfully started")
+			continueInit = self.StartDCCServer()		
 		else:
 			logging.info("DCC HTTP Server not started in simulation mode")
-		self.rr.Initialize()
+			continueInit = True
+			
+		if continueInit:
+			self.rr.Initialize()
+		else:
+			self.queueCmd({"cmd": ["failedstart"]})
+
 		
 	def DelayedStartup(self, _):
 		if not self.settings.simulation:
@@ -110,10 +115,17 @@ class ServerMain:
 		self.DCCServer = DCCHTTPServer(self.settings.ipaddr, self.settings.dccserverport, self.settings.dcctty)
 		if not self.DCCServer.IsConnected():
 			logging.error("Failed to open DCC bus on device %s.  Exiting..." % self.settings.dcctty)
-			exit(1)
+			return False
+		else:
+			logging.info("DCC HTTP server successfully started")
+			return True
 
 	def socketEventReceipt(self, cmd):
 		logging.info("received socket connection request: %s" % str(cmd))
+		self.cmdQ.put(cmd)
+
+	def queueCmd(self, cmd):
+		logging.info("queueing command: %s" % str(cmd))
 		self.cmdQ.put(cmd)
 
 	def NewClient(self, cmd):
@@ -291,6 +303,15 @@ class ServerMain:
 
 	def ProcessCommand(self, cmd):			
 		verb = cmd["cmd"][0]
+		if verb == "failedstart":
+			logging.info("received failed start command")
+			self.forever = False
+			return 
+		
+		if not self.forever:
+			print("skipping command %s because of an earlier error" % verb)
+			return
+		
 		if verb != "interval":
 			try:
 				jstr = json.dumps(cmd)
@@ -731,7 +752,7 @@ class ServerMain:
 				if self.delay <= 0:
 					self.delay = None
 					self.cmdQ.put({"cmd": ["delayedstartup"]})
-
+					
 	def ServeForever(self):
 		logging.info("serve forever starting")
 		self.forever = True
@@ -743,6 +764,7 @@ class ServerMain:
 			time.sleep(0.005)
 			
 		logging.info("terminating server threads")
+		print("trying to terminate server threads", flush=True)
 		try:
 			self.dispServer.close()
 		except Exception as e:

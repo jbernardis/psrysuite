@@ -28,6 +28,8 @@ from advisor.overswitch import OverSwitch
 from advisor.train import Train
 from advisor.route import Route
 
+from traineditor.trainsequences.train import Trains
+
 from advisor.listener import Listener
 from advisor.rrserver import RRServer
 
@@ -36,8 +38,9 @@ class MainUnit:
 		logging.info("PSRY Adviser starting...")
 		self.sessionid = None
 		self.settings = Settings()
-
-		self.triggers = Triggers()
+		
+		self.trainSeq = Trains(os.path.join(os.getcwd(), "data"))
+		self.triggers = Triggers(self.trainSeq)
 
 		self.blocks = {}
 		self.turnouts = {}
@@ -319,7 +322,6 @@ class MainUnit:
 	def Request(self, req):
 		logging.info("Outgoing request: %s" % json.dumps(req))
 		self.rrServer.SendRequest(req)
-
 
 main = MainUnit()
 main.run()

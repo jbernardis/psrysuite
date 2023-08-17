@@ -1,3 +1,4 @@
+import sys
 import serial
 import select
 import time
@@ -110,6 +111,7 @@ class DCCThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 
 class DCCHTTPServer:
 	def __init__(self, ip, port, tty):
+		self.failed = False
 		self.locos = {}
 		self.tty = tty
 		try:
@@ -123,13 +125,17 @@ class DCCHTTPServer:
 		except serial.SerialException:
 			self.port = None
 			logging.error("Unable to Connect to serial port %s" % self.tty)
-			# sys.exit()
+			self.failed = True
 
-		self.server = DCCThreadingHTTPServer((ip, port), DCCHandler)
-		self.server.setApp(self)
-		self.thread = Thread(target=self.server.serve_dcc)
-		self.thread.start()
-		logging.info("DCC server started")
+		if not self.failed:
+			self.server = DCCThreadingHTTPServer((ip, port), DCCHandler)
+			self.server.setApp(self)
+			self.thread = Thread(target=self.server.serve_dcc)
+			self.thread.start()
+			logging.info("DCC server started")
+			
+	def SetupFailed(self):
+		return self.failed
 	
 	def IsConnected(self):
 		return self.port is not None

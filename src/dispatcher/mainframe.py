@@ -179,15 +179,18 @@ class MainFrame(wx.Frame):
 		else:
 			self.PlaceWidgets()
 
-		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(self.centerOffset+100, 15), size=BTNDIM)
+		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(self.centerOffset+50, 15), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnSubscribe, self.bSubscribe)
 
-		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", pos=(self.centerOffset+100, 45), size=BTNDIM)
+		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", pos=(self.centerOffset+50, 45), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, self.bRefresh)
 		self.bRefresh.Enable(False)
 
-		self.bThrottle = wx.Button(self, wx.ID_ANY, "Throttle", pos=(self.centerOffset+100, 75), size=BTNDIM)
+		self.bThrottle = wx.Button(self, wx.ID_ANY, "Throttle", pos=(self.centerOffset+150, 15), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnThrottle, self.bThrottle)
+
+		self.bEditTrains = wx.Button(self, wx.ID_ANY, "Edit Trains", pos=(self.centerOffset+150, 45), size=BTNDIM)
+		self.Bind(wx.EVT_BUTTON, self.OnEditTrains, self.bEditTrains)
 
 		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Train IDs", pos=(self.centerOffset+250, 15), size=BTNDIM)
 		self.bLoadTrains.Enable(False)
@@ -218,6 +221,7 @@ class MainFrame(wx.Frame):
 			self.bSaveTrains.Hide()
 			self.bSaveLocos.Hide()
 			self.bClearTrains.Hide()
+			self.bEditTrains.Hide()
 
 		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(self.centerOffset+2200, 25), style=wx.TE_READONLY)
 		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(self.centerOffset+2300, 25), style=wx.TE_READONLY)
@@ -410,6 +414,11 @@ class MainFrame(wx.Frame):
 		throttleExec = os.path.join(os.getcwd(), "throttle", "main.py")
 		throttleProc = Popen([sys.executable, throttleExec])
 		logging.info("Throttle started as PID %d" % throttleProc.pid)
+					
+	def OnEditTrains(self, _):
+		treditExec = os.path.join(os.getcwd(), "traineditor", "main.py")
+		treditProc = Popen([sys.executable, treditExec])
+		logging.info("Train Editor started as PID %d" % treditProc.pid)
 
 	def OnBActiveTrains(self, _):		
 		self.activeTrains.ShowTrainList(self)
@@ -1078,10 +1087,13 @@ class MainFrame(wx.Frame):
 
 	def DoFleetPending(self, block):
 		bname = block.GetName()
+		print("in do fleeting for block %s" % bname)
 		if bname not in self.pendingFleets:
+			print("but there are no pending fleets here")
 			return
 
 		sig = self.pendingFleets[bname]
+		print("that block has a pending fleet for signal %s" % sig.GetName())
 		del(self.pendingFleets[bname])
 
 		sig.DoFleeting()		
@@ -1731,6 +1743,7 @@ class MainFrame(wx.Frame):
 				for p in parms:
 					sigName = p["name"]
 					aspect = p["aspect"]
+					print("got signal %s %s" % (sigName, aspect))
 					try:
 						sig = self.signals[sigName]
 					except:
@@ -2054,6 +2067,8 @@ class MainFrame(wx.Frame):
 					self.delayedRequests.Append(req)
 				else:
 					#logging.debug(json.dumps(req))
+					if command == "signal":
+						print("sending %s" % json.dumps(req))
 					self.rrServer.SendRequest(req)
 		else:
 			logging.info("disallowing command %s from non dispatcher" % command)
@@ -2234,18 +2249,16 @@ class MainFrame(wx.Frame):
 		self.CloseProgram()
 		
 	def CloseProgram(self):
+		killServer = False
 		if self.IsDispatcher():
 			dlg = ExitDlg(self)
 			rc = dlg.ShowModal()
+			if rc == wx.ID_OK:
+				killServer = dlg.GetResults()
+
 			dlg.Destroy()
 			if rc != wx.ID_OK:
-				return
-		self.KillWindow()
-		
-	def KillWindow(self):
-		if self.IsDispatcher():
-			# make the server visible on exit
-			self.Request( {"server": {"action": "show"}})	
+				return	
 			
 		self.events.Close()
 		self.advice.Close()
@@ -2254,6 +2267,10 @@ class MainFrame(wx.Frame):
 			self.listener.join()
 		except:
 			pass
+		
+		if killServer:
+			self.rrServer.SendRequest({"quit": {}})
+			
 		self.Destroy()
 		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Display"))
 		
@@ -2463,6 +2480,13 @@ class ExitDlg (wx.Dialog):
 		vsz.AddSpacer(10)
 		vsz.Add(self.bLocos, 0, wx.ALIGN_CENTER)
 		vsz.AddSpacer(20)
+	
+		self.cbKillServer = wx.CheckBox(self, wx.ID_ANY, "Shutdown Server")
+		self.cbKillServer.SetValue(True)
+		
+		vsz.Add(self.cbKillServer, 0, wx.ALIGN_CENTER)
+
+		vsz.AddSpacer(20)
 
 		bsz = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -2480,7 +2504,7 @@ class ExitDlg (wx.Dialog):
 		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
 
 		vsz.Add(bsz, 0, wx.ALIGN_CENTER)
-
+		
 		vsz.AddSpacer(20)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
@@ -2498,6 +2522,9 @@ class ExitDlg (wx.Dialog):
 
 	def onSaveLocos(self, _):
 		self.parent.SaveLocos()
+		
+	def GetResults(self):
+		return self.cbKillServer.GetValue()
 
 	def onCancel(self, _):
 		self.EndModal(wx.ID_CANCEL)
