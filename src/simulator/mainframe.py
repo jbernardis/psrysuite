@@ -16,6 +16,9 @@ from simulator.trainparmdlg import TrainParmDlg
 
 from simulator.train import Trains
 
+from traineditor.layoutdata import LayoutData
+from traineditor.generators import GenerateSim
+
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
@@ -38,6 +41,7 @@ class MainFrame(wx.Frame):
 		self.selectedScripts = []
 		self.startable = []
 		self.stoppable = []
+		self.layout = LayoutData(os.path.join(os.getcwd(), "data"))
 
 		icon = wx.Icon()
 		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "simulator.ico"), wx.BITMAP_TYPE_ANY))
@@ -130,15 +134,15 @@ class MainFrame(wx.Frame):
 
 		self.ClearDataStructures()
 
-		with open(os.path.join(os.getcwd(), "data", "simscripts.json"), "r") as jfp:
-			scripts = json.load(jfp)
-
-		for scr in scripts:
-			s = Script(self, scripts[scr], scr, self.cbComplete)
-			self.scripts[scr] = s
-			self.scriptList.AddScript(s)
 			
 		self.trains = Trains(os.path.join(os.getcwd(), "data"))
+			
+		for tr in self.trains:
+			trid, script = GenerateSim(tr, self.layout)
+
+			s = Script(self, script, trid, self.cbComplete)
+			self.scripts[trid] = s
+			self.scriptList.AddScript(s)
 
 	def reportSelection(self):
 		selectedScripts = self.scriptList.GetChecked()

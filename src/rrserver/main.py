@@ -6,12 +6,20 @@ if cmdFolder not in sys.path:
 lfn = os.path.join(os.getcwd(), "logs", "rrserver.log")
 
 import logging
-logging.basicConfig(filename=lfn, filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+import logging.handlers
+should_roll_over = os.path.isfile(lfn)
+
+handler = logging.handlers.RotatingFileHandler(lfn, mode='a', backupCount=5)
+
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG, handlers=[handler])
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s: %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
+
+if should_roll_over:
+	handler.doRollover()
 
 import json
 import socket

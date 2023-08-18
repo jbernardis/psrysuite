@@ -24,14 +24,15 @@ from atc.block import Block
 from atc.overswitch import OverSwitch
 from atc.train import Train
 from atc.route import Route
+from atc.generatescripts import GenerateScripts
 
 from atc.dccremote import DCCRemote
-#from atc.dccloco import DCCLoco
 from atc.atclist import ATCListCtrl
 from atc.listener import Listener
 from atc.rrserver import RRServer
 from atc.dccserver import DCCServer
 from atc.ticker import Ticker
+
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
@@ -203,11 +204,16 @@ class MainFrame(wx.Frame):
 		for blk, sublist in subblocks.items():
 			for sub in sublist:
 				submap[sub] = blk
-
-		scripts = self.rrServer.Get("getsimscripts", {})
-		if scripts is None:
-			logging.error("Unable to retrieve simulator/atc scripts")
+				
+		trains = self.rrServer.Get("gettrains", {})
+		if trains is None:
+			logging.error("Unable to retrieve trains information")
 			return False
+		
+		logging.info("Trains: %s" % json.dumps(trains))
+		print("Trains: %s" % json.dumps(trains), flush=True)
+
+		scripts = GenerateScripts(layout, trains)
 		
 		self.scripts = {}
 		

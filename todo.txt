@@ -42,9 +42,7 @@ siding unlock levers from all tower panels - cliff, port
 
 4. algorithm for a more robust way of handling loss of detection
 
-2a. finish ATC script generation in real time for ATC and SIM
-
-2b. remove generate script from train editor, and add a validation button.  REemove the ARscripts and simscripts files from data dir
+add a validation button in 2 places to train editor (one to validate all, and 1 to validate current train)
 
 3. unify representation of handswitches and their indicators, etc
 
@@ -75,5 +73,3 @@ audit data structures
 	Turnout <== done
 
 test, test, test
-
-prohibit adding a train to ATC if it does not have a loco ID

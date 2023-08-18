@@ -21,7 +21,7 @@
       "sbwest": "B21.W"
     },
     "BOSE": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     },
@@ -211,7 +211,7 @@
       "sbwest": null
     },
     "F10": {
-      "east": 0,
+      "east": 1,
       "sbeast": "F10.E",
       "sbwest": null
     },
@@ -736,7 +736,7 @@
       "sbwest": null
     },
     "SOSHF": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     },

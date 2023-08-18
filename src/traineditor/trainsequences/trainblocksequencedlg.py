@@ -1,14 +1,10 @@
 import wx
-import json
 import os
 
 from traineditor.trainsequences.traindlg import TrainDlg
 from traineditor.trainsequences.train import Trains
 from traineditor.trainsequences.blocksequence import BlockSequenceListCtrl
 from traineditor.trainsequences.layoutdata import LayoutData
-from traineditor.trainsequences.simscriptdlg import SimScriptDlg
-from traineditor.trainsequences.arscriptdlg import ARScriptDlg
-from traineditor.trainsequences.arblockdlg import ARBlockDlg
 
 SIMSCRIPTFN = "simscripts.json"
 ARSCRIPTFN =  "arscripts.json"
@@ -57,27 +53,9 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		self.Bind(wx.EVT_BUTTON, self.OnBExit, self.bExit)
 		self.bRevert = wx.Button(self, wx.ID_ANY, "Revert", size=(80, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBRevert, self.bRevert)
-		self.bGenSim = wx.Button(self, wx.ID_ANY, "Sim/ATC\nScript", size=(80, 50))
-		self.Bind(wx.EVT_BUTTON, self.OnBGenSim, self.bGenSim)
-		self.bGenSim.Enable(False)
-		self.bGenAR = wx.Button(self, wx.ID_ANY, "AR/Advisor\nScript", size=(80, 50))
-		self.Bind(wx.EVT_BUTTON, self.OnBGenAR, self.bGenAR)
-		self.bGenAR.Enable(False)
-		self.bGenSimAll = wx.Button(self, wx.ID_ANY, "Sim/ATC\nAll", size=(80, 50))
-		self.Bind(wx.EVT_BUTTON, self.OnBGenSimAll, self.bGenSimAll)
-		self.bGenARAll = wx.Button(self, wx.ID_ANY, "AR/Advisor\nAll", size=(80, 50))
-		self.Bind(wx.EVT_BUTTON, self.OnBGenARAll, self.bGenARAll)
 		
 		buttonsz = wx.BoxSizer(wx.HORIZONTAL)
 		buttonsz.AddSpacer(10)
-		buttonsz.Add(self.bGenSim)
-		buttonsz.AddSpacer(10)
-		buttonsz.Add(self.bGenSimAll)
-		buttonsz.AddSpacer(30)
-		buttonsz.Add(self.bGenAR)
-		buttonsz.AddSpacer(10)
-		buttonsz.Add(self.bGenARAll)
-		buttonsz.AddSpacer(30)
 		buttonsz.Add(self.bSave)
 		buttonsz.AddSpacer(20)
 		buttonsz.Add(self.bRevert)
@@ -170,8 +148,6 @@ class TrainBlockSequencesDlg(wx.Dialog):
 			self.cbTrain.SetSelection(tx)
 			
 		self.bDelTrain.Enable(self.selectedTrain is not None)
-		self.bGenAR.Enable(self.selectedTrain is not None)
-		self.bGenSim.Enable(self.selectedTrain is not None)
 				
 	def AddTrainChoice(self, newtid):
 		if newtid in self.trainChoices:
@@ -303,204 +279,6 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		self.SetTrainChoices()
 		
 		self.SetModified()
-
-	def OnBGenSimAll(self, _):
-		allSim = {}
-		for tr in self.trains:
-			if tr.GetNSteps() > 0:
-				_, scr = self.GenSim(tr)
-				allSim.update(scr)
-		
-		fn = os.path.join(os.getcwd(), "data", SIMSCRIPTFN)
-		with open(fn, "w") as jfp:
-			json.dump(allSim, jfp, indent=2)
-
-	def OnBGenSim(self, _):
-		# TODO; need to do sometning about loco number.  Do we put it here, or should it be put inmy the simulator?
-		# TODO - train length
-		trainid, scr = self.GenSim(self.currentTrain)
-		scrString = json.dumps(scr, indent=2)
-		dlg = SimScriptDlg(self, scrString, trainid)
-		rc = dlg.ShowModal()
-		if rc == wx.ID_OK:
-			fn = os.path.join(os.getcwd(), "data", SIMSCRIPTFN)
-			try:
-				with open(fn, "r") as jfp:
-					j = json.load(jfp)
-			except FileNotFoundError:
-				j = {}
-			j.update(scr)
-			
-			with open(fn, "w") as jfp:
-				json.dump(j, jfp, indent=2)
-									
-		dlg.Destroy()
-		
-	def GenSim(self, tr):
-		locoid = 0
-		trainid = tr.GetTrainID()
-		east = tr.IsEast()
-		segTimes, segString = self.determineSegmentsAndTimes(tr.GetStartBlock(), None, east, tr.GetStartBlockTime())
-		sBlk = tr.GetStartBlock()
-		subBlk = tr.GetStartSubBlock()
-		#if subBlk is not None:
-			#sBlk = subBlk
-			
-		# determine which segment is our starting position and ignore the seqments before it in the list
-		for idx in range(len(segTimes)):
-			if sBlk == segTimes[idx][0]:
-				break
-		else:
-			idx = 0
-			
-		script = []
-		placeTrainCmd = {"block": sBlk, "name": trainid, "loco": locoid, "time": segTimes[idx][1], "length": 3}
-		if subBlk is not None:
-			placeTrainCmd["subblock"] = segTimes[idx][0]
-			
-		script.append({"placetrain": placeTrainCmd})
-
-		idx += 1
-		while idx < len(segTimes):
-			script.append({"movetrain": {"block": segTimes[idx][0], "time": segTimes[idx][1]}})
-			idx += 1
-
-		blkSeq = tr.GetSteps()
-		nblocks = len(blkSeq)
-		bx = 0
-		lastBlock = sBlk
-		for b in blkSeq:
-			bx += 1
-			terminus = bx == nblocks
-			if self.checkChangeDirection(lastBlock, b["os"], b["block"]):
-				east = not east
-				
-			segTimes, segString = self.determineSegmentsAndTimes(b["block"], b["os"], east, b["time"], terminus=terminus)
-
-			script.append({"waitfor": {"signal": b["signal"], "route": b["route"], "os": segTimes[0][0], "block": segString}})
-			
-			script.append({"movetrain": {"block": segTimes[0][0], "time": segTimes[0][1]}})
-			for seg, tm in segTimes[1:]:
-				script.append({"movetrain": {"block": seg, "time": tm}})
-				
-			lastBlock = b["block"]
-
-		scr = {"%s" % trainid: script}
-		return trainid, scr
-	
-	def checkChangeDirection(self, b1, os, b2):
-		if self.layout.IsCrossoverPt(os, b1):
-			return True
-		
-		return self.layout.IsCrossoverPt(os, b2)		
-		
-	def determineSegmentsAndTimes(self, block, os, east, blockTime, terminus=False):
-		subBlocks = self.layout.GetSubBlocks(block)
-		if len(subBlocks) == 0:
-			subBlocks = [block]  # no sub-blocks - just use the block name itself
-		stopBlocks = self.layout.GetStopBlocks(block)
-		
-		blks = []
-		waitblks = []
-		subCt = len(subBlocks)
-		stopCt = 0
-		if east:
-			if stopBlocks[1]:
-				stopCt += 1
-				blks.append(stopBlocks[1])
-				waitblks.append(stopBlocks[1])
-			blks.extend(subBlocks)
-			waitblks.append(block)
-			if stopBlocks[0] and not terminus: # Don't include stop block in terminus'
-				stopCt += 1
-				blks.append(stopBlocks[0])
-				waitblks.append(stopBlocks[0])
-		else:
-			if stopBlocks[0]:
-				stopCt += 1
-				blks.append(stopBlocks[0])
-				waitblks.append(stopBlocks[0])
-			# when traveling westbound, subblocks are visited in the reverse order
-			blks.extend(list(reversed(subBlocks)))
-			waitblks.append(block)
-			if stopBlocks[1] and not terminus: # Don't include stop block in terminus:
-				stopCt += 1
-				blks.append(stopBlocks[1])
-				waitblks.append(stopBlocks[1])
-
-		waitString = ",".join(waitblks) # segment string should NOT include the os
-		if os is not None:
-			blks.insert(0, os)
-			subCt += 1
-		stopTime = int(blockTime * 0.1)
-		subTime = int((blockTime - stopTime * stopCt) / subCt)
-		segTimes = [[blk, stopTime if StoppingSection(blk) else subTime] for blk in blks]
-		
-		return segTimes,waitString
-
-	def OnBGenARAll(self, _):
-		allAR = {}
-		for tr in self.trains:
-			if tr.GetNSteps() > 0:
-				_, scr = self.GenAR(tr, None)
-				allAR.update(scr)
-		
-		fn = os.path.join(os.getcwd(), "data", ARSCRIPTFN)
-		with open(fn, "w") as jfp:
-			json.dump(allAR, jfp, indent=2)
-		
-	def OnBGenAR(self, _):
-		# TODO: we may not want to autproute at every OS - need a way to check the ones we do want
-		blist = []
-		lb = self.startBlock
-		for b in self.blockSeq.GetBlocks():
-			blist.append("%s => %s" % (lb, b["block"]))
-			lb = b["block"]
-
-		dlg = ARBlockDlg(self, blist)
-		dlg.ShowModal()
-		blist = dlg.GetResults()
-		dlg.Destroy()
-		
-		blks = [self.blockSeq.GetBlocks()[b]["block"] for b in blist]
-		
-		trainid, scr = self.GenAR(self.currentTrain, blks)
-		
-		scrString = json.dumps(scr, indent=2)
-		dlg = ARScriptDlg(self, scrString, trainid)
-		rc = dlg.ShowModal()
-		if rc == wx.ID_OK:
-			fn = os.path.join(os.getcwd(), "data", ARSCRIPTFN)
-			try:
-				with open(fn, "r") as jfp:
-					j = json.load(jfp)
-			except FileNotFoundError:
-				j = {}
-			j.update(scr)
-			
-			with open(fn, "w") as jfp:
-				json.dump(j, jfp, indent=2)
-			
-		dlg.Destroy()
-
-	def GenAR(self, tr, blks):		
-		trainid = tr.GetTrainID()
-		lastBlock = tr.GetStartBlock()
-		blkSeq = tr.GetSteps()
-		script = {}
-		for b in blkSeq:
-			if len(script) == 0:
-				script["origin"] = lastBlock
-				
-			if blks is None or b["block"] in blks:
-				trigger = 'F' if b["trigger"] == "Front" else 'R'			
-				script[lastBlock] = {"route": b["route"], "trigger": trigger}
-			lastBlock = b["block"]
-			
-		script["terminus"] = lastBlock
-
-		scr = {"%s" % trainid: script}
-		return trainid, scr
 		
 	def SetModified(self, flag=True):
 		self.modified = flag
