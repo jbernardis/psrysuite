@@ -1743,7 +1743,6 @@ class MainFrame(wx.Frame):
 				for p in parms:
 					sigName = p["name"]
 					aspect = p["aspect"]
-					print("got signal %s %s" % (sigName, aspect))
 					try:
 						sig = self.signals[sigName]
 					except:

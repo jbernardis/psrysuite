@@ -42,8 +42,6 @@ siding unlock levers from all tower panels - cliff, port
 
 4. algorithm for a more robust way of handling loss of detection
 
-1. where is the extra set signal to green coming from when running through a block that is already green with autorouter
-
 2a. finish ATC script generation in real time for ATC and SIM
 
 2b. remove generate script from train editor, and add a validation button.  REemove the ARscripts and simscripts files from data dir

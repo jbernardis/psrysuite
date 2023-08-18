@@ -220,9 +220,7 @@ class ServerMain:
 		for m in self.trainList.GetSetTrainCmds():
 			self.socketServer.sendToOne(skt, addr, m)
 		self.socketServer.sendToOne(skt, addr, {"end": {"type": "trains"}})
-		logging.info("===================== end of trains - should be ok to gen layoutr")
 		self.generateLayoutFile()
-		logging.info("===================== back from genlayout")
 
 	def sendRouteDefs(self, addr, skt):
 		for rte in self.routeDefs.values():

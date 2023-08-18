@@ -211,7 +211,6 @@ class Railroad():
 	def SetInputBit(self, distName, vbyte, vbit, val):
 		pass
 
-#============================================================================================
 	def SetIndicator(self, indname, state):
 		'''
 		turn an indicator on/off

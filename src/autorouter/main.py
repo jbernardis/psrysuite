@@ -89,7 +89,7 @@ class MainUnit:
 		while self.running:
 			data = self.commandQ.get()
 			jdata = json.loads(data)
-			#logging.info("Inbound message: %s" % data)
+			logging.info("Inbound message: %s" % data)
 			for cmd, parms in jdata.items():
 				if cmd == "turnout":
 					for p in parms:
@@ -131,7 +131,6 @@ class MainUnit:
 					for p in parms:
 						block = p["block"]
 						clear = p["clear"]
-						logging.info("blockclear: %s %s" % (block, clear))
 						if block not in self.blocks:
 							self.blocks[block] = Block(self, block, 0, 'E', clear != 0)
 						else:
@@ -142,6 +141,8 @@ class MainUnit:
 					for p in parms:
 						sigName = p["name"]
 						aspect = int(p["aspect"])
+						if sigName == "C14RB":
+							logging.info("Signal: %s: %s" % (sigName, aspect))
 						if sigName not in self.signals:
 							self.signals[sigName] = Signal(self, sigName, aspect)
 						else:
@@ -346,12 +347,10 @@ class MainUnit:
 	def CheckTrainInBlock(self, train, block, triggerPoint):
 		rtName = self.triggers.GetRoute(train, block)
 		if rtName is None:
-			logging.info("Train/block combination %s/%s not found" % (train, block))
 			return None
 
 		blockTriggerPoint = self.triggers.GetTriggerPoint(train, block)
 		if blockTriggerPoint != triggerPoint:
-			logging.info("Trigger point mismatch, wanted %s, got %s" % (triggerPoint, blockTriggerPoint))
 			return None
 		
 		return RouteRequest(train, self.routes[rtName], block)
@@ -368,38 +367,20 @@ class MainUnit:
 		logging.info("evaluating routeRequest %s" % rteRq.toString())
 		rname = rteRq.GetName()
 		blkName = rteRq.GetEntryBlock()
-		logging.info("evaluate route %s" % rname)
 		rte = self.routes[rname]
 		osName = rte.GetOS()
+
+		# harper's ferry is a special case - check if it is cleared and return false if so		
+		if self.HarpersFerryCrossingCleared(osName):
+			logging.info("eval false - harper's ferry crossing trumps OS")
+			return False
+
 		activeRte = self.osList[osName].GetActiveRoute()
 		blk = self.blocks[rte.GetOS()]
-		# if the active route is not the one we want, find out if it is cleared
-		# if the wanted route is already cleared, flag nothing - it will just 
-		# go through and allow the route to be setup
-		activeRteCleared = activeRte is not None and blk.GetClear() and activeRte.GetName() != rname
 		
-		# check if harpers ferry crossing is cleared - this trumps the regular active route,
-		# but only for the SHORE OSes
-		if self.HarpersFerryCrossingCleared(osName):
-			activeRteCleared = True
-		
-		tolock = []
-		siglock = []
-		logging.info("active route = %s" % ("None" if activeRte is None else activeRte.GetName()))
-		if activeRte is None or activeRte.GetName() != rname:
-			logging.info("evaluating turnouts for route")
-			for t in rte.GetTurnouts():
-				logging.info("turnout: %s" % t)
-				toname, state = t.split(":")
-				logging.info("Locked: %s  state = %s" % (self.turnouts[toname].IsLocked(), self.turnouts[toname].GetState()))
-				
-				if self.turnouts[toname].IsLocked() and self.turnouts[toname].GetState() != state:
-					#  turnout is locked AND we need to change it
-					tolock.append(toname)
-		#  else we are already on this route - no turnout evauation needed
+		OSClear = blk.GetClear()
 		
 		# look at state of exit block
-		exitBlockAvailable = False
 		ends = rte.GetEnds()
 		if ends[0] == blkName:
 			exitBlk = ends[1]
@@ -408,34 +389,51 @@ class MainUnit:
 			
 		if exitBlk in self.blocks:
 			b = self.blocks[exitBlk]
-			state = b.GetState()
-			clear = b.GetClear()
+			exitState = b.GetState()
+			exitClear = b.GetClear()
 			for sbNm in [exitBlk+".E", exitBlk+".W"]:
 				if sbNm in self.blocks:
 					sb = self.blocks[sbNm]
-					state += sb.GetState()
-					clear += sb.GetClear()
+					exitState += sb.GetState()
+					exitClear += sb.GetClear()
 					
-			exitBlockAvailable = state == 0 and clear == 0
-			logging.info("Exit block %s State = %d clear = %d" % (exitBlk, state, clear))
 		else:
-			state = None
-			clear = None
+			exitState = 0
+			exitClear = 0
+			
+		logging.info("Exit block %s State = %d clear = %d" % (exitBlk, exitState, exitClear))
+			
+		# if the active route is the one we want
+		if activeRte is not None and activeRte.GetName() == rname and OSClear and exitState == 0 and exitClear != 0:
+			logging.info("eval true - want current route and route is already clear")
+			return True
+
+		# don't try to evaluate switches and/or signals if the exit block is not available		
+		if exitState != 0:
+			logging.info("eval false - exit block %s not available" % exitBlk)
+			return False
 		
+		# otherwise, the route through the OS needs to change - so we need to check for locked
+		# turnouts and signals
+		
+		tolock = []
+		siglock = []
+		for t in rte.GetTurnouts():
+			toname, state = t.split(":")
+			
+			if self.turnouts[toname].IsLocked() and self.turnouts[toname].GetState() != state:
+				tolock.append(toname)
 
 		sigNm = rte.GetSignalForEnd(blkName)
-		logging.info("Evaluating signal: %s" % sigNm)
 		if sigNm is not None:
-			logging.info("Locked: %s  aspect = %s" % (self.signals[sigNm].IsLocked(), self.signals[sigNm].GetAspect()))
 			if self.signals[sigNm].IsLocked() and self.signals[sigNm].GetAspect() == 0:
 				siglock.append(sigNm)
 
-		if len(tolock) + len(siglock) == 0 and exitBlockAvailable and not activeRteCleared:
-			logging.info("eval true")
+		if len(tolock) + len(siglock) == 0:
+			logging.info("eval true - no locked signals or turnouts")
 			return True  # OK to proceed with this route
 		else:
-			#  TODO - do something with the tolock and siglock arrays
-			logging.info("Eval false to=%s sig=%s block %s state = %s clear = %s" % (str(tolock), str(siglock), exitBlk, str(state), str(clear)))
+			logging.info("Eval false for locked turnouts: to=%s / signals: sig=%s " % (str(tolock), str(siglock)))
 			return False  # this route is unavailable right now
 
 	def SetupRoute(self, rteRq):
@@ -452,28 +450,34 @@ class MainUnit:
 					self.ReqQueue.Append(cmd)
 					logging.info("command sent: %s" % str(cmd))
 				else:
+					pass
 					logging.info("skipping this turnout since we do not control Port")
 			else:
+				pass
 				logging.info("turnout already in desired position - no command sent")
 
 		sigNm = rte.GetSignalForEnd(blkName)
 		if sigNm is not None:
-			logging.info("signal %s" % sigNm)
+			if sigNm == "C14RB":
+				logging.info("signal %s" % sigNm)
 			try:
 				aspect = self.signals[sigNm].GetAspect()
 			except:
-				logging.info("Unable to retrieve signal aspect - assume 0")
+				if sigNm == "C14RB":
+					logging.info("Unable to retrieve signal aspect - assume 0")
 				aspect = 0
 				
 			if aspect == 0:
 				if not sigNm.startswith("P"):
 					cmd = {"signal": {"name": sigNm, "aspect": -1}}
 					self.ReqQueue.Append(cmd)
-					logging.info("command sent: %s" % str(cmd))
+					if sigNm == "C14RB":
+						logging.info("command sent: %s" % str(cmd))
 				else:
 					logging.info("skipping this signal since we do not control Port")
 			else:
-				logging.info("Current signal aspect (%s) allows movement - no command sent" % aspect)
+				if sigNm == "C14RB":
+					logging.info("Current signal aspect (%s) allows movement - no command sent" % aspect)
 
 	def EnqueueRouteRequest(self, rteRq):
 		osNm = rteRq.GetOS()
@@ -491,12 +495,8 @@ class MainUnit:
 			logging.info("OS: %s" % osNm)
 			req = self.OSQueue[osNm].Peek()
 			if req is not None:
-				logging.info("Request for block %s" % req.GetName())
-				logging.info("%s" % req.toString())
 				if self.EvaluateRouteRequest(req):
-					logging.info("OK to proceed")
 					self.OSQueue[osNm].Pop()
-					logging.info("popping from queue for os %s" % osNm)
 					self.SetupRoute(req)
 
 		logging.info("end of queued requests")
