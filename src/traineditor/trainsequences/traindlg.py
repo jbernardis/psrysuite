@@ -4,6 +4,7 @@ from wx.lib.intctrl import IntCtrl
 from traineditor.trainsequences.nextblocklist import NextBlockListCtrl
 from traineditor.trainsequences.blocksequence import BlockSequenceListCtrl
 from traineditor.trainsequences.editblockdlg import EditBlockDlg
+from numpy.distutils.log import good
 		
 class TrainDlg(wx.Dialog):
 	def __init__(self, parent, train, layout):
@@ -48,6 +49,8 @@ class TrainDlg(wx.Dialog):
 		self.Bind(wx.EVT_BUTTON, self.OnBDel, self.bDel)
 		self.bDel.Enable(False)
 
+		self.bValidate = wx.Button(self, wx.ID_ANY, "Validate", size=(80, 50))
+		self.Bind(wx.EVT_BUTTON, self.OnBValidate, self.bValidate)
 		self.bOK = wx.Button(self, wx.ID_ANY, "OK", size=(80, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBOK, self.bOK)
 		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=(80, 50))
@@ -121,6 +124,8 @@ class TrainDlg(wx.Dialog):
 		vsz.AddSpacer(10)
 		
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(self.bValidate)
+		hsz.AddSpacer(50)
 		hsz.Add(self.bOK)
 		hsz.AddSpacer(20)
 		hsz.Add(self.bCancel)
@@ -286,7 +291,25 @@ class TrainDlg(wx.Dialog):
 		else:
 			self.GetAvailableBlocks(r["block"])
 			self.nextBlockList.SetBlocks(self.availableBlocks)
+			
+	def OnBValidate(self, _):
+		blk = self.startBlock
+		steps = self.blockSequence.GetBlocks()
+		badTransitions = self.parent.validateSequence(blk, steps)
 
+		title = "Validation Results for Train %s" % self.trainid		
+		if len(badTransitions) == 0:
+			dlg = wx.MessageDialog(self, 'Block sequence is correct!',
+					title, wx.OK | wx.ICON_INFORMATION)
+		else:
+			msg = "The following transitions are incorrect:\n " + "\n ".join(badTransitions)
+			dlg = wx.MessageDialog(self, msg,
+					title, wx.OK | wx.ICON_ERROR)
+			
+		dlg.ShowModal()
+		dlg.Destroy()
+			
+		
 	def GetAvailableBlocks(self, blk):
 		self.availableBlocks = []
 		if blk is None:

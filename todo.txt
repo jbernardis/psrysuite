@@ -40,10 +40,6 @@ siding unlock levers from all tower panels - cliff, port
 
 
 
-4. algorithm for a more robust way of handling loss of detection
-
-add a validation button in 2 places to train editor (one to validate all, and 1 to validate current train)
-
 3. unify representation of handswitches and their indicators, etc
 
 

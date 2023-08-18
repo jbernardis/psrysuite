@@ -19,6 +19,8 @@ from rrserver.constants import INPUT_BLOCK, INPUT_TURNOUTPOS, INPUT_BREAKER, INP
 from rrserver.rrobjects import Block, StopRelay, Signal, SignalLever, RouteIn, Turnout,\
 			OutNXButton, Handswitch, Breaker, Indicator, ODevice, Lock
 
+pendingDetectionLossCycles = 3  # how many cycles before we "Believe" detection loss
+
 class Railroad():
 	def __init__(self, parent, cbEvent, settings):
 		self.cbEvent = cbEvent
@@ -54,6 +56,7 @@ class Railroad():
 		self.indicators = {}
 		self.odevices = {}
 		self.locks = {}
+		self.pendingDetectionLoss = PendingDetectionLoss(self)
 		self.reSigName = re.compile("([A-Z][0-9]*)([A-Z])")
 		
 		self.pulsedOutputs = {} 
@@ -956,7 +959,9 @@ class Railroad():
 				delList.append(toname)
 				
 		for toname in delList:
-			del self.pulsedOutputs[toname]				
+			del self.pulsedOutputs[toname]	
+			
+		self.pendingDetectionLoss.NextCycle()			
 			
 		for district in self.districts.values():
 			district.OutIn()
@@ -986,11 +991,21 @@ class Railroad():
 			for node, vbyte, vbit, objparms, newval in changedBits:
 				obj = objparms[0]
 				objType = obj.InputType()
+				objName = obj.Name()
 
 				if objType == INPUT_BLOCK:
-					if obj.SetOccupied(newval != 0):
-						self.RailroadEvent(obj.GetEventMessage())
-						obj.UpdateIndicators()
+					# if block has changed to occupied
+					if newval != 0:
+						# if we have a pending detection loss, just clear the pending flag and ignore this change
+						if not self.pendingDetectionLoss.Remove(objName):
+							# false means there was nothing pending. this is a normal detection gain - just process it
+							if obj.SetOccupied(newval != 0):
+								self.RailroadEvent(obj.GetEventMessage())
+								obj.UpdateIndicators()
+					
+					# otherwise, this is a detection loss - add it to pending
+					else:
+						self.pendingDetectionLoss.Add(objName, obj)
 			
 				elif objType == INPUT_TURNOUTPOS:
 					pos = obj.Position()
@@ -1111,6 +1126,39 @@ class Railroad():
 	def RailroadEvent(self, event):
 		self.cbEvent(event)
 
+class PendingDetectionLoss:
+	def __init__(self, railroad):
+		self.pendingDetectionLoss = {}
+		self.railroad = railroad
+				
+	def Add(self, block, obj):
+		logging.info("adding block %s to pending detection loss list" % block)
+		self.pendingDetectionLoss[block] = [obj, pendingDetectionLossCycles]
+		
+	def Remove(self, block):
+		try:
+			del self.pendingDetectionLoss[block]
+		except:
+			return False
+		
+		return True
+		
+	def NextCycle(self):
+		removeBlock = []
+		for blkName in self.pendingDetectionLoss:
+			self.pendingDetectionLoss[blkName][1] -= 1
+			if self.pendingDetectionLoss[blkName][1] <= 0:
+				# it's time to believe - process the detection loss and remove from this list
+				obj = self.pendingDetectionLoss[blkName][0]
+				if obj.SetOccupied(False):
+					self.railroad.RailroadEvent(obj.GetEventMessage())
+					obj.UpdateIndicators()
+					
+				removeBlock.append(blkName)
+			
+		for blkName in removeBlock:
+			del(self.pendingDetectionLoss[blkName])
+		
 class PulseCounter:
 	def __init__(self, vbyte, vbit, pct, plen, node):
 		self.vbyte = vbyte

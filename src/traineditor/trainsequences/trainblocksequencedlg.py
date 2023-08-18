@@ -47,6 +47,10 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		trsz.AddSpacer(5)
 		trsz.Add(self.cbTrain)
 		
+		self.bValCurrent = wx.Button(self, wx.ID_ANY, "Validate\nCurrent", size=(80, 50))
+		self.Bind(wx.EVT_BUTTON, self.OnBValCurrent, self.bValCurrent)
+		self.bValAll = wx.Button(self, wx.ID_ANY, "Validate\nAll", size=(80, 50))
+		self.Bind(wx.EVT_BUTTON, self.OnBValAll, self.bValAll)
 		self.bSave = wx.Button(self, wx.ID_ANY, "Save", size=(80, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBSave, self.bSave)
 		self.bExit = wx.Button(self, wx.ID_ANY, "Exit", size=(80, 50))
@@ -56,6 +60,10 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		
 		buttonsz = wx.BoxSizer(wx.HORIZONTAL)
 		buttonsz.AddSpacer(10)
+		buttonsz.Add(self.bValCurrent)
+		buttonsz.AddSpacer(20)
+		buttonsz.Add(self.bValAll)
+		buttonsz.AddSpacer(50)
 		buttonsz.Add(self.bSave)
 		buttonsz.AddSpacer(20)
 		buttonsz.Add(self.bRevert)
@@ -123,6 +131,7 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		
 	def EnableButtons(self, flag=True):
 		self.bEditSteps.Enable(flag)
+		self.bValCurrent.Enable(flag)
 		
 	def loadTrains(self):
 		self.trains = Trains(self.dataDir)
@@ -262,6 +271,28 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		self.ShowStartBlock()
 		self.SetModified()
 		
+	def validateSequence(self, blk, steps):
+		badTransitions = []
+		for step in steps:
+			stepList = [step["block"], step["signal"], step["os"], step["route"]]
+			availableBlocks = []
+			rteList = self.layout.GetRoutesForBlock(blk)
+			for r in rteList:
+				e = self.layout.GetRouteEnds(r)
+				s = self.layout.GetRouteSignals(r)
+				os = self.layout.GetRouteOS(r)
+				if e[0] == blk:
+					availableBlocks.append([e[1], s[0], os, r])
+				elif e[1] == blk:
+					availableBlocks.append([e[0], s[1], os, r])
+					
+			if stepList not in availableBlocks:
+				badTransitions.append("Block %s  ==>  Block %s via signal %s OS %s Route %s" % (blk, stepList[0], stepList[1], stepList[2], stepList[3]))
+				
+			blk = step["block"] # move on to the next block
+		
+		return badTransitions
+		
 	def OnBDelTrain(self, _):
 		if self.currentTrain is None:
 			return
@@ -283,7 +314,57 @@ class TrainBlockSequencesDlg(wx.Dialog):
 	def SetModified(self, flag=True):
 		self.modified = flag
 		self.ShowTitle()
+
+	def OnBValCurrent(self, _):
+		steps = self.currentTrain.GetSteps()
+		startBlock = self.currentTrain.GetStartBlock()
 		
+		badTransitions = self.validateSequence(startBlock, steps)
+		title = "Validation Results for Train %s" % self.currentTrain.GetTrainID()		
+		if len(badTransitions) == 0:
+			dlg = wx.MessageDialog(self, 'Block sequence is correct!',
+					title, wx.OK | wx.ICON_INFORMATION)
+		else:
+			msg = "The following block transitions are incorrect:\n " + "\n ".join(badTransitions)
+			dlg = wx.MessageDialog(self, msg,
+					title, wx.OK | wx.ICON_ERROR)
+			
+		dlg.ShowModal()
+		dlg.Destroy()
+
+	def OnBValAll(self, _):
+		trainResults = {}
+		for tr in self.trains:
+			trid = tr.GetTrainID()
+			steps = tr.GetSteps()
+			startBlock = tr.GetStartBlock()
+			trainResults[trid] = self.validateSequence(startBlock, steps)
+
+		results = ""
+		errors = 0			
+		for trid in sorted(trainResults):
+			t = trainResults[trid]
+			errors += len(t)
+			if len(t) == 0:
+				results += "Train %s: Correct\n" % trid
+			else:
+				results += "Train %s:\n" % trid
+				for r in t:
+					results += "  %s\n" % r
+
+		if errors == 0:
+			results = "All trains are correct"
+		else:
+			results = "The following block transitions are incorrect:\n" + results
+
+		dlg = wx.MessageDialog(self, results,
+			"Validation Results for ALL Trains", wx.OK | (wx.ICON_ERROR if errors != 0 else wx.ICON_INFORMATION))
+			
+		dlg.ShowModal()
+		dlg.Destroy()
+
+
+				
 	def OnBSave(self, _):
 		self.trains.Save()
 		self.SetModified(False)
