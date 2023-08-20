@@ -23,14 +23,14 @@ class Cliff(District):
 		self.released = False
 		self.control = 2
 		
-		self.revCSw21a = None
-		self.revCSw21b = None
-		self.revCSw19  = None
-		self.revCSw15  = None
-		self.revCSw11  = None
-		
-		self.revIndicators = [ "CSw21a", "CSw21b", "CSw19", "CSw15", "CSw11" ]
-		self.norm = { ind: None for ind in self.revIndicators }
+  # self.revCSw21a = None
+  # self.revCSw21b = None
+  # self.revCSw19  = None
+  # self.revCSw15  = None
+  # self.revCSw11  = None
+  #
+  # self.revIndicators = [ "CSw21a", "CSw21b", "CSw19", "CSw15", "CSw11" ]
+  # self.norm = { ind: None for ind in self.revIndicators }
 
 		addr = GREENMTN
 		with self.nodes[addr] as n:
@@ -118,11 +118,11 @@ class Cliff(District):
 			self.rr.AddTurnoutLock("CSw17", self, n, addr, [(6, 6)])
 			self.rr.AddTurnoutLock("CSw23", self, n, addr, [(6, 7)])
 			
-			self.rr.AddIndicator("CSw21a", self, n, addr, [(7, 0)])
-			self.rr.AddIndicator("CSw21b", self, n, addr, [(7, 1)])
-			self.rr.AddIndicator("CSw19",  self, n, addr, [(7, 2)])
-			self.rr.AddIndicator("CSw15",  self, n, addr, [(7, 3)])
-			self.rr.AddIndicator("CSw11",  self, n, addr, [(7, 4)])
+			self.rr.AddHandswitchReverseInd("CSw21a", self, n, addr, [(7, 0)])
+			self.rr.AddHandswitchReverseInd("CSw21b", self, n, addr, [(7, 1)])
+			self.rr.AddHandswitchReverseInd("CSw19",  self, n, addr, [(7, 2)])
+			self.rr.AddHandswitchReverseInd("CSw15",  self, n, addr, [(7, 3)])
+			self.rr.AddHandswitchReverseInd("CSw11",  self, n, addr, [(7, 4)])
 
 			# Inputs
 			self.rr.AddRouteIn("CC21E",  self, n, addr, [(0, 0)])
@@ -428,17 +428,6 @@ class Cliff(District):
 
 		# release controls if requested by operator or if osslocks are turned off by dispatcher			
 		self.released = rlReq or not ossLocks
-
-		# see if any of the reverse indicators need to be updated
-		for tout in self.revIndicators:	
-			norm = self.rr.GetHandswitch(tout).IsNormal()
-			if norm != self.norm[tout]:
-				self.norm[tout] = norm
-				ind = self.rr.GetIndicator(tout)
-				bits = ind.Bits()
-				if bits is None or len(bits) < 1:
-					continue
-				self.nodes[CLIFF].SetOutputBit(bits[0][0], bits[0][1], 0 if norm else 1)
 			
 		self.rr.UpdateDistrictTurnoutLocks(self.name, self.released)
 		

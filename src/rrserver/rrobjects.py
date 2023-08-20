@@ -760,10 +760,11 @@ class Handswitch:
     def UpdateReverseIndicators(self):
         if len(self.reverseIndicators) == 0:
             return False
+        rval = 0 if self.normal else 1
         for ind in self.reverseIndicators:
             district, node, address, bits = ind
             if len(bits) == 1:
-                node.SetOutputBit(bits[0][0], bits[0][1], 1 if not self.normal else 0)
+                node.SetOutputBit(bits[0][0], bits[0][1], rval)
             
         return True
   

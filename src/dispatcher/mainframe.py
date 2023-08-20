@@ -2481,7 +2481,11 @@ class ExitDlg (wx.Dialog):
 		vsz.AddSpacer(20)
 	
 		self.cbKillServer = wx.CheckBox(self, wx.ID_ANY, "Shutdown Server")
-		self.cbKillServer.SetValue(True)
+		self.cbKillServer.SetValue(self.parent.settings.precheckshutdownserver)
+
+  # self.activesuppressyards = True
+  # self.activesuppressunknown = False
+  # self.activeonlyatc = False
 		
 		vsz.Add(self.cbKillServer, 0, wx.ALIGN_CENTER)
 

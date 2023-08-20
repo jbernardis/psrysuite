@@ -227,12 +227,12 @@ class Port(District):
 			self.rr.AddSignalLED("PB2",  self, n, addr, [(3, 0), (3, 1), (3, 2)])
 			self.rr.AddSignalLED("PB4",  self, n, addr, [(3, 3), (3, 4), (3, 5)])
 
-			self.rr.AddHandswitchInd("PBSw5",  self, n, addr, [(3, 6), (3, 7)])
+			self.rr.AddHandswitchInd("PBSw5",  self, n, addr, [(3, 6), (3, 7)], inverted=True)
 
 			self.rr.AddSignalLED("PB12",  self, n, addr, [(4, 0), (4, 1), (4, 2)])
 			self.rr.AddSignalLED("PB14",  self, n, addr, [(4, 3), (4, 4), (4, 5)])
 
-			self.rr.AddHandswitchInd("PBSw15ab",  self, n, addr, [(4, 6), (4, 7)])
+			self.rr.AddHandswitchInd("PBSw15ab",  self, n, addr, [(4, 6), (4, 7)], inverted=True)
 			
 			self.rr.AddBlockInd("P30", self, n, addr, [(5, 0)])
 			self.rr.AddBlockInd("P42", self, n, addr, [(5, 1)])
@@ -243,12 +243,12 @@ class Port(District):
 			self.rr.AddTurnoutLock("PBSw1", self, n, addr, [(5, 6)])
 			self.rr.AddTurnoutLock("PBSw3", self, n, addr, [(5, 7)])
 
-			self.rr.AddHandswitchInd("PBSw5", self, n, addr, [(6, 0)])
+			self.rr.AddHandswitchInd("PBSw5", self, n, addr, [(6, 0)], inverted=True)
 			
 			self.rr.AddTurnoutLock("PBSw11", self, n, addr, [(6, 1)])
 			self.rr.AddTurnoutLock("PBSw13", self, n, addr, [(6, 2)])
 	
-			self.rr.AddHandswitchInd("PBSw15ab",  self, n, addr, [(6, 3)])
+			self.rr.AddHandswitchInd("PBSw15ab",  self, n, addr, [(6, 3)], inverted=True)
 			
 			self.rr.AddStopRelay("P32.srel", self, n, addr, [(6, 4)])
 			self.rr.AddStopRelay("P41.srel", self, n, addr, [(6, 5)])

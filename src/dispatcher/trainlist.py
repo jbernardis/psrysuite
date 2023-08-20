@@ -54,9 +54,12 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.Bind(wx.EVT_SIZE, self.OnResize)
 		self.Bind(wx.EVT_IDLE,self.OnIdle)
-		self.suppressYards = True
-		self.suppressUnknown = False
-		self.suppressNonATC = False
+		
+		self.settings = parent.settings
+		self.suppressYards =   self.settings.activesuppressyards
+		self.suppressUnknown = self.settings.activesuppressunknown
+		self.suppressNonATC =  self.settings.activeonlyatc
+
 		self.resized = False
 
 		self.dlgExit = dlgExit

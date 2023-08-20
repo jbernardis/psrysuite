@@ -31,8 +31,12 @@ class Settings:
 		self.serverport = 9000
 		self.socketport = 9001
 		self.showcameras = False
-		self.allowatcrequests = True #False
-
+		self.allowatcrequests = True
+		self.precheckshutdownserver = True
+		self.activesuppressyards = True
+		self.activesuppressunknown = False
+		self.activeonlyatc = False
+		
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
 		if not self.cfg.read(self.inifile):
@@ -55,6 +59,18 @@ class Settings:
 
 				elif opt == 'dispatch':
 					self.dispatch = parseBoolean(value, False)
+
+				elif opt == 'precheckshutdownserver':
+					self.precheckshutdownserver = parseBoolean(value, True)
+
+				elif opt == 'activesuppressyards':
+					self.activesuppressyards = parseBoolean(value, True)
+
+				elif opt == 'activesuppressunknown':
+					self.activesuppressunknown = parseBoolean(value, False)
+
+				elif opt == 'activeonlyatc':
+					self.activeonlyatc = parseBoolean(value, False)
 
 				elif opt == 'showcameras':
 					self.showcameras = parseBoolean(value, False)
