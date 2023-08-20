@@ -34,7 +34,7 @@ class Settings:
 		self.topulsect = 3
 		self.nxbpulselen = 4
 		self.nxbpulsect = 2
-
+		self.pendingdetectionlosscycles = 2
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
 		if not self.cfg.read(self.inifile):
@@ -66,6 +66,9 @@ class Settings:
 
 				elif opt == "nxbpulsect":
 					self.nxbpulsect = int(value)
+
+				elif opt == "pendingdetectionlosscycles":
+					self.pendingdetectionlosscycles = int(value)
 
 		else:
 			logging.warning("Missing %s section - assuming defaults" % self.section)

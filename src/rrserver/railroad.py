@@ -19,8 +19,6 @@ from rrserver.constants import INPUT_BLOCK, INPUT_TURNOUTPOS, INPUT_BREAKER, INP
 from rrserver.rrobjects import Block, StopRelay, Signal, SignalLever, RouteIn, Turnout,\
 			OutNXButton, Handswitch, Breaker, Indicator, ODevice, Lock
 
-pendingDetectionLossCycles = 3  # how many cycles before we "Believe" detection loss
-
 class Railroad():
 	def __init__(self, parent, cbEvent, settings):
 		self.cbEvent = cbEvent
@@ -1130,10 +1128,11 @@ class PendingDetectionLoss:
 	def __init__(self, railroad):
 		self.pendingDetectionLoss = {}
 		self.railroad = railroad
+		self.pendingDetectionLossCycles = railroad.settings.pendingdetectionlosscycles
 				
 	def Add(self, block, obj):
 		logging.info("adding block %s to pending detection loss list" % block)
-		self.pendingDetectionLoss[block] = [obj, pendingDetectionLossCycles]
+		self.pendingDetectionLoss[block] = [obj, self.pendingDetectionLossCycles]
 		
 	def Remove(self, block):
 		try:
