@@ -409,7 +409,7 @@ class MainUnit:
 			return True
 
 		# don't try to evaluate switches and/or signals if the exit block is not available		
-		if exitState != 0:
+		if exitState != 0 or exitClear != 0:
 			logging.info("eval false - exit block %s not available" % exitBlk)
 			return False
 		
