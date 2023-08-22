@@ -5,6 +5,7 @@ from traineditor.rrserver import RRServer
 from traineditor.trainsequences.trainblocksequencedlg import TrainBlockSequencesDlg
 from traineditor.tracker.traintrackerdlg import TrainTrackerDlg
 from traineditor.locomotives.managelocos import ManageLocosDlg
+from utilities.backup import saveData, restoreData
 
 
 class MainFrame(wx.Frame):
@@ -33,6 +34,12 @@ class MainFrame(wx.Frame):
 		self.bLayout = wx.Button(self, wx.ID_ANY, "Generate Layout File", size=(200, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBLayout, self.bLayout)
 				
+		self.bBackup = wx.Button(self, wx.ID_ANY, "Backup Data Files", size=(200, 50))
+		self.Bind(wx.EVT_BUTTON, self.OnBBackup, self.bBackup)
+				
+		self.bRestore = wx.Button(self, wx.ID_ANY, "Restore Data Files", size=(200, 50))
+		self.Bind(wx.EVT_BUTTON, self.OnBRestore, self.bRestore)
+				
 		self.bExit = wx.Button(self, wx.ID_ANY, "Exit", size=(80, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBExit, self.bExit)
 
@@ -47,6 +54,12 @@ class MainFrame(wx.Frame):
 		
 		vsz.AddSpacer(40)
 		vsz.Add(self.bLayout, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vsz.AddSpacer(40)
+		vsz.Add(self.bBackup, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vsz.AddSpacer(10)
+		vsz.Add(self.bRestore, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
 		vsz.AddSpacer(40)
 		
@@ -85,7 +98,13 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 		if rv == wx.ID_YES:
 			self.RRServer.SendRequest({"genlayout": {}})
-		
+
+	def OnBBackup(self, _):
+		saveData(self, self.settings)
+				
+	def OnBRestore(self, _):
+		restoreData(self, self.settings)
+				
 	def OnBExit(self, _):
 		self.doExit()
 		

@@ -5,6 +5,7 @@ import winshell
 
 from config.settings import Settings
 from config.generatedlg import GenerateDlg
+from utilities.backup import saveData, restoreData
 
 		
 class MainFrame(wx.Frame):
@@ -167,13 +168,24 @@ class MainFrame(wx.Frame):
 		self.bSave = wx.Button(self, wx.ID_ANY, "Save", size=(200, 60))
 		vszr.Add(self.bSave, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		self.Bind(wx.EVT_BUTTON, self.OnBSave, self.bSave)
-		vszr.AddSpacer(30)
+		vszr.AddSpacer(20)
 		
 		self.bGenerate = wx.Button(self, wx.ID_ANY, "Generate Shortcuts/Start Menu", size=(200, 60))
 		vszr.Add(self.bGenerate, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenerate, self.bGenerate)
 		vszr.AddSpacer(20)
 
+				
+		self.bBackup = wx.Button(self, wx.ID_ANY, "Backup Data Files", size=(200, 50))
+		vszr.Add(self.bBackup, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		self.Bind(wx.EVT_BUTTON, self.OnBBackup, self.bBackup)
+		vszr.AddSpacer(10)
+				
+		self.bRestore = wx.Button(self, wx.ID_ANY, "Restore Data Files", size=(200, 50))
+		vszr.Add(self.bRestore, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		self.Bind(wx.EVT_BUTTON, self.OnBRestore, self.bRestore)
+		vszr.AddSpacer(20)
+		
 		hszr = wx.BoxSizer(wx.HORIZONTAL)
 		hszr.AddSpacer(10)
 		hszr.Add(vszr)
@@ -232,6 +244,12 @@ class MainFrame(wx.Frame):
 		dlg = GenerateDlg(self, self.GenShortcut)
 		dlg.ShowModal()
 		dlg.Destroy
+
+	def OnBBackup(self, _):
+		saveData(self, self.settings)
+				
+	def OnBRestore(self, _):
+		restoreData(self, self.settings)
 		
 	def OnBSave(self, _):
 		self.settings.ipaddr = self.teIpAddr.GetValue()

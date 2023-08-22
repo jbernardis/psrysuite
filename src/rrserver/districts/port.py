@@ -52,13 +52,13 @@ class Port(District):
 			self.rr.AddSignal("PA4L",   self, n, addr, [])  # virtual signals for semaphores
 			self.rr.AddSignal("PA10L",  self, n, addr, [])
 		
-			self.rr.AddSignalLED("PA4",  self, n, addr, [(2, 7), (3, 0), (3, 1)])
-			self.rr.AddSignalLED("PA6",  self, n, addr, [(3, 2), (3, 3), (3, 4)])
-			self.rr.AddSignalLED("PA8",  self, n, addr, [(3, 5), (3, 6), (3, 7)])
-			self.rr.AddSignalLED("PA10", self, n, addr, [(4, 0), (4, 1), (4, 2)])
-			self.rr.AddSignalLED("PA12", self, n, addr, [(4, 3), (4, 4), (4, 5)])
-			self.rr.AddSignalLED("PA32", self, n, addr, [(4, 6), (4, 7), (5, 0)])
-			self.rr.AddSignalLED("PA34", self, n, addr, [(5, 1), (5, 2), (5, 3)])
+			self.rr.AddSignalLED("PA4",  self, n, addr, [(3, 1), (3, 0), (2, 7)])
+			self.rr.AddSignalLED("PA6",  self, n, addr, [(3, 4), (3, 3), (3, 2)])
+			self.rr.AddSignalLED("PA8",  self, n, addr, [(3, 7), (3, 6), (3, 5)])
+			self.rr.AddSignalLED("PA10", self, n, addr, [(4, 2), (4, 1), (4, 0)])
+			self.rr.AddSignalLED("PA12", self, n, addr, [(4, 5), (4, 4), (4, 3)])
+			self.rr.AddSignalLED("PA32", self, n, addr, [(5, 0), (4, 7), (4, 6)])
+			self.rr.AddSignalLED("PA34", self, n, addr, [(5, 3), (5, 2), (5, 1)])
 		
 			self.rr.AddBlockInd("P21", self, n, addr, [(5, 4)])
 			self.rr.AddBlockInd("P40", self, n, addr, [(5, 5)])
@@ -224,13 +224,13 @@ class Port(District):
 			self.rr.AddSignal("PB12R", self, n, addr, [(2, 2), (2, 3), (2, 4)])
 			self.rr.AddSignal("PB14R", self, n, addr, [(2, 5), (2, 6), (2, 7)])
 
-			self.rr.AddSignalLED("PB2",  self, n, addr, [(3, 0), (3, 1), (3, 2)])
-			self.rr.AddSignalLED("PB4",  self, n, addr, [(3, 3), (3, 4), (3, 5)])
+			self.rr.AddSignalLED("PB2",  self, n, addr, [(3, 2), (3, 1), (3, 0)])
+			self.rr.AddSignalLED("PB4",  self, n, addr, [(3, 5), (3, 4), (3, 3)])
 
 			self.rr.AddHandswitchInd("PBSw5",  self, n, addr, [(3, 6), (3, 7)], inverted=True)
 
-			self.rr.AddSignalLED("PB12",  self, n, addr, [(4, 0), (4, 1), (4, 2)])
-			self.rr.AddSignalLED("PB14",  self, n, addr, [(4, 3), (4, 4), (4, 5)])
+			self.rr.AddSignalLED("PB12",  self, n, addr, [(4, 2), (4, 1), (4, 0)])
+			self.rr.AddSignalLED("PB14",  self, n, addr, [(4, 5), (4, 4), (4, 3)])
 
 			self.rr.AddHandswitchInd("PBSw15ab",  self, n, addr, [(4, 6), (4, 7)], inverted=True)
 			
