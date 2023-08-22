@@ -994,12 +994,12 @@ class Railroad():
 				if objType == INPUT_BLOCK:
 					# if block has changed to occupied
 					if newval != 0:
-						# if we have a pending detection loss, just clear the pending flag and ignore this change
-						if not self.pendingDetectionLoss.Remove(objName):
-							# false means there was nothing pending. this is a normal detection gain - just process it
-							if obj.SetOccupied(newval != 0):
-								self.RailroadEvent(obj.GetEventMessage())
-								obj.UpdateIndicators()
+						# remove any pending detectio loss
+						self.pendingDetectionLoss.Remove(objName)
+						# and process the detection gain
+						if obj.SetOccupied(newval != 0):
+							self.RailroadEvent(obj.GetEventMessage())
+							obj.UpdateIndicators()
 					
 					# otherwise, this is a detection loss - add it to pending
 					else:

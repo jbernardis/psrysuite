@@ -23,15 +23,6 @@ class Cliff(District):
 		self.released = False
 		self.control = 2
 		
-  # self.revCSw21a = None
-  # self.revCSw21b = None
-  # self.revCSw19  = None
-  # self.revCSw15  = None
-  # self.revCSw11  = None
-  #
-  # self.revIndicators = [ "CSw21a", "CSw21b", "CSw19", "CSw15", "CSw11" ]
-  # self.norm = { ind: None for ind in self.revIndicators }
-
 		addr = GREENMTN
 		with self.nodes[addr] as n:
 			# outputs

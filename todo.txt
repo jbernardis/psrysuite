@@ -1,5 +1,6 @@
 
 call on signals - I think it refers to JUST lighting the signal with no route clearing etc
+what is supposed to happen when the operator presses the red buttons on their panels
 
 verify the correct sequencing of subblocks
     S11: S11A, S11B
@@ -17,28 +18,17 @@ sniffer interface - a new process that sends messages to rrserver who then forwa
 
 
 tracker:
-	backup/restore - need a backup/restore for the entire suite - not in tracker
 	reports - the only thing we really need is train cards, and this is not in tracker, but in train editor
 
 I think server periodically crashes or has i/o errors that it can't recover from - why
+do we need a re-open logic in server to help to recover from serial issues
 
 why was a single car train being reported as non-contiguous??
 train contiguous - do not show message is ?? train - disabled for now until we can figure out what's going on
 
-verify all signal lights and turnout lights on all panels - verify proper panel operation.  Verify lever operation and indicators
-	nassau verified
-	cliff
-	yard verified
-	port
-	
 verify signal lever functionality and signal indicators for cliff
-what is supposed to happen when the operator presses the red buttons on their panels
-siding unlock levers from all tower panels - cliff, port
-
-
-new server:
-still have to test port, cliff, hyde on the new server
-
+siding unlock levers from all tower panels - cliff
+still need to resolve inverted fleet and siding indications from cliff
 
 
 possibilities:
