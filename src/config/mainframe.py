@@ -173,18 +173,20 @@ class MainFrame(wx.Frame):
 		self.bGenerate = wx.Button(self, wx.ID_ANY, "Generate Shortcuts/Start Menu", size=(200, 60))
 		vszr.Add(self.bGenerate, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenerate, self.bGenerate)
-		vszr.AddSpacer(20)
+		vszr.AddSpacer(30)
 
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
 				
-		self.bBackup = wx.Button(self, wx.ID_ANY, "Backup Data Files", size=(200, 50))
-		vszr.Add(self.bBackup, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		self.bBackup = wx.Button(self, wx.ID_ANY, "Backup\nData Files", size=(100, 50))
+		hsz.Add(self.bBackup)		
+		hsz.AddSpacer(30)
 		self.Bind(wx.EVT_BUTTON, self.OnBBackup, self.bBackup)
-		vszr.AddSpacer(10)
-				
-		self.bRestore = wx.Button(self, wx.ID_ANY, "Restore Data Files", size=(200, 50))
-		vszr.Add(self.bRestore, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		self.bRestore = wx.Button(self, wx.ID_ANY, "Restore\nData Files", size=(100, 50))
+		hsz.Add(self.bRestore)
 		self.Bind(wx.EVT_BUTTON, self.OnBRestore, self.bRestore)
-		vszr.AddSpacer(20)
+		
+		vszr.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		vszr.AddSpacer(30)
 		
 		hszr = wx.BoxSizer(wx.HORIZONTAL)
 		hszr.AddSpacer(10)

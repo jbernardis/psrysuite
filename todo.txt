@@ -30,6 +30,8 @@ verify signal lever functionality and signal indicators for cliff
 siding unlock levers from all tower panels - cliff
 still need to resolve inverted fleet and siding indications from cliff
 
+implement notes in autorouter when evaluating a route
+
 
 possibilities:
 	ar/atc/advisor - ??get rid of checkboxes and have always on???
