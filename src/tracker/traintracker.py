@@ -24,7 +24,7 @@ from tracker.trainroster import TrainRoster
 from tracker.locomotives import Locomotives
 from tracker.engineers import Engineers
 from tracker.activetrain import ActiveTrain
-from tracker.activetrainlist import ActiveTrainList, FWD_128, FWD_28, REV_128, REV_28, STOP 
+from tracker.activetrainlist import ActiveTrainList   #, FWD_128, FWD_28, REV_128, REV_28, STOP 
 from tracker.activetrainlistctrl import ActiveTrainListCtrl
 from tracker.activetrainlistdlg import ActiveTrainListDlg
 from tracker.completedtrainlist import CompletedTrainList
@@ -36,7 +36,7 @@ from tracker.settings import Settings
 from tracker.reports import Report
 from tracker.completedtrains import CompletedTrains
 from tracker.listener import Listener
-from tracker.backup import saveData, restoreData
+from utilities.backup import saveData, restoreData
 from tracker.engqueuedlg import EngQueueDlg
 from dispatcher.breaker import BreakerName
 
@@ -1428,10 +1428,10 @@ class TrainTrackerPanel(wx.Panel):
 		self.report.TrainCards(self.trainRoster, self.extraTrains, self.trainSchedule)
 		
 	def onSaveData(self, _):
-		saveData(self, self.settings)
+		saveData(self)
 		
 	def onRestoreData(self, _):
-		restoreData(self, self.settings)
+		restoreData(self)
 			
 	def onClose(self, _):
 		if self.atl.count() > 0:

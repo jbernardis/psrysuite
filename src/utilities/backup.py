@@ -11,7 +11,7 @@ TYPE_LOCO = "loco"
 root = "<root>"
 BTNSZ = (120, 46)
 
-def saveData(parent, settings):
+def saveData(parent):
 		wildcard = "ZIP File (*.zip)|*.zip"
 		dlg = wx.FileDialog(
 			parent, message="Save data files to zip file ...", defaultDir=os.getcwd(),
@@ -53,15 +53,15 @@ def saveData(parent, settings):
 		dlg.ShowModal()
 		dlg.Destroy()
 
-def fileExists(fn, settings):
-	fqfn = formFileName(fn, settings)
+def fileExists(fn):
+	fqfn = formFileName(fn)
 	return os.path.isfile(fqfn)
 
-def formFileName(fn, settings):
+def formFileName(fn):
 	return os.path.join(os.getcwd(), fn)
 
 		
-def restoreData(parent, settings):
+def restoreData(parent):
 		wildcard = "ZIP File (*.zip)|*.zip"
 		dlg = wx.FileDialog(
 			parent, message="Restore data files from ...", defaultDir=os.getcwd(),
@@ -112,7 +112,7 @@ def restoreData(parent, settings):
 
 			exists = []
 			for fx in range(len(nl)):
-				exists.append(nlFlags[fx] and fileExists(nl[fx], settings))
+				exists.append(nlFlags[fx] and fileExists(nl[fx]))
 				
 			exct = 0
 			for f in exists:
@@ -123,7 +123,7 @@ def restoreData(parent, settings):
 				exfl = []
 				for fx in range(len(nl)):
 					if exists[fx]:
-						exfl.append(formFileName(nl[fx], settings))
+						exfl.append(formFileName(nl[fx]))
 
 				dlg = ChooseOverwriteFiles(parent, exfl)
 				rc = dlg.ShowModal()
@@ -144,7 +144,7 @@ def restoreData(parent, settings):
 			for fx in range(len(nl)):
 				if nlFlags[fx]:
 					fn = nl[fx]
-					dfn = formFileName(fn, settings)
+					dfn = formFileName(fn)
 					f = os.path.basename(fn)
 						
 					data = zfp.read(fn)

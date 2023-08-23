@@ -380,7 +380,7 @@ class MainUnit:
 		
 		OSClear = blk.GetClear()
 		
-		# look at state of exit block
+		# determine all route characteristics
 		ends = rte.GetEnds()
 		if ends[0] == blkName:
 			exitBlk = ends[1]
@@ -403,16 +403,22 @@ class MainUnit:
 			
 		logging.info("Exit block %s State = %d clear = %d" % (exitBlk, exitState, exitClear))
 			
-		# if the active route is the one we want
 		if activeRte is not None and activeRte.GetName() == rname and OSClear and exitState == 0 and exitClear != 0:
 			logging.info("eval true - want current route and route is already clear")
 			return True
+		
+		if activeRte is not None and activeRte.GetName() != rname and OSClear:
+			logging.info("eval false - another cleared route is currently set up through the OS")
+			return False
 
-		# don't try to evaluate switches and/or signals if the exit block is not available		
 		if exitState != 0 or exitClear != 0:
 			logging.info("eval false - exit block %s not available" % exitBlk)
 			return False
-		
+					
+		if activeRte is not None and activeRte.GetName() == rname and not OSClear and exitState != 0:
+			logging.info("eval false - previous train has not left the exit block yet")
+			return False
+
 		# otherwise, the route through the OS needs to change - so we need to check for locked
 		# turnouts and signals
 		
