@@ -173,9 +173,13 @@ class District:
 				rteSet = rte.GetSetTurnouts()
 				if all(x in toMap for x in rteSet):
 					rteMap[osName] = rte
-
+		
 		for osn, rte in rteMap.items():
-			self.blocks[osn].SetRoute(None if rte is None else rte)
+			if rte is None:
+				self.blocks[osn].SetRoute(None)
+		for osn, rte in rteMap.items():
+			if rte is not None:
+				self.blocks[osn].SetRoute(rte)
 
 	def MatrixTurnoutRequest(self, tolist, interval = 0):
 		first = True

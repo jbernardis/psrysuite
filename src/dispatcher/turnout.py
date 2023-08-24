@@ -124,9 +124,9 @@ class Turnout:
 		self.normal = False
 		if self.pairedTurnout is not None:
 			if self.opposite:
-				self.pairedTurnout.SetNormal(refresh)
+				self.pairedTurnout.SetNormal(refresh, force)
 			else:
-				self.pairedTurnout.SetReverse(refresh)
+				self.pairedTurnout.SetReverse(refresh, force)
 		self.district.DetermineRoute(self.blockList)
 
 		if refresh:
@@ -143,9 +143,9 @@ class Turnout:
 		self.normal = True
 		if self.pairedTurnout is not None:
 			if self.opposite:
-				self.pairedTurnout.SetReverse(refresh)
+				self.pairedTurnout.SetReverse(refresh, force)
 			else:
-				self.pairedTurnout.SetNormal(refresh)
+				self.pairedTurnout.SetNormal(refresh, force)
 
 		self.district.DetermineRoute(self.blockList)
 		if refresh:

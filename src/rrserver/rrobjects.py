@@ -654,7 +654,8 @@ class Turnout:
     def IsLocked(self):
         return self.locked
         
-    def GetEventMessage(self, lock=False):
+    def GetEventMessage(self, lock=False, force=False):
+        self.force = force
         if lock:
             return {"turnoutlock": [{ "name": self.name, "state": 1 if self.locked else 0}]}
         else:

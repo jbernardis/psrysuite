@@ -86,11 +86,11 @@ class Cliff(District):
 			self.rr.AddSignalLED("C22", self, n, addr, [(3, 2), (3, 3), (3, 4)])
 			self.rr.AddSignalLED("C24", self, n, addr, [(3, 5), (3, 6), (3, 7)])
 
-			self.rr.AddHandswitchInd("CSw3",  self, n, addr, [(4, 0), (4, 1)])
-			self.rr.AddHandswitchInd("CSw11", self, n, addr, [(4, 2), (4, 3)])
-			self.rr.AddHandswitchInd("CSw15", self, n, addr, [(4, 4), (4, 5)])
-			self.rr.AddHandswitchInd("CSw19", self, n, addr, [(4, 6), (4, 7)])
-			self.rr.AddHandswitchInd("CSw21ab", self, n, addr, [(5, 0), (5, 1)])
+			self.rr.AddHandswitchInd("CSw3",  self, n, addr, [(4, 0), (4, 1)], inverted=True)
+			self.rr.AddHandswitchInd("CSw11", self, n, addr, [(4, 2), (4, 3)], inverted=True)
+			self.rr.AddHandswitchInd("CSw15", self, n, addr, [(4, 4), (4, 5)], inverted=True)
+			self.rr.AddHandswitchInd("CSw19", self, n, addr, [(4, 6), (4, 7)], inverted=True)
+			self.rr.AddHandswitchInd("CSw21ab", self, n, addr, [(5, 0), (5, 1)], inverted=True)
 			
 			self.rr.AddBlockInd("B10", self, n, addr, [(5, 2)])
 			
@@ -322,7 +322,6 @@ class Cliff(District):
 			"CC44W", "CC43W", "CC42W", "CC41W", "CC40W", "CC21W", "CC50W", "CC51W", "CC52W", "CC53W", "CC54W",
 		]
 
-
 	def PressButton(self, btn):
 		self.rr.SetRouteIn(btn.Name())
 		
@@ -359,17 +358,18 @@ class Cliff(District):
 	def CheckTurnoutPosition(self, tout):
 		self.rr.RailroadEvent({"turnout": [{"name": tout.Name(), "state": "N" if tout.IsNormal() else "R"}]})
 
-	def DetermineSignalLevers(self):
-		self.sigLever["C2"] = self.DetermineSignalLever(["C2L"], ["C2RA", "C2RB", "C2RC", "C2RD"])  # signal indicators
-		self.sigLever["C4"] = self.DetermineSignalLever(["C4LA", "C4LB", "C4LC", "C4LD"], ["C4R"])
-		self.sigLever["C6"] = self.DetermineSignalLever(["C6L"], ["C6RA", "C6RB", "C6RC", "C6RD", "C6RE", "C6RF", "C6RG", "C6RH", "C6GJ", "C6RK", "C6RL"])
-		self.sigLever["C8"] = self.DetermineSignalLever(["C8LA", "C8LB", "C8LC", "C8LD", "C8LE", "C8LF", "C8LG", "C8LH", "C8LJ", "C8LK", "C8LL"], ["C8R"])
-		self.sigLever["C10"] = self.DetermineSignalLever(["C10L"], ["C10R"])
-		self.sigLever["C12"] = self.DetermineSignalLever(["C12L"], ["C12R"])
-		self.sigLever["C14"] = self.DetermineSignalLever(["C14LA", "C14LB"], ["C14R"])
-		self.sigLever["C18"] = self.DetermineSignalLever(["C18L"], ["C18RA", "C18RB"])
-		self.sigLever["C22"] = self.DetermineSignalLever(["C22L"], ["C22R"])
-		self.sigLever["C24"] = self.DetermineSignalLever(["C24L"], ["C24R"])
+ # def DetermineSignalLevers(self):
+ # 	self.sigLever["C2"] = self.DetermineSignalLever(["C2L"], ["C2RA", "C2RB", "C2RC", "C2RD"])  # signal indicators
+ # 	self.sigLever["C4"] = self.DetermineSignalLever(["C4LA", "C4LB", "C4LC", "C4LD"], ["C4R"])
+ # 	self.sigLever["C6"] = self.DetermineSignalLever(["C6L"], ["C6RA", "C6RB", "C6RC", "C6RD", "C6RE", "C6RF", "C6RG", "C6RH", "C6GJ", "C6RK", "C6RL"])
+ # 	self.sigLever["C8"] = self.DetermineSignalLever(["C8LA", "C8LB", "C8LC", "C8LD", "C8LE", "C8LF", "C8LG", "C8LH", "C8LJ", "C8LK", "C8LL"], ["C8R"])
+ # 	self.sigLever["C10"] = self.DetermineSignalLever(["C10L"], ["C10R"])
+ # 	self.sigLever["C12"] = self.DetermineSignalLever(["C12L"], ["C12R"])
+ # 	self.sigLever["C14"] = self.DetermineSignalLever(["C14LA", "C14LB"], ["C14R"])
+ # 	self.sigLever["C18"] = self.DetermineSignalLever(["C18L"], ["C18RA", "C18RB"])
+ # 	self.sigLever["C22"] = self.DetermineSignalLever(["C22L"], ["C22R"])
+ # 	self.sigLever["C24"] = self.DetermineSignalLever(["C24L"], ["C24R"])
+ #
 
 
 	def SetHandswitchIn(self, hs, state):
@@ -399,8 +399,7 @@ class Cliff(District):
 			optBankFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
 			optClivedenFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
 			optFleet = self.rr.GetControlOption("cliff.fleet")  # 0 => no fleeting, 1 => fleeting
-			
-			
+						
 		dispatchList = self.fleetedSignals[self.control]
 		panelList = [x for x in self.fleetedSignals[2] if x not in dispatchList]
 		
@@ -411,7 +410,6 @@ class Cliff(District):
 			if self.control in [0, 1]:  # the only control options that have local fleeting ability
 				for signame in panelList:
 					self.rr.RailroadEvent({"fleet": [{"name": signame, "value": optFleet}]})
-			
 
 		rlReq = self.nodes[CLIFF].GetInputBit(6, 3)
 			

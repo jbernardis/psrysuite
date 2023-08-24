@@ -1011,15 +1011,19 @@ class Railroad():
 						bits, district, node, address = pos
 						nflag = node.GetInputBit(bits[0][0], bits[0][1])
 						rflag = node.GetInputBit(bits[1][0], bits[1][1])
+						'''
+						the switch itself is telling us what position it is it.  This
+						must be forced on all display programs
+						'''
 						if obj.IsNormal():
 							if nflag == 0 and rflag == 1:
 								if obj.SetNormal(False):
-									self.RailroadEvent(obj.GetEventMessage())
+									self.RailroadEvent(obj.GetEventMessage(force=True))
 									obj.UpdateLed()
 						else:
 							if nflag == 1 and rflag == 0:
 								if obj.SetNormal(True):
-									self.RailroadEvent(obj.GetEventMessage())
+									self.RailroadEvent(obj.GetEventMessage(force=True))
 									obj.UpdateLed()
 								
 					if obj.HasLever():

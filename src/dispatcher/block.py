@@ -80,6 +80,17 @@ class Route:
 	def GetSignals(self):
 		return self.signals
 	
+	def RemoveOccupiedStatus(self):
+		print("remove occupied status from route %s" % self.name, flush=True)
+		for t, screen, pos, revflag in self.osblk.tiles:
+			print("consider position %d %d" % (pos[0], pos[1]), flush=True)
+			if pos in self.pos:
+				print("That's in this route", flush=True)
+				bmp = t.getBmp(EMPTY, True, revflag)
+				self.osblk.frame.DrawTile(screen, pos, bmp)
+			else:
+				print("sorry - not in this routr")
+	
 	def RemoveClearStatus(self):
 		if self.osblk.IsReversed():
 			b = self.blkin
@@ -723,6 +734,7 @@ class OverSwitch (Block):
 		if self.route is not None:
 			self.route.ReleaseSignalLocks()  # release locks along the old route
 			self.route.RemoveClearStatus()
+			self.route.RemoveOccupiedStatus()
 
 		self.route = route
 		self.rtName = newName

@@ -4,7 +4,6 @@ from rrserver.district import District
 from rrserver.constants import  NASSAUW, NASSAUE, NASSAUNX
 from rrserver.node import Node
 
-
 class Nassau(District):
 	def __init__(self, rr, name, settings):
 		District.__init__(self, rr, name, settings)
@@ -44,7 +43,6 @@ class Nassau(District):
 			self.rr.AddIndicator("S11AB", self, n, addr, [(2, 7)]) # Shore approach indicator
 			self.rr.AddBlockInd("R10",    self, n, addr, [(3, 0)]) # Shore approach indicator
 			self.rr.AddBlockInd("B20",    self, n, addr, [(3, 1)]) # Bank approach indicator
-
 
 			self.rr.AddIndicator("NFleet",  self, n, addr, [(3, 2)])
 			self.rr.AddIndicator("nNFleet", self, n, addr, [(3, 3)]) # negated nassau fleet
@@ -323,28 +321,29 @@ class Nassau(District):
 			}
 
 		}
-
-
-
-
-
-
-
-	def DetermineSignalLevers(self):
-		self.sigLever["N14"] = self.DetermineSignalLever(["N14LA", "N14LB", "N14LC"], ["N14R"])
-		self.sigLever["N16"] = self.DetermineSignalLever(["N16L"], ["N16R"])
-		self.sigLever["N18"] = self.DetermineSignalLever(["N18LA", "N18LB"], ["N18R"])
-		self.sigLever["N20"] = self.DetermineSignalLever(["N20L"], ["N20R"])
-		self.sigLever["N24"] = self.DetermineSignalLever(["N24L"], ["N24RA", "N24RB", "N24RC", "N24RD"])
-		self.sigLever["N26"] = self.DetermineSignalLever(["N26L"], ["N26RA", "N26RB", "N26RC"])
-		self.sigLever["N28"] = self.DetermineSignalLever(["N28L"], ["N28R"])
-
-
-
-
-
-
-
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ # def DetermineSignalLevers(self):
+ # 	self.sigLever["N14"] = self.DetermineSignalLever(["N14LA", "N14LB", "N14LC"], ["N14R"])
+ # 	self.sigLever["N16"] = self.DetermineSignalLever(["N16L"], ["N16R"])
+ # 	self.sigLever["N18"] = self.DetermineSignalLever(["N18LA", "N18LB"], ["N18R"])
+ # 	self.sigLever["N20"] = self.DetermineSignalLever(["N20L"], ["N20R"])
+ # 	self.sigLever["N24"] = self.DetermineSignalLever(["N24L"], ["N24RA", "N24RB", "N24RC", "N24RD"])
+ # 	self.sigLever["N26"] = self.DetermineSignalLever(["N26L"], ["N26RA", "N26RB", "N26RC"])
+ # 	self.sigLever["N28"] = self.DetermineSignalLever(["N28L"], ["N28R"])
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
 
 	def PressButton(self, btn):
 		'''
@@ -381,7 +380,6 @@ class Nassau(District):
 				return []
 		
 		return tolist
-
 	
 	def SelectRouteIn(self, rt):
 		if rt.Name() in self.coachRoutes:		
@@ -415,7 +413,6 @@ class Nassau(District):
 		dispatchList = self.fleetedSignals[self.control]
 		panelList = [x for x in self.fleetedSignals[2] if x not in dispatchList]
 		
-
 		if self.control in [0, 1]: 
 			if self.fleetPanel != fleetPanel:
 				self.fleetPanel = fleetPanel

@@ -165,7 +165,6 @@ class ChooseRestoreFiles(wx.Dialog):
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		
 		self.files = files
-		print("in choose restore filed: %s" % str(self.files))
 
 		vsizer = wx.BoxSizer(wx.VERTICAL)
 		vsizer.AddSpacer(20)
