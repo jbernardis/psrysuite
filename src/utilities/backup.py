@@ -1,6 +1,7 @@
 
 import wx
 import os
+from glob import glob
 from zipfile import ZipFile, is_zipfile
 
 TYPE_TRAIN = "train"
@@ -12,19 +13,17 @@ root = "<root>"
 BTNSZ = (120, 46)
 
 def saveData(parent, settings):
-	wildcard = "ZIP File (*.zip)|*.zip"
-	dlg = wx.FileDialog(
-		parent, message="Save data files to zip file ...", defaultDir=settings.backupdir,
-		defaultFile="", wildcard=wildcard, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
-		)
+	dlg = ChooseItemDlg(parent, True, settings)
 	rc = dlg.ShowModal()
 	if rc == wx.ID_OK:
-		zipfile = dlg.GetPath()
-
+		zf = dlg.GetValue()
 	dlg.Destroy()
 	if rc != wx.ID_OK:
 		return
 	
+	if zf is None:
+		return
+
 	dirs = {
 		root: os.path.join(os.getcwd(), "data"),
 		"locos": os.path.join(os.getcwd(), "data", "locos"),
@@ -34,9 +33,13 @@ def saveData(parent, settings):
 
 	fc = 0
 	msg2 = ""
-	with ZipFile(zipfile, 'w') as zfp:
+	with ZipFile(zf, 'w') as zfp:
 		for d, ddir in dirs.items():
-			fl = [ f for f in os.listdir(ddir) if os.path.isfile(os.path.join(ddir, f)) and not f.endswith(".lock")]
+			try:
+				fl = [ f for f in os.listdir(ddir) if os.path.isfile(os.path.join(ddir, f)) and not f.endswith(".lock")]
+			except FileNotFoundError:
+				fl = []
+				
 			for fn in fl:
 				fc += 1
 				msg2 += "%d: %s\n" % (fc, os.path.join(d, fn))
@@ -47,7 +50,7 @@ def saveData(parent, settings):
 				arcname = os.path.join(arcdir, fn)
 				zfp.write(os.path.join(ddir, fn), arcname = arcname)
 		
-	msg1 = "%d files successfully written to\n%s\n\n" % (fc, zipfile)
+	msg1 = "%d files successfully written to\n%s\n\n" % (fc, zf)
 			
 	dlg = wx.MessageDialog(parent, msg1 + msg2, 'Data backup successfully written', wx.OK | wx.ICON_INFORMATION)
 	dlg.ShowModal()
@@ -62,17 +65,15 @@ def formFileName(fn):
 
 		
 def restoreData(parent, settings):
-	wildcard = "ZIP File (*.zip)|*.zip"	
-
-	dlg = wx.FileDialog(
-		parent, message="Restore data files from ...", defaultDir=settings.backupdir,
-		defaultFile="", wildcard=wildcard, style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST
-		)
+	dlg = ChooseItemDlg(parent, False, settings)
 	rc = dlg.ShowModal()
 	if rc == wx.ID_OK:
-		zf = dlg.GetPath()
+		zf = dlg.GetValue()
 	dlg.Destroy()
 	if rc != wx.ID_OK:
+		return
+	
+	if zf is None:
 		return
 
 	if not is_zipfile(zf):
@@ -159,6 +160,169 @@ def restoreData(parent, settings):
 	dlg = wx.MessageDialog(parent, msg1 + msg2, 'Data restore successful', wx.OK | wx.ICON_INFORMATION)
 	dlg.ShowModal()
 	dlg.Destroy()
+	
+class ChooseItemDlg(wx.Dialog):
+	def __init__(self, parent, allowentry, settings):
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
+		self.settings = settings
+		self.Bind(wx.EVT_CLOSE, self.OnCancel)
+		self.allowentry = allowentry
+		if allowentry:
+			self.SetTitle("Choose/Enter zip file")
+		else:
+			self.SetTitle("Choose zip file")
+		
+		self.allowentry = allowentry
+
+		vszr = wx.BoxSizer(wx.VERTICAL)
+		vszr.AddSpacer(20)
+		
+		if allowentry:
+			style = wx.CB_DROPDOWN
+		else:
+			style = wx.CB_DROPDOWN | wx.CB_READONLY	
+			
+		self.GetFiles()				
+		
+		cb = wx.ComboBox(self, 500, "", size=(160, -1), choices=self.files, style=style)
+		self.cbItems = cb
+		vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		if not allowentry and len(self.files) > 0:
+			self.cbItems.SetSelection(0)
+		else:
+			self.cbItems.SetSelection(wx.NOT_FOUND)
+		
+		vszr.AddSpacer(20)
+		
+		btnszr = wx.BoxSizer(wx.HORIZONTAL)
+		
+		bOK = wx.Button(self, wx.ID_ANY, "OK")
+		bOK.SetDefault()
+		self.Bind(wx.EVT_BUTTON, self.OnBOK, bOK)
+		
+		bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+		self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
+		
+		bDelete = wx.Button(self, wx.ID_ANY, "Delete")
+		self.Bind(wx.EVT_BUTTON, self.OnDelete, bDelete)
+		
+		btnszr.Add(bOK)
+		btnszr.AddSpacer(20)
+		btnszr.Add(bCancel)
+		btnszr.AddSpacer(20)
+		btnszr.Add(bDelete)
+		
+		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vszr.AddSpacer(20)
+				
+		hszr = wx.BoxSizer(wx.HORIZONTAL)
+		hszr.AddSpacer(20)
+		hszr.Add(vszr)
+		
+		hszr.AddSpacer(20)
+		
+		self.SetSizer(hszr)
+		self.Layout()
+		self.Fit();
+		
+	def GetFiles(self):
+		self.files = [os.path.splitext(os.path.split(x)[1])[0] for x in glob(os.path.join(self.settings.backupdir, "*.zip"))]
+		
+	def GetValue(self):
+		fn = self.cbItems.GetValue()
+		if fn is None or fn == "":
+			return None
+		return os.path.join(os.getcwd(), self.settings.backupdir, fn+".zip")
+		
+	def OnCancel(self, _):
+		self.EndModal(wx.ID_CANCEL)
+		
+	def OnBOK(self, _):
+		fn = self.cbItems.GetValue()
+		if fn in self.files and self.allowentry:
+			dlg = wx.MessageDialog(self, "File '%s' already exists.\n Are you sure you want to over-write it?" % fn,
+				"File exists", wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
+			rv = dlg.ShowModal()
+			dlg.Destroy()
+			if rv == wx.ID_NO:
+				return
+
+		self.EndModal(wx.ID_OK)
+		
+	def OnDelete(self, _):
+		dlg = ChooseItemsDlg(self, self.files)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			l = dlg.GetValue()
+			
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+
+		if len(l) == 0:
+			return 
+				
+		for fn in l:
+			path = os.path.join(self.settings.backupdir, fn+".zip")
+			os.unlink(path)
+			
+		self.GetFiles()
+		self.cbItems.SetItems(self.files)
+		if not self.allowentry and len(self.files) > 0:
+			self.cbItems.SetSelection(0)
+		else:
+			self.cbItems.SetSelection(wx.NOT_FOUND)
+
+class ChooseItemsDlg(wx.Dialog):
+	def __init__(self, parent, items):
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
+		self.Bind(wx.EVT_CLOSE, self.OnCancel)
+		self.SetTitle("Choose zip file(s) to delete")
+
+		vszr = wx.BoxSizer(wx.VERTICAL)
+		vszr.AddSpacer(20)
+		
+		cb = wx.CheckListBox(self, wx.ID_ANY, size=(160, -1), choices=items)
+		self.cbItems = cb
+		vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vszr.AddSpacer(20)
+		
+		btnszr = wx.BoxSizer(wx.HORIZONTAL)
+		
+		bOK = wx.Button(self, wx.ID_ANY, "OK")
+		self.Bind(wx.EVT_BUTTON, self.OnBOK, bOK)
+		
+		bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+		self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
+		
+		btnszr.Add(bOK)
+		btnszr.AddSpacer(20)
+		btnszr.Add(bCancel)
+		
+		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
+		vszr.AddSpacer(20)
+				
+		hszr = wx.BoxSizer(wx.HORIZONTAL)
+		hszr.AddSpacer(20)
+		hszr.Add(vszr)
+		
+		hszr.AddSpacer(20)
+		
+		self.SetSizer(hszr)
+		self.Layout()
+		self.Fit();
+		
+	def GetValue(self):
+		return self.cbItems.GetCheckedStrings()
+		
+	def OnCancel(self, _):
+		self.EndModal(wx.ID_CANCEL)
+		
+	def OnBOK(self, _):
+		self.EndModal(wx.ID_OK)
 
 class ChooseRestoreFiles(wx.Dialog):
 	def __init__(self, parent, files):
