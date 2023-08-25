@@ -1428,10 +1428,10 @@ class TrainTrackerPanel(wx.Panel):
 		self.report.TrainCards(self.trainRoster, self.extraTrains, self.trainSchedule)
 		
 	def onSaveData(self, _):
-		saveData(self)
+		saveData(self, self.settings)
 		
 	def onRestoreData(self, _):
-		restoreData(self)
+		restoreData(self, self.settings)
 			
 	def onClose(self, _):
 		if self.atl.count() > 0:

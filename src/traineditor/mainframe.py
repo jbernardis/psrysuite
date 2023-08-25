@@ -101,10 +101,10 @@ class MainFrame(wx.Frame):
 			self.RRServer.SendRequest({"genlayout": {}})
 
 	def OnBBackup(self, _):
-		saveData(self)
+		saveData(self, self.settings)
 				
 	def OnBRestore(self, _):
-		restoreData(self)
+		restoreData(self, self.settings)
 				
 	def OnBExit(self, _):
 		self.doExit()

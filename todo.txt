@@ -33,3 +33,5 @@ still need to resolve inverted fleet and siding indications from cliff
 possibilities:
 	ar/atc/advisor - ??get rid of checkboxes and have always on???
 
+
+reconcile the fact that tracker is not run on the same PC as the rest of the suite.  How should backup/restore work with this?  Should data be sent to/taken from server PC?  Then you couldn't use it without the server PC being on.

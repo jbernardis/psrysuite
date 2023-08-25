@@ -24,6 +24,7 @@ class Settings:
         self.serverport = 9000
         self.socketport = 9001
         self.dccserverport = 9002
+        self.backupdir = os.getcwd()
         
         self.showcameras = True
         self.pages = 1
@@ -69,6 +70,9 @@ class Settings:
                         
                 elif opt == 'ipaddr':
                     self.ipaddr = value        
+                        
+                elif opt == 'backupdir':
+                    self.backupdir = value        
         
         else:
             print("Missing global section - assuming defaults")

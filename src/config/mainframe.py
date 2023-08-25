@@ -248,10 +248,10 @@ class MainFrame(wx.Frame):
 		dlg.Destroy
 
 	def OnBBackup(self, _):
-		saveData(self)
+		saveData(self, self.settings)
 				
 	def OnBRestore(self, _):
-		restoreData(self)
+		restoreData(self, self.settings)
 		
 	def OnBSave(self, _):
 		self.settings.ipaddr = self.teIpAddr.GetValue()

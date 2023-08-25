@@ -11,6 +11,7 @@ class Settings:
 
 		self.ipaddr = "192.168.1.144"
 		self.serverport = 9000
+		self.backupdir = os.getcwd()
 
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -28,9 +29,11 @@ class Settings:
 						s = 9000
 					self.socketport = s
 						
-						
 				elif opt == 'ipaddr':
 					self.ipaddr = value
+						
+				elif opt == 'backupdir':
+					self.backupdir = value
 
 		else:
 			print("Missing global section - assuming defaults")

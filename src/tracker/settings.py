@@ -29,6 +29,7 @@ class Settings:
 		self.socketport = 9001
 		self.dccsnifferport = "COM5"
 		self.dccsnifferbaud = 38400
+		self.backupdir = os.getcwd()
 		
 		self.browser = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
 
@@ -79,6 +80,9 @@ class Settings:
 						
 				elif opt == 'ipaddr':
 					self.ipaddr = value
+						
+				elif opt == 'backupdir':
+					self.backupdir = value
 
 		else:
 			logging.warning("Missing global section - assuming defaults")
