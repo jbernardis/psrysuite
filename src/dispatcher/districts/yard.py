@@ -77,13 +77,13 @@ class Yard (District):
 			"YSw1", "YSw3", "YSw7", "YSw9", "YSw11", "YSw17", "YSw19", "YSw21", "YSw23", "YSw25",
 			"YSw27", "YSw29", "YSw33", "YSw113", "YSw115", "YSw116", "YSw131", "YSw132", "YSw134"])
 
-	def PerformSignalAction(self, sig):
+	def PerformSignalAction(self, sig, oncall=False):
 		controlOpt = self.frame.rbYardControl.GetSelection()
 		if controlOpt == 0:  # Yard local control
 			self.frame.PopupEvent("Yard control is local")
 			return
 
-		District.PerformSignalAction(self, sig)
+		District.PerformSignalAction(self, sig, oncall=oncall)
 
 	def PerformButtonAction(self, btn):
 		controlOpt = self.frame.rbYardControl.GetSelection()

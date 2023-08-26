@@ -14,7 +14,7 @@ class Nassau (District):
 		self.NWBlocks = ["NWOSCY", "NWOSTY", "NWOSW", "NWOSE"]
 		self.NEBlocks = ["NEOSRH", "NEOSW", "NEOSE"]
 
-	def PerformSignalAction(self, sig):
+	def PerformSignalAction(self, sig, oncall=False):
 		controlOpt = self.frame.rbNassauControl.GetSelection()
 		if controlOpt == 0:  # nassau local control
 			self.frame.PopupEvent("Nassau control is local")
@@ -48,7 +48,7 @@ class Nassau (District):
 				self.frame.PopupEvent("Nassau control is main only")
 				return
 
-		if not District.PerformSignalAction(self, sig):
+		if not District.PerformSignalAction(self, sig, oncall=oncall):
 			return
 		#self.EvaluateDistrictLocks(sig)
 		
@@ -157,8 +157,8 @@ class Nassau (District):
 		if blk.GetName() == "N21":
 			self.CheckBlockSignals("N21", "N21W", False)
 			
-	def DoSignalAction(self, sig, aspect):
-		District.DoSignalAction(self, sig, aspect)
+	def DoSignalAction(self, sig, aspect, oncall=0):
+		District.DoSignalAction(self, sig, aspect, oncall=oncall)
 		signame = sig.GetName()
 		if signame in [ "N14LA", "N14LB", "N14LC", "N14LD", "N16L", "N18LA", "N18LB", "N20L" ]:
 			self.CheckBlockSignals("N11", "N11W", False)

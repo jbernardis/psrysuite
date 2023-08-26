@@ -229,35 +229,39 @@ class District:
 		# print("no route found")
 		return None, None
 
-	def PerformSignalAction(self, sig):
+	def PerformSignalAction(self, sig, oncall=False):
 		currentMovement = sig.GetAspect() != 0  # does the CURRENT signal status allow movement
 		signm = sig.GetName()
 		rt, osblk = self.FindRoute(sig)
 
-		if rt is None:
-			self.frame.PopupEvent("No available route")
-			return False
-
-		if osblk.AreHandSwitchesSet():
-			self.frame.PopupEvent("Block is locked")
-			return False
-
-		# this is a valid signal for the current route	
-		if not currentMovement:  # we are trying to change the signal to allow movement
-			aspect = self.CalculateAspect(sig, osblk, rt)
-			if aspect is None:
+		if oncall:
+			aspect = 0 if currentMovement else 1
+		else:
+			if rt is None:
+				self.frame.PopupEvent("No available route")
 				return False
-
-		else:  # we are trying to change the signal to stop the train
-			esig = osblk.GetEntrySignal()
-			if esig is not None and esig.GetName() != signm:
-				self.frame.PopupEvent("Incorrect signal for current route")
+	
+			if osblk.AreHandSwitchesSet():
+				self.frame.PopupEvent("Block is locked")
 				return False
-			aspect = 0
+	
+			# this is a valid signal for the current route	
+			if not currentMovement:  # we are trying to change the signal to allow movement
+				aspect = self.CalculateAspect(sig, osblk, rt)
+				if aspect is None:
+					return False
+	
+			else:  # we are trying to change the signal to stop the train
+				esig = osblk.GetEntrySignal()
+				if esig is not None and esig.GetName() != signm:
+					self.frame.PopupEvent("Incorrect signal for current route")
+					return False
+				aspect = 0
 
-		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "dbg": 1}})
+		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "oncall": 1 if oncall else 0}})
 		
-		sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
+		if not oncall:
+			sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 			
 		return True
 
@@ -585,8 +589,13 @@ class District:
 		else:
 			turnout.SetReverse(refresh=True, force=force)
 
-	def DoSignalAction(self, sig, aspect):
+	def DoSignalAction(self, sig, aspect, oncall=0):
 		signm = sig.GetName()
+		print("got do signal action for signal %s, aspect = %d, oncall = %d" % (signm, aspect, oncall))
+		
+		if oncall != 0:
+			sig.SetAspect(aspect, refresh=True)
+			return
 
 		for blknm, siglist in self.osSignals.items():
 			if signm in siglist:
@@ -598,6 +607,7 @@ class District:
 				if sig.IsPossibleRoute(blknm, rname):
 					break
 		else:
+			print("returning because no possible routes")
 			return
 
 		if aspect < 0:

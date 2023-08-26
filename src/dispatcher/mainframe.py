@@ -1209,13 +1209,13 @@ class MainFrame(wx.Frame):
 			sig = None
 
 		if sig:
-			if right or shift:  # only process left clicks here
+			if right:  # only process left clicks here
 				return
 			
 			if sig.IsDisabled():
 				return
 
-			sig.GetDistrict().PerformSignalAction(sig)
+			sig.GetDistrict().PerformSignalAction(sig, oncall=shift)
 
 		try:
 			hs = self.handswitchMap[(screen, pos)]
@@ -1741,8 +1741,14 @@ class MainFrame(wx.Frame):
 					
 			elif cmd == "signal":
 				for p in parms:
+					print("signal paranmeters: %s" % str(parms))
 					sigName = p["name"]
 					aspect = p["aspect"]
+					try:
+						oncall = int(p["oncall"])
+					except:
+						oncall = 0
+
 					try:
 						sig = self.signals[sigName]
 					except:
@@ -1750,7 +1756,7 @@ class MainFrame(wx.Frame):
 
 					if sig is not None and aspect != sig.GetAspect():
 						district = sig.GetDistrict()
-						district.DoSignalAction(sig, aspect)
+						district.DoSignalAction(sig, aspect, oncall=oncall)
 
 			elif cmd == "siglever":
 				if self.IsDispatcher():

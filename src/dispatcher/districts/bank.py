@@ -29,13 +29,13 @@ class Bank (District):
 
 		District.PerformTurnoutAction(self, turnout, force=force)
 
-	def PerformSignalAction(self, sig):
+	def PerformSignalAction(self, sig, oncall=False):
 		controlOpt = self.frame.rbCliffControl.GetSelection()
 		if controlOpt == 0:  # bank local control
 			self.frame.PopupEvent("Bank control is local")
 			return
 
-		District.PerformSignalAction(self, sig)
+		District.PerformSignalAction(self, sig, oncall=oncall)
 
 	def DetermineRoute(self, blocks):
 		self.FindTurnoutCombinations(blocks, ["CSw17", "CSw23"])
@@ -254,8 +254,8 @@ class Bank (District):
 		if blknm in [ "B20", "B21" ]:
 			self.CheckBlockSignalsAdv("B20", "B21", "B20E", True)
 			
-	def DoSignalAction(self, sig, aspect):
-		District.DoSignalAction(self, sig, aspect)
+	def DoSignalAction(self, sig, aspect, oncall=0):
+		District.DoSignalAction(self, sig, aspect, oncall=oncall)
 		signame = sig.GetName()
 		if signame in [ "C18R", "C22R", "C24R", "C22L", "C24L" ]:
 			self.CheckBlockSignalsAdv("B20", "B21", "B20E", True)

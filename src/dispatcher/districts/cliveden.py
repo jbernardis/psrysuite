@@ -29,13 +29,13 @@ class Cliveden (District):
 
 		District.PerformTurnoutAction(self, turnout, force=force)
 
-	def PerformSignalAction(self, sig):
+	def PerformSignalAction(self, sig, oncall=False):
 		controlOpt = self.frame.rbCliffControl.GetSelection()
 		if controlOpt == 0:  # Cliveden local control
 			self.frame.PopupEvent("Cliveden control is local")
 			return
 
-		District.PerformSignalAction(self, sig)
+		District.PerformSignalAction(self, sig, oncall=oncall)
 
 	def DetermineRoute(self, blocks):
 		self.FindTurnoutCombinations(blocks, ["CSw9", "CSw13"])

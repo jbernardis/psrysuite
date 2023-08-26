@@ -382,7 +382,7 @@ class Railroad():
 			tout.UpdateLockBits(release=release)
 			self.RailroadEvent(tout.GetEventMessage(lock=True))
 		
-	def SetAspect(self, signame, aspect):
+	def SetAspect(self, signame, aspect, oncall=0):
 		try:
 			sig = self.signals[signame]
 		except KeyError:
@@ -413,7 +413,7 @@ class Railroad():
 
 		sig.UpdateIndicators() # make sure all indicators reflect this change
 		self.UpdateSignalLeverLEDs(sig, aspect)
-		self.RailroadEvent(sig.GetEventMessage())
+		self.RailroadEvent(sig.GetEventMessage(oncall=oncall))
 		
 	def UpdateSignalLeverLEDs(self, sig, aspect):
 		r = self.reSigName.findall(sig.Name())
