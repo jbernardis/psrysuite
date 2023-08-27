@@ -1001,9 +1001,10 @@ class Railroad():
 							self.RailroadEvent(obj.GetEventMessage())
 							obj.UpdateIndicators()
 					
-					# otherwise, this is a detection loss - add it to pending
+					# otherwise, this is a detection loss - add it to pending, but only if we are currently occupied
 					else:
-						self.pendingDetectionLoss.Add(objName, obj)
+						if obj.IsOccupied():
+							self.pendingDetectionLoss.Add(objName, obj)
 			
 				elif objType == INPUT_TURNOUTPOS:
 					pos = obj.Position()
