@@ -12,14 +12,9 @@ class Triggers:
 		self.trainSeq = trainSeq
 		self.triggerTable = {}
 		for tr in self.trainSeq:
-			print(str(tr))
-			print(dir(tr))
 			trid = tr.GetTrainID()
-			print("generating script for train %s" % trid)
 			trid, script = GenerateAR(tr, None)
 			self.triggerTable[trid] = script
-			if trid == "11":
-				print(json.dumps(self.triggerTable[trid]))
 			
 	def GetOrigin(self, train):			
 		if train not in self.triggerTable:

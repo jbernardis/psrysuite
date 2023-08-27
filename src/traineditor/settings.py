@@ -16,7 +16,6 @@ class Settings:
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
 		if not self.cfg.read(self.inifile):
-			print("Settings file %s does not exist.  Using default values" % INIFILE)
 			return
 			
 		if self.cfg.has_section(GLOBAL):
@@ -25,7 +24,6 @@ class Settings:
 					try:
 						s = int(value)
 					except:
-						print("invalid value in ini file for socket port: (%s)" % value)
 						s = 9000
 					self.socketport = s
 						
@@ -34,6 +32,3 @@ class Settings:
 						
 				elif opt == 'backupdir':
 					self.backupdir = value
-
-		else:
-			print("Missing global section - assuming defaults")

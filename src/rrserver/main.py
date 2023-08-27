@@ -340,9 +340,9 @@ class ServerMain:
 		signame = cmd["name"][0]
 		aspect = int(cmd["aspect"][0])
 		try:
-			oncall = int(cmd["oncall"][0])
+			oncall = int(cmd["oncall"][0]) == 1
 		except:
-			oncall = 0
+			oncall = False
 			
 		self.rr.SetAspect(signame, aspect, oncall)
 

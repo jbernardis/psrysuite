@@ -589,11 +589,10 @@ class District:
 		else:
 			turnout.SetReverse(refresh=True, force=force)
 
-	def DoSignalAction(self, sig, aspect, oncall=0):
+	def DoSignalAction(self, sig, aspect, oncall=False):
 		signm = sig.GetName()
-		print("got do signal action for signal %s, aspect = %d, oncall = %d" % (signm, aspect, oncall))
 		
-		if oncall != 0:
+		if oncall:
 			sig.SetAspect(aspect, refresh=True)
 			return
 
@@ -607,7 +606,7 @@ class District:
 				if sig.IsPossibleRoute(blknm, rname):
 					break
 		else:
-			print("returning because no possible routes")
+			logging.info("returning because no possible routes")
 			return
 
 		if aspect < 0:

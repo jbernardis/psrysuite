@@ -338,7 +338,6 @@ class MainFrame(wx.Frame):
 		try:
 			lid = int(nlid)
 		except ValueError:
-			print("must be numeric")
 			return 
 		
 		if lid == 0:

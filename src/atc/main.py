@@ -211,7 +211,6 @@ class MainFrame(wx.Frame):
 			return False
 		
 		logging.info("Trains: %s" % json.dumps(trains))
-		print("Trains: %s" % json.dumps(trains), flush=True)
 
 		scripts = GenerateScripts(layout, trains)
 		
@@ -350,7 +349,6 @@ class MainFrame(wx.Frame):
 			
 	def OnDeliveryEvent(self, evt):  # thread context
 		for cmd, parms in evt.data.items():
-			#print("Received: %s: %s" % (cmd, parms))
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]

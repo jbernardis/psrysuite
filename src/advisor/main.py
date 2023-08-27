@@ -283,7 +283,7 @@ class MainUnit:
 				logging.info("already set to the active route with a signal")
 				return
 
-		routeRequest.Print()
+		# routeRequest.Print()
 		logging.info("Advise: Train %s needs a route to block %s via signal %s" % (routeRequest.GetTrain(), exitBlkNm, signalNm))
 		req = {"advice": {"msg": "Train %s route to %s via signal %s" % (routeRequest.GetTrain(), exitBlkNm, signalNm)}}
 		self.Request(req)

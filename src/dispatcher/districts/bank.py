@@ -254,7 +254,7 @@ class Bank (District):
 		if blknm in [ "B20", "B21" ]:
 			self.CheckBlockSignalsAdv("B20", "B21", "B20E", True)
 			
-	def DoSignalAction(self, sig, aspect, oncall=0):
+	def DoSignalAction(self, sig, aspect, oncall=False):
 		District.DoSignalAction(self, sig, aspect, oncall=oncall)
 		signame = sig.GetName()
 		if signame in [ "C18R", "C22R", "C24R", "C22L", "C24L" ]:

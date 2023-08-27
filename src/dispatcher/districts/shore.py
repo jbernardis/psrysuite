@@ -42,9 +42,8 @@ class Shore (District):
 		self.frame.Request({"signal": { "name": signm, "aspect": aspect}})
 		sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 
-	def DoSignalAction(self, sig, aspect, oncall=0):
-		print("do signal action, oncall=%d" % oncall)
-		if oncall == 0:
+	def DoSignalAction(self, sig, aspect, oncall=False):
+		if not oncall:
 			signm = sig.GetName()
 			if signm in ["S8L", "S8R"]:
 				osblk = self.blocks["SOSHF"]

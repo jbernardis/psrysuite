@@ -255,7 +255,6 @@ class TrainListCtrl(wx.ListCtrl):
 		self.RefreshItems(0, len(self.filtered)-1)
 		
 	def SetSuppressNonATC(self, flag):
-		print("set suppress non atc to %s" % flag)
 		self.suppressNonATC = flag
 
 		self.filterTrains()	

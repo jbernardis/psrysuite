@@ -382,7 +382,7 @@ class Railroad():
 			tout.UpdateLockBits(release=release)
 			self.RailroadEvent(tout.GetEventMessage(lock=True))
 		
-	def SetAspect(self, signame, aspect, oncall=0):
+	def SetAspect(self, signame, aspect, oncall=False):
 		try:
 			sig = self.signals[signame]
 		except KeyError:

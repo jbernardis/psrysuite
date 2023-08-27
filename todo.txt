@@ -1,5 +1,6 @@
 
 call on signals - I think it refers to JUST lighting the signal with no route clearing etc
+implemented for when requested by dispatcher - not from a control panel yet
 what is supposed to happen when the operator presses the red buttons on their panels
 
 verify the correct sequencing of subblocks
@@ -33,5 +34,3 @@ still need to resolve inverted fleet and siding indications from cliff
 possibilities:
 	ar/atc/advisor - ??get rid of checkboxes and have always on???
 
-
-reconcile the fact that tracker is not run on the same PC as the rest of the suite.  How should backup/restore work with this?  Should data be sent to/taken from server PC?  Then you couldn't use it without the server PC being on.

@@ -1087,13 +1087,10 @@ class MainFrame(wx.Frame):
 
 	def DoFleetPending(self, block):
 		bname = block.GetName()
-		print("in do fleeting for block %s" % bname)
 		if bname not in self.pendingFleets:
-			print("but there are no pending fleets here")
 			return
 
 		sig = self.pendingFleets[bname]
-		print("that block has a pending fleet for signal %s" % sig.GetName())
 		del(self.pendingFleets[bname])
 
 		sig.DoFleeting()		
@@ -1741,13 +1738,12 @@ class MainFrame(wx.Frame):
 					
 			elif cmd == "signal":
 				for p in parms:
-					print("signal paranmeters: %s" % str(parms))
 					sigName = p["name"]
 					aspect = p["aspect"]
 					try:
-						oncall = int(p["oncall"])
+						oncall = int(p["oncall"]) == 1
 					except:
-						oncall = 0
+						oncall = False
 
 					try:
 						sig = self.signals[sigName]
@@ -2072,8 +2068,6 @@ class MainFrame(wx.Frame):
 					self.delayedRequests.Append(req)
 				else:
 					#logging.debug(json.dumps(req))
-					if command == "signal":
-						print("sending %s" % json.dumps(req))
 					self.rrServer.SendRequest(req)
 		else:
 			logging.info("disallowing command %s from non dispatcher" % command)

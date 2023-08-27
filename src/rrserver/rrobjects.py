@@ -400,11 +400,11 @@ class Signal:
             district, node, address, bits = ind
             node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.aspect != 0 else 0)
     
-    def GetEventMessage(self, lock=False, oncall=0):
+    def GetEventMessage(self, lock=False, oncall=False):
         if lock:
             return {"signallock": [{ "name": self.name, "state": 1 if self.locked else 0}]}
         else:
-            return {"signal": [{ "name": self.name, "aspect": self.aspect, "oncall": oncall}]}
+            return {"signal": [{ "name": self.name, "aspect": self.aspect, "oncall": 1 if oncall else 0}]}
         
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)

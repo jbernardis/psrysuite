@@ -157,7 +157,7 @@ class Nassau (District):
 		if blk.GetName() == "N21":
 			self.CheckBlockSignals("N21", "N21W", False)
 			
-	def DoSignalAction(self, sig, aspect, oncall=0):
+	def DoSignalAction(self, sig, aspect, oncall=False):
 		District.DoSignalAction(self, sig, aspect, oncall=oncall)
 		signame = sig.GetName()
 		if signame in [ "N14LA", "N14LB", "N14LC", "N14LD", "N16L", "N18LA", "N18LB", "N20L" ]:
