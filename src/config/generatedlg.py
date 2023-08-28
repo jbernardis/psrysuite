@@ -58,6 +58,10 @@ class GenerateDlg(wx.Dialog):
         self.bGenEditor = wx.Button(genBox, wx.ID_ANY, "Train Editor", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenEditor, self.bGenEditor)
         vsz.Add(self.bGenEditor, 0, wx.ALL, 10)
+                    
+        self.bGenSaveLogs = wx.Button(genBox, wx.ID_ANY, "Save Log Files", size=GENBTNSZ)
+        self.Bind(wx.EVT_BUTTON, self.OnBGenSaveLogs, self.bGenSaveLogs)
+        vsz.Add(self.bGenSaveLogs, 0, wx.ALL, 10)
         
         hsz.Add(vsz)
         
@@ -243,6 +247,16 @@ class GenerateDlg(wx.Dialog):
             "main": "main.py",
             "desc": "Configuration Tool",
             "icon": "config.ico"
+        }
+        self.generator(module, self.cbStartMenu.IsChecked())
+        
+    def OnBGenSaveLogs(self, _):
+        module = {
+            "name": "PSRY Suite - save logs",
+            "dir":  "savelogs",
+            "main": "main.py",
+            "desc": "Save Logs and output for debugging",
+            "icon": "savelogs.ico",
         }
         self.generator(module, self.cbStartMenu.IsChecked())
             

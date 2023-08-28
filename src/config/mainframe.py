@@ -208,6 +208,14 @@ class MainFrame(wx.Frame):
 			"icon": "config.ico",
 		}
 		self.GenShortcut(module, True)
+		module = {
+			"name": "PSRY Suite - save logs",
+			"dir":  "savelogs",
+			"main": "main.py",
+			"desc": "Save Logs and output for debugging",
+			"icon": "savelogs.ico",
+		}
+		self.GenShortcut(module, True)
 		
 	def GenShortcut(self, module, forceStartMenu=False):
 		psrypath = os.getcwd()
