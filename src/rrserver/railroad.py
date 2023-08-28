@@ -997,7 +997,7 @@ class Railroad():
 						# remove any pending detectio loss
 						self.pendingDetectionLoss.Remove(objName)
 						# and process the detection gain
-						if obj.SetOccupied(newval != 0):
+						if obj.SetOccupied(True):
 							self.RailroadEvent(obj.GetEventMessage())
 							obj.UpdateIndicators()
 					
@@ -1005,6 +1005,11 @@ class Railroad():
 					else:
 						if obj.IsOccupied():
 							self.pendingDetectionLoss.Add(objName, obj)
+						else:
+							if obj.SetOccupied(False):
+								self.RailroadEvent(obj.GetEventMessage())
+								obj.UpdateIndicators()
+
 			
 				elif objType == INPUT_TURNOUTPOS:
 					pos = obj.Position()

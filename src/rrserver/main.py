@@ -598,7 +598,6 @@ class ServerMain:
 		except (IndexError, KeyError):
 			loco = None
 		block = cmd["block"][0]
-		# train information is always echoed back to all listeners
 
 		if trn and trn.startswith("??"):
 			# this is an unknown train - see if we have a known train in the same block
@@ -623,6 +622,10 @@ class ServerMain:
 					if eloco != loco:
 						loco = eloco
 
+		# TODO - we need to set the occupancy bit (or clear it is trn is None)
+		self.rr.OccupyBlock(block, 0 if trn is None else 1)
+		
+		# train information is always echoed back to all listeners
 		resp = {"settrain": [{"name": trn, "loco": loco, "block": block}]}
 		self.socketServer.sendToAll(resp)
 
@@ -634,6 +637,7 @@ class ServerMain:
 		except (IndexError, KeyError):
 			return
 		self.rr.PlaceTrain(blknm)
+		self.rr.OccupyBlock(blknm, 1)
 
 	def DoRemoveTrain(self, cmd): #"removetrain":
 		try:
@@ -641,6 +645,7 @@ class ServerMain:
 		except (IndexError, KeyError):
 			return
 		self.rr.RemoveTrain(blknm)
+		self.rr.OccupyBlock(blknm, 0)
 
 	def DoTrainComplete(self, cmd):
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
