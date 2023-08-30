@@ -21,6 +21,12 @@ logging.getLogger('').addHandler(console)
 if should_roll_over:
 	handler.doRollover()
 
+ofp = open(os.path.join(os.getcwd(), "output", "rrserver.out"), "w")
+efp = open(os.path.join(os.getcwd(), "output", "rrserver.err"), "w")
+
+sys.stdout = ofp
+sys.stderr = efp
+
 import json
 import socket
 import time

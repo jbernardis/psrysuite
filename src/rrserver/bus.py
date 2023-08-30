@@ -10,7 +10,10 @@ class Bus:
 		self.tty = tty
 		self.byteTally = {}
 		self.lastUsed = {}
-		logging.info("Attempting to connect to serial port %s" % tty)
+		self.open()
+		
+	def open(self):
+		logging.info("Attempting to connect to serial port %s" % self.tty)
 		try:
 			self.port = serial.Serial(port=self.tty,
 					baudrate=19200,
@@ -21,14 +24,25 @@ class Bus:
 
 		except serial.SerialException:
 			self.port = None
-			logging.error("Unable to Connect to serial port %s" % tty)
-			return
+			logging.error("Unable to Connect to serial port %s: serial exception" % self.tty)
+			return False
 
 		self.initialized = True
 		logging.info("successfully connected")
+		return True
 
 	def close(self):
+		logging.info("closing serial port %s" % self.tty)
 		self.port.close()
+		
+	def reopen(self):
+		logging.info("attempting to re-open serial port")
+		self.close()
+		rc = self.open()
+		if not rc:
+			logging.error("Unable to re-open serial port")
+			
+		return rc
 
 	def sendRecv(self, address, outbuf, nbytes, threshold=1):
 		if not self.initialized:

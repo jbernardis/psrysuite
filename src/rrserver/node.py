@@ -68,6 +68,8 @@ class Node:
             if inb is not None:
                 for i in range(self.bcount):
                     self.inb[i] = int.from_bytes(inb[i], "big")
+            else:
+                logging.error("Communications error on railroad serial port")
                     
     def GetChangedInputs(self):
         results = []
