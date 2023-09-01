@@ -340,7 +340,11 @@ class ServerMain:
 			handler(cmd)
 			
 	def DoInterval(self, _):
-		self.rr.OutIn()
+		successful, errs = self.rr.OutIn()
+		if errs != 0:
+			logging.error("Polling interval had %d/%d I/O errors/successes" % (errs, successful))
+			if successful == 0:
+				logging.error("Every I/O attempt failed in this interval")
 
 	def DoSignal(self, cmd):
 		signame = cmd["name"][0]

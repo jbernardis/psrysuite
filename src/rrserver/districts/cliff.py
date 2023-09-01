@@ -15,7 +15,7 @@ class Cliff(District):
 		self.nodes = {
 			GREENMTN:   Node(self, rr, GREENMTN,  3, settings),
 			CLIFF:      Node(self, rr, CLIFF,     8, settings),
-			SHEFFIELD:  Node(self, rr, SHEFFIELD, 4, settings)
+			SHEFFIELD:  Node(self, rr, SHEFFIELD, 4, settings, incount=2)
 		}
 		self.entryButton = None
 		self.currentCoachRoute = None
@@ -420,7 +420,7 @@ class Cliff(District):
 			
 		self.rr.UpdateDistrictTurnoutLocks(self.name, self.released)
 		
-		District.OutIn(self)
+		return District.OutIn(self)
 		
 	def Released(self, _):
 		return self.released

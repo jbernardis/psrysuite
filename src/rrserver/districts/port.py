@@ -14,8 +14,8 @@ class Port(District):
 		self.n25occ = None
 		self.nodeAddresses = [ PORTA, PORTB, PARSONS]
 		self.nodes = {
-			PORTA:    Node(self, rr, PORTA,   9, settings),
-			PORTB:    Node(self, rr, PORTB,   7, settings),
+			PORTA:    Node(self, rr, PORTA,   9, settings, incount=8),
+			PORTB:    Node(self, rr, PORTB,   7, settings, incount=6),
 			PARSONS:  Node(self, rr, PARSONS, 4, settings)
 		}
 
@@ -386,7 +386,7 @@ class Port(District):
 		self.rr.UpdateDistrictTurnoutLocksByNode(self.name, self.releasedA, [PORTA, PARSONS])
 		self.rr.UpdateDistrictTurnoutLocksByNode(self.name, self.releasedB, [PORTB])
 		
-		District.OutIn(self)
+		return District.OutIn(self)
 		
 	def Released(self, tout):
 		addr = tout.address

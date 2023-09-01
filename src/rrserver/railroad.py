@@ -960,11 +960,20 @@ class Railroad():
 			del self.pulsedOutputs[toname]	
 			
 		self.pendingDetectionLoss.NextCycle()			
-			
+		
+		errs = 0
+		successful = 0
 		for district in self.districts.values():
-			district.OutIn()
-			
+			s, e = district.OutIn()
+			successful += s
+			errs += e
+
+		if errs != 0:
+			logging.error("%d errors from railroad I/O" % errs)	
+					
 		self.ExamineInputs()
+		
+		return successful, errs
 		
 	def UpdateDistrictTurnoutLocksByNode(self, districtName, released, addressList):
 		for t in self.turnouts.values():

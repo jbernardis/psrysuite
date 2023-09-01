@@ -14,7 +14,7 @@ class Nassau(District):
 		self.nodes = {
 			NASSAUW:   Node(self, rr, NASSAUW,  8, settings),
 			NASSAUE:   Node(self, rr, NASSAUE,  4, settings),
-			NASSAUNX:  Node(self, rr, NASSAUNX, 3, settings)
+			NASSAUNX:  Node(self, rr, NASSAUNX, 3, settings, incount=0)
 		}
 		self.S11AB = None
 		self.entryButton = None
@@ -463,7 +463,7 @@ class Nassau(District):
 
 		self.rr.UpdateDistrictTurnoutLocks(self.name, self.released)
 		
-		District.OutIn(self)
+		return District.OutIn(self)
 		
 	def Released(self, _):
 		return self.released

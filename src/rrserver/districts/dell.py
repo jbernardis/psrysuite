@@ -15,7 +15,7 @@ class Dell(District):
 		self.name = name
 		self.nodeAddresses = [ DELL, FOSS ]
 		self.nodes = {
-			DELL:  Node(self, rr, DELL,  5, settings),
+			DELL:  Node(self, rr, DELL,  5, settings, incount=3),
 			FOSS:  Node(self, rr, FOSS,  3, settings)
 		}
 
@@ -179,4 +179,4 @@ class Dell(District):
 		if sig.Aspect() != aspect:
 			self.rr.SetAspect("R10W", aspect)			
 
-		District.OutIn(self)
+		return District.OutIn(self)

@@ -21,8 +21,8 @@ class Shore(District):
 		self.control = 0
 		self.nodeAddresses = [ SHORE, HYDEJCT ]
 		self.nodes = {
-			SHORE:   Node(self, rr, SHORE,   7, settings),
-			HYDEJCT: Node(self, rr, HYDEJCT, 3, settings)
+			SHORE:   Node(self, rr, SHORE,   7, settings, incount=5),
+			HYDEJCT: Node(self, rr, HYDEJCT, 3, settings, incount=2)
 		}
 
 		with self.nodes[SHORE] as n:
@@ -211,5 +211,5 @@ class Shore(District):
 			self.F10D = F10D
 			self.rr.SetAspect("F10D", 1 if F10D else 0)
 		
-		District.OutIn(self)
+		return District.OutIn(self)
 

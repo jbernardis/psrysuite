@@ -12,7 +12,7 @@ class Latham(District):
 		self.nodeAddresses = [ LATHAM, CARLTON ]
 		self.nodes = {
 			LATHAM:   Node(self, rr, LATHAM,   5, settings),
-			CARLTON:  Node(self, rr, CARLTON,  5, settings)
+			CARLTON:  Node(self, rr, CARLTON,  5, settings, incount=3)
 		}
 
 		addr = LATHAM		
@@ -141,4 +141,4 @@ class Latham(District):
 		self.rr.SetAspect("N10W", 1)
 
 	def OutIn(self):
-		District.OutIn(self)
+		return District.OutIn(self)

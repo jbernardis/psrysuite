@@ -17,11 +17,18 @@ def getBit(ibyte, ibit):
     return 1 if b & mask != 0 else 0
 
 class Node:
-    def __init__(self, district, rr, address, bcount, settings):
+    def __init__(self, district, rr, address, bcount, settings, incount=None):
         self.district = district
         self.rr = rr
         self.address = address
         self.bcount = bcount
+        '''
+        We assume there are as many input bytes as there are output bytes, and indeed, we do pulse in the same
+        number of bytes.  Some nodes, though, have less bytes with actual data.  Since the subsequent bytes
+        might be garbage, we use incount to tell us how many of these input bytes should be processed.  The rest
+        are ignored
+        '''
+        self.incount = bcount if incount is None else incount
         self.outb = [0 for _ in range(bcount)]
         self.inb = [0 for _ in range(bcount)]
         self.lastinb = [0 for _ in range(bcount)]
@@ -34,7 +41,7 @@ class Node:
         self.inputMap = {}
         
         self.rrBus = None
-       
+      
     def GetAllBits(self):
         return self.bcount, self.outb, self.inb
       
@@ -63,17 +70,24 @@ class Node:
         self.rrBus = bus
         
     def OutIn(self):
-        if self.rrBus is not None:     
-            inb = self.rrBus.sendRecv(self.address, self.outb, self.bcount)
-            if inb is not None:
-                for i in range(self.bcount):
-                    self.inb[i] = int.from_bytes(inb[i], "big")
-            else:
-                logging.error("Communications error on railroad serial port")
+        '''
+        return value = # successful reads, # failed reads
+        '''
+        if self.rrBus is None: 
+            return 0, 0 # simulation mode
+            
+        inb = self.rrBus.sendRecv(self.address, self.outb, self.bcount)
+        if inb is not None:
+            for i in range(self.bcount):
+                self.inb[i] = int.from_bytes(inb[i], "big")
+            return 1, 0
+        else:
+            logging.error("Communications error on railroad serial port for address 0x%02x" % self.address)
+            return 0, 1
                     
     def GetChangedInputs(self):
         results = []
-        for b in range(len(self.inb)):
+        for b in range(self.incount):
             new = self.inb[b]
             old = self.lastinb[b]
             if self.first:
@@ -93,9 +107,10 @@ class Node:
                             o = None
                         if o:
                             results.append([self, b, i, o, v])
-                            
+                        
         self.lastinb = [x for x in self.inb]
         self.first = False
+    
         return results
 
                 

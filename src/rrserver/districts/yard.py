@@ -21,7 +21,7 @@ class Yard(District):
 			EASTJCT: Node(self, rr, EASTJCT, 2, settings),
 			KALE:    Node(self, rr, KALE,    4, settings),
 			YARD:    Node(self, rr, YARD,    6, settings),
-			YARDSW:  Node(self, rr, YARDSW,  5, settings)
+			YARDSW:  Node(self, rr, YARDSW,  5, settings, incount=0)
 		}
 		
 		# cornell node
@@ -339,7 +339,7 @@ class Yard(District):
 
 		optFleet = self.rr.GetControlOption("yard.fleet")  # 0 => no fleeting, 1 => fleeting
 
-		District.OutIn(self)
+		successful, errs = District.OutIn(self)
 		
 		Y20  = self.rr.GetBlock("Y20")
 		Y20E = self.rr.GetBlock("Y20.E")
@@ -350,6 +350,8 @@ class Yard(District):
 			self.Y20D = Y20D
 			self.rr.SetAspect("Y20H", 1 if Y20H else 0)
 			self.rr.SetAspect("Y20D", 1 if Y20D else 0)
+			
+		return successful, errs
 		
 	def GetControlOption(self):
 		if self.control == 1:  # dispatcher control
