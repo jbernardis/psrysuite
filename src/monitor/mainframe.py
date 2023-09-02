@@ -112,6 +112,12 @@ class MainFrame(wx.Frame):
 		
 		bsz.AddSpacer(20)
 		
+		self.bReopen = wx.Button(self, wx.ID_ANY, "Reopen port", size=(100, 46))
+		self.Bind(wx.EVT_BUTTON, self.OnReopen, self.bReopen)
+		bsz.Add(self.bReopen)
+		
+		bsz.AddSpacer(20)
+		
 		self.bQuit = wx.Button(self, wx.ID_ANY, "Shutdown\nServer", size=(100, 46))
 		self.Bind(wx.EVT_BUTTON, self.OnQuit, self.bQuit)
 		bsz.Add(self.bQuit)
@@ -251,6 +257,7 @@ class MainFrame(wx.Frame):
 			self.bBreaker.Enable(flag)
 			self.bClearAll.Enable(flag)
 			self.bQuit.Enable(flag)
+			self.bReopen.Enable(flag)
 			self.bTurnoutPos.Enable(flag)
 			self.bSetInputBit.Enable(flag)
 		
@@ -304,6 +311,9 @@ class MainFrame(wx.Frame):
 	def DlgSessionsExit(self):
 		self.dlgSessions.Destroy()
 		self.dlgSessions = None
+		
+	def OnReopen(self, _):
+		self.rrServer.SendRequest({"reopen": {}})
 		
 	def OnQuit(self, _):
 		self.rrServer.SendRequest({"quit": {}})

@@ -309,7 +309,8 @@ class ServerMain:
 			
 			"quit":			self.DoQuit,
 			"delayedstartup":
-							self.DelayedStartup
+							self.DelayedStartup,
+			"reopen":		self.DoReopen
 		}
 
 
@@ -340,11 +341,14 @@ class ServerMain:
 			handler(cmd)
 			
 	def DoInterval(self, _):
+		if self.pause > 0:
+			self.pause -= 1
+			return 
+		
 		successful, errs = self.rr.OutIn()
 		if errs != 0:
 			logging.error("Polling interval had %d/%d I/O errors/successes" % (errs, successful))
-			if successful == 0:
-				logging.error("Every I/O attempt failed in this interval")
+			self.DoAlert("Railroad I/O Errors: %d" % errs)
 
 	def DoSignal(self, cmd):
 		signame = cmd["name"][0]
@@ -556,6 +560,13 @@ class ServerMain:
 		
 	def DoQuit(self, _):
 		self.Shutdown()
+		
+	def DoReopen(self, _):
+		if self.settings.simulation:
+			return 
+
+		self.pause = 12 # pause I/O for 12 (~5 seconds) cycles while port is re-opened		
+		self.rrBus.reopen()
 
 	def DoBlockDir(self, cmd):
 		block = cmd["block"][0]
@@ -772,8 +783,9 @@ class ServerMain:
 	def AtInterval(self):
 		if self.forever:
 			threading.Timer(0.4, self.AtInterval).start()
-			self.cmdQ.put({"cmd": ["interval"]})
-			if self.delay and self.delay > 0:
+			if self.delay is None or self.delay <= 0:
+				self.cmdQ.put({"cmd": ["interval"]})
+			elif self.delay > 0:
 				self.delay -= 1
 				if self.delay <= 0:
 					self.delay = None
@@ -783,6 +795,7 @@ class ServerMain:
 		logging.info("serve forever starting")
 		self.forever = True
 		self.delay = 5  # wait 5 cycles before delayed startup
+		self.pause = 0
 		self.AtInterval()
 		while self.forever:
 			while not self.cmdQ.empty():
