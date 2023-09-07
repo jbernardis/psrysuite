@@ -278,7 +278,7 @@ class District:
 			doReverseOS = True
 		else:
 			doReverseOS = False
-
+			
 		exitBlkNm = rt.GetExitBlock(reverse=doReverseOS)
 		rType = rt.GetRouteType(reverse=doReverseOS)
 

@@ -48,7 +48,7 @@ class DCCRemote:
 			return 0, 0, 0 if speed == 0 else -10
 		elif aspect == 0b011: #clear
 			target = profile["fast"]
-		elif aspect in [ 0b100, 0b110 ]: # Restricting or Approach Slow
+		elif aspect in [ 0b100, 0b110, 0b101 ]: # Restricting or Approach Slow
 			target = profile["slow"]
 		else:
 			target = profile["medium"]

@@ -66,7 +66,8 @@ class Node:
 		self.bitmap = bitmapName
 		self.offset = offset
 
-BTNDIM = (80, 23)
+BTNDIM = (80, 23) if sys.platform.lower() == "win32" else (100, 23)
+WIDTHADJUST = 0 if sys.platform.lower() == "win32" else 56
 
 class MainFrame(wx.Frame):
 	def __init__(self, settings):
@@ -224,8 +225,8 @@ class MainFrame(wx.Frame):
 			self.bEditTrains.Hide()
 
 		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(self.centerOffset+2200, 25), style=wx.TE_READONLY)
-		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(self.centerOffset+2300, 25), style=wx.TE_READONLY)
-		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(40, -1), pos=(self.centerOffset+2360, 25), style=wx.TE_READONLY)
+		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(60, -1), pos=(self.centerOffset+2300, 25), style=wx.TE_READONLY)
+		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(60, -1), pos=(self.centerOffset+2380, 25), style=wx.TE_READONLY)
 		
 		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(self.centerOffset+2200, 75), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnResetScreen, self.bResetScreen)
@@ -274,6 +275,8 @@ class MainFrame(wx.Frame):
 		self.showSplash = True
 		self.ResetScreen()
 		self.Bind(wx.EVT_CHAR_HOOK, self.OnKeyDown)
+
+		wx.CallAfter(self.Initialize)
 		
 	def OnKeyDown(self, evt):
 		kcd = evt.GetKeyCode()
@@ -354,8 +357,8 @@ class MainFrame(wx.Frame):
 		self.ResetScreen()
 		
 	def ResetScreen(self):
-		self.SetMaxSize((self.totalw, self.totalh))
-		self.SetSize((self.totalw, self.totalh))
+		self.SetMaxSize((self.totalw+WIDTHADJUST, self.totalh))
+		self.SetSize((self.totalw+WIDTHADJUST, self.totalh))
 		self.SetPosition((-self.centerOffset, 0))
 		
 		self.shiftXOffset = -self.centerOffset
@@ -364,9 +367,7 @@ class MainFrame(wx.Frame):
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})
 			
-		self.DoRefresh()
-
-		wx.CallAfter(self.Initialize)
+		# self.DoRefresh()
 		
 	def OnBResetClock(self, _):
 		self.tickerCount = 0

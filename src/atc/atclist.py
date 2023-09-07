@@ -183,7 +183,7 @@ class ATCListCtrl(wx.ListCtrl):
 		if aspect == 0b011: # clear
 			return self.idxGrn
 		
-		if aspect in [ 0b100, 0b110 ]: # Restricting or Approach Slow
+		if aspect in [ 0b100, 0b110, 0b101 ]: # Restricting, Diverging or Approach Slow
 			return self.idxRedYel
 
 		return self.idxGrnYel

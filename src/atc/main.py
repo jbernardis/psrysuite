@@ -299,6 +299,7 @@ class MainFrame(wx.Frame):
 			aspect = 0  # assume STOP
 			
 			if dccl.HasCompleted():
+				logging.info("Train %s has completed" % dccl.GetTrain())
 				aspect = 0 # we've reached the terminus - we should stop
 				
 			elif gs is None:
@@ -448,6 +449,20 @@ class MainFrame(wx.Frame):
 						self.trains[name].AddBlock(block)
 
 						self.blocks[block].SetTrain(name, loco)
+						
+			elif cmd == "trainsignal":
+				train = parms["train"][0]
+				dccl = self.dccRemote.GetDCCLocoByTrain(train)
+				if dccl is None:
+					# ignore non-ATC trains
+					return
+
+				sig = parms["signal"][0]
+				asp = parms["aspect"][0]
+				blk = parms["block"][0]
+				
+				gs, _ = dccl.GetGoverningSignal()
+				logging.info("trainsignal: train %s, sig/aspect/block = %s/%s/%s  gs = (%s)" % (train, sig, asp, block, str(gs)))
 
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)

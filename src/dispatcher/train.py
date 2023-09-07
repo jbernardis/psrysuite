@@ -8,6 +8,7 @@ class Train:
 		else:
 			self.name = Train.NextName()
 		self.loco = "??"
+		logging.info("set loco to ?? when instantiating new train %s" % self.name)
 		self.atc = False
 		self.ar = False
 		self.sbActive = False
@@ -53,6 +54,7 @@ class Train:
 
 	def SetLoco(self, loco):
 		self.loco = loco
+		logging.info("changing loco to %s for train %s" % (loco, self.name))
 
 	def GetName(self):
 		return self.name
@@ -75,12 +77,12 @@ class Train:
 
 	def GetNameAndLoco(self):
 		return self.name, self.loco
-
-	def GetIDString(self):
-		a = "A-" if self.atc else ""
-		n = self.name if self.name else "??"
-		l = self.loco if self.loco else "??"
-		return a+n+"/"+l
+ #
+ # def GetIDString(self):
+ # 	a = "A-" if self.atc else ""
+ # 	n = self.name if self.name else "??"
+ # 	l = self.loco if self.loco else "??"
+ # 	return a+n+"/"+l
 	
 	def SetSBActive(self, flag):
 		self.sbActive = flag

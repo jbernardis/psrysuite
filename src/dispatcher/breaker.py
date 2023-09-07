@@ -54,6 +54,7 @@ class BreakerDisplay(wx.TextCtrl):
 		wx.TextCtrl.__init__(self, parent, wx.ID_ANY, "", size=size, pos=pos, style=wx.TE_CENTER)
 		self.parent = parent
 		self.SetFont(wx.Font(wx.Font(22, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.NORMAL, faceName="Arial")))
+		self.SetForegroundColour(wx.Colour(255, 255, 255))
 		self.red   = wx.Colour(255, 0, 0)
 		self.green = wx.Colour(0, 160, 24)
 		self.black = wx.Colour(100, 100, 100)
@@ -66,14 +67,14 @@ class BreakerDisplay(wx.TextCtrl):
 	def UpdateDisplay(self):
 		if not self.parent.subscribed:
 			self.SetBackgroundColour(self.black)
-			self.SetLabel("Not Connected")
+			self.SetValue("Not Connected")
 			self.currentPosition = None
 			self.interval = None
 			return
 
 		if len(self.breakers) == 0:
 			self.SetBackgroundColour(self.green)
-			self.SetLabel("All Clear")
+			self.SetValue("All Clear")
 			self.currentPosition = None
 			self.interval = None
 		else:
@@ -95,7 +96,7 @@ class BreakerDisplay(wx.TextCtrl):
 
 		if len(self.breakers) > 1:
 			text += " (%s/%s)" % (self.currentPosition+1, len(self.breakers))
-		self.SetLabel(text)
+		self.SetValue(text)
 		self.interval = 3
 
 	def AddBreaker(self, brkr):
