@@ -744,10 +744,12 @@ class OverSwitch (Block):
 		exitBlkName = self.route.GetExitBlock()
 		exitBlk = self.frame.GetBlockByName(exitBlkName)
 
-		if not entryBlk:
+		if entryBlkName is not None and entryBlk is None:
 			logging.warning("could not determine entry block for %s/%s from name %s" % (self.name, self.rtName, entryBlkName))
-		if not exitBlk:
+			
+		if exitBlkName is not None and exitBlk is None:
 			logging.warning("could not determine exit block for %s/%s from name %s" % (self.name, self.rtName, exitBlkName))
+			
 		if self.east:
 			if entryBlk:
 				if self.district.CrossingEastWestBoundary(self, entryBlk):

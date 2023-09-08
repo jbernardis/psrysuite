@@ -2,7 +2,7 @@ import logging
 
 from dispatcher.constants import RegAspects, RegSloAspects, AdvAspects, SloAspects, \
 	MAIN, SLOW, DIVERGING, RESTRICTING, \
-	CLEARED, OCCUPIED, STOP, NORMAL, OVERSWITCH
+	CLEARED, OCCUPIED, EMPTY, STOP, NORMAL, OVERSWITCH
 	
 EWCrossoverPoints = [
 	["COSSHE", "C20"],
@@ -15,6 +15,105 @@ EWCrossoverPoints = [
 	["YOSKL1", "Y70"],
 	["YOSKL2", "Y70"]
 ]
+
+def statusname(status):
+	if status == EMPTY:
+		return "EMPTY"
+	
+	elif status == "OCCUPIED":
+		return "OCCUPIED"
+	
+	elif status == CLEARED:
+		return "CLEARED"
+	
+	else:
+		return "None"
+
+def aspectname(aspect, atype):
+	if atype == RegAspects:
+		if aspect == 0b011:
+			return "Clear"
+
+		elif aspect == 0b010:
+			return "Approach Medium"
+
+		elif aspect == 0b111:
+			return "Medium Clear"
+
+		elif aspect == 0b110:
+			return "Approach Slow"
+
+		elif aspect == 0b001:
+			return "Approach"
+
+		elif aspect == 0b101:
+			return "Medium Approach"
+
+		elif aspect == 0b100:
+			return "Restricting"
+
+		else:
+			return "Stop"
+
+	elif atype == RegSloAspects:
+		if aspect == 0b011:
+			return "Clear"
+
+		elif aspect == 0b111:
+			return "Slow clear"
+
+		elif aspect == 0b001:
+			return "Approach"
+
+		elif aspect == 0b101:
+			return "Slow Approach"
+
+		elif aspect == 0b100:
+			return "Restricting"
+
+		else:
+			return "Stop"
+
+	elif atype == AdvAspects:
+		if aspect == 0b011:
+			return "Clear"
+
+		elif aspect == 0b010:
+			return "Approach Medium"
+
+		elif aspect == 0b111:
+			return "Clear"
+
+		elif aspect == 0b110:
+			return "Advance Approach"
+
+		elif aspect == 0b001:
+			return "Approach"
+
+		elif aspect == 0b101:
+			return "Medium Approach"
+
+		elif aspect == 0b100:
+			return "Restricting"
+
+		else:
+			return "Stop"
+
+	elif atype == SloAspects:
+		if aspect == 0b01:
+			return "Slow Clear"
+
+		elif aspect == 0b11:
+			return "Slow Approach"
+
+		elif aspect == 0b10:
+			return "Restricting"
+
+		else:
+			return "Stop"
+
+	else:
+		return "Stop"
 
 def aspecttype(atype):
 	if atype == RegAspects:
@@ -266,9 +365,12 @@ class District:
 		return True
 
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
+		logging.debug("Calculating aspect for signal %s route %s" % (sig.GetName(), rt.GetName()))
+		
 		if osblk.IsBusy():
 			if not silent:
 				self.frame.PopupEvent("Block %s is busy" % osblk.GetName())
+			logging.debug("Unable to calculate aspect: OS Block is busy")
 			return None
 
 		sigE = sig.GetEast()
@@ -285,16 +387,19 @@ class District:
 		exitBlk = self.frame.blocks[exitBlkNm]
 		if exitBlk.IsOccupied():
 			self.frame.PopupEvent("Block %s is busy" % exitBlk.GetName())
+			logging.debug("Unable to calculate aspect: Block %s is busy" % exitBlkNm)
 			return None
 
 		crossEW = self.CrossingEastWestBoundary(osblk, exitBlk)
 		if exitBlk.IsCleared():
 			if (sigE != exitBlk.GetEast() and not crossEW) or (sigE == exitBlk.GetEast() and crossEW):
 				self.frame.PopupEvent("Block is cleared in opposite direction")
+				logging.debug("Unable to calculate aspect: Block %s cleared in opposite direction" % exitBlkNm)
 				return None
 
 		if exitBlk.AreHandSwitchesSet():
 			self.frame.PopupEvent("Block %s is locked" % exitBlk.GetName())
+			logging.debug("Unable to calculate aspect: Block %s is locked" % exitBlkNm)
 			return None
 
 		if exitBlk.GetEast() != osblk.GetEast():
@@ -333,7 +438,11 @@ class District:
 			nbRType = None
 			nnbClear = False
 
-		aspect = self.GetAspect(sig.GetAspectType(), rType, nbStatus, nbRType, nnbClear)
+		aType = sig.GetAspectType()
+		aspect = self.GetAspect(aType, rType, nbStatus, nbRType, nnbClear)
+		
+		logging.debug("Calculated aspect = %s   aspect type = %s route type = %s next block status = %s next block route type = %s next next block clear = %s" %
+					(aspectname(aspect, aType), aspecttype(aType), routetype(rType), statusname(nbStatus), routetype(nbRType), nnbClear))
 
 		#self.CheckBlockSignals(sig, aspect, exitBlk, doReverseExit, rType, nbStatus, nbRType, nnbClear)
 
