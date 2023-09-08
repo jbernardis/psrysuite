@@ -1,5 +1,5 @@
 import wx
-import os, sys
+import os, sys 
 cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
