@@ -367,8 +367,6 @@ class MainFrame(wx.Frame):
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})
 			
-		# self.DoRefresh()
-		
 	def OnBResetClock(self, _):
 		self.tickerCount = 0
 		self.timeValue = 360 # 6:00
@@ -1001,7 +999,7 @@ class MainFrame(wx.Frame):
 
 		self.trains = {}
 
-		#self.districts.Initialize()
+		self.districts.Initialize()
 
 		# only set up hot spots on the diagram for dispatchr - not for remote display
 		if self.settings.dispatch:
@@ -1612,7 +1610,7 @@ class MainFrame(wx.Frame):
 				self.cbAdvisor.Enable(True)
 				
 			self.RetrieveData()
-			self.districts.Initialize()
+			#self.districts.Initialize()
 			self.SendControlValues()
 
 		self.breakerDisplay.UpdateDisplay()
