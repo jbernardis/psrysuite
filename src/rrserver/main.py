@@ -354,11 +354,11 @@ class ServerMain:
 		signame = cmd["name"][0]
 		aspect = int(cmd["aspect"][0])
 		try:
-			oncall = int(cmd["oncall"][0]) == 1
+			callon = int(cmd["callon"][0]) == 1
 		except:
-			oncall = False
+			callon = False
 			
-		self.rr.SetAspect(signame, aspect, oncall)
+		self.rr.SetAspect(signame, aspect, callon)
 
 	def DoSignalLock(self, cmd):			
 		signame = cmd["name"][0]

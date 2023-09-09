@@ -374,7 +374,8 @@ class Railroad():
 		try:
 			tout = self.turnouts[toname]
 		except KeyError:
-			logging.warning("Attempt to change lock state on unknown turnout: %s" % toname)
+			# logging.warning("Attempt to change lock state on unknown turnout: %s" % toname)
+			# this is normal for the B half of all crossover pairings
 			return
 
 		release = tout.district.Released(tout)			
@@ -382,7 +383,7 @@ class Railroad():
 			tout.UpdateLockBits(release=release)
 			self.RailroadEvent(tout.GetEventMessage(lock=True))
 		
-	def SetAspect(self, signame, aspect, oncall=False):
+	def SetAspect(self, signame, aspect, callon=False):
 		try:
 			sig = self.signals[signame]
 		except KeyError:
@@ -413,7 +414,7 @@ class Railroad():
 
 		sig.UpdateIndicators() # make sure all indicators reflect this change
 		self.UpdateSignalLeverLEDs(sig, aspect)
-		self.RailroadEvent(sig.GetEventMessage(oncall=oncall))
+		self.RailroadEvent(sig.GetEventMessage(callon=callon))
 		
 	def UpdateSignalLeverLEDs(self, sig, aspect):
 		r = self.reSigName.findall(sig.Name())

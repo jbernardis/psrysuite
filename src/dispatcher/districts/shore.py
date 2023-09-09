@@ -12,16 +12,16 @@ class Shore (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
 
-	def PerformSignalAction(self, sig, oncall=False):
+	def PerformSignalAction(self, sig, callon=False):
 		signm = sig.GetName()
 		osblk = self.blocks["SOSHF"]
 		if signm not in ["S8L", "S8R"]:
-			if not oncall:
+			if not callon:
 				if signm in ["S12R", "S12LA", "S12LB", "S12LC", "S4R", "S4LA", "S4LB", "S4LC" ]:
 					if osblk.IsBusy():
 						self.ReportOSBusy(osblk.GetName())
 						return
-			District.PerformSignalAction(self, sig, oncall=oncall)
+			District.PerformSignalAction(self, sig, callon=callon)
 			return
 
 		aspect = sig.GetAspect()
@@ -42,8 +42,8 @@ class Shore (District):
 		self.frame.Request({"signal": { "name": signm, "aspect": aspect}})
 		sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 
-	def DoSignalAction(self, sig, aspect, oncall=False):
-		if not oncall:
+	def DoSignalAction(self, sig, aspect, callon=False):
+		if not callon:
 			signm = sig.GetName()
 			if signm in ["S8L", "S8R"]:
 				osblk = self.blocks["SOSHF"]
@@ -74,7 +74,7 @@ class Shore (District):
 				if self.blocks["SOSHF"].IsBusy():
 					return
 			
-		District.DoSignalAction(self, sig, aspect, oncall=oncall)
+		District.DoSignalAction(self, sig, aspect, callon=callon)
 		self.drawCrossing()
 
 		

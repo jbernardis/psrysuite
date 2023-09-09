@@ -25,7 +25,7 @@ class Cliff (District):
 
 		District.PerformHandSwitchAction(self, hs)
 
-	def PerformSignalAction(self, sig, oncall=False):
+	def PerformSignalAction(self, sig, callon=False):
 		controlOpt = self.frame.rbCliffControl.GetSelection()
 		if controlOpt != 2:  # cliff local control or limited to bank/cliveden (handled in those districts)
 			if controlOpt == 0:
@@ -35,7 +35,7 @@ class Cliff (District):
 			self.frame.PopupEvent(msg)
 			return
 
-		District.PerformSignalAction(self, sig, oncall=oncall)
+		District.PerformSignalAction(self, sig, callon=callon)
 
 	def PerformButtonAction(self, btn):
 		controlOpt = self.frame.rbCliffControl.GetSelection()

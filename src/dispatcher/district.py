@@ -328,12 +328,12 @@ class District:
 		# print("no route found")
 		return None, None
 
-	def PerformSignalAction(self, sig, oncall=False):
+	def PerformSignalAction(self, sig, callon=False):
 		currentMovement = sig.GetAspect() != 0  # does the CURRENT signal status allow movement
 		signm = sig.GetName()
 		rt, osblk = self.FindRoute(sig)
 
-		if oncall:
+		if callon:
 			aspect = 0 if currentMovement else 1
 		else:
 			if rt is None:
@@ -357,9 +357,9 @@ class District:
 					return False
 				aspect = 0
 
-		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "oncall": 1 if oncall else 0}})
+		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "callon": 1 if callon else 0}})
 		
-		if not oncall:
+		if not callon:
 			sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 			
 		return True
@@ -698,10 +698,10 @@ class District:
 		else:
 			turnout.SetReverse(refresh=True, force=force)
 
-	def DoSignalAction(self, sig, aspect, oncall=False):
+	def DoSignalAction(self, sig, aspect, callon=False):
 		signm = sig.GetName()
 		
-		if oncall:
+		if callon:
 			sig.SetAspect(aspect, refresh=True)
 			return
 

@@ -12,7 +12,7 @@ class Latham (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
 
-	def PerformSignalAction(self, sig, oncall=False):
+	def PerformSignalAction(self, sig, callon=False):
 		signm = sig.GetName()
 		if signm in [ "L4R", "L4L" ]:
 			controlOpt = self.frame.rbS4Control.GetSelection()
@@ -20,7 +20,7 @@ class Latham (District):
 				self.frame.PopupEvent("Signal 4 control is with Port")
 				return
 
-		District.PerformSignalAction(self, sig, oncall=oncall)
+		District.PerformSignalAction(self, sig, callon=callon)
 
 	def DetermineRoute(self, blocks):
 		s3 = 'N' if self.turnouts["LSw3"].IsNormal() else 'R'

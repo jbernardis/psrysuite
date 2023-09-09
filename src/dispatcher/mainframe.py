@@ -1211,7 +1211,7 @@ class MainFrame(wx.Frame):
 			if sig.IsDisabled():
 				return
 
-			sig.GetDistrict().PerformSignalAction(sig, oncall=shift)
+			sig.GetDistrict().PerformSignalAction(sig, callon=shift)
 
 		try:
 			hs = self.handswitchMap[(screen, pos)]
@@ -1740,9 +1740,9 @@ class MainFrame(wx.Frame):
 					sigName = p["name"]
 					aspect = p["aspect"]
 					try:
-						oncall = int(p["oncall"]) == 1
+						callon = int(p["callon"]) == 1
 					except:
-						oncall = False
+						callon = False
 
 					try:
 						sig = self.signals[sigName]
@@ -1751,7 +1751,7 @@ class MainFrame(wx.Frame):
 
 					if sig is not None and aspect != sig.GetAspect():
 						district = sig.GetDistrict()
-						district.DoSignalAction(sig, aspect, oncall=oncall)
+						district.DoSignalAction(sig, aspect, callon=callon)
 
 			elif cmd == "siglever":
 				if self.IsDispatcher():
