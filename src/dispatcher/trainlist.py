@@ -155,7 +155,7 @@ class ActiveTrainsDlg(wx.Dialog):
 		
 class TrainListCtrl(wx.ListCtrl):
 	def __init__(self, parent):
-		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(810, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
+		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(910, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
 		self.parent = parent
 		self.trains = {}
 		self.order = []
@@ -171,21 +171,23 @@ class TrainListCtrl(wx.ListCtrl):
 		self.SetColumnWidth(0, 80)
 		self.InsertColumn(1, "Loco")
 		self.SetColumnWidth(1, 80)
-		self.InsertColumn(2, "ATC")
-		self.SetColumnWidth(2, 50)
-		self.InsertColumn(3, "AR")
+		self.InsertColumn(2, "Engineer")
+		self.SetColumnWidth(2, 100)
+		self.InsertColumn(3, "ATC")
 		self.SetColumnWidth(3, 50)
-		self.InsertColumn(4, "SB")
+		self.InsertColumn(4, "AR")
 		self.SetColumnWidth(4, 50)
-		self.InsertColumn(5, "Signal")
-		self.SetColumnWidth(5, 100)
-		self.InsertColumn(6, "Blocks")
-		self.SetColumnWidth(6, 400)
+		self.InsertColumn(5, "SB")
+		self.SetColumnWidth(5, 50)
+		self.InsertColumn(6, "Signal")
+		self.SetColumnWidth(6, 100)
+		self.InsertColumn(7, "Blocks")
+		self.SetColumnWidth(7, 400)
 		self.SetItemCount(0)
 		
 	def ChangeSize(self, sz):
 		self.SetSize(sz[0]-56, sz[1]-84)
-		self.SetColumnWidth(6, sz[0]-466)
+		self.SetColumnWidth(7, sz[0]-566)
 		
 	def AddTrain(self, tr):
 		nm = tr.GetName()
@@ -294,12 +296,15 @@ class TrainListCtrl(wx.ListCtrl):
 		elif col == 1:
 			return tr.GetLoco()
 		elif col == 2:
-			return u"\u2713" if tr.IsOnATC() else " "
+			nm = tr.GetEngineer()
+			return "" if nm is None else nm
 		elif col == 3:
-			return u"\u2713" if tr.IsOnAR() else " "
+			return u"\u2713" if tr.IsOnATC() else " "
 		elif col == 4:
-			return u"\u2713" if tr.GetSBActive() else " "
+			return u"\u2713" if tr.IsOnAR() else " "
 		elif col == 5:
+			return u"\u2713" if tr.GetSBActive() else " "
+		elif col == 6:
 			sig, aspect = tr.GetSignal()
 			if sig is None:
 				return ""
@@ -307,5 +312,5 @@ class TrainListCtrl(wx.ListCtrl):
 			if aspect is not None:
 				resp += ":%d" % aspect
 			return resp
-		elif col == 6:
+		elif col == 7:
 			return ", ".join(tr.GetBlockNameList())

@@ -39,8 +39,7 @@ from tracker.listener import Listener
 from utilities.backup import saveData, restoreData
 from tracker.engqueuedlg import EngQueueDlg
 from dispatcher.breaker import BreakerName
-
-DEVELOPMODE = True
+from tracker.departuretimerdlg import DepartureTimerDlg
 
 BTNSZ = (120, 46)
 
@@ -60,6 +59,7 @@ MENU_DISPATCH_DISCONNECT = 402
 MENU_VIEW_ENG_QUEUE = 601
 MENU_VIEW_ACTIVE_TRAINS = 602
 MENU_VIEW_LEGEND = 603
+MENU_VIEW_TIMER = 604
 MENU_VIEW_SORT = 610
 MENU_SORT_TID = 650
 MENU_SORT_TIME = 651
@@ -140,6 +140,9 @@ class MainFrame(wx.Frame):
 		
 		i = wx.MenuItem(self.menuView, MENU_VIEW_ACTIVE_TRAINS, "Active Train List", helpString="Display Active Train List")
 		self.menuView.Append(i)
+		
+		i = wx.MenuItem(self.menuView, MENU_VIEW_TIMER, "Departure Timer", helpString="Show Departure Timer Dialog")
+		self.menuView.Append(i)
 
 		i = wx.MenuItem(self.menuView, MENU_VIEW_LEGEND, "Legend", helpString="Display a legend for icons")
 		self.menuView.Append(i)
@@ -205,6 +208,7 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.panel.onViewEngQueue, id=MENU_VIEW_ENG_QUEUE)
 		self.Bind(wx.EVT_MENU, self.panel.onViewActiveTrains, id=MENU_VIEW_ACTIVE_TRAINS)
 		self.Bind(wx.EVT_MENU, self.panel.onViewLegend, id=MENU_VIEW_LEGEND)
+		self.Bind(wx.EVT_MENU, self.panel.onViewDepartureTimer, id=MENU_VIEW_TIMER)
 		self.Bind(wx.EVT_MENU, self.panel.onChangeSort, id=MENU_SORT_TID)	
 		self.Bind(wx.EVT_MENU, self.panel.onChangeSort, id=MENU_SORT_TIME)		
 		self.Bind(wx.EVT_MENU, self.panel.onChangeSort, id=MENU_SORT_GROUP)		
@@ -291,6 +295,7 @@ class TrainTrackerPanel(wx.Panel):
 		self.trainSchedule = None
 		
 		self.dlgLegend = None
+		self.dlgDepartureTimer = None
 
 		self.atl = ActiveTrainList()
 		self.atl.setSortKey("time")
@@ -577,6 +582,12 @@ class TrainTrackerPanel(wx.Panel):
 			self.breakerx += 1
 			if self.breakerx >= len(self.tripped):
 				self.breakerx = 0
+				
+		if self.dlgDepartureTimer is not None:
+			try:
+				self.dlgDepartureTimer.tick()
+			except:
+				pass
 							
 		self.atl.ticker()
 		
@@ -764,6 +775,16 @@ class TrainTrackerPanel(wx.Panel):
 
 	def onLegendDlgClose(self):
 		self.dlgLegend = None
+		
+	def onViewDepartureTimer(self, _):
+		if self.dlgDepartureTimer is None:
+			self.dlgDepartureTimer = DepartureTimerDlg(self, self.onDepartureTimerDlgClose)
+			self.dlgDepartureTimer.Show()
+		else:
+			self.dlgDepartureTimer.Raise()
+			
+	def onDepartureTimerDlgClose(self):
+		self.dlgDepartureTimer = None
 	
 	def setExtraTrains(self):
 		if self.trainSchedule is None:
@@ -947,7 +968,7 @@ class TrainTrackerPanel(wx.Panel):
 			return
 
 		logging.info("Train %s assigned to %s" % (tid, eng))
-		req = {"advice": {"msg": "Train %s assigned to %s" % (tid, eng)}}
+		req = {"assigntrain": {"train": tid, "engineer": eng, "reassign": 0}}
 		self.Request(req)
 		
 		if tInfo["loco"] is None:
@@ -1066,6 +1087,8 @@ class TrainTrackerPanel(wx.Panel):
 		logging.info("Reassigning train %s from %s to %s" % (tid, oeng, neng))
 		
 		self.atl.setNewEngineer(tid, neng)
+		req = {"assigntrain": {"train": tid, "engineer": neng , "reassign": 1}}
+		self.Request(req)
 		
 	def splash(self):
 		splashExec = os.path.join(os.getcwd(), "splash", "main.py")
@@ -1181,9 +1204,8 @@ class TrainTrackerPanel(wx.Panel):
 		if rc == wx.ID_CANCEL:
 			return
 		
-		req = {"advice": {"msg": "Train %s has completed" % at.tid}}
+		req = {"traincomplete": {"train": at.tid}}
 		self.Request(req)
-
 
 		mins = int(at.time / 60)
 		secs = at.time % 60
@@ -1192,7 +1214,7 @@ class TrainTrackerPanel(wx.Panel):
 		self.completedTrainList.update()
 		self.atl.delTrain(tx)
 		
-		logging.log("Train %s has completed" % at.tid)
+		logging.info("Train %s has completed" % at.tid)
 		
 		if self.trainSchedule.isExtraTrain(at.tid):
 			self.setExtraTrains()
@@ -1446,10 +1468,22 @@ class TrainTrackerPanel(wx.Panel):
 		self.ticker.Stop()
 			
 		if self.dlgEngQueue is not None:
-			self.dlgEngQueue.Destroy()
+			try:
+				self.dlgEngQueue.Destroy()
+			except:
+				pass
 			
 		if self.dlgActiveTrains is not None:
-			self.dlgActiveTrains.Destroy()
+			try:
+				self.dlgActiveTrains.Destroy()
+			except:
+				pass
+			
+		if self.dlgDepartureTimer is not None:
+			try:
+				self.dlgDepartureTimer.Destroy()
+			except:
+				pass
 			
 		if self.listener is not None:
 			self.listener.kill()
@@ -1552,20 +1586,11 @@ class App(wx.App):
 	def OnInit(self):
 		self.frame = MainFrame()
 		self.frame.Show()
-		if not DEVELOPMODE:
-			self.frame.Maximize(True)
+		self.frame.Maximize(True)
 			
 		self.SetTopWindow(self.frame)
 		return True
 
-import sys
-
-ofp = open("tracker.out", "w")
-efp = open("tracker.err", "w")
-
-if not DEVELOPMODE:
-	sys.stdout = ofp
-	sys.stderr = efp
 
 app = App(False)
 app.MainLoop()

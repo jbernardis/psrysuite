@@ -277,6 +277,7 @@ class ServerMain:
 			"movetrain":	self.DoMoveTrain,
 			"removetrain":	self.DoRemoveTrain,
 			"traincomplete":self.DoTrainComplete,
+			"assigntrain":  self.DoAssignTrain,
 			
 			"signal":   	self.DoSignal,
 			"signallock":	self.DoSignalLock,
@@ -671,6 +672,11 @@ class ServerMain:
 	def DoTrainComplete(self, cmd):
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"traincomplete": [p]}
+		self.socketServer.sendToAll(resp)
+
+	def DoAssignTrain(self, cmd):
+		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
+		resp = {"assigntrain": [p]}
 		self.socketServer.sendToAll(resp)
 		
 	def GetTrainList(self):

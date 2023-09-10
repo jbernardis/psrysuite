@@ -1,6 +1,6 @@
 import wx
 
-from activetrainlistctrl import ActiveTrainListCtrl
+from tracker.activetrainlistctrl import ActiveTrainListCtrl
 
 		
 class ActiveTrainListDlg(wx.Dialog):

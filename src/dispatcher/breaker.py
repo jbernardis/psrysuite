@@ -53,7 +53,8 @@ class BreakerDisplay(wx.TextCtrl):
 	def __init__(self, parent, size=wx.DefaultSize, pos=wx.DefaultPosition):
 		wx.TextCtrl.__init__(self, parent, wx.ID_ANY, "", size=size, pos=pos, style=wx.TE_CENTER)
 		self.parent = parent
-		self.SetFont(wx.Font(wx.Font(22, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.NORMAL, faceName="Arial")))
+		#self.SetFont(wx.Font(wx.Font(22, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.NORMAL, faceName="Arial")))
+		self.SetFont(wx.Font(22, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.NORMAL, faceName="Arial"))
 		self.SetForegroundColour(wx.Colour(255, 255, 255))
 		self.red   = wx.Colour(255, 0, 0)
 		self.green = wx.Colour(0, 160, 24)

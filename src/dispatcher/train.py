@@ -17,6 +17,7 @@ class Train:
 		self.signal = None
 		self.east = True
 		self.aspect = None
+		self.engineer = None
 	
 	@classmethod	
 	def ResetTX(cls):
@@ -55,6 +56,12 @@ class Train:
 	def SetLoco(self, loco):
 		self.loco = loco
 		logging.info("changing loco to %s for train %s" % (loco, self.name))
+		
+	def SetEngineer(self, engineer):
+		self.engineer = engineer
+		
+	def GetEngineer(self):
+		return self.engineer
 
 	def GetName(self):
 		return self.name

@@ -1909,6 +1909,7 @@ class MainFrame(wx.Frame):
 							blk.DrawTrain()
 							
 			elif cmd == "traincomplete": # from simulator when a train reaches its terminus
+				print("traincomplete message received", flush=True)
 				for p in parms:
 					train = p["train"]
 
@@ -1928,6 +1929,39 @@ class MainFrame(wx.Frame):
 						tr.SetAR(False)
 						self.Request({"ar": {"action": "remove", "train": train}})
 						self.activeTrains.UpdateTrain(train)
+						
+					tr.SetEngineer(None)
+					self.activeTrains.UpdateTrain(train)
+					self.PopupAdvice("Train %s has completed" % train)
+						
+					tr.Draw()
+					
+			elif cmd == "assigntrain":
+				for p in parms:
+					train = p["train"]
+					try:
+						engineer = p["engineer"]
+					except KeyError:
+						engineer = None
+						
+					try:
+						reassigned = p["reassign"] != 0
+					except KeyError:
+						reassigned = False
+						
+					try:
+						tr = self.trains[train]
+					except:
+						logging.error("Unknown train name (%s) in assigntrain message" % train)
+						return
+						
+					tr.SetEngineer(engineer)
+					self.activeTrains.UpdateTrain(train)
+					
+					if reassigned:
+						self.PopupAdvice("Train %s has been reassigned to %s" % (train, engineer))
+					else:
+						self.PopupAdvice("Train %s has been assigned to %s" % (train, engineer))
 						
 					tr.Draw()
 					
