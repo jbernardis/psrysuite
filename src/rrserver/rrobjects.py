@@ -146,7 +146,8 @@ class Block:
  
         for ind in parentBlk.indicators:
             district, node, address, bits = ind
-            node.SetOutputBit(bits[0][0], bits[0][1], occ)
+            if len(bits) > 0:
+                node.SetOutputBit(bits[0][0], bits[0][1], occ)
  
     def GetEventMessage(self, clear=False, direction=False):
         bname = self.mainBlockName if self.mainBlockName is not None else self.name
@@ -250,7 +251,8 @@ class Breaker:
         
         for ind in self.indicators:
             district, node, address, bits = ind
-            node.SetOutputBit(bits[0][0], bits[0][1], 0 if self.status else 1)
+            if len(bits) > 0:
+                node.SetOutputBit(bits[0][0], bits[0][1], 0 if self.status else 1)
         return True
 
     def GetEventMessage(self):
@@ -398,7 +400,8 @@ class Signal:
     def UpdateIndicators(self):
         for ind in self.indicators:
             district, node, address, bits = ind
-            node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.aspect != 0 else 0)
+            if len(bits) > 0:
+                node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.aspect != 0 else 0)
     
     def GetEventMessage(self, lock=False, callon=False):
         if lock:

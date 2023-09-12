@@ -15,6 +15,8 @@ class Shore(District):
 		self.BX = None
 		self.F10H = self.F10D = None
 
+		self.H30power = None
+
 		self.rr = rr
 		self.name = name
 		self.released = False
@@ -63,7 +65,12 @@ class Shore(District):
 
 			self.rr.AddStopRelay("S20.srel", self, n, SHORE, [(5, 6)])
 			self.rr.AddStopRelay("S11.srel", self, n, SHORE, [(5, 7)])
-			self.rr.AddStopRelay("H30.srel", self, n, SHORE, [(6, 0)])
+			'''
+			bit position 6:0 is Actually a merge of H30Power and !H30.srel
+			create a virtual stopping relay and a virtual indicator, and do the merging in the outin
+			'''
+			self.rr.AddStopRelay("H30.srel", self, n, SHORE, [])
+			self.rr.AddIndicator("H30Power", self, n, SHORE, [])
 			self.rr.AddStopRelay("H10.srel", self, n, SHORE, [(6, 1)])
 			self.rr.AddStopRelay("F10.srel", self, n, SHORE, [(6, 2)])
 			self.rr.AddStopRelay("F11.srel", self, n, SHORE, [(6, 3)])
@@ -210,6 +217,12 @@ class Shore(District):
 		if F10D != self.F10D:
 			self.F10D = F10D
 			self.rr.SetAspect("F10D", 1 if F10D else 0)
+
+		# handle the merging of h30Power and H30 stop relay			
+		H30power = self.rr.GetIndicator("H30Power").IsOn() and not self.rr.GetStopRelay("H30")
+		if H30power != self.H30power:
+			self.H30power = H30power
+			self.nodes[SHORE].SetOutputBit(6, 0, 1 if H30power else 0)
 		
 		return District.OutIn(self)
 

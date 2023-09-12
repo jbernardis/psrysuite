@@ -226,8 +226,10 @@ class Railroad():
 			return False
 	
 		ind.SetOn(state)	
-		vbyte, vbit = ind.Bits()[0]
-		ind.node.SetOutputBit(vbyte, vbit, 1 if state else 0)
+		bits = ind.Bits()
+		if len(bits) > 0:
+			vbyte, vbit = bits[0]
+			ind.node.SetOutputBit(vbyte, vbit, 1 if state else 0)
 		return True
 
 	def SetODevice(self, odname, state):
@@ -252,9 +254,11 @@ class Railroad():
 		except KeyError:
 			logging.warning("Ignoring stoprelay command - unknown relay: %s" % relayname)
 			return
-		
-		vbyte, vbit = r.Bits()[0]
-		r.node.SetOutputBit(vbyte, vbit, 1 if state != 0 else 0)
+
+		bits = r.Bits()
+		if len(bits) > 0:		
+			vbyte, vbit = bits[0]
+			r.node.SetOutputBit(vbyte, vbit, 1 if state != 0 else 0)
 		
 	def GetRouteIn(self, rtnm):
 		try:
@@ -899,6 +903,12 @@ class Railroad():
 	def GetBlock(self, blknm):
 		try:
 			return self.blocks[blknm]
+		except KeyError:
+			return None
+
+	def GetStopRelay(self, blknm):
+		try:
+			return self.stopRelays[blknm]
 		except KeyError:
 			return None
 

@@ -18,11 +18,12 @@ class Hyde (District):
 
 		self.buttons["HydeWestPower"].TurnOn(refresh=True)
 		self.buttons["HydeEastPower"].TurnOn(refresh=True)
+		self.buttons["H30Power"].TurnOn(refresh=True)
 
 	def OnConnect(self):
 		District.OnConnect(self)
 
-		for bname in ["HydeEastPower", "HydeWestPower" ]:
+		for bname in ["HydeEastPower", "HydeWestPower", "H30Power" ]:
 			onFlag = 1 if self.buttons[bname].IsOn() else 0
 			self.indicators[bname].SetValue(onFlag, force=True)
 
@@ -33,7 +34,7 @@ class Hyde (District):
 
 	def PerformButtonAction(self, btn):
 		bname = btn.GetName()
-		if bname in [ "HydeEastPower", "HydeWestPower" ]:
+		if bname in [ "HydeEastPower", "HydeWestPower", "H30Power" ]:
 			onFlag = self.buttons[bname].IsOn()
 			nv = 0 if onFlag else 1
 			self.indicators[bname].SetValue(nv)
@@ -789,7 +790,7 @@ class Hyde (District):
 
 	def DefineIndicators(self):
 		self.indicators = {}
-		indNames = [ "HydeEastPower", "HydeWestPower" ]
+		indNames = [ "HydeEastPower", "HydeWestPower", "H30Power" ]
 		for ind in indNames:
 			self.indicators[ind] = Indicator(self.frame, self, ind)
 
@@ -873,5 +874,8 @@ class Hyde (District):
 
 		b = Button(self, self.screen, self.frame, "HydeWestPower", (11, 6), self.btntiles)
 		self.buttons["HydeWestPower"] = b
+
+		b = Button(self, self.screen, self.frame, "H30Power", (11, 8), self.btntiles)
+		self.buttons["H30Power"] = b
 
 		return self.buttons
