@@ -43,7 +43,7 @@ class Sniffer:
 						p = s.split()
 						req = {
 							"dccspeed": {
-								"cmd": p[0],
+								"speedtype": p[0],
 								"loco": "%d" % int(p[1]), # strip off any leading zeroes
 								"speed": p[2]
 							}

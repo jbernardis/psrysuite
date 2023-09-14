@@ -417,10 +417,10 @@ class Railroad():
 				sig.node.SetOutputBit(vbyte, vbit, 1 if val != 0 else 0)
 
 		sig.UpdateIndicators() # make sure all indicators reflect this change
-		self.UpdateSignalLeverLEDs(sig, aspect)
+		self.UpdateSignalLeverLEDs(sig, aspect, callon)
 		self.RailroadEvent(sig.GetEventMessage(callon=callon))
 		
-	def UpdateSignalLeverLEDs(self, sig, aspect):
+	def UpdateSignalLeverLEDs(self, sig, aspect, callon):
 		r = self.reSigName.findall(sig.Name())
 		if len(r) != 1 or len(r[0]) != 2:
 			return 
@@ -443,7 +443,7 @@ class Railroad():
 			lbit = 0
 			rbit = 0
 					
-		sl.SetLeverState(lbit, 0, rbit)
+		sl.SetLeverState(rbit, 1 if callon else 0, lbit)
 		sl.UpdateLed()
 		
 	def SetSignalLock(self, signame, lock):
@@ -1003,11 +1003,13 @@ class Railroad():
 				t.UpdateLockBits(released)
 		
 	def ExamineInputs(self):
+		print("====================================", flush=True)
 		for addr, district, node in self.addrList:
 			skiplist, resumelist = district.GetControlOption()
 			changedBits = node.GetChangedInputs()
 			for node, vbyte, vbit, objparms, newval in changedBits:
 				obj = objparms[0]
+				print("examine next input object: %s" % obj.Name(), flush=True)
 				objType = obj.InputType()
 				objName = obj.Name()
 
@@ -1069,13 +1071,17 @@ class Railroad():
 							self.RailroadEvent(obj.GetEventMessage())
 	
 				elif objType == INPUT_SIGNALLEVER:
+					print("signal lever %s has changed" % obj.Name())
 					if obj.Name() not in skiplist: # bypass levers that are skipped because of control option
 						bt = obj.Bits()
 						if len(bt) > 0:
 							rbit, cbit, lbit = node.GetInputBits(bt)
+							print("calling set lever state r:%s c:%s l:%s" % (rbit, cbit, lbit))
 							if obj.SetLeverState(rbit, cbit, lbit):
+								print("changed values")
 								self.RailroadEvent(obj.GetEventMessage())
 								obj.UpdateLed()
+							print("end of set lever state", flush=True)
 
 				elif objType == INPUT_HANDSWITCH:
 					dataType = objparms[1]

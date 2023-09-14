@@ -114,6 +114,12 @@ def aspectname(aspect, atype):
 
 	else:
 		return "Stop"
+	
+def restrictedaspect(atype):
+	if atype == SloAspects:
+		return 0b10
+	else:
+		return 0b100
 
 def aspecttype(atype):
 	if atype == RegAspects:
@@ -334,7 +340,7 @@ class District:
 		rt, osblk = self.FindRoute(sig)
 
 		if callon:
-			aspect = 0 if currentMovement else 1
+			aspect = 0 if currentMovement else restrictedaspect(sig.GetAspectType())
 		else:
 			if rt is None:
 				self.frame.PopupEvent("No available route")
@@ -772,7 +778,7 @@ class District:
 	def EvaluateDistrictLocks(self, sig):
 		pass
 
-	def DoSignalLeverAction(self, signame, state):
+	def DoSignalLeverAction(self, signame, state, callon):
 		sigPrefix = signame.split(".")[0]
 		osblknms = self.sigLeverMap[signame]
 		signm = None
@@ -824,14 +830,19 @@ class District:
 			return
 
 		if movement:
-			aspect = self.CalculateAspect(sig, osblk, route)
-			if aspect is None:
-				return
+			if callon:
+				aspect = restrictedaspect(sig.GetAspectType())
+			else:
+				aspect = self.CalculateAspect(sig, osblk, route)
+				if aspect is None:
+					return
 		else:
 			aspect = 0
 
-		self.frame.Request({"signal": {"name": signm, "aspect": aspect}})
-		sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
+		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "callon": 1 if callon else 0}})
+	
+		if not callon:
+			sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 
 	def LockTurnoutsForSignal(self, osblknm, sig, flag):
 		signm = sig.GetName()

@@ -120,7 +120,7 @@ class MainFrame(wx.Frame):
 
 		self.title = "PSRY Dispatcher" if self.settings.dispatch else "PSRY Monitor"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
-		self.bitmaps = BitMaps(os.path.join(os.getcwd(), "data", "bitmaps"))
+		self.bitmaps = BitMaps(os.path.join(os.getcwd(), "images", "bitmaps"))
 		singlePage = self.settings.pages == 1
 		self.bmpw, self.bmph = self.bitmaps.diagrams.HydeYardPort.GetSize()
 		self.diagrams = {
@@ -1758,12 +1758,16 @@ class MainFrame(wx.Frame):
 					for p in parms:
 						signame = p["name"]
 						state = p["state"]
+						try:
+							callon = p["callon"]
+						except KeyError:
+							callon = 0
 
 						district = self.GetSignalLeverDistrict(signame)
 						if district is None:
 							# unable to find district for signal lever
 							return
-						district.DoSignalLeverAction(signame, state)
+						district.DoSignalLeverAction(signame, state, callon == 1)
 						
 			elif cmd == "handswitch":
 				for p in parms:
@@ -1897,7 +1901,7 @@ class MainFrame(wx.Frame):
 							self.CheckTrainsInBlock(block, None)
 						
 						if loco:
-							tr.SetLoco(loco)
+							self.activeTrains.SetLoco(tr, loco)
 							
 						self.activeTrains.UpdateTrain(tr.GetName())
 
@@ -1969,6 +1973,13 @@ class MainFrame(wx.Frame):
 				if not self.IsDispatcher():
 					self.timeValue = int(parms[0]["value"])
 					self.DisplayTimeValue()
+					
+			elif cmd == "dccspeed":
+				for p in parms:
+					loco = p["loco"]
+					speed = p["speed"]
+					speedtype = p["speedtype"]
+					self.PopupEvent("Locomotive %s has changed speed to %s/%s" % (loco, speed, speedtype))
 
 			elif cmd == "control":
 				for p in parms:

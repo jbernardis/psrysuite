@@ -1,9 +1,10 @@
-FWD_128 = 1
-FWD_28 = 2
-REV_128 = 3
-REV_28 = 4
-STOP = 5
 
+ST_FWD    = "f"
+ST_FWD128 = "F"
+ST_REV    = "r"
+ST_REV128 = "R"
+ST_STOP   = "s"
+ST_ESTOP  = "e"
 
 class ActiveTrainList:
 	def __init__(self):
@@ -120,13 +121,13 @@ class ActiveTrainList:
 	def formatThrottle(self, speed, speedType):
 		speedStr = "%3d" % speed
 	
-		if speedType == FWD_128:
+		if speedType == ST_FWD128:
 			return speedStr
-		elif speedType == FWD_28:
+		elif speedType == ST_FWD:
 			return "%s/28" % speedStr
-		elif speedType == REV_128:
+		elif speedType == ST_REV128:
 			return "(%s)" % speedStr
-		elif speedType == REV_28:
+		elif speedType == ST_REV:
 			return "(%s/28)" % speedStr
 		else:
 			return speedStr

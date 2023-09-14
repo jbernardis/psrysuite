@@ -308,6 +308,8 @@ class ServerMain:
 			"debug":		self.DoDebug,
 			"simulate": 	self.DoSimulate,
 			
+			"dccspeed":		self.DoDCCSpeed,
+			
 			"quit":			self.DoQuit,
 			"delayedstartup":
 							self.DelayedStartup,
@@ -453,6 +455,14 @@ class ServerMain:
 		value = cmd["value"][0]
 		resp = {"clock": [{ "value": value}]}
 		self.timeValue = value
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER")
+		for addr, skt in addrList:
+			self.socketServer.sendToOne(skt, addr, resp)
+			
+	def DoDCCSpeed(self, cmd):
+		print("received DCC Speed message: %s" % str(cmd))
+		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
+		resp = {"dccspeed": [p]}
 		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)

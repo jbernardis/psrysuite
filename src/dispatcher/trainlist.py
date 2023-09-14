@@ -13,9 +13,14 @@ class ActiveTrainList:
 	def __init__(self):
 		self.trains = {}
 		self.dlgTrainList = None
+		self.locoMap = {}
+		
+	def RegenerateLocoMap(self):
+		self.locoMap = {tr.GetLoco(): tr for tr in self.trains.values() if tr.GetLoco() != "??"}
 		
 	def AddTrain(self, tr):
 		self.trains[tr.GetName()] = tr
+		self.RegenerateLocoMap()
 		if self.dlgTrainList is not None:
 			self.dlgTrainList.AddTrain(tr)
 			
@@ -26,13 +31,25 @@ class ActiveTrainList:
 	def RenameTrain(self, oldName, newName):
 		self.trains[newName] = self.trains[oldName]
 		del(self.trains[oldName])
+		self.RegenerateLocoMap()
 		if self.dlgTrainList is not None:
 			self.dlgTrainList.RenameTrain(oldName, newName)
 			
 	def RemoveTrain(self, trid):
 		del(self.trains[trid])
+		self.RegenerateLocoMap()
 		if self.dlgTrainList is not None:
 			self.dlgTrainList.RemoveTrain(trid)
+			
+	def SetLoco(self, tr, loco):
+		tr.SetLoco(loco)
+		self.RegenerateLocoMap()
+			
+	def FindTrainByLoco(self, loco):
+		try:
+			return self.locoMap[loco]
+		except:
+			return None
 			
 	def ShowTrainList(self, parent):
 		if self.dlgTrainList is None:
@@ -155,7 +172,7 @@ class ActiveTrainsDlg(wx.Dialog):
 		
 class TrainListCtrl(wx.ListCtrl):
 	def __init__(self, parent):
-		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(910, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
+		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1010, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
 		self.parent = parent
 		self.trains = {}
 		self.order = []
@@ -181,13 +198,15 @@ class TrainListCtrl(wx.ListCtrl):
 		self.SetColumnWidth(5, 50)
 		self.InsertColumn(6, "Signal")
 		self.SetColumnWidth(6, 100)
-		self.InsertColumn(7, "Blocks")
-		self.SetColumnWidth(7, 400)
+		self.InsertColumn(7, "Throttle")
+		self.SetColumnWidth(7, 100)
+		self.InsertColumn(8, "Blocks")
+		self.SetColumnWidth(8, 400)
 		self.SetItemCount(0)
 		
 	def ChangeSize(self, sz):
 		self.SetSize(sz[0]-56, sz[1]-84)
-		self.SetColumnWidth(7, sz[0]-566)
+		self.SetColumnWidth(8, sz[0]-566)
 		
 	def AddTrain(self, tr):
 		nm = tr.GetName()
@@ -293,17 +312,23 @@ class TrainListCtrl(wx.ListCtrl):
 		
 		if col == 0:
 			return tr.GetName()
+		
 		elif col == 1:
 			return tr.GetLoco()
+		
 		elif col == 2:
 			nm = tr.GetEngineer()
 			return "" if nm is None else nm
+		
 		elif col == 3:
 			return u"\u2713" if tr.IsOnATC() else " "
+		
 		elif col == 4:
 			return u"\u2713" if tr.IsOnAR() else " "
+		
 		elif col == 5:
 			return u"\u2713" if tr.GetSBActive() else " "
+		
 		elif col == 6:
 			sig, aspect = tr.GetSignal()
 			if sig is None:
@@ -311,6 +336,11 @@ class TrainListCtrl(wx.ListCtrl):
 			resp = sig.GetName()
 			if aspect is not None:
 				resp += ":%d" % aspect
-			return resp
+			return resp 
+		
 		elif col == 7:
+			throttle = tr.GetThrottle()
+			return throttle
+		
+		elif col == 8:
 			return ", ".join(tr.GetBlockNameList())

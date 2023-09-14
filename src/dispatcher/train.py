@@ -8,13 +8,13 @@ class Train:
 		else:
 			self.name = Train.NextName()
 		self.loco = "??"
-		logging.info("set loco to ?? when instantiating new train %s" % self.name)
 		self.atc = False
 		self.ar = False
 		self.sbActive = False
 		self.blocks = {}
 		self.blockOrder = []
 		self.signal = None
+		self.throttle = ""
 		self.east = True
 		self.aspect = None
 		self.engineer = None
@@ -75,6 +75,12 @@ class Train:
 	
 	def GetSignal(self):
 		return self.signal, self.aspect
+	
+	def SetThrottle(self, throttle):
+		self.throttle = throttle
+	
+	def GetThrottle(self):
+		return self.throttle
 
 	def GetBlockNameList(self):
 		return list(self.blocks.keys())

@@ -1,7 +1,7 @@
 import logging
+import traceback
 
 from rrserver.constants import INPUT_BLOCK, INPUT_BREAKER, INPUT_SIGNALLEVER, INPUT_ROUTEIN, INPUT_HANDSWITCH, INPUT_TURNOUTPOS
-from pickle import FALSE
 
 class Block:
     def __init__(self, name, district, node, address):
@@ -427,6 +427,7 @@ class SignalLever:
         self.address = address
         self.led = None
         self.state = "N"
+        self.callon = False
         self.bits = []
 
     def IsNullLever(self):
@@ -466,13 +467,23 @@ class SignalLever:
         return self.bits
     
     def SetLeverState(self, rbit, cbit, lbit):
+        self.callon = cbit == 1
         nstate = self.state
+        print("set lever state.  before = %s" % self.state)
         if lbit is not None and lbit != 0:
+            print("lbit is not 0")
             nstate = "L"
         elif rbit is not None and rbit != 0:
+            print("rbit is not 0")
             nstate = "R"
         elif (lbit is None or lbit == 0) and (rbit is None or rbit == 0):
             nstate = "N"
+            print("both bits are 0")
+            
+        print("new state = %s" % nstate, flush=True)
+        print("name: %s" % self.name, flush=True)
+        if self.name == "N24" and nstate == "L":
+            traceback.print_stack()
 
         if nstate != self.state:
             self.state = nstate
@@ -494,7 +505,7 @@ class SignalLever:
                 node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'L' else 0)
        
     def GetEventMessage(self):
-        return {"siglever": [{ "name": self.name+".lvr", "state": self.state}]}
+        return {"siglever": [{ "name": self.name+".lvr", "state": self.state, "callon": 1 if self.callon else 0}]}
 
 
 class RouteIn:

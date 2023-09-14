@@ -24,7 +24,7 @@ from tracker.trainroster import TrainRoster
 from tracker.locomotives import Locomotives
 from tracker.engineers import Engineers
 from tracker.activetrain import ActiveTrain
-from tracker.activetrainlist import ActiveTrainList   #, FWD_128, FWD_28, REV_128, REV_28, STOP 
+from tracker.activetrainlist import ActiveTrainList
 from tracker.activetrainlistctrl import ActiveTrainListCtrl
 from tracker.activetrainlistdlg import ActiveTrainListDlg
 from tracker.completedtrainlist import CompletedTrainList
@@ -712,6 +712,29 @@ class TrainTrackerPanel(wx.Panel):
 					if loco is not None:
 						self.locos.setLimit(lid, aspect)
 						self.atl.setLimit(lid, self.locos.getLimit(lid))
+						
+			elif cmd == "dccspeed":
+				logging.info("DCC Speed: %s" % parms)
+				try:
+					lid = parms["loco"]
+				except:
+					lid = None
+				try:
+					speed = parms("speed")
+				except:
+					speed = None
+				try:
+					speedtype = parms("speedtype")
+				except:
+					speed = None
+				
+				if lid is None or speed is None or speedtype is None:
+					return
+				
+				loco = self.locos.getLoco(lid)
+				if loco is not None:
+					self.atl.setThrottle(loco, speed, speedtype)
+				
 
 	def DoRefresh(self, rtype=None):
 		req = {"refresh": {"SID": self.sessionid}}
