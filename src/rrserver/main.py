@@ -233,6 +233,7 @@ class ServerMain:
 	def sendTrainInfo(self, addr, skt):
 		for m in self.trainList.GetSetTrainCmds():
 			self.socketServer.sendToOne(skt, addr, m)
+
 		self.socketServer.sendToOne(skt, addr, {"end": {"type": "trains"}})
 		self.generateLayoutFile()
 
@@ -325,7 +326,6 @@ class ServerMain:
 			return 
 		
 		if not self.forever:
-			print("skipping command %s because of an earlier error" % verb)
 			return
 		
 		if verb != "interval":
@@ -460,15 +460,11 @@ class ServerMain:
 			self.socketServer.sendToOne(skt, addr, resp)
 			
 	def DoDCCSpeed(self, cmd):
-		print("received DCC Speed message: %s" % str(cmd))
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"dccspeed": [p]}
-		print("sending DCC Speed message: %s" % str(resp))
-		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("TRACKER")
 		for addr, skt in addrList:
-			print("send to address %s" % str(addr))
 			self.socketServer.sendToOne(skt, addr, resp)
-		print("====================================", flush=True)
 			
 	def DoSimulate(self, cmd):
 		action = cmd["action"][0]
@@ -499,8 +495,7 @@ class ServerMain:
 			self.deleteClients(["AR", "ADVISOR", "ATC"])
 			self.pidAR = None
 			self.pidADV = None
-			logging.info("==== done with dispatcher identify")
-			
+
 	def DoRouteDef(self, cmd):
 		name = cmd["name"][0]
 		osNm = cmd["os"][0]

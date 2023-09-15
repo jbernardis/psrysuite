@@ -1913,7 +1913,6 @@ class MainFrame(wx.Frame):
 							blk.DrawTrain()
 							
 			elif cmd == "traincomplete": # from simulator when a train reaches its terminus
-				print("traincomplete message received", flush=True)
 				for p in parms:
 					train = p["train"]
 
@@ -1949,7 +1948,7 @@ class MainFrame(wx.Frame):
 						engineer = None
 						
 					try:
-						reassigned = p["reassign"] != 0
+						reassigned = p["reassign"] != "0"
 					except KeyError:
 						reassigned = False
 						
@@ -2056,7 +2055,6 @@ class MainFrame(wx.Frame):
 			elif cmd == "atcrequest":
 				trnm = parms["train"][0]
 				if self.ATCEnabled:
-					logging.info("atcrequest: %s" % str(parms))
 					try:
 						tr = self.trains[trnm]
 					except KeyError:

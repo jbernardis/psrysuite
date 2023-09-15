@@ -1161,7 +1161,6 @@ class PendingDetectionLoss:
 		self.pendingDetectionLossCycles = railroad.settings.pendingdetectionlosscycles
 				
 	def Add(self, block, obj):
-		logging.info("adding block %s to pending detection loss list" % block)
 		self.pendingDetectionLoss[block] = [obj, self.pendingDetectionLossCycles]
 		
 	def Remove(self, block):

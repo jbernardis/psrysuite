@@ -276,7 +276,7 @@ class MainUnit:
 		self.EvaluateQueuedRequests()
 
 	def BlockTrainChange(self, blkName, oldTrain, oldLoco, newTrain, newLoco):
-		if oldTrain is not None:
+		if oldTrain is not None and oldTrain != newTrain:
 			try:
 				if self.trains[oldTrain].DelBlock(blkName) == 0:
 					del(self.trains[oldTrain])

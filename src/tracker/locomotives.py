@@ -25,7 +25,7 @@ class Locomotives:
 	def getLoco(self, lId):
 		if lId not in self.locos:
 			return None
-		
+
 		return self.locos[lId]
 
 	def setLimit(self, lId, aspect):

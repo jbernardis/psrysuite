@@ -364,7 +364,6 @@ class Block:
 				tr = self.IdentifyTrain()
 				if tr is None:
 					tr = self.frame.NewTrain()
-					logging.info("Calling newtrain 1 in setoccupied block %s" % self.GetName())
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
@@ -386,7 +385,6 @@ class Block:
 				tr = self.IdentifyTrain()
 				if tr is None:
 					tr = self.frame.NewTrain()
-					logging.info("Calling newtrain 2 in setoccupied block %s" % self.GetName())
 
 				trn, loco = tr.GetNameAndLoco()
 

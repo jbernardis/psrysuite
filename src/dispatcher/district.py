@@ -721,7 +721,7 @@ class District:
 				if sig.IsPossibleRoute(blknm, rname):
 					break
 		else:
-			logging.info("returning because no possible routes")
+			logging.info("DoSignalAction returning because no possible routes")
 			return
 
 		if aspect < 0:

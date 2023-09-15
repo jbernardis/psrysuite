@@ -1,3 +1,5 @@
+import logging
+
 class TrainList:
 	def __init__(self, parent):
 		self.parent = parent
@@ -25,6 +27,7 @@ class TrainList:
 
 			for tr in dellist:
 				del(self.trains[tr])
+
 		else:
 			if train in self.trains:
 				if block not in self.trains[train]["blocks"]:

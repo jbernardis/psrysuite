@@ -641,7 +641,6 @@ class TrainTrackerPanel(wx.Panel):
 		logging.info("delivery event: %s" % str(evt.data))
 		for cmd, parms in evt.data.items():
 			if  cmd == "breaker":
-				logging.info("breaker: %s" % parms)
 				for p in parms:
 					brkName = p["name"]
 					brkVal = p["value"]
@@ -714,26 +713,27 @@ class TrainTrackerPanel(wx.Panel):
 						self.atl.setLimit(lid, self.locos.getLimit(lid))
 						
 			elif cmd == "dccspeed":
-				logging.info("DCC Speed: %s" % parms)
-				try:
-					lid = parms["loco"]
-				except:
-					lid = None
-				try:
-					speed = parms("speed")
-				except:
-					speed = None
-				try:
-					speedtype = parms("speedtype")
-				except:
-					speed = None
-				
-				if lid is None or speed is None or speedtype is None:
-					return
-				
-				loco = self.locos.getLoco(lid)
-				if loco is not None:
-					self.atl.setThrottle(loco, speed, speedtype)
+				for p in parms:
+					logging.info("DCC Speed: %s" % p)
+					try:
+						lid = p["loco"]
+					except:
+						lid = None
+					try:
+						speed = p["speed"]
+					except:
+						speed = None
+					try:
+						speedtype = p["speedtype"]
+					except:
+						speedtype = None
+					
+					if lid is None or speed is None or speedtype is None:
+						return
+					
+					loco = self.locos.getLoco(lid)
+					if loco is not None:
+						self.atl.setThrottle(lid, speed, speedtype)
 				
 
 	def DoRefresh(self, rtype=None):

@@ -119,7 +119,7 @@ class ActiveTrainList:
 				return
 			
 	def formatThrottle(self, speed, speedType):
-		speedStr = "%3d" % speed
+		speedStr = "%3d" % int(speed)
 	
 		if speedType == ST_FWD128:
 			return speedStr
