@@ -1,5 +1,28 @@
 import logging
 
+	
+ST_FWD    = "f"
+ST_FWD128 = "F"
+ST_REV    = "r"
+ST_REV128 = "R"
+ST_STOP   = "s"
+ST_ESTOP  = "e"
+		
+def formatThrottle(speed, speedType):
+	speedStr = "%3d" % int(speed)
+
+	if speedType == ST_FWD128:
+		return speedStr
+	elif speedType == ST_FWD:
+		return "%s/28" % speedStr
+	elif speedType == ST_REV128:
+		return "(%s)" % speedStr
+	elif speedType == ST_REV:
+		return "(%s/28)" % speedStr
+	else:
+		return speedStr
+
+
 class Train:
 	tx = 0
 	def __init__(self, name=None):
@@ -76,8 +99,8 @@ class Train:
 	def GetSignal(self):
 		return self.signal, self.aspect
 	
-	def SetThrottle(self, throttle):
-		self.throttle = throttle
+	def SetThrottle(self, speed, speedtype):
+		self.throttle = formatThrottle(speed, speedtype)
 	
 	def GetThrottle(self):
 		return self.throttle

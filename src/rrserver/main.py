@@ -463,9 +463,12 @@ class ServerMain:
 		print("received DCC Speed message: %s" % str(cmd))
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"dccspeed": [p]}
-		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER")
+		print("sending DCC Speed message: %s" % str(resp))
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH")
 		for addr, skt in addrList:
+			print("send to address %s" % str(addr))
 			self.socketServer.sendToOne(skt, addr, resp)
+		print("====================================", flush=True)
 			
 	def DoSimulate(self, cmd):
 		action = cmd["action"][0]

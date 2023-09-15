@@ -1976,10 +1976,28 @@ class MainFrame(wx.Frame):
 					
 			elif cmd == "dccspeed":
 				for p in parms:
-					loco = p["loco"]
-					speed = p["speed"]
-					speedtype = p["speedtype"]
-					self.PopupEvent("Locomotive %s has changed speed to %s/%s" % (loco, speed, speedtype))
+					try:
+						loco = p["loco"]
+					except:
+						loco = None
+					
+					try:
+						speed = p["speed"]
+					except:
+						speed = "0"
+						
+					try:
+						speedtype = p["speedtype"]
+					except:
+						speedtype = None
+						
+					if loco is None:
+						return 
+					
+					tr = self.activeTrains.FindTrainByLoco(loco)
+					if tr is not None:
+						tr.SetThrottle(speed, speedtype)
+						self.activeTrains.UpdateTrain(tr.GetName())
 
 			elif cmd == "control":
 				for p in parms:
