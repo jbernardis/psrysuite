@@ -271,13 +271,17 @@ class District:
 		# This maps OS name to new route.  Initially assume None for all OSes
 		rteMap = {os.GetName(): None for os in blocks if os.GetBlockType() == OVERSWITCH}
 		toMap = [[x, 'N' if self.turnouts[x].IsNormal() else 'R'] for x in turnouts]
+		print("tomap: %s" % str(toMap))
 
 		for rte in self.routes.values():
 			osName = rte.GetOSName()
 			if osName in rteMap:
 				rteSet = rte.GetSetTurnouts()
+				print("rteset for route %s: %s" % (rte.GetName(), rteSet))
 				if all(x in toMap for x in rteSet):
+					print("adding route %s to os %s" % (rte.GetName(), osName))
 					rteMap[osName] = rte
+		print("====================================", flush=True)
 		
 		for osn, rte in rteMap.items():
 			if rte is None:

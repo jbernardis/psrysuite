@@ -1830,7 +1830,14 @@ class MainFrame(wx.Frame):
 							if tr:
 								tr.RemoveFromBlock(blk)
 								self.activeTrains.UpdateTrain(tr.GetName())
-								if not tr.IsContiguous():
+								if tr.IsInNoBlocks():
+									trid = tr.GetName()
+									try:
+										self.activeTrains.RemoveTrain(trid)
+										del(self.trains[trid])
+									except:
+										logging.warning("can't delete train %s from train list" % trid)
+								elif not tr.IsContiguous():
 									self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
 							delList = []
