@@ -143,6 +143,7 @@ class Train:
 		if bn not in self.blocks:
 			return False
 
+		blk.SetTrain(None)
 		del self.blocks[bn]
 		self.blockOrder.remove(bn)
 		return True

@@ -285,6 +285,12 @@ class Block:
 		return not self.defaultEast
 
 	def SetEast(self, east, broadcast=True):
+		if self.train is not None:
+			'''
+			set direction of train in block to same value
+			'''
+			self.train.SetEast(east)
+			
 		if self.east == east:
 			return
 
