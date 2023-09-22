@@ -1020,6 +1020,21 @@ class Nassau (District):
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
+		sigs = [ "N14LA", "N14LB", "N14LC", "N14LD" ]
+		for s in sigs:
+			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
+
+		sigs = [ "N26RA", "N26RB", "N26RC" ]
+		for s in sigs:
+			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
+
+		sigs = [ "N24RA", "N24RB", "N24RC", "N24RD" ]
+		for s in sigs:
+			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
+
+		self.signals["N18LA"].SetMutexSignals(["N18LB"])
+		self.signals["N18LB"].SetMutexSignals(["N18LA"])
+
 		self.sigLeverMap = {
 			"N14.lvr": [ "NWOSCY", "NWOSW", "NWOSE" ],
 			"N16.lvr": [ "NWOSCY", "NWOSW", "NWOSE" ],

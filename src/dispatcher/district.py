@@ -359,7 +359,7 @@ class District:
 			else:  # we are trying to change the signal to stop the train
 				esig = osblk.GetEntrySignal()
 				if esig is not None and esig.GetName() != signm:
-					self.frame.PopupEvent("Incorrect signal for current route")
+					self.frame.PopupEvent("Incorrect signal for current route  %s not = %s" % (esig.GetName(), signm))
 					return False
 				aspect = 0
 
@@ -708,9 +708,10 @@ class District:
 		signm = sig.GetName()
 		
 		if callon:
-			sig.SetAspect(aspect, refresh=True)
+			sig.SetAspect(aspect, refresh=True, callon=True)
 			return
 
+		osblock = None
 		for blknm, siglist in self.osSignals.items():
 			if signm in siglist:
 				osblock = self.frame.blocks[blknm]
@@ -721,8 +722,9 @@ class District:
 				if sig.IsPossibleRoute(blknm, rname):
 					break
 		else:
-			logging.info("DoSignalAction returning because no possible routes")
-			return
+			if aspect != 0:
+				logging.info("DoSignalAction returning because no possible routes")
+				return
 
 		if aspect < 0:
 			aspect = self.CalculateAspect(sig, osblock, self.routes[rname], silent=True)
@@ -740,28 +742,33 @@ class District:
 		if aspect != STOP:
 			osblock.SetEast(sig.GetEast())
 
+		sig.SetAspect(aspect, refresh=True)
+		
 		exitBlkNm = osblock.GetExitBlock()
 		entryBlkNm = osblock.GetEntryBlock()
-		sig.SetAspect(aspect, refresh=True)
-		osblock.SetEntrySignal(sig)
-		osblock.SetCleared(aspect != STOP, refresh=True)
+		exitBlk  = self.frame.GetBlockByName(exitBlkNm)
+		entryBlk = self.frame.GetBlockByName(entryBlkNm)
 
-		self.frame.CheckTrainsInBlock(entryBlkNm, sig)
+		if aspect != 0:
+			osblock.SetEntrySignal(sig)
+			osblock.SetCleared(True, refresh=True)
+			self.frame.CheckTrainsInBlock(entryBlkNm, sig)
+		else:
+			entrySig = osblock.GetEntrySignal()
+			if entrySig is not None:
+				if sig.GetName() == entrySig.GetName():
+					osblock.SetCleared(False, refresh=True)
 
 		if osblock.IsBusy() and aspect == STOP:
 			return
 
-		exitBlk  = self.frame.GetBlockByName(exitBlkNm)
-		entryBlk = self.frame.GetBlockByName(entryBlkNm)
-		# if exitBlk.IsOccupied():
-		# 	return
 
-		if self.CrossingEastWestBoundary(osblock, exitBlk):
-			nd = not sig.GetEast()
-		else:
-			nd = sig.GetEast()
-
-		if aspect != STOP:
+		if aspect != 0:
+			if self.CrossingEastWestBoundary(osblock, exitBlk):
+				nd = not sig.GetEast()
+			else:
+				nd = sig.GetEast()
+				
 			exitBlk.SetEast(nd)
 			'''
 			this next statement handles those situations when a train reverses direction within a block.

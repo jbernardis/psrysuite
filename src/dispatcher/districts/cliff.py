@@ -778,6 +778,24 @@ class Cliff (District):
 		
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
+			
+		self.signals["C2LA"].SetMutexSignals(["C2LB", "C2LC", "C2LD"])
+		self.signals["C2LB"].SetMutexSignals(["C2LA", "C2LC", "C2LD"])
+		self.signals["C2LC"].SetMutexSignals(["C2LA", "C2LB", "C2LC"])
+		self.signals["C2LD"].SetMutexSignals(["C2LA", "C2LB", "C2LC"])
+
+		self.signals["C4RA"].SetMutexSignals(["C4RB", "C4RC", "C4RD"])
+		self.signals["C4RB"].SetMutexSignals(["C4RA", "C4RC", "C4RD"])
+		self.signals["C4RC"].SetMutexSignals(["C4RA", "C4RB", "C4RC"])
+		self.signals["C4RD"].SetMutexSignals(["C4RA", "C4RB", "C4RC"])
+
+		sigs = [ "C6LA", "C6LB", "C6LC", "C6LD", "C6LE","C6LF", "C6LG", "C6LH", "C6LJ", "C6LK", "C6LL" ]
+		for s in sigs:
+			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
+
+		sigs = [ "C8RA", "C8RB", "C8RC", "C8RD", "C8RE","C8RF", "C8RG", "C8RH", "C8RJ", "C8RK", "C8RL" ]
+		for s in sigs:
+			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
 
 		blockSigs = {
 			# # which signals govern blocks, west and east

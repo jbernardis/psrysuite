@@ -1074,8 +1074,8 @@ class MainFrame(wx.Frame):
 		else:
 			return self.blockOSMap[blknm]
 
-	def AddPendingFleet(self, block, sig):
-		self.pendingFleets[block.GetName()] = sig
+	def AddPendingFleet(self, block, osblock, route, sig):
+		self.pendingFleets[block.GetName()] = [sig, osblock, route]
 
 	def DelPendingFleet(self, block):
 		bname = block.GetName()
@@ -1089,10 +1089,18 @@ class MainFrame(wx.Frame):
 		if bname not in self.pendingFleets:
 			return
 
-		sig = self.pendingFleets[bname]
+		sig, osblock, rtname = self.pendingFleets[bname]
 		del(self.pendingFleets[bname])
-
-		sig.DoFleeting()		
+		
+		'''
+		check if this signal is still in the selected route through this OS block
+		'''
+		rt = osblock.GetRoute()
+		if rt is not None:
+			if rt.GetName() == rtname:
+				sigs = rt.GetSignals()
+				if sig.GetName() in sigs:
+					sig.DoFleeting()	
 
 	def BuildBlockMap(self, bl):
 		blkMap = {}

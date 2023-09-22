@@ -674,9 +674,11 @@ class Yard (District):
 			[ "Y22R",  RegSloAspects, False,  "leftlong",  (106, 10) ],
 			[ "Y24LA", RegAspects, True,   "right", (95, 10) ],
 			[ "Y24LB", RegAspects, True,   "right", (95, 8) ],
+			
 			[ "Y26LA", RegAspects, True,   "right", (96, 16) ],
 			[ "Y26LB", RegAspects, True,   "right", (96, 14) ],
 			[ "Y26LC", RegAspects, True,   "right", (96, 12) ],
+			
 			[ "Y26R",  RegAspects, False,  "left",  (106, 12)],
 
 			[ "Y34L",  RegAspects, True,   "rightlong", (84, 14) ],
@@ -697,6 +699,35 @@ class Yard (District):
 		]
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
+			
+		self.signals["Y4RA"].SetMutexSignals(["Y4RB"])
+		self.signals["Y4RB"].SetMutexSignals(["Y4RC"])
+
+		self.signals["Y8LA"].SetMutexSignals(["Y8LB", "Y8LC"])
+		self.signals["Y8LB"].SetMutexSignals(["Y8LA", "Y8LC"])
+		self.signals["Y8LC"].SetMutexSignals(["Y8LA", "Y8LB"])
+			
+		self.signals["Y24LA"].SetMutexSignals(["Y24LB"])
+		self.signals["Y24LB"].SetMutexSignals(["Y24LC"])
+
+		self.signals["Y26LA"].SetMutexSignals(["Y26LB", "Y26LC"])
+		self.signals["Y26LB"].SetMutexSignals(["Y26LA", "Y26LC"])
+		self.signals["Y26LC"].SetMutexSignals(["Y26LA", "Y26LB"])
+			
+		self.signals["Y34RA"].SetMutexSignals(["Y34RB"])
+			
+		self.signals["Y24LA"].SetMutexSignals(["Y24LB"])
+		self.signals["Y24LB"].SetMutexSignals(["Y24LC"])
+
+		self.signals["Y40RA"].SetMutexSignals(["Y40RB", "Y40RC", "Y40RD"])
+		self.signals["Y40RB"].SetMutexSignals(["Y40RA", "Y40RC", "Y40RD"])
+		self.signals["Y40RC"].SetMutexSignals(["Y40RA", "Y40RB", "Y40RD"])
+		self.signals["Y40RD"].SetMutexSignals(["Y40RA", "Y40RB", "Y40RC"])
+
+		self.signals["Y42LA"].SetMutexSignals(["Y42LB", "Y42LC", "Y42LD"])
+		self.signals["Y42LB"].SetMutexSignals(["Y42LA", "Y42LC", "Y42LD"])
+		self.signals["Y42LC"].SetMutexSignals(["Y42LA", "Y42LB", "Y42LD"])
+		self.signals["Y42LD"].SetMutexSignals(["Y42LA", "Y42LB", "Y42LC"])
 
 		self.sigLeverMap = {
 			"Y2.lvr": [ "YOSCJW", "YOSCJE" ],

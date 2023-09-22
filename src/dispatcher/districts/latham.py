@@ -341,6 +341,9 @@ class Latham (District):
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
+		self.signals["L6RA"].SetMutexSignals(["L6RB"])
+		self.signals["L6RB"].SetMutexSignals(["L6RA"])
+
 		blockSbSigs = {
 			# which signals govern stopping sections, west and east
 			"L10": ("Y2R",  None),

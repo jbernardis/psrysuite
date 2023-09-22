@@ -19,6 +19,7 @@ class Signal:
 		self.lastAspect = 0
 		self.locked = False
 		self.lockedBy = []
+		self.mutex = [] # mutually exclusive signals
 
 	def SetDisabled(self, flag=True):
 		self.disabled = flag
@@ -73,6 +74,9 @@ class Signal:
 
 	def GetAspect(self):
 		return self.aspect
+	
+	def SetMutexSignals(self, mutexList):
+		self.mutex = mutexList
 
 	def SetLock(self, lockedby, flag=True):
 		if flag:
@@ -98,29 +102,33 @@ class Signal:
 			self.locked = False
 			self.frame.Request({"signallock": { "name": self.name, "status": 0}})
 
-	def SetAspect(self, aspect, refresh = False):
+	def SetAspect(self, aspect, refresh = False, callon = False):
 		if self.aspect == aspect:
 			return False
 		
 		self.aspect = aspect
-		if aspect != 0:
-			self.lastAspect = aspect
+		if not callon:
+			if aspect != 0:
+				self.lastAspect = aspect
+				for signm in self.mutex:
+					self.frame.Request({"signal": {"name": signm, "aspect": 0, "callon": 0}})
 
 		if refresh:
 			self.Draw()
 
 		if self.guardBlock is not None:
 			self.guardBlock.EvaluateStoppingSections()
+			
 		return True
 
-	def SetFleetPending(self, flag, blk):
+	def SetFleetPending(self, flag, osblk, rtname, blk):
 		if not self.fleetEnabled:
 			return
 
 		if not flag:
 			self.frame.DelPendingFleet(blk)
 		else:
-			self.frame.AddPendingFleet(blk, self)
+			self.frame.AddPendingFleet(blk, osblk, rtname, self)
 
 	def DoFleeting(self):
 		self.frame.Request({"signal": { "name": self.GetName(), "aspect": self.lastAspect }})

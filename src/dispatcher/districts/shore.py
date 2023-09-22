@@ -524,6 +524,13 @@ class Shore (District):
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
+		self.signals["S18LA"].SetMutexSignals(["S18LB"])
+		self.signals["S18LB"].SetMutexSignals(["S18LA"])
+		
+		self.signals["S4LA"].SetMutexSignals(["S4LB", "S4LC"])
+		self.signals["S4LB"].SetMutexSignals(["S4LA", "S4LC"])
+		self.signals["S4LC"].SetMutexSignals(["S4LA", "S4LB"])
+
 		blockSbSigs = {
 			# which signals govern stopping sections, west and east
 			"S10": ("D12L", "S12R"),

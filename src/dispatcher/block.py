@@ -876,6 +876,9 @@ class OverSwitch (Block):
 		if self.route:
 			tolist = self.route.GetLockTurnouts()
 			self.district.LockTurnouts(self.name, tolist, occupied)
+			rtName = self.route.GetName()
+		else:
+			rtName = None
 
 		if occupied:
 			if self.entrySignal is not None:
@@ -889,9 +892,9 @@ class OverSwitch (Block):
 
 					#self.entrySignal.SetLock(exitBlkName, 1)
 					self.entrySignal.SetLock(self.name, 1)
-					self.entrySignal.SetFleetPending(self.entrySignal.GetAspect() != 0, exitBlk)
+					self.entrySignal.SetFleetPending(self.entrySignal.GetAspect() != 0, self, rtName, exitBlk)
 				else:
-					self.entrySignal.SetFleetPending(False, None)
+					self.entrySignal.SetFleetPending(False, self, None, None)
 				# turn the signal we just passed red, but hold onto the lock to be cleared when we exit the block
 				self.frame.Request({"signal": { "name": signm, "aspect": STOP}})
 				self.district.LockTurnoutsForSignal(self.GetName(), self.entrySignal, False)

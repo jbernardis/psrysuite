@@ -243,6 +243,12 @@ class Dell (District):
 		]
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
+			
+		self.signals["D4RA"].SetMutexSignals(["D4RB"])
+		self.signals["D4RB"].SetMutexSignals(["D4RA"])
+			
+		self.signals["D6RA"].SetMutexSignals(["D6RB"])
+		self.signals["D6RB"].SetMutexSignals(["D6RA"])
 
 		blockSbSigs = {
 			# which signals govern stopping sections, west and east

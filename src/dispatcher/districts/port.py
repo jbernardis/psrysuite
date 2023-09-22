@@ -964,6 +964,7 @@ class Port (District):
 			[ "PA34RB", RegAspects, True,    "right",     (116, 21) ],
 			[ "PA34RC", RegAspects, True,    "right",     (118, 23) ],
 			[ "PA34RD", RegAspects, True,    "rightlong", (119, 25) ],
+			
 			[ "PA34LA", RegAspects, False,   "leftlong",  (127, 21) ],
 			[ "PA34LB", RegAspects, False,   "leftlong",  (127, 23) ],
 
@@ -983,6 +984,30 @@ class Port (District):
 			sig  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 			sig.SetDisabled(True)
 			self.signals[signm]  = sig
+			
+		self.signals["PA12LA"].SetMutexSignals(["PA12LB", "PA12LC"])
+		self.signals["PA12LB"].SetMutexSignals(["PA12LA", "PA12LC"])
+		self.signals["PA12LC"].SetMutexSignals(["PA12LA", "PA12LB"])
+
+		self.signals["PA10RA"].SetMutexSignals(["PA10RB"])
+		self.signals["PA10RB"].SetMutexSignals(["PA10RA"])
+			
+		self.signals["PA6LA"].SetMutexSignals(["PA6LB", "PA6LC"])
+		self.signals["PA6LB"].SetMutexSignals(["PA6LA", "PA6LC"])
+		self.signals["PA6LC"].SetMutexSignals(["PA6LA", "PA6LB"])
+
+		self.signals["PA4RA"].SetMutexSignals(["PA4RB"])
+		self.signals["PA4RB"].SetMutexSignals(["PA4RA"])
+
+		self.signals["PA32RA"].SetMutexSignals(["PA32RB"])
+		self.signals["PA32RB"].SetMutexSignals(["PA32RA"])
+
+		sigs = [ "PA34RA", "PA34RB", "PA34RC", "PA34RD" ]
+		for s in sigs:
+			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
+
+		self.signals["PA34LA"].SetMutexSignals(["PA34LB"])
+		self.signals["PA34LB"].SetMutexSignals(["PA34LA"])
 
 		self.sigLeverMap = {
 			"PA4.lvr":  [ "POSSP2", "POSSP3", "POSSP4", "POSSP5" ],

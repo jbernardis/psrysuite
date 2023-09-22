@@ -653,7 +653,7 @@ class ServerMain:
 						loco = eloco
 
 		# TODO - we need to set the occupancy bit (or clear it is trn is None)
-		self.rr.OccupyBlock(block, 0 if trn is None else 1)
+		#self.rr.OccupyBlock(block, 0 if trn is None else 1)
 		
 		# train information is always echoed back to all listeners
 		resp = {"settrain": [{"name": trn, "loco": loco, "block": block}]}

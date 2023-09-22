@@ -295,6 +295,9 @@ class Krulish (District):
 		for signm in ["N20W", "N10W", "S21E", "S11E"]:
 			self.signals[signm].EnableFleeting(True)
 			
+		self.signals["K8LA"].SetMutexSignals(["K8LB"])
+		self.signals["K8LB"].SetMutexSignals(["K8LA"])
+			
 		blockSigs = {
 			# # which signals govern stopping sections, west and east
 			"N10": ("N10W",  "K8R"),

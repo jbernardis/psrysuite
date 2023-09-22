@@ -633,19 +633,23 @@ class Hyde (District):
 			[ "H4LC", RegAspects, False, "left",  (32, 18) ],
 			[ "H4LD", RegAspects, False, "left",  (32, 20) ],
 			[ "H4R",  RegAspects, True,  "rightlong", (21, 16) ],
+			
 			[ "H6LA", RegAspects, False, "leftlong",  (32, 6) ],
 			[ "H6LB", RegAspects, False, "leftlong",  (32, 8) ],
 			[ "H6LC", RegAspects, False, "leftlong",  (32,10) ],
 			[ "H6LD", RegAspects, False, "leftlong",  (32, 12) ],
 			[ "H6R",  RegAspects, True,  "right", (21, 14) ],
+			
 			[ "H8L",  RegAspects, False, "leftlong",  (32, 4) ],
 			[ "H8R",  RegAspects, True,  "right", (27, 6) ],
+			
 			[ "H10L", RegAspects, False, "left",  (56, 14) ],
 			[ "H10RA", RegAspects, True, "rightlong", (41, 16) ],
 			[ "H10RB", RegAspects, True, "rightlong", (41, 18) ],
 			[ "H10RC", RegAspects, True, "rightlong", (41, 20) ],
 			[ "H10RD", RegAspects, True, "rightlong", (41, 22) ],
 			[ "H10RE", RegAspects, True, "rightlong", (41, 24) ],
+			
 			[ "H12RA", RegAspects, True, "right", (41, 6) ],
 			[ "H12RB", RegAspects, True, "right", (41, 8) ],
 			[ "H12RC", RegAspects, True, "right", (41, 10) ],
@@ -655,6 +659,22 @@ class Hyde (District):
 		]
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
+
+		sigs = [ "H4LA", "H4LB", "H4LC", "H4LD" ]
+		for s in sigs:
+			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
+
+		sigs = [ "H6LA", "H6LB", "H6LC", "H6LD" ]
+		for s in sigs:
+			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
+
+		sigs = [ "H10RA", "H10RB", "H10RC", "H10RD", "H10RE" ]
+		for s in sigs:
+			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
+
+		sigs = [ "H12RA", "H12RB", "H12RC", "H12RD", "H12RE" ]
+		for s in sigs:
+			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
 
 		blockSbSigs = {
 			# which signals govern stopping sections, west and east

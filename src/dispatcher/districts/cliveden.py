@@ -210,6 +210,9 @@ class Cliveden (District):
 		]
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
+			
+		self.signals["C14RA"].SetMutexSignals(["C14RB"])
+		self.signals["C14RB"].SetMutexSignals(["C14RA"])
 
 		self.sigLeverMap = {
 			"C10.lvr": [ "COSCLEW", "COSCLEE" ],

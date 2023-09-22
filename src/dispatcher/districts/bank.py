@@ -170,6 +170,9 @@ class Bank (District):
 		]
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
+			
+		self.signals["C18LA"].SetMutexSignals(["C18LB"])
+		self.signals["C18LB"].SetMutexSignals(["C18LA"])
 
 		self.sigLeverMap = {
 			"C18.lvr": [ "BOSE" ],
