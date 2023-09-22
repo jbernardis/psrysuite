@@ -688,6 +688,9 @@ class ServerMain:
 		self.socketServer.sendToAll(resp)
 		
 	def GetTrainList(self):
+		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		for addr, skt in addrList:
+			self.socketServer.sendToOne(skt, addr, {"dumptrains": ""})
 		return self.trainList.GetTrainList()
 
 	def DoRenameTrain(self, cmd):

@@ -63,6 +63,10 @@ class ActiveTrainList:
 		if self.dlgTrainList is not None:
 			self.dlgTrainList.Destroy()
 			self.dlgTrainList = None
+			
+	def dump(self):
+		for tr in self.trains:
+			self.trains[tr].dump()
 		
 
 class ActiveTrainsDlg(wx.Dialog):

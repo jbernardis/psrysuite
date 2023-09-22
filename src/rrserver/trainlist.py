@@ -84,6 +84,10 @@ class TrainList:
 		return True
 	
 	def GetTrainList(self):
+		print("train list")
+		for tr, trinfo in self.trains.items():
+			print("Train %s: %s %s %s %s" % (tr, trinfo["loco"], str(trinfo["blocks"]), trinfo["signal"], trinfo["aspect"]))
+		print("=======================================", flush=True)
 		return self.trains
 
 	def GetSetTrainCmds(self, train=None):

@@ -146,7 +146,6 @@ class Railroad():
 		'''
 		this method is solely for simulation - to set a block as occupied or not
 		'''
-		print("occupy block: %s" % blknm)
 		try:
 			blist = [ self.blocks[blknm] ]
 		except KeyError:
@@ -156,7 +155,6 @@ class Railroad():
 				logging.warning("Ignoring occupy command - unknown block name: %s" % blknm)
 				return
 
-		print("occupy block list = %s" % str(blist))		
 		for blk in blist:
 			if len(blk.Bits()) > 0:
 				vbyte, vbit = blk.Bits()[0]
@@ -1015,7 +1013,6 @@ class Railroad():
 				objName = obj.Name()
 
 				if objType == INPUT_BLOCK:
-					print("Block %s has changed occupancy: %d (%d:%d)" % (objName, newval, vbyte, vbit))
 					# if block has changed to occupied
 					if newval != 0:
 						# remove any pending detectio loss

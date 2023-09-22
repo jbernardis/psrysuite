@@ -41,6 +41,19 @@ class Train:
 		self.east = True
 		self.aspect = None
 		self.engineer = None
+		
+	def dump(self):
+		print("Train %s: %s %s %s" % (self.name, self.loco, self.blockInfo(), self.signalInfo()))
+		
+	def blockInfo(self):
+		bl = [bl for bl in self.blocks]
+		return "[" + ", ".join(bl) + "]"
+	
+	def signalInfo(self):
+		if self.signal is None:
+			return "None"
+		
+		return "%s: %d" % (self.signal.GetName(), self.aspect)
 	
 	@classmethod	
 	def ResetTX(cls):

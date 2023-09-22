@@ -2126,6 +2126,15 @@ class MainFrame(wx.Frame):
 					self.activeTrains.UpdateTrain(trnm)
 			
 					tr.Draw()
+			elif cmd == "dumptrains":
+				print("===========================dump by trains")
+				self.activeTrains.dump()
+				print("===========================dump by block")
+				for _, blk in self.blocks.items():
+					tr = blk.GetTrain()
+					if tr is not None:
+						print("%s: %s(%s)" % (blk.GetName(), tr.GetName(), tr.GetLoco()))
+				print("===========================end of dump trains", flush=True)
 
 	def raiseDisconnectEvent(self): # thread context
 		evt = DisconnectEvent()
