@@ -139,6 +139,3 @@ class Latham(District):
 		
 		self.rr.SetAspect("S21E", 1)
 		self.rr.SetAspect("N10W", 1)
-
-	def OutIn(self):
-		return District.OutIn(self)

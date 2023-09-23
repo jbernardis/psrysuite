@@ -339,7 +339,7 @@ class Yard(District):
 
 		optFleet = self.rr.GetControlOption("yard.fleet")  # 0 => no fleeting, 1 => fleeting
 
-		successful, errs = District.OutIn(self)
+		successful, errs, errAddrs = District.OutIn(self)
 		
 		Y20  = self.rr.GetBlock("Y20")
 		Y20E = self.rr.GetBlock("Y20.E")
@@ -351,7 +351,7 @@ class Yard(District):
 			self.rr.SetAspect("Y20H", 1 if Y20H else 0)
 			self.rr.SetAspect("Y20D", 1 if Y20D else 0)
 			
-		return successful, errs
+		return successful, errs, errAddrs
 		
 	def GetControlOption(self):
 		if self.control == 1:  # dispatcher control

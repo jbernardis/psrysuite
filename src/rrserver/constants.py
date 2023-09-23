@@ -24,6 +24,34 @@ GREENMTN  = 0x92
 CLIFF     = 0x93
 SHEFFIELD = 0x95
 
+
+nodeNames = {
+    YARD:       "Yard",
+    KALE:       "Kale",
+    EASTJCT:    "East Jct",
+    CORNELL:    "Cornell",
+    YARDSW:     "Yard SW",
+    PARSONS:    "Parsons Jct",
+    PORTA:      "Port A",
+    PORTB:      "Port B",
+    LATHAM:     "Latham",
+    CARLTON:    "Carlton",
+    DELL:       "Dell",
+    FOSS:       "Foss",
+    HYDEJCT:    "Hyde Jct",
+    HYDE:       "Hyde",
+    SHORE:      "Shore",
+    KRULISH:    "Krulish",
+    NASSAUW:    "Nassau W",
+    NASSAUE:    "Nassau E",
+    NASSAUNX:   "Nassau NX",
+    BANK:       "Bank",
+    CLIVEDEN:   "Cliveden",
+    GREENMTN:   "Green Mtn",
+    CLIFF:      "Cliff",
+    SHEFFIELD:  "Sheffield"
+}
+    
 # input bit types
 INPUT_BLOCK = 1
 INPUT_TURNOUTPOS = 2

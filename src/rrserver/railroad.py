@@ -975,17 +975,19 @@ class Railroad():
 		
 		errs = 0
 		successful = 0
+		errAddrs = []
 		for district in self.districts.values():
-			s, e = district.OutIn()
+			s, e, eAddrs = district.OutIn()
 			successful += s
 			errs += e
+			errAddrs.extend(eAddrs)
 
 		if errs != 0:
 			logging.error("%d errors from railroad I/O" % errs)	
 					
 		self.ExamineInputs()
 		
-		return successful, errs
+		return successful, errs, errAddrs
 		
 	def UpdateDistrictTurnoutLocksByNode(self, districtName, released, addressList):
 		for t in self.turnouts.values():

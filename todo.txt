@@ -21,6 +21,7 @@ tracker:
 
 I think server periodically crashes or has i/o errors that it can't recover from - why
 do we need a re-open logic in server to help to recover from serial issues
+reopen fixed the problem, and provided a cleaner way to recover - but perhaps it can be enhanced - to happen automatically, and to try to remember train and loco IDs
 
 why was a single car train being reported as non-contiguous??
 train contiguous - do not show message is ?? train - disabled for now until we can figure out what's going on
@@ -34,3 +35,21 @@ possibilities:
 
 
 redesign ATC as a non-GUI program, add ATC frame to dispatcher (and display??) and use messages between the two to keep the display up to date
+
+
+why don't I see the AR/ARC on the active train display for a remote display?
+
+why don't I see speed on the active train display
+
+in addition to the "request ATC add" for a train from a remote display, allow "request AR - both ADD and Remove"
+
+
+signal bits to mast heads:
+000 = Red
+100 = Yellow/Green
+010 = Red/Yellow
+110 = Red/Green
+001 = Red/Red
+101 = Yellow/Green
+011 = Red/Yellow
+111 = Red/Green

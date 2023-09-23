@@ -69,6 +69,9 @@ class Node:
     def setBus(self, bus):
         self.rrBus = bus
         
+    def GetAddress(self):
+        return self.address
+        
     def OutIn(self):
         '''
         return value = # successful reads, # failed reads

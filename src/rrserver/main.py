@@ -46,6 +46,8 @@ from rrserver.clientlist import ClientList
 from rrserver.trainlist import TrainList
 from rrserver.dccserver import DCCHTTPServer
 
+from rrserver.constants import nodeNames
+
 class ServerMain:
 	def __init__(self):
 		self.socketServer = None
@@ -348,10 +350,13 @@ class ServerMain:
 			self.pause -= 1
 			return 
 		
-		successful, errs = self.rr.OutIn()
+		successful, errs, errAddrs = self.rr.OutIn()
 		if errs != 0:
-			logging.error("Polling interval had %d/%d I/O errors/successes" % (errs, successful))
-			self.DoAlert("Railroad I/O Errors: %d" % errs)
+			errAddrString = ", ".join([nodeNames[x] for x in errAddrs])
+			plural = "s" if errs > 1 else ""
+			msg = "%d I/O error%s at node%s %s" % (errs, plural, plural, errAddrString)
+			logging.error(msg)
+			self.DoAlert({"msg": [msg]})
 
 	def DoSignal(self, cmd):
 		signame = cmd["name"][0]
