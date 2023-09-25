@@ -772,6 +772,7 @@ class ServerMain:
 		addrList = self.clientList.GetFunctionAddress("AR") + self.clientList.GetFunctionAddress("DISPLAY")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"ar": cmd})
+			logging.debug("XXX rrserver main, echoing AR command to all AR and DISPLAY: %s" % str(cmd))
 			
 						
 	def DoAdvisor(self, cmd):
@@ -789,11 +790,13 @@ class ServerMain:
 		addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atc": cmd})
+			logging.debug("XXX rrserver main, echoing ATC command to all ATC and DISPLAY: %s" % str(cmd))
 				
 	def DoATCRequest(self, cmd):
 		addrList = self.clientList.GetFunctionAddress("DISPATCH")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atcrequest": cmd})
+			logging.debug("XXX rrserver main, echoing ATCRequest command to all DISPATCH: %s" % str(cmd))
 					
 	def DoATCStatus(self, cmd):
 		self.socketServer.sendToAll({"atcstatus": cmd})

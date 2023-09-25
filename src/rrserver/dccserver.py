@@ -83,7 +83,10 @@ class DCCHandler(BaseHTTPRequestHandler):
 			self.send_response(200)
 			self.send_header("Content-type", "text/plain")
 			self.end_headers()
-			self.wfile.write(body)
+			try:
+				self.wfile.write(body)
+			except ConnectionAbortedError:
+				logging.error("DCC Server connection aborted while sending %s" % str(cmdDict))
 		else:
 			self.send_response(400)
 			self.send_header("Content-type", "text/plain")
