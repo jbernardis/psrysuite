@@ -452,7 +452,7 @@ class Port (District):
 				(self.tiles["horiz"],    self.screen, (114, 35), False),
 				(self.tiles["horiznc"],  self.screen, (115, 35), False),
 				(self.tiles["horiz"],    self.screen, (116, 35), False),
-			], True)
+			], False)
 		self.blocks["P40"].AddTrainLoc(self.screen, (113, 35))
 		self.blocks["P40"].AddStoppingBlock([
 				(self.tiles["horiznc"],  self.screen, (117, 35), False),
@@ -968,17 +968,17 @@ class Port (District):
 			[ "PA34LA", RegAspects, False,   "leftlong",  (127, 21) ],
 			[ "PA34LB", RegAspects, False,   "leftlong",  (127, 23) ],
 
-			[ "PB2R",   RegAspects, True,    "rightlong", (119, 36) ],
-			[ "PB2L",   RegAspects, False,   "leftlong",  (126, 34) ],
+			[ "PB2L",   RegAspects, True,    "rightlong", (119, 36) ],
+			[ "PB2R",   RegAspects, False,   "leftlong",  (126, 34) ],
 
-			[ "PB4R",   RegAspects, True,    "rightlong", (119, 34) ],
-			[ "PB4L",   RegAspects, False,   "leftlong",  (126, 32) ],
+			[ "PB4L",   RegAspects, True,    "rightlong", (119, 34) ],
+			[ "PB4R",   RegAspects, False,   "leftlong",  (126, 32) ],
 
-			[ "PB14R",  RegAspects, True,    "rightlong", (135, 34) ],
-			[ "PB14L",  RegAspects, False,   "leftlong",  (142, 32) ],
+			[ "PB14L",  RegAspects, True,    "rightlong", (135, 34) ],
+			[ "PB14R",  RegAspects, False,   "leftlong",  (142, 32) ],
 
-			[ "PB12R",  RegAspects, True,    "rightlong", (135, 36) ],
-			[ "PB12L",  RegAspects, False,   "leftlong",  (142, 34) ],
+			[ "PB12L",  RegAspects, True,    "rightlong", (135, 36) ],
+			[ "PB12R",  RegAspects, False,   "leftlong",  (142, 34) ],
 		]
 		for signm, atype, east, tileSet, pos in sigList:
 			sig  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
@@ -1032,13 +1032,13 @@ class Port (District):
 			"P10": (None,     "PA34RD"),
 			"P11": ("PA34LB", "L6RB"),
 			"P20": (None,     "PA32RA"),
-			"P21": (None,     "L4R"),
-			"P31": ("PB4L",   "PB14R"),
-			"P41": ("PB2L",   "PB12R"),
-			"P32": ("PB14L",  "S4LC"),
-			"P42": ("PB12L",  "S16R"),
-			"P30": ("P32RB",  "PB4R"),
-			"P40": (None,     "PB2R"),
+			"P21": (None,     "L4R"),			
+			"P31": ("PB4R",   "PB14L"),
+			"P41": ("PB2R",   "PB12L"),
+			"P32": ("PB14R",  "S4LC"),
+			"P42": ("PB12R",  "S16R"),
+			"P30": ("PB4L",   "PA32RB"),
+			"P40": ("PB2L",   None),			
 			"P50": ("Y4RA",  "PA34LA")
 		}
 
@@ -1058,12 +1058,14 @@ class Port (District):
 			"P11": ("PA34LB", "L6RB"),
 			"P20": ("PA8L",   "PA32RA"),
 			"P21": ("PA32L",  "L4R"),
-			"P30": ("PA32RB", "PB4R"),
-			"P31": ("PB4L",   "PB14R"),
-			"P32": ("PB14L",  "S4LC"),
-			"P40": ("PA4L",   "PB2R"),
-			"P41": ("PB2L",   "PB12R"),
-			"P42": ("PB12L",  "S16R"),
+			
+			"P30": ("PB4L",   "PA32RB"),
+			"P31": ("PB4R",   "PB14L"),
+			"P32": ("PB14R",  "S4LC"),
+			"P40": ("PB2L",   "PA4L"),
+			"P41": ("PB2R",   "PB12L"),			
+			"P42": ("PB12R",  "S16R"),
+			
 			"P50": ("Y4RA",   "PA34LA"),
 			"P60": ("PA12LB", "PA34RB"),
 			"P61": ("PA12LC", "PA34RC"),
@@ -1083,21 +1085,21 @@ class Port (District):
 		# routes for circus junction
 		block = self.blocks["POSCJ1"]
 		self.routes["PRtP31P32"] = Route(self.screen, block, "PRtP31P32", "P32", [ (135, 33), (136, 33), (137, 33), (138, 33), (139, 33), (140, 33), (141, 33), (142, 33) ], "P31", [MAIN, MAIN], ["PBSw11:N", "PBSw13:N"], ["PB14L", "PB14R"])
-		self.routes["PRtP31P42"] = Route(self.screen, block, "PRtP31P42", "P42", [ (135, 33), (136, 33), (137, 34), (138, 35), (139, 35), (140, 35), (141, 35), (142, 35) ], "P31", [DIVERGING, DIVERGING], ["PBSw11:R", "PBSw13:N"], ["PB12L", "PB14R"])
+		self.routes["PRtP31P42"] = Route(self.screen, block, "PRtP31P42", "P42", [ (135, 33), (136, 33), (137, 34), (138, 35), (139, 35), (140, 35), (141, 35), (142, 35) ], "P31", [DIVERGING, DIVERGING], ["PBSw11:R", "PBSw13:N"], ["PB14L", "PB12R"])
 
 		block = self.blocks["POSCJ2"]
-		self.routes["PRtP41P32"] = Route(self.screen, block, "PRtP41P32", "P32", [ (135, 35), (136, 35), (137, 35), (138, 35), (139, 35), (140, 34), (141, 33), (142, 33) ], "P41", [DIVERGING, DIVERGING], ["PBSw11:N", "PBSw13:R"], ["PB14L", "PB12R"])
+		self.routes["PRtP41P32"] = Route(self.screen, block, "PRtP41P32", "P32", [ (135, 35), (136, 35), (137, 35), (138, 35), (139, 35), (140, 34), (141, 33), (142, 33) ], "P41", [DIVERGING, DIVERGING], ["PBSw11:N", "PBSw13:R"], ["PB12L", "PB14R"])
 		self.routes["PRtP41P42"] = Route(self.screen, block, "PRtP41P42", "P42", [ (135, 35), (136, 35), (137, 35), (138, 35), (139, 35), (140, 35), (141, 35), (142, 35) ], "P41", [MAIN, MAIN], ["PBSw11:N", "PBSw13:N"], ["PB12L", "PB12R"])
 
-		self.signals["PB14R"].AddPossibleRoutes("POSCJ1", [ "PRtP31P32", "PRtP31P42" ])
-		self.signals["PB14L"].AddPossibleRoutes("POSCJ1", [ "PRtP31P32" ])
-		self.signals["PB14L"].AddPossibleRoutes("POSCJ2", [ "PRtP41P32" ])
-		self.signals["PB12R"].AddPossibleRoutes("POSCJ2", [ "PRtP41P32", "PRtP41P42" ])
-		self.signals["PB12L"].AddPossibleRoutes("POSCJ1", [ "PRtP31P42" ])
-		self.signals["PB12L"].AddPossibleRoutes("POSCJ2", [ "PRtP41P42" ])
+		self.signals["PB14L"].AddPossibleRoutes("POSCJ1", [ "PRtP31P32", "PRtP31P42" ])
+		self.signals["PB14R"].AddPossibleRoutes("POSCJ1", [ "PRtP31P32" ])
+		self.signals["PB14R"].AddPossibleRoutes("POSCJ2", [ "PRtP41P32" ])
+		self.signals["PB12L"].AddPossibleRoutes("POSCJ2", [ "PRtP41P32", "PRtP41P42" ])
+		self.signals["PB12R"].AddPossibleRoutes("POSCJ1", [ "PRtP31P42" ])
+		self.signals["PB12R"].AddPossibleRoutes("POSCJ2", [ "PRtP41P42" ])
 
-		self.osSignals["POSCJ1"] = [ "PB14R", "PB14L", "PB12L" ]
-		self.osSignals["POSCJ2"] = [ "PB12R", "PB12L", "PB14L" ]
+		self.osSignals["POSCJ1"] = [ "PB14L", "PB14R", "PB12R" ]
+		self.osSignals["POSCJ2"] = [ "PB12L", "PB12R", "PB14R" ]
 
 		# routes for south junction
 		block = self.blocks["POSSJ1"]

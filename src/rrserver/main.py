@@ -303,6 +303,7 @@ class ServerMain:
 			
 			"autorouter":	self.DoAutorouter,
 			"ar":			self.DoAR,
+			"arrequest":	self.DoARRequest,
 			"advisor":		self.DoAdvisor,
 			"atc":			self.DoATC,
 			"atcrequest":	self.DoATCRequest,
@@ -467,6 +468,7 @@ class ServerMain:
 	def DoDCCSpeed(self, cmd):
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"dccspeed": [p]}
+		print("sending dcc speed message: (%s)" % str(resp))
 		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("TRACKER")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)
@@ -787,18 +789,25 @@ class ServerMain:
 			self.pidADV = None
 			
 	def DoATC(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY")
+		addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atc": cmd})
-			logging.debug("XXX rrserver main, echoing ATC command to all ATC and DISPLAY: %s" % str(cmd))
+			logging.debug("XXX rrserver main, echoing ATC command to all ATC and DISPLAY/DISPATCH: %s" % str(cmd))
 				
 	def DoATCRequest(self, cmd):
 		addrList = self.clientList.GetFunctionAddress("DISPATCH")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atcrequest": cmd})
 			logging.debug("XXX rrserver main, echoing ATCRequest command to all DISPATCH: %s" % str(cmd))
+				
+	def DoARRequest(self, cmd):
+		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		for addr, skt in addrList:
+			self.socketServer.sendToOne(skt, addr, {"arrequest": cmd})
+			logging.debug("XXX rrserver main, echoing ARRequest command to all DISPATCH: %s" % str(cmd))
 					
 	def DoATCStatus(self, cmd):
+		logging.debug("XXX rrserver main, echoing ATCStatus command to all: %s" % str(cmd))
 		self.socketServer.sendToAll({"atcstatus": cmd})
 
 	def Shutdown(self):

@@ -41,7 +41,8 @@ why don't I see the AR/ARC on the active train display for a remote display?
 
 why don't I see speed on the active train display
 
-in addition to the "request ATC add" for a train from a remote display, allow "request AR - both ADD and Remove"
+
+a button or other method for changing train direction
 
 
 signal bits to mast heads:

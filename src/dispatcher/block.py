@@ -234,6 +234,10 @@ class Block:
 		pass
 
 	def Reset(self):
+		if self.IsOccupied():
+			# do not reset the block under a train
+			return 
+		
 		self.SetEast(self.defaultEast)
 
 	def SetNextBlockEast(self, blk):

@@ -581,7 +581,7 @@
       "sbwest": null
     },
     "P40": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P40.E",
       "sbwest": null
     },
@@ -5541,8 +5541,8 @@
       ],
       "os": "POSCJ1",
       "signals": [
-        "PB12L",
-        "PB14R"
+        "PB14L",
+        "PB12R"
       ],
       "turnouts": [
         [
@@ -5778,8 +5778,8 @@
       ],
       "os": "POSCJ2",
       "signals": [
-        "PB14L",
-        "PB12R"
+        "PB12L",
+        "PB14R"
       ],
       "turnouts": [
         [

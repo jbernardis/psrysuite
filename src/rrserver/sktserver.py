@@ -6,7 +6,6 @@ import socket
 import select
 import json
 
-
 class SktServer (threading.Thread):
 	def __init__(self, ip, port, cbEvent):
 		threading.Thread.__init__(self)

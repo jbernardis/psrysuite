@@ -1,4 +1,13 @@
 import logging
+'''
+DISPATCH = 10
+DISPLAY  = 11
+TRACKER  = 20
+ATC      = 30
+AR       = 40
+'''
+
+functions = [ "DISPATCH", "DISPLAY", "TRACKER", "ATC", "AR" ]
 
 class ClientList:
 	def __init__(self, parent):
@@ -6,6 +15,7 @@ class ClientList:
 		self.skts = []
 		self.functions = []
 		self.clientList = []
+		self.functionLists = {}
 
 	def AddClient(self, addr, skt, sid, function):
 		if addr in self.clientList:
@@ -16,6 +26,7 @@ class ClientList:
 		self.sids.append(sid)
 		self.skts.append(skt)
 		self.functions.append("")
+		self.UpdateFunctionLists()
 		
 	def GetClients(self):
 		return [[self.sids[x], self.functions[x], self.clientList[x][0], self.clientList[x][1]] for x in range(len(self.sids))]
@@ -27,6 +38,8 @@ class ClientList:
 			return
 		
 		self.functions[index] = function
+		self.UpdateFunctionLists()
+		
 		
 	def HasFunction(self, function):
 		return function in self.functions
@@ -39,6 +52,21 @@ class ClientList:
 				cl.append((self.clientList[i], self.skts[i]))
 			
 		return cl
+	
+	def UpdateFunctionLists(self):
+		self.functionLists = {}
+		for f in functions:
+			self.functionLists[f] = self.GetFunctionAddress(f)
+			
+	def GetFunctionClients(self, flist):
+		clients = []
+		for f in flist:
+			try:
+				clients.extend(self.functionLists[f])
+			except KeyError:
+				pass
+		return clients
+			
 	
 	def GetFunctionAtAddress(self, address):
 		for i in range(len(self.clientList)):
@@ -61,3 +89,4 @@ class ClientList:
 		del(self.sids[index])
 		del(self.skts[index])
 		del(self.functions[index])
+		self.UpdateFunctionLists()

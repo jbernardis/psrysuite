@@ -49,11 +49,13 @@ MENU_AR_ADD      = 903
 MENU_AR_REMOVE   = 904
 MENU_ATC_REM_REQ = 905
 MENU_ATC_ADD_REQ = 906
+MENU_AR_REM_REQ  = 907
+MENU_AR_ADD_REQ  = 908
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
-allowedCommands = [ "settrain", "renametrain", "identify", "refresh", "atcrequest" ]
+allowedCommands = [ "settrain", "renametrain", "identify", "refresh", "atcrequest", "arrequest" ]
 
 wildcardTrain = "train files (*.trn)|*.trn|"	 \
 			"All files (*.*)|*.*"
@@ -1282,6 +1284,12 @@ class MainFrame(wx.Frame):
 								else:
 									menu.Append( MENU_ATC_ADD_REQ, "Request: ATC Add" )
 									self.Bind(wx.EVT_MENU, self.OnATCAddReq, id=MENU_ATC_ADD_REQ)
+								if tr.IsOnAR():
+									menu.Append( MENU_AR_REM_REQ, "Request: AR Remove" )
+									self.Bind(wx.EVT_MENU, self.OnARRemReq, id=MENU_AR_REM_REQ)
+								else:
+									menu.Append( MENU_AR_ADD_REQ, "Request: AR Add" )
+									self.Bind(wx.EVT_MENU, self.OnARAddReq, id=MENU_AR_ADD_REQ)
 								addedMenuItem = True
 						
 						else: # IS Dispatcher								
@@ -1429,6 +1437,12 @@ class MainFrame(wx.Frame):
 			self.Request({"ar": {"action": "add", "train": trainid}})
 			logging.debug("XXX dispatcher mainframe OnARAdd sending AR Add command train %s" % trainid)
 			self.menuTrain.Draw()
+
+	def OnARAddReq(self, evt):
+		trainid = self.menuTrain.GetName()
+		if self.VerifyTrainID(trainid):
+			self.Request({"arrequest": {"action": "add", "train": trainid}})
+			logging.debug("XXX dispatcher mainframe OnARAddReq sending ARrequest Add command train %s" % (trainid))
 		
 	def OnARRemove(self, evt):
 		trainid = self.menuTrain.GetName()
@@ -1438,6 +1452,12 @@ class MainFrame(wx.Frame):
 			self.Request({"ar": {"action": "remove", "train": trainid}})
 			logging.debug("XXX dispatcher mainframe OnARRemove sending AR Remove command train %s" % trainid)
 			self.menuTrain.Draw()
+							
+	def OnARRemReq(self, evt):
+		trainid = self.menuTrain.GetName()
+		if self.VerifyTrainID(trainid):
+			self.Request({"arrequest": {"action": "remove", "train": trainid}})
+			logging.debug("XXX dispatcher mainframe OnARRemReq sending ARrequest Remove command train %s" % (trainid))
 
 	def DrawTile(self, screen, pos, bmp):
 		offset = self.diagrams[screen].offset
@@ -2095,6 +2115,29 @@ class MainFrame(wx.Frame):
 				self.activeTrains.UpdateTrain(trnm)
 				tr.Draw()
 				logging.debug("XXX dispatcher mainframe ar command updating train %s locally" % trnm)
+				
+			elif cmd == "arrequest":
+				trnm = parms["train"][0]
+				if self.AREnabled:
+					try:
+						tr = self.trains[trnm]
+					except KeyError:
+						logging.warning("AR train %s does not exist" % trnm)
+						return
+					
+					action = parms["action"][0]
+					
+					tr.SetAR(action == "add")
+					self.activeTrains.UpdateTrain(trnm)
+					tr.Draw()
+					
+					self.Request({"ar": {"action": action, "train": trnm}})
+					tr.Draw()
+					logging.debug("XXX dispatcher mainframe arrequest sending AR %s command for train %s" % (action, trnm))
+				
+				else:
+					self.PopupEvent("AR request for %s - not enabled" % trnm)
+
 				
 			elif cmd == "atc":
 				trnm = parms["train"][0]
