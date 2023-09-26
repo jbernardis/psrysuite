@@ -75,16 +75,16 @@ class Cliff(District):
 		addr = CLIFF
 		with self.nodes[addr] as n:
 			# outputs
-			self.rr.AddSignalLED("C2",  self, n, addr, [(0, 0), (0, 1), (0, 2)])
-			self.rr.AddSignalLED("C4",  self, n, addr, [(0, 3), (0, 4), (0, 5)])
-			self.rr.AddSignalLED("C6",  self, n, addr, [(0, 6), (0, 7), (1, 0)])
-			self.rr.AddSignalLED("C8",  self, n, addr, [(1, 1), (1, 2), (1, 3)])
-			self.rr.AddSignalLED("C10", self, n, addr, [(1, 4), (1, 5), (1, 6)])
-			self.rr.AddSignalLED("C12", self, n, addr, [(1, 7), (2, 0), (2, 1)])
-			self.rr.AddSignalLED("C14", self, n, addr, [(2, 2), (2, 3), (2, 4)])
-			self.rr.AddSignalLED("C18", self, n, addr, [(2, 7), (3, 0), (3, 1)])
-			self.rr.AddSignalLED("C22", self, n, addr, [(3, 2), (3, 3), (3, 4)])
-			self.rr.AddSignalLED("C24", self, n, addr, [(3, 5), (3, 6), (3, 7)])
+			self.rr.AddSignalLED("C2",  self, n, addr, [(0, 2), (0, 1), (0, 0)])
+			self.rr.AddSignalLED("C4",  self, n, addr, [(0, 5), (0, 4), (0, 3)])
+			self.rr.AddSignalLED("C6",  self, n, addr, [(1, 0), (0, 7), (0, 6)])
+			self.rr.AddSignalLED("C8",  self, n, addr, [(1, 3), (1, 2), (1, 1)])
+			self.rr.AddSignalLED("C10", self, n, addr, [(1, 6), (1, 5), (1, 4)])
+			self.rr.AddSignalLED("C12", self, n, addr, [(2, 1), (2, 0), (1, 7)])
+			self.rr.AddSignalLED("C14", self, n, addr, [(2, 4), (2, 3), (2, 2)])
+			self.rr.AddSignalLED("C18", self, n, addr, [(3, 1), (3, 0), (2, 7)])
+			self.rr.AddSignalLED("C22", self, n, addr, [(3, 4), (3, 3), (3, 2)])
+			self.rr.AddSignalLED("C24", self, n, addr, [(3, 7), (3, 6), (3, 5)])
 
 			self.rr.AddHandswitchInd("CSw3",  self, n, addr, [(4, 0), (4, 1)], inverted=True)
 			self.rr.AddHandswitchInd("CSw11", self, n, addr, [(4, 2), (4, 3)], inverted=True)

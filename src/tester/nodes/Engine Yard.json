@@ -4,7 +4,7 @@
   "obytes": [
     [
       {
-        "label": "Y2:L",
+        "label": "Y2:R",
         "used": true
       },
       {
@@ -12,15 +12,7 @@
         "used": true
       },
       {
-        "label": "Y2:R",
-        "used": true
-      },
-      {
-        "label": "Y4:L",
-        "used": true
-      },
-      {
-        "label": "Y4:N",
+        "label": "Y2:L",
         "used": true
       },
       {
@@ -28,7 +20,15 @@
         "used": true
       },
       {
-        "label": "Y8:L",
+        "label": "Y4:N",
+        "used": true
+      },
+      {
+        "label": "Y4:L",
+        "used": true
+      },
+      {
+        "label": "Y8:R",
         "used": true
       },
       {
@@ -38,15 +38,7 @@
     ],
     [
       {
-        "label": "Y8:R",
-        "used": true
-      },
-      {
-        "label": "Y10:L",
-        "used": true
-      },
-      {
-        "label": "Y10:N",
+        "label": "Y8:L",
         "used": true
       },
       {
@@ -54,11 +46,11 @@
         "used": true
       },
       {
-        "label": "Y22:L",
+        "label": "Y10:N",
         "used": true
       },
       {
-        "label": "Y22:N",
+        "label": "Y10:L",
         "used": true
       },
       {
@@ -66,7 +58,15 @@
         "used": true
       },
       {
-        "label": "Y24:L",
+        "label": "Y22:N",
+        "used": true
+      },
+      {
+        "label": "Y22:L",
+        "used": true
+      },
+      {
+        "label": "Y24:R",
         "used": true
       }
     ],
@@ -76,7 +76,7 @@
         "used": true
       },
       {
-        "label": "Y26:L",
+        "label": "Y26:R",
         "used": true
       },
       {
@@ -84,11 +84,11 @@
         "used": true
       },
       {
-        "label": "Y26:R",
+        "label": "Y26:L",
         "used": true
       },
       {
-        "label": "Y34:L",
+        "label": "Y34:R",
         "used": true
       },
       {
@@ -96,7 +96,7 @@
         "used": true
       },
       {
-        "label": "Y34:R",
+        "label": "Y34:L",
         "used": true
       },
       {

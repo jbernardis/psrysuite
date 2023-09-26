@@ -4,7 +4,7 @@
   "obytes": [
     [
       {
-        "label": "C2:L",
+        "label": "C2:R",
         "used": true
       },
       {
@@ -12,15 +12,7 @@
         "used": true
       },
       {
-        "label": "C2:R",
-        "used": true
-      },
-      {
-        "label": "C4:L",
-        "used": true
-      },
-      {
-        "label": "C4:N",
+        "label": "C2:L",
         "used": true
       },
       {
@@ -28,7 +20,15 @@
         "used": true
       },
       {
-        "label": "C6:L",
+        "label": "C4:N",
+        "used": true
+      },
+      {
+        "label": "C4:L",
+        "used": true
+      },
+      {
+        "label": "C6:R",
         "used": true
       },
       {
@@ -38,15 +38,7 @@
     ],
     [
       {
-        "label": "C6:R",
-        "used": true
-      },
-      {
-        "label": "C8:L",
-        "used": true
-      },
-      {
-        "label": "C8:N",
+        "label": "C6:L",
         "used": true
       },
       {
@@ -54,11 +46,11 @@
         "used": true
       },
       {
-        "label": "C10:L",
+        "label": "C8:N",
         "used": true
       },
       {
-        "label": "C10:N",
+        "label": "C8:L",
         "used": true
       },
       {
@@ -66,7 +58,15 @@
         "used": true
       },
       {
-        "label": "C12:L",
+        "label": "C10:N",
+        "used": true
+      },
+      {
+        "label": "C10:L",
+        "used": true
+      },
+      {
+        "label": "C12:R",
         "used": true
       }
     ],
@@ -76,11 +76,11 @@
         "used": true
       },
       {
-        "label": "C12:R",
+        "label": "C12:L",
         "used": true
       },
       {
-        "label": "C14:L",
+        "label": "C14:R",
         "used": true
       },
       {
@@ -88,7 +88,7 @@
         "used": true
       },
       {
-        "label": "C14:R",
+        "label": "C14:L",
         "used": true
       },
       {
@@ -100,7 +100,7 @@
         "used": true
       },
       {
-        "label": "C18:L",
+        "label": "C18:R",
         "used": true
       }
     ],
@@ -110,15 +110,7 @@
         "used": true
       },
       {
-        "label": "C18:R",
-        "used": true
-      },
-      {
-        "label": "C22:L",
-        "used": true
-      },
-      {
-        "label": "C22:N",
+        "label": "C18:L",
         "used": true
       },
       {
@@ -126,7 +118,15 @@
         "used": true
       },
       {
-        "label": "C24:L",
+        "label": "C22:N",
+        "used": true
+      },
+      {
+        "label": "C22:L",
+        "used": true
+      },
+      {
+        "label": "C24:R",
         "used": true
       },
       {
@@ -134,7 +134,7 @@
         "used": true
       },
       {
-        "label": "C24:R",
+        "label": "C24:L",
         "used": true
       }
     ],
