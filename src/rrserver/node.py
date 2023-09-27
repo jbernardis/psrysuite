@@ -77,16 +77,12 @@ class Node:
         return value = # successful reads, # failed reads
         '''
         if self.rrBus is None: 
-            return 0, 0 # simulation mode
+            return # simulation mode
             
         inb = self.rrBus.sendRecv(self.address, self.outb, self.bcount)
         if inb is not None:
             for i in range(self.bcount):
                 self.inb[i] = int.from_bytes(inb[i], "big")
-            return 1, 0
-        else:
-            logging.error("Communications error on railroad serial port for address 0x%02x" % self.address)
-            return 0, 1
                     
     def GetChangedInputs(self):
         results = []

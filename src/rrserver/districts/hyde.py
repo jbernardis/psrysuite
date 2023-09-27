@@ -218,7 +218,7 @@ class Hyde(District):
 
 		optFleet = self.rr.GetControlOption("hyde.fleet")  # 0 => no fleeting, 1 => fleeting
 
-		return District.OutIn(self)
+		District.OutIn(self)
 		
 	def CheckTurnoutPosition(self, tout):
 		'''

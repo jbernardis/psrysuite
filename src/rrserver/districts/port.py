@@ -386,7 +386,7 @@ class Port(District):
 		self.rr.UpdateDistrictTurnoutLocksByNode(self.name, self.releasedA, [PORTA, PARSONS])
 		self.rr.UpdateDistrictTurnoutLocksByNode(self.name, self.releasedB, [PORTB])
 		
-		return District.OutIn(self)
+		District.OutIn(self)
 		
 	def Released(self, tout):
 		addr = tout.address

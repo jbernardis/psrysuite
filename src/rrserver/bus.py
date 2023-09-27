@@ -4,6 +4,13 @@ import logging
 
 MAXTRIES = 5
 
+class RailroadIOException(Exception):
+	def __init__(self, address):
+		self.address = address
+
+	def __str__(self):
+		return "0x%02x" % self.address
+
 class Bus:
 	def __init__(self, tty):
 		self.initialized = False
@@ -34,6 +41,8 @@ class Bus:
 	def close(self):
 		logging.info("closing serial port %s" % self.tty)
 		self.port.close()
+		self.initialized = False
+		self.port = None
 		
 	def reopen(self):
 		logging.info("attempting to re-open serial port")
@@ -62,6 +71,7 @@ class Bus:
 		sendBuffer.extend(outbuf)
 		
 		retries = 3;
+		self.port.reset_input_buffer()
 		while retries > 0:
 			try:
 				retries -= 1		
@@ -75,11 +85,12 @@ class Bus:
 				else:
 					break
 					
-			time.sleep(0.0001)
+			time.sleep(0.01)
 
 		if retries <= 0:
 			# failed to write - don't even try to read
-			return None
+			logging.error("Unsuccessful write for address %x." % address)
+			raise RailroadIOException(address)
 
 		tries = 0
 		inbuf = []
@@ -93,7 +104,7 @@ class Bus:
 				
 			if len(b) == 0:
 				tries += 1
-				time.sleep(0.01) # an experiment to see if a larger wait period reduces the number of errors.  Was:  0.0001)
+				time.sleep(0.2) # was 0.01 and before that 0.0001
 			else:
 				tries = 0
 				inbuf.extend([bytes([b[i]]) for i in range(len(b))])
@@ -101,21 +112,20 @@ class Bus:
 				
 		if len(inbuf) != nbytes:
 			logging.error("incomplete read for address %x.  Expecting %d characters, got %d" % (address, nbytes, len(inbuf)))
-			return None #[b'\x00']*nbytes
-		else:
-			# make sure that if a byte is different, that it is at least different for "threshold" cycles before we accept it
-			for i in range(nbytes):
-				if lastused[i] is None:
-					lastused[i] = inbuf[i]
-				elif inbuf[i] == lastused[i]:
-					self.byteTally[(address, i)] = 0
-				elif self.verifyChange(address, i, threshold):
-					lastused[i] = inbuf[i]
-				else:
-					inbuf[i] = lastused[i]
-					
-					
-			return inbuf
+			raise RailroadIOException(address)
+		
+		# make sure that if a byte is different, that it is at least different for "threshold" cycles before we accept it
+		for i in range(nbytes):
+			if lastused[i] is None:
+				lastused[i] = inbuf[i]
+			elif inbuf[i] == lastused[i]:
+				self.byteTally[(address, i)] = 0
+			elif self.verifyChange(address, i, threshold):
+				lastused[i] = inbuf[i]
+			else:
+				inbuf[i] = lastused[i]
+									
+		return inbuf
 		
 	def verifyChange(self, address, bx, threshold):
 		try:

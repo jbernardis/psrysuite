@@ -4,7 +4,6 @@ class TrainList:
 	def __init__(self, parent):
 		self.parent = parent
 		self.trains = {}
-		self.count = 0
 
 	def SetAtc(self, train, atcflag):
 		if train not in self.trains:
@@ -13,6 +12,7 @@ class TrainList:
 		self.trains[train]["atc"] = atcflag
 
 	def Update(self, train, loco, block):
+		logging.debug("train list update %s %s %s" % (train, loco, block))
 		if block is None:
 			return
 
@@ -21,12 +21,16 @@ class TrainList:
 			dellist = []
 			for tr in self.trains:
 				if block in self.trains[tr]["blocks"]:
+					logging.debug("deleting block %s from train %s" % (block, tr))
 					self.trains[tr]["blocks"].remove(block)
+					logging.debug("new block list = %s" % str(self.trains[tr]["blocks"]))
 					if len(self.trains[tr]["blocks"]) == 0:
 						dellist.append(tr)
+						logging.debug("adding train %s to the dellist" % tr)
 
 			for tr in dellist:
 				del(self.trains[tr])
+				logging.debug("removing train %s from the trainlist " % tr)
 
 		else:
 			if train in self.trains:

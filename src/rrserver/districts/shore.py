@@ -224,5 +224,5 @@ class Shore(District):
 			self.H30power = H30power
 			self.nodes[SHORE].SetOutputBit(6, 0, 1 if H30power else 0)
 		
-		return District.OutIn(self)
+		District.OutIn(self)
 

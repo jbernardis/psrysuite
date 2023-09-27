@@ -36,7 +36,7 @@ import threading
 from subprocess import Popen
 
 from rrserver.settings import Settings
-from rrserver.bus import Bus
+from rrserver.bus import Bus, RailroadIOException
 from rrserver.railroad import Railroad
 from rrserver.httpserver import HTTPServer
 from rrserver.sktserver import SktServer
@@ -348,16 +348,17 @@ class ServerMain:
 			
 	def DoInterval(self, _):
 		if self.pause > 0:
+			'''
+			no I/O while pause is active
+			'''
 			self.pause -= 1
 			return 
 		
-		successful, errs, errAddrs = self.rr.OutIn()
-		if errs != 0:
-			errAddrString = ", ".join([nodeNames[x] for x in errAddrs])
-			plural = "s" if errs > 1 else ""
-			msg = "%d I/O error%s at node%s %s" % (errs, plural, plural, errAddrString)
-			logging.error(msg)
-			self.DoAlert({"msg": [msg]})
+		try:
+			self.rr.OutIn()
+		except RailroadIOException as e: 
+			self.DoAlert({"msg": ["Railroad IO Error with address 0x%02x" % e.address]})
+			self.DoBusReopen()
 
 	def DoSignal(self, cmd):
 		signame = cmd["name"][0]
@@ -578,6 +579,9 @@ class ServerMain:
 		self.Shutdown()
 		
 	def DoReopen(self, _):
+		self.DoBusReopen()
+		
+	def DoBusReopen(self):
 		if self.settings.simulation:
 			return 
 

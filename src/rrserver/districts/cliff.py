@@ -420,7 +420,7 @@ class Cliff(District):
 			
 		self.rr.UpdateDistrictTurnoutLocks(self.name, self.released)
 		
-		return District.OutIn(self)
+		District.OutIn(self)
 		
 	def Released(self, _):
 		return self.released

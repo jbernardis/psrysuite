@@ -378,6 +378,7 @@ class Block:
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
 				self.frame.Request({"settrain": { "block": self.GetName(), "name": trn, "loco": loco}})
+				print("settrain1")
 			if refresh:
 				self.Draw()
 			return
@@ -400,6 +401,7 @@ class Block:
 
 				self.SetTrain(tr)
 				self.frame.Request({"settrain": { "block": self.GetName(), "name": trn, "loco": loco}})
+				print("settrain2")
 		else:
 			for b in [self.sbEast, self.sbWest]:
 				if b is not None:
@@ -424,6 +426,7 @@ class Block:
 		# all unoccupied - clean up
 		if self.frame.IsDispatcher():
 			self.frame.Request({"settrain": { "block": self.GetName(), "name": None, "loco": None}})
+			print("settrain3")
 		self.train = None
 		self.EvaluateStoppingSections()
 		if self.entrySignal is not None:

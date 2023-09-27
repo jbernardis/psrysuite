@@ -179,4 +179,4 @@ class Dell(District):
 		if sig.Aspect() != aspect:
 			self.rr.SetAspect("R10W", aspect)			
 
-		return District.OutIn(self)
+		District.OutIn(self)

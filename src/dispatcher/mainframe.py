@@ -1239,6 +1239,7 @@ class MainFrame(wx.Frame):
 				return
 
 			sig.GetDistrict().PerformSignalAction(sig, callon=shift)
+			return
 
 		try:
 			hs = self.handswitchMap[(screen, pos)]
@@ -1253,6 +1254,7 @@ class MainFrame(wx.Frame):
 				return
 			
 			hs.GetDistrict().PerformHandSwitchAction(hs)
+			return
 
 		try:
 			ln = self.blockMap[(screen, pos[1])]
@@ -1270,8 +1272,14 @@ class MainFrame(wx.Frame):
 				blk = None
 
 			if blk:
+				self.PopupEvent("Block %s" % blk.GetName())
 				if blk.IsOccupied():
 					tr = blk.GetTrain()
+					if tr is None:
+						logging.error("Block %s is occupied, but get train returned None" % blk.GetName())
+						#blk.SetOccupied(occupied=False, refresh=True)
+						return 
+					
 					if right:
 						menu = wx.Menu()
 						self.menuTrain = tr
@@ -1348,7 +1356,9 @@ class MainFrame(wx.Frame):
 							self.activeTrains.UpdateTrain(oldName)
 							
 							self.Request({"settrain": { "block": blk.GetName()}})
+							print("settrain4")
 							self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco}})
+							print("settrain5")
 
 
 							if self.IsDispatcher():
@@ -1753,6 +1763,7 @@ class MainFrame(wx.Frame):
 				for p in parms:
 					block = p["name"]
 					state = p["state"]
+					print("block %s %s" % (block, state))
 
 					blk = None
 					try:
@@ -1771,6 +1782,7 @@ class MainFrame(wx.Frame):
 					if blk is not None:
 						if blk.GetStatus(blockend) != stat:
 							district = blk.GetDistrict()
+							print("calling district do block action, %s %s %s" % (block, blockend, stat))
 							district.DoBlockAction(blk, blockend, stat)
 							if self.IsDispatcher():
 								self.CheckTrainsInBlock(block, None)
@@ -1963,7 +1975,7 @@ class MainFrame(wx.Frame):
 							# not there - create a new one")
 							tr = Train(name)
 							self.trains[name] = tr
-							self.activeTrain.AddTrain(tr)
+							self.activeTrains.AddTrain(tr)
 							
 						tr.AddToBlock(blk)
 						tr.SetEast(blk.GetEast()) # train takes on the direction of the block

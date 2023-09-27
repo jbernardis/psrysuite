@@ -15,17 +15,8 @@ class District:
 		return self.name
 				
 	def OutIn(self):
-		successful = 0
-		errs = 0
-		errAddrs = []
 		for nd in self.nodes.values():
-			s, e = nd.OutIn()
-			successful += s
-			errs += e
-			if e > 0:
-				errAddrs.append(nd.GetAddress())
-			
-		return successful, errs, errAddrs
+			nd.OutIn()
 
 	def Initialize(self):
 		pass
