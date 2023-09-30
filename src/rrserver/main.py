@@ -36,7 +36,7 @@ import threading
 from subprocess import Popen
 
 from rrserver.settings import Settings
-from rrserver.bus import Bus, RailroadIOException
+from rrserver.bus import Bus
 from rrserver.railroad import Railroad
 from rrserver.httpserver import HTTPServer
 from rrserver.sktserver import SktServer
@@ -45,8 +45,6 @@ from rrserver.routedef import RouteDef
 from rrserver.clientlist import ClientList
 from rrserver.trainlist import TrainList
 from rrserver.dccserver import DCCHTTPServer
-
-from rrserver.constants import nodeNames
 
 class ServerMain:
 	def __init__(self):
@@ -354,11 +352,7 @@ class ServerMain:
 			self.pause -= 1
 			return 
 		
-		try:
-			self.rr.OutIn()
-		except RailroadIOException as e: 
-			self.DoAlert({"msg": ["Railroad IO Error with address 0x%02x" % e.address]})
-			self.DoBusReopen()
+		self.rr.OutIn()
 
 	def DoSignal(self, cmd):
 		signame = cmd["name"][0]

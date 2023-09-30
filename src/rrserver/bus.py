@@ -3,13 +3,14 @@ import time
 import logging
 
 MAXTRIES = 5
-
+'''
 class RailroadIOException(Exception):
 	def __init__(self, address):
 		self.address = address
 
 	def __str__(self):
 		return "0x%02x" % self.address
+'''
 
 class Bus:
 	def __init__(self, tty):
@@ -71,10 +72,10 @@ class Bus:
 		sendBuffer.extend(outbuf)
 		
 		retries = 3;
-		self.port.reset_input_buffer()
 		while retries > 0:
 			try:
 				retries -= 1		
+				self.port.reset_input_buffer()
 				nb = self.port.write(sendBuffer)
 			except Exception as e:
 				logging.error("Exception %s when trying to write to address %x" % (str(e), address))
@@ -90,7 +91,7 @@ class Bus:
 		if retries <= 0:
 			# failed to write - don't even try to read
 			logging.error("Unsuccessful write for address %x." % address)
-			raise RailroadIOException(address)
+			return None
 
 		tries = 0
 		inbuf = []
@@ -112,7 +113,7 @@ class Bus:
 				
 		if len(inbuf) != nbytes:
 			logging.error("incomplete read for address %x.  Expecting %d characters, got %d" % (address, nbytes, len(inbuf)))
-			raise RailroadIOException(address)
+			return None
 		
 		# make sure that if a byte is different, that it is at least different for "threshold" cycles before we accept it
 		for i in range(nbytes):

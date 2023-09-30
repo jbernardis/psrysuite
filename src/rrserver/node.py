@@ -1,6 +1,8 @@
 
 import logging
 
+from rrserver.constants import nodeNames
+
 def setBit(obyte, obit, val):
     if val != 0:
         return (obyte | (1 << obit)) & 0xff
@@ -73,9 +75,6 @@ class Node:
         return self.address
         
     def OutIn(self):
-        '''
-        return value = # successful reads, # failed reads
-        '''
         if self.rrBus is None: 
             return # simulation mode
             
@@ -83,6 +82,10 @@ class Node:
         if inb is not None:
             for i in range(self.bcount):
                 self.inb[i] = int.from_bytes(inb[i], "big")
+        else:
+            msg = "Railroad IO error at node %s(0x%2x)" % (nodeNames[self.address], self.address)
+            logging.error(msg)
+            print(msg)
                     
     def GetChangedInputs(self):
         results = []
