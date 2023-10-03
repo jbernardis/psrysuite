@@ -28,7 +28,7 @@ class Bus:
 					bytesize=serial.EIGHTBITS,
 					parity=serial.PARITY_NONE,
 					stopbits=serial.STOPBITS_ONE, 
-					timeout=0)
+					timeout=0.02)
 
 		except serial.SerialException:
 			self.port = None
@@ -72,6 +72,8 @@ class Bus:
 		sendBuffer.extend(outbuf)
 		
 		retries = 3;
+		self.port.reset_input_buffer()
+		self.port.reset_output_buffer()
 		while retries > 0:
 			try:
 				retries -= 1		
@@ -105,7 +107,7 @@ class Bus:
 				
 			if len(b) == 0:
 				tries += 1
-				time.sleep(0.2) # was 0.01 and before that 0.0001
+				time.sleep(0.01) # was 0.0001
 			else:
 				tries = 0
 				inbuf.extend([bytes([b[i]]) for i in range(len(b))])

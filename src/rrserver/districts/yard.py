@@ -155,14 +155,14 @@ class Yard(District):
 			
 			# inputs	
 			self.rr.AddTurnoutPosition("YSw33", self, n, addr, [(0, 0), (0, 1)])		
-			self.rr.AddSignalLever("Y2",  self, n, addr, [(0, 4), (0, 3), (0, 2)])
-			self.rr.AddSignalLever("Y4",  self, n, addr, [(0, 7), (0, 6), (0, 5)])
-			self.rr.AddSignalLever("Y8",  self, n, addr, [(1, 2), (1, 1), (1, 0)])
-			self.rr.AddSignalLever("Y10", self, n, addr, [(1, 4), (1, 4), (1, 3)])
-			self.rr.AddSignalLever("Y22", self, n, addr, [(2, 0), (1, 7), (1, 6)])
-			self.rr.AddSignalLever("Y24", self, n, addr, [None, (2, 2), (2, 1)])
-			self.rr.AddSignalLever("Y26", self, n, addr, [(2, 5), (2, 4), (2, 3)])
-			self.rr.AddSignalLever("Y34", self, n, addr, [(3, 0), (2, 7), (2, 6)])
+			self.rr.AddSignalLever("Y2",  self, n, addr, [(0, 2), (0, 3), (0, 4)])
+			self.rr.AddSignalLever("Y4",  self, n, addr, [(0, 5), (0, 6), (0, 7)])
+			self.rr.AddSignalLever("Y8",  self, n, addr, [(1, 0), (1, 1), (1, 2)])
+			self.rr.AddSignalLever("Y10", self, n, addr, [(1, 3), (1, 4), (1, 5)])
+			self.rr.AddSignalLever("Y22", self, n, addr, [(1, 6), (1, 7), (2, 0)])
+			self.rr.AddSignalLever("Y24", self, n, addr, [(2, 1), (2, 2), None])
+			self.rr.AddSignalLever("Y26", self, n, addr, [(2, 3), (2, 4), (2, 5)])
+			self.rr.AddSignalLever("Y34", self, n, addr, [(2, 6), (2, 7), (3, 0)])
 			
 			self.rr.AddRouteIn("Y81W",  self, n, addr, [(3, 3)])
 			self.rr.AddRouteIn("Y82W",  self, n, addr, [(3, 4)])

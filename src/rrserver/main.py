@@ -568,6 +568,13 @@ class ServerMain:
 		value = int(cmd["value"][0])
 
 		self.rr.SetControlOption(name, value)
+		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
+		resp = {"control": [p]}
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH")
+		logging.debug("forwarding control")
+		for addr, skt in addrList:
+			logging.info("sending control message: %s to %s" % (str(resp), str(addr)))
+			self.socketServer.sendToOne(skt, addr, resp)
 		
 	def DoQuit(self, _):
 		self.Shutdown()

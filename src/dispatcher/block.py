@@ -133,6 +133,7 @@ class Block:
 		self.determineStatus()
 		self.entrySignal = None
 		self.entryAspect = 0
+		self.lastSubBlockEntered = None
 
 	def SetTrain(self, train):
 		self.train = train
@@ -229,6 +230,9 @@ class Block:
 		if self.sbWest and self.sbWest.IsActive():
 			active = True
 		return active
+	
+	def SetLastEntered(self, subblk):
+		self.lastSubBlockEntered = subblk
 
 	def DrawTurnouts(self):
 		pass
@@ -239,6 +243,7 @@ class Block:
 			return 
 		
 		self.SetEast(self.defaultEast)
+		self.SetLastEntered(None)
 
 	def SetNextBlockEast(self, blk):
 		self.blkEast = blk
@@ -364,6 +369,9 @@ class Block:
 		self.turnouts.append(turnout)
 
 	def SetOccupied(self, occupied=True, blockend=None, refresh=False):
+		if not occupied:
+			self.SetLastEntered(None)
+
 		if blockend in ["E", "W"]:
 			b = self.sbEast if blockend == "E" else self.sbWest
 			if b is None:
@@ -561,6 +569,7 @@ class StoppingBlock (Block):
 		self.lastBlockEmpty = False
 
 	def EvaluateStoppingSection(self):
+		logging.debug("evaluate stopping section, last sb entered = %s" % self.block.lastSubBlockEntered)
 		logging.debug("evaluate stopping block %s, lastSignalGreen = %s, lastBlockEmpty = %s" % (self.GetName(), str(self.lastSignalGreen), str(self.lastBlockEmpty)))
 		if not self.occupied:
 			logging.debug("Deactivating stopping block %s because block is not occupied" % self.GetName())
@@ -585,39 +594,49 @@ class StoppingBlock (Block):
 		else:
 			return
 		
-		if signm:
-			logging.debug("considering signal %s" % signm)
-			if blk:
-				logging.debug("looking at next block %s" % blk.GetName())
-				tr = self.block.GetTrain()
-				if tr is None:
-					logging.debug("no train identified in current block %s" % self.block.GetName())
-					return
-				blkOccupied = blk.IsOccupied()
-				if blkOccupied:
-					logging.debug("next block is occupied")
-					trnext = blk.GetTrain()
-					if trnext is None:
-						logging.debug("but we dont have a train identified - no action")
-						return
-					if tr.GetName() == trnext.GetName():
-						logging.debug("it's occupied, but with the same train")
-						return
-			else:
-				logging.debug("no block identified - assume block is occupied (worst case)")
-				blkOccupied = True
-
-			sv = self.frame.GetSignalByName(signm).GetAspect()
-			if not(self.lastSignalGreen and self.lastBlockEmpty and sv == 0 and blkOccupied):
-				self.Activate(sv == 0)
-				logging.debug("%s stopping block %s" % (("Activating" if sv == 0 else "Deactivating"), self.GetName()))
-			else:
-				logging.debug("No activation necessary for stopping block %s" % self.GetName())
-				
-			self.lastSignalGreen = sv != 0
-			self.lastBlockEmpty = not blkOccupied
-		else:
+		if not signm:
 			logging.debug("No action on stopping block because no signal identified")
+			return 
+		
+		logging.debug("considering signal %s" % signm)
+		if blk:
+			logging.debug("looking at next block %s" % blk.GetName())
+			tr = self.block.GetTrain()
+			if tr is None:
+				logging.debug("no train identified in current block %s" % self.block.GetName())
+				return
+			
+			
+			logging.debug("train block list = (%s)" % str(tr.GetBlockList().keys()))
+			if self.block.GetName() in tr.GetBlockList().keys():
+				logging.debug("we are entering the stopping section from the main block")
+			else:
+				logging.debug("this is not a condition in which to activate the stopping relay")
+				return 
+			
+			blkOccupied = blk.IsOccupied()
+			if blkOccupied:
+				logging.debug("next block is occupied")
+				trnext = blk.GetTrain()
+				if trnext is None:
+					logging.debug("but we dont have a train identified - no action")
+					return
+				if tr.GetName() == trnext.GetName():
+					logging.debug("it's occupied, but with the same train")
+					return
+		else:
+			logging.debug("no block identified - assume block is occupied (worst case)")
+			blkOccupied = True
+
+		sv = self.frame.GetSignalByName(signm).GetAspect()
+		if not(self.lastSignalGreen and self.lastBlockEmpty and sv == 0 and blkOccupied):
+			self.Activate(sv == 0)
+			logging.debug("%s stopping block %s" % (("Activating" if sv == 0 else "Deactivating"), self.GetName()))
+		else:
+			logging.debug("No activation necessary for stopping block %s" % self.GetName())
+			
+		self.lastSignalGreen = sv != 0
+		self.lastBlockEmpty = not blkOccupied
 
 	def Activate(self, flag=True):
 		if flag == self.active:
@@ -705,6 +724,10 @@ class StoppingBlock (Block):
 		self.cleared = False
 		self.determineStatus()
 		self.Draw()
+		
+	
+	def SetLastEntered(self, subblk):
+		self.block.SetLastEntered(subblk)
 
 	def SetOccupied(self, occupied=True, refresh=False):
 		if self.occupied == occupied:

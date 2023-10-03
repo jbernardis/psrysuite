@@ -175,23 +175,25 @@ class MainFrame(wx.Frame):
 		voffset = topSpace+diagramh+10
 		self.widgetMap = {HyYdPt: [], LaKr: [], NaCl: []}
 		self.DefineWidgets(voffset)
-
+		self.DefineControlDisplay(voffset)
+		
 		if self.settings.pages == 3:
 			self.currentScreen = None
 			self.SwapToScreen(LaKr)
 		else:
 			self.PlaceWidgets()
 
-		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(self.centerOffset+50, 15), size=BTNDIM)
+		#self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(self.centerOffset+50, 15), size=BTNDIM)
+		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(int(totalw/2-185), 80), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnSubscribe, self.bSubscribe)
 		self.bSubscribe.SetToolTip("Connect to/Disconnect from the Railroad server")
 
-		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", pos=(self.centerOffset+50, 45), size=BTNDIM)
+		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", pos=(self.centerOffset+50, 15), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, self.bRefresh)
 		self.bRefresh.SetToolTip("Refresh all railroad information from the railroad server")
 		self.bRefresh.Enable(False)
 
-		self.bReOpen = wx.Button(self, wx.ID_ANY, "reOpen", pos=(self.centerOffset+50, 75), size=BTNDIM)
+		self.bReOpen = wx.Button(self, wx.ID_ANY, "reOpen", pos=(self.centerOffset+50, 45), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnReOpen, self.bReOpen)
 		self.bReOpen.SetToolTip("Reinitialize the serial connection to the railroad")
 		self.bReOpen.Enable(False)
@@ -246,13 +248,14 @@ class MainFrame(wx.Frame):
 		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(60, -1), pos=(self.centerOffset+2300, 25), style=wx.TE_READONLY)
 		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(60, -1), pos=(self.centerOffset+2380, 25), style=wx.TE_READONLY)
 		
-		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(self.centerOffset+2200, 75), size=BTNDIM)
+		#self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(self.centerOffset+2200, 75), size=BTNDIM)
+		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(int(totalw/2+100), 80), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnResetScreen, self.bResetScreen)
 		self.bResetScreen.SetToolTip("Move the screen back to its home location")
 
 		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 30), size=(400, 40))
 	
-		self.cbOSSLocks = wx.CheckBox(self, -1, "OSS Locks", (int(totalw/2-100/2), 80))
+		self.cbOSSLocks = wx.CheckBox(self, -1, "OSS Locks", (int(totalw/2-100/2), 85))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBOSSLocks, self.cbOSSLocks)
 		self.cbOSSLocks.SetValue(self.OSSLocks)
 
@@ -440,6 +443,64 @@ class MainFrame(wx.Frame):
 
 	def OnBActiveTrains(self, _):		
 		self.activeTrains.ShowTrainList(self)
+		
+	def DefineControlDisplay(self, voffset):
+		if self.IsDispatcher():
+			return 
+		
+		f = wx.Font(16, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")
+		
+		self.stCliffControl = wx.StaticText(self, wx.ID_ANY, "CLIFF: Dispatch All", pos=(2100, voffset+10))
+		self.stCliffControl.Hide()
+		self.stCliffControl.SetFont(f)
+		self.widgetMap[NaCl].append([self.stCliffControl, 1])
+		
+		self.stYardControl = wx.StaticText(self, wx.ID_ANY, "YARD: Local", pos=(1550, voffset+10))
+		self.stYardControl.Hide()
+		self.stYardControl.SetFont(f)
+		self.widgetMap[HyYdPt].append([self.stYardControl, 1])
+		
+		self.stNassauControl = wx.StaticText(self, wx.ID_ANY, "NASSAU: Dispatch All", pos=(170, voffset+10))
+		self.stNassauControl.Hide()
+		self.stNassauControl.SetFont(f)
+		self.widgetMap[NaCl].append([self.stNassauControl, 1])
+		
+		self.stSignal4Control = wx.StaticText(self, wx.ID_ANY, "SIGNAL 4: Port", pos=(150, voffset+10))
+		self.stSignal4Control.Hide()
+		self.stSignal4Control.SetFont(f)
+		self.widgetMap[LaKr].append([self.stSignal4Control, 1])
+		
+	def UpdateControlDisplay(self, name, value):
+		if self.IsDispatcher():
+			return
+		
+		if name == "yard":
+			if value == 0:
+				self.stYardControl.SetLabel("YARD: Local")
+			elif value == 1:
+				self.stYardControl.SetLabel("YARD: Dispatch")
+
+		elif name == "signal4":
+			if value == 0:
+				self.stSignal4Control.SetLabel("SIGNAL 4: Port")
+			elif value == 1:
+				self.stSignal4Control.SetLabel("SIGNAL 4: Dispatch")
+				
+		elif name == "nassau":
+			if value == 0:
+				self.stNassauControl.SetLabel("NASSAU: Local")
+			elif value == 1:
+				self.stNassauControl.SetLabel("NASSAU: Dispatch Main")
+			elif value == 2:
+				self.stNassauControl.SetLabel("NASSAU: Dispatch All")
+				
+		elif name == "cliff":
+			if value == 0:
+				self.stCliffControl.SetLabel("CLIFF: Local")
+			elif value == 1:
+				self.stCliffControl.SetLabel("CLIFF: Dispatch Bank/Cliveden")
+			elif value == 2:
+				self.stCliffControl.SetLabel("CLIFF: Dispatch All")
 
 	def DefineWidgets(self, voffset):
 		if not self.IsDispatcher():
@@ -449,7 +510,7 @@ class MainFrame(wx.Frame):
 				["Nassau", "Dispatcher: Main", "Dispatcher: All"], 1, wx.RA_SPECIFY_COLS)
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBNassau, self.rbNassauControl)
 		self.rbNassauControl.Hide()
-		self.widgetMap[NaCl].append(self.rbNassauControl)
+		self.widgetMap[NaCl].append([self.rbNassauControl, 0])
 		self.rbNassauControl.SetSelection(2)
 		self.nassauControl = 2
 
@@ -457,7 +518,7 @@ class MainFrame(wx.Frame):
 				["Cliff", "Dispatcher: Bank/Cliveden", "Dispatcher: All"], 1, wx.RA_SPECIFY_COLS)
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBCliff, self.rbCliffControl)
 		self.rbCliffControl.Hide()
-		self.widgetMap[NaCl].append(self.rbCliffControl)
+		self.widgetMap[NaCl].append([self.rbCliffControl, 0])
 		self.rbCliffControl.SetSelection(2)
 		self.cliffControl = 2
 
@@ -465,60 +526,60 @@ class MainFrame(wx.Frame):
 				["Yard", "Dispatcher"], 1, wx.RA_SPECIFY_COLS)
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBYard, self.rbYardControl)
 		self.rbYardControl.Hide()
-		self.widgetMap[HyYdPt].append(self.rbYardControl)
+		self.widgetMap[HyYdPt].append([self.rbYardControl, 0])
 
 		self.rbS4Control = wx.RadioBox(self, wx.ID_ANY, "Signal 4L/4R", (150, voffset), wx.DefaultSize,
 				["Port", "Dispatcher"], 1, wx.RA_SPECIFY_COLS)
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBS4, self.rbS4Control)
 		self.rbS4Control.Hide()
-		self.widgetMap[LaKr].append(self.rbS4Control)
+		self.widgetMap[LaKr].append([self.rbS4Control, 0])
 
 		self.cbLathamFleet = wx.CheckBox(self, -1, "Latham Fleeting", (300, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBLathamFleet, self.cbLathamFleet)
 		self.cbLathamFleet.Hide()
-		self.widgetMap[LaKr].append(self.cbLathamFleet)
+		self.widgetMap[LaKr].append([self.cbLathamFleet, 0])
 		self.LathamFleetSignals =  ["L8R", "L8L", "L6RA", "L6RB", "L6L", "L4R", "L4L"]
 
 		self.cbCarltonFleet = wx.CheckBox(self, -1, "Carlton Fleeting", (300, voffset+30))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBCarltonFleet, self.cbCarltonFleet)
 		self.cbCarltonFleet.Hide()
-		self.widgetMap[LaKr].append(self.cbCarltonFleet)
+		self.widgetMap[LaKr].append([self.cbCarltonFleet, 0])
 		self.CarltonFleetSignals = ["L18R", "L18L", "L16R", "L14R", "L14L"]
 
 		self.cbValleyJctFleet = wx.CheckBox(self, -1, "Valley Junction Fleeting", (900, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBValleyJctFleet, self.cbValleyJctFleet)
 		self.cbValleyJctFleet.Hide()
-		self.widgetMap[LaKr].append(self.cbValleyJctFleet)
+		self.widgetMap[LaKr].append([self.cbValleyJctFleet, 0])
 		self.ValleyJctFleetSignals = ["D6RA", "D6RB", "D6L", "D4RA", "D4RB", "D4L"]
 
 		self.cbFossFleet = wx.CheckBox(self, -1, "Foss Fleeting", (900, voffset+30))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBFossFleet, self.cbFossFleet)
 		self.cbFossFleet.Hide()
-		self.widgetMap[LaKr].append(self.cbFossFleet)
+		self.widgetMap[LaKr].append([self.cbFossFleet, 0])
 		self.FossFleetSignals = ["D10R", "D10L", "D12R", "D12L"]
 
 		self.cbShoreFleet = wx.CheckBox(self, -1, "Shore Fleeting", (1500, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBShoreFleet, self.cbShoreFleet)
 		self.cbShoreFleet.Hide()
-		self.widgetMap[LaKr].append(self.cbShoreFleet)
+		self.widgetMap[LaKr].append([self.cbShoreFleet, 0])
 		self.ShoreFleetSignals = ["S4R", "S12R", "S4LA", "S4LB", "S4LC", "S12LA", "S12LB", "S12LC"]
 
 		self.cbHydeJctFleet = wx.CheckBox(self, -1, "Hyde Junction Fleeting", (1500, voffset+30))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBHydeJctFleet, self.cbHydeJctFleet)
 		self.cbHydeJctFleet.Hide()
-		self.widgetMap[LaKr].append(self.cbHydeJctFleet)
+		self.widgetMap[LaKr].append([self.cbHydeJctFleet, 0])
 		self.HydeJctFleetSignals = ["S20R", "S18R", "S16R", "S20L", "S18LA", "S18LB", "S16L"]
 
 		self.cbKrulishFleet = wx.CheckBox(self, -1, "Krulish Fleeting", (2100, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBKrulishFleet, self.cbKrulishFleet)
 		self.cbKrulishFleet.Hide()
-		self.widgetMap[LaKr].append(self.cbKrulishFleet)
+		self.widgetMap[LaKr].append([self.cbKrulishFleet, 0])
 		self.KrulishFleetSignals = ["K8R", "K4R", "K2R", "K8LA", "K8LB", "K2L"]
 
 		self.cbNassauFleet = wx.CheckBox(self, -1, "Nassau Fleeting", (300, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBNassauFleet, self.cbNassauFleet)
 		self.cbNassauFleet.Hide()
-		self.widgetMap[NaCl].append(self.cbNassauFleet)
+		self.widgetMap[NaCl].append([self.cbNassauFleet, 0])
 		self.NassauFleetSignalsMain = ["N16R", "N14R",
 						"N18LB", "N16L", "N14LA", "N14LB",
 						"N26RB", "N26RC", "N24RA", "N24RB",
@@ -532,19 +593,19 @@ class MainFrame(wx.Frame):
 		self.cbBankFleet = wx.CheckBox(self, -1, "Martinsville Fleeting", (900, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBBankFleet, self.cbBankFleet)
 		self.cbBankFleet.Hide()
-		self.widgetMap[NaCl].append(self.cbBankFleet)
+		self.widgetMap[NaCl].append([self.cbBankFleet, 0])
 		self.BankFleetSignals = ["C22L", "C24L", "C22R", "C24R"]
 
 		self.cbClivedenFleet = wx.CheckBox(self, -1, "Cliveden Fleeting", (1400, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBClivedenFleet, self.cbClivedenFleet)
 		self.cbClivedenFleet.Hide()
-		self.widgetMap[NaCl].append(self.cbClivedenFleet)
+		self.widgetMap[NaCl].append([self.cbClivedenFleet, 0])
 		self.ClivedenFleetSignals = ["C10L", "C12L", "C10R", "C12R", "C14L", "C14RA", "C14RB", "C18LA", "C18LB", "C18R"]
 
 		self.cbYardFleet = wx.CheckBox(self, -1, "Yard Fleeting", (1650, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBYardFleet, self.cbYardFleet)
 		self.cbYardFleet.Hide()
-		self.widgetMap[HyYdPt].append(self.cbYardFleet)
+		self.widgetMap[HyYdPt].append([self.cbYardFleet, 0])
 		self.YardFleetSignals = [ "Y2R", "Y2L", "Y4RA", "Y4RB", "Y4L", "Y8R", "Y8LA", "Y8LB", "Y8LC", "Y10R", "Y10L",
 					"Y22R", "Y22L", "Y24LA", "Y24LB", "Y26R", "Y26LA", "Y26LB", "Y26LC", "Y34RA", "Y34RB", "Y34L",
 					"Y40RA", "Y40RB", "Y40RC", "Y40RD", "Y40L", "Y42R", "Y42LA", "Y42LB", "Y42LC", "Y42LD" ]
@@ -552,7 +613,7 @@ class MainFrame(wx.Frame):
 		self.cbCliffFleet = wx.CheckBox(self, -1, "Cliff Fleeting", (2100, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBCliffFleet, self.cbCliffFleet)
 		self.cbCliffFleet.Hide()
-		self.widgetMap[NaCl].append(self.cbCliffFleet)
+		self.widgetMap[NaCl].append([self.cbCliffFleet, 0])
 		self.CliffFleetSignals = [ "C2LA", "C2LB", "C2LC", "C2LD", "C2R",
 					"C4L", "C4RA", "C4RB", "C4RC", "C4RD",
 					"C6LA", "C6LB", "C6LC", "C6LD", "C6LE", "C6LF", "C6LG", "C6LH", "C6LJ", "C6LK", "C6LL", "C6R",
@@ -561,7 +622,7 @@ class MainFrame(wx.Frame):
 		self.cbHydeFleet = wx.CheckBox(self, -1, "Hyde Fleeting", (250, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBHydeFleet, self.cbHydeFleet)
 		self.cbHydeFleet.Hide()
-		self.widgetMap[HyYdPt].append(self.cbHydeFleet)
+		self.widgetMap[HyYdPt].append([self.cbHydeFleet, 0])
 		self.HydeFleetSignals = [ "H4R", "H4LA", "H4LB", "H4LC", "H4LD", "H6R", "H6LA", "H6LB", "H6LC", "H6LD", "H8R", "H8L",
 					"H10L", "H10RA", "H10RB", "H10RC", "H10RD", "H10RE", "H12L", "H12RA", "H12RB", "H12RC", "H12RD", "H12RE"  ]
 
@@ -673,7 +734,7 @@ class MainFrame(wx.Frame):
 		
 		ctl = self.rbNassauControl.GetSelection()
 		self.cbNassauFleet.Enable(ctl != 0)
-		self.Request({"control": { "name": "nassau", "value": ctl}})
+		self.Request({"": { "name": "nassau", "value": ctl}})
 		self.nassauControl = ctl
 			
 		ctl = self.rbCliffControl.GetSelection()
@@ -1542,9 +1603,12 @@ class MainFrame(wx.Frame):
 		self.currentScreen = screen
 
 		for scr in self.widgetMap:
-			for w in self.widgetMap[scr]:
-				if scr == self.currentScreen:
-					w.Show()
+			for w, app in self.widgetMap[scr]:
+				if (app == 0 and self.IsDispatcher()) or (app == 1 and not self.IsDispatcher()):
+					if scr == self.currentScreen:
+						w.Show()
+					else:
+						w.Hide()
 				else:
 					w.Hide()
 
@@ -1780,9 +1844,13 @@ class MainFrame(wx.Frame):
 
 					stat = OCCUPIED if state == 1 else EMPTY
 					if blk is not None:
+						if state == 1:
+							logging.debug("=========== entering block %s %s" % (block, blockend))
+							blk.SetLastEntered(blockend)
+							
 						if blk.GetStatus(blockend) != stat:
 							district = blk.GetDistrict()
-							print("calling district do block action, %s %s %s" % (block, blockend, stat))
+							logging.debug("calling district do block action, %s %s %s" % (block, blockend, stat))
 							district.DoBlockAction(blk, blockend, stat)
 							if self.IsDispatcher():
 								self.CheckTrainsInBlock(block, None)
@@ -2089,7 +2157,10 @@ class MainFrame(wx.Frame):
 				for p in parms:
 					name = p["name"]
 					value = int(p["value"])
-					self.UpdateControlWidget(name, value)
+					if self.IsDispatcher():
+						self.UpdateControlWidget(name, value)
+					else:
+						self.UpdateControlDisplay(name, value)
 
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)

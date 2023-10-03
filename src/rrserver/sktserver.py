@@ -54,7 +54,7 @@ class SktServer (threading.Thread):
 			nbytes = len(m).to_bytes(2, "little")
 			skt.send(nbytes)
 			skt.send(m)
-		except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
+		except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError, OSError):
 			self.deleteSocket(addr)
 
 	def deleteSocket(self, addr):
