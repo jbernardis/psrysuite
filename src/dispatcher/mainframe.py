@@ -1333,7 +1333,6 @@ class MainFrame(wx.Frame):
 				blk = None
 
 			if blk:
-				self.PopupEvent("Block %s" % blk.GetName())
 				if blk.IsOccupied():
 					tr = blk.GetTrain()
 					if tr is None:
@@ -1417,10 +1416,9 @@ class MainFrame(wx.Frame):
 							self.activeTrains.UpdateTrain(oldName)
 							
 							self.Request({"settrain": { "block": blk.GetName()}})
-							print("settrain4")
+							logging.debug("settrain in block check all unoccupied: %s NONE NONE" % blk.GetName())
 							self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco}})
-							print("settrain5")
-
+							logging.debug("settrain in block check all unoccupied: %s %s %s" % (blk.GetName(), newName, newLoco))
 
 							if self.IsDispatcher():
 								self.CheckTrainsInBlock(blk.GetName(), None)
@@ -1440,14 +1438,12 @@ class MainFrame(wx.Frame):
 								tr.SetATC(atc)
 								self.activeTrains.UpdateTrain(trainid)
 								self.Request({"atc": {"action": "add" if atc else "remove", "train": trainid, "loco": locoid}})
-								logging.debug("XXX dispatcher mainframe after dialog sending ATC Add command train %s loco %s" % (trainid, str(locoid)))
 							
 						if self.IsDispatcher() and ar != oldAR:
 							if self.VerifyTrainID(trainid):
 								tr.SetAR(ar)
 								self.activeTrains.UpdateTrain(trainid)
 								self.Request({"ar": {"action": "add" if ar else "remove", "train": trainid}})
-								logging.debug("XXX dispatcher mainframe after dialog sending AR %s command train %s" % ("add" if ar else "remove", trainid))
 	
 						tr.Draw()
 
@@ -1470,14 +1466,12 @@ class MainFrame(wx.Frame):
 			self.menuTrain.SetATC(True)
 			self.activeTrains.UpdateTrain(trainid)
 			self.Request({"atc": {"action": "add", "train": trainid, "loco": locoid}})
-			logging.debug("XXX dispatcher mainframe OnATCAdd sending ATC Add command train %s loco %s" % (trainid, str(locoid)))
 			self.menuTrain.Draw()
 
 	def OnATCAddReq(self, evt):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
 		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
 			self.Request({"atcrequest": {"action": "add", "train": trainid, "loco": locoid}})
-			logging.debug("XXX dispatcher mainframe OnATCAddReq sending ATCrequest Add command train %s loco %s" % (trainid, str(locoid)))
 							
 	def OnATCRemove(self, evt):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
@@ -1485,20 +1479,17 @@ class MainFrame(wx.Frame):
 			self.menuTrain.SetATC(False)
 			self.activeTrains.UpdateTrain(trainid)
 			self.Request({"atc": {"action": "remove", "train": trainid, "loco": locoid}})
-			logging.debug("XXX dispatcher mainframe OnATCRemove sending ATC Remove command train %s loco %s" % (trainid, str(locoid)))
 			self.menuTrain.Draw()
 							
 	def OnATCRemReq(self, evt):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
 		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
 			self.Request({"atcrequest": {"action": "remove", "train": trainid, "loco": locoid}})
-			logging.debug("XXX dispatcher mainframe OnATCRemReq sending ATCrequest Remove command train %s loco %s" % (trainid, str(locoid)))
 		
 	def OnATCStop(self, evt):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
 		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
 			self.Request({"atc": {"action": "forcestop", "train": trainid, "loco": locoid}})
-			logging.debug("XXX dispatcher mainframe OnATCStop sending ATC forcestop command train %s loco %s" % (trainid, str(locoid)))
 		
 	def OnARAdd(self, evt):
 		trainid = self.menuTrain.GetName()
@@ -1506,14 +1497,12 @@ class MainFrame(wx.Frame):
 			self.menuTrain.SetAR(True)
 			self.activeTrains.UpdateTrain(trainid)
 			self.Request({"ar": {"action": "add", "train": trainid}})
-			logging.debug("XXX dispatcher mainframe OnARAdd sending AR Add command train %s" % trainid)
 			self.menuTrain.Draw()
 
 	def OnARAddReq(self, evt):
 		trainid = self.menuTrain.GetName()
 		if self.VerifyTrainID(trainid):
 			self.Request({"arrequest": {"action": "add", "train": trainid}})
-			logging.debug("XXX dispatcher mainframe OnARAddReq sending ARrequest Add command train %s" % (trainid))
 		
 	def OnARRemove(self, evt):
 		trainid = self.menuTrain.GetName()
@@ -1521,14 +1510,12 @@ class MainFrame(wx.Frame):
 			self.menuTrain.SetAR(False)
 			self.activeTrains.UpdateTrain(trainid)
 			self.Request({"ar": {"action": "remove", "train": trainid}})
-			logging.debug("XXX dispatcher mainframe OnARRemove sending AR Remove command train %s" % trainid)
 			self.menuTrain.Draw()
 							
 	def OnARRemReq(self, evt):
 		trainid = self.menuTrain.GetName()
 		if self.VerifyTrainID(trainid):
 			self.Request({"arrequest": {"action": "remove", "train": trainid}})
-			logging.debug("XXX dispatcher mainframe OnARRemReq sending ARrequest Remove command train %s" % (trainid))
 
 	def DrawTile(self, screen, pos, bmp):
 		offset = self.diagrams[screen].offset
@@ -1625,11 +1612,12 @@ class MainFrame(wx.Frame):
 			else:
 				offset = 0
 
-			for w in self.widgetMap[scr]:
-				pos = w.GetPosition()
-				pos[0] += offset
-				w.SetPosition(pos)
-				w.Show()
+			for w, app in self.widgetMap[scr]:
+				if (app == 0 and self.IsDispatcher()) or (app == 1 and not self.IsDispatcher()):
+					pos = w.GetPosition()
+					pos[0] += offset
+					w.SetPosition(pos)
+					w.Show()
 
 	def GetBlockStatus(self, blknm):
 		try:
@@ -1827,7 +1815,7 @@ class MainFrame(wx.Frame):
 				for p in parms:
 					block = p["name"]
 					state = p["state"]
-					print("block %s %s" % (block, state))
+					logging.debug("Inbound BLOCK: %s %s" % (block, state))
 
 					blk = None
 					try:
@@ -1845,12 +1833,10 @@ class MainFrame(wx.Frame):
 					stat = OCCUPIED if state == 1 else EMPTY
 					if blk is not None:
 						if state == 1:
-							logging.debug("=========== entering block %s %s" % (block, blockend))
 							blk.SetLastEntered(blockend)
 							
 						if blk.GetStatus(blockend) != stat:
 							district = blk.GetDistrict()
-							logging.debug("calling district do block action, %s %s %s" % (block, blockend, stat))
 							district.DoBlockAction(blk, blockend, stat)
 							if self.IsDispatcher():
 								self.CheckTrainsInBlock(block, None)
@@ -2078,14 +2064,12 @@ class MainFrame(wx.Frame):
 					if self.ATCEnabled and tr.IsOnATC():
 						locoid = tr.GetLoco()
 						self.Request({"atc": {"action": "remove", "train": train, "loco": locoid}})
-						logging.debug("XXX dispatcher mainframe traincomplete sending ATC Remove command train %s loco %s" % (train, str(locoid)))
 						tr.SetATC(False)
 						self.activeTrains.UpdateTrain(train)
 						
 					if self.AREnabled and tr.IsOnAR():				
 						tr.SetAR(False)
 						self.Request({"ar": {"action": "remove", "train": train}})
-						logging.debug("XXX dispatcher mainframe traincomplete sending AR Remove command train %s" % train)
 						self.activeTrains.UpdateTrain(train)
 						
 					tr.SetEngineer(None)
@@ -2197,7 +2181,6 @@ class MainFrame(wx.Frame):
 				tr.SetAR(action == "add")
 				self.activeTrains.UpdateTrain(trnm)
 				tr.Draw()
-				logging.debug("XXX dispatcher mainframe ar command updating train %s locally" % trnm)
 				
 			elif cmd == "arrequest":
 				trnm = parms["train"][0]
@@ -2216,7 +2199,6 @@ class MainFrame(wx.Frame):
 					
 					self.Request({"ar": {"action": action, "train": trnm}})
 					tr.Draw()
-					logging.debug("XXX dispatcher mainframe arrequest sending AR %s command for train %s" % (action, trnm))
 				
 				else:
 					self.PopupEvent("AR request for %s - not enabled" % trnm)
@@ -2234,7 +2216,6 @@ class MainFrame(wx.Frame):
 				tr.SetATC(action == "add")
 				self.activeTrains.UpdateTrain(trnm)
 				tr.Draw()
-				logging.debug("XXX dispatcher mainframe atc command updating train %s locally" % trnm)
 				
 			elif cmd == "atcrequest":
 				trnm = parms["train"][0]
@@ -2254,7 +2235,6 @@ class MainFrame(wx.Frame):
 					trainid, locoid = tr.GetNameAndLoco()
 					self.Request({"atc": {"action": action, "train": trainid, "loco": locoid}})
 					self.menuTrain.Draw()
-					logging.debug("XXX dispatcher mainframe atcrequest sending AYTC %s command for train %s" % (action, trnm))
 				
 				else:
 					self.PopupEvent("ATC request for %s - not enabled" % trnm)

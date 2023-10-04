@@ -36,7 +36,7 @@ class SktServer (threading.Thread):
 				m = msg.encode()
 			except:
 				m = msg
-		logging.debug("socket send to all: %s" % m)
+		#logging.debug("socket send to all: %s" % m)
 		with self.socketLock:
 			tl = [x for x in self.sockets]
 		for skt, addr in tl:

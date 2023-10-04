@@ -571,9 +571,7 @@ class ServerMain:
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"control": [p]}
 		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH")
-		logging.debug("forwarding control")
 		for addr, skt in addrList:
-			logging.info("sending control message: %s to %s" % (str(resp), str(addr)))
 			self.socketServer.sendToOne(skt, addr, resp)
 		
 	def DoQuit(self, _):
@@ -613,7 +611,6 @@ class ServerMain:
 				skt = data[0]
 				break
 		else:
-			logging.info("session %s not found" % sid)
 			return
 
 		try:
@@ -779,7 +776,6 @@ class ServerMain:
 		addrList = self.clientList.GetFunctionAddress("AR") + self.clientList.GetFunctionAddress("DISPLAY")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"ar": cmd})
-			logging.debug("XXX rrserver main, echoing AR command to all AR and DISPLAY: %s" % str(cmd))
 			
 						
 	def DoAdvisor(self, cmd):
@@ -797,22 +793,18 @@ class ServerMain:
 		addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atc": cmd})
-			logging.debug("XXX rrserver main, echoing ATC command to all ATC and DISPLAY/DISPATCH: %s" % str(cmd))
 				
 	def DoATCRequest(self, cmd):
 		addrList = self.clientList.GetFunctionAddress("DISPATCH")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atcrequest": cmd})
-			logging.debug("XXX rrserver main, echoing ATCRequest command to all DISPATCH: %s" % str(cmd))
 				
 	def DoARRequest(self, cmd):
 		addrList = self.clientList.GetFunctionAddress("DISPATCH")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"arrequest": cmd})
-			logging.debug("XXX rrserver main, echoing ARRequest command to all DISPATCH: %s" % str(cmd))
 					
 	def DoATCStatus(self, cmd):
-		logging.debug("XXX rrserver main, echoing ATCStatus command to all: %s" % str(cmd))
 		self.socketServer.sendToAll({"atcstatus": cmd})
 
 	def Shutdown(self):

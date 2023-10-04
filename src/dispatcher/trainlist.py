@@ -1,6 +1,5 @@
 import wx
 import logging
-from pickle import FALSE
 
 YardBlocks = [
 	"C21", "C31", "C40", "C41", "C42", "C43", "C44", "C50", "C51", "C52", "C53", "C54",

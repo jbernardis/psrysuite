@@ -107,7 +107,7 @@ class Bus:
 				
 			if len(b) == 0:
 				tries += 1
-				time.sleep(0.01) # was 0.0001
+				#time.sleep(0.01) # was 0.0001
 			else:
 				tries = 0
 				inbuf.extend([bytes([b[i]]) for i in range(len(b))])

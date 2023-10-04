@@ -150,6 +150,7 @@ class Train:
 
 		self.blocks[bn] = blk
 		self.blockOrder.append(bn)
+		logging.debug("Added block %s to train %s, new block list = %s" % (bn, self.name, str(self.blockOrder)))
 
 	def RemoveFromBlock(self, blk):
 		bn = blk.GetName()
@@ -159,6 +160,7 @@ class Train:
 		blk.SetTrain(None)
 		del self.blocks[bn]
 		self.blockOrder.remove(bn)
+		logging.debug("Removed block %s from train %s, new block list = %s" % (bn, self.name, str(self.blockOrder)))
 		return True
 		
 	def IsContiguous(self):
