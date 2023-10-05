@@ -889,6 +889,9 @@ class OverSwitch (Block):
 		return self.occupied or self.cleared
 
 	def SetOccupied(self, occupied=True, blockend=None, refresh=False):
+		if occupied == self.IsOccupied():
+			return # we're already in the desired state
+		
 		Block.SetOccupied(self, occupied, blockend, refresh)
 		
 		if self.route:
@@ -916,7 +919,7 @@ class OverSwitch (Block):
 				# turn the signal we just passed red, but hold onto the lock to be cleared when we exit the block
 				self.frame.Request({"signal": { "name": signm, "aspect": STOP}})
 				self.district.LockTurnoutsForSignal(self.GetName(), self.entrySignal, False)
-				self.entrySignal = None
+				#self.entrySignal = None
 		else:
 			if self.route and self.entrySignal is not None:
 				self.district.EvaluateDistrictLocks(self.entrySignal)

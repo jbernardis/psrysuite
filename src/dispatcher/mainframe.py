@@ -255,10 +255,6 @@ class MainFrame(wx.Frame):
 
 		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 30), size=(400, 40))
 	
-		self.cbOSSLocks = wx.CheckBox(self, -1, "OSS Locks", (int(totalw/2-100/2), 85))
-		self.Bind(wx.EVT_CHECKBOX, self.OnCBOSSLocks, self.cbOSSLocks)
-		self.cbOSSLocks.SetValue(self.OSSLocks)
-
 		self.timeDisplay = LEDNumberCtrl(self, wx.ID_ANY, pos=(self.centerOffset+480, 10), size=(150, 50))
 
 		if self.IsDispatcher():
@@ -274,6 +270,10 @@ class MainFrame(wx.Frame):
 			self.bResetClock = wx.Button(self, wx.ID_ANY, "Reset", pos=(self.centerOffset+565, 90), size=(60, 23))
 			self.Bind(wx.EVT_BUTTON, self.OnBResetClock, self.bResetClock)
 			self.bResetClock.Enable(False)
+			
+			self.cbOSSLocks = wx.CheckBox(self, -1, "OSS Locks", (int(totalw/2-100/2), 85))
+			self.Bind(wx.EVT_CHECKBOX, self.OnCBOSSLocks, self.cbOSSLocks)
+			self.cbOSSLocks.SetValue(self.OSSLocks)
 
 			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(self.centerOffset+670, 25))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
@@ -501,6 +501,9 @@ class MainFrame(wx.Frame):
 				self.stCliffControl.SetLabel("CLIFF: Dispatch Bank/Cliveden")
 			elif value == 2:
 				self.stCliffControl.SetLabel("CLIFF: Dispatch All")
+				
+		elif name == "osslocks":
+			self.districts.EvaluateDistrictLocks(ossLocks = value==1)
 
 	def DefineWidgets(self, voffset):
 		if not self.IsDispatcher():
@@ -856,6 +859,7 @@ class MainFrame(wx.Frame):
 	def SendOSSLocks(self):
 		self.OSSLocks = self.cbOSSLocks.IsChecked()		
 		self.Request({"control": {"name": "osslocks", "value": 1 if self.OSSLocks else 0}})
+		self.districts.EvaluateDistrictLocks(self.OSSLocks)
 
 	def OnCBAdvisor(self, evt):
 		self.AdvisorEnabled = self.cbAdvisor.IsChecked()

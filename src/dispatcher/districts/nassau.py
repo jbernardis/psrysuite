@@ -13,6 +13,8 @@ class Nassau (District):
 		District.__init__(self, name, frame, screen)
 		self.NWBlocks = ["NWOSCY", "NWOSTY", "NWOSW", "NWOSE"]
 		self.NEBlocks = ["NEOSRH", "NEOSW", "NEOSE"]
+		self.NWLocks = [False, False, False, False]
+		self.NELocks = [False, False, False]
 
 	def PerformSignalAction(self, sig, callon=False):
 		controlOpt = self.frame.rbNassauControl.GetSelection()
@@ -52,7 +54,31 @@ class Nassau (District):
 			return
 		#self.EvaluateDistrictLocks(sig)
 		
-	def EvaluateDistrictLocks(self, sig):
+	def EvaluateDistrictLocks(self, sig, ossLocks=None):
+		if sig is None:
+			'''
+			the osslocks setting has changed.  If it's false, all locks should be cleared,
+			if it true, all locks should be restored to the previously computed value
+			'''
+			if ossLocks is None:  # should never happen
+				return 
+			
+			if ossLocks:
+				for i in range(len(self.NWLocks)):
+					self.wlocks[i].TurnOn(flag=not self.NWLocks[i], refresh=True)
+				for i in range(len(self.NELocks)):
+					self.elocks[i].TurnOn(flag=not self.NELocks[i], refresh=True)
+			else:
+				for i in range(len(self.NWLocks)):
+					self.wlocks[i].TurnOn(flag=True, refresh=True)
+				for i in range(len(self.NELocks)):
+					self.elocks[i].TurnOn(flag=True, refresh=True)
+			return 
+
+		'''
+		otherwise, the OSS locks value has not changed - let's get its current value
+		'''		
+		ossLocks = self.frame.OSSLocks
 		rt, osblk = self.FindRoute(sig)
 		osblknm = osblk.GetName()
 
@@ -85,6 +111,9 @@ class Nassau (District):
 				
 			lv = [1 if x else 0 for x in lock]
 			self.frame.Request({"districtlock": { "name": "NWSL", "value": lv }})
+			self.NWLocks = [x for x in lock]
+			for i in range(len(self.NWLocks)):
+				self.wlocks[i].TurnOn(flag=not self.NWLocks[i], refresh=True)
 			
 		elif osblknm in self.NEBlocks:
 			lock = [False, False, False]
@@ -103,13 +132,16 @@ class Nassau (District):
 							bLock[1] = True
 						elif s.startswith("N24"):
 							bLock[2] = True
-				if bLock[0] and bLock[2]:
-					bLock[1] = True
-					
+					if bLock[0] and bLock[2]:
+						bLock[1] = True
+						
 				lock = [a or b for a, b in zip(lock, bLock)]
 
 			lv = [1 if x else 0 for x in lock]
 			self.frame.Request({"districtlock": { "name": "NESL", "value": lv }})
+			self.NELocks = [x for x in lock]
+			for i in range(len(self.NELocks)):
+				self.elocks[i].TurnOn(flag=not self.NELocks[i], refresh=True)
 
 	def CheckIfMainRoute(self, osblknm):
 		osblk = self.blocks[osblknm]
@@ -976,6 +1008,19 @@ class Nassau (District):
 				"NNXBtnB20": "NRtB20W20",
 			},
 		}
+		
+		# these aren't really buttons, but are used to indicate the status of the east and west interlockings
+		self.wlocks = []
+		self.wlocks.append(Button(self, self.screen, self.frame, "NWSL0", (11, 16), self.btntiles))
+		self.wlocks.append(Button(self, self.screen, self.frame, "NWSL1", (11, 18), self.btntiles))
+		self.wlocks.append(Button(self, self.screen, self.frame, "NWSL2", (11, 20), self.btntiles))
+		self.wlocks.append(Button(self, self.screen, self.frame, "NWSL3", (11, 22), self.btntiles))
+		self.elocks = []
+		self.elocks.append(Button(self, self.screen, self.frame, "NESL0", (41, 16), self.btntiles))
+		self.elocks.append(Button(self, self.screen, self.frame, "NESL1", (41, 18), self.btntiles))
+		self.elocks.append(Button(self, self.screen, self.frame, "NESL2", (41, 20), self.btntiles))
+		for b in self.wlocks + self.elocks:
+			b.TurnOn(flag=True, refresh=True)
 
 		return self.buttons
 	

@@ -19,16 +19,9 @@ sniffer interface - a new process that sends messages to rrserver who then forwa
 tracker:
 	reports - the only thing we really need is train cards - it stays in tracker because it works in conjunction with schedules
 
-I think server periodically crashes or has i/o errors that it can't recover from - why
-do we need a re-open logic in server to help to recover from serial issues
-reopen fixed the problem, and provided a cleaner way to recover - but perhaps it can be enhanced - to happen automatically, and to try to remember train and loco IDs
 
 why was a single car train being reported as non-contiguous??
 train contiguous - do not show message is ?? train - disabled for now until we can figure out what's going on
-
-verify signal lever functionality and signal indicators for cliff
-siding unlock levers from all tower panels - cliff
-still need to resolve inverted fleet and siding indications from cliff
 
 possibilities:
 	ar/atc/advisor - ??get rid of checkboxes and have always on???
@@ -64,3 +57,13 @@ West and East stopping sections for P31/P32 seem to be reversed, should I change
 When adding a new train, instead of defaulting to east bound, it should take on the direction of the block.  If the train then changes direction after being identified, the block should be changed.
 
 reverse the signal heads for port B
+
+clear button for event and advice displays
+
+over-ride button versus callon
+
+ability to suppress specific trains from active train display
+
+Do I have stop blocks backwards east of nassau in B and.or R blocks???
+
+sever train should allow specification of blocks to cut out of old train

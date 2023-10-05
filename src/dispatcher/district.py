@@ -347,7 +347,7 @@ class District:
 				return False
 	
 			if osblk.AreHandSwitchesSet():
-				self.frame.PopupEvent("Block is locked")
+				self.frame.PopupEvent("Block %s siding(s) unlocked" % osblk.GetName())
 				return False
 	
 			# this is a valid signal for the current route	
@@ -399,7 +399,7 @@ class District:
 		crossEW = self.CrossingEastWestBoundary(osblk, exitBlk)
 		if exitBlk.IsCleared():
 			if (sigE != exitBlk.GetEast() and not crossEW) or (sigE == exitBlk.GetEast() and crossEW):
-				self.frame.PopupEvent("Block is cleared in opposite direction")
+				self.frame.PopupEvent("Block %s is cleared in opposite direction" % exitBlk.GetName())
 				logging.debug("Unable to calculate aspect: Block %s cleared in opposite direction" % exitBlkNm)
 				return None
 
@@ -789,7 +789,7 @@ class District:
 				
 		self.EvaluateDistrictLocks(sig)
 		
-	def EvaluateDistrictLocks(self, sig):
+	def EvaluateDistrictLocks(self, sig, ossLocks=None):
 		pass
 
 	def DoSignalLeverAction(self, signame, state, callon):
@@ -959,6 +959,10 @@ class Districts:
 	def Draw(self):
 		for t in self.districts.values():
 			t.Draw()
+
+	def EvaluateDistrictLocks(self, ossLocks):
+		for t in self.districts.values():
+			t.EvaluateDistrictLocks(None, ossLocks=ossLocks)
 
 	def DefineBlocks(self):
 		blocks = {}
