@@ -254,7 +254,7 @@ class District:
 			if toList is None or self.anyTurnoutLocked(toList):
 				wButton.Invalidate(refresh=True)
 				eButton.Invalidate(refresh=True)
-				self.frame.PopupEvent("No available route")
+				self.frame.PopupEvent("No available route" if toList is None else "Route locked out")
 
 			else:
 				wButton.Acknowledge(refresh=True)

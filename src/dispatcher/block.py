@@ -919,10 +919,10 @@ class OverSwitch (Block):
 				# turn the signal we just passed red, but hold onto the lock to be cleared when we exit the block
 				self.frame.Request({"signal": { "name": signm, "aspect": STOP}})
 				self.district.LockTurnoutsForSignal(self.GetName(), self.entrySignal, False)
-				#self.entrySignal = None
 		else:
 			if self.route and self.entrySignal is not None:
 				self.district.EvaluateDistrictLocks(self.entrySignal)
+			self.entrySignal = None
 		
 	def GetTileInRoute(self, screen, pos):
 		if self.route is None:
