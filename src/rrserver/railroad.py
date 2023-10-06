@@ -836,7 +836,10 @@ class Railroad():
 			dobj.setBus(bus)
 
 	def GetCurrentValues(self):
-		for l in [self.signals, self.signalLevers, self.turnouts, self.blocks, self.stopRelays]:
+		'''
+		set turnouts/routes/blocks BEFORE signals
+		'''					
+		for l in [self.turnouts, self.blocks, self.signals, self.signalLevers, self.stopRelays]:
 			for s in l.values():
 				m = s.GetEventMessage()
 				if m is not None:

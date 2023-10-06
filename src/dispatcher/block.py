@@ -244,6 +244,12 @@ class Block:
 		
 		self.SetEast(self.defaultEast)
 		self.SetLastEntered(None)
+		
+	def ForceUnCleared(self):
+		if self.IsCleared():
+			self.cleared = False
+			self.determineStatus()
+			self.Draw()
 
 	def SetNextBlockEast(self, blk):
 		self.blkEast = blk

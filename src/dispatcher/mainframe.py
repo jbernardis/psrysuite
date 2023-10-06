@@ -8,7 +8,6 @@ import json
 import logging
 import time
 from subprocess import Popen
-from glob import glob
 
 from dispatcher.constants import BLOCK
 
@@ -41,6 +40,8 @@ from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg
+from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg
+
 
 MENU_ATC_REMOVE  = 900
 MENU_ATC_STOP    = 901
@@ -290,6 +291,9 @@ class MainFrame(wx.Frame):
 			self.bAdvice = wx.Button(self, wx.ID_ANY, "Advice Log", pos=(self.centerOffset+840, 65), size=BTNDIM)
 			self.Bind(wx.EVT_BUTTON, self.OnBAdviceLog, self.bAdvice)
 			
+			self.bSnapshot = wx.Button(self, wx.ID_ANY, "Snapshot", pos=(self.centerOffset+940, 25), size=BTNDIM)
+			self.Bind(wx.EVT_BUTTON, self.OnBSnapshot, self.bSnapshot)
+			
 		self.totalw = totalw
 		self.totalh = diagramh + 280 # 1080 if diagram is full 800 height
 		self.centerw = int(self.totalw/2)
@@ -347,10 +351,6 @@ class MainFrame(wx.Frame):
 			if self.shiftYOffset > 0:
 				self.shiftYOffset = 0
 			self.SetPosition((self.shiftXOffset, self.shiftYOffset))
-							
-		elif kcd == wx.WXK_SHIFT:
-			self.SetShift(True)
-			evt.Skip()
 			
 		elif kcd == wx.WXK_HOME:
 			self.ResetScreen()
@@ -358,9 +358,14 @@ class MainFrame(wx.Frame):
 			
 		elif kcd == wx.WXK_SHIFT:
 			self.SetShift(True)
+			for pnl in self.panels.values():
+				pnl.SetShift(True)
 			
 		elif kcd == wx.WXK_ESCAPE and self.shift:
 			self.CloseProgram()
+			self.SetShift(False)
+			for pnl in self.panels.values():
+				pnl.SetShift(False)
 				
 		else:
 			evt.Skip()
@@ -369,6 +374,8 @@ class MainFrame(wx.Frame):
 		kcd = evt.GetKeyCode()
 		if kcd == wx.WXK_SHIFT:
 			self.SetShift(False)
+			for pnl in self.panels.values():
+				pnl.SetShift(False)
 
 		evt.Skip()
 			
@@ -1404,28 +1411,43 @@ class MainFrame(wx.Frame):
 							trainid, locoid, atc, ar = dlg.GetResults()
 						dlg.Destroy()
 						
-						if rc == wx.ID_CUT:
+						if rc == wx.ID_CUT:							
+							blockList = tr.GetBlockList()
+							dlg = ChooseBlocksDlg(self, oldName, blockList)
+							rc = dlg.ShowModal()
+							if rc == wx.ID_OK:
+								blist = dlg.GetResults()
+							dlg.Destroy()
+							
+							if rc != wx.ID_OK:
+								return	
+							
+							if len(blist) == 0:
+								logging.info("No blocks chosen for sever operation - ignoring request")
+								return
+							
+							logging.info("Severing following blocks from train %s: %s" % (oldName, str(blist)))			
+
 							newTr = Train()
 							newName = newTr.GetName()
 							newLoco = newTr.GetLoco()
-
-							tr.RemoveFromBlock(blk)
-							newTr.AddToBlock(blk)
-							blk.SetTrain(newTr)
+							
+							blkx = blockList[blist[0]] # remember the first block on this list
+							for bn in blist:
+								blk = blockList[bn]							
+								tr.RemoveFromBlock(blk)
+								newTr.AddToBlock(blk)
+								blk.SetTrain(newTr)
+								self.Request({"settrain": { "block": blk.GetName()}})
+								self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco}})
+								if self.IsDispatcher():
+									self.CheckTrainsInBlock(blk.GetName(), None)
 							
 							self.trains[newName] = newTr
-							newTr.SetEast(blk.GetEast()) # train takes on the direction of the block
+							newTr.SetEast(blkx.GetEast()) # train takes on the direction of the block
 							
 							self.activeTrains.AddTrain(newTr)
 							self.activeTrains.UpdateTrain(oldName)
-							
-							self.Request({"settrain": { "block": blk.GetName()}})
-							logging.debug("settrain in block check all unoccupied: %s NONE NONE" % blk.GetName())
-							self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco}})
-							logging.debug("settrain in block check all unoccupied: %s %s %s" % (blk.GetName(), newName, newLoco))
-
-							if self.IsDispatcher():
-								self.CheckTrainsInBlock(blk.GetName(), None)
 							
 							tr.Draw()
 							newTr.Draw()
@@ -1671,6 +1693,20 @@ class MainFrame(wx.Frame):
 		if self.dlgEvents is None:
 			self.dlgEvents = ListDlg(self, "Events List", self.eventsList, self.DlgEventsExit)
 			self.dlgEvents.Show()
+
+	def OnBSnapshot(self, _):		
+		dlg = ChooseSnapshotActionDlg(self)	
+		rc = dlg.ShowModal()
+		dlg.Destroy()
+		if rc == wx.ID_SAVE:
+			trinfo = self.activeTrains.forSnapshot()
+			datafolder = os.path.join(os.getcwd(), "data")
+			fn = os.path.join(datafolder, "snapshot.json")
+			with open(fn, "w") as jfp:
+				json.dump(trinfo, jfp, indent=2)
+			self.PopupEvent("Snapshot Saved")
+		elif rc == wx.ID_OPEN:
+			self.PopupEvent("Snapshot Restored")
 			
 	def DlgEventsExit(self):
 		self.dlgEvents.Destroy()
@@ -1708,6 +1744,10 @@ class MainFrame(wx.Frame):
 				self.cbAutoRouter.Enable(False)
 				self.cbATC.Enable(False)
 				self.cbAdvisor.Enable(False)
+			else:
+				self.ClearAllLocks()
+				self.AllSignalsNeutral()
+				self.AllBlocksNotClear()
 			
 		else:
 			self.listener = Listener(self, self.settings.ipaddr, self.settings.socketport)
@@ -1764,6 +1804,11 @@ class MainFrame(wx.Frame):
 		self.Request({"reopen": {}})
 
 	def OnRefresh(self, _):
+		if not self.IsDispatcher():
+			self.ClearAllLocks()
+			self.AllSignalsNeutral()
+			self.AllBlocksNotClear()
+			
 		self.DoRefresh()
 		
 	def DoRefresh(self):
@@ -1771,6 +1816,21 @@ class MainFrame(wx.Frame):
 			self.Request({"clock": { "value": self.timeValue}})
 
 		self.Request({"refresh": {"SID": self.sessionid}})
+		
+	def ClearAllLocks(self):
+		for t in self.turnouts.values():
+			t.ClearLocks(forward=False)
+			
+		for s in self.signals.values():
+			s.ClearLocks(forward=False)
+	
+	def AllSignalsNeutral(self):
+		for s in self.signals.values():
+			s.ForceNeutral()
+			
+	def AllBlocksNotClear(self):
+		for b in self.blocks.values():
+			b.ForceUnCleared()
 
 	def raiseDeliveryEvent(self, data): # thread context
 		try:
@@ -2512,190 +2572,6 @@ class MainFrame(wx.Frame):
 			
 		self.Destroy()
 		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Display"))
-		
-
-class ChooseItemDlg(wx.Dialog):
-	def __init__(self, parent, trains, allowentry):
-		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
-		self.Bind(wx.EVT_CLOSE, self.OnCancel)
-		self.trains = trains
-		self.allowentry = allowentry
-		if trains:
-			if allowentry:
-				self.SetTitle("Choose/Enter train IDs file")
-			else:
-				self.SetTitle("Choose train IDs file")
-		else:
-			if allowentry:
-				self.SetTitle("Choose/Enter loco #s file")
-			else:
-				self.SetTitle("Choose loco #s file")
-		
-		self.allowentry = allowentry
-
-		vszr = wx.BoxSizer(wx.VERTICAL)
-		vszr.AddSpacer(20)
-		
-		if allowentry:
-			style = wx.CB_DROPDOWN
-		else:
-			style = wx.CB_DROPDOWN | wx.CB_READONLY	
-			
-		self.GetFiles()				
-		
-		cb = wx.ComboBox(self, 500, "", size=(160, -1), choices=self.files, style=style)
-		self.cbItems = cb
-		vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
-		if not allowentry and len(self.files) > 0:
-			self.cbItems.SetSelection(0)
-		else:
-			self.cbItems.SetSelection(wx.NOT_FOUND)
-		
-		vszr.AddSpacer(20)
-		
-		btnszr = wx.BoxSizer(wx.HORIZONTAL)
-		
-		bOK = wx.Button(self, wx.ID_ANY, "OK")
-		bOK.SetDefault()
-		self.Bind(wx.EVT_BUTTON, self.OnBOK, bOK)
-		
-		bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
-		self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
-		
-		bDelete = wx.Button(self, wx.ID_ANY, "Delete")
-		self.Bind(wx.EVT_BUTTON, self.OnDelete, bDelete)
-		
-		btnszr.Add(bOK)
-		btnszr.AddSpacer(20)
-		btnszr.Add(bCancel)
-		btnszr.AddSpacer(20)
-		btnszr.Add(bDelete)
-		
-		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
-		
-		vszr.AddSpacer(20)
-				
-		hszr = wx.BoxSizer(wx.HORIZONTAL)
-		hszr.AddSpacer(20)
-		hszr.Add(vszr)
-		
-		hszr.AddSpacer(20)
-		
-		self.SetSizer(hszr)
-		self.Layout()
-		self.Fit();
-		
-	def GetFiles(self):
-		if self.trains:
-			fxp = os.path.join(os.getcwd(), "data", "trains", "*.trn")
-		else:
-			fxp = os.path.join(os.getcwd(), "data", "locos", "*.loco")
-		self.files = [os.path.splitext(os.path.split(x)[1])[0] for x in glob(fxp)]
-		
-	def GetValue(self):
-		fn = self.cbItems.GetValue()
-		if fn is None or fn == "":
-			return None
-		
-		if self.trains:
-			return os.path.join(os.getcwd(), "data", "trains", fn+".trn")
-		else:
-			return os.path.join(os.getcwd(), "data", "locos", fn+".loco")
-		
-	def OnCancel(self, _):
-		self.EndModal(wx.ID_CANCEL)
-		
-	def OnBOK(self, _):
-		fn = self.cbItems.GetValue()
-		if fn in self.files and self.allowentry:
-			dlg = wx.MessageDialog(self, "File '%s' already exists.\n Are you sure you want to over-write it?" % fn,
-				"File exists", wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
-			rv = dlg.ShowModal()
-			dlg.Destroy()
-			if rv == wx.ID_NO:
-				return
-
-		self.EndModal(wx.ID_OK)
-		
-	def OnDelete(self, _):
-		dlg = ChooseItemsDlg(self, self.files, self.trains)
-		rc = dlg.ShowModal()
-		if rc == wx.ID_OK:
-			l = dlg.GetValue()
-			
-		dlg.Destroy()
-		if rc != wx.ID_OK:
-			return 
-
-		if len(l) == 0:
-			return 
-				
-		for fn in l:
-			if self.trains:
-				path = os.path.join(os.getcwd(), "data", "trains", fn+".trn")
-			else:
-				path = os.path.join(os.getcwd(), "data", "locos", fn+".loco")
-			os.unlink(path)
-			
-		self.GetFiles()
-		self.cbItems.SetItems(self.files)
-		if not self.allowentry and len(self.files) > 0:
-			self.cbItems.SetSelection(0)
-		else:
-			self.cbItems.SetSelection(wx.NOT_FOUND)
-
-class ChooseItemsDlg(wx.Dialog):
-	def __init__(self, parent, items, trains):
-		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
-		self.Bind(wx.EVT_CLOSE, self.OnCancel)
-		if trains:
-			self.SetTitle("Choose train file(s) to delete")
-		else:
-			self.SetTitle("Choose loco file(s) to delete")
-
-		vszr = wx.BoxSizer(wx.VERTICAL)
-		vszr.AddSpacer(20)
-		
-		cb = wx.CheckListBox(self, wx.ID_ANY, size=(160, -1), choices=items)
-		self.cbItems = cb
-		vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
-		
-		vszr.AddSpacer(20)
-		
-		btnszr = wx.BoxSizer(wx.HORIZONTAL)
-		
-		bOK = wx.Button(self, wx.ID_ANY, "OK")
-		self.Bind(wx.EVT_BUTTON, self.OnBOK, bOK)
-		
-		bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
-		self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
-		
-		btnszr.Add(bOK)
-		btnszr.AddSpacer(20)
-		btnszr.Add(bCancel)
-		
-		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
-		
-		vszr.AddSpacer(20)
-				
-		hszr = wx.BoxSizer(wx.HORIZONTAL)
-		hszr.AddSpacer(20)
-		hszr.Add(vszr)
-		
-		hszr.AddSpacer(20)
-		
-		self.SetSizer(hszr)
-		self.Layout()
-		self.Fit();
-		
-	def GetValue(self):
-		return self.cbItems.GetCheckedStrings()
-		
-	def OnCancel(self, _):
-		self.EndModal(wx.ID_CANCEL)
-		
-	def OnBOK(self, _):
-		self.EndModal(wx.ID_OK)
 
 class ExitDlg (wx.Dialog):
 	def __init__(self, parent):
@@ -2723,10 +2599,6 @@ class ExitDlg (wx.Dialog):
 		self.cbKillServer = wx.CheckBox(self, wx.ID_ANY, "Shutdown Server")
 		self.cbKillServer.SetValue(self.parent.settings.precheckshutdownserver)
 
-  # self.activesuppressyards = True
-  # self.activesuppressunknown = False
-  # self.activeonlyatc = False
-		
 		vsz.Add(self.cbKillServer, 0, wx.ALIGN_CENTER)
 
 		vsz.AddSpacer(20)

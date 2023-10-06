@@ -361,7 +361,7 @@ class ServerMain:
 			callon = int(cmd["callon"][0]) == 1
 		except:
 			callon = False
-			
+	
 		self.rr.SetAspect(signame, aspect, callon)
 
 	def DoSignalLock(self, cmd):			
@@ -834,7 +834,6 @@ class ServerMain:
 			time.sleep(0.005)
 			
 		logging.info("terminating server threads")
-		print("trying to terminate server threads", flush=True)
 		try:
 			self.dispServer.close()
 		except Exception as e:

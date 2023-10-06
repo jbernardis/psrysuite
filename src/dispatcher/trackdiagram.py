@@ -90,6 +90,9 @@ class TrackDiagram(wx.Panel):
 			self.frame.SetShift(False)
 
 		event.Skip()
+		
+	def SetShift(self, flag):
+		self.shift_down = flag		
 
 	def OnLeftUp(self, evt):
 		self.frame.ProcessClick(self.scr, (self.tx, self.ty), shift=self.shift_down, screenpos=evt.GetPosition())

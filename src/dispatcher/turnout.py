@@ -50,6 +50,13 @@ class Turnout:
 				self.frame.Request({"turnoutlock": { "name": self.name, "status": 0}})
 		if refresh:
 			self.Draw()
+			
+	def ClearLocks(self, forward=True):
+		self.lockedBy = []
+		if self.locked:
+			self.locked = False
+			if forward:
+				self.frame.Request({"turnoutlock": { "name": self.name, "status": 0}})
 
 	def GetType(self):
 		return self.ttype

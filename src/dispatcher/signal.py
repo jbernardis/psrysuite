@@ -96,11 +96,12 @@ class Signal:
 				self.locked = False
 				self.frame.Request({"signallock": { "name": self.name, "status": 0}})
 
-	def ClearLocks(self):
+	def ClearLocks(self, forward=True):
 		self.lockedBy = []
 		if self.locked:
 			self.locked = False
-			self.frame.Request({"signallock": { "name": self.name, "status": 0}})
+			if forward:
+				self.frame.Request({"signallock": { "name": self.name, "status": 0}})
 
 	def SetAspect(self, aspect, refresh = False, callon = False):
 		if self.aspect == aspect:
@@ -120,6 +121,10 @@ class Signal:
 			self.guardBlock.EvaluateStoppingSections()
 			
 		return True
+	
+	def ForceNeutral(self):
+		self.aspect = 0
+		self.Draw()
 
 	def SetFleetPending(self, flag, osblk, rtname, blk):
 		if not self.fleetEnabled:

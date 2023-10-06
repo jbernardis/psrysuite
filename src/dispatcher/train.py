@@ -45,6 +45,12 @@ class Train:
 	def dump(self):
 		print("Train %s: %s %s %s" % (self.name, self.loco, self.blockInfo(), self.signalInfo()))
 		
+	def forSnapshot(self):
+		return { "name": self.name, 
+			"loco": self.loco,
+			"east": self.east,
+			"blocks": self.blockOrder }
+		
 	def blockInfo(self):
 		bl = [bl for bl in self.blocks]
 		return "[" + ", ".join(bl) + "]"

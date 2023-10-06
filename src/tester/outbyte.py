@@ -53,7 +53,6 @@ class OutByte(wx.StaticBox):
         
     def EvtCB(self, evt, n):
         checked = evt.IsChecked()
-        n = 7 - n
         if checked:
             mask = 1 << n
             self.value |= mask
@@ -62,7 +61,7 @@ class OutByte(wx.StaticBox):
             self.value &= mask
             
         nv = ("{0:08b}".format(self.value))
-        self.stByteValue.SetLabel(nv)
+        self.stByteValue.SetLabel(nv[::-1])
         
         evt = OutputChangeEvent(index=self.byteNumber)
         wx.QueueEvent(self.parent, evt)

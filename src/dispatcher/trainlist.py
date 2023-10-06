@@ -6,7 +6,7 @@ YardBlocks = [
 	"H12", "H22", "H30", "H31", "H32", "H33", "H34", "H40", "H41", "H42", "H43",
 	"N32", "N42",
 	"P1", "P2", "P3", "P4", "P5", "P6", "P7",
-	"Y50", "Y51", "Y51", "Y53", "Y81", "Y82", "Y83", "Y84" ]
+	"Y50", "Y51", "Y52", "Y53", "Y81", "Y82", "Y83", "Y84" ]
 
 class ActiveTrainList:
 	def __init__(self):
@@ -62,6 +62,13 @@ class ActiveTrainList:
 		if self.dlgTrainList is not None:
 			self.dlgTrainList.Destroy()
 			self.dlgTrainList = None
+			
+	def forSnapshot(self):
+		result = {}
+		for trid, tr in self.trains.items():
+			result[trid] = tr.forSnapshot()
+		
+		return result
 			
 	def dump(self):
 		for tr in self.trains:
