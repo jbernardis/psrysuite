@@ -406,7 +406,7 @@ class Block:
 			self.cleared = False
 			self.frame.Request({"blockclear": { "block": self.GetName(), "clear": 0}})
 
-			if self.train is None:   # and self.frame.IsDispatcher():
+			if self.train is None and self.frame.IsDispatcher():
 				tr = self.IdentifyTrain()
 				if tr is None:
 					tr = self.frame.NewTrain()

@@ -2,7 +2,7 @@ import wx
 import os
 
 
-versiondate = "5-October-2023"
+versiondate = "6-October-2023"
 
 class MainFrame(wx.Frame):
 	def __init__(self):
@@ -31,7 +31,7 @@ class MainFrame(wx.Frame):
 		vsizer.Add(b, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		vsizer.AddSpacer(20)
 		
-		sta = wx.StaticText(self, wx.ID_ANY, "version:", size=(100, -1), style=wx.ALIGN_RIGHT)
+		sta = wx.StaticText(self, wx.ID_ANY, "version:", size=(200, -1), style=wx.ALIGN_RIGHT)
 		stb = wx.StaticText(self, wx.ID_ANY, versiondate, size=(400, -1))
 		sta.SetFont(textFont)
 		stb.SetFont(textFontBold)
@@ -42,7 +42,18 @@ class MainFrame(wx.Frame):
 		vsizer.Add(hsz)
 		vsizer.AddSpacer(20)
 		
-		sta = wx.StaticText(self, wx.ID_ANY, "github:", size=(100, -1), style=wx.ALIGN_RIGHT)
+		sta = wx.StaticText(self, wx.ID_ANY, "started development:", size=(200, -1), style=wx.ALIGN_RIGHT)
+		stb = wx.StaticText(self, wx.ID_ANY, "14-January-2023", size=(400, -1))
+		sta.SetFont(textFont)
+		stb.SetFont(textFontBold)
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(sta)
+		hsz.AddSpacer(10)
+		hsz.Add(stb)		
+		vsizer.Add(hsz)
+		vsizer.AddSpacer(20)
+		
+		sta = wx.StaticText(self, wx.ID_ANY, "github:", size=(200, -1), style=wx.ALIGN_RIGHT)
 		stb = wx.StaticText(self, wx.ID_ANY, "https://github.com/jbernardis/psrysuite", size=(400, -1))
 		sta.SetFont(textFont)
 		stb.SetFont(textFontBold)
@@ -53,7 +64,7 @@ class MainFrame(wx.Frame):
 		vsizer.Add(hsz)
 		vsizer.AddSpacer(20)
 		
-		sta = wx.StaticText(self, wx.ID_ANY, "written by:", size=(100, -1), style=wx.ALIGN_RIGHT)
+		sta = wx.StaticText(self, wx.ID_ANY, "written by:", size=(200, -1), style=wx.ALIGN_RIGHT)
 		stb = wx.StaticText(self, wx.ID_ANY, "Jeff Bernardis", size=(400, -1))
 		sta.SetFont(textFont)
 		stb.SetFont(textFontBold)
@@ -64,7 +75,7 @@ class MainFrame(wx.Frame):
 		vsizer.Add(hsz)
 		vsizer.AddSpacer(20)
 
-		sta = wx.StaticText(self, wx.ID_ANY, "based on:", size=(100, -1), style=wx.ALIGN_RIGHT)
+		sta = wx.StaticText(self, wx.ID_ANY, "based on:", size=(200, -1), style=wx.ALIGN_RIGHT)
 		stb = wx.StaticText(self, wx.ID_ANY, "Dispatcher 1 written by Geoff Green", size=(400, -1))
 		sta.SetFont(textFont)
 		stb.SetFont(textFontBold)

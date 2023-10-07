@@ -66,4 +66,4 @@ ability to suppress specific trains from active train display
 
 Do I have stop blocks backwards east of nassau in B and.or R blocks???
 
-sever train should allow specification of blocks to cut out of old train
+merge train

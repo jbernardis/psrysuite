@@ -1449,9 +1449,23 @@ class MainFrame(wx.Frame):
 							self.activeTrains.AddTrain(newTr)
 							self.activeTrains.UpdateTrain(oldName)
 							
-							tr.Draw()
+							if tr.IsInNoBlocks():
+								trid = tr.GetName()
+								try:
+									self.activeTrains.RemoveTrain(trid)
+									del(self.trains[trid])
+								except:
+									logging.warning("can't delete train %s from train list" % trid)
+							
+							else:
+								tr.Draw()
+								
 							newTr.Draw()
 							return 
+						
+						if rc == wx.ID_PASTE:
+							self.PopupEvent("Merge not yet implemented")
+							return
 						
 						if rc != wx.ID_OK:
 							return
@@ -1700,13 +1714,76 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 		if rc == wx.ID_SAVE:
 			trinfo = self.activeTrains.forSnapshot()
+			lenTrInfo = len(trinfo)
+			if lenTrInfo == 0:
+				self.PopupEvent("No trains to save")
+				return 
+			
 			datafolder = os.path.join(os.getcwd(), "data")
 			fn = os.path.join(datafolder, "snapshot.json")
 			with open(fn, "w") as jfp:
 				json.dump(trinfo, jfp, indent=2)
-			self.PopupEvent("Snapshot Saved")
+			self.PopupEvent("%d trains saved in Snapshot" % lenTrInfo)
+			
 		elif rc == wx.ID_OPEN:
-			self.PopupEvent("Snapshot Restored")
+			blks = [x for x in self.blocks.values() if x.IsOccupied()]
+
+			blkNames = [b.GetName() for b in blks]
+						
+			datafolder = os.path.join(os.getcwd(), "data")
+			fn = os.path.join(datafolder, "snapshot.json")
+			try:
+				with open(fn, "r") as jfp:
+					trjson = json.load(jfp)
+			except:
+				self.PopupEvent("Unable to open snapshot file")
+				
+			foundTrainBlocks = []
+			foundTrains = {}
+				
+			for trid, trinfo in trjson.items():
+				for b in trinfo["blocks"]:
+					if b in blkNames:
+						# first remove the block from the old train
+						blk = self.blocks[b]
+						otr = blk.GetTrain()
+						otr.RemoveFromBlock(blk)
+						
+						if otr.IsInNoBlocks():
+							otrid = otr.GetName()
+							try:
+								self.activeTrains.RemoveTrain(otrid)
+								del(self.trains[otrid])
+							except:
+								logging.warning("can't delete train %s from train list" % otrid)
+						else:
+							otr.Draw()
+						
+						# now if the new train does not yet exist - create it
+						if trid not in self.trains:
+							# we don't have a train of this name.  create one
+							ntr = Train(trid)
+							self.trains[trid] = ntr
+							self.activeTrains.AddTrain(ntr)
+						else:
+							ntr = self.trains[trid]
+							
+						# now add the block to the new train
+						ntr.AddToBlock(blk)
+						foundTrainBlocks.append(b)
+						foundTrains[trid] = 1
+						ntr.Draw()
+						self.Request({"settrain": { "block": blk.GetName()}})
+						self.Request({"settrain": { "block": blk.GetName(), "name": trid, "loco": trinfo["loco"]}})
+
+					else:
+						self.PopupEvent("Block %s/Train %s in snapshot - not occupied" % (b, trid))
+						
+			unknownBlocks = [b for b in blkNames if b not in foundTrainBlocks]
+			if len(unknownBlocks) > 0:
+				self.PopupEvent("Occupied Blocks not in snapshot: %s" % ", ".join(unknownBlocks))
+				
+			self.PopupEvent("%d trains restored from Snapshot" % len(foundTrains))
 			
 	def DlgEventsExit(self):
 		self.dlgEvents.Destroy()
@@ -2009,6 +2086,7 @@ class MainFrame(wx.Frame):
 							ind.SetValue(val, silent=True)
 
 			elif cmd == "settrain":
+				print("settrain %s" % str(parms))
 				for p in parms:
 					block = p["block"]
 					name = p["name"]

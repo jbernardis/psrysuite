@@ -155,6 +155,7 @@ class Train:
 			return
 
 		self.blocks[bn] = blk
+		blk.SetTrain(self)
 		self.blockOrder.append(bn)
 		logging.debug("Added block %s to train %s, new block list = %s" % (bn, self.name, str(self.blockOrder)))
 
