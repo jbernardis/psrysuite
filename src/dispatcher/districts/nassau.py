@@ -1104,7 +1104,7 @@ class Nassau (District):
 			self.blocks[blknm].SetSBSignals(siglist)
 
 			#"N60": (None,     "N18R"),
-		blockSigs = {
+		self.blockSigs = {
 			# # which signals govern blocks, west and east
 			"N12": ("N16L",   "N26RC"),
 			"N21": ("K2L",    "N14R"),
@@ -1121,7 +1121,7 @@ class Nassau (District):
 			"W20": ("N14LD",  "N24RD")
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
 
 		block = self.blocks["NWOSTY"]
@@ -1277,5 +1277,5 @@ class Nassau (District):
 		self.osSignals["NEOSW"] = [ "N26L", "N28R", "N26RA", "N26RB", "N26RC", "N24RA", "N24RB", "N24RC", "N24RD" ]
 		self.osSignals["NEOSE"] = [ "N24L", "N28R", "N26RA", "N26RB", "N26RC", "N24RA", "N24RB", "N24RC", "N24RD" ]
 
-		return self.signals
+		return self.signals, self.blockSigs
 

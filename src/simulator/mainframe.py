@@ -363,6 +363,10 @@ class MainFrame(wx.Frame):
 					block = p["block"]
 					name = p["name"]
 					loco = p["loco"]
+					try:
+						east = p["east"]
+					except KeyError:
+						east = True
 
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)

@@ -40,8 +40,9 @@ from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg
-from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg
+from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
 
+showAspectCalculation = True
 
 MENU_ATC_REMOVE  = 900
 MENU_ATC_STOP    = 901
@@ -1076,7 +1077,7 @@ class MainFrame(wx.Frame):
 
 		self.blocks, self.osBlocks = self.districts.DefineBlocks()
 		self.turnouts = self.districts.DefineTurnouts(self.blocks)
-		self.signals =  self.districts.DefineSignals()
+		self.signals, self.blocksignals =  self.districts.DefineSignals()
 		self.buttons =  self.districts.DefineButtons()
 		self.handswitches =  self.districts.DefineHandSwitches()
 		self.indicators = self.districts.DefineIndicators()
@@ -1429,6 +1430,8 @@ class MainFrame(wx.Frame):
 							logging.info("Severing following blocks from train %s: %s" % (oldName, str(blist)))			
 
 							newTr = Train()
+							east = tr.GetEast()
+							newTr.SetEast(east)
 							newName = newTr.GetName()
 							newLoco = newTr.GetLoco()
 							
@@ -1438,8 +1441,9 @@ class MainFrame(wx.Frame):
 								tr.RemoveFromBlock(blk)
 								newTr.AddToBlock(blk)
 								blk.SetTrain(newTr)
+								blk.SetEast(east)
 								self.Request({"settrain": { "block": blk.GetName()}})
-								self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco}})
+								self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco, "east": east}})
 								if self.IsDispatcher():
 									self.CheckTrainsInBlock(blk.GetName(), None)
 							
@@ -1464,6 +1468,19 @@ class MainFrame(wx.Frame):
 							return 
 						
 						if rc == wx.ID_PASTE:
+							trList = [t for t in self.trains.keys()]
+							dlg = ChooseTrainDlg(self, oldName, trList)
+							rc = dlg.ShowModal()
+							if rc == wx.ID_OK:
+								trid = dlg.GetResults()
+							dlg.Destroy()
+							if rc != wx.ID_OK:
+								return 
+							
+							if trid is None:
+								self.PopupEvent("No train chosen")
+							else:
+								self.PopupEvent("Chose train %s" % trid)
 							self.PopupEvent("Merge not yet implemented")
 							return
 						
@@ -1725,7 +1742,7 @@ class MainFrame(wx.Frame):
 				json.dump(trinfo, jfp, indent=2)
 			self.PopupEvent("%d trains saved in Snapshot" % lenTrInfo)
 			
-		elif rc == wx.ID_OPEN:
+		elif rc == wx.ID_OPEN: #restore from snapshot
 			blks = [x for x in self.blocks.values() if x.IsOccupied()]
 
 			blkNames = [b.GetName() for b in blks]
@@ -1772,9 +1789,11 @@ class MainFrame(wx.Frame):
 						ntr.AddToBlock(blk)
 						foundTrainBlocks.append(b)
 						foundTrains[trid] = 1
-						ntr.Draw()
+						ntr.SetEast(trinfo["east"])
+						blk.SetEast(trinfo("east"))
 						self.Request({"settrain": { "block": blk.GetName()}})
-						self.Request({"settrain": { "block": blk.GetName(), "name": trid, "loco": trinfo["loco"]}})
+						self.Request({"settrain": { "block": blk.GetName(), "name": trid, "loco": trinfo["loco"], "east": 1 if trinfo["east"] else 0}})
+						ntr.Draw()
 
 					else:
 						self.PopupEvent("Block %s/Train %s in snapshot - not occupied" % (b, trid))
@@ -2091,6 +2110,10 @@ class MainFrame(wx.Frame):
 					block = p["block"]
 					name = p["name"]
 					loco = p["loco"]
+					try:
+						east = p["east"]
+					except KeyError:
+						east = True
 
 					try:
 						blk = self.blocks[block]
@@ -2167,14 +2190,19 @@ class MainFrame(wx.Frame):
 						try:
 							# trying to find train in existing list
 							tr = self.trains[name]
+							e = tr.GetEast()
+							blk.SetEast(e) # block takes on direction of the train if known
 						except:
 							# not there - create a new one")
 							tr = Train(name)
 							self.trains[name] = tr
 							self.activeTrains.AddTrain(tr)
+							# new train takes on direction from the settrain command
+							tr.SetEast(east)
+							# and block is set to the same thing
+							blk.SetEast(east)
 							
 						tr.AddToBlock(blk)
-						tr.SetEast(blk.GetEast()) # train takes on the direction of the block
 						if not tr.IsContiguous():
 							self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
@@ -2650,6 +2678,16 @@ class MainFrame(wx.Frame):
 			
 		self.Destroy()
 		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Display"))
+		
+
+	def MessageDlg(self, msg):
+		if not showAspectCalculation:
+			return 
+		
+		dlg = wx.MessageDialog(self, msg, "", wx.OK | wx.ICON_NONE)
+		dlg.ShowModal()
+		dlg.Destroy()
+
 
 class ExitDlg (wx.Dialog):
 	def __init__(self, parent):

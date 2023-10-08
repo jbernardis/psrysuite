@@ -238,7 +238,7 @@ class Block:
 		pass
 
 	def Reset(self):
-		if self.IsOccupied():
+		if self.IsOccupied() or self.IsCleared():
 			# do not reset the block under a train
 			return 
 		
@@ -388,10 +388,17 @@ class Block:
 				tr = self.IdentifyTrain()
 				if tr is None:
 					tr = self.frame.NewTrain()
+					# new trains take on the direction of the block
+					east = self.GetEast()
+					tr.SetEast(east)
+				else:
+					# known trains push their direction onto the block
+					east = tr.GetEast()
+					self.SetEast(east)
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
-				self.frame.Request({"settrain": { "block": self.GetName(), "name": trn, "loco": loco}})
+				self.frame.Request({"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": east}})
 				logging.debug("settrain in block set occupied SB: %s %s %s" % (self.GetName(), trn, loco))
 			if refresh:
 				self.Draw()
@@ -410,11 +417,18 @@ class Block:
 				tr = self.IdentifyTrain()
 				if tr is None:
 					tr = self.frame.NewTrain()
+					# new trains take on the direction of the block
+					east = self.GetEast()
+					tr.SetEast(east)
+				else:
+					# known trains push their direction onto the block
+					east = tr.GetEast()
+					self.SetEast(east)
 
 				trn, loco = tr.GetNameAndLoco()
 
 				self.SetTrain(tr)
-				self.frame.Request({"settrain": { "block": self.GetName(), "name": trn, "loco": loco}})
+				self.frame.Request({"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": east}})
 				logging.debug("settrain in block set occupied MB: %s %s %s" % (self.GetName(), trn, loco))
 		else:
 			for b in [self.sbEast, self.sbWest]:

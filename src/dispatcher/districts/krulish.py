@@ -298,7 +298,7 @@ class Krulish (District):
 		self.signals["K8LA"].SetMutexSignals(["K8LB"])
 		self.signals["K8LB"].SetMutexSignals(["K8LA"])
 			
-		blockSigs = {
+		self.blockSigs = {
 			# # which signals govern stopping sections, west and east
 			"N10": ("N10W",  "K8R"),
 			"N11": ("K8LB",  "N16R"),
@@ -306,7 +306,7 @@ class Krulish (District):
 			"N25": ("S16L",  "K4R")
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 			self.blocks[blknm].SetSignals(siglist)
 		self.blocks["K10"].SetSignals(("K8LA", None))
@@ -355,4 +355,4 @@ class Krulish (District):
 		self.osSignals["KOSN10S11"] = [ "N10W", "S11E" ]
 		self.osSignals["KOSN20S21"] = [ "N20W", "S21E" ]
 
-		return self.signals
+		return self.signals, self.blockSigs

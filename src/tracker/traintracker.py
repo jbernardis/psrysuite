@@ -677,6 +677,10 @@ class TrainTrackerPanel(wx.Panel):
 						block = p["block"]
 					except:
 						block = None
+					try:
+						east = p["east"]
+					except:
+						east = None
 						
 					if train is None or "??" in train:
 						continue

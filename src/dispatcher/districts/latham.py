@@ -356,7 +356,7 @@ class Latham (District):
 		for blknm, siglist in blockSbSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 
-		blockSigs = {
+		self.blockSigs = {
 			# which signals govern blocks, west and east
 			"L10": ("Y2R",  "L8R"),
 			"L11": ("L8L",  "L18R"),
@@ -365,7 +365,7 @@ class Latham (District):
 			"L31": ("L4L",  "L14R")
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
 
 		self.routes = {}
@@ -435,7 +435,7 @@ class Latham (District):
 		self.osSignals["LOSCAM"] = [ "L16R", "L18L", "L14L" ]
 		self.osSignals["LOSCAE"] = [ "L14R", "L14L" ]
 
-		return self.signals
+		return self.signals, self.blockSigs
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

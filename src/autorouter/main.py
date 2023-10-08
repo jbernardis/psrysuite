@@ -182,6 +182,10 @@ class MainUnit:
 						block = p["block"]
 						name = p["name"]
 						loco = p["loco"]
+						try:
+							east = p["east"]
+						except KeyError:
+							east = True
 	
 						if name is None:
 							self.blocks[block].SetTrain(None, None)
@@ -190,6 +194,8 @@ class MainUnit:
 								self.trains[name] = Train(self, name, loco)
 	
 							self.trains[name].AddBlock(block)
+							self.trains[name].SetEast(east)
+							self.blocks[block].SetEast(east)
 	
 							self.blocks[block].SetTrain(name, loco)
 	

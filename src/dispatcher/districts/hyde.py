@@ -690,7 +690,7 @@ class Hyde (District):
 		for blknm, siglist in blockSbSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 
-		blockSigs = {
+		self.blockSigs = {
 			# which signals govern blocks, west and east
 			"H10": ("S12LC", "S20R"),
 			"H11": ("S20L",  "H6R"),
@@ -714,7 +714,7 @@ class Hyde (District):
 			"H43": ("H4LB",  "H10RB"),
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
 
 		self.routes = {}
@@ -806,7 +806,7 @@ class Hyde (District):
 					"HOSWE": ["H4LA", "H4LB", "H4LC", "H4LD", "H4R"],
 					"HOSEW": ["H12L", "H12RA", "H12RB", "H12RC", "H12RD", "H12RE"],
 					"HOSEE": ["H10L", "H10RA", "H10RB", "H10RC", "H10RD", "H10RE"]}
-		return self.signals
+		return self.signals, self.blockSigs
 
 	def DefineIndicators(self):
 		self.indicators = {}

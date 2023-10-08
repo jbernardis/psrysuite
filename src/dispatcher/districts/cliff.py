@@ -797,7 +797,7 @@ class Cliff (District):
 		for s in sigs:
 			self.signals[s].SetMutexSignals([x for x in sigs if x != s])
 
-		blockSigs = {
+		self.blockSigs = {
 			# # which signals govern blocks, west and east
 			"C10": ("C4RC",  "C2LB"),
 			"C20": ("C2R",   "C6L"),
@@ -819,7 +819,7 @@ class Cliff (District):
 			"G21": ("C4RD",  None),
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
 
 		self.routes = {}
@@ -921,7 +921,7 @@ class Cliff (District):
 
 		self.osSignals["COSSHW"] = [ "C8L", "C8RA", "C8RB", "C8RC", "C8RD", "C8RE", "C8RF", "C8RG", "C8RH", "C8RJ", "C8RK", "C8RL" ]
 
-		return self.signals
+		return self.signals, self.blockSigs
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

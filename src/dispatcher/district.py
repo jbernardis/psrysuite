@@ -369,6 +369,11 @@ class District:
 			sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 			
 		return True
+	
+	def FindBlockForSignal(self, sigName):
+		for blkName, sigList in self.frame.blocksignals.items():
+			if sigName in sigList:
+				return blkName
 
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
 		logging.debug("Calculating aspect for signal %s route %s" % (sig.GetName(), rt.GetName()))
@@ -378,17 +383,26 @@ class District:
 				self.frame.PopupEvent("Block %s is busy" % osblk.GetName())
 			logging.debug("Unable to calculate aspect: OS Block is busy")
 			return None
+		
 
-		sigE = sig.GetEast()
-		if sigE != osblk.GetEast():
-			# the block will need to be reversed, but it's premature
-			# to do so now - so force return values as if reversed
-			doReverseOS = True
-		else:
-			doReverseOS = False
+		msg = []
+		sigName = sig.GetName()
+		startBlockName = self.FindBlockForSignal(sigName)
+		startBlock = self.frame.blocks[startBlockName]
+		msg.append("starting block: %s" % startBlockName)
+		msg.append("OS: %s Rte: %s  Sig: %s  SigE: %s" % (osblk.GetName(), rt.GetName(), sig.GetName(), sig.GetEast()))
+		currentDirection = sig.GetEast()
+		
+		msg.append("current movement is %s" % currentDirection)
+		msg.append("check %s/%s" % (osblk.GetName(), startBlockName))
+		if self.CrossingEastWestBoundary(osblk, startBlock):
+			currentDirection = not currentDirection
+			msg.append("Crossing EW boundary between %s and %s - direction now %s" % (osblk.GetName(), startBlockName, currentDirection))
+		
 			
-		exitBlkNm = rt.GetExitBlock(reverse=doReverseOS)
-		rType = rt.GetRouteType(reverse=doReverseOS)
+		exitBlkNm = rt.GetExitBlock(reverse = currentDirection!=osblk.GetEast())
+		rType = rt.GetRouteType(reverse = currentDirection!=osblk.GetEast())
+		msg.append("exit block name = %s  Route Type = %s" % (exitBlkNm, routetype(rType)))
 
 		exitBlk = self.frame.blocks[exitBlkNm]
 		if exitBlk.IsOccupied():
@@ -396,9 +410,13 @@ class District:
 			logging.debug("Unable to calculate aspect: Block %s is busy" % exitBlkNm)
 			return None
 
-		crossEW = self.CrossingEastWestBoundary(osblk, exitBlk)
+		msg.append("check %s/%s" % (osblk.GetName(), exitBlkNm))
+		if self.CrossingEastWestBoundary(osblk, exitBlk):
+			currentDirection = not currentDirection
+			msg.append("Crossing EW boundary between %s and %s - direction now %s" % (osblk.GetName(), exitBlkNm, currentDirection))
+			
 		if exitBlk.IsCleared():
-			if (sigE != exitBlk.GetEast() and not crossEW) or (sigE == exitBlk.GetEast() and crossEW):
+			if exitBlk.GetEast() != currentDirection:
 				self.frame.PopupEvent("Block %s is cleared in opposite direction" % exitBlk.GetName())
 				logging.debug("Unable to calculate aspect: Block %s cleared in opposite direction" % exitBlkNm)
 				return None
@@ -408,44 +426,63 @@ class District:
 			logging.debug("Unable to calculate aspect: Block %s is locked" % exitBlkNm)
 			return None
 
-		if exitBlk.GetEast() != osblk.GetEast():
-			doReverseExit = True
-		else:
-			doReverseExit = False
-		nb = exitBlk.NextBlock(reverse=doReverseExit)
+		nxe, nxw = exitBlk.GetAdjacentBlocks()
+		msg.append("Next East = %s, west = %s" % ("None" if nxe is None else nxe.GetName(), "None" if nxw is None else nxw.GetName()))
+
+		
+		nb = exitBlk.NextBlock(reverse = currentDirection!=exitBlk.GetEast())
 		if nb:
+			nbName = nb.GetName()
+			msg.append("check %s/%s" % (nbName, exitBlkNm))
+			if self.CrossingEastWestBoundary(nb, exitBlk):
+				currentDirection = not currentDirection
+				msg.append("Crossing EW boundary between %s and %s - direction now %s" % (nbName, exitBlkNm, currentDirection))
+			
 			nbStatus = nb.GetStatus()
 			nbRType = nb.GetRouteType()
 			# try to go one more block, skipping past an OS block
 
-			if sigE != nb.GetEast():
-				# the block will need to be reversed, but it's premature
-				# to do so now - so force return values as if reversed
-				doReverseNext = True
-			else:
-				doReverseNext = False
-
-			nxbNm = nb.GetExitBlock(reverse=doReverseNext)
+			nxbNm = nb.GetExitBlock(reverse = currentDirection!=nb.GetEast())
 			if nxbNm is None:
 				nnb = None
 			else:
-				nxb = self.frame.blocks[nxbNm]
+				msg.append("nxbnm = %s" % nxbNm)
+				try:
+					nxb = self.frame.blocks[nxbNm]
+				except:
+					nxb = None
 				if nxb:
-					nnb = nxb.NextBlock(reverse=doReverseNext)
+					msg.append("check %s/%s" % (nbName, nxbNm))
+					if self.CrossingEastWestBoundary(nb, nxb):
+						currentDirection = not currentDirection
+						msg.append("Crossing EW boundary between %s and %s - direction now %s" % (nbName, nxbNm, currentDirection))
+					nnb = nxb.NextBlock(reverse = currentDirection!=nxb.GetEast())
 				else:
 					nnb = None
 
 			if nnb:
 				nnbClear = nnb.GetStatus() == CLEARED
+				nnbName = nnb.GetName()
 			else:
 				nnbClear = False
+				nnbName = None
 		else:
 			nbStatus = None
+			nbName = None
 			nbRType = None
 			nnbClear = False
+			nnbName = None
 
 		aType = sig.GetAspectType()
 		aspect = self.GetAspect(aType, rType, nbStatus, nbRType, nnbClear)
+		
+		
+		msg.append("RT: %s" % routetype(rType))
+		msg.append("NB: %s Stat: %s  NRT: %s" % (nbName, statusname(nbStatus), routetype(nbRType)))
+		msg.append("NNB: %s  NNBC: %s" % (nnbName, nnbClear))
+		msg.append("Aspect = %s (%x)" % (aspectname(aspect, aType), aspect))
+		
+		self.frame.MessageDlg("\n".join(msg))
 		
 		logging.debug("Calculated aspect = %s   aspect type = %s route type = %s next block status = %s next block route type = %s next next block clear = %s" %
 					(aspectname(aspect, aType), aspecttype(aType), routetype(rType), statusname(nbStatus), routetype(nbRType), nnbClear))
@@ -983,10 +1020,13 @@ class Districts:
 
 	def DefineSignals(self):
 		sigs = {}
+		blocksigs = {}
 		for t in self.districts.values():
-			sigs.update(t.DefineSignals())
+			sl, bsl = t.DefineSignals()
+			sigs.update(sl)
+			blocksigs.update(bsl)
 
-		return sigs
+		return sigs, blocksigs
 
 	def DefineButtons(self):
 		btns = {}

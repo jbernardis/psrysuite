@@ -753,7 +753,7 @@ class Yard (District):
 		for blknm, siglist in blockSbSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 
-		blockSigs = {
+		self.blockSigs = {
 			# which signals govern blocks, west and east
 			"Y10": ("Y22R", "Y8LA"),
 			"Y11": ("Y8R",  "Y2L"),
@@ -773,7 +773,7 @@ class Yard (District):
 			"Y87": ("Y42R", "Y8LB"),
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
 
 		self.routes = {}
@@ -916,8 +916,8 @@ class Yard (District):
 		self.osSignals["YOSWYW"] = [ "Y40L", "Y40RA", "Y40RB", "Y40RC", "Y40RD" ]
 		self.osSignals["YOSWYE"] = [ "Y42R", "Y42LA", "Y42LB", "Y42LC", "Y42LD" ]
 
-		return self.signals
-
+		return self.signals, self.blockSigs
+	
 	def DefineButtons(self):
 		self.buttons = {}
 		self.osButtons = {}

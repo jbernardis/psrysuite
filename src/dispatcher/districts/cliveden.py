@@ -233,7 +233,7 @@ class Cliveden (District):
 		for blknm, siglist in blockSbSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 
-		blockSigs = {
+		self.blockSigs = {
 			# # which signals govern blocks, west and east
 			"C11": ("C12R",  "C4L"),
 			"C12": ("C14RA", "C12L"),
@@ -242,7 +242,7 @@ class Cliveden (District):
 			"C23": ("C14RB", "C10L"),
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
 
 		self.routes = {}
@@ -274,7 +274,7 @@ class Cliveden (District):
 		self.osSignals["COSCLEW"] = [ "C10L", "C10R", "C12R" ]
 		self.osSignals["COSCLEE"] = [ "C12L", "C12R", "C10L" ]
 
-		return self.signals
+		return self.signals, self.blockSigs
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

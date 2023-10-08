@@ -261,7 +261,7 @@ class Dell (District):
 		for blknm, siglist in blockSbSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 
-		blockSigs = {
+		self.blockSigs = {
 			# which signals govern blocks, west and east
 			"D10": ("L18L", "D6RB"),
 			"D11": ("D6L",  "D12R"),
@@ -269,7 +269,7 @@ class Dell (District):
 			"D21": ("D4L",  "D10R")
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
 
 		self.routes = {}
@@ -320,7 +320,7 @@ class Dell (District):
 		self.osSignals["DOSFOE"] = [ "D10R", "D10L", "D12L" ]
 		self.osSignals["DOSFOW"] = [ "D10R", "D12R", "D12L" ]
 
-		return self.signals
+		return self.signals, self.blockSigs
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

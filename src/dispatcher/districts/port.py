@@ -417,32 +417,32 @@ class Port (District):
 
 		self.blocks["P32"] = Block(self, self.frame, "P32",
 			[
-				(self.tiles["diagleft"],      self.screen, (146, 31), True),
-				(self.tiles["diagleft"],      self.screen, (147, 30), True),
-				(self.tiles["turnrightdown"], self.screen, (148, 29), True),
-				(self.tiles["verticalnc"],    self.screen, (148, 28), True),
-				(self.tiles["vertical"],      self.screen, (148, 27), True),
-				(self.tiles["verticalnc"],    self.screen, (148, 26), True),
+				(self.tiles["diagleft"],      self.screen, (146, 31), False),
+				(self.tiles["diagleft"],      self.screen, (147, 30), False),
+				(self.tiles["turnrightdown"], self.screen, (148, 29), False),
+				(self.tiles["verticalnc"],    self.screen, (148, 28), False),
+				(self.tiles["vertical"],      self.screen, (148, 27), False),
+				(self.tiles["verticalnc"],    self.screen, (148, 26), False),
 
 				(self.tiles["horiznc"],        LaKr,        (113, 21), False),
 				(self.tiles["turnrightright"], LaKr,        (114, 21), False),
 				(self.tiles["turnleftup"],     LaKr,        (115, 22), False),
 				(self.tiles["verticalnc"],     LaKr,        (115, 23), False),
-				(self.tiles["vertical"],       LaKr,        (115, 24), True),
+				(self.tiles["vertical"],       LaKr,        (115, 24), False),
 				(self.tiles["verticalnc"],     LaKr,        (115, 25), False),
-				(self.tiles["vertical"],       LaKr,        (115, 26), True),
+				(self.tiles["vertical"],       LaKr,        (115, 26), False),
 			], False)
 		self.blocks["P32"].AddTrainLoc(self.screen, (147, 29))
 		self.blocks["P32"].AddTrainLoc(LaKr, (113, 21))
 		self.blocks["P32"].AddStoppingBlock([
-				(self.tiles["eobleft"],  self.screen, (143, 33), True),
-				(self.tiles["turnleftright"], self.screen, (144, 33), True),
-				(self.tiles["diagleft"], self.screen, (145, 32), True),
+				(self.tiles["eobleft"],  self.screen, (143, 33), False),
+				(self.tiles["turnleftright"], self.screen, (144, 33), False),
+				(self.tiles["diagleft"], self.screen, (145, 32), False),
 			], False)
 		self.blocks["P32"].AddStoppingBlock([
-				(self.tiles["eobleft"],  LaKr,        (110, 21), True),
+				(self.tiles["eobleft"],  LaKr,        (110, 21), False),
 				(self.tiles["horiznc"],  LaKr,        (111, 21), False),
-				(self.tiles["horiz"],    LaKr,        (112, 21), False),
+				(self.tiles["horiz"],    LaKr,        (112, 21), True),
 			], True)
 
 		self.blocks["P40"] = Block(self, self.frame, "P40",
@@ -599,7 +599,7 @@ class Port (District):
 				(self.tiles["horiznc"],  self.screen, (141, 35), False),
 				(self.tiles["eobright"], self.screen, (142, 35), False),
 				(self.tiles["diagleft"], self.screen, (140, 34), False),
-				(self.tiles["eobright"], self.screen, (142, 35), False),
+				(self.tiles["eobright"], self.screen, (142, 33), False),
 			], False)
 
 		self.blocks["POSSJ1"] = OverSwitch(self, self.frame, "POSSJ1",
@@ -1045,7 +1045,7 @@ class Port (District):
 		for blknm, siglist in blockSbSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 
-		blockSigs = {
+		self.blockSigs = {
 			# which signals govern blocks, west and east
 			"P1": (None,      "PA4RB"),
 			"P2": (None,      "PA4RA"),
@@ -1076,7 +1076,7 @@ class Port (District):
 			"V11": (None,    "PA34RA")
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
 
 		self.routes = {}
@@ -1326,7 +1326,7 @@ class Port (District):
 		self.osSignals["POSSP4"] = [ "PA6R", "PA4RA", "PA4RB", "PA6LA", "PA6LB", "PA6LC" ]
 		self.osSignals["POSSP5"] = [ "PA6R", "PA4RA", "PA4RB", "PA4L" ]
 
-		return self.signals
+		return self.signals, self.blockSigs
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

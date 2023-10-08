@@ -193,14 +193,14 @@ class Bank (District):
 		for blknm, siglist in blockSbSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 			
-		blockSigs = {
+		self.blockSigs = {
 			# # which signals govern blocks, west and east - not needed for OS and stopping blocks
 			"B11": ("C22R",  "C18LA"),
 			"B20": ("N24L",  "C24L"),
 			"B21": ("C24R",  "C18LB"),
 		}
 
-		for blknm, siglist in blockSigs.items():
+		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
 
 		self.routes = {}
@@ -232,7 +232,7 @@ class Bank (District):
 		self.osSignals["BOSWE"] = [ "C24L", "C24R" ]
 		self.osSignals["BOSE"] = [ "C18LB", "C18LA", "C18R" ]
 
-		return self.signals
+		return self.signals, self.blockSigs
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

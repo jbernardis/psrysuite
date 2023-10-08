@@ -541,6 +541,15 @@ class Shore (District):
 			"S21": ("S4LB", "S21E"),
 		}
 
+		self.blockSigs = {
+			"S10": ("D12L", "S12R"),
+			"S20": ("D10L", "S4R"),
+			"S11": ("S12LA", "S11E"),
+			"F10": (None, "S8R"),
+			"F11": ("S8L", None),
+			"S21": ("S4LB", "S21E"),
+		}
+
 		for blknm, siglist in blockSbSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 			self.blocks[blknm].SetSignals(siglist)
@@ -644,7 +653,7 @@ class Shore (District):
 
 		self.blocks["SOSHF"].SetRoute(self.routes["SRtF10F11"])
 
-		return self.signals
+		return self.signals, self.blockSigs
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

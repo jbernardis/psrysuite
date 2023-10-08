@@ -230,6 +230,66 @@ class ChooseBlocksDlg(wx.Dialog):
     def OnBOK(self, _):
         self.EndModal(wx.ID_OK)
         
+
+class ChooseTrainDlg(wx.Dialog):
+    def __init__(self, parent, tid, trainlist):
+        wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
+        self.Bind(wx.EVT_CLOSE, self.OnCancel)
+        self.SetTitle("Choose train")
+
+        vszr = wx.BoxSizer(wx.VERTICAL)
+        vszr.AddSpacer(20)
+        
+        st = wx.StaticText(self, wx.ID_ANY, "Choose train to merge with %s" % tid)
+        vszr.Add(st, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        vszr.AddSpacer(10)
+
+        choiceList = [t for t in trainlist if t != tid]        
+        cb = wx.ListBox(self, wx.ID_ANY, size=(160, -1), choices=choiceList, style=wx.LB_SINGLE)
+        self.cbItems = cb
+        vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        
+        vszr.AddSpacer(20)
+        
+        btnszr = wx.BoxSizer(wx.HORIZONTAL)
+        
+        bOK = wx.Button(self, wx.ID_ANY, "OK")
+        self.Bind(wx.EVT_BUTTON, self.OnBOK, bOK)
+        
+        bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
+        
+        btnszr.Add(bOK)
+        btnszr.AddSpacer(20)
+        btnszr.Add(bCancel)
+        
+        vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        
+        vszr.AddSpacer(20)
+                
+        hszr = wx.BoxSizer(wx.HORIZONTAL)
+        hszr.AddSpacer(20)
+        hszr.Add(vszr)
+        
+        hszr.AddSpacer(20)
+        
+        self.SetSizer(hszr)
+        self.Layout()
+        self.Fit();
+        
+    def GetResults(self):
+        idx = self.cbItems.GetSelection()
+        if idx == wx.NOT_FOUND:
+            return None
+        
+        return self.cbItems.GetString(idx)
+        
+    def OnCancel(self, _):
+        self.EndModal(wx.ID_CANCEL)
+        
+    def OnBOK(self, _):
+        self.EndModal(wx.ID_OK)
+        
 BTNDIM = (80, 40)
    
 class ChooseSnapshotActionDlg(wx.Dialog):
