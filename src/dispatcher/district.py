@@ -369,11 +369,6 @@ class District:
 			sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 			
 		return True
-	
-	def FindBlockForSignal(self, sigName):
-		for blkName, sigList in self.frame.blocksignals.items():
-			if sigName in sigList:
-				return blkName
 
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
 		logging.debug("Calculating aspect for signal %s route %s" % (sig.GetName(), rt.GetName()))
@@ -384,22 +379,11 @@ class District:
 			logging.debug("Unable to calculate aspect: OS Block is busy")
 			return None
 		
-
 		msg = []
-		sigName = sig.GetName()
-		startBlockName = self.FindBlockForSignal(sigName)
-		startBlock = self.frame.blocks[startBlockName]
-		msg.append("starting block: %s" % startBlockName)
 		msg.append("OS: %s Rte: %s  Sig: %s  SigE: %s" % (osblk.GetName(), rt.GetName(), sig.GetName(), sig.GetEast()))
 		currentDirection = sig.GetEast()
 		
 		msg.append("current movement is %s" % currentDirection)
-		msg.append("check %s/%s" % (osblk.GetName(), startBlockName))
-		if self.CrossingEastWestBoundary(osblk, startBlock):
-			currentDirection = not currentDirection
-			msg.append("Crossing EW boundary between %s and %s - direction now %s" % (osblk.GetName(), startBlockName, currentDirection))
-		
-			
 		exitBlkNm = rt.GetExitBlock(reverse = currentDirection!=osblk.GetEast())
 		rType = rt.GetRouteType(reverse = currentDirection!=osblk.GetEast())
 		msg.append("exit block name = %s  Route Type = %s" % (exitBlkNm, routetype(rType)))

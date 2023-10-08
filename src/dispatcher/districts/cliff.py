@@ -800,7 +800,7 @@ class Cliff (District):
 		self.blockSigs = {
 			# # which signals govern blocks, west and east
 			"C10": ("C4RC",  "C2LB"),
-			"C20": ("C2R",   "C6L"),
+			"C20": ("C2R",   "C6R"),
 			"C21": ("C8RA",  "C6LA"),
 			"C30": ("C4RB",  "C2LA"),
 			"C31": ("C4RA",  None),
