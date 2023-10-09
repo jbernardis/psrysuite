@@ -787,8 +787,10 @@ class District:
 		if aspect != 0:
 			if self.CrossingEastWestBoundary(osblock, exitBlk):
 				nd = not sig.GetEast()
+				od = not nd
 			else:
 				nd = sig.GetEast()
+				od = nd
 				
 			exitBlk.SetEast(nd)
 			'''
@@ -796,7 +798,7 @@ class District:
 			For all other cases, this is redundant.
 			'''
 			if entryBlk is not None:
-				entryBlk.SetEast(nd)
+				entryBlk.SetEast(od)
 
 		exitBlk.SetCleared(aspect != STOP, refresh=True)
 

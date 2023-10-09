@@ -1,11 +1,12 @@
 import wx
 
 class ListDlg(wx.Dialog):
-    def __init__(self, parent, title, dataList, dlgexit):
+    def __init__(self, parent, title, dataList, dlgexit, dataclear):
         wx.Dialog.__init__(self, parent, style=wx.DEFAULT_FRAME_STYLE)
         
         self.parent = parent
         self.dlgexit = dlgexit
+        self.dataclear = dataclear
         
         self.SetTitle(title)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
@@ -22,8 +23,15 @@ class ListDlg(wx.Dialog):
         tcList.ShowPosition(len(data))
         vsz.Add(tcList)
         vsz.AddSpacer(10)
+        self.tcList = tcList
         
         bsz = wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.bClear = wx.Button(self, wx.ID_ANY, "Clear")
+        self.Bind(wx.EVT_BUTTON, self.OnBClear, self.bClear)
+        bsz.Add(self.bClear)
+        
+        bsz.AddSpacer(50)
         
         self.bExit = wx.Button(self, wx.ID_ANY, "Close")
         self.Bind(wx.EVT_BUTTON, self.OnBExit, self.bExit)
@@ -43,6 +51,13 @@ class ListDlg(wx.Dialog):
         
         self.Fit()
         self.Layout()
+        
+    def AddItem(self, msg):
+        self.tcList.AppendText("\n"+msg)
+        
+    def OnBClear(self, _):
+        self.tcList.Clear()
+        self.dataclear()
 
     def OnClose(self, _):
         self.DoClose()

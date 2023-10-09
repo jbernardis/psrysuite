@@ -244,8 +244,7 @@ class ChooseTrainDlg(wx.Dialog):
         vszr.Add(st, 0, wx.ALIGN_CENTER_HORIZONTAL)
         vszr.AddSpacer(10)
 
-        choiceList = [t for t in trainlist if t != tid]        
-        cb = wx.ListBox(self, wx.ID_ANY, size=(160, -1), choices=choiceList, style=wx.LB_SINGLE)
+        cb = wx.ListBox(self, wx.ID_ANY, size=(160, -1), choices=trainlist, style=wx.LB_SINGLE)
         self.cbItems = cb
         vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
         

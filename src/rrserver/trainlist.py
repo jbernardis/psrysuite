@@ -11,8 +11,8 @@ class TrainList:
 		
 		self.trains[train]["atc"] = atcflag
 
-	def Update(self, train, loco, block):
-		logging.debug("train list update %s %s %s" % (train, loco, block))
+	def Update(self, train, loco, block, east):
+		logging.debug("train list update %s %s %s east=%s" % (train, loco, block, east))
 		if block is None:
 			return
 
@@ -38,8 +38,9 @@ class TrainList:
 					self.trains[train]["blocks"].append(block)
 				if loco:
 					self.trains[train]["loco"] = loco
+				self.trains[train]["east"] = east
 			else:
-				self.trains[train] = {"blocks": [block], "loco": loco, "atc": False, "signal": None, "aspect": 0}
+				self.trains[train] = {"blocks": [block], "loco": loco, "atc": False, "signal": None, "aspect": 0, "east": east}
 				
 	def UpdateSignal(self, train, signal, aspect):
 		if train not in self.trains:
@@ -63,8 +64,10 @@ class TrainList:
 
 		return None
 
-	def RenameTrain(self, oname, nname, oloco, nloco):
+	def RenameTrain(self, oname, nname, oloco, nloco, east):
 		if oname == nname and oloco == nloco:
+			if east is not None:
+				self.trains[oname]["east"] = east
 			return False
 			
 		if oname != nname:
@@ -84,6 +87,9 @@ class TrainList:
 
 		if nloco is not None:
 			self.trains[nname]["loco"] = nloco
+			
+		if east is not None:
+			self.trains[nname]["east"] = east
 
 		return True
 	
@@ -106,9 +112,11 @@ class TrainList:
 				atc = trinfo["atc"]
 				signal = trinfo["signal"]
 				aspect = "%d" % trinfo["aspect"]
+				east = "1" if trinfo["east"] else "0"
+				logging.debug("trinfo = %s" % str(trinfo))
 				clist = []
 				for b in blocks:
-					clist.append({"block": b, "name": tr, "loco": loco, "atc": atc})
+					clist.append({"block": b, "name": tr, "loco": loco, "atc": atc, "east": east})
 				yield({"settrain": clist})
 				yield({"trainsignal": {"train": tr, "block": frontblock, "signal": signal, "aspect": aspect}})
 				

@@ -245,6 +245,8 @@ class EditTrainDlg(wx.Dialog):
 	def GetResults(self):
 		t = self.chosenTrain
 		l = self.chosenLoco
+		tr = self.trains[self.chosenTrain]
 		atc = False if not self.atcFlag else self.cbATC.GetValue()
 		ar = False if not self.arFlag else self.cbAR.GetValue()
-		return t, l, atc, ar
+		east = tr["eastbound"]
+		return t, l, atc, ar, east

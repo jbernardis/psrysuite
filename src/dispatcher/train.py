@@ -146,7 +146,9 @@ class Train:
 		return self.sbActive
 
 	def Draw(self):
+		logging.debug("in draw for train %s, direction %s" % (self.name, self.east))
 		for blk in self.blocks.values():
+			logging.debug("Drawing train for block %s" % blk.GetName())
 			blk.DrawTrain()
 
 	def AddToBlock(self, blk):

@@ -125,7 +125,7 @@ class MainUnit:
 							self.blocks[block] = Block(self, block, 0, direction, False)
 						else:
 							b = self.blocks[block]
-							b.SetDirection(direction)
+							b.SetEast(direction)
 	
 				elif cmd == "blockclear":
 					for p in parms:
@@ -179,6 +179,7 @@ class MainUnit:
 	
 				elif cmd == "settrain":
 					for p in parms:
+						logging.debug("inbound settrain: %s" % str(p))
 						block = p["block"]
 						name = p["name"]
 						loco = p["loco"]

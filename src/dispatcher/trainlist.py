@@ -182,7 +182,7 @@ class ActiveTrainsDlg(wx.Dialog):
 		
 class TrainListCtrl(wx.ListCtrl):
 	def __init__(self, parent):
-		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1010, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
+		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1066, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
 		self.parent = parent
 		self.trains = {}
 		self.order = []
@@ -196,27 +196,29 @@ class TrainListCtrl(wx.ListCtrl):
 
 		self.InsertColumn(0, "Train")
 		self.SetColumnWidth(0, 80)
-		self.InsertColumn(1, "Loco")
-		self.SetColumnWidth(1, 80)
-		self.InsertColumn(2, "Engineer")
-		self.SetColumnWidth(2, 100)
-		self.InsertColumn(3, "ATC")
-		self.SetColumnWidth(3, 50)
-		self.InsertColumn(4, "AR")
+		self.InsertColumn(1, "E/W")
+		self.SetColumnWidth(1, 56)
+		self.InsertColumn(2, "Loco")
+		self.SetColumnWidth(2, 80)
+		self.InsertColumn(3, "Engineer")
+		self.SetColumnWidth(3, 100)
+		self.InsertColumn(4, "ATC")
 		self.SetColumnWidth(4, 50)
-		self.InsertColumn(5, "SB")
+		self.InsertColumn(5, "AR")
 		self.SetColumnWidth(5, 50)
-		self.InsertColumn(6, "Signal")
-		self.SetColumnWidth(6, 100)
-		self.InsertColumn(7, "Throttle")
+		self.InsertColumn(6, "SB")
+		self.SetColumnWidth(6, 50)
+		self.InsertColumn(7, "Signal")
 		self.SetColumnWidth(7, 100)
-		self.InsertColumn(8, "Blocks")
-		self.SetColumnWidth(8, 400)
+		self.InsertColumn(8, "Throttle")
+		self.SetColumnWidth(8, 100)
+		self.InsertColumn(9, "Blocks")
+		self.SetColumnWidth(9, 400)
 		self.SetItemCount(0)
 		
 	def ChangeSize(self, sz):
 		self.SetSize(sz[0]-56, sz[1]-84)
-		self.SetColumnWidth(8, sz[0]-566)
+		self.SetColumnWidth(9, sz[0]-666)
 		
 	def AddTrain(self, tr):
 		nm = tr.GetName()
@@ -324,22 +326,25 @@ class TrainListCtrl(wx.ListCtrl):
 			return tr.GetName()
 		
 		elif col == 1:
-			return tr.GetLoco()
+			return "E" if tr.GetEast() else "W"
 		
 		elif col == 2:
+			return tr.GetLoco()
+		
+		elif col == 3:
 			nm = tr.GetEngineer()
 			return "" if nm is None else nm
 		
-		elif col == 3:
+		elif col == 4:
 			return u"\u2713" if tr.IsOnATC() else " "
 		
-		elif col == 4:
+		elif col == 5:
 			return u"\u2713" if tr.IsOnAR() else " "
 		
-		elif col == 5:
+		elif col == 6:
 			return u"\u2713" if tr.GetSBActive() else " "
 		
-		elif col == 6:
+		elif col == 7:
 			sig, aspect = tr.GetSignal()
 			if sig is None:
 				return ""
@@ -348,9 +353,9 @@ class TrainListCtrl(wx.ListCtrl):
 				resp += ":%d" % aspect
 			return resp 
 		
-		elif col == 7:
+		elif col == 8:
 			throttle = tr.GetThrottle()
 			return throttle
 		
-		elif col == 8:
+		elif col == 9:
 			return ", ".join(tr.GetBlockNameList())

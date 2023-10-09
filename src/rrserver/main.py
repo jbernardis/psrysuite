@@ -655,7 +655,7 @@ class ServerMain:
 			# in the block, and just replace it
 			etrn, eloco = self.trainList.FindTrainInBlock(block)
 			if etrn:
-				if self.trainList.RenameTrain(etrn, trn, eloco, loco):
+				if self.trainList.RenameTrain(etrn, trn, eloco, loco, east):
 					for cmd in self.trainList.GetSetTrainCmds(trn):
 						self.socketServer.sendToAll(cmd)
 				return
@@ -672,7 +672,7 @@ class ServerMain:
 		resp = {"settrain": [{"name": trn, "loco": loco, "block": block, "east": east}]}
 		self.socketServer.sendToAll(resp)
 
-		self.trainList.Update(trn, loco, block)
+		self.trainList.Update(trn, loco, block, east)
 		
 	def DoMoveTrain(self, cmd): #"movetrain":
 		try:
@@ -723,8 +723,12 @@ class ServerMain:
 			nloco = cmd["newloco"][0]
 		except (IndexError, KeyError):
 			nloco = None
+		try:
+			east = cmd["east"][0] == 1
+		except (IndexError, KeyError):
+			east = None
 
-		if self.trainList.RenameTrain(oname, nname, oloco, nloco):
+		if self.trainList.RenameTrain(oname, nname, oloco, nloco, east):
 			for cmd in self.trainList.GetSetTrainCmds(nname):
 				self.socketServer.sendToAll(cmd)
 		

@@ -1,6 +1,7 @@
 import logging
 
 from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, BLOCK, OVERSWITCH, STOPPINGBLOCK, MAIN, STOP
+from asyncio.locks import Condition
 
 
 class Route:
@@ -423,7 +424,7 @@ class Block:
 				else:
 					# known trains push their direction onto the block
 					east = tr.GetEast()
-					self.SetEast(east)
+					self.SetEast(east)					
 
 				trn, loco = tr.GetNameAndLoco()
 
@@ -590,6 +591,68 @@ class StoppingBlock (Block):
 		self.lastBlockEmpty = False
 
 	def EvaluateStoppingSection(self):
+		if (self.block.east and (not self.eastend)) or ((not self.block.east) and self.eastend):
+			# wrong end of the block - assert stopping section is inactive
+			self.Activate(False)
+			return
+		
+		if not self.occupied:
+			logging.debug("Deactivating stopping block %s because block is not occupied" % self.GetName())
+			self.Activate(False)
+			return
+		
+		mainBlk = self.block
+		district = self.block.GetDistrict()
+
+		if self.block.east:
+			blk = self.block.blkEast
+			if district.CrossingEastWestBoundary(blk, mainBlk):
+				signm = self.block.sbSigWest
+			else:
+				signm = self.block.sbSigEast
+		else:
+			blk = self.block.blkWest
+			if district.CrossingEastWestBoundary(blk, mainBlk):
+				signm = self.block.sbSigEast
+			else:
+				signm = self.block.sbSigWest
+		
+		if not signm:
+			logging.debug("No action on stopping block because no signal identified")
+			return 
+		
+		if blk is None:
+			# we don't know the exit block - this means the OS is set to a different
+			# route and the signal should be red - assert that stopping block is active
+			self.Activate(True)
+			return
+		
+		# identify the train that is in this block
+		tr = self.block.GetTrain()
+		if tr is None:
+			logging.debug("no train identified in current block %s" % self.block.GetName())
+			return
+		
+		# identify the train that is in the next block
+		trnext = blk.GetTrain()
+		
+		if trnext and tr.GetName() == trnext.GetName():
+			# the same train is in the stopping section and the exit block - this is normal Condition
+			# and the stopping section is irrelevant - assert that it's inactive
+			self.Activate(False)
+			return
+		
+		elif trnext is not None:
+			# there is some other train in the next block - the signal should be red
+			self.Activate(True)
+			return
+		
+		# in all other cases, activate based solely on the signal value
+		sv = self.frame.GetSignalByName(signm).GetAspect()
+		# activate the stopping block if the signal is red, deactivate if not
+		self.Activate(sv == 0)
+
+	def EvaluateStoppingSectionxx(self):
 		if not self.occupied:
 			logging.debug("Deactivating stopping block %s because block is not occupied" % self.GetName())
 			self.Activate(False)

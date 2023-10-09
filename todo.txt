@@ -54,11 +54,8 @@ When a train passes westbound through N31, it changes to the identity of the tra
 
 West and East stopping sections for P31/P32 seem to be reversed, should I change the definition of the stopping bliock, or just change the interpretation of the input bits
 
-When adding a new train, instead of defaulting to east bound, it should take on the direction of the block.  If the train then changes direction after being identified, the block should be changed.
 
 reverse the signal heads for port B
-
-clear button for event and advice displays
 
 over-ride button versus callon
 
@@ -66,4 +63,4 @@ ability to suppress specific trains from active train display
 
 Do I have stop blocks backwards east of nassau in B and.or R blocks???
 
-merge train
+merge train - complete
