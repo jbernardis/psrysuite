@@ -251,7 +251,7 @@ class ServerMain:
 		self.socketServer.sendToAll(cmd)
 
 	def dispCommandReceipt(self, cmd): # thread context
-		logging.info("HTTP Event: %s" % str(cmd))
+		#logging.info("HTTP Event: %s" % str(cmd))
 		self.cmdQ.put(cmd)
 		
 	def CreateDispatchTable(self):					
@@ -334,7 +334,7 @@ class ServerMain:
 				jstr = json.dumps(cmd)
 			except:
 				jstr = str(cmd)
-			logging.info("Command receipt: %s" % jstr)
+			logging.info("HTTP Cmd receipt: %s" % jstr)
 		
 		try:
 			handler = self.dispatch[verb]
@@ -463,7 +463,6 @@ class ServerMain:
 	def DoDCCSpeed(self, cmd):
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"dccspeed": [p]}
-		print("sending dcc speed message: (%s)" % str(resp))
 		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("TRACKER")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)
@@ -637,7 +636,7 @@ class ServerMain:
 		except (IndexError, KeyError):
 			loco = None
 		try:
-			east = cmd["east"][0]
+			east = True if cmd["east"][0] == "1" else False
 		except (IndexError, KeyError):
 			east = True
 		block = cmd["block"][0]
@@ -647,6 +646,9 @@ class ServerMain:
 			ntrn, nloco = self.trainList.FindTrainInBlock(block)
 			if ntrn:
 				trn = ntrn
+				trinfo = self.trainList.GetTrainInfo(trn)
+				east = trinfo["east"]
+				
 			if nloco:
 				loco = nloco
 				
@@ -660,7 +662,7 @@ class ServerMain:
 						self.socketServer.sendToAll(cmd)
 				return
 			else: # see if we have it anywhere, and preserve the loco value if we do
-				eloco = self.trainList.FindTrain(trn)
+				eloco = self.trainList.GetLocoForTrain(trn)
 				if eloco is not None:
 					if eloco != loco:
 						loco = eloco
@@ -724,7 +726,7 @@ class ServerMain:
 		except (IndexError, KeyError):
 			nloco = None
 		try:
-			east = cmd["east"][0] == 1
+			east = cmd["east"][0] == "1"
 		except (IndexError, KeyError):
 			east = None
 

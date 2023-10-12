@@ -56,8 +56,14 @@ class TrainList:
 				return tr, trinfo["loco"]
 
 		return None, None
+	
+	def GetTrainInfo(self, trid):
+		if trid in self.trains:
+			return self.trains[trid]
+		
+		return None
 
-	def FindTrain(self, trn):
+	def GetLocoForTrain(self, trn):
 		for tr, trinfo in self.trains.items():
 			if tr == trn:
 				return trinfo["loco"]
@@ -68,7 +74,9 @@ class TrainList:
 		if oname == nname and oloco == nloco:
 			if east is not None:
 				self.trains[oname]["east"] = east
-			return False
+				return True
+			else:
+				return False
 			
 		if oname != nname:
 			if oname not in self.trains:
@@ -94,10 +102,6 @@ class TrainList:
 		return True
 	
 	def GetTrainList(self):
-		print("train list")
-		for tr, trinfo in self.trains.items():
-			print("Train %s: %s %s %s %s" % (tr, trinfo["loco"], str(trinfo["blocks"]), trinfo["signal"], trinfo["aspect"]))
-		print("=======================================", flush=True)
 		return self.trains
 
 	def GetSetTrainCmds(self, train=None):
@@ -112,7 +116,7 @@ class TrainList:
 				atc = trinfo["atc"]
 				signal = trinfo["signal"]
 				aspect = "%d" % trinfo["aspect"]
-				east = "1" if trinfo["east"] else "0"
+				east = trinfo["east"]
 				logging.debug("trinfo = %s" % str(trinfo))
 				clist = []
 				for b in blocks:

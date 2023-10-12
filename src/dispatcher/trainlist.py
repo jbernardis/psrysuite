@@ -63,6 +63,10 @@ class ActiveTrainList:
 			self.dlgTrainList.Destroy()
 			self.dlgTrainList = None
 			
+	def RefreshTrain(self, trid):
+		if self.dlgTrainList is not None:
+			self.dlgTrainList.RefreshTrain(trid)
+			
 	def forSnapshot(self):
 		result = {}
 		for trid, tr in self.trains.items():
@@ -159,6 +163,9 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.trCtl.AddTrain(tr)
 		
 	def UpdateTrain(self, trid):
+		self.trCtl.UpdateTrain(trid)
+		
+	def RefreshTrain(self, trid):
 		self.trCtl.UpdateTrain(trid)
 		
 	def RenameTrain(self, oldName, newName):

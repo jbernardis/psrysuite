@@ -37,7 +37,7 @@ def GenerateSim(tr, layout):
 		idx = 0
 		
 	script = []
-	placeTrainCmd = {"block": sBlk, "name": trainid, "loco": locoid, "time": segTimes[idx][1], "length": 3}
+	placeTrainCmd = {"block": sBlk, "name": trainid, "loco": locoid, "time": segTimes[idx][1], "length": 3, "dir": "E" if east else "W"}
 	if subBlk is not None:
 		placeTrainCmd["subblock"] = segTimes[idx][0]
 		

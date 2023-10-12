@@ -120,6 +120,8 @@ class EditTrainDlg(wx.Dialog):
 		self.bSever.SetToolTip("Split this train into 2 sections")
 		self.bMerge = wx.Button(self, wx.ID_ANY, "Merge")
 		self.bMerge.SetToolTip("Merge this train with another")
+		self.bReverse = wx.Button(self, wx.ID_ANY, "Reverse")
+		self.bReverse.SetToolTip("Reverse Direction on this train")
 
 		bsz.Add(self.bOK)
 		bsz.AddSpacer(30)
@@ -128,11 +130,14 @@ class EditTrainDlg(wx.Dialog):
 		bsz.Add(self.bSever)
 		bsz.AddSpacer(30)
 		bsz.Add(self.bMerge)
+		bsz.AddSpacer(30)
+		bsz.Add(self.bReverse)
 
 		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
 		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
 		self.Bind(wx.EVT_BUTTON, self.onSever, self.bSever)
 		self.Bind(wx.EVT_BUTTON, self.onMerge, self.bMerge)
+		self.Bind(wx.EVT_BUTTON, self.onReverse, self.bReverse)
 
 		vsz.Add(bsz, 0, wx.ALIGN_CENTER)
 
@@ -241,6 +246,9 @@ class EditTrainDlg(wx.Dialog):
 		
 	def onMerge(self, _):
 		self.EndModal(wx.ID_PASTE)
+		
+	def onReverse(self, _):
+		self.EndModal(wx.ID_BACKWARD)
 
 	def GetResults(self):
 		t = self.chosenTrain

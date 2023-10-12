@@ -144,9 +144,9 @@ class Script (wx.Frame):
 					subblock = block
 
 				try:
-					direction = params["dir"]
+					direction = params["dir"] == "E"
 				except KeyError:
-					direction = None
+					direction = True
 
 				if self.trainlen is None:
 					try:
@@ -159,10 +159,13 @@ class Script (wx.Frame):
 				except KeyError:
 					duration = 1000
 
-				if direction is not None:
-					self.parent.Request({"blockdir": { "block": block, "dir": direction}})
-				self.parent.Request({"movetrain": {"block": subblock}})
-				self.parent.Request({"settrain": {"block": block, "name": name, "loco": loco}})
+				#if direction is not None:
+					#self.parent.Request({"blockdir": { "block": block, "dir": direction}})
+				req = {"movetrain": {"block": subblock}}
+				self.parent.Request(req)
+				
+				req = {"settrain": {"block": block, "name": name, "loco": loco, "east": "1" if direction else "0"}}
+				self.parent.Request(req)
 				self.ticker.StartOnce(duration * self.tm)
 
 				self.AddToOccupiedBlocks(subblock)

@@ -841,27 +841,27 @@
       "sbwest": null
     },
     "Y70": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     },
     "Y81": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     },
     "Y82": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     },
     "Y83": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     },
     "Y84": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     },
@@ -911,7 +911,7 @@
       "sbwest": null
     },
     "YOSWYE": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -951,12 +951,8 @@
       "Y30"
     ],
     [
-      "YOSKL1",
-      "Y70"
-    ],
-    [
-      "YOSKL2",
-      "Y70"
+      "YOSWYE",
+      "Y87"
     ]
   ],
   "routes": {
@@ -7432,13 +7428,13 @@
     },
     "YRtY70Y81": {
       "ends": [
-        "Y81",
-        "Y70"
+        "Y70",
+        "Y81"
       ],
       "os": "YOSWYW",
       "signals": [
-        "Y40RA",
-        "Y40L"
+        "Y40L",
+        "Y40RA"
       ],
       "turnouts": [
         [
@@ -7453,13 +7449,13 @@
     },
     "YRtY70Y82": {
       "ends": [
-        "Y82",
-        "Y70"
+        "Y70",
+        "Y82"
       ],
       "os": "YOSWYW",
       "signals": [
-        "Y40RB",
-        "Y40L"
+        "Y40L",
+        "Y40RB"
       ],
       "turnouts": [
         [
@@ -7478,13 +7474,13 @@
     },
     "YRtY70Y83": {
       "ends": [
-        "Y83",
-        "Y70"
+        "Y70",
+        "Y83"
       ],
       "os": "YOSWYW",
       "signals": [
-        "Y40RC",
-        "Y40L"
+        "Y40L",
+        "Y40RC"
       ],
       "turnouts": [
         [
@@ -7503,13 +7499,13 @@
     },
     "YRtY70Y84": {
       "ends": [
-        "Y84",
-        "Y70"
+        "Y70",
+        "Y84"
       ],
       "os": "YOSWYW",
       "signals": [
-        "Y40RD",
-        "Y40L"
+        "Y40L",
+        "Y40RD"
       ],
       "turnouts": [
         [

@@ -345,12 +345,9 @@ class Cliff(District):
 			return 
 		
 		for toName, state in tolist:
-			print("route in - setting turnout %s aspect = %s" % (toName, state))
 			tout = self.rr.GetTurnout(toName)
 			if tout:
 				tout.SetNormal(state == "N")
-			else:
-				print("turnout %s not found" % toName)
 		
 		self.rr.RailroadEvent({"turnout": [{"name": x[0], "state": x[1]} for x in tolist] })
 

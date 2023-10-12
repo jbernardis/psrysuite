@@ -1,5 +1,4 @@
 import logging
-
 	
 ST_FWD    = "f"
 ST_FWD128 = "F"
@@ -132,12 +131,6 @@ class Train:
 
 	def GetNameAndLoco(self):
 		return self.name, self.loco
- #
- # def GetIDString(self):
- # 	a = "A-" if self.atc else ""
- # 	n = self.name if self.name else "??"
- # 	l = self.loco if self.loco else "??"
- # 	return a+n+"/"+l
 	
 	def SetSBActive(self, flag):
 		self.sbActive = flag
@@ -146,10 +139,13 @@ class Train:
 		return self.sbActive
 
 	def Draw(self):
-		logging.debug("in draw for train %s, direction %s" % (self.name, self.east))
 		for blk in self.blocks.values():
-			logging.debug("Drawing train for block %s" % blk.GetName())
 			blk.DrawTrain()
+
+	def SetBlocksDirection(self):
+		for blk in self.blocks.values():
+			blk.SetEast(self.east)
+			blk.Draw()
 
 	def AddToBlock(self, blk):
 		bn = blk.GetName()

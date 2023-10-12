@@ -5,6 +5,7 @@ if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
 from dispatcher.settings import Settings
+from dispatcher.mainframe import MainFrame
 
 settings = Settings()
 
@@ -23,8 +24,6 @@ import logging
 logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "%s.log" % fn), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
-
-from dispatcher.mainframe import MainFrame 
 
 class App(wx.App):
 	def OnInit(self):

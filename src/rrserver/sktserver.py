@@ -29,14 +29,6 @@ class SktServer (threading.Thread):
 		return self.endOfLife
 
 	def sendToAll(self, msg):
-		try:
-			m = json.dumps(msg).encode()
-		except:
-			try:
-				m = msg.encode()
-			except:
-				m = msg
-		#logging.debug("socket send to all: %s" % m)
 		with self.socketLock:
 			tl = [x for x in self.sockets]
 		for skt, addr in tl:

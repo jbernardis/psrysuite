@@ -1,7 +1,6 @@
 import logging
 
 from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, BLOCK, OVERSWITCH, STOPPINGBLOCK, MAIN, STOP
-from asyncio.locks import Condition
 
 
 class Route:
@@ -301,12 +300,6 @@ class Block:
 		return not self.defaultEast
 
 	def SetEast(self, east, broadcast=True):
-		if self.train is not None:
-			'''
-			set direction of train in block to same value
-			'''
-			self.train.SetEast(east)
-			
 		if self.east == east:
 			return
 
@@ -399,8 +392,8 @@ class Block:
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
-				self.frame.Request({"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": east}})
-				logging.debug("settrain in block set occupied SB: %s %s %s" % (self.GetName(), trn, loco))
+				req = {"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": "1" if east else "0"}}
+				self.frame.Request(req)
 			if refresh:
 				self.Draw()
 			return
@@ -427,10 +420,9 @@ class Block:
 					self.SetEast(east)					
 
 				trn, loco = tr.GetNameAndLoco()
-
 				self.SetTrain(tr)
-				self.frame.Request({"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": east}})
-				logging.debug("settrain in block set occupied MB: %s %s %s" % (self.GetName(), trn, loco))
+				req = {"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": "1" if east else "0"}}
+				self.frame.Request(req)
 		else:
 			for b in [self.sbEast, self.sbWest]:
 				if b is not None:
@@ -455,7 +447,6 @@ class Block:
 		# all unoccupied - clean up
 		if self.frame.IsDispatcher():
 			self.frame.Request({"settrain": { "block": self.GetName(), "name": None, "loco": None}})
-			logging.debug("settrain in block check all unoccupied: %s NONE NONE" % self.GetName())
 
 		self.train = None
 		self.EvaluateStoppingSections()
@@ -486,10 +477,12 @@ class Block:
 					if blkWest:
 						tr = blkWest.GetTrain()
 						if tr:
+							self.CheckEWCross(tr, blkWest)						
 							return tr
 				else:
 					tr = self.blkWest.GetTrain()
 					if tr:
+						self.CheckEWCross(tr, self.blkWest)						
 						return tr
 			
 			if self.blkEast:
@@ -498,11 +491,13 @@ class Block:
 					if blkEast:
 						tr = blkEast.GetTrain()
 						if tr:
+							self.CheckEWCross(tr, blkEast)							
 							return tr
 
 				else:
 					tr = self.blkEast.GetTrain()
 					if tr:
+						self.CheckEWCross(tr, self.blkEast)							
 						return tr
 			
 			return None
@@ -517,11 +512,13 @@ class Block:
 					if blkEast:
 						tr = blkEast.GetTrain()
 						if tr:
+							self.CheckEWCross(tr, blkEast)						
 							return tr
 
 				else:
 					tr = self.blkEast.GetTrain()
 					if tr:
+						self.CheckEWCross(tr, self.blkEast)						
 						return tr
 					
 			if self.blkWest:
@@ -530,13 +527,24 @@ class Block:
 					if blkWest:
 						tr = blkWest.GetTrain()
 						if tr:
-							return tr
+							self.CheckEWCross(tr, blkWest)						
+							return tr																																																				
 				else:
 					tr = self.blkWest.GetTrain()
 					if tr:
+						self.CheckEWCross(tr, self.blkWest)						
 						return tr		
 				
 			return None
+		
+	def CheckEWCross(self, tr, blk):
+		if self.type == OVERSWITCH:
+			rc = self.district.CrossingEastWestBoundary(self, blk)
+		else:
+			rc = self.district.CrossingEastWestBoundary(blk, self)
+		if rc:
+			tr.SetEast(not tr.GetEast())
+			self.frame.Request({"renametrain": { "oldname": tr.GetName(), "name": tr.GetName(), "east": "1" if tr.GetEast() else "0"}})			
 
 	def SetCleared(self, cleared=True, refresh=False):
 		if cleared and self.occupied:
@@ -651,63 +659,6 @@ class StoppingBlock (Block):
 		sv = self.frame.GetSignalByName(signm).GetAspect()
 		# activate the stopping block if the signal is red, deactivate if not
 		self.Activate(sv == 0)
-
-	def EvaluateStoppingSectionxx(self):
-		if not self.occupied:
-			logging.debug("Deactivating stopping block %s because block is not occupied" % self.GetName())
-			self.Activate(False)
-			return
-		
-		mainBlk = self.block
-		district = self.block.GetDistrict()
-
-		if self.block.east and self.eastend:
-			blk = self.block.blkEast
-			if district.CrossingEastWestBoundary(blk, mainBlk):
-				signm = self.block.sbSigWest
-			else:
-				signm = self.block.sbSigEast
-		elif (not self.block.east) and (not self.eastend):
-			blk = self.block.blkWest
-			if district.CrossingEastWestBoundary(blk, mainBlk):
-				signm = self.block.sbSigEast
-			else:
-				signm = self.block.sbSigWest
-		else:
-			return
-		
-		if not signm:
-			logging.debug("No action on stopping block because no signal identified")
-			return 
-		
-		if blk:
-			tr = self.block.GetTrain()
-			if tr is None:
-				logging.debug("no train identified in current block %s" % self.block.GetName())
-				return
-			
-			
-			if self.block.GetName() not in tr.GetBlockList().keys():
-				# we are in a stopping block, but not in the main section of the b;ovk
-				return 
-			
-			blkOccupied = blk.IsOccupied()
-			if blkOccupied:
-				trnext = blk.GetTrain()
-				if trnext is None:
-					return
-				if tr.GetName() == trnext.GetName():
-					return
-		else:
-			# no block identified - assume block is occupied (worst case)
-			blkOccupied = True
-
-		sv = self.frame.GetSignalByName(signm).GetAspect()
-		if not(self.lastSignalGreen and self.lastBlockEmpty and sv == 0 and blkOccupied):
-			self.Activate(sv == 0)
-			
-		self.lastSignalGreen = sv != 0
-		self.lastBlockEmpty = not blkOccupied
 
 	def Activate(self, flag=True):
 		if flag == self.active:

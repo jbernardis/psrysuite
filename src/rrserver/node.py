@@ -85,7 +85,6 @@ class Node:
         else:
             msg = "Railroad IO error at node %s(0x%2x)" % (nodeNames[self.address], self.address)
             logging.error(msg)
-            print(msg)
                     
     def GetChangedInputs(self):
         results = []

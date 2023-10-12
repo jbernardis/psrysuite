@@ -12,8 +12,7 @@ EWCrossoverPoints = [
 	["SOSE",   "P32"],
 	["SOSW",   "P32"],
 	["YOSKL4", "Y30"],
-	["YOSKL1", "Y70"],
-	["YOSKL2", "Y70"]
+	["YOSWYE", "Y87"],
 ]
 
 def statusname(status):

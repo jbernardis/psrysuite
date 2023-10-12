@@ -23,8 +23,8 @@ from dispatcher.toaster import Toaster
 from dispatcher.listdlg import ListDlg
 from dispatcher.delayedrequest import DelayedRequests
 
-from dispatcher.districts.hyde import Hyde
 from dispatcher.districts.yard import Yard
+from dispatcher.districts.hyde import Hyde
 from dispatcher.districts.latham import Latham
 from dispatcher.districts.dell import Dell
 from dispatcher.districts.shore import Shore
@@ -399,7 +399,7 @@ class MainFrame(wx.Frame):
 			
 	def OnBResetClock(self, _):
 		self.tickerCount = 0
-		self.timeValue = 360 # 6:00
+		self.timeValue = self.settings.clockstarttime
 		self.DisplayTimeValue()
 		
 	def OnBStartClock(self, _):
@@ -419,7 +419,7 @@ class MainFrame(wx.Frame):
 			self.ToD = False
 			self.bStartClock.Enable(True)
 			self.bResetClock.Enable(True)
-			#self.timeValue = 360 # initial value 6:00
+			self.timeValue = self.settings.clockstarttime
 			
 		self.clockRunning = False
 		self.bStartClock.SetLabel("Start")
@@ -1449,7 +1449,7 @@ class MainFrame(wx.Frame):
 								blk.SetTrain(newTr)
 								blk.SetEast(east)
 								self.Request({"settrain": { "block": blk.GetName()}})
-								self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco, "east": east}})
+								self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
 								if self.IsDispatcher():
 									self.CheckTrainsInBlock(blk.GetName(), None)
 							
@@ -1484,23 +1484,50 @@ class MainFrame(wx.Frame):
 							dlg = ChooseTrainDlg(self, oldName, trList)
 							rc = dlg.ShowModal()
 							if rc == wx.ID_OK:
-								trid = dlg.GetResults()
+								trxid = dlg.GetResults()
 							dlg.Destroy()
 							if rc != wx.ID_OK:
 								return 
 							
-							if trid is None:
+							if trxid is None:
 								self.PopupEvent("No train chosen")
 							else:
-								self.PopupEvent("Chose train %s" % trid)
-							self.PopupEvent("Merge not yet implemented")
+								self.PopupEvent("Chose train %s" % trxid)
+							trx = self.trains[trxid]
+							
+							east = tr.GetEast()  # assume the direction of the surviving train
+							
+							for blkNm in [x for x in trx.GetBlockList()]:
+								blk = self.blocks[blkNm]
+								trx.RemoveFromBlock(blk)
+								tr.AddToBlock(blk)
+								blk.SetTrain(tr)
+								blk.SetEast(east)
+								self.Request({"settrain": { "block": blkNm}})
+								self.Request({"settrain": { "block": blkNm, "name": oldName, "loco": oldLoco, "east": "1" if east else "0"}})
+								if self.IsDispatcher():
+									self.CheckTrainsInBlock(blk.GetName(), None)
+									
+							del(self.trains[trxid])
+							
+							self.activeTrains.RemoveTrain(trxid)
+							return
+						
+						if rc == wx.ID_BACKWARD:
+							nd = not tr.GetEast()
+							tr.SetEast(nd)
+							self.activeTrains.RefreshTrain(tr.GetName())
+							tr.SetBlocksDirection()
+							req = {"renametrain": { "oldname": tr.GetName(), "newname": tr.GetName(), "east": "1" if nd else "0"}}
+							self.Request(req)
+
 							return
 						
 						if rc != wx.ID_OK:
 							return
 	
 						if oldName != trainid or oldLoco != locoid:
-							self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid, "east": 1 if east else 0}})
+							self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid, "east": "1" if east else "0"}})
 							
 						if east != tr.GetEast():
 							tr.SetEast(east)
@@ -1835,7 +1862,7 @@ class MainFrame(wx.Frame):
 						ntr.SetEast(trinfo["east"])
 						blk.SetEast(trinfo["east"])
 						self.Request({"settrain": { "block": blk.GetName()}})
-						self.Request({"settrain": { "block": blk.GetName(), "name": trid, "loco": trinfo["loco"], "east": 1 if trinfo["east"] else 0}})
+						self.Request({"settrain": { "block": blk.GetName(), "name": trid, "loco": trinfo["loco"], "east": "1" if trinfo["east"] else "0"}})
 						ntr.Draw()
 						blk.Draw()
 
@@ -1966,7 +1993,7 @@ class MainFrame(wx.Frame):
 
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
-			logging.info("Dispatch: %s: %s" % (cmd, parms))
+			logging.info("Inbound command: %s: %s" % (cmd, parms))
 			if cmd == "turnout":
 				for p in parms:
 					turnout = p["name"]
@@ -2002,7 +2029,6 @@ class MainFrame(wx.Frame):
 				for p in parms:
 					block = p["name"]
 					state = p["state"]
-					logging.debug("Inbound BLOCK: %s %s" % (block, state))
 
 					blk = None
 					try:
@@ -2052,9 +2078,11 @@ class MainFrame(wx.Frame):
 								blk = None
 					if blk is not None:
 						blk.SetEast(direction, broadcast=False)
-						tr = blk.GetTrain()
-						if tr:
-							tr.SetEast(direction)
+						#=======================================================
+						# tr = blk.GetTrain()
+						# if tr:
+						# 	tr.SetEast(direction)
+						#=======================================================
 
 			elif cmd == "blockclear":
 				pass
@@ -2135,6 +2163,28 @@ class MainFrame(wx.Frame):
 						ind = self.indicators[name]
 						if val != ind.GetValue():
 							ind.SetValue(val, silent=True)
+							
+			elif cmd == "trainsignal":
+				'''
+				{'train': '43', 'block': 'C23', 'signal': 'C14RB', 'aspect': '0'}
+				'''
+				trid = parms["train"]
+					
+				signm = parms["signal"]
+				
+				try:
+					tr = self.trains[trid]
+				except:
+					tr = None
+					
+				try:
+					sig = self.signals[signm]
+				except:
+					sig  = None
+					
+				if tr is not None and sig is not None:
+					tr.SetSignal(sig)
+					self.activeTrains.UpdateTrain(trid)
 
 			elif cmd == "settrain":
 				for p in parms:
@@ -2142,7 +2192,7 @@ class MainFrame(wx.Frame):
 					name = p["name"]
 					loco = p["loco"]
 					try:
-						east = p["east"] == "1"
+						east = p["east"]
 					except KeyError:
 						east = True
 
@@ -2191,6 +2241,7 @@ class MainFrame(wx.Frame):
 							logging.warning("Set train for block %s, but that block is unoccupied" % block)
 							return
 
+						oldName = None
 						if tr:
 							oldName = tr.GetName()
 							if oldName and oldName != name:
@@ -2205,8 +2256,12 @@ class MainFrame(wx.Frame):
 									self.activeTrains.UpdateTrain(name)
 								else:
 									tr.SetName(name)
+									if name in self.trainList:
+										tr.SetEast(self.trainList[name]["eastbound"])
+									
 									self.trains[name] = tr
 									self.activeTrains.RenameTrain(oldName, name)
+									self.Request({"renametrain": { "oldname": oldName, "name": name, "east": "1" if tr.GetEast() else "0"}})
 
 								try:
 									self.activeTrains.RemoveTrain(oldName)
@@ -2221,10 +2276,13 @@ class MainFrame(wx.Frame):
 						try:
 							# trying to find train in existing list
 							tr = self.trains[name]
-							e = tr.GetEast()
-							logging.debug("Train %s, direction %s" % (tr.GetName(), tr.GetEast()))
-							blk.SetEast(e) # block takes on direction of the train if known
-						except:
+							if oldName and oldName == name:
+								tr.SetEast(east)
+								blk.SetEast(east)
+							else:
+								e = tr.GetEast()
+								blk.SetEast(e) # block takes on direction of the train if known
+						except KeyError:
 							# not there - create a new one")
 							tr = Train(name)
 							self.trains[name] = tr
@@ -2235,6 +2293,7 @@ class MainFrame(wx.Frame):
 							blk.SetEast(east)
 							
 						tr.AddToBlock(blk)
+						blk.SetTrain(tr)
 						if not tr.IsContiguous():
 							self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
@@ -2243,13 +2302,13 @@ class MainFrame(wx.Frame):
 						
 						if loco:
 							self.activeTrains.SetLoco(tr, loco)
-							
+						
 						self.activeTrains.UpdateTrain(tr.GetName())
 
-						blk.SetTrain(tr)
 						blk.EvaluateStoppingSections()
 						blk.Draw()   # this will redraw the train in this block only
 						tr.Draw() # necessary if this train appears in other blocks too
+						
 							
 			elif cmd == "traincomplete": # from simulator when a train reaches its terminus
 				for p in parms:
@@ -2308,9 +2367,11 @@ class MainFrame(wx.Frame):
 					tr.Draw()
 					
 			elif cmd == "clock":
-				if not self.IsDispatcher():
-					self.timeValue = int(parms[0]["value"])
-					self.DisplayTimeValue()
+				if self.IsDispatcher():
+					return 
+				
+				self.timeValue = int(parms[0]["value"])
+				self.DisplayTimeValue()
 					
 			elif cmd == "dccspeed":
 				for p in parms:

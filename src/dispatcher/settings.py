@@ -36,6 +36,7 @@ class Settings:
 		self.activesuppressyards = True
 		self.activesuppressunknown = False
 		self.activeonlyatc = False
+		self.clockstarttime = 355
 		
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -74,6 +75,15 @@ class Settings:
 
 				elif opt == 'showcameras':
 					self.showcameras = parseBoolean(value, False)
+					
+				elif opt == 'clockstarttime':
+					try:
+						s = int(value)
+					except:
+						logging.warning("invalid value in ini file for clock start timer: %s" % value)
+						s = 355
+					self.clockstarttime = s
+
 
 		else:
 			logging.warning("Missing %s section - assuming defaults" % self.section)
