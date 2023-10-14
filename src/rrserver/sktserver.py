@@ -34,7 +34,8 @@ class SktServer (threading.Thread):
 		for skt, addr in tl:
 			self.sendToOne(skt, addr, msg)
 			
-	def sendToOne(self, skt, addr, msg):
+	def sendToOne(self, skt, addr, msg):		
+		logging.debug("sending message: %s" % str(msg))
 		try:
 			m = json.dumps(msg).encode()
 		except:

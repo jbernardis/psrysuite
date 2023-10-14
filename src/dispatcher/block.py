@@ -544,7 +544,7 @@ class Block:
 			rc = self.district.CrossingEastWestBoundary(blk, self)
 		if rc:
 			tr.SetEast(not tr.GetEast())
-			self.frame.Request({"renametrain": { "oldname": tr.GetName(), "name": tr.GetName(), "east": "1" if tr.GetEast() else "0"}})			
+			self.frame.Request({"renametrain": { "oldname": tr.GetName(), "newname": tr.GetName(), "east": "1" if tr.GetEast() else "0"}})	
 
 	def SetCleared(self, cleared=True, refresh=False):
 		if cleared and self.occupied:
@@ -611,6 +611,8 @@ class StoppingBlock (Block):
 		
 		mainBlk = self.block
 		district = self.block.GetDistrict()
+		bname = self.block.GetName()
+		direction = "East" if self.eastend else "West"
 
 		if self.block.east:
 			blk = self.block.blkEast
@@ -630,10 +632,15 @@ class StoppingBlock (Block):
 			return 
 		
 		if blk is None:
+			logging.debug("no known exit block from %s" % mainBlk.GetName())
 			# we don't know the exit block - this means the OS is set to a different
 			# route and the signal should be red - assert that stopping block is active
+			logging.debug("===activating stopping relay for block %s %s because unable to identify next block" % (bname, direction))
+			logging.debug("blocks for train %s = %s" % (tr.GetName(), ",".join(tr.GetBlockNameList())))
 			self.Activate(True)
 			return
+		
+		logging.debug("evaluate stopping section, %s -> %s" % (mainBlk.GetName(), blk.GetName()))
 		
 		# identify the train that is in this block
 		tr = self.block.GetTrain()
@@ -641,8 +648,13 @@ class StoppingBlock (Block):
 			logging.debug("no train identified in current block %s" % self.block.GetName())
 			return
 		
+		logging.debug("train %s" % tr.GetName())
+		
 		# identify the train that is in the next block
 		trnext = blk.GetTrain()
+		
+		if trnext:
+			logging.debug("train next = %s" % tr.GetName())
 		
 		if trnext and tr.GetName() == trnext.GetName():
 			# the same train is in the stopping section and the exit block - this is normal Condition
@@ -652,12 +664,17 @@ class StoppingBlock (Block):
 		
 		elif trnext is not None:
 			# there is some other train in the next block - the signal should be red
+			logging.debug("===activating stopping relay for block %s %s because train ahead = %s and this train = %s" % (bname, direction, tr.GetName(), trnext.GetName()))
+			logging.debug("blocks for train %s = %s" % (tr.GetName(), ",".join(tr.GetBlockNameList())))
 			self.Activate(True)
 			return
 		
 		# in all other cases, activate based solely on the signal value
 		sv = self.frame.GetSignalByName(signm).GetAspect()
 		# activate the stopping block if the signal is red, deactivate if not
+		if sv == 0:
+			logging.debug("===activating stopping relay for block %s %s because signal aspect = %x" % (bname, direction, sv))
+			logging.debug("blocks for train %s = %s" % (tr.GetName(), ",".join(tr.GetBlockNameList())))
 		self.Activate(sv == 0)
 
 	def Activate(self, flag=True):

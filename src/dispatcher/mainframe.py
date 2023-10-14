@@ -2235,11 +2235,11 @@ class MainFrame(wx.Frame):
 								except:
 									logging.warning("can't delete train %s from train list" % trid)
 
-							return
+							continue
 
 						if not blk.IsOccupied():
 							logging.warning("Set train for block %s, but that block is unoccupied" % block)
-							return
+							continue
 
 						oldName = None
 						if tr:
@@ -2563,7 +2563,7 @@ class MainFrame(wx.Frame):
 				if "delay" in req[command] and req[command]["delay"] > 0:
 					self.delayedRequests.Append(req)
 				else:
-					#logging.debug(json.dumps(req))
+					logging.debug("Sending HTTP Request: %s" % json.dumps(req))
 					self.rrServer.SendRequest(req)
 		else:
 			logging.info("disallowing command %s from non dispatcher" % command)
