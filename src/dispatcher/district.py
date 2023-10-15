@@ -515,8 +515,9 @@ class District:
 
 	def CheckBlockSignalsAdv(self, blkNm, blkNxtNm, sigNm, blkEast):
 		blk = self.frame.blocks[blkNm]
-		clear = not blk.IsOccupied()
-			
+		clear = blk.IsCleared() # is the first block cleared
+					
+		# now let's look at the OS to determine if it's cleared and what type of route is set up through it
 		east = blk.GetEast()
 		
 		if east == blkEast:		
@@ -536,6 +537,7 @@ class District:
 			else:
 				nxtrte = rt.rtype[0 if blkEast else 1] # get next route type
 
+		# now consider the block beyond the OS (as identified in a parameter) for clear and route type
 		try:
 			blknxt = self.frame.blocks[blkNxtNm]
 		except KeyError:
@@ -549,7 +551,7 @@ class District:
 				nxtclradv = blknxt.IsCleared()
 		
 		if east != blkEast or nxtEast != blkEast:
-			aspect = 0	
+			aspect = 0	# blocks going in opposite directions - just stop
 		elif clear and nxtclr and (nxtrte == MAIN) and nxtclradv:
 			aspect = 0b011  # clear
 		elif clear and nxtclr and (nxtrte == MAIN) and (not nxtclradv):
