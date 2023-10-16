@@ -63,6 +63,7 @@ class ServerMain:
 		self.DCCSniffer = None
 		self.pidDCCSniffer = None
 		self.timeValue = None
+		self.clockStatus = 2
 		
 		self.cmdQ = queue.Queue()
 
@@ -223,7 +224,7 @@ class ServerMain:
 
 	def refreshClient(self, addr, skt):
 		if self.timeValue is not None:
-			m = {"clock": [{ "value": self.timeValue}]}
+			m = {"clock": [{ "value": self.timeValue, "status": self.clockStatus}]}
 			self.socketServer.sendToOne(skt, addr, m)
 		
 		for m in self.rr.GetCurrentValues():
@@ -454,8 +455,10 @@ class ServerMain:
 		
 	def DoClock(self, cmd):
 		value = cmd["value"][0]
-		resp = {"clock": [{ "value": value}]}
+		status = cmd["status"][0]
+		resp = {"clock": [{ "value": value, "status": status}]}
 		self.timeValue = value
+		self.clockStatus = status
 		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)

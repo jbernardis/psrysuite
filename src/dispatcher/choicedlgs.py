@@ -180,12 +180,12 @@ class ChooseBlocksDlg(wx.Dialog):
     def __init__(self, parent, tid, blocklist):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
-        self.SetTitle("Sever from train %s" % tid)
+        self.SetTitle("Split block(s) from train %s" % tid)
 
         vszr = wx.BoxSizer(wx.VERTICAL)
         vszr.AddSpacer(20)
         
-        st = wx.StaticText(self, wx.ID_ANY, "Choose blocks to sever")
+        st = wx.StaticText(self, wx.ID_ANY, "Choose blocks to split")
         vszr.Add(st, 0, wx.ALIGN_CENTER_HORIZONTAL)
         vszr.AddSpacer(10)
         

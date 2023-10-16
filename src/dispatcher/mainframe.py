@@ -95,6 +95,7 @@ class MainFrame(wx.Frame):
 		self.ToD = True
 		self.timeValue = self.GetToD()
 		self.clockRunning = False # only applies to non-TOD clock
+		self.clockStatus = 3 # default = ToD
 		
 		self.eventsList = []
 		self.adviceList = []
@@ -258,8 +259,11 @@ class MainFrame(wx.Frame):
 		self.breakerDisplay = BreakerDisplay(self, pos=(int(totalw/2-400/2), 30), size=(400, 40))
 	
 		self.timeDisplay = LEDNumberCtrl(self, wx.ID_ANY, pos=(self.centerOffset+480, 10), size=(150, 50))
+		self.timeDisplay.SetBackgroundColour(wx.Colour(0, 0, 0))
 
 		if self.IsDispatcher():
+			self.DetermineClockStatus()
+			self.ShowClockStatus()
 			self.DisplayTimeValue()
 			self.cbToD = wx.CheckBox(self, wx.ID_ANY, "Time of Day", pos=(self.centerOffset+515, 65))
 			self.cbToD.SetValue(True)
@@ -404,10 +408,12 @@ class MainFrame(wx.Frame):
 		
 	def OnBStartClock(self, _):
 		self.clockRunning = not self.clockRunning
+		self.DetermineClockStatus()			
 		self.bStartClock.SetLabel("Stop" if self.clockRunning else "Start")
 		self.bResetClock.Enable(not self.clockRunning)
 		if self.clockRunning:
 			self.tickerCount = 0
+		self.DisplayTimeValue()
 
 	def OnCBToD(self, _):
 		if self.cbToD.IsChecked():
@@ -423,12 +429,33 @@ class MainFrame(wx.Frame):
 			
 		self.clockRunning = False
 		self.bStartClock.SetLabel("Start")
-			
+
+		self.DetermineClockStatus()			
 		self.DisplayTimeValue()
 		
 	def GetToD(self):
 		tm = time.localtime()
 		return (tm.tm_hour%12) * 60 + tm.tm_min
+	
+	def DetermineClockStatus(self):
+		if self.ToD:
+			self.clockStatus = 2
+		elif self.clockRunning:
+			self.clockStatus = 1
+		else:
+			self.clockStatus = 0
+		self.ShowClockStatus()
+		
+	def ShowClockStatus(self):
+		if self.clockStatus == 0: # clock is stopped
+			self.timeDisplay.SetForegroundColour(wx.Colour(255, 0, 0))
+		
+		elif self.clockStatus == 1: # running in railroad mode
+			self.timeDisplay.SetForegroundColour(wx.Colour(0, 255, 0))
+		
+		elif self.clockStatus == 2: # time of day
+			self.timeDisplay.SetForegroundColour(wx.Colour(32, 229, 240))
+		self.timeDisplay.Refresh()
 		
 	def DisplayTimeValue(self):
 		hours = int(self.timeValue/60)
@@ -437,7 +464,7 @@ class MainFrame(wx.Frame):
 		minutes = self.timeValue % 60
 		self.timeDisplay.SetValue("%2d:%02d" % (hours, minutes))
 		if self.subscribed and self.IsDispatcher():
-			self.Request({"clock": { "value": self.timeValue}})
+			self.Request({"clock": { "value": self.timeValue, "status": self.clockStatus}})
 					
 	def OnThrottle(self, _):
 		throttleExec = os.path.join(os.getcwd(), "throttle", "main.py")
@@ -1430,10 +1457,10 @@ class MainFrame(wx.Frame):
 								return	
 							
 							if len(blist) == 0:
-								logging.info("No blocks chosen for sever operation - ignoring request")
+								logging.info("No blocks chosen for split operation - ignoring request")
 								return
 							
-							logging.info("Severing following blocks from train %s: %s" % (oldName, str(blist)))			
+							logging.info("Splitting following blocks from train %s: %s" % (oldName, str(blist)))			
 
 							newTr = Train()
 							east = tr.GetEast()
@@ -1490,9 +1517,9 @@ class MainFrame(wx.Frame):
 								return 
 							
 							if trxid is None:
-								self.PopupEvent("No train chosen")
-							else:
-								self.PopupEvent("Chose train %s" % trxid)
+								self.PopupEvent("No train chosen for merge operation - ignoring request")
+								return 
+							
 							trx = self.trains[trxid]
 							
 							east = tr.GetEast()  # assume the direction of the surviving train
@@ -1963,7 +1990,7 @@ class MainFrame(wx.Frame):
 		
 	def DoRefresh(self):
 		if self.IsDispatcher():
-			self.Request({"clock": { "value": self.timeValue}})
+			self.Request({"clock": { "value": self.timeValue, "status": self.clockStatus}})
 
 		self.Request({"refresh": {"SID": self.sessionid}})
 		
@@ -2370,7 +2397,14 @@ class MainFrame(wx.Frame):
 				if self.IsDispatcher():
 					return 
 				
+				print("received clock message: %s" % str(parms))
+				
 				self.timeValue = int(parms[0]["value"])
+				status = int(parms[0]["status"])
+				print("update clock message, time value = %d, status = %d" % (self.timeValue, status))
+				if status != self.clockStatus:
+					self.clockStatus = status
+					self.ShowClockStatus()
 				self.DisplayTimeValue()
 					
 			elif cmd == "dccspeed":
