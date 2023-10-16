@@ -169,11 +169,13 @@ class Train:
 		return True
 		
 	def IsContiguous(self):
+		print("check for contiguous: %s" % self.GetName())
 		if self.GetName().startswith("??"):
 			# do not test for trains with temporary names
 			return True
 		
 		bnames = list(self.blocks.keys())
+		print("blocks: %s" % str(bnames))
 		countBlocks = len(bnames)
 		if countBlocks <= 1:
 			# only occupying 1 block - contiguous by default
@@ -187,6 +189,7 @@ class Train:
 		blkAdj = ""
 		for blk in self.blocks.values():
 			adje, adjw = blk.GetAdjacentBlocks()
+			print("adjacent to block %s = %s, %s" % (blk.GetName(), "None" if adje is None else adje.GetName(), "None" if adjw is None else adjw.GetName()))
 			adjc = 0
 			blkAdj += "%s: %s,%s  " % (blk.GetName(), "None" if adje is None else adje.GetName(), "None" if adjw is None else adjw.GetName())
 			for adj in adje, adjw:
@@ -195,6 +198,7 @@ class Train:
 				if adj.GetName() in bnames:
 					adjc += 1
 			adjStr += "%s: %s, " % (blk.GetName(), adjc)
+			print(adjStr)
 
 			# the count is either 1 (for the blocks at the beginning and the end of the train)
 			# or two for all of the blocks in between
@@ -206,14 +210,15 @@ class Train:
 				logging.error("block %s in train %s adjacent count = %d" % (blk.GetName(), self.GetName(), adjc))
 
 		# so when we reach here, there MUST be 2 blocks whose adjacent count is 1 - the first and last blocks
-		# there must also be countBlocks-2 blocks whose count is 2 - this is all the blocks mid train						
+		# there must also be countBlocks-2 blocks whose count is 2 - this is all the blocks mid train
+		print("after block loop, counts = %d, %d" % (count1, count2))						
 		if count1 != 2 or count2 != countBlocks-2:
 			logging.info("=============================================")
 			logging.info("train %s is non contiguous, blocks=%s c1=%d c2=%d countblocks=%d" % (self.GetName(), str(bnames), count1, count2, countBlocks))
 			logging.info(adjStr)
 			logging.info(blkAdj)
 			logging.info("=============================================")
-			return True # - disabling for now, but let's track the tests to see where the faults are  False
+			return False
 		
 		return True
 			

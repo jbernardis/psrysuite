@@ -280,6 +280,7 @@ class ServerMain:
 			"removetrain":	self.DoRemoveTrain,
 			"traincomplete":self.DoTrainComplete,
 			"assigntrain":  self.DoAssignTrain,
+			"checktrains":  self.DoCheckTrains,
 			
 			"signal":   	self.DoSignal,
 			"signallock":	self.DoSignalLock,
@@ -736,6 +737,11 @@ class ServerMain:
 		if self.trainList.RenameTrain(oname, nname, oloco, nloco, east):
 			for cmd in self.trainList.GetSetTrainCmds(nname):
 				self.socketServer.sendToAll(cmd)
+
+	def DoCheckTrains(self, cnd):				
+		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		for addr, skt in addrList:
+			self.socketServer.sendToOne(skt, addr, {"checktrains": {}})
 		
 	def DoTrainSignal(self, cmd):
 		trid = cmd["train"][0]

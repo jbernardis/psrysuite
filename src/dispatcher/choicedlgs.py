@@ -38,6 +38,67 @@ class ChooseItemDlg(wx.Dialog):
             self.cbItems.SetSelection(0)
         else:
             self.cbItems.SetSelection(wx.NOT_FOUND)
+            
+        if not allowentry:
+            vszr.AddSpacer(20)
+
+            hszr = wx.BoxSizer(wx.HORIZONTAL)
+            hszr.AddSpacer(100)            
+            self.cbCliff = wx.CheckBox(self, wx.ID_ANY, "Cliff")
+            self.cbCliff.SetValue(True)
+            hszr.Add(self.cbCliff)
+            vszr.Add(hszr)
+            
+            hszr = wx.BoxSizer(wx.HORIZONTAL)
+            hszr.AddSpacer(100)            
+            self.cbNassau = wx.CheckBox(self, wx.ID_ANY, "Nassau")
+            self.cbNassau.SetValue(True)
+            hszr.Add(self.cbNassau)
+            vszr.Add(hszr)
+            
+            hszr = wx.BoxSizer(wx.HORIZONTAL)
+            hszr.AddSpacer(100)            
+            self.cbHyde = wx.CheckBox(self, wx.ID_ANY, "Hyde")
+            self.cbHyde.SetValue(True)
+            hszr.Add(self.cbHyde)
+            vszr.Add(hszr)
+            
+            hszr = wx.BoxSizer(wx.HORIZONTAL)
+            hszr.AddSpacer(100)            
+            self.cbPort = wx.CheckBox(self, wx.ID_ANY, "Port")
+            self.cbPort.SetValue(True)
+            hszr.Add(self.cbPort)
+            vszr.Add(hszr)
+            
+            hszr = wx.BoxSizer(wx.HORIZONTAL)
+            hszr.AddSpacer(100)            
+            self.cbYard = wx.CheckBox(self, wx.ID_ANY, "Yard")
+            self.cbYard.SetValue(True)
+            hszr.Add(self.cbYard)
+            vszr.Add(hszr)
+            
+            vszr.AddSpacer(5)
+            
+            hszr = wx.BoxSizer(wx.HORIZONTAL)
+            hszr.AddSpacer(100)            
+            self.cbOthers = wx.CheckBox(self, wx.ID_ANY, "Other locations")
+            self.cbOthers.SetValue(True)
+            hszr.Add(self.cbOthers)
+            vszr.Add(hszr)
+            
+            vszr.AddSpacer(5)
+            
+            bAll = wx.Button(self, wx.ID_ANY, "All")
+            self.Bind(wx.EVT_BUTTON, self.OnBAll, bAll)
+            bNone = wx.Button(self, wx.ID_ANY, "None")
+            self.Bind(wx.EVT_BUTTON, self.OnBNone, bNone)
+            
+            hsz = wx.BoxSizer(wx.HORIZONTAL)
+            hsz.Add(bAll)
+            hsz.AddSpacer(30)
+            hsz.Add(bNone)
+            
+            vszr.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
         
         vszr.AddSpacer(20)
         
@@ -73,6 +134,20 @@ class ChooseItemDlg(wx.Dialog):
         self.Layout()
         self.Fit();
         
+    def OnBAll(self, _):
+        self.SetLocations(True)
+        
+    def OnBNone(self, _):
+        self.SetLocations(False)
+        
+    def SetLocations(self, flag):
+        self.cbCliff.SetValue(flag)
+        self.cbNassau.SetValue(flag)
+        self.cbHyde.SetValue(flag)
+        self.cbPort.SetValue(flag)
+        self.cbYard.SetValue(flag)
+        self.cbOthers.SetValue(flag)
+        
     def GetFiles(self):
         if self.trains:
             fxp = os.path.join(os.getcwd(), "data", "trains", "*.trn")
@@ -80,15 +155,38 @@ class ChooseItemDlg(wx.Dialog):
             fxp = os.path.join(os.getcwd(), "data", "locos", "*.loco")
         self.files = [os.path.splitext(os.path.split(x)[1])[0] for x in glob(fxp)]
         
-    def GetValue(self):
+    def GetFile(self):
         fn = self.cbItems.GetValue()
         if fn is None or fn == "":
             return None
         
         if self.trains:
-            return os.path.join(os.getcwd(), "data", "trains", fn+".trn")
+            fn = os.path.join(os.getcwd(), "data", "trains", fn+".trn")
         else:
-            return os.path.join(os.getcwd(), "data", "locos", fn+".loco")
+            fn = os.path.join(os.getcwd(), "data", "locos", fn+".loco")
+            
+        return fn
+        
+    def GetLocations(self):
+        if self.allowentry:
+            return None
+        
+        locations = ""
+        if self.cbCliff.IsChecked():
+            locations += "C"
+        if self.cbNassau.IsChecked():
+            locations += "N"
+        if self.cbHyde.IsChecked():
+            locations += "H"
+        if self.cbPort.IsChecked():
+            locations += "P"
+        if self.cbYard.IsChecked():
+            locations += "Y"
+        if self.cbOthers.IsChecked():
+            locations += "*"
+            
+        return locations, "CNHPY"
+
         
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)
@@ -109,7 +207,7 @@ class ChooseItemDlg(wx.Dialog):
         dlg = ChooseItemsDlg(self, self.files, self.trains)
         rc = dlg.ShowModal()
         if rc == wx.ID_OK:
-            l = dlg.GetValue()
+            l = dlg.GetFiles()
             
         dlg.Destroy()
         if rc != wx.ID_OK:
@@ -175,6 +273,15 @@ class ChooseItemsDlg(wx.Dialog):
         self.SetSizer(hszr)
         self.Layout()
         self.Fit();
+            
+    def OnCancel(self, _):
+        self.EndModal(wx.ID_CANCEL)
+        
+    def OnBOK(self, _):
+        self.EndModal(wx.ID_OK)
+        
+    def GetFiles(self):
+        return self.cbItems.GetCheckedStrings()
 
 class ChooseBlocksDlg(wx.Dialog):
     def __init__(self, parent, tid, blocklist):

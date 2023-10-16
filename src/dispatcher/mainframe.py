@@ -41,6 +41,7 @@ from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
+from pickle import FALSE
 
 showAspectCalculation = False
 
@@ -208,6 +209,10 @@ class MainFrame(wx.Frame):
 		self.bEditTrains = wx.Button(self, wx.ID_ANY, "Edit Trains", pos=(self.centerOffset+150, 45), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnEditTrains, self.bEditTrains)
 		self.bEditTrains.SetToolTip("Open up the train editor window")
+
+		self.bCheckTrains = wx.Button(self, wx.ID_ANY, "Check Trains", pos=(self.centerOffset+150, 75), size=BTNDIM)
+		self.Bind(wx.EVT_BUTTON, self.OnBCheckTrains, self.bCheckTrains)
+		self.bCheckTrains.SetToolTip("Check trains for continuity and for locomotive number uniqueness")
 
 		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Train IDs", pos=(self.centerOffset+250, 15), size=BTNDIM)
 		self.bLoadTrains.Enable(False)
@@ -1692,7 +1697,7 @@ class MainFrame(wx.Frame):
 				self.activeTrains.UpdateTrain(trid)
 				req = {"trainsignal": { "train": trid, "block": blkNm, "signal": sig.GetName(), "aspect": sig.GetAspect()}}
 				self.Request(req)
-
+				
 	def SwapToScreen(self, screen):
 		if screen == HyYdPt:
 			self.bScreenHyYdPt.Enable(False)
@@ -2242,8 +2247,6 @@ class MainFrame(wx.Frame):
 										del(self.trains[trid])
 									except:
 										logging.warning("can't delete train %s from train list" % trid)
-								elif not tr.IsContiguous():
-									self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
 							delList = []
 							for trid, tr in self.trains.items():
@@ -2252,8 +2255,6 @@ class MainFrame(wx.Frame):
 									self.activeTrains.UpdateTrain(tr.GetName())
 									if tr.IsInNoBlocks():
 										delList.append(trid)
-									elif not tr.IsContiguous():
-										self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
 							for trid in delList:
 								try:
@@ -2321,8 +2322,6 @@ class MainFrame(wx.Frame):
 							
 						tr.AddToBlock(blk)
 						blk.SetTrain(tr)
-						if not tr.IsContiguous():
-							self.PopupEvent("Train %s is non-contiguous" % tr.GetName())
 
 						if self.IsDispatcher():
 							self.CheckTrainsInBlock(block, None)
@@ -2572,6 +2571,12 @@ class MainFrame(wx.Frame):
 			
 					tr.Draw()
 					
+			elif cmd == "checktrains":
+				rc1 = self.CheckTrainsContiguous()
+				rc2 = self.CheckLocosUnique()
+				if rc1 and rc2:
+					self.PopupEvent("All trains OK")
+					
 			elif cmd == "dumptrains":
 				print("===========================dump by trains")
 				self.activeTrains.dump()
@@ -2653,6 +2658,10 @@ class MainFrame(wx.Frame):
 	def OnBSaveTrains(self, _):
 		self.SaveTrains()
 		
+	def OnBCheckTrains(self, _):
+		self.CheckTrainsContiguous()
+		self.CheckLocosUnique()
+		
 	def OnBClearTrains(self, _):
 		dlg = wx.MessageDialog(self, 'This clears all train IDs.  Are you sure you want to continue?\nPress "Yes" to confirm,\nor "No" to cancel.',
 				'Clear Train IDs', wx.YES_NO | wx.ICON_WARNING)
@@ -2676,10 +2685,13 @@ class MainFrame(wx.Frame):
 			self.trains[nname] = tr
 		
 	def SaveTrains(self):
+		if not self.CheckTrainsContiguous(True):
+			return 
+		
 		dlg = ChooseItemDlg(self, True, True)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			file = dlg.GetValue()
+			file = dlg.GetFile()
 			
 		dlg.Destroy()
 		if rc != wx.ID_OK:
@@ -2696,11 +2708,18 @@ class MainFrame(wx.Frame):
 		with open(file, "w") as fp:
 			json.dump(trDict, fp, indent=4, sort_keys=True)
 
+		if len(trDict) == 1:
+			plural = ""
+		else:
+			plural = "s"			
+		self.PopupEvent("%d train%s saved to file %s" % (len(trDict), plural, os.path.basename(file)))
+
 	def OnBLoadTrains(self, _):
 		dlg = ChooseItemDlg(self, True, False)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			file = dlg.GetValue()
+			file = dlg.GetFile()
+			locations, allLocations = dlg.GetLocations()
 			
 		dlg.Destroy()
 		if rc != wx.ID_OK:
@@ -2711,26 +2730,96 @@ class MainFrame(wx.Frame):
 
 		with open(file, "r") as fp:
 			trDict = json.load(fp)
+			
+		if len(trDict) == 1:
+			plural = ""
+		else:
+			plural = "s"			
+		self.PopupEvent("%d train%s loaded from file %s" % (len(trDict), plural, os.path.basename(file)))
 
 		for tid, blist in trDict.items():
 			for bname in blist:
 				blk = self.blocks[bname]
-				if blk:
+				if blk and self.BlockIncluded(locations, allLocations, bname):
 					if blk.IsOccupied():
 						tr = blk.GetTrain()
 						oldName, _ = tr.GetNameAndLoco()
 						self.Request({"renametrain": { "oldname": oldName, "newname": tid, "east": 1 if tr.GetEast() else 0}})
 					else:
 						self.PopupEvent("Block %s not occupied, expecting train %s" % (bname, tid))
+						
+		self.Request({"checktrains": {}}) # this command will invoke the CheckTrains method after all the renaming has been done
+		
+	def CheckTrainsContiguous(self, query=False):
+		t = [tr for tr in self.trains.values() if not tr.IsContiguous()]
+		if len(t) == 0:
+			return True
+		
+		if query:
+			style = wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION
+		else:
+			style = wx.OK | wx.ICON_WARNING
+		
+		msg = "The following trains are in multiple sections:\n\n" + "\n".join([tr.GetName() for tr in t])
+		if query:
+			msg += "\n\nPress \"YES\" to proceed anyway, or \"NO\" to cancel"
+			
+		dlg = wx.MessageDialog(self, msg, "Non Contiguous Trains", style)
+		rc = dlg.ShowModal()
+		dlg.Destroy()
+		
+		if query and rc == wx.ID_YES:
+			return True
+		
+		return False
+	
+	def CheckLocosUnique(self, query=False):
+		locoMap = {}
+		for trid, tr in self.trains.items():
+			loco = tr.GetLoco()
+			if loco != "??":
+				if loco in locoMap:
+					locoMap[loco].append(trid)
+				else:
+					locoMap[loco] = [trid]
+					
+		locos = list(locoMap.keys())
+		for l in locos:
+			if len(locoMap[l]) == 1:
+				del(locoMap[l])	
+		if len(locoMap) == 0:
+			return True
+
+		if query:
+			style = wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION
+		else:
+			style = wx.OK | wx.ICON_WARNING
+		
+		locoList = ["%s: (%s)" % (lid, ", ".join(locoMap[lid])) for lid in locoMap.keys()]				
+		msg = "The following locomotive numbers are not unique to a single train:\n\n" + "\n".join(locoList)
+		if query:
+			msg += "\n\nPress \"YES\" to proceed anyway, or \"NO\" to cancel"
+			
+		dlg = wx.MessageDialog(self, msg, "Non Unique Locomotive numbers", style)
+		rc = dlg.ShowModal()
+		dlg.Destroy()
+		
+		if query and rc == wx.ID_YES:
+			return True
+		
+		return False
 
 	def OnBSaveLocos(self, _):
 		self.SaveLocos()
 		
 	def SaveLocos(self):
+		if not self.CheckLocosUnique(True):
+			return 
+		
 		dlg = ChooseItemDlg(self, False, True)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			file = dlg.GetValue()
+			file = dlg.GetFile()
 			
 		dlg.Destroy()
 		if rc != wx.ID_OK:
@@ -2747,12 +2836,19 @@ class MainFrame(wx.Frame):
 
 		with open(file, "w") as fp:
 			json.dump(locoDict, fp, indent=4, sort_keys=True)
+			
+		if len(locoDict) == 1:
+			plural = ""
+		else:
+			plural = "s"			
+		self.PopupEvent("%d locomotive%s saved to file %s" % (len(locoDict), plural, os.path.basename(file)))
 
 	def OnBLoadLocos(self, _):
 		dlg = ChooseItemDlg(self, False, False)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			file = dlg.GetValue()
+			file = dlg.GetFile()
+			locations, allLocations = dlg.GetLocations()
 			
 		dlg.Destroy()
 		if rc != wx.ID_OK:
@@ -2764,17 +2860,35 @@ class MainFrame(wx.Frame):
 		with open(file, "r") as fp:
 			locoDict = json.load(fp)
 
+		if len(locoDict) == 1:
+			plural = ""
+		else:
+			plural = "s"			
+		self.PopupEvent("%d locomotive%s loaded from file %s" % (len(locoDict), plural, os.path.basename(file)))
+
 		for lid, blist in locoDict.items():
 			for bname in blist:
 				blk = self.blocks[bname]
-				if blk:
+				if blk and self.BlockIncluded(locations, allLocations, bname):
 					if blk.IsOccupied():
 						tr = blk.GetTrain()
 						oldName, oldLoco = tr.GetNameAndLoco()
 						self.Request({"renametrain": { "oldname": oldName, "newname": oldName, "oldloco": oldLoco, "newloco": lid, "east": 1 if tr.GetEast() else 0}})
 					else:
 						self.PopupEvent("Block %s not occupied, expecting locomotive %s" % (bname, lid))
+						
+		self.Request({"checktrains": {}}) # this command will invoke the CheckTrains method after all the renaming has been done
 
+	def BlockIncluded(self, locations, allLocations, bname):
+		blocation = bname[0]
+		if blocation in locations:
+			return True
+		
+		if blocation not in allLocations and "*" in locations:
+			return True
+		
+		return False
+	
 	def OnClose(self, _):
 		self.CloseProgram()
 		

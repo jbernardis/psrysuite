@@ -21,6 +21,8 @@ class EditTrainDlg(wx.Dialog):
 		ar = train.IsOnAR()
 		self.block = block
 		
+		self.startingEast = train.GetEast()
+		
 		self.locos = locos
 		self.trains = trains
 		
@@ -253,8 +255,14 @@ class EditTrainDlg(wx.Dialog):
 	def GetResults(self):
 		t = self.chosenTrain
 		l = self.chosenLoco
-		tr = self.trains[self.chosenTrain]
 		atc = False if not self.atcFlag else self.cbATC.GetValue()
 		ar = False if not self.arFlag else self.cbAR.GetValue()
-		east = tr["eastbound"]
+		try:
+			tr = self.trains[self.chosenTrain]
+		except KeyError:
+			tr = None
+		if tr is None:
+			east = self.startingEast # using the eastbound value of the train we came into here with
+		else:
+			east = tr["eastbound"]
 		return t, l, atc, ar, east
