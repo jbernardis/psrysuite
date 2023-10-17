@@ -389,8 +389,11 @@ class MainFrame(wx.Frame):
 
 		evt.Skip()
 			
-	def SetShift(self, flag):
+	def SetShift(self, flag, propagate=False):
 		self.shift = flag
+		if propagate:
+			for pnl in self.panels.values():
+				pnl.SetShift(False)
 		
 	def OnResetScreen(self, _):
 		self.ResetScreen()
@@ -1085,6 +1088,7 @@ class MainFrame(wx.Frame):
 		self.SetTitle(titleString)
 
 	def Initialize(self):
+		self.CreateDispatchTable()
 		self.listener = None
 		self.ShowTitle()
 		self.Bind(EVT_DELIVERY, self.onDeliveryEvent)
@@ -1299,6 +1303,7 @@ class MainFrame(wx.Frame):
 				self.buttonsToClear[bx][0] = secs
 
 	def ProcessClick(self, screen, pos, shift=False, right=False, screenpos=None):
+		self.SetShift(False, propagate=True)
 		# ignore screen clicks if not connected
 		if not self.subscribed:
 			return
@@ -2023,569 +2028,610 @@ class MainFrame(wx.Frame):
 		evt = DeliveryEvent(data=jdata)
 		wx.QueueEvent(self, evt)
 
+		
+	def CreateDispatchTable(self):					
+		self.dispatch = {
+			"turnout":			self.DoCmdTurnout,
+			"fleet":			self.DoCmdFleet,
+			"block":			self.DoCmdBlock,
+			"blockdir":			self.DoCmdBlockDir,
+			"blockclear":		self.DoCmdBlockClear,
+			"signal":			self.DoCmdSignal,
+			"siglever":			self.DoCmdSigLever,
+			"handswitch":		self.DoCmdHandSwitch,
+			"indicator":		self.DoCmdIndicator,
+			"breaker":			self.DoCmdBreaker,
+			"trainsignal":		self.DoCmdTrainSignal,
+			"settrain":			self.DoCmdSetTrain,
+			"assigntrain":		self.DoCmdAssignTrain,
+			"traincomplete":	self.DoCmdTrainComplete,
+			"clock":			self.DoCmdClock,
+			"dccspeed":			self.DoCmdDCCSpeed,
+			"control":			self.DoCmdControl,
+			"sessionID":		self.DoCmdSessionID,
+			"end":				self.DoCmdEnd,
+			"advice":			self.DoCmdAdvice,
+			"alert":			self.DoCmdAlert,
+			"ar":				self.DoCmdAR,
+			"arrequest":		self.DoCmdARRequest,
+			"atc":				self.DoCmdATC,
+			"atcrequest":		self.DoCmdATCRequest,
+			"atcstatus":		self.DoCmdATCStatus,
+			"checktrains":		self.DoCmdCheckTrains,
+			"dumptrains":		self.DoCmdDumpTrains,
+			"relay":			self.DoCmdNOOP,
+			"setroute":			self.DoCmdNOOP,
+			"turnoutlock":		self.DoCmdNOOP,
+			"signallock":		self.DoCmdNOOP,
+		}
+		
+	def DoCmdNOOP(self, _):
+		pass
+
 	def onDeliveryEvent(self, evt):
 		for cmd, parms in evt.data.items():
 			logging.info("Inbound command: %s: %s" % (cmd, parms))
-			if cmd == "turnout":
-				for p in parms:
-					turnout = p["name"]
-					state = p["state"]
-					try:
-						force = p["force"]
-					except:
-						force = False
-						
-					try:
-						to = self.turnouts[turnout]
-					except KeyError:
-						to = None
-						
-					if to is not None and state != to.GetStatus():
-						district = to.GetDistrict()
-						st = REVERSE if state == "R" else NORMAL
-						district.DoTurnoutAction(to, st, force=force)
-
-			elif cmd == "fleet":
-				for p in parms:
-					signm = p["name"]
-					try:
-						value = int(p["value"])
-					except:
-						value = 0
-
-					sig = self.signals[signm]
-					sig.EnableFleeting(value == 1)
-					self.FleetCheckBoxes(signm)
-
-			elif cmd == "block":
-				for p in parms:
-					block = p["name"]
-					state = p["state"]
-
-					blk = None
-					try:
-						blk = self.blocks[block]
-						blockend = None
-					except KeyError:
-						if block.endswith(".E") or block.endswith(".W"):
-							blockend = block[-1]
-							block = block[:-2]
-							try:
-								blk = self.blocks[block]
-							except KeyError:
-								blk = None
-
-					stat = OCCUPIED if state == 1 else EMPTY
-					if blk is not None:
-						if state == 1:
-							blk.SetLastEntered(blockend)
-							
-						if blk.GetStatus(blockend) != stat:
-							district = blk.GetDistrict()
-							district.DoBlockAction(blk, blockend, stat)
-							if self.IsDispatcher():
-								self.CheckTrainsInBlock(block, None)
-
-			elif cmd == "blockdir":
-				for p in parms:
-					block = p["block"]
-					try:
-						direction = p["dir"] == 'E'
-					except KeyError:
-						direction = True  # east
-						logging.debug("default path in blockdir")
-
-					logging.debug("Inbound Blockdir %s %s" % (block, direction))
-					blk = None
-					try:
-						blk = self.blocks[block]
-						blockend = None
-					except KeyError:
-						if block.endswith(".E") or block.endswith(".W"):
-							blockend = block[-1]
-							block = block[:-2]
-							try:
-								blk = self.blocks[block]
-							except KeyError:
-								blk = None
-					if blk is not None:
-						blk.SetEast(direction, broadcast=False)
-						#=======================================================
-						# tr = blk.GetTrain()
-						# if tr:
-						# 	tr.SetEast(direction)
-						#=======================================================
-
-			elif cmd == "blockclear":
-				pass
-					
-			elif cmd == "signal":
-				for p in parms:
-					sigName = p["name"]
-					aspect = p["aspect"]
-					try:
-						callon = int(p["callon"]) == 1
-					except:
-						callon = False
-
-					try:
-						sig = self.signals[sigName]
-					except:
-						sig = None
-
-					if sig is not None and aspect != sig.GetAspect():
-						district = sig.GetDistrict()
-						district.DoSignalAction(sig, aspect, callon=callon)
-
-			elif cmd == "siglever":
-				if self.IsDispatcher():
-					for p in parms:
-						signame = p["name"]
-						state = p["state"]
-						try:
-							callon = p["callon"]
-						except KeyError:
-							callon = 0
-
-						district = self.GetSignalLeverDistrict(signame)
-						if district is None:
-							# unable to find district for signal lever
-							return
-						district.DoSignalLeverAction(signame, state, callon == 1)
-						
-			elif cmd == "handswitch":
-				for p in parms:
-					hsName = p["name"]
-					state = p["state"]
-					
-					try:
-						hs = self.handswitches[hsName]
-					except:
-						hs = None
-
-					if hs is not None and state != hs.GetValue():
-						district = hs.GetDistrict()
-						district.DoHandSwitchAction(hs, state)
-						
-			elif cmd == "indicator":
-				for p in parms:
-					iName = p["name"]
-					value = int(p["value"])
-					
-					try:
-						ind = self.indicators[iName]
-					except:
-						ind = None
-
-					if ind is not None:
-						district = ind.GetDistrict()
-						district.DoIndicatorAction(ind, value)
-
-			elif cmd == "breaker":
-				for p in parms:
-					name = p["name"]
-					val = p["value"]
-					if val == 0:
-						self.PopupEvent("Breaker: %s" % BreakerName(name))
-						self.breakerDisplay.AddBreaker(name)
-					else:
-						self.breakerDisplay.DelBreaker(name)
-
-					if name in self.indicators:
-						ind = self.indicators[name]
-						if val != ind.GetValue():
-							ind.SetValue(val, silent=True)
-							
-			elif cmd == "trainsignal":
-				'''
-				{'train': '43', 'block': 'C23', 'signal': 'C14RB', 'aspect': '0'}
-				'''
-				trid = parms["train"]
-					
-				signm = parms["signal"]
+			
+			try:
+				handler = self.dispatch[cmd]
+			except KeyError:
+				logging.error("Unknown command: %s" % cmd)
+				self.PopupEvent("Unknown command: %s" % cmd)
+			
+			else:
+				handler(parms)
+			
+	def DoCmdTurnout(self, parms):
+		for p in parms:
+			turnout = p["name"]
+			state = p["state"]
+			try:
+				force = p["force"]
+			except:
+				force = False
 				
-				try:
-					tr = self.trains[trid]
-				except:
-					tr = None
-					
-				try:
-					sig = self.signals[signm]
-				except:
-					sig  = None
-					
-				if tr is not None and sig is not None:
-					tr.SetSignal(sig)
-					self.activeTrains.UpdateTrain(trid)
+			try:
+				to = self.turnouts[turnout]
+			except KeyError:
+				to = None
+				
+			if to is not None and state != to.GetStatus():
+				district = to.GetDistrict()
+				st = REVERSE if state == "R" else NORMAL
+				district.DoTurnoutAction(to, st, force=force)
 
-			elif cmd == "settrain":
-				for p in parms:
-					block = p["block"]
-					name = p["name"]
-					loco = p["loco"]
-					try:
-						east = p["east"]
-					except KeyError:
-						east = True
+	def DoCmdFleet(self, parms):
+		for p in parms:
+			signm = p["name"]
+			try:
+				value = int(p["value"])
+			except:
+				value = 0
 
+			sig = self.signals[signm]
+			sig.EnableFleeting(value == 1)
+			self.FleetCheckBoxes(signm)
+			
+	def DoCmdBlock(self, parms):
+		for p in parms:
+			block = p["name"]
+			state = p["state"]
+
+			blk = None
+			try:
+				blk = self.blocks[block]
+				blockend = None
+			except KeyError:
+				if block.endswith(".E") or block.endswith(".W"):
+					blockend = block[-1]
+					block = block[:-2]
 					try:
 						blk = self.blocks[block]
-					except:
-						logging.warning("unable to identify block (%s)" % block)
+					except KeyError:
 						blk = None
 
-					if blk:
-						tr = blk.GetTrain()
-						if name is None:
-							if tr:
-								tr.RemoveFromBlock(blk)
-								self.activeTrains.UpdateTrain(tr.GetName())
-								if tr.IsInNoBlocks():
-									trid = tr.GetName()
-									try:
-										self.activeTrains.RemoveTrain(trid)
-										del(self.trains[trid])
-									except:
-										logging.warning("can't delete train %s from train list" % trid)
-
-							delList = []
-							for trid, tr in self.trains.items():
-								if tr.IsInBlock(blk):
-									tr.RemoveFromBlock(blk)
-									self.activeTrains.UpdateTrain(tr.GetName())
-									if tr.IsInNoBlocks():
-										delList.append(trid)
-
-							for trid in delList:
-								try:
-									self.activeTrains.RemoveTrain(trid)
-									del(self.trains[trid])
-								except:
-									logging.warning("can't delete train %s from train list" % trid)
-
-							continue
-
-						if not blk.IsOccupied():
-							logging.warning("Set train for block %s, but that block is unoccupied" % block)
-							continue
-
-						oldName = None
-						if tr:
-							oldName = tr.GetName()
-							if oldName and oldName != name:
-								if name in self.trains:
-									# merge the two trains under the new "name"
-									try:
-										bl = self.trains[oldName].GetBlockList()
-									except:
-										bl = {}
-									for blk in bl.values():
-										self.trains[name].AddToBlock(blk)
-									self.activeTrains.UpdateTrain(name)
-								else:
-									tr.SetName(name)
-									if name in self.trainList:
-										tr.SetEast(self.trainList[name]["eastbound"])
-									
-									self.trains[name] = tr
-									self.activeTrains.RenameTrain(oldName, name)
-									self.Request({"renametrain": { "oldname": oldName, "name": name, "east": "1" if tr.GetEast() else "0"}})
-
-								try:
-									self.activeTrains.RemoveTrain(oldName)
-								except:
-									logging.warning("can't delete train %s from train list" % oldName)
-
-								try:
-									del(self.trains[oldName])
-								except:
-									logging.warning("can't delete train %s from train list" % oldName)
-						
-						try:
-							# trying to find train in existing list
-							tr = self.trains[name]
-							if oldName and oldName == name:
-								tr.SetEast(east)
-								blk.SetEast(east)
-							else:
-								e = tr.GetEast()
-								blk.SetEast(e) # block takes on direction of the train if known
-						except KeyError:
-							# not there - create a new one")
-							tr = Train(name)
-							self.trains[name] = tr
-							self.activeTrains.AddTrain(tr)
-							# new train takes on direction from the settrain command
-							tr.SetEast(east)
-							# and block is set to the same thing
-							blk.SetEast(east)
-							
-						tr.AddToBlock(blk)
-						blk.SetTrain(tr)
-
-						if self.IsDispatcher():
-							self.CheckTrainsInBlock(block, None)
-						
-						if loco:
-							self.activeTrains.SetLoco(tr, loco)
-						
-						self.activeTrains.UpdateTrain(tr.GetName())
-
-						blk.EvaluateStoppingSections()
-						blk.Draw()   # this will redraw the train in this block only
-						tr.Draw() # necessary if this train appears in other blocks too
-						
-							
-			elif cmd == "traincomplete": # from simulator when a train reaches its terminus
-				for p in parms:
-					train = p["train"]
-
-					try:
-						tr = self.trains[train]
-					except:
-						logging.error("Unknown train name (%s) in traincomplete message" % train)
-						return
-						
-					if self.ATCEnabled and tr.IsOnATC():
-						locoid = tr.GetLoco()
-						self.Request({"atc": {"action": "remove", "train": train, "loco": locoid}})
-						tr.SetATC(False)
-						self.activeTrains.UpdateTrain(train)
-						
-					if self.AREnabled and tr.IsOnAR():				
-						tr.SetAR(False)
-						self.Request({"ar": {"action": "remove", "train": train}})
-						self.activeTrains.UpdateTrain(train)
-						
-					tr.SetEngineer(None)
-					self.activeTrains.UpdateTrain(train)
-					self.PopupAdvice("Train %s has completed" % train)
-						
-					tr.Draw()
+			stat = OCCUPIED if state == 1 else EMPTY
+			if blk is not None:
+				if state == 1:
+					blk.SetLastEntered(blockend)
 					
-			elif cmd == "assigntrain":
-				for p in parms:
-					train = p["train"]
-					try:
-						engineer = p["engineer"]
-					except KeyError:
-						engineer = None
-						
-					try:
-						reassigned = p["reassign"] != "0"
-					except KeyError:
-						reassigned = False
-						
-					try:
-						tr = self.trains[train]
-					except:
-						logging.error("Unknown train name (%s) in assigntrain message" % train)
-						return
-						
-					tr.SetEngineer(engineer)
-					self.activeTrains.UpdateTrain(train)
-					
-					if reassigned:
-						self.PopupAdvice("Train %s has been reassigned to %s" % (train, engineer))
-					else:
-						self.PopupAdvice("Train %s has been assigned to %s" % (train, engineer))
-						
-					tr.Draw()
-					
-			elif cmd == "clock":
-				if self.IsDispatcher():
-					return 
-				
-				print("received clock message: %s" % str(parms))
-				
-				self.timeValue = int(parms[0]["value"])
-				status = int(parms[0]["status"])
-				print("update clock message, time value = %d, status = %d" % (self.timeValue, status))
-				if status != self.clockStatus:
-					self.clockStatus = status
-					self.ShowClockStatus()
-				self.DisplayTimeValue()
-					
-			elif cmd == "dccspeed":
-				for p in parms:
-					try:
-						loco = p["loco"]
-					except:
-						loco = None
-					
-					try:
-						speed = p["speed"]
-					except:
-						speed = "0"
-						
-					try:
-						speedtype = p["speedtype"]
-					except:
-						speedtype = None
-						
-					if loco is None:
-						return 
-					
-					tr = self.activeTrains.FindTrainByLoco(loco)
-					if tr is not None:
-						tr.SetThrottle(speed, speedtype)
-						self.activeTrains.UpdateTrain(tr.GetName())
-
-			elif cmd == "control":
-				for p in parms:
-					name = p["name"]
-					value = int(p["value"])
+				if blk.GetStatus(blockend) != stat:
+					district = blk.GetDistrict()
+					district.DoBlockAction(blk, blockend, stat)
 					if self.IsDispatcher():
-						self.UpdateControlWidget(name, value)
-					else:
-						self.UpdateControlDisplay(name, value)
+						self.CheckTrainsInBlock(block, None)
 
-			elif cmd == "sessionID":
-				self.sessionid = int(parms)
-				logging.info("connected to railroad server with session ID %d" % self.sessionid)
-				self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatch else "DISPLAY"}})
-				self.DoRefresh()
-				self.districts.OnConnect()
-				self.ShowTitle()
+	def DoCmdBlockDir(self, parms):
+		for p in parms:
+			block = p["block"]
+			try:
+				direction = p["dir"] == 'E'
+			except KeyError:
+				direction = True  # east
+				logging.debug("default path in blockdir")
 
-			elif cmd == "end":
-				if parms["type"] == "layout":
-					if self.settings.dispatch:
-						self.SendBlockDirRequests()
-						self.SendOSRoutes()
-						self.SendCrossoverPoints()
-					self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
+			logging.debug("Inbound Blockdir %s %s" % (block, direction))
+			blk = None
+			try:
+				blk = self.blocks[block]
+				blockend = None
+			except KeyError:
+				if block.endswith(".E") or block.endswith(".W"):
+					blockend = block[-1]
+					block = block[:-2]
+					try:
+						blk = self.blocks[block]
+					except KeyError:
+						blk = None
+			if blk is not None:
+				blk.SetEast(direction, broadcast=False)
+
+	def DoCmdBlockClear(self, parms):
+		pass
 					
-			elif cmd == "advice":
-				self.PopupAdvice(parms["msg"][0])
-					
-			elif cmd == "alert":
-				logging.info("ALERT: %s: %s" % (cmd, str(parms)))
-				self.PopupEvent(parms["msg"][0])
-				
-			elif cmd == "ar":
-				trnm = parms["train"][0]
+	def DoCmdSignal(self, parms):
+		for p in parms:
+			sigName = p["name"]
+			aspect = p["aspect"]
+			try:
+				callon = int(p["callon"]) == 1
+			except:
+				callon = False
+
+			try:
+				sig = self.signals[sigName]
+			except:
+				sig = None
+
+			if sig is not None and aspect != sig.GetAspect():
+				district = sig.GetDistrict()
+				district.DoSignalAction(sig, aspect, callon=callon)
+
+	def DoCmdSigLever(self, parms):
+		if self.IsDispatcher():
+			for p in parms:
+				signame = p["name"]
+				state = p["state"]
 				try:
-					tr = self.trains[trnm]
+					callon = p["callon"]
 				except KeyError:
-					logging.warning("AR train %s does not exist" % trnm)
-					return
-				
-				action = parms["action"][0]
-				tr.SetAR(action == "add")
-				self.activeTrains.UpdateTrain(trnm)
-				tr.Draw()
-				
-			elif cmd == "arrequest":
-				trnm = parms["train"][0]
-				if self.AREnabled:
-					try:
-						tr = self.trains[trnm]
-					except KeyError:
-						logging.warning("AR train %s does not exist" % trnm)
-						return
-					
-					action = parms["action"][0]
-					
-					tr.SetAR(action == "add")
-					self.activeTrains.UpdateTrain(trnm)
-					tr.Draw()
-					
-					self.Request({"ar": {"action": action, "train": trnm}})
-					tr.Draw()
-				
-				else:
-					self.PopupEvent("AR request for %s - not enabled" % trnm)
+					callon = 0
 
-				
-			elif cmd == "atc":
-				trnm = parms["train"][0]
-				try:
-					tr = self.trains[trnm]
-				except KeyError:
-					logging.warning("ATC train %s does not exist" % trnm)
+				district = self.GetSignalLeverDistrict(signame)
+				if district is None:
+					# unable to find district for signal lever
 					return
-				
-				action = parms["action"][0]
-				tr.SetATC(action == "add")
-				self.activeTrains.UpdateTrain(trnm)
-				tr.Draw()
-				
-			elif cmd == "atcrequest":
-				trnm = parms["train"][0]
-				if self.ATCEnabled:
-					try:
-						tr = self.trains[trnm]
-					except KeyError:
-						logging.warning("ATC train %s does not exist" % trnm)
-						return
-					
-					action = parms["action"][0]
-					
-					tr.SetATC(action == "add")
-					self.activeTrains.UpdateTrain(trnm)
-					tr.Draw()
-					
-					trainid, locoid = tr.GetNameAndLoco()
-					self.Request({"atc": {"action": action, "train": trainid, "loco": locoid}})
-					self.menuTrain.Draw()
-				
-				else:
-					self.PopupEvent("ATC request for %s - not enabled" % trnm)
+				district.DoSignalLeverAction(signame, state, callon == 1)
 
-					
-			elif cmd == "atcstatus":
-				action = parms["action"][0]
-				if action == "reject":
-					trnm = parms["train"][0]
-					try:
-						tr = self.trains[trnm]
-					except KeyError:
-						logging.warning("ATC rejected train %s does not exist" % trnm)
-						return
-	
-					self.PopupEvent("Rejected ATC train %s - no script" % trnm)				
-					tr.SetATC(False)
-					self.activeTrains.UpdateTrain(trnm)
-					tr.Draw()
-					
-				elif action in [ "complete", "remove" ]:
-					trnm = parms["train"][0]
-					try:
-						tr = self.trains[trnm]
-					except KeyError:
-						logging.warning("ATC completed train %s does not exist" % trnm)
-						return
-	
-					if action == "complete":
-						self.PopupEvent("ATC train %s has completed" % trnm)	
-					else:			
-						self.PopupEvent("Train %s removed from ATC" % trnm)	
-						
-					tr.SetATC(False)
-					if self.AREnabled and tr.IsOnAR():				
-						tr.SetAR(False)
-						self.Request({"ar": {"action": "remove", "train": trnm}})
-						
-					self.activeTrains.UpdateTrain(trnm)
+	def DoCmdHandSwitch(self, parms):				
+		for p in parms:
+			hsName = p["name"]
+			state = p["state"]
 			
-					tr.Draw()
+			try:
+				hs = self.handswitches[hsName]
+			except:
+				hs = None
+
+			if hs is not None and state != hs.GetValue():
+				district = hs.GetDistrict()
+				district.DoHandSwitchAction(hs, state)
+						
+	def DoCmdIndicator(self, parms):
+		for p in parms:
+			iName = p["name"]
+			value = int(p["value"])
+			
+			try:
+				ind = self.indicators[iName]
+			except:
+				ind = None
+
+			if ind is not None:
+				district = ind.GetDistrict()
+				district.DoIndicatorAction(ind, value)
+
+	def DoCmdBreaker(self, parms):
+		for p in parms:
+			name = p["name"]
+			val = p["value"]
+			if val == 0:
+				self.PopupEvent("Breaker: %s" % BreakerName(name))
+				self.breakerDisplay.AddBreaker(name)
+			else:
+				self.breakerDisplay.DelBreaker(name)
+
+			if name in self.indicators:
+				ind = self.indicators[name]
+				if val != ind.GetValue():
+					ind.SetValue(val, silent=True)
+
+	def DoCmdTrainSignal(self, parms):							
+		trid = parms["train"]			
+		signm = parms["signal"]
+		
+		try:
+			tr = self.trains[trid]
+		except:
+			tr = None
+			
+		try:
+			sig = self.signals[signm]
+		except:
+			sig  = None
+			
+		if tr is not None and sig is not None:
+			tr.SetSignal(sig)
+			self.activeTrains.UpdateTrain(trid)
+
+	def DoCmdSetTrain(self, parms):
+		for p in parms:
+			block = p["block"]
+			name = p["name"]
+			loco = p["loco"]
+			try:
+				east = p["east"]
+			except KeyError:
+				east = True
+
+			try:
+				blk = self.blocks[block]
+			except:
+				logging.warning("unable to identify block (%s)" % block)
+				blk = None
+
+			if blk:
+				tr = blk.GetTrain()
+				if name is None:
+					if tr:
+						tr.RemoveFromBlock(blk)
+						self.activeTrains.UpdateTrain(tr.GetName())
+						if tr.IsInNoBlocks():
+							trid = tr.GetName()
+							try:
+								self.activeTrains.RemoveTrain(trid)
+								del(self.trains[trid])
+							except:
+								logging.warning("can't delete train %s from train list" % trid)
+
+					delList = []
+					for trid, tr in self.trains.items():
+						if tr.IsInBlock(blk):
+							tr.RemoveFromBlock(blk)
+							self.activeTrains.UpdateTrain(tr.GetName())
+							if tr.IsInNoBlocks():
+								delList.append(trid)
+
+					for trid in delList:
+						try:
+							self.activeTrains.RemoveTrain(trid)
+							del(self.trains[trid])
+						except:
+							logging.warning("can't delete train %s from train list" % trid)
+
+					continue
+
+				if not blk.IsOccupied():
+					logging.warning("Set train for block %s, but that block is unoccupied" % block)
+					continue
+
+				oldName = None
+				if tr:
+					oldName = tr.GetName()
+					if oldName and oldName != name:
+						if name in self.trains:
+							# merge the two trains under the new "name"
+							try:
+								bl = self.trains[oldName].GetBlockList()
+							except:
+								bl = {}
+							for blk in bl.values():
+								self.trains[name].AddToBlock(blk)
+							self.activeTrains.UpdateTrain(name)
+						else:
+							tr.SetName(name)
+							if name in self.trainList:
+								tr.SetEast(self.trainList[name]["eastbound"])
+							
+							self.trains[name] = tr
+							self.activeTrains.RenameTrain(oldName, name)
+							self.Request({"renametrain": { "oldname": oldName, "name": name, "east": "1" if tr.GetEast() else "0"}})
+
+						try:
+							self.activeTrains.RemoveTrain(oldName)
+						except:
+							logging.warning("can't delete train %s from train list" % oldName)
+
+						try:
+							del(self.trains[oldName])
+						except:
+							logging.warning("can't delete train %s from train list" % oldName)
+				
+				try:
+					# trying to find train in existing list
+					tr = self.trains[name]
+					if oldName and oldName == name:
+						tr.SetEast(east)
+						blk.SetEast(east)
+					else:
+						e = tr.GetEast()
+						blk.SetEast(e) # block takes on direction of the train if known
+				except KeyError:
+					# not there - create a new one")
+					tr = Train(name)
+					self.trains[name] = tr
+					self.activeTrains.AddTrain(tr)
+					# new train takes on direction from the settrain command
+					tr.SetEast(east)
+					# and block is set to the same thing
+					blk.SetEast(east)
 					
-			elif cmd == "checktrains":
-				rc1 = self.CheckTrainsContiguous()
-				rc2 = self.CheckLocosUnique()
-				if rc1 and rc2:
-					self.PopupEvent("All trains OK")
+				tr.AddToBlock(blk)
+				blk.SetTrain(tr)
+
+				if self.IsDispatcher():
+					self.CheckTrainsInBlock(block, None)
+				
+				if loco:
+					self.activeTrains.SetLoco(tr, loco)
+				
+				self.activeTrains.UpdateTrain(tr.GetName())
+
+				blk.EvaluateStoppingSections()
+				blk.Draw()   # this will redraw the train in this block only
+				tr.Draw() # necessary if this train appears in other blocks too
+						
+		
+	def DoCmdTrainComplete(self, parms):					
+		for p in parms:
+			train = p["train"]
+
+			try:
+				tr = self.trains[train]
+			except:
+				logging.error("Unknown train name (%s) in traincomplete message" % train)
+				return
+				
+			if self.ATCEnabled and tr.IsOnATC():
+				locoid = tr.GetLoco()
+				self.Request({"atc": {"action": "remove", "train": train, "loco": locoid}})
+				tr.SetATC(False)
+				self.activeTrains.UpdateTrain(train)
+				
+			if self.AREnabled and tr.IsOnAR():				
+				tr.SetAR(False)
+				self.Request({"ar": {"action": "remove", "train": train}})
+				self.activeTrains.UpdateTrain(train)
+				
+			tr.SetEngineer(None)
+			self.activeTrains.UpdateTrain(train)
+			self.PopupAdvice("Train %s has completed" % train)
+				
+			tr.Draw()
+	
+	def DoCmdAssignTrain(self, parms):		
+		for p in parms:
+			train = p["train"]
+			try:
+				engineer = p["engineer"]
+			except KeyError:
+				engineer = None
+				
+			try:
+				reassigned = p["reassign"] != "0"
+			except KeyError:
+				reassigned = False
+				
+			try:
+				tr = self.trains[train]
+			except:
+				logging.error("Unknown train name (%s) in assigntrain message" % train)
+				return
+				
+			tr.SetEngineer(engineer)
+			self.activeTrains.UpdateTrain(train)
+			
+			if reassigned:
+				self.PopupAdvice("Train %s has been reassigned to %s" % (train, engineer))
+			else:
+				self.PopupAdvice("Train %s has been assigned to %s" % (train, engineer))
+				
+			tr.Draw()
+	
+	def DoCmdClock(self, parms):				
+		if self.IsDispatcher():
+			return 
+		
+		print("received clock message: %s" % str(parms))
+		
+		self.timeValue = int(parms[0]["value"])
+		status = int(parms[0]["status"])
+		print("update clock message, time value = %d, status = %d" % (self.timeValue, status))
+		if status != self.clockStatus:
+			self.clockStatus = status
+			self.ShowClockStatus()
+		self.DisplayTimeValue()
+	
+	def DoCmdDCCSpeed(self, parms):		
+		for p in parms:
+			try:
+				loco = p["loco"]
+			except:
+				loco = None
+			
+			try:
+				speed = p["speed"]
+			except:
+				speed = "0"
+				
+			try:
+				speedtype = p["speedtype"]
+			except:
+				speedtype = None
+				
+			if loco is None:
+				return 
+			
+			tr = self.activeTrains.FindTrainByLoco(loco)
+			if tr is not None:
+				tr.SetThrottle(speed, speedtype)
+				self.activeTrains.UpdateTrain(tr.GetName())
+
+	def DoCmdControl(self, parms):
+		for p in parms:
+			name = p["name"]
+			value = int(p["value"])
+			if self.IsDispatcher():
+				self.UpdateControlWidget(name, value)
+			else:
+				self.UpdateControlDisplay(name, value)
+
+	def DoCmdSessionID(self, parms):
+		self.sessionid = int(parms)
+		logging.info("connected to railroad server with session ID %d" % self.sessionid)
+		self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatch else "DISPLAY"}})
+		self.DoRefresh()
+		self.districts.OnConnect()
+		self.ShowTitle()
+
+	def DoCmdEnd(self, parms):
+		if parms["type"] == "layout":
+			if self.settings.dispatch:
+				self.SendBlockDirRequests()
+				self.SendOSRoutes()
+				self.SendCrossoverPoints()
+			self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 					
-			elif cmd == "dumptrains":
-				print("===========================dump by trains")
-				self.activeTrains.dump()
-				print("===========================dump by block")
-				for _, blk in self.blocks.items():
-					tr = blk.GetTrain()
-					if tr is not None:
-						print("%s: %s(%s)" % (blk.GetName(), tr.GetName(), tr.GetLoco()))
-				print("===========================end of dump trains", flush=True)
+	def DoCmdAdvice(self, parms):
+		self.PopupAdvice(parms["msg"][0])
+					
+	def DoCmdAlert(self, parms):
+		logging.info("ALERT: %s" % (str(parms)))
+		self.PopupEvent(parms["msg"][0])
+				
+	def DoCmdAR(self, parms):
+		trnm = parms["train"][0]
+		try:
+			tr = self.trains[trnm]
+		except KeyError:
+			logging.warning("AR train %s does not exist" % trnm)
+			return
+		
+		action = parms["action"][0]
+		tr.SetAR(action == "add")
+		self.activeTrains.UpdateTrain(trnm)
+		tr.Draw()
+				
+	def DoCmdARRequest(self, parms):
+		trnm = parms["train"][0]
+		if self.AREnabled:
+			try:
+				tr = self.trains[trnm]
+			except KeyError:
+				logging.warning("AR train %s does not exist" % trnm)
+				return
+			
+			action = parms["action"][0]
+			
+			tr.SetAR(action == "add")
+			self.activeTrains.UpdateTrain(trnm)
+			tr.Draw()
+			
+			self.Request({"ar": {"action": action, "train": trnm}})
+			tr.Draw()
+		
+		else:
+			self.PopupEvent("AR request for %s - not enabled" % trnm)
+
+		
+	def DoCmdATC(self, parms):
+		trnm = parms["train"][0]
+		try:
+			tr = self.trains[trnm]
+		except KeyError:
+			logging.warning("ATC train %s does not exist" % trnm)
+			return
+		
+		action = parms["action"][0]
+		tr.SetATC(action == "add")
+		self.activeTrains.UpdateTrain(trnm)
+		tr.Draw()
+				
+	def DoCmdATCRequest(self, parms):
+		trnm = parms["train"][0]
+		if self.ATCEnabled:
+			try:
+				tr = self.trains[trnm]
+			except KeyError:
+				logging.warning("ATC train %s does not exist" % trnm)
+				return
+			
+			action = parms["action"][0]
+			
+			tr.SetATC(action == "add")
+			self.activeTrains.UpdateTrain(trnm)
+			tr.Draw()
+			
+			trainid, locoid = tr.GetNameAndLoco()
+			self.Request({"atc": {"action": action, "train": trainid, "loco": locoid}})
+			self.menuTrain.Draw()
+		
+		else:
+			self.PopupEvent("ATC request for %s - not enabled" % trnm)
+
+					
+	def DoCmdATCStatus(self, parms):
+		action = parms["action"][0]
+		if action == "reject":
+			trnm = parms["train"][0]
+			try:
+				tr = self.trains[trnm]
+			except KeyError:
+				logging.warning("ATC rejected train %s does not exist" % trnm)
+				return
+
+			self.PopupEvent("Rejected ATC train %s - no script" % trnm)				
+			tr.SetATC(False)
+			self.activeTrains.UpdateTrain(trnm)
+			tr.Draw()
+			
+		elif action in [ "complete", "remove" ]:
+			trnm = parms["train"][0]
+			try:
+				tr = self.trains[trnm]
+			except KeyError:
+				logging.warning("ATC completed train %s does not exist" % trnm)
+				return
+
+			if action == "complete":
+				self.PopupEvent("ATC train %s has completed" % trnm)	
+			else:			
+				self.PopupEvent("Train %s removed from ATC" % trnm)	
+				
+			tr.SetATC(False)
+			if self.AREnabled and tr.IsOnAR():				
+				tr.SetAR(False)
+				self.Request({"ar": {"action": "remove", "train": trnm}})
+				
+			self.activeTrains.UpdateTrain(trnm)
+	
+			tr.Draw()
+					
+	def DoCmdCheckTrains(self, parms):
+		rc1 = self.CheckTrainsContiguous()
+		rc2 = self.CheckLocosUnique()
+		if rc1 and rc2:
+			self.PopupEvent("All trains OK")
+					
+	def DoCmdDumpTrains(self, parms):
+		print("===========================dump by trains")
+		self.activeTrains.dump()
+		print("===========================dump by block")
+		for _, blk in self.blocks.items():
+			tr = blk.GetTrain()
+			if tr is not None:
+				print("%s: %s(%s)" % (blk.GetName(), tr.GetName(), tr.GetLoco()))
+		print("===========================end of dump trains", flush=True)
 
 	def raiseDisconnectEvent(self): # thread context
 		evt = DisconnectEvent()

@@ -841,9 +841,10 @@ class Railroad():
 		'''					
 		for l in [self.turnouts, self.blocks, self.signals, self.signalLevers, self.stopRelays]:
 			for s in l.values():
-				m = s.GetEventMessage()
-				if m is not None:
-					yield m
+				ml = s.GetEventMessages()
+				for m in ml:
+					if m is not None:
+						yield m
 					
 		for s in self.breakers.values():
 			if not s.HasProxy(): # skip breakers that use a proxy

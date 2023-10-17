@@ -147,6 +147,9 @@ class Block:
             district, node, address, bits = ind
             if len(bits) > 0:
                 node.SetOutputBit(bits[0][0], bits[0][1], occ)
+                
+    def GetEventMessages(self):
+        return [self.GetEventMessage(), self.GetEventMessage(clear=True), self.GetEventMessage(direction=True)]
  
     def GetEventMessage(self, clear=False, direction=False):
         bname = self.mainBlockName if self.mainBlockName is not None else self.name
@@ -177,6 +180,9 @@ class StopRelay:
         
     def IsActivated(self):
         return self.activated
+    
+    def GetEventMessages(self):
+        return [self.GetEventMessage()]
     
     def GetEventMessage(self):
         return {"relay": [{ "name": self.name, "state": 1 if self.activated else 0}]}
@@ -401,6 +407,9 @@ class Signal:
             district, node, address, bits = ind
             if len(bits) > 0:
                 node.SetOutputBit(bits[0][0], bits[0][1], 1 if self.aspect != 0 else 0)
+                
+    def GetEventMessages(self):
+        return [self.GetEventMessage(), self.GetEventMessage(lock=True)]
     
     def GetEventMessage(self, lock=False, callon=False):
         if lock:
@@ -493,6 +502,9 @@ class SignalLever:
             bt = bits[2]
             if bt:
                 node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'L' else 0)
+                
+    def GetEventMessages(self):
+        return [self.GetEventMessage()]
        
     def GetEventMessage(self):
         return {"siglever": [{ "name": self.name+".lvr", "state": self.state, "callon": 1 if self.callon else 0}]}
@@ -657,6 +669,9 @@ class Turnout:
         
     def IsLocked(self):
         return self.locked
+    
+    def GetEventMessages(self):
+        return [self.GetEventMessage(), self.GetEventMessage(lock=True)]
         
     def GetEventMessage(self, lock=False, force=False):
         self.force = force
