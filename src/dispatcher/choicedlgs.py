@@ -296,7 +296,7 @@ class ChooseBlocksDlg(wx.Dialog):
         vszr.Add(st, 0, wx.ALIGN_CENTER_HORIZONTAL)
         vszr.AddSpacer(10)
         
-        cb = wx.CheckListBox(self, wx.ID_ANY, size=(160, -1), choices=list(blocklist.keys()))
+        cb = wx.CheckListBox(self, wx.ID_ANY, size=(160, -1), choices=blocklist)
         self.cbItems = cb
         vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
         
@@ -329,7 +329,7 @@ class ChooseBlocksDlg(wx.Dialog):
         self.Fit();
         
     def GetResults(self):
-        return self.cbItems.GetCheckedStrings()
+        return list(self.cbItems.GetCheckedStrings())
         
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)

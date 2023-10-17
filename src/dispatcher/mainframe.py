@@ -41,7 +41,6 @@ from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
-from pickle import FALSE
 
 showAspectCalculation = False
 
@@ -1449,9 +1448,11 @@ class MainFrame(wx.Frame):
 							trainid, locoid, atc, ar, east = dlg.GetResults()
 						dlg.Destroy()
 						
-						if rc == wx.ID_CUT:							
-							blockList = tr.GetBlockList()
-							if len(blockList) == 1:
+						if rc == wx.ID_CUT:	
+							bname = blk.GetName()	
+							blockDict = tr.GetBlockList()					
+							blockList = [b for b in blockDict.keys() if b != bname]
+							if len(blockList) == 0:
 								dlg = wx.MessageDialog(self, "Train occupies only 1 block", "Unable to split train", wx.OK | wx.ICON_INFORMATION)
 								dlg.ShowModal()
 								dlg.Destroy()
@@ -1461,14 +1462,11 @@ class MainFrame(wx.Frame):
 							rc = dlg.ShowModal()
 							if rc == wx.ID_OK:
 								blist = dlg.GetResults()
+								blist.append(bname)
 							dlg.Destroy()
 							
 							if rc != wx.ID_OK:
 								return	
-							
-							if len(blist) == 0:
-								logging.info("No blocks chosen for split operation - ignoring request")
-								return
 							
 							logging.info("Splitting following blocks from train %s: %s" % (oldName, str(blist)))			
 
@@ -1478,20 +1476,18 @@ class MainFrame(wx.Frame):
 							newName = newTr.GetName()
 							newLoco = newTr.GetLoco()
 							
-							blkx = blockList[blist[0]] # remember the first block on this list
 							for bn in blist:
-								blk = blockList[bn]							
-								tr.RemoveFromBlock(blk)
-								newTr.AddToBlock(blk)
-								blk.SetTrain(newTr)
-								blk.SetEast(east)
-								self.Request({"settrain": { "block": blk.GetName()}})
-								self.Request({"settrain": { "block": blk.GetName(), "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
+								b = blockDict[bn]							
+								tr.RemoveFromBlock(b)
+								newTr.AddToBlock(b)
+								b.SetTrain(newTr)
+								b.SetEast(east)
+								self.Request({"settrain": { "block": b.GetName()}})
+								self.Request({"settrain": { "block": b.GetName(), "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
 								if self.IsDispatcher():
-									self.CheckTrainsInBlock(blk.GetName(), None)
+									self.CheckTrainsInBlock(b.GetName(), None)
 							
 							self.trains[newName] = newTr
-							newTr.SetEast(blkx.GetEast()) # train takes on the direction of the block
 							
 							self.activeTrains.AddTrain(newTr)
 							self.activeTrains.UpdateTrain(oldName)
@@ -2618,10 +2614,7 @@ class MainFrame(wx.Frame):
 			tr.Draw()
 					
 	def DoCmdCheckTrains(self, parms):
-		rc1 = self.CheckTrainsContiguous()
-		rc2 = self.CheckLocosUnique()
-		if rc1 and rc2:
-			self.PopupEvent("All trains OK")
+		self.CheckTrains()
 					
 	def DoCmdDumpTrains(self, parms):
 		print("===========================dump by trains")
@@ -2705,8 +2698,7 @@ class MainFrame(wx.Frame):
 		self.SaveTrains()
 		
 	def OnBCheckTrains(self, _):
-		self.CheckTrainsContiguous()
-		self.CheckLocosUnique()
+		self.CheckTrains()
 		
 	def OnBClearTrains(self, _):
 		dlg = wx.MessageDialog(self, 'This clears all train IDs.  Are you sure you want to continue?\nPress "Yes" to confirm,\nor "No" to cancel.',
@@ -2795,6 +2787,12 @@ class MainFrame(wx.Frame):
 						self.PopupEvent("Block %s not occupied, expecting train %s" % (bname, tid))
 						
 		self.Request({"checktrains": {}}) # this command will invoke the CheckTrains method after all the renaming has been done
+		
+	def CheckTrains(self):
+		rc1 = self.CheckTrainsContiguous()
+		rc2 = self.CheckLocosUnique()
+		if rc1 and rc2:
+			self.PopupEvent("All trains OK")
 		
 	def CheckTrainsContiguous(self, query=False):
 		t = [tr for tr in self.trains.values() if not tr.IsContiguous()]
