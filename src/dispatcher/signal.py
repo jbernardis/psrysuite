@@ -16,7 +16,6 @@ class Signal:
 		self.possibleRoutes = {}
 		self.guardBlock = None # block that the signal is guarding exit from
 		self.fleetEnabled = False
-		self.lastAspect = 0
 		self.locked = False
 		self.lockedBy = []
 		self.mutex = [] # mutually exclusive signals
@@ -110,7 +109,6 @@ class Signal:
 		self.aspect = aspect
 		if not callon:
 			if aspect != 0:
-				self.lastAspect = aspect
 				for signm in self.mutex:
 					self.frame.Request({"signal": {"name": signm, "aspect": 0, "callon": 0}})
 
@@ -135,8 +133,11 @@ class Signal:
 		else:
 			self.frame.AddPendingFleet(blk, osblk, rtname, self)
 
-	def DoFleeting(self):
-		self.frame.Request({"signal": { "name": self.GetName(), "aspect": self.lastAspect }})
+	def DoFleeting(self, newAspect):
+		if self.aspect != 0:
+			return # it's already been taken for other purposes - do nothing
+		
+		self.frame.Request({"signal": { "name": self.GetName(), "aspect": newAspect }})
 
 	def SetGuardBlock(self, blk):
 		self.guardBlock = blk

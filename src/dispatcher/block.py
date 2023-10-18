@@ -450,7 +450,7 @@ class Block:
 
 		self.train = None
 		self.EvaluateStoppingSections()
-		if self.entrySignal is not None:
+		if self.type == OVERSWITCH and self.entrySignal is not None:
 			signm = self.entrySignal.GetName()
 			self.frame.Request({"signal": { "name": signm, "aspect": STOP}})
 			self.entrySignal.SetLock(self.GetName(), 0)

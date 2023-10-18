@@ -1218,16 +1218,28 @@ class MainFrame(wx.Frame):
 
 		sig, osblock, rtname = self.pendingFleets[bname]
 		del(self.pendingFleets[bname])
+
+		'''
+		the signal should be red, so if it's not, do nothing here
+		'''
+		if sig.GetAspect() != 0:
+			return
+		
+		
+		'''
+		calculate a new aspect for this signal, based on current conditions
+		'''
+		rt = osblock.GetRoute()
+		newAspect = sig.GetDistrict().CalculateAspect(sig, osblock, rt)
 		
 		'''
 		check if this signal is still in the selected route through this OS block
 		'''
-		rt = osblock.GetRoute()
 		if rt is not None:
 			if rt.GetName() == rtname:
 				sigs = rt.GetSignals()
 				if sig.GetName() in sigs:
-					sig.DoFleeting()	
+					sig.DoFleeting(newAspect)	
 
 	def BuildBlockMap(self, bl):
 		blkMap = {}
