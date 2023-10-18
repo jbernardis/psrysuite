@@ -104,7 +104,8 @@ class TrainList:
 	def GetTrainList(self):
 		return self.trains
 
-	def GetSetTrainCmds(self, train=None):
+	def GetSetTrainCmds(self, train=None, nameonly=False):
+		nameflag = "1" if nameonly else "0"
 		for tr, trinfo in self.trains.items():
 			if train is None or train == tr:
 				loco = trinfo["loco"]
@@ -120,7 +121,7 @@ class TrainList:
 				logging.debug("trinfo = %s" % str(trinfo))
 				clist = []
 				for b in blocks:
-					clist.append({"block": b, "name": tr, "loco": loco, "atc": atc, "east": east})
+					clist.append({"block": b, "name": tr, "loco": loco, "atc": atc, "east": east, "nameonly": nameflag})
 				yield({"settrain": clist})
 				yield({"trainsignal": {"train": tr, "block": frontblock, "signal": signal, "aspect": aspect}})
 				

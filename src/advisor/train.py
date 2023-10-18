@@ -5,6 +5,7 @@ class Train:
 		self.loco = loco
 		self.blocks = []
 		self.atOrigin = True
+		self.east = True
 
 	def AddBlock(self, block):
 		if block in self.blocks:
@@ -18,6 +19,9 @@ class Train:
 	
 	def SetAtOrigin(self, flag):
 		self.atOrigin = flag
+		
+	def SetEast(self, flag):
+		self.east = flag
 		
 	def GetBlocks(self):
 		return self.blocks

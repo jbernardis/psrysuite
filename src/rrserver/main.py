@@ -735,7 +735,7 @@ class ServerMain:
 			east = None
 
 		if self.trainList.RenameTrain(oname, nname, oloco, nloco, east):
-			for cmd in self.trainList.GetSetTrainCmds(nname):
+			for cmd in self.trainList.GetSetTrainCmds(nname, nameonly=True):
 				self.socketServer.sendToAll(cmd)
 
 	def DoCheckTrains(self, cnd):				

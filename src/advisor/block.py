@@ -15,7 +15,7 @@ class Block:
 		self.state = state
 		self.parent.BlockStateChange(self.name, self.state)
 
-	def SetDirection(self, direction):
+	def SetEast(self, direction):
 		if direction == self.direction:
 			return
 
@@ -42,7 +42,7 @@ class Block:
 	def GetName(self):
 		return self.name
 
-	def GetDirection(self):
+	def GetEast(self):
 		return self.direction
 
 	def GetState(self):

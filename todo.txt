@@ -35,18 +35,31 @@ why don't I see the AR/ARC on the active train display for a remote display?
 why don't I see speed on the active train display
 
 
-a button or other method for changing train direction
 
 
-signal bits to mast heads:
+signal bits to mast heads: (is this still accurate, or does it represent the old tester with the reversed bit ordering)
 000 = Red
-100 = Yellow/Green
-010 = Red/Yellow
+100 = Red/Yellow
+010 = Yellow/Green
 110 = Red/Green
-001 = Red/Red
-101 = Yellow/Green
-011 = Red/Yellow
+001 = Yellow/Red
+101 = Red/Flashing Yellow
+011 = Green/Red
 111 = Red/Green
+
+as per Bill Schaffer:
+
+Clear             = Green/Red           011
+Approach Medium   = Yellow/Green        010
+Medium Clear      = Red/Green           111
+Approach Slow     = Red/Yellow          110xxxx
+Approach          = Yellow/Red          001
+Medium Approach   = Red/Flashing Yellow 101
+Slow Approach and                       100
+Restricting       = Flashing Red/Red(Red/Yellow)
+
+
+Need to verify aspects with fixed tester program.  Also need to take note of bit order and make sure I am using the same order in server
 
 
 
@@ -54,13 +67,12 @@ When a train passes westbound through N31, it changes to the identity of the tra
 
 West and East stopping sections for P31/P32 seem to be reversed, should I change the definition of the stopping bliock, or just change the interpretation of the input bits
 
-
-reverse the signal heads for port B
-
 over-ride button versus callon
 
 ability to suppress specific trains from active train display
 
 Do I have stop blocks backwards east of nassau in B and.or R blocks???
 
-merge train - complete
+refine aspect calculation debugging information
+
+revisit fleeting algorithm - should signals work as a group or as individual signals?  If I change the route through the OS, if a signal fleets back to green, should it go with the new route, or just be abandoned>

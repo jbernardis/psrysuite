@@ -141,8 +141,6 @@ class MainUnit:
 					for p in parms:
 						sigName = p["name"]
 						aspect = int(p["aspect"])
-						if sigName == "C14RB":
-							logging.info("Signal: %s: %s" % (sigName, aspect))
 						if sigName not in self.signals:
 							self.signals[sigName] = Signal(self, sigName, aspect)
 						else:
@@ -184,6 +182,11 @@ class MainUnit:
 						name = p["name"]
 						loco = p["loco"]
 						try:
+							nameonly = p["nameonly"] == "1"
+						except KeyError:
+							nameonly = False
+							
+						try:
 							east = p["east"]
 						except KeyError:
 							east = True
@@ -194,11 +197,12 @@ class MainUnit:
 							if name not in self.trains:
 								self.trains[name] = Train(self, name, loco)
 	
-							self.trains[name].AddBlock(block)
 							self.trains[name].SetEast(east)
 							self.blocks[block].SetEast(east)
-	
-							self.blocks[block].SetTrain(name, loco)
+							
+							if not nameonly: # this prevents us from setting up a route request for changes to name/direction only
+								self.trains[name].AddBlock(block)	
+								self.blocks[block].SetTrain(name, loco)
 	
 				elif cmd == "ar":
 					action = parms["action"][0]
@@ -359,7 +363,8 @@ class MainUnit:
 		blockTriggerPoint = self.triggers.GetTriggerPoint(train, block)
 		if blockTriggerPoint != triggerPoint:
 			return None
-		
+
+		logging.info("CheckTrainInBlock: adding a route request for block %s trigger point %s" % (block, triggerPoint))		
 		return RouteRequest(train, self.routes[rtName], block)
 
 	def HarpersFerryCrossingCleared(self, osName):
@@ -471,26 +476,18 @@ class MainUnit:
 
 		sigNm = rte.GetSignalForEnd(blkName)
 		if sigNm is not None:
-			if sigNm == "C14RB":
-				logging.info("signal %s" % sigNm)
 			try:
 				aspect = self.signals[sigNm].GetAspect()
 			except:
-				if sigNm == "C14RB":
-					logging.info("Unable to retrieve signal aspect - assume 0")
 				aspect = 0
 				
 			if aspect == 0:
 				if not sigNm.startswith("P"):
 					cmd = {"signal": {"name": sigNm, "aspect": -1}}
 					self.ReqQueue.Append(cmd)
-					if sigNm == "C14RB":
-						logging.info("command sent: %s" % str(cmd))
-				else:
-					logging.info("skipping this signal since we do not control Port")
+					logging.info("command sent: %s" % str(cmd))
 			else:
-				if sigNm == "C14RB":
-					logging.info("Current signal aspect (%s) allows movement - no command sent" % aspect)
+					logging.info("skipping this signal since we do not control Port")
 
 	def EnqueueRouteRequest(self, rteRq):
 		osNm = rteRq.GetOS()

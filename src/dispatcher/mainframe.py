@@ -42,7 +42,7 @@ from dispatcher.rrserver import RRServer
 from dispatcher.edittraindlg import EditTrainDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
 
-showAspectCalculation = False
+showAspectCalculation = True
 
 MENU_ATC_REMOVE  = 900
 MENU_ATC_STOP    = 901

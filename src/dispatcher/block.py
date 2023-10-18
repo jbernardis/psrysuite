@@ -899,11 +899,11 @@ class OverSwitch (Block):
 	def GetRouteName(self):
 		return self.rtName
 
-	def GetRouteType(self):
+	def GetRouteType(self, reverse=False):
 		if self.route is None:
 			return None
 
-		return self.route.GetRouteType()
+		return self.route.GetRouteType(reverse=reverse)
 
 	def SetEntrySignal(self, sig):
 		self.entrySignal = sig

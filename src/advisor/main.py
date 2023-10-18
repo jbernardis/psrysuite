@@ -83,6 +83,7 @@ class MainUnit:
 		while self.running:
 			data = self.commandQ.get()
 			jdata = json.loads(data)
+			logging.info("Inbound message: %s" % data)
 			for cmd, parms in jdata.items():
 				if cmd == "turnout":
 					for p in parms:
@@ -118,7 +119,7 @@ class MainUnit:
 							self.blocks[block] = Block(self, block, 0, direction, False)
 						else:
 							b = self.blocks[block]
-							b.SetDirection(direction)
+							b.SetEast(direction)
 	
 				elif cmd == "blockclear":
 					for p in parms:
@@ -177,6 +178,10 @@ class MainUnit:
 							east = p["east"]
 						except KeyError:
 							east = True
+						try:
+							nameonly = p["nameonly"] == "1"
+						except KeyError:
+							nameonly = False
 	
 						if name is None:
 							self.blocks[block].SetTrain(None, None)
@@ -184,13 +189,13 @@ class MainUnit:
 							if name not in self.trains:
 								self.trains[name] = Train(self, name, loco)
 	
-							self.trains[name].AddBlock(block)
 							self.trains[name].SetEast(east)
 							self.blocks[block].SetEast(east)
 							
-							self.CheckTrainAtOrigin(name, block)
-	
-							self.blocks[block].SetTrain(name, loco)
+							if not nameonly:
+								self.trains[name].AddBlock(block)
+								self.CheckTrainAtOrigin(name, block)
+								self.blocks[block].SetTrain(name, loco)
 	
 				elif cmd == "sessionID":
 					self.sessionid = int(parms)
@@ -208,7 +213,7 @@ class MainUnit:
 					self.running = False
 	
 				else:
-					if cmd not in ["control", "relay", "handswitch", "siglever", "breaker", "fleet"]:
+					if cmd not in ["control", "relay", "handswitch", "siglever", "breaker", "fleet", "trainsignal"]:
 						logging.info("unknown command ignored: %s: %s" % (cmd, parms))
 
 		try:

@@ -27,7 +27,7 @@ class Fifo:
 			return None
 
 		result = self.data[self.nextout]
-		logging.info("FIFO POP: %s" % result.toString())
+		logging.info("FIFO PEEK: %s" % result.toString())
 		return result
 
 	def IsEmpty(self):

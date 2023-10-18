@@ -370,6 +370,7 @@ class District:
 		return True
 
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
+		msg = []
 		logging.debug("Calculating aspect for signal %s route %s" % (sig.GetName(), rt.GetName()))
 		
 		if osblk.IsBusy():
@@ -378,14 +379,10 @@ class District:
 			logging.debug("Unable to calculate aspect: OS Block is busy")
 			return None
 		
-		msg = []
-		msg.append("OS: %s Rte: %s  Sig: %s  SigE: %s" % (osblk.GetName(), rt.GetName(), sig.GetName(), sig.GetEast()))
 		currentDirection = sig.GetEast()
 		
-		msg.append("current movement is %s" % currentDirection)
 		exitBlkNm = rt.GetExitBlock(reverse = currentDirection!=osblk.GetEast())
 		rType = rt.GetRouteType(reverse = currentDirection!=osblk.GetEast())
-		msg.append("exit block name = %s  Route Type = %s" % (exitBlkNm, routetype(rType)))
 
 		exitBlk = self.frame.blocks[exitBlkNm]
 		if exitBlk.IsOccupied():
@@ -393,10 +390,8 @@ class District:
 			logging.debug("Unable to calculate aspect: Block %s is busy" % exitBlkNm)
 			return None
 
-		msg.append("check %s/%s" % (osblk.GetName(), exitBlkNm))
 		if self.CrossingEastWestBoundary(osblk, exitBlk):
 			currentDirection = not currentDirection
-			msg.append("Crossing EW boundary between %s and %s - direction now %s" % (osblk.GetName(), exitBlkNm, currentDirection))
 			
 		if exitBlk.IsCleared():
 			if exitBlk.GetEast() != currentDirection:
@@ -408,37 +403,29 @@ class District:
 			self.frame.PopupEvent("Block %s is locked" % exitBlk.GetName())
 			logging.debug("Unable to calculate aspect: Block %s is locked" % exitBlkNm)
 			return None
-
-		nxe, nxw = exitBlk.GetAdjacentBlocks()
-		msg.append("Next East = %s, west = %s" % ("None" if nxe is None else nxe.GetName(), "None" if nxw is None else nxw.GetName()))
-
 		
 		nb = exitBlk.NextBlock(reverse = currentDirection!=exitBlk.GetEast())
 		if nb:
 			nbName = nb.GetName()
-			msg.append("check %s/%s" % (nbName, exitBlkNm))
 			if self.CrossingEastWestBoundary(nb, exitBlk):
 				currentDirection = not currentDirection
-				msg.append("Crossing EW boundary between %s and %s - direction now %s" % (nbName, exitBlkNm, currentDirection))
 			
 			nbStatus = nb.GetStatus()
-			nbRType = nb.GetRouteType()
+			nbRType = nb.GetRouteType(reverse = currentDirection!=nb.GetEast())
+			nbRtName = nb.GetRouteName()
 			# try to go one more block, skipping past an OS block
 
 			nxbNm = nb.GetExitBlock(reverse = currentDirection!=nb.GetEast())
 			if nxbNm is None:
 				nnb = None
 			else:
-				msg.append("nxbnm = %s" % nxbNm)
 				try:
 					nxb = self.frame.blocks[nxbNm]
 				except:
 					nxb = None
 				if nxb:
-					msg.append("check %s/%s" % (nbName, nxbNm))
 					if self.CrossingEastWestBoundary(nb, nxb):
 						currentDirection = not currentDirection
-						msg.append("Crossing EW boundary between %s and %s - direction now %s" % (nbName, nxbNm, currentDirection))
 					nnb = nxb.NextBlock(reverse = currentDirection!=nxb.GetEast())
 				else:
 					nnb = None
@@ -450,22 +437,27 @@ class District:
 				nnbClear = False
 				nnbName = None
 		else:
+			nxbNm = None
 			nbStatus = None
 			nbName = None
 			nbRType = None
+			nbRtName = None
 			nnbClear = False
 			nnbName = None
 
 		aType = sig.GetAspectType()
 		aspect = self.GetAspect(aType, rType, nbStatus, nbRType, nnbClear)
 		
-		
-		msg.append("RT: %s" % routetype(rType))
-		msg.append("NB: %s Stat: %s  NRT: %s" % (nbName, statusname(nbStatus), routetype(nbRType)))
+		msg.append("OS: %s Route: %s  Sig: %s" % (osblk.GetName(), rt.GetName(), sig.GetName()))
+		msg.append("exit block name = %s   RT: %s" % (exitBlkNm, routetype(rType)))
+		msg.append("NB: %s Status: %s  NRT: %s" % (nbName, statusname(nbStatus), routetype(nbRType)))
+		msg.append("Next route = %s" % nbRtName)
+		msg.append("next exit block = %s" % nxbNm)
 		msg.append("NNB: %s  NNBC: %s" % (nnbName, nnbClear))
 		msg.append("Aspect = %s (%x)" % (aspectname(aspect, aType), aspect))
 		
-		self.frame.MessageDlg("\n".join(msg))
+		for m in msg:
+			self.frame.PopupEvent(m)
 		
 		logging.debug("Calculated aspect = %s   aspect type = %s route type = %s next block status = %s next block route type = %s next next block clear = %s" %
 					(aspectname(aspect, aType), aspecttype(aType), routetype(rType), statusname(nbStatus), routetype(nbRType), nnbClear))
