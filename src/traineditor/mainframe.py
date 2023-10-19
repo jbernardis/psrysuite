@@ -87,7 +87,7 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 		
 	def OnBLocos(self, _):
-		dlg = ManageLocosDlg(self)
+		dlg = ManageLocosDlg(self, self.settings.browser)
 		dlg.ShowModal()
 		dlg.Destroy()
 		

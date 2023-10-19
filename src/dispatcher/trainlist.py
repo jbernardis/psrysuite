@@ -70,7 +70,8 @@ class ActiveTrainList:
 	def forSnapshot(self):
 		result = {}
 		for trid, tr in self.trains.items():
-			result[trid] = tr.forSnapshot()
+			if not trid.startswith("??"):
+				result[trid] = tr.forSnapshot()
 		
 		return result
 			

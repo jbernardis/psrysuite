@@ -12,6 +12,7 @@ class Settings:
 		self.ipaddr = "192.168.1.144"
 		self.serverport = 9000
 		self.backupdir = os.getcwd()
+		self.browser = None
 
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -32,3 +33,6 @@ class Settings:
 						
 				elif opt == 'backupdir':
 					self.backupdir = value
+					
+				elif opt == 'browser':
+					self.browser = value

@@ -311,6 +311,7 @@ class ServerMain:
 			
 			"debug":		self.DoDebug,
 			"simulate": 	self.DoSimulate,
+			"dumptrains":	self.DoDumpTrains,
 			
 			"dccspeed":		self.DoDCCSpeed,
 			
@@ -644,6 +645,7 @@ class ServerMain:
 		except (IndexError, KeyError):
 			east = True
 		block = cmd["block"][0]
+		print("inbound settrain: name: %s loco: %s blk: %s east: %s" % (trn, loco, block, east))
 
 		if trn and trn.startswith("??"):
 			# this is an unknown train - see if we have a known train in the same block
@@ -733,6 +735,7 @@ class ServerMain:
 			east = cmd["east"][0] == "1"
 		except (IndexError, KeyError):
 			east = None
+		print("inbound renametrain: on: %s nn: %s ol: %s nl: %s east: %s" % (oname, nname, oloco, nloco, east))
 
 		if self.trainList.RenameTrain(oname, nname, oloco, nloco, east):
 			for cmd in self.trainList.GetSetTrainCmds(nname, nameonly=True):
@@ -773,6 +776,9 @@ class ServerMain:
 		addrList = self.clientList.GetFunctionAddress(function)
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"debug": cmd})
+			
+	def DoDumpTrains(self, cmd):
+		self.trainList.Dump()
 
 	def DoClose(self, cmd):
 		function = cmd["function"][0]

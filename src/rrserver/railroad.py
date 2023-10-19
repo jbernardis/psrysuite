@@ -407,9 +407,9 @@ class Railroad():
 			if lb == 1:
 				vals = [1 if aspect != 0 else 0] 
 			elif lb == 2:
-				vals = [aspect & 0x01, aspect & 0x02] 
+				vals = [aspect & 0x02, aspect & 0x01] 
 			elif lb == 3:
-				vals = [aspect & 0x01, aspect & 0x02, aspect & 0x04] 
+				vals = [aspect & 0x04, aspect & 0x02, aspect & 0x01] 
 			else:
 				logging.warning("Unknown bits length for signal %s: %d" % (sig.Name(), len(bits)))
 				return

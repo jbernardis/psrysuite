@@ -467,75 +467,90 @@ class Block:
 			self.sbWest.EvaluateStoppingSection()
 
 	def IdentifyTrain(self):
+		print("identify train in block %s" % self.GetName())
 		if self.east:
+			print("eastbound block")
 			'''
 			first look west, then east, then create a new train
 			'''
 			if self.blkWest:
+				print("looking west into %s" % self.blkWest.GetName())
 				if self.blkWest.GetName() in ["KOSN10S11", "KOSN20S21"]:
 					blkWest = self.blkWest.blkWest
 					if blkWest:
 						tr = blkWest.GetTrain()
 						if tr:
-							self.CheckEWCross(tr, blkWest)						
+							self.CheckEWCross(tr, blkWest)	
+							print("returning 1: %s" % tr.GetName())					
 							return tr
 				else:
 					tr = self.blkWest.GetTrain()
 					if tr:
 						self.CheckEWCross(tr, self.blkWest)						
+						print("returning 2: %s" % tr.GetName())					
 						return tr
 			
 			if self.blkEast:
+				print("looking east into %s" % self.blkEast.GetName())
 				if self.blkEast.GetName() in ["KOSN10S11", "KOSN20S21"]:
 					blkEast = self.blkEast.blkEast
 					if blkEast:
 						tr = blkEast.GetTrain()
 						if tr:
 							self.CheckEWCross(tr, blkEast)							
+							print("returning 3: %s" % tr.GetName())					
 							return tr
 
 				else:
 					tr = self.blkEast.GetTrain()
 					if tr:
 						self.CheckEWCross(tr, self.blkEast)							
+						print("returning 4: %s" % tr.GetName())					
 						return tr
-			
-			return None
 		
 		else:
+			print("westbound block")
 			'''
 			first look east, then west, then create a new train
 			'''
 			if self.blkEast:
+				print("looking east into %s" % self.blkEast.GetName())
 				if self.blkEast.GetName() in ["KOSN10S11", "KOSN20S21"]:
 					blkEast = self.blkEast.blkEast
 					if blkEast:
 						tr = blkEast.GetTrain()
 						if tr:
 							self.CheckEWCross(tr, blkEast)						
+							print("returning 5: %s" % tr.GetName())					
 							return tr
 
 				else:
 					tr = self.blkEast.GetTrain()
 					if tr:
 						self.CheckEWCross(tr, self.blkEast)						
+						print("returning 6: %s" % tr.GetName())					
 						return tr
 					
 			if self.blkWest:
+				print("looking west into %s" % self.blkWest.GetName())
 				if self.blkWest.GetName() in ["KOSN10S11", "KOSN20S21"]:
 					blkWest = self.blkWest.blkWest
 					if blkWest:
 						tr = blkWest.GetTrain()
 						if tr:
 							self.CheckEWCross(tr, blkWest)						
+							print("returning 7: %s" % tr.GetName())					
 							return tr																																																				
 				else:
 					tr = self.blkWest.GetTrain()
 					if tr:
 						self.CheckEWCross(tr, self.blkWest)						
+						print("returning 8: %s" % tr.GetName())					
 						return tr		
 				
-			return None
+
+		print("no train identified")			
+		return None
 		
 	def CheckEWCross(self, tr, blk):
 		if self.type == OVERSWITCH:

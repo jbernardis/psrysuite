@@ -42,7 +42,7 @@ from dispatcher.rrserver import RRServer
 from dispatcher.edittraindlg import EditTrainDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
 
-showAspectCalculation = True
+showAspectCalculation = False
 
 MENU_ATC_REMOVE  = 900
 MENU_ATC_STOP    = 901
@@ -1840,7 +1840,10 @@ class MainFrame(wx.Frame):
 		self.dlgAdvice.Destroy()
 		self.dlgAdvice = None
 
-	def OnBSnapshot(self, _):		
+	def OnBSnapshot(self, _):
+		self.Request({"dumptrains": {}})
+		self.DoCmdDumpTrains({})
+		print("=================================================================================================================", flush=True)		
 		dlg = ChooseSnapshotActionDlg(self)	
 		rc = dlg.ShowModal()
 		dlg.Destroy()
@@ -1879,17 +1882,20 @@ class MainFrame(wx.Frame):
 						# first remove the block from the old train
 						blk = self.blocks[b]
 						otr = blk.GetTrain()
-						otr.RemoveFromBlock(blk)
-						
-						if otr.IsInNoBlocks():
-							otrid = otr.GetName()
-							try:
-								self.activeTrains.RemoveTrain(otrid)
-								del(self.trains[otrid])
-							except:
-								logging.warning("can't delete train %s from train list" % otrid)
+						if otr is None:
+							self.PopupEvent("Unable to find train %s in block %s" % blk.GetName())
 						else:
-							otr.Draw()
+							otr.RemoveFromBlock(blk)
+							
+							if otr.IsInNoBlocks():
+								otrid = otr.GetName()
+								try:
+									self.activeTrains.RemoveTrain(otrid)
+									del(self.trains[otrid])
+								except:
+									logging.warning("can't delete train %s from train list" % otrid)
+							else:
+								otr.Draw()
 						
 						# now if the new train does not yet exist - create it
 						if trid not in self.trains:
@@ -2124,6 +2130,7 @@ class MainFrame(wx.Frame):
 		for p in parms:
 			block = p["name"]
 			state = p["state"]
+			print("inbound block command: %s %s" % (block, state))
 
 			blk = None
 			try:
@@ -2281,6 +2288,8 @@ class MainFrame(wx.Frame):
 				east = p["east"]
 			except KeyError:
 				east = True
+				
+			print("inbound settrain: %s %s %s %s" % (block, name, loco, east))
 
 			try:
 				blk = self.blocks[block]
@@ -2321,6 +2330,7 @@ class MainFrame(wx.Frame):
 
 				if not blk.IsOccupied():
 					logging.warning("Set train for block %s, but that block is unoccupied" % block)
+					self.PopupAdvice("Set train for block %s, but that block is unoccupied" % block)
 					continue
 
 				oldName = None
@@ -2329,6 +2339,14 @@ class MainFrame(wx.Frame):
 					if oldName and oldName != name:
 						if name in self.trains:
 							# merge the two trains under the new "name"
+							if not oldName.startswith("??"):
+								self.PopupEvent("Merging train %s => %s block %s" % (oldName, name, blk.GetName))
+								print("merging train %s into train %s starting in block %s" % (oldName, name, blk.GetName()))
+								print("existing train:")
+								tr.dump()
+								print("old train:")
+								self.trains[oldName].dump()
+								print("==============================================================================")
 							try:
 								bl = self.trains[oldName].GetBlockList()
 							except:
@@ -2343,7 +2361,7 @@ class MainFrame(wx.Frame):
 							
 							self.trains[name] = tr
 							self.activeTrains.RenameTrain(oldName, name)
-							self.Request({"renametrain": { "oldname": oldName, "name": name, "east": "1" if tr.GetEast() else "0"}})
+							self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0"}})
 
 						try:
 							self.activeTrains.RemoveTrain(oldName)
@@ -2654,6 +2672,8 @@ class MainFrame(wx.Frame):
 					self.delayedRequests.Append(req)
 				else:
 					logging.debug("Sending HTTP Request: %s" % json.dumps(req))
+					if command in ["settrain", "renametrain"]:
+						print("outgoing command: %s" % json.dumps(req))
 					self.rrServer.SendRequest(req)
 		else:
 			logging.info("disallowing command %s from non dispatcher" % command)
@@ -2975,13 +2995,8 @@ class MainFrame(wx.Frame):
 		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Display"))
 		
 
-	def MessageDlg(self, msg):
-		if not showAspectCalculation:
-			return 
-		
-		dlg = wx.MessageDialog(self, msg, "", wx.OK | wx.ICON_NONE)
-		dlg.ShowModal()
-		dlg.Destroy()
+	def GetDebugFlag(self):
+		return showAspectCalculation
 
 
 class ExitDlg (wx.Dialog):

@@ -1,4 +1,5 @@
 import logging
+import json
 
 class TrainList:
 	def __init__(self, parent):
@@ -41,6 +42,12 @@ class TrainList:
 				self.trains[train]["east"] = east
 			else:
 				self.trains[train] = {"blocks": [block], "loco": loco, "atc": False, "signal": None, "aspect": 0, "east": east}
+				
+	def Dump(self):
+		print("==========================start of trains dump")
+		for trid in self.trains:
+			print("%s: %s" % (trid, json.dumps(self.trains[trid])))
+		print("==========================end of trains dump", flush=True)
 				
 	def UpdateSignal(self, train, signal, aspect):
 		if train not in self.trains:

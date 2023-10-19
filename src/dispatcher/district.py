@@ -176,6 +176,7 @@ class District:
 		self.eastButton = {}
 		self.westButton = {}
 		logging.info("Creating district %s" % name)
+		self.showaspectcalculation = self.frame.GetDebugFlag()
 
 	def SetTiles(self, tiles, totiles, sstiles, sigtiles, misctiles, btntiles):
 		self.tiles = tiles
@@ -370,7 +371,6 @@ class District:
 		return True
 
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
-		msg = []
 		logging.debug("Calculating aspect for signal %s route %s" % (sig.GetName(), rt.GetName()))
 		
 		if osblk.IsBusy():
@@ -447,17 +447,15 @@ class District:
 
 		aType = sig.GetAspectType()
 		aspect = self.GetAspect(aType, rType, nbStatus, nbRType, nnbClear)
-		
-		msg.append("OS: %s Route: %s  Sig: %s" % (osblk.GetName(), rt.GetName(), sig.GetName()))
-		msg.append("exit block name = %s   RT: %s" % (exitBlkNm, routetype(rType)))
-		msg.append("NB: %s Status: %s  NRT: %s" % (nbName, statusname(nbStatus), routetype(nbRType)))
-		msg.append("Next route = %s" % nbRtName)
-		msg.append("next exit block = %s" % nxbNm)
-		msg.append("NNB: %s  NNBC: %s" % (nnbName, nnbClear))
-		msg.append("Aspect = %s (%x)" % (aspectname(aspect, aType), aspect))
-		
-		for m in msg:
-			self.frame.PopupEvent(m)
+
+		if self.showaspectcalculation:		
+			self.frame.PopupEvent("OS: %s Route: %s  Sig: %s" % (osblk.GetName(), rt.GetName(), sig.GetName()))
+			self.frame.PopupEvent("exit block name = %s   RT: %s" % (exitBlkNm, routetype(rType)))
+			self.frame.PopupEvent("NB: %s Status: %s  NRT: %s" % (nbName, statusname(nbStatus), routetype(nbRType)))
+			self.frame.PopupEvent("Next route = %s" % nbRtName)
+			self.frame.PopupEvent("next exit block = %s" % nxbNm)
+			self.frame.PopupEvent("NNB: %s  NNBC: %s" % (nnbName, nnbClear))
+			self.frame.PopupEvent("Aspect = %s (%x)" % (aspectname(aspect, aType), aspect))
 		
 		logging.debug("Calculated aspect = %s   aspect type = %s route type = %s next block status = %s next block route type = %s next next block clear = %s" %
 					(aspectname(aspect, aType), aspecttype(aType), routetype(rType), statusname(nbStatus), routetype(nbRType), nnbClear))

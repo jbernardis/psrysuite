@@ -4,6 +4,7 @@ import os
 
 from traineditor.locomotives.locomotives import Locomotives
 from traineditor.locomotives.modifylocodlg import ModifyLocoDlg
+from traineditor.reports import Report
 
 BTNSZ = (120, 46)
 
@@ -11,11 +12,12 @@ defaultProfile = {'acc': 1, 'dec': 1, 'fast': 80, 'medium': 58, 'slow': 10, 'sta
 
 
 class ManageLocosDlg(wx.Dialog):
-	def __init__(self, parent):
+	def __init__(self, parent, browser):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		
 		self.titleString = "Manage Locomotives"
+		self.browser = browser
 		
 		self.modified = None
 		self.selectedLx = None
@@ -76,7 +78,16 @@ class ManageLocosDlg(wx.Dialog):
 		self.Bind(wx.EVT_BUTTON, self.bRevertPressed, self.bRevert)
 		btnSizer.Add(self.bRevert)
 		
-		btnSizer.AddSpacer(50)
+		btnSizer.AddSpacer(30)
+		
+		self.bPrint = wx.Button(self, wx.ID_ANY, "Print", size=BTNSZ)
+		self.bPrint.SetToolTip("Print a report of the locomotive information")
+		self.Bind(wx.EVT_BUTTON, self.bPrintPressed, self.bPrint)
+		self.bPrint.Enable(self.browser is not None)
+		btnSizer.Add(self.bPrint)
+
+		
+		btnSizer.AddSpacer(30)
 		
 		self.bExit = wx.Button(self, wx.ID_ANY, "Exit", size=BTNSZ)
 		self.bExit.SetToolTip("Dismiss the dialog box")
@@ -144,6 +155,10 @@ class ManageLocosDlg(wx.Dialog):
 		self.locoOrder = self.locoList.getLocoOrder()
 		self.SetModified()
 		
+	def bPrintPressed(self, _):
+		rpt = Report(self, self.browser)
+		rpt.LocosReport(self.locos)
+		
 	def reportSelection(self, lx, doubleclick=False):
 		self.bDel.Enable(lx is not None)
 		self.selectedLx = lx
@@ -182,8 +197,8 @@ class ManageLocosDlg(wx.Dialog):
 			if rc != wx.ID_YES:
 				return
 			
-		locos = Locomotives(os.path.join(os.getcwd(), "data", "locos.json"))
-		self.extractLocoData(locos)
+		self.locos = Locomotives(os.path.join(os.getcwd(), "data", "locos.json"))
+		self.extractLocoData(self.locos)
 
 		self.SetModified(False)
 
