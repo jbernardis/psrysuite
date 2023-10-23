@@ -1,8 +1,9 @@
 import wx
 import os
 import json
-from traineditor.tracker.trainroster import TrainRoster
+from traineditor.trntracker.trainroster import TrainRoster
 from traineditor.locomotives.locomotives import Locomotives
+from traineditor.trntracker.traincardsreport import TrainCardsReport
 
 BTNSZ = (120, 46)
 BTNSZSMALL = (80, 30)
@@ -19,11 +20,12 @@ def formatLocation(info, tp):
 	return ("%s / %s" % (info[tp]["loc"], info[tp]["track"]))
 
 class TrainTrackerDlg(wx.Dialog):
-	def __init__(self, parent):
+	def __init__(self, parent, browser):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 
 		self.parent = parent
+		self.browser = browser
 		
 		self.titleString = "Edit Train Tracker Information"
 		self.filename = os.path.join(os.getcwd(), "data", "trains.json")
@@ -368,8 +370,17 @@ class TrainTrackerDlg(wx.Dialog):
 		self.bRevert.SetToolTip("Revert to the most recently saved trains file")
 		self.Bind(wx.EVT_BUTTON, self.bRevertPressed, self.bRevert)
 		btnSizer.Add(self.bRevert)
+		
+		btnSizer.AddSpacer(30)
+
+		self.bPrintTrainCards = wx.Button(self, wx.ID_ANY, "Print Train Cards", size=BTNSZ)
+		self.bPrintTrainCards.SetFont(btnFont)
+		self.bPrintTrainCards.SetToolTip("Print train cards")
+		self.Bind(wx.EVT_BUTTON, self.bPrintTrainCardsPressed, self.bPrintTrainCards)
+		self.bPrintTrainCards.Enable(self.browser is not None)
+		btnSizer.Add(self.bPrintTrainCards)
 				
-		btnSizer.AddSpacer(50)
+		btnSizer.AddSpacer(30)
 		
 		self.bExit = wx.Button(self, wx.ID_ANY, "Exit", size=BTNSZ)
 		self.bExit.SetFont(btnFont)
@@ -903,6 +914,11 @@ class TrainTrackerDlg(wx.Dialog):
 				json.dump(self.trains, fp)
 				
 		self.setModified(False)
+		
+	def bPrintTrainCardsPressed(self, _):
+		rpt = TrainCardsReport(self, self.browser)
+		rpt.TrainCards(self.roster, self.trainList)
+
 		
 	def bExitPressed(self, _):
 		if self.modified:

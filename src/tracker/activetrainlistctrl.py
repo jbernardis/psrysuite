@@ -3,7 +3,6 @@ import os
 
 MENU_REMOVE_TRAIN    = 1100
 MENU_CHANGE_ENGINEER = 1101
-MENU_CHANGE_LOCO     = 1102
 MENU_SHOW_DETAILS    = 1103
 MENU_RETURN_TRAIN    = 1104
 
@@ -130,13 +129,11 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 		menu = wx.Menu()
 		menu.Append( MENU_REMOVE_TRAIN, "Train at Destination" )
 		menu.Append( MENU_CHANGE_ENGINEER, "Change Engineer" )
-		menu.Append( MENU_CHANGE_LOCO, "Change Locomotive" )
 		menu.Append( MENU_SHOW_DETAILS, "Show Train Details" )
 		menu.Append( MENU_RETURN_TRAIN, "Return Train to Schedule" )
 		self.Bind(wx.EVT_MENU, self.onRemoveTrain, id=MENU_REMOVE_TRAIN)
 		self.Bind(wx.EVT_MENU, self.onChangeEngineer, id=MENU_CHANGE_ENGINEER)
 		self.Bind(wx.EVT_MENU, self.onShowDetails, id=MENU_SHOW_DETAILS)
-		self.Bind(wx.EVT_MENU, self.onChangeLoco, id=MENU_CHANGE_LOCO)
 		self.Bind(wx.EVT_MENU, self.onReturnTrain, id=MENU_RETURN_TRAIN)
 		self.PopupMenu( menu, evt.GetPoint() )
 		menu.Destroy()
@@ -146,9 +143,6 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 		
 	def onChangeEngineer(self, evt):
 		self.parent.reassignTrain(self.itemSelected)
-		
-	def onChangeLoco(self, evt):
-		self.parent.changeLoco(self.itemSelected)
 		
 	def onShowDetails(self, evt):
 		self.parent.showDetails(self.itemSelected)

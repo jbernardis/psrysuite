@@ -2,7 +2,7 @@
 class ActiveTrain:
 	def __init__(self, tid, tInfo, loco, ldesc, llimit, eng, block):
 		self.tid = tid
-		self.dir = "East" if tInfo["eastbound"] else "West"
+		self.SetEast(tInfo["eastbound"])
 
 		if tInfo["origin"]["loc"] is None:
 			self.origin = ""
@@ -33,3 +33,7 @@ class ActiveTrain:
 		self.sortAscending = False
 		self.sortGroupDir = False
 		self.sortKey = "time"
+		
+	def SetEast(self, flag):
+		self.east = flag
+		self.dir = "East" if flag else "West"

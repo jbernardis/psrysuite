@@ -2435,7 +2435,7 @@ class MainFrame(wx.Frame):
 				
 			tr.Draw()
 	
-	def DoCmdAssignTrain(self, parms):		
+	def DoCmdAssignTrain(self, parms):	
 		for p in parms:
 			train = p["train"]
 			try:

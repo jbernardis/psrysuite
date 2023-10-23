@@ -4,6 +4,8 @@ if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
 import wx
+from wx.lib.gizmos.ledctrl import LEDNumberCtrl
+
 from subprocess import Popen
 
 from wx.lib import newevent
@@ -30,10 +32,8 @@ from tracker.activetrainlistdlg import ActiveTrainListDlg
 from tracker.completedtrainlist import CompletedTrainList
 from tracker.manageengineers import ManageEngineersDlg
 from tracker.manageschedule import ManageScheduleDlg
-from tracker.assignlocos import AssignLocosDlg
 from tracker.detailsdlg import DetailsDlg
 from tracker.settings import Settings
-from tracker.reports import Report
 from tracker.completedtrains import CompletedTrains
 from tracker.listener import Listener
 from utilities.backup import saveData, restoreData
@@ -47,13 +47,8 @@ MENU_FILE_BACKUP = 113
 MENU_FILE_RESTORE = 114
 MENU_FILE_EXIT = 199
 MENU_MANAGE_ENGINEERS = 201
-MENU_MANAGE_ASSIGN_LOCOS = 203
 MENU_MANAGE_SCHEDULE = 205
 MENU_MANAGE_RESET = 299
-MENU_REPORT_OP_WORKSHEET = 301
-MENU_REPORT_TRAIN_CARDS = 302
-MENU_REPORT_LOCOS = 303
-MENU_REPORT_STATUS = 304
 MENU_DISPATCH_CONNECT = 401
 MENU_DISPATCH_DISCONNECT = 402
 MENU_VIEW_ENG_QUEUE = 601
@@ -67,6 +62,7 @@ MENU_SORT_GROUP = 652
 MENU_SORT_ASCENDING = 653
 
 MAX_STEPS = 9
+MAX_BREAKER_CYCLES = 3
 
 wildcard = "JSON file (*.json)|*.json|"	 \
 				"All files (*.*)|*.*"
@@ -157,27 +153,10 @@ class MainFrame(wx.Frame):
 		i = wx.MenuItem(self.menuManage, MENU_MANAGE_SCHEDULE, "Train Schedule", helpString="Add/remove/reorder trains to/from the schedule and extra train list")
 		self.menuManage.Append(i)
 		
-		i = wx.MenuItem(self.menuManage, MENU_MANAGE_ASSIGN_LOCOS, "Assign Locomotives", helpString="Assign locomotives to trains")
-		self.menuManage.Append(i)
-		
 		self.menuManage.AppendSeparator()
 		
 		i = wx.MenuItem(self.menuManage, MENU_MANAGE_RESET, "Reset Session", helpString="Reset Operating Session")
 		self.menuManage.Append(i)
-		
-		self.menuReports = wx.Menu()
-		
-		i = wx.MenuItem(self.menuReports, MENU_REPORT_OP_WORKSHEET, "Operating Worksheet", helpString="Print an Operating Worksheet")
-		self.menuReports.Append(i)
-		
-		i = wx.MenuItem(self.menuReports, MENU_REPORT_TRAIN_CARDS, "Train Cards", helpString="Print Train Cards")
-		self.menuReports.Append(i)
-		
-		i = wx.MenuItem(self.menuReports, MENU_REPORT_LOCOS, "Locomotives", helpString="Print Locomotive Roster")
-		self.menuReports.Append(i)
-		
-		i = wx.MenuItem(self.menuReports, MENU_REPORT_STATUS, "Train Status", helpString="List of all active and completed trains")
-		self.menuReports.Append(i)
 		
 		self.menuDispatch = wx.Menu()
 		
@@ -191,7 +170,6 @@ class MainFrame(wx.Frame):
 		menuBar.Append(self.menuFile, "File")
 		menuBar.Append(self.menuView, "View")
 		menuBar.Append(self.menuManage, "Manage")
-		menuBar.Append(self.menuReports, "Reports")
 		menuBar.Append(self.menuDispatch, "Dispatch")
 				
 		self.SetMenuBar(menuBar)
@@ -216,13 +194,7 @@ class MainFrame(wx.Frame):
 		
 		self.Bind(wx.EVT_MENU, self.panel.onManageEngineers, id=MENU_MANAGE_ENGINEERS)
 		self.Bind(wx.EVT_MENU, self.panel.onManageSchedule, id=MENU_MANAGE_SCHEDULE)
-		self.Bind(wx.EVT_MENU, self.panel.onAssignLocos, id=MENU_MANAGE_ASSIGN_LOCOS)
 		self.Bind(wx.EVT_MENU, self.panel.onResetSession, id=MENU_MANAGE_RESET)
-		
-		self.Bind(wx.EVT_MENU, self.panel.onReportOpWorksheet, id=MENU_REPORT_OP_WORKSHEET)
-		self.Bind(wx.EVT_MENU, self.panel.onReportTrainCards, id=MENU_REPORT_TRAIN_CARDS)
-		self.Bind(wx.EVT_MENU, self.panel.onReportLocos, id=MENU_REPORT_LOCOS)
-		self.Bind(wx.EVT_MENU, self.panel.onReportStatus, id=MENU_REPORT_STATUS)
 		
 		self.Bind(wx.EVT_MENU, self.panel.connectToDispatch, id=MENU_DISPATCH_CONNECT)
 		self.Bind(wx.EVT_MENU, self.panel.disconnectFromDispatch, id=MENU_DISPATCH_DISCONNECT)
@@ -251,15 +223,10 @@ class MainFrame(wx.Frame):
 			title += "    Not Connected to server"
 			
 		self.SetTitle(title)
-		
-	def disableReports(self):
-		for r in [ MENU_REPORT_OP_WORKSHEET, MENU_REPORT_TRAIN_CARDS, MENU_REPORT_LOCOS, MENU_REPORT_STATUS ]:
-			self.menuReports.Enable(r, False)
 			
 	def enableForConnection(self, connected):
 		self.menuDispatch.Enable(MENU_DISPATCH_DISCONNECT, connected)
 		self.menuManage.Enable(MENU_MANAGE_SCHEDULE, connected)
-		self.menuManage.Enable(MENU_MANAGE_ASSIGN_LOCOS, connected)
 		
 		self.menuDispatch.Enable(MENU_DISPATCH_CONNECT, not connected)
 	
@@ -278,6 +245,10 @@ class TrainTrackerPanel(wx.Panel):
 		self.setConnected(False)
 		self.completedTrains = CompletedTrains()
 		self.breakers = {}
+		self.timeValue = 0
+		self.clockStatus = None
+		self.cycleTimer = MAX_BREAKER_CYCLES
+
 		
 		self.sessionid = None
 		
@@ -296,6 +267,7 @@ class TrainTrackerPanel(wx.Panel):
 		
 		self.dlgLegend = None
 		self.dlgDepartureTimer = None
+		self.showingTrain = None
 
 		self.atl = ActiveTrainList()
 		self.atl.setSortKey("time")
@@ -428,12 +400,18 @@ class TrainTrackerPanel(wx.Panel):
 		self.pngPSRY.SetMask(mask)
 		b = wx.StaticBitmap(self, wx.ID_ANY, self.pngPSRY)
 		
+		self.timeDisplay = LEDNumberCtrl(self, wx.ID_ANY, size=(150, 50))
+		self.timeDisplay.SetBackgroundColour(wx.Colour(0, 0, 0))
+		
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
-		hsz.Add(self.teBreaker, 1, wx.TOP, 40)
+		hsz.Add(self.teBreaker, 0, wx.TOP, 40)
 		hsz.AddSpacer(40)
 		hsz.Add(b)
+		hsz.AddSpacer(40)
+		hsz.Add(self.timeDisplay, 0, wx.TOP, 30)
 		
 		vsizerr.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		
 		vsizerr.AddSpacer(10)
 
 		boxDetails = wx.StaticBox(self, wx.ID_ANY, "Train Details")
@@ -547,10 +525,6 @@ class TrainTrackerPanel(wx.Panel):
 		self.completedTrainList.update()
 
 		self.loadEngineerFile(os.path.join(os.getcwd(), "data", "engineers.txt"))
-		
-		self.report = Report(self, self.settings)
-		if not self.report.Initialized():
-			self.parent.disableReports()
 
 		self.setExtraTrains()
 		
@@ -560,11 +534,35 @@ class TrainTrackerPanel(wx.Panel):
 		self.ticker = wx.Timer(self)
 		self.ticker.Start(1000)
 		logging.info("Tracker initialization completed")
+		self.displayTimeValue()
+				
+	def DisplayTimeValue(self):
+		if not self.connected:
+			self.timeDisplay.SetValue("")
+			return 
+		
+		hours = int(self.timeValue/60)
+		if hours == 0:
+			hours = 12
+		minutes = self.timeValue % 60
+		self.timeDisplay.SetValue("%2d:%02d" % (hours, minutes))
+		
+	def ShowClockStatus(self):
+		if self.clockStatus == 0: # clock is stopped
+			self.timeDisplay.SetForegroundColour(wx.Colour(255, 0, 0))
+		
+		elif self.clockStatus == 1: # running in railroad mode
+			self.timeDisplay.SetForegroundColour(wx.Colour(0, 255, 0))
+		
+		elif self.clockStatus == 2: # time of day
+			self.timeDisplay.SetForegroundColour(wx.Colour(32, 229, 240))
+		self.timeDisplay.Refresh()
 		
 	def ShowBreakers(self):
-		self.tripped = [name for name in self.breakers if self.breakers[name] == 0]
+		self.tripped = sorted([name for name in self.breakers if self.breakers[name] == 0])
 		if len(self.tripped) == 0:
 			self.breakerx = 0
+		self.cycleTimer = MAX_BREAKER_CYCLES
 		
 	def onTicker(self, _):
 		if not self.connected:
@@ -576,12 +574,19 @@ class TrainTrackerPanel(wx.Panel):
 			self.teBreaker.SetValue("All OK")
 			
 		else:
-			bn = BreakerName(self.tripped[self.breakerx])
-			self.teBreaker.SetValue(bn)
-			self.teBreaker.SetBackgroundColour(wx.Colour(241, 41, 47))
-			self.breakerx += 1
-			if self.breakerx >= len(self.tripped):
-				self.breakerx = 0
+			self.cycleTimer += 1
+			if self.cycleTimer >= MAX_BREAKER_CYCLES:
+				bn = BreakerName(self.tripped[self.breakerx])
+				n = len(self.tripped)
+				if n > 1:
+					bn += " (%d/%d)" % (self.breakerx+1, len(self.tripped))
+					
+				self.teBreaker.SetValue(bn)
+				self.teBreaker.SetBackgroundColour(wx.Colour(241, 41, 47))
+				self.breakerx += 1
+				if self.breakerx >= len(self.tripped):
+					self.breakerx = 0
+				self.cycleTimer = 0
 				
 		if self.dlgDepartureTimer is not None:
 			try:
@@ -624,13 +629,15 @@ class TrainTrackerPanel(wx.Panel):
 		
 	def onConnectEvent(self, evt):
 		self.setConnected(True)
-		
+		self.DisplayTimeValue()
+
 	def raiseDisconnectEvent(self): # thread context
 		evt = DisconnectEvent()
 		wx.QueueEvent(self, evt)
 
 	def onDisconnectEvent(self, evt):
 		self.setConnected(False)
+		self.DisplayTimeValue()
 		
 	def raiseDeliveryEvent(self, msg): # thread context
 		jdata = json.loads(msg)
@@ -665,6 +672,7 @@ class TrainTrackerPanel(wx.Panel):
 			elif cmd == "settrain":
 				logging.info("settrain: %s" % parms)
 				for p in parms:
+					
 					try:
 						train = p["name"]
 					except:
@@ -694,6 +702,11 @@ class TrainTrackerPanel(wx.Panel):
 					tr = self.trainRoster.getTrain(train)					
 					tr["block"] = block
 					tr["loco"] = loco
+					if east is not None:
+						tr["eastbound"] = east
+					
+					if train == self.showingTrain:
+						self.showInfo(train)
 					
 				self.updateActiveListLocos()
 								
@@ -738,6 +751,15 @@ class TrainTrackerPanel(wx.Panel):
 					loco = self.locos.getLoco(lid)
 					if loco is not None:
 						self.atl.setThrottle(lid, speed, speedtype)
+						
+			elif cmd == "clock":
+				self.timeValue = int(parms[0]["value"])
+				status = int(parms[0]["status"])
+				if status != self.clockStatus:
+					self.clockStatus = status
+					self.ShowClockStatus()
+				self.DisplayTimeValue()
+
 				
 
 	def DoRefresh(self, rtype=None):
@@ -868,7 +890,7 @@ class TrainTrackerPanel(wx.Panel):
 				else:
 					ndesc = self.locos.getLoco(rloco)
 
-				self.atl.updateTrain(tid, rloco, ndesc, tInfo["block"])
+				self.atl.updateTrain(tid, rloco, ndesc, tInfo["block"], tInfo["eastbound"])
 
 	def loadEngineerFile(self, fn, preserveActive=False):
 		try:
@@ -1283,7 +1305,7 @@ class TrainTrackerPanel(wx.Panel):
 		logging.info("changing locomotive for train %s to %s" % (at.tid, lid))
 		
 		desc = self.locos.getLoco(lid)
-		self.atl.updateTrain(at.tid, lid, desc, None)
+		self.atl.updateTrain(at.tid, lid, desc, None, None)
 		
 		if lid in self.speeds:
 			self.atl.setThrottle(lid, self.speeds[lid][0], self.speeds[lid][1])
@@ -1327,6 +1349,7 @@ class TrainTrackerPanel(wx.Panel):
 		self.showInfo(tid)
 		
 	def showInfo(self, tid):
+		self.showingTrain = tid
 		if tid is None or tid == "":
 			for i in range(MAX_STEPS):
 				self.stStepTowers[i].SetLabel("")
@@ -1442,39 +1465,6 @@ class TrainTrackerPanel(wx.Panel):
 		self.selectedEngineer = self.chEngineer.GetString(0)
 		
 		self.selectedEngineers = [x for x in self.idleEngineers] + [x for x in busyEngineers if x in availableEngineers]
-
-	def onAssignLocos(self, _):
-		order = [x for x in self.trainSchedule]
-		dlg = AssignLocosDlg(self, self.trainRoster, order, self.extraTrains, self.locos)
-		rc = dlg.ShowModal()
-		if rc == wx.ID_OK:
-			result = dlg.getValues()
-			
-		dlg.Destroy()
-		
-		if rc != wx.ID_OK:
-			return
-		
-		for tid in list(self.trainSchedule) + self.extraTrains:
-			tinfo = self.trainRoster.getTrain(tid)
-			if tinfo["loco"] != result[tid]:
-				tinfo["loco"] = result[tid]
-					
-		self.showInfo(self.selectedTrain)
-		self.updateActiveListLocos()
-		self.trainRoster.save()
-
-	def onReportOpWorksheet(self, _):
-		self.report.OpWorksheetReport(self.trainRoster, self.trainSchedule, self.locos)
-		
-	def onReportLocos(self, _):
-		self.report.LocosReport(self.locos)
-		
-	def onReportStatus(self, _):
-		self.report.StatusReport(self.atl, self.completedTrains)
-			
-	def onReportTrainCards(self, _):
-		self.report.TrainCards(self.trainRoster, self.extraTrains, self.trainSchedule)
 		
 	def onSaveData(self, _):
 		saveData(self, self.settings)

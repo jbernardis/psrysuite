@@ -1,4 +1,3 @@
-import json
 
 class TrainRoster:
 	def __init__(self, rrserver):

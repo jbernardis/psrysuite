@@ -46,7 +46,7 @@ class ActiveTrainList:
 		del(self.trains[tid])
 		self.refreshDisplays()
 		
-	def updateTrain(self, tid, loco, desc, block):
+	def updateTrain(self, tid, loco, desc, block, ndir):
 		if tid not in self.order:
 			return
 		
@@ -66,6 +66,9 @@ class ActiveTrainList:
 			if at.block != block:
 				at.highlight = 5 # 5 second highlight time
 				at.block = block
+				
+		if ndir:
+			at.SetEast(ndir)
 				
 		if desc is not None:
 			at.ldesc = desc

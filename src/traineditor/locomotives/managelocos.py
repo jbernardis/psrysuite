@@ -4,7 +4,7 @@ import os
 
 from traineditor.locomotives.locomotives import Locomotives
 from traineditor.locomotives.modifylocodlg import ModifyLocoDlg
-from traineditor.reports import Report
+from traineditor.locomotives.locoreport import LocosReport
 
 BTNSZ = (120, 46)
 
@@ -156,7 +156,7 @@ class ManageLocosDlg(wx.Dialog):
 		self.SetModified()
 		
 	def bPrintPressed(self, _):
-		rpt = Report(self, self.browser)
+		rpt = LocosReport(self, self.browser)
 		rpt.LocosReport(self.locos)
 		
 	def reportSelection(self, lx, doubleclick=False):

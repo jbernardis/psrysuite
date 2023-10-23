@@ -377,6 +377,12 @@ class Block:
 			if b is None:
 				logging.warning("Stopping block %s not defined for block %s" % (blockend, self.GetName()))
 				return
+			print("setting sb %s(%s) occupied=%s" % (self.GetName(), blockend, occupied))
+			tr = self.GetTrain()
+			if tr is None:
+				print("main block doies not have a train")
+			else:
+				print("Main block has train %s, but we are going to try identify anyway" % tr.GetName())
 			b.SetOccupied(occupied, refresh)
 			if occupied and self.train is None and self.frame.IsDispatcher():
 				tr = self.IdentifyTrain()

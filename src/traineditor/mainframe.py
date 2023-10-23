@@ -3,7 +3,7 @@ import wx
 from traineditor.settings import Settings 
 from traineditor.rrserver import RRServer
 from traineditor.trainsequences.trainblocksequencedlg import TrainBlockSequencesDlg
-from traineditor.tracker.traintrackerdlg import TrainTrackerDlg
+from traineditor.trntracker.traintrackerdlg import TrainTrackerDlg
 from traineditor.locomotives.managelocos import ManageLocosDlg
 from utilities.backup import saveData, restoreData
 
@@ -82,7 +82,7 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 		
 	def OnBTrainTrackerData(self, _):
-		dlg = TrainTrackerDlg(self)
+		dlg = TrainTrackerDlg(self, self.settings.browser)
 		dlg.ShowModal()
 		dlg.Destroy()
 		
