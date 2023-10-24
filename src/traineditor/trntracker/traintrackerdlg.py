@@ -822,9 +822,10 @@ class TrainTrackerDlg(wx.Dialog):
 		
 		self.cbCutoff.SetValue(self.selectedTrainInfo['cutoff'])
 		self.stCutoff.SetLabel(str(self.selectedTrainInfo['cutoff']))
-		
-		self.teDesc.SetValue(self.selectedTrainInfo["desc"])
-		self.stDescription.SetLabel(self.selectedTrainInfo["desc"])
+
+		desc = self.selectedTrainInfo["desc"]		
+		self.teDesc.SetValue("" if desc is None else desc)
+		self.stDescription.SetLabel("" if desc is None else desc)
 
 		loco = self.selectedTrainInfo["normalloco"]
 		if loco is None:
