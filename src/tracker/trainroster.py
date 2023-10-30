@@ -20,6 +20,9 @@ class TrainRoster:
 		rv = self.order[self._tx]
 		self._tx += 1
 		return rv
+	
+	def knownTrain(self, tid):
+		return tid in self.trains
 				
 	def getTrainList(self):
 		return list(self.trains.keys())

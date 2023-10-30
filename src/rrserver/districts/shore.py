@@ -194,18 +194,15 @@ class Shore(District):
 			self.SXG = SXG
 			self.rr.SetODevice("SXG", self.SXG)
 
+		asp8l = self.rr.GetSignal("S8L").Aspect()
+		asp8r = self.rr.GetSignal("S8R").Aspect()
 		# determine if we need to power the harper's ferry crossing diamond		
-		asp = self.rr.GetSignal("S8R").Aspect()
-		BX = asp		
-		asp = self.rr.GetSignal("S8L").Aspect()
-		BX += asp
+		BX = (asp8l != 0) or (asp8r != 0) or (self.rr.GetBlock("SOSHF").IsOccupied())
 		if self.BX != BX:
 			self.BX = BX
 			self.rr.SetODevice("BX", self.BX)
 
 		# determine how we need to set the branch signals		
-		asp8l = self.rr.GetSignal("S8L").Aspect()
-		asp8r = self.rr.GetSignal("S8R").Aspect()
 		f10occ = self.rr.GetBlock("F10").IsOccupied()
 		F10H = asp8l == 0 and f10occ == 0
 		F10D = F10H and (asp8r != 0)

@@ -21,6 +21,9 @@ class CompletedTrains:
 			loco = ""
 		return tid, eng, loco
 	
+	def toJson(self):
+		return [{"train": tid,  "engineer": self.completedTrains[tid][0], "loco": self.completedTrains[tid][1]} for tid in self.entryOrder]
+	
 	def getTrainList(self):
 		return self.entryOrder
 	

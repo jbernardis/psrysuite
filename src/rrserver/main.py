@@ -371,6 +371,8 @@ class ServerMain:
 		signame = cmd["name"][0]
 		status = int(cmd["status"][0])
 		
+		print("SIGNAL LOCK: %s %d" % (signame, status))
+		
 		self.rr.SetSignalLock(signame, status)
 				
 	def DoTurnout(self, cmd):

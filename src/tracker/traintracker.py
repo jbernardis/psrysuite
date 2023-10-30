@@ -11,6 +11,8 @@ from subprocess import Popen
 from wx.lib import newevent
 import json
 import logging
+from datetime import datetime
+
 
 
 logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "tracker.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
@@ -40,11 +42,15 @@ from utilities.backup import saveData, restoreData
 from tracker.engqueuedlg import EngQueueDlg
 from dispatcher.breaker import BreakerName
 from tracker.departuretimerdlg import DepartureTimerDlg
+from tracker.choosesnapshotdlg import ChooseSnapshotDlg, ChooseSnapshotsDlg
 
 BTNSZ = (120, 46)
 
 MENU_FILE_BACKUP = 113
 MENU_FILE_RESTORE = 114
+MENU_FILE_TAKESNAPSHOT = 115
+MENU_FILE_RESTORESNAPSHOT = 116
+MENU_FILE_DELETESNAPSHOT = 117
 MENU_FILE_EXIT = 199
 MENU_MANAGE_ENGINEERS = 201
 MENU_MANAGE_SCHEDULE = 205
@@ -96,6 +102,17 @@ class MainFrame(wx.Frame):
 		self.menuFile.Append(i)
 		
 		i = wx.MenuItem(self.menuFile, MENU_FILE_RESTORE, "Restore", helpString="Restore data files from a ZIP file")
+		self.menuFile.Append(i)
+		
+		self.menuFile.AppendSeparator()
+		
+		i = wx.MenuItem(self.menuFile, MENU_FILE_TAKESNAPSHOT, "Take Snapshot", helpString="Save the current session state")
+		self.menuFile.Append(i)
+		
+		i = wx.MenuItem(self.menuFile, MENU_FILE_RESTORESNAPSHOT, "Restore Snapshot", helpString="Restore session from a saved snapshot file")
+		self.menuFile.Append(i)
+		
+		i = wx.MenuItem(self.menuFile, MENU_FILE_DELETESNAPSHOT, "Delete Snapshot(s)", helpString="Delete snapshot files")
 		self.menuFile.Append(i)
 		
 		self.menuFile.AppendSeparator()
@@ -181,6 +198,9 @@ class MainFrame(wx.Frame):
 		
 		self.Bind(wx.EVT_MENU, self.panel.onSaveData, id=MENU_FILE_BACKUP)
 		self.Bind(wx.EVT_MENU, self.panel.onRestoreData, id=MENU_FILE_RESTORE)
+		self.Bind(wx.EVT_MENU, self.panel.onTakeSnapshot, id=MENU_FILE_TAKESNAPSHOT)
+		self.Bind(wx.EVT_MENU, self.panel.onRestoreSnapshot, id=MENU_FILE_RESTORESNAPSHOT)
+		self.Bind(wx.EVT_MENU, self.panel.onDeleteSnapshots, id=MENU_FILE_DELETESNAPSHOT)
 		self.Bind(wx.EVT_MENU, self.onClose, id=MENU_FILE_EXIT)
 		
 		self.Bind(wx.EVT_MENU, self.panel.onViewEngQueue, id=MENU_VIEW_ENG_QUEUE)
@@ -227,6 +247,7 @@ class MainFrame(wx.Frame):
 	def enableForConnection(self, connected):
 		self.menuDispatch.Enable(MENU_DISPATCH_DISCONNECT, connected)
 		self.menuManage.Enable(MENU_MANAGE_SCHEDULE, connected)
+		self.menuFile.Enable(MENU_FILE_RESTORESNAPSHOT, connected)
 		
 		self.menuDispatch.Enable(MENU_DISPATCH_CONNECT, not connected)
 	
@@ -534,7 +555,7 @@ class TrainTrackerPanel(wx.Panel):
 		self.ticker = wx.Timer(self)
 		self.ticker.Start(1000)
 		logging.info("Tracker initialization completed")
-		self.displayTimeValue()
+		self.DisplayTimeValue()
 				
 	def DisplayTimeValue(self):
 		if not self.connected:
@@ -835,11 +856,12 @@ class TrainTrackerPanel(wx.Panel):
 	def onDepartureTimerDlgClose(self):
 		self.dlgDepartureTimer = None
 	
-	def setExtraTrains(self):
-		if self.trainSchedule is None:
-			self.extraTrains = []
-		else:
-			self.extraTrains = [t for t in self.trainSchedule.getExtras() if not self.atl.hasTrain(t)]
+	def setExtraTrains(self, extrasSet=False):
+		if not extrasSet:
+			if self.trainSchedule is None:
+				self.extraTrains = []
+			else:
+				self.extraTrains = [t for t in self.trainSchedule.getExtras() if not self.atl.hasTrain(t)]
 
 		self.chExtra.SetItems(self.extraTrains)
 		if len(self.extraTrains) > 0:
@@ -1471,6 +1493,130 @@ class TrainTrackerPanel(wx.Panel):
 		
 	def onRestoreData(self, _):
 		restoreData(self, self.settings)
+		
+	def onTakeSnapshot(self, _):
+		snapshot = {}
+		snapshot["completed"] = self.completedTrains.toJson()
+		snapshot["pending"] = self.pendingTrains
+		snapshot["extra"] = self.extraTrains
+		snapshot["active"] = self.atl.toJson()
+		sndir = os.path.join(os.getcwd(), "data", "trackersnapshots")
+		os.makedirs(sndir, exist_ok = True)
+		
+		bfn = "snap%s.json" % datetime.now().strftime("%Y%m%d")
+		fn = os.path.join(sndir, bfn)
+		
+		with open(fn, "w") as jfp:
+			json.dump(snapshot, jfp)
+		
+		dlg = wx.MessageDialog(self, "Snapshot saved to %s" % bfn,
+			'Snapshot saved',
+			wx.OK | wx.ICON_INFORMATION)
+		dlg.ShowModal()
+		dlg.Destroy()
+			
+	def onRestoreSnapshot(self, _):
+		dlg = wx.MessageDialog(self, 'This will over write all scheduled/extra/active/completed trains\nwith values from a snapshot.\nAre you sure you want to proceed?\n\nPress "Yes" to proceed, or "No" to cancel.',
+							'Restore Snapshot', wx.YES_NO | wx.ICON_WARNING)
+		rc = dlg.ShowModal()
+		dlg.Destroy()
+		if rc != wx.ID_YES:
+			return
+		
+		dlg = ChooseSnapshotDlg(self)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			fn = dlg.GetFile()
+			
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+		
+		with open(fn, "r") as jfp:
+			ssdata = json.load(jfp)
+			
+		print(json.dumps(ssdata, indent=2))
+		unknown = []
+		unkCompleted = []
+		for tinfo in ssdata["completed"]:
+			if not self.trainRoster.knownTrain(tinfo["train"]):
+				unkCompleted.append(tinfo["train"])
+		if len(unkCompleted) > 0:
+			unknown.append("Completed: %s" % ", ".join(unkCompleted))
+			
+		unkPending = []
+		for t in ssdata["pending"]:
+			if not self.trainRoster.knownTrain(t):
+				unkPending.append(t)
+		if len(unkPending) > 0:
+			unknown.append("Scheduled: %s" % ", ".join(unkPending))
+			
+		unkExtra = []
+		for t in ssdata["extra"]:
+			if not self.trainRoster.knownTrain(t):
+				unkExtra.append(t)
+		if len(unkExtra) > 0:
+			unknown.append("Extra: %s" % ", ".join(unkExtra))
+			
+		unkActive = []
+		for atinfo in ssdata["active"]:
+			if not self.trainRoster.knownTrain(atinfo["train"]):
+				unkActive.append(atinfo["train"])
+		if len(unkActive) > 0:
+			unknown.append("Active: %s" % ", ".join(unkActive))
+			
+		if len(unknown) > 0:
+			dlg = wx.MessageDialog(self, "The following trains from this snapshot are unknown\n\n" + "\n".join(unknown) + "\n\nPress \"Yes\" to continue, or \"No\" to cancel",
+							'Unknown Trains', wx.YES_NO | wx.ICON_WARNING)
+			rc = dlg.ShowModal()
+			dlg.Destroy()
+			if rc == wx.ID_NO:
+				return
+
+		self.completedTrains.clear()
+		self.completedTrainList.update()
+		for tinfo in ssdata["completed"]:
+			if self.trainRoster.knownTrain(tinfo["train"]):
+				self.completedTrains.append(tinfo["train"], tinfo["engineer"], tinfo["loco"])
+		self.completedTrainList.setList(self.completedTrains)
+
+		self.pendingTrains = [t for t in ssdata["pending"] if self.trainRoster.knownTrain(t)]
+		self.extraTrains = sorted([t for t in ssdata["extra"] if self.trainRoster.knownTrain(t)])
+		self.setTrainSchedule(preserveActive=False)
+		self.setExtraTrains(extrasSet=True)
+		
+		self.atl.clear()
+		for atinfo in ssdata["active"]:
+			trid = atinfo["train"]
+			if self.trainRoster.knownTrain(trid):
+				engineer = atinfo["engineer"]
+				tinfo = self.trainRoster.getTrain(trid)
+				self.atl.addTrain(ActiveTrain(trid, tinfo, "", "", 0, engineer, ""))
+
+		
+	def onDeleteSnapshots(self, _):
+		dlg = ChooseSnapshotsDlg(self)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			l = dlg.GetFiles()
+		
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+		
+		if len(l) == 0:
+			return 
+		
+		for fn in l:
+			path = os.path.join(os.getcwd(), "data", "trackersnapshots", fn+".json")
+			os.unlink(path)
+
+		dlg = wx.MessageDialog(self, 'Snapshots deleted',
+					'Snapshot files deleted',
+					wx.OK | wx.ICON_INFORMATION)
+		dlg.ShowModal()
+		dlg.Destroy()
+
 			
 	def onClose(self, _):
 		if self.atl.count() > 0:
@@ -1603,7 +1749,7 @@ class App(wx.App):
 	def OnInit(self):
 		self.frame = MainFrame()
 		self.frame.Show()
-		self.frame.Maximize(True)
+		#self.frame.Maximize(True)
 			
 		self.SetTopWindow(self.frame)
 		return True

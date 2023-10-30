@@ -27,13 +27,13 @@ class CompletedTrainList(wx.ListCtrl):
 	def clear(self):
 		self.SetItemCount(0)
 		
+	def setList(self, ct):
+		self.SetItemCount(0)
+		self.completedTrains = ct
+		self.update()
+				
 	def update(self):
 		self.SetItemCount(self.completedTrains.count())
-		
-	def addTrain(self, tr):
-		self.activeTrains.append(tr)
-		self.highlight.append(0)
-		self.SetItemCount(len(self.activeTrains))
 
 	def OnGetItemText(self, item, col):
 		if item < 0 or item >= self.completedTrains.count():

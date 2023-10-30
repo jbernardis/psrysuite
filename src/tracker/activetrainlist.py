@@ -37,6 +37,9 @@ class ActiveTrainList:
 		self.order.append(at.tid)
 		self.sortTrains()
 		
+	def toJson(self):
+		return [{"train": at.tid, "engineer": at.engineer} for at in self.trains.values()]
+		
 	def delTrain(self, tx):
 		if tx < 0 or tx >= len(self.order):
 			return
