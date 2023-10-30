@@ -80,11 +80,15 @@ class Shore (District):
 		
 	def DoBlockAction(self, blk, blockend, state):
 		blknm = blk.GetName()
+		print("DBA: block (%s) state %s" % (blknm, state), flush=True)
 		if blknm == "S21" and blockend == "E" and not self.frame.GetBlockByName("KOSN20S21").GetEast():
 			District.DoBlockAction(self, self.frame.GetBlockByName("KOSN20S21"), None, state)
 		elif blknm == "S11" and blockend == "E" and not self.frame.GetBlockByName("KOSN10S11").GetEast():
 			District.DoBlockAction(self, self.frame.GetBlockByName("KOSN10S11"), None, state)
-
+		
+		if blknm == "SOSHF" and state == 0:
+			for sig in [self.signals["S8L"], self.signals["S8R"]]:
+				sig.SetLock("SOSHF", 0)
 		District.DoBlockAction(self, blk, blockend, state)
 
 	def DrawOthers(self, block):
