@@ -31,9 +31,6 @@ class MainFrame(wx.Frame):
 		self.bLocos = wx.Button(self, wx.ID_ANY, "Edit Locomotive Data", size=(200, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBLocos, self.bLocos)
 				
-		self.bLayout = wx.Button(self, wx.ID_ANY, "Generate Layout File", size=(200, 50))
-		self.Bind(wx.EVT_BUTTON, self.OnBLayout, self.bLayout)
-				
 		self.bBackup = wx.Button(self, wx.ID_ANY, "Backup\nData Files", size=(100, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBBackup, self.bBackup)
 				
@@ -51,9 +48,6 @@ class MainFrame(wx.Frame):
 		vsz.Add(self.bTrainTracker, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		vsz.AddSpacer(20)
 		vsz.Add(self.bLocos, 0, wx.ALIGN_CENTER_HORIZONTAL)
-		
-		vsz.AddSpacer(40)
-		vsz.Add(self.bLayout, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.Add(self.bBackup)
@@ -90,15 +84,6 @@ class MainFrame(wx.Frame):
 		dlg = ManageLocosDlg(self, self.settings.browser)
 		dlg.ShowModal()
 		dlg.Destroy()
-		
-	def OnBLayout(self, _):
-		dlg = wx.MessageDialog(self,
-				"This requires that both Server, and Dispatcher are running and connected.\n\nPress 'Yes' to proceed, or\nPress 'No' to Cancel",
-                "Conform", wx.YES_NO | wx.YES_DEFAULT | wx.ICON_QUESTION)
-		rv = dlg.ShowModal()
-		dlg.Destroy()
-		if rv == wx.ID_YES:
-			self.RRServer.SendRequest({"genlayout": {}})
 
 	def OnBBackup(self, _):
 		saveData(self, self.settings)

@@ -196,11 +196,6 @@ class MainFrame(wx.Frame):
 		self.bRefresh.SetToolTip("Refresh all railroad information from the railroad server")
 		self.bRefresh.Enable(False)
 
-		self.bReOpen = wx.Button(self, wx.ID_ANY, "reOpen", pos=(self.centerOffset+50, 45), size=BTNDIM)
-		self.Bind(wx.EVT_BUTTON, self.OnReOpen, self.bReOpen)
-		self.bReOpen.SetToolTip("Reinitialize the serial connection to the railroad")
-		self.bReOpen.Enable(False)
-
 		self.bThrottle = wx.Button(self, wx.ID_ANY, "Throttle", pos=(self.centerOffset+150, 15), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnThrottle, self.bThrottle)
 		self.bThrottle.SetToolTip("Open up a new throttle window - multiple allowed")
@@ -249,13 +244,11 @@ class MainFrame(wx.Frame):
 			self.bSaveLocos.Hide()
 			self.bClearTrains.Hide()
 			self.bEditTrains.Hide()
-			self.bReOpen.Hide()
 
 		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(self.centerOffset+2200, 25), style=wx.TE_READONLY)
 		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(60, -1), pos=(self.centerOffset+2300, 25), style=wx.TE_READONLY)
 		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(60, -1), pos=(self.centerOffset+2380, 25), style=wx.TE_READONLY)
 		
-		#self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(self.centerOffset+2200, 75), size=BTNDIM)
 		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(int(totalw/2+100), 80), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnResetScreen, self.bResetScreen)
 		self.bResetScreen.SetToolTip("Move the screen back to its home location")
@@ -1935,7 +1928,6 @@ class MainFrame(wx.Frame):
 			self.sessionid = None
 			self.bSubscribe.SetLabel("Connect")
 			self.bRefresh.Enable(False)
-			self.bReOpen.Enable(False)
 			self.bLoadTrains.Enable(False)
 			self.bLoadLocos.Enable(False)
 			self.bSaveTrains.Enable(False)
@@ -1961,7 +1953,6 @@ class MainFrame(wx.Frame):
 			self.subscribed = True
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
-			self.bReOpen.Enable(True)
 			self.bLoadTrains.Enable(True)
 			self.bLoadLocos.Enable(True)
 			self.bSaveTrains.Enable(True)
@@ -1993,16 +1984,6 @@ class MainFrame(wx.Frame):
 			trains = {}
 			
 		self.trainList = trains
-
-	def OnReOpen(self, _):
-		dlg = wx.MessageDialog(self, 'This will cause the server to close and reopen the port to the railroad.  Some information may be lost.  Are you sure you want to continue?\nPress "Yes" to confirm,\nor "No" to cancel.',
-				'Re-Open Railroad Port', wx.YES_NO | wx.ICON_WARNING)
-		rc = dlg.ShowModal()
-		dlg.Destroy()
-		if rc != wx.ID_YES:
-			return
-		
-		self.Request({"reopen": {}})
 
 	def OnRefresh(self, _):
 		if not self.IsDispatcher():
@@ -2705,7 +2686,6 @@ class MainFrame(wx.Frame):
 		self.subscribed = False
 		self.bSubscribe.SetLabel("Connect")
 		self.bRefresh.Enable(False)
-		self.bReOpen.Enable(False)
 		self.bLoadTrains.Enable(False)
 		self.bLoadLocos.Enable(False)
 		self.bSaveTrains.Enable(False)
