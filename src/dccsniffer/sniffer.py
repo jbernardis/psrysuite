@@ -41,14 +41,17 @@ class Sniffer:
 						logging.info("unable to convert DCC message to string: (" + s + ")")
 					else:
 						p = s.split()
-						req = {
-							"dccspeed": {
-								"speedtype": p[0],
-								"loco": "%d" % int(p[1]), # strip off any leading zeroes
-								"speed": p[2]
+						if len(p) < 3:
+							logging.warning("received unexpected DCC message: %s" % s)
+						else:
+							req = {
+								"dccspeed": {
+									"speedtype": p[0],
+									"loco": "%d" % int(p[1]), # strip off any leading zeroes
+									"speed": p[2]
+								}
 							}
-						}
-						rrserver.SendRequest(req)
+							rrserver.SendRequest(req)
 
 		try:
 			self.port.close()

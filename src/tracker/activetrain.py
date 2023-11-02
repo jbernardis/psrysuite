@@ -24,7 +24,7 @@ class ActiveTrain:
 		self.engineer = eng
 		self.throttle = None
 		self.speed = 0
-		self.limit = llimit
+		self.limit = int(llimit)
 		self.highlight = 0
 		self.time = 0
 		self.hasStarted = False

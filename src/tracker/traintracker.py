@@ -597,6 +597,8 @@ class TrainTrackerPanel(wx.Panel):
 		else:
 			self.cycleTimer += 1
 			if self.cycleTimer >= MAX_BREAKER_CYCLES:
+				if self.breakerx >= len(self.tripped):
+					self.breakerx = 0
 				bn = BreakerName(self.tripped[self.breakerx])
 				n = len(self.tripped)
 				if n > 1:
@@ -605,8 +607,6 @@ class TrainTrackerPanel(wx.Panel):
 				self.teBreaker.SetValue(bn)
 				self.teBreaker.SetBackgroundColour(wx.Colour(241, 41, 47))
 				self.breakerx += 1
-				if self.breakerx >= len(self.tripped):
-					self.breakerx = 0
 				self.cycleTimer = 0
 				
 		if self.dlgDepartureTimer is not None:
@@ -720,14 +720,17 @@ class TrainTrackerPanel(wx.Panel):
 					if loco is None or "??" in loco:
 						loco = ""
 					
-					tr = self.trainRoster.getTrain(train)					
-					tr["block"] = block
-					tr["loco"] = loco
-					if east is not None:
-						tr["eastbound"] = east
-					
-					if train == self.showingTrain:
-						self.showInfo(train)
+					tr = self.trainRoster.getTrain(train)	
+					if tr is None:
+						logging.warning("ignoring unknown train %s in settrain command" % train)	
+					else:			
+						tr["block"] = block
+						tr["loco"] = loco
+						if east is not None:
+							tr["eastbound"] = east
+						
+						if train == self.showingTrain:
+							self.showInfo(train)
 					
 				self.updateActiveListLocos()
 								
@@ -743,12 +746,15 @@ class TrainTrackerPanel(wx.Panel):
 					aspect = 0  # default is to stop
 
 				tr = self.trainRoster.getTrain(train)					
-				lid = tr["loco"]
-				if lid is not None and "??" not in lid:
-					loco = self.locos.getLoco(lid)
-					if loco is not None:
-						self.locos.setLimit(lid, aspect)
-						self.atl.setLimit(lid, self.locos.getLimit(lid))
+				if tr is None:
+					logging.warning("ignoring unknown train %s in trainsignal command" % train)	
+				else:
+					lid = tr["loco"]
+					if lid is not None and "??" not in lid:
+						loco = self.locos.getLoco(lid)
+						if loco is not None:
+							self.locos.setLimit(lid, aspect)
+							self.atl.setLimit(lid, self.locos.getLimit(lid))
 						
 			elif cmd == "dccspeed":
 				for p in parms:

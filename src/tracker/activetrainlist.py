@@ -63,7 +63,7 @@ class ActiveTrainList:
 				at.loco = loco
 				at.speed = 0
 				at.limit = None
-				at.throttle = None
+				at.throttle = 0
 
 		if block is not None:
 			if at.block != block:
@@ -141,7 +141,7 @@ class ActiveTrainList:
 	def setLimit(self, loco, limit):
 		for at in self.trains.values():
 			if at.loco == loco:
-				at.limit = limit
+				at.limit = int(limit)
 				tx = self.order.index(at.tid)
 				try:
 					tx = self.order.index(at.tid)

@@ -1198,6 +1198,9 @@ class MainFrame(wx.Frame):
 		self.pendingFleets[block.GetName()] = [sig, osblock, route]
 
 	def DelPendingFleet(self, block):
+		if block is None:
+			return 
+		
 		bname = block.GetName()
 		if bname not in self.pendingFleets:
 			return
