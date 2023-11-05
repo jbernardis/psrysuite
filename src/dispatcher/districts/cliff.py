@@ -921,7 +921,7 @@ class Cliff (District):
 
 		self.osSignals["COSSHW"] = [ "C8L", "C8RA", "C8RB", "C8RC", "C8RD", "C8RE", "C8RF", "C8RG", "C8RH", "C8RJ", "C8RK", "C8RL" ]
 
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

@@ -247,7 +247,7 @@ class District:
 			self.frame.ResetButtonExpiry(2, eButton)
 			try:
 				rtName = self.NXMap[wButton.GetName()][eButton.GetName()]
-				toList = self.routes[rtName].GetSetTurnouts()
+				toList = self.frame.routes[rtName].GetSetTurnouts()
 			except KeyError:
 				toList = None
 
@@ -272,7 +272,7 @@ class District:
 		rteMap = {os.GetName(): None for os in blocks if os.GetBlockType() == OVERSWITCH}
 		toMap = [[x, 'N' if self.turnouts[x].IsNormal() else 'R'] for x in turnouts]
 
-		for rte in self.routes.values():
+		for rte in self.frame.routes.values():
 			osName = rte.GetOSName()
 			if osName in rteMap:
 				rteSet = rte.GetSetTurnouts()
@@ -315,7 +315,7 @@ class District:
 		signm = sig.GetName()
 		# print("find route for signal %s" % signm)
 		# print("possible routes: %s" % json.dumps(sig.possibleRoutes))
-		for blknm, siglist in self.osSignals.items():
+		for blknm, siglist in self.frame.ossignals.items():
 			# print("block, sigs = %s %s" % (blknm, str(siglist)))
 			if signm in siglist:
 				osblk = self.frame.blocks[blknm]
@@ -325,7 +325,7 @@ class District:
 				if osblk.route is None:
 					continue
 
-				rt = self.routes[rname]
+				rt = self.frame.routes[rname]
 				if sig.IsPossibleRoute(blknm, rname):
 					# print("good route")
 					return rt, osblk
@@ -343,7 +343,6 @@ class District:
 			aspect = 0 if currentMovement else restrictedaspect(sig.GetAspectType())
 		else:
 			if rt is None:
-				self.frame.PopupEvent("No available route")
 				return False
 	
 			if osblk.AreHandSwitchesSet():
@@ -373,7 +372,7 @@ class District:
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
 		logging.debug("Calculating aspect for signal %s route %s" % (sig.GetName(), rt.GetName()))
 		
-		if osblk.IsBusy():
+		if osblk.IsOccupied():
 			if not silent:
 				self.frame.PopupEvent("Block %s is busy" % osblk.GetName())
 			logging.debug("Unable to calculate aspect: OS Block is busy")
@@ -386,21 +385,24 @@ class District:
 
 		exitBlk = self.frame.blocks[exitBlkNm]
 		if exitBlk.IsOccupied():
-			self.frame.PopupEvent("Block %s is busy" % exitBlk.GetName())
+			if not silent:
+				self.frame.PopupEvent("Block %s is busy" % exitBlk.GetName())
 			logging.debug("Unable to calculate aspect: Block %s is busy" % exitBlkNm)
 			return None
 
 		if self.CrossingEastWestBoundary(osblk, exitBlk):
 			currentDirection = not currentDirection
-			
+	
 		if exitBlk.IsCleared():
 			if exitBlk.GetEast() != currentDirection:
-				self.frame.PopupEvent("Block %s is cleared in opposite direction" % exitBlk.GetName())
+				if not silent or True:
+					self.frame.PopupEvent("Block %s is cleared in opposite direction" % exitBlk.GetName())
 				logging.debug("Unable to calculate aspect: Block %s cleared in opposite direction" % exitBlkNm)
 				return None
 
 		if exitBlk.AreHandSwitchesSet():
-			self.frame.PopupEvent("Block %s is locked" % exitBlk.GetName())
+			if not silent:
+				self.frame.PopupEvent("Block %s is locked" % exitBlk.GetName())
 			logging.debug("Unable to calculate aspect: Block %s is locked" % exitBlkNm)
 			return None
 		
@@ -556,7 +558,7 @@ class District:
 		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect }})
 
 	def GetRouteDefinitions(self):
-		return [r.GetDefinition() for r in self.routes.values()]
+		return [r.GetDefinition() for r in self.frame.routes.values()]
 
 	def anyTurnoutLocked(self, toList):
 		rv = False
@@ -724,7 +726,7 @@ class District:
 			return
 
 		osblock = None
-		for blknm, siglist in self.osSignals.items():
+		for blknm, siglist in self.frame.ossignals.items():
 			if signm in siglist:
 				osblock = self.frame.blocks[blknm]
 				if osblock.route is None:
@@ -739,7 +741,7 @@ class District:
 				return
 
 		if aspect < 0:
-			aspect = self.CalculateAspect(sig, osblock, self.routes[rname], silent=True)
+			aspect = self.CalculateAspect(sig, osblock, self.frame.routes[rname], silent=True)
 			#  report calculated aspect back to the server
 			if aspect is None:
 				aspect = sig.GetAspect()
@@ -802,6 +804,81 @@ class District:
 				self.LockTurnouts(signm, tolist, aspect != STOP)
 				
 		self.EvaluateDistrictLocks(sig)
+		self.EvaluatePreviousSignals(sig)
+		
+	def EvaluatePreviousSignals(self, sig):
+		if self.showaspectcalculation:		
+			self.frame.PopupEvent("Evaluating prior signals for signal %s" % sig.GetName())
+		rt, osblk = self.FindRoute(sig)
+		if osblk is None:
+			return
+		
+		# we're going backwards, so look in that same direction
+		currentDirection = not sig.GetEast()
+		exitBlkNm = rt.GetExitBlock(reverse = currentDirection!=osblk.GetEast())
+
+		try:
+			exitBlk = self.frame.blocks[exitBlkNm]
+		except KeyError:
+			return 
+		
+		if self.CrossingEastWestBoundary(osblk, exitBlk):
+			currentDirection = not currentDirection
+			
+		nb = exitBlk.NextBlock(reverse = currentDirection!=exitBlk.GetEast())
+		if nb is None:
+			return 
+		
+		nbName = nb.GetName()
+		if nb.GetBlockType() != OVERSWITCH:
+			return
+		
+		rt = nb.GetRoute()
+		if rt is None:
+			return 
+		
+		if self.CrossingEastWestBoundary(nb, exitBlk):
+			currentDirection = not currentDirection
+			
+		sigs = rt.GetSignals()
+		ep = rt.GetEndPoints()
+		if len(sigs) != 2 or len(ep) != 2:
+			logging.error("signals and or endpoints for route %s != 2" % rt.GetName())
+			return 
+		
+		if exitBlkNm not in ep:
+			return
+		
+		if exitBlkNm == ep[0]:
+			sigNm = sigs[1]
+		elif exitBlkNm == ep[1]:
+			sigNm = sigs[0]
+			
+		try:
+			psig = self.frame.signals[sigNm]
+		except KeyError:
+			return
+		
+		currentAspect = psig.GetAspect()
+		if currentAspect == 0:
+			# we're not going to change signals that ate stopped, so end this here
+			return
+		
+		if sigNm.startswith("P"):
+			# skip anything to do with Port - we don't control trat
+			return
+
+		newAspect = self.CalculateAspect(psig, nb, rt, silent=True)
+		if newAspect == currentAspect:
+			return 
+		
+		'''
+		DoSignalAction will propagate the checking
+		'''
+		if self.showaspectcalculation:		
+			self.frame.PopupEvent("Calculated new aspect for signal %s = %s" % (psig.GetName(), newAspect))		
+		self.DoSignalAction(psig, newAspect)
+		
 		
 	def EvaluateDistrictLocks(self, sig, ossLocks=None):
 		pass
@@ -875,7 +952,7 @@ class District:
 	def LockTurnoutsForSignal(self, osblknm, sig, flag):
 		signm = sig.GetName()
 		if osblknm in sig.possibleRoutes:
-			osblk = self.blocks[osblknm]
+			osblk = self.frame.blocks[osblknm]
 			rt = osblk.GetRoute()
 			if rt:
 				tolist = rt.GetLockTurnouts()
@@ -917,7 +994,7 @@ class District:
 
 	def DefineSignals(self):
 		self.signals = {}
-		return {}
+		return {}, {}, {}
 
 	def DefineButtons(self):
 		self.buttons = {}
@@ -998,12 +1075,16 @@ class Districts:
 	def DefineSignals(self):
 		sigs = {}
 		blocksigs = {}
+		ossigs = {}
+		routes = {}
 		for t in self.districts.values():
-			sl, bsl = t.DefineSignals()
+			sl, bsl, osl, rtl = t.DefineSignals()
 			sigs.update(sl)
 			blocksigs.update(bsl)
+			ossigs.update(osl)
+			routes.update(rtl)
 
-		return sigs, blocksigs
+		return sigs, blocksigs, ossigs, routes
 
 	def DefineButtons(self):
 		btns = {}

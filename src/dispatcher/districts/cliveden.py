@@ -274,7 +274,7 @@ class Cliveden (District):
 		self.osSignals["COSCLEW"] = [ "C10L", "C10R", "C12R" ]
 		self.osSignals["COSCLEE"] = [ "C12L", "C12R", "C10L" ]
 
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

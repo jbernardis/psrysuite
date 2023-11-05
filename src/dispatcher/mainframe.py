@@ -1105,7 +1105,7 @@ class MainFrame(wx.Frame):
 
 		self.blocks, self.osBlocks = self.districts.DefineBlocks()
 		self.turnouts = self.districts.DefineTurnouts(self.blocks)
-		self.signals, self.blocksignals =  self.districts.DefineSignals()
+		self.signals, self.blocksignals, self.ossignals, self.routes =  self.districts.DefineSignals()
 		self.buttons =  self.districts.DefineButtons()
 		self.handswitches =  self.districts.DefineHandSwitches()
 		self.indicators = self.districts.DefineIndicators()

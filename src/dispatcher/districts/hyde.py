@@ -806,7 +806,7 @@ class Hyde (District):
 					"HOSWE": ["H4LA", "H4LB", "H4LC", "H4LD", "H4R"],
 					"HOSEW": ["H12L", "H12RA", "H12RB", "H12RC", "H12RD", "H12RE"],
 					"HOSEE": ["H10L", "H10RA", "H10RB", "H10RC", "H10RD", "H10RE"]}
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes
 
 	def DefineIndicators(self):
 		self.indicators = {}

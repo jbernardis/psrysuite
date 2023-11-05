@@ -1,5 +1,5 @@
 
-from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, NORMAL, REVERSE, STOP, CLEAR
+from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, NORMAL, REVERSE, STOP, CLEAR, RegAspects, RegSloAspects, AdvAspects, SloAspects
 
 class Tile:
 	def __init__(self, name, bmps):
@@ -124,9 +124,18 @@ class SignalTile:
 		self.bmps = bmps
 
 	def getBmp(self, sig):
+		if sig.aspectType == SloAspects:
+			clearValue = 0b01
+		elif sig.aspectType == AdvAspects:
+			clearValue = 0b111
+		elif sig.aspectType == RegSloAspects:
+			clearValue = 0b011
+		else: # assume RegAspects
+			clearValue = CLEAR
+			
 		if sig.aspect == STOP:
 			return self.bmps["red-fleet"] if sig.fleetEnabled else self.bmps["red"]
-		elif sig.aspect != CLEAR:
+		elif sig.aspect != clearValue:
 			try:
 				bmp =  self.bmps["restr-fleet"] if sig.fleetEnabled else self.bmps["restr"]
 			except:
@@ -623,8 +632,10 @@ def loadTiles(bitmaps):
 		{
 			"green": b.left.green,
 			"red": b.left.red,
+			"restr": b.left.yellow,
 			"green-fleet": b.left.greenfleet,
-			"red-fleet": b.left.redfleet
+			"red-fleet": b.left.redfleet,
+			"restr-fleet": b.left.yellowfleet,
 		})
 	signals["leftlong"] = SignalTile("leftlong", 
 		{
@@ -639,8 +650,10 @@ def loadTiles(bitmaps):
 		{
 			"green": b.right.green,
 			"red": b.right.red,
+			"restr": b.right.yellow,
 			"green-fleet": b.right.greenfleet,
-			"red-fleet": b.right.redfleet
+			"red-fleet": b.right.redfleet,
+			"restr-fleet": b.right.yellowfleet,
 		})
 	signals["rightlong"] = SignalTile("rightlong", 
 		{

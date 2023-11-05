@@ -435,7 +435,7 @@ class Latham (District):
 		self.osSignals["LOSCAM"] = [ "L16R", "L18L", "L14L" ]
 		self.osSignals["LOSCAE"] = [ "L14R", "L14L" ]
 
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

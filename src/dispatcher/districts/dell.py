@@ -320,7 +320,7 @@ class Dell (District):
 		self.osSignals["DOSFOE"] = [ "D10R", "D10L", "D12L" ]
 		self.osSignals["DOSFOW"] = [ "D10R", "D12R", "D12L" ]
 
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

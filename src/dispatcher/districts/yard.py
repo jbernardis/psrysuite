@@ -916,7 +916,7 @@ class Yard (District):
 		self.osSignals["YOSWYW"] = [ "Y40L", "Y40RA", "Y40RB", "Y40RC", "Y40RD" ]
 		self.osSignals["YOSWYE"] = [ "Y42R", "Y42LA", "Y42LB", "Y42LC", "Y42LD" ]
 
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes
 	
 	def DefineButtons(self):
 		self.buttons = {}

@@ -355,4 +355,4 @@ class Krulish (District):
 		self.osSignals["KOSN10S11"] = [ "N10W", "S11E" ]
 		self.osSignals["KOSN20S21"] = [ "N20W", "S21E" ]
 
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes

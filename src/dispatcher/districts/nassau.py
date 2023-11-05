@@ -1277,5 +1277,5 @@ class Nassau (District):
 		self.osSignals["NEOSW"] = [ "N26L", "N28R", "N26RA", "N26RB", "N26RC", "N24RA", "N24RB", "N24RC", "N24RD" ]
 		self.osSignals["NEOSE"] = [ "N24L", "N28R", "N26RA", "N26RB", "N26RC", "N24RA", "N24RB", "N24RC", "N24RD" ]
 
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes
 

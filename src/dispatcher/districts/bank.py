@@ -232,7 +232,7 @@ class Bank (District):
 		self.osSignals["BOSWE"] = [ "C24L", "C24R" ]
 		self.osSignals["BOSE"] = [ "C18LB", "C18LA", "C18R" ]
 
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

@@ -657,7 +657,7 @@ class Shore (District):
 
 		self.blocks["SOSHF"].SetRoute(self.routes["SRtF10F11"])
 
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

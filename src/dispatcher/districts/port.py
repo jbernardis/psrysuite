@@ -1326,7 +1326,7 @@ class Port (District):
 		self.osSignals["POSSP4"] = [ "PA6R", "PA4RA", "PA4RB", "PA6LA", "PA6LB", "PA6LC" ]
 		self.osSignals["POSSP5"] = [ "PA6R", "PA4RA", "PA4RB", "PA4L" ]
 
-		return self.signals, self.blockSigs
+		return self.signals, self.blockSigs, self.osSignals, self.routes
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}
