@@ -139,3 +139,5 @@ class Latham(District):
 		
 		self.rr.SetAspect("S21E", 1)
 		self.rr.SetAspect("N10W", 1)
+		self.rr.SetBlockDirection("N20", "E")
+		self.rr.SetBlockDirection("S11", "W")

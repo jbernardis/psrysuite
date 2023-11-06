@@ -125,17 +125,17 @@ class SignalTile:
 
 	def getBmp(self, sig):
 		if sig.aspectType == SloAspects:
-			clearValue = 0b01
+			clearValues = [ 0b01 ]
 		elif sig.aspectType == AdvAspects:
-			clearValue = 0b111
+			clearValues = [ 0b011, 0b111 ]
 		elif sig.aspectType == RegSloAspects:
-			clearValue = 0b011
+			clearValues = [ 0b011 ]
 		else: # assume RegAspects
-			clearValue = CLEAR
+			clearValues = [ CLEAR ]
 			
 		if sig.aspect == STOP:
 			return self.bmps["red-fleet"] if sig.fleetEnabled else self.bmps["red"]
-		elif sig.aspect != clearValue:
+		elif sig.aspect not in clearValues:
 			try:
 				bmp =  self.bmps["restr-fleet"] if sig.fleetEnabled else self.bmps["restr"]
 			except:

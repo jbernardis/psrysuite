@@ -1,4 +1,5 @@
 from dispatcher.constants import STOP
+from dispatcher.district import aspectname, aspecttype
 
 
 class Signal:
@@ -28,6 +29,9 @@ class Signal:
 
 	def IsLocked(self):
 		return self.locked
+	
+	def GetLockedBy(self):
+		return self.lockedBy
 
 	def EnableFleeting(self, flag=None):
 		if flag is None:
@@ -60,6 +64,9 @@ class Signal:
 
 	def GetAspectType(self):
 		return self.aspectType
+	
+	def GetAspectName(self):
+		return "%s (%s)" % (aspectname(self.aspect, self.aspectType), aspecttype(self.aspectType))
 
 	def GetPos(self):
 		return self.pos

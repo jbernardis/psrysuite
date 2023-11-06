@@ -304,6 +304,7 @@ class Block:
 			return
 
 		self.east = east
+		self.Draw()
 		if broadcast:
 			self.frame.Request({"blockdir": { "block": self.GetName(), "dir": "E" if east else "W"}})
 			for b in [self.sbEast, self.sbWest]:

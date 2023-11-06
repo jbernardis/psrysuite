@@ -115,10 +115,7 @@ def aspectname(aspect, atype):
 		return "Stop"
 	
 def restrictedaspect(atype):
-	if atype == SloAspects:
-		return 0b10
-	else:
-		return 0b100
+	return 0b10 if atype == SloAspects else 0b100
 
 def aspecttype(atype):
 	if atype == RegAspects:
@@ -343,6 +340,7 @@ class District:
 			aspect = 0 if currentMovement else restrictedaspect(sig.GetAspectType())
 		else:
 			if rt is None:
+				self.frame.PopupEvent("No available route")
 				return False
 	
 			if osblk.AreHandSwitchesSet():
@@ -379,6 +377,11 @@ class District:
 			return None
 		
 		currentDirection = sig.GetEast()
+		if currentDirection != osblk.GetEast() and osblk.IsCleared():
+			if not silent:
+				self.frame.PopupEvent("Block %s is cleared in opposite direction" % osblk.GetName())
+			logging.debug("Unable to calculate aspect: Block %s is cleared in opposite direction" % osblk.GetName())
+			return None
 		
 		exitBlkNm = rt.GetExitBlock(reverse = currentDirection!=osblk.GetEast())
 		rType = rt.GetRouteType(reverse = currentDirection!=osblk.GetEast())
@@ -450,7 +453,8 @@ class District:
 		aType = sig.GetAspectType()
 		aspect = self.GetAspect(aType, rType, nbStatus, nbRType, nnbClear)
 
-		if self.showaspectcalculation:		
+		if self.showaspectcalculation:
+			self.frame.PopupEvent("======== New aspect calculation ========")		
 			self.frame.PopupEvent("OS: %s Route: %s  Sig: %s" % (osblk.GetName(), rt.GetName(), sig.GetName()))
 			self.frame.PopupEvent("exit block name = %s   RT: %s" % (exitBlkNm, routetype(rType)))
 			self.frame.PopupEvent("NB: %s Status: %s  NRT: %s" % (nbName, statusname(nbStatus), routetype(nbRType)))

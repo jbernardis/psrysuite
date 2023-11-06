@@ -600,6 +600,7 @@ class ServerMain:
 
 	def DoBlockDirs(self, cmd):
 		data = json.loads(cmd["data"][0])
+		print("blockdirs command: %d blocks" % len(data), flush=True)
 		for b in data:
 			block = b["block"]
 			direction = b["dir"]

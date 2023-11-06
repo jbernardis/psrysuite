@@ -42,7 +42,7 @@ from dispatcher.rrserver import RRServer
 from dispatcher.edittraindlg import EditTrainDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
 
-showAspectCalculation = False
+showAspectCalculation = True
 
 MENU_ATC_REMOVE  = 900
 MENU_ATC_STOP    = 901
@@ -1121,14 +1121,12 @@ class MainFrame(wx.Frame):
 
 		self.districts.Initialize()
 
-		# only set up hot spots on the diagram for dispatchr - not for remote display
-		if self.settings.dispatch:
-			self.turnoutMap = { (t.GetScreen(), t.GetPos()): t for t in self.turnouts.values() if not t.IsRouteControlled() }
-			self.buttonMap = { (b.GetScreen(), b.GetPos()): b for b in self.buttons.values() }
-			self.signalMap = { (s.GetScreen(), s.GetPos()): s for s in self.signals.values() }
-			self.handswitchMap = { (l.GetScreen(), l.GetPos()): l for l in self.handswitches.values() }
-
-		# set up hot spots for entering/modifying train/loco ID - displays can do this too
+		# only set up hot spots on the diagram
+		self.turnoutMap = { (t.GetScreen(), t.GetPos()): t for t in self.turnouts.values() if not t.IsRouteControlled() }
+		self.disabledTurnoutMap = { (t.GetScreen(), t.GetPos()): t for t in self.turnouts.values() if t.IsRouteControlled() }
+		self.buttonMap = { (b.GetScreen(), b.GetPos()): b for b in self.buttons.values() }
+		self.signalMap = { (s.GetScreen(), s.GetPos()): s for s in self.signals.values() }
+		self.handswitchMap = { (l.GetScreen(), l.GetPos()): l for l in self.handswitches.values() }
 		self.blockMap = self.BuildBlockMap(self.blocks)
 
 		self.buttonsToClear = []
@@ -1322,13 +1320,30 @@ class MainFrame(wx.Frame):
 			to = None
 
 		if to:
-			if right:  # only process left clicks here
+			if right:  # provide turnout status
+				l = to.GetLockedBy()
+				lockers = "" if len(l) == 0 else ("Locked: %s" % ", ".join(l))
+				self.PopupAdvice("%s - %s   %s" % (to.GetName(), "Normal" if to.IsNormal() else "Reversed", lockers))
 				return
 			
 			if to.IsDisabled():
 				return
 
-			to.GetDistrict().PerformTurnoutAction(to, force=shift)
+			if self.IsDispatcher():
+				to.GetDistrict().PerformTurnoutAction(to, force=shift)
+			return
+
+		try:
+			to = self.disabledTurnoutMap[(screen, pos)]
+		except KeyError:
+			to = None
+
+		if to:
+			if right:  # provide turnout status
+				l = to.GetLockedBy()
+				lockers = "" if len(l) == 0 else ("Locked: %s" % ", ".join(l))
+				self.PopupAdvice("%s - %s   %s" % (to.GetName(), "Normal" if to.IsNormal() else "Reversed", lockers))
+				return
 			return
 
 		try:
@@ -1340,7 +1355,8 @@ class MainFrame(wx.Frame):
 			if right or shift:  # only process left clicks here
 				return
 			
-			btn.GetDistrict().PerformButtonAction(btn)
+			if self.IsDispatcher():
+				btn.GetDistrict().PerformButtonAction(btn)
 			return
 
 		try:
@@ -1349,13 +1365,17 @@ class MainFrame(wx.Frame):
 			sig = None
 
 		if sig:
-			if right:  # only process left clicks here
+			if right:  # provide signal status
+				l = sig.GetLockedBy()
+				lockers = "" if len(l) == 0 else ("Locked: %s" % ", ".join(l))
+				self.PopupAdvice("%s -  %s   %s" % (sig.GetName(), sig.GetAspectName(), lockers))
 				return
 			
 			if sig.IsDisabled():
 				return
 
-			sig.GetDistrict().PerformSignalAction(sig, callon=shift)
+			if self.IsDispatcher():
+				sig.GetDistrict().PerformSignalAction(sig, callon=shift)
 			return
 
 		try:
@@ -1370,7 +1390,8 @@ class MainFrame(wx.Frame):
 			if hs.IsDisabled():
 				return
 			
-			hs.GetDistrict().PerformHandSwitchAction(hs)
+			if self.IsDispatcher():
+				hs.GetDistrict().PerformHandSwitchAction(hs)
 			return
 
 		try:
@@ -2673,13 +2694,28 @@ class MainFrame(wx.Frame):
 			for sb in [sbw, sbe]:
 				if sb:
 					bdirs.append({ "block": sb.GetName(), "dir": "E" if b.GetEast() else "W"})
-		self.Request({"blockdirs": { "data": json.dumps(bdirs)}})
+			if len(bdirs) >= 100:
+				self.Request({"blockdirs": { "data": json.dumps(bdirs)}})
+				print("sending %d bdirs" % len(bdirs), flush=True)
+				bdirs = []
+		if len(bdirs) > 0:
+			self.Request({"blockdirs": { "data": json.dumps(bdirs)}})
+			print("sending remaining %d bdirs" % len(bdirs), flush=True)
 
 	def SendOSRoutes(self):
 		for b in self.blocks.values():
 			if b.GetBlockType() == OVERSWITCH:
 				b.SendRouteRequest()
-		self.Request({"routedefs": { "data": json.dumps(self.districts.GetRouteDefinitions())}})
+		rds = self.districts.GetRouteDefinitions()
+		print("sending a total of %d routedefs" % len(rds))
+		rx = 0
+		step = 200
+		while rx < len(rds):
+			print("sending batch size %s" % len(rds[rx:rx+step]))
+			self.Request({"routedefs": { "data": json.dumps(rds[rx:rx+step])}})
+			rx  += step
+		print("done sending rds", flush=True)
+
 			
 	def SendCrossoverPoints(self):
 		self.Request({"crossover": {"data": ["%s:%s" % (b[0], b[1]) for b in self.districts.GetCrossoverPoints()]}})

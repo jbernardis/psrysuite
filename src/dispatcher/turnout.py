@@ -27,6 +27,9 @@ class Turnout:
 
 	def IsLocked(self):
 		return self.locked
+	
+	def GetLockedBy(self):
+		return self.lockedBy
 
 	def IsDisabled(self):
 		return self.disabled
