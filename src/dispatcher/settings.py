@@ -18,6 +18,11 @@ def parseBoolean(val, defaultVal):
 	
 	return defaultVal
 
+class Debug:
+	def __init__(self):
+		self.showaspectcalculation = False
+		self.loglevel = "DEBUG"
+
 
 class Settings:
 	def __init__(self):
@@ -37,6 +42,8 @@ class Settings:
 		self.activesuppressunknown = False
 		self.activeonlyatc = False
 		self.clockstarttime = 355
+		
+		self.debug = Debug()
 		
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -92,6 +99,13 @@ class Settings:
 			for opt, value in self.cfg.items("display"):
 				if opt == 'allowatcrequests':
 					self.allowatcrequests = parseBoolean(value, False)
+			
+		if self.cfg.has_section("debug"):
+			for opt, value in self.cfg.items("debug"):
+				if opt == 'showaspectcalculation':
+					self.debug.showaspectcalculation = parseBoolean(value, False)
+				elif opt == 'loglevel':
+					self.debug.loglevel = value
 				
 		if self.cfg.has_section(GLOBAL):
 			for opt, value in self.cfg.items(GLOBAL):

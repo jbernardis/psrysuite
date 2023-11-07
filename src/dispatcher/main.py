@@ -21,7 +21,23 @@ sys.stdout = ofp
 sys.stderr = efp
 
 import logging
-logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "%s.log" % fn), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
+
+logLevels = {
+	"DEBUG":	logging.DEBUG,
+	"INFO":		logging.INFO,
+	"WARNING":	logging.WARNING,
+	"ERROR":	logging.ERROR,
+	"CRITICAL":	logging.CRITICAL,
+}
+
+l = settings.debug.loglevel
+if l not in logLevels:
+	print("unknown logging level: %s.  Defaulting to DEBUG" % l, file=sys.stderr)
+	l = "DEBUG"
+	
+loglevel = logLevels[l]
+
+logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "%s.log" % fn), filemode='w', format='%(asctime)s %(message)s', level=loglevel)
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 

@@ -42,8 +42,6 @@ from dispatcher.rrserver import RRServer
 from dispatcher.edittraindlg import EditTrainDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
 
-showAspectCalculation = True
-
 MENU_ATC_REMOVE  = 900
 MENU_ATC_STOP    = 901
 MENU_ATC_ADD     = 902
@@ -3014,8 +3012,8 @@ class MainFrame(wx.Frame):
 		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Display"))
 		
 
-	def GetDebugFlag(self):
-		return showAspectCalculation
+	def GetDebugFlags(self):
+		return self.settings.debug
 
 
 class ExitDlg (wx.Dialog):

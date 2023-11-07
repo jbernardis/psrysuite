@@ -1,5 +1,4 @@
-from dispatcher.constants import STOP
-from dispatcher.district import aspectname, aspecttype
+from dispatcher.constants import STOP, aspectname, aspecttype
 
 
 class Signal:
