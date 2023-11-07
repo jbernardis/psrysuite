@@ -35,7 +35,7 @@ from dispatcher.districts.cliveden import Cliveden
 from dispatcher.districts.cliff import Cliff
 from dispatcher.districts.port import Port
 
-from dispatcher.constants import HyYdPt, LaKr, NaCl, screensList, EMPTY, OCCUPIED, NORMAL, REVERSE, OVERSWITCH
+from dispatcher.constants import HyYdPt, LaKr, NaCl, screensList, EMPTY, OCCUPIED, NORMAL, REVERSE, OVERSWITCH, SLIPSWITCH, turnoutstate
 from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
 
@@ -1319,9 +1319,7 @@ class MainFrame(wx.Frame):
 
 		if to:
 			if right:  # provide turnout status
-				l = to.GetLockedBy()
-				lockers = "" if len(l) == 0 else ("Locked: %s" % ", ".join(l))
-				self.PopupAdvice("%s - %s   %s" % (to.GetName(), "Normal" if to.IsNormal() else "Reversed", lockers))
+				self.ShowTurnoutInfo(to)
 				return
 			
 			if to.IsDisabled():
@@ -1338,9 +1336,7 @@ class MainFrame(wx.Frame):
 
 		if to:
 			if right:  # provide turnout status
-				l = to.GetLockedBy()
-				lockers = "" if len(l) == 0 else ("Locked: %s" % ", ".join(l))
-				self.PopupAdvice("%s - %s   %s" % (to.GetName(), "Normal" if to.IsNormal() else "Reversed", lockers))
+				self.ShowTurnoutInfo(to)
 				return
 			return
 
@@ -1606,6 +1602,20 @@ class MainFrame(wx.Frame):
 								self.Request({"ar": {"action": "add" if ar else "remove", "train": trainid}})
 	
 						tr.Draw()
+						
+	def ShowTurnoutInfo(self, to):
+		l = to.GetLockedBy()
+		lockers = "" if len(l) == 0 else ("Locked: %s" % ", ".join(l))
+		if to.GetType() == SLIPSWITCH:
+			st = to.GetStatus()
+			if len(st) == 2:
+				state = "%s/%s" % (turnoutstate(st[0], short=True), turnoutstate(st[1], short=True))
+			else:
+				state = "??"
+		else:
+			state = "Normal" if to.IsNormal() else "Reversed"
+		self.PopupAdvice("%s - %s   %s" % (to.GetName(), state, lockers))
+
 
 	def VerifyTrainID(self, trainid):
 		if trainid is None or trainid.startswith("??"):

@@ -38,6 +38,13 @@ RegSloAspects = 51
 AdvAspects = 52
 SloAspects = 53
 
+def turnoutstate(st, short=False):
+    if st == NORMAL:
+        return "Nml" if short else "Normal"
+    if st == REVERSE:
+        return "Rev" if short else "Reverse"
+    
+    return "??"
 
 def statusname(status):
     if status == EMPTY:

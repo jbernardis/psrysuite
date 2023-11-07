@@ -359,19 +359,22 @@ class ServerMain:
 
 	def DoSignal(self, cmd):
 		signame = cmd["name"][0]
-		aspect = int(cmd["aspect"][0])
+		try:
+			aspect = int(cmd["aspect"][0])
+		except KeyError:
+			aspect = None
+			logging.error("Received signal command with no aspect - ignoring (%s)" % str(cmd))
 		try:
 			callon = int(cmd["callon"][0]) == 1
 		except:
 			callon = False
 	
-		self.rr.SetAspect(signame, aspect, callon)
+		if aspect is not None:
+			self.rr.SetAspect(signame, aspect, callon)
 
 	def DoSignalLock(self, cmd):			
 		signame = cmd["name"][0]
 		status = int(cmd["status"][0])
-		
-		print("SIGNAL LOCK: %s %d" % (signame, status))
 		
 		self.rr.SetSignalLock(signame, status)
 				

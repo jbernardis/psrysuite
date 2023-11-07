@@ -682,6 +682,9 @@ class District:
 		self.EvaluatePreviousSignals(sig)
 		
 	def EvaluatePreviousSignals(self, sig):
+		if not self.frame.IsDispatcher():
+			return
+		
 		if self.showaspectcalculation:		
 			self.frame.PopupEvent("Evaluating prior signals for signal %s" % sig.GetName())
 		rt, osblk = self.FindRoute(sig)
@@ -746,14 +749,11 @@ class District:
 		newAspect = self.CalculateAspect(psig, nb, rt, silent=True)
 		if newAspect == currentAspect:
 			return 
-		
-		'''
-		DoSignalAction will propagate the checking
-		'''
+	
+		self.frame.Request({"signal": {"name": sigNm, "aspect": newAspect, "callon": 0}})
+
 		if self.showaspectcalculation:		
 			self.frame.PopupEvent("Calculated new aspect for signal %s = %s" % (psig.GetName(), newAspect))		
-		self.DoSignalAction(psig, newAspect)
-		
 		
 	def EvaluateDistrictLocks(self, sig, ossLocks=None):
 		pass
