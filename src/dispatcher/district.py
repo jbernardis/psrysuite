@@ -655,18 +655,10 @@ class District:
 		if aspect != 0:
 			if self.CrossingEastWestBoundary(osblock, exitBlk):
 				nd = not sig.GetEast()
-				od = not nd
 			else:
 				nd = sig.GetEast()
-				od = nd
 				
 			exitBlk.SetEast(nd)
-			'''
-			this next statement handles those situations when a train reverses direction within a block.
-			For all other cases, this is redundant.
-			'''
-			if entryBlk is not None:
-				entryBlk.SetEast(od)
 
 		exitBlk.SetCleared(aspect != STOP, refresh=True)
 
@@ -710,7 +702,7 @@ class District:
 		nbName = nb.GetName()
 		if nb.GetBlockType() != OVERSWITCH:
 			return
-		
+
 		rt = nb.GetRoute()
 		if rt is None:
 			return 
@@ -737,17 +729,18 @@ class District:
 		except KeyError:
 			return
 		
+		# we're not going to change signals that ate stopped, so end this here
 		currentAspect = psig.GetAspect()
 		if currentAspect == 0:
-			# we're not going to change signals that ate stopped, so end this here
 			return
 		
 		if sigNm.startswith("P"):
-			# skip anything to do with Port - we don't control trat
+			# skip anything to do with Port - we don't control it
 			return
 
+		# stop if the aspect is unchanged or can't be calculated
 		newAspect = self.CalculateAspect(psig, nb, rt, silent=True)
-		if newAspect == currentAspect:
+		if newAspect is None or newAspect == currentAspect:
 			return 
 	
 		self.frame.Request({"signal": {"name": sigNm, "aspect": newAspect, "callon": 0}})

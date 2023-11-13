@@ -42,6 +42,7 @@ class Settings:
 		self.activesuppressunknown = False
 		self.activeonlyatc = False
 		self.clockstarttime = 355
+		self.matrixturnoutdelay = 2
 		
 		self.debug = Debug()
 		
@@ -82,6 +83,14 @@ class Settings:
 
 				elif opt == 'showcameras':
 					self.showcameras = parseBoolean(value, False)
+					
+				elif opt == 'matrixturnoutdelay':
+					try:
+						s = int(value)
+					except:
+						logging.warning("invalid value in ini file for matrix turnout delay: %s" % value)
+						s = 2
+					self.matrixturnoutdelay = s
 					
 				elif opt == 'clockstarttime':
 					try:

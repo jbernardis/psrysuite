@@ -18,6 +18,7 @@ class Yard (District):
 		self.buttonToRoute = None
 		self.sw17 = None
 		self.sw21 = None
+		self.matrixturnoutdelay = frame.settings.matrixturnoutdelay
 
 	def Draw(self):
 		District.Draw(self)
@@ -97,11 +98,11 @@ class Yard (District):
 		District.PerformButtonAction(self, btn)
 		bname = btn.GetName()
 		if bname in self.osButtons["YOSCJW"]:
-			self.DoEntryExitButtons(btn, "YOSCJ", interval=2)
+			self.DoEntryExitButtons(btn, "YOSCJ", interval=self.matrixturnoutdelay)
 		elif bname in self.osButtons["YOSEJW"]:
-			self.DoEntryExitButtons(btn, "YOSEJ", interval=2)
+			self.DoEntryExitButtons(btn, "YOSEJ", interval=self.matrixturnoutdelay)
 		elif bname in self.osButtons["YOSKL1"]:
-			self.DoEntryExitButtons(btn, "YOSKL", interval=2)
+			self.DoEntryExitButtons(btn, "YOSKL", interval=self.matrixturnoutdelay)
 		else:
 			rtname = self.buttonToRoute[bname]
 			rte = self.routes[rtname]
@@ -114,7 +115,7 @@ class Yard (District):
 
 			btn.Press(refresh=True)
 			self.frame.ClearButtonAfter(2, btn)
-			self.MatrixTurnoutRequest(tolist, interval=2)
+			self.MatrixTurnoutRequest(tolist, interval=self.matrixturnoutdelay)
 			self.frame.Request({"nxbutton": { "button": bname}})
 
 	def DefineBlocks(self):

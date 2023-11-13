@@ -84,22 +84,27 @@ class Signal:
 		self.mutex = mutexList
 
 	def SetLock(self, lockedby, flag=True):
+		# lockedby == NOne means we are in the display process.  Just mark the signal as locked/unlocked and be done
 		if flag:
 			self.locked = True
-			if lockedby in self.lockedBy:
+			if lockedby is not None:
+				if lockedby in self.lockedBy:
 				# already locked by this signal
-				return
-			self.lockedBy.append(lockedby)
-			if len(self.lockedBy) == 1:
-				self.frame.Request({"signallock": { "name": self.name, "status": 1}})
+					return
+				self.lockedBy.append(lockedby)
+				if len(self.lockedBy) == 1:
+					self.frame.Request({"signallock": { "name": self.name, "status": 1}})
 		else:
-			if lockedby not in self.lockedBy:
-				# this signal hasn't locked by this locker, so it can't unlock it
-				return
-			self.lockedBy.remove(lockedby)
-			if len(self.lockedBy) == 0:
+			if lockedby is None:
 				self.locked = False
-				self.frame.Request({"signallock": { "name": self.name, "status": 0}})
+			else:
+				if lockedby not in self.lockedBy:
+					# this signal hasn't locked by this locker, so it can't unlock it
+					return
+				self.lockedBy.remove(lockedby)
+				if len(self.lockedBy) == 0:
+					self.locked = False
+					self.frame.Request({"signallock": { "name": self.name, "status": 0}})
 
 	def ClearLocks(self, forward=True):
 		self.lockedBy = []

@@ -99,6 +99,7 @@ class MainFrame(wx.Frame):
 		self.adviceList = []
 		self.dlgEvents = None
 		self.dlgAdvice = None
+		self.busy = None
 		
 		self.locoList = []
 		self.trainList = []
@@ -1360,8 +1361,12 @@ class MainFrame(wx.Frame):
 
 		if sig:
 			if right:  # provide signal status
-				l = sig.GetLockedBy()
-				lockers = "" if len(l) == 0 else ("Locked: %s" % ", ".join(l))
+				if sig.IsLocked():
+					l = sig.GetLockedBy()
+					lockers = "Locked" if len(l) == 0 else ("Locked: %s" % ", ".join(l))
+				else:
+					lockers = ""
+					
 				self.PopupAdvice("%s -  %s   %s" % (sig.GetName(), sig.GetAspectName(), lockers))
 				return
 			
@@ -2026,6 +2031,7 @@ class MainFrame(wx.Frame):
 		self.DoRefresh()
 		
 	def DoRefresh(self):
+		self.busy = wx.BusyCursor()
 		if self.IsDispatcher():
 			self.Request({"clock": { "value": self.timeValue, "status": self.clockStatus}})
 
@@ -2089,7 +2095,7 @@ class MainFrame(wx.Frame):
 			"relay":			self.DoCmdNOOP,
 			"setroute":			self.DoCmdNOOP,
 			"turnoutlock":		self.DoCmdNOOP,
-			"signallock":		self.DoCmdNOOP,
+			"signallock":		self.DoCmdSignalLock,
 		}
 		
 	def DoCmdNOOP(self, _):
@@ -2230,6 +2236,25 @@ class MainFrame(wx.Frame):
 					# unable to find district for signal lever
 					return
 				district.DoSignalLeverAction(signame, state, callon == 1)
+				
+	def DoCmdSignalLock(self, parms):
+		if self.IsDispatcher():
+			return 
+		for p in parms:
+			signame = p["name"]
+			try:
+				state = int(p["state"])
+			except:
+				state = None
+			
+			try:
+				sig = self.signals[signame]
+			except:
+				sig = None
+			if sig is None or state is None:
+				return 
+			
+			sig.SetLock(None, state == 1)
 
 	def DoCmdHandSwitch(self, parms):				
 		for p in parms:
@@ -2300,7 +2325,7 @@ class MainFrame(wx.Frame):
 			try:
 				east = p["east"]
 			except KeyError:
-				east = True
+				east = None
 				
 			print("inbound settrain: %s %s %s %s" % (block, name, loco, east))
 
@@ -2390,8 +2415,9 @@ class MainFrame(wx.Frame):
 					# trying to find train in existing list
 					tr = self.trains[name]
 					if oldName and oldName == name:
-						tr.SetEast(east)
-						blk.SetEast(east)
+						if east is not None:
+							tr.SetEast(east)
+							blk.SetEast(east)
 					else:
 						e = tr.GetEast()
 						blk.SetEast(e) # block takes on direction of the train if known
@@ -2540,6 +2566,14 @@ class MainFrame(wx.Frame):
 				self.SendOSRoutes()
 				self.SendCrossoverPoints()
 			self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
+			
+		elif parms["type"] == "trains":
+			if self.busy:
+				del self.busy
+				self.busy = None
+				
+		else:
+			self.PopupEvent("Got end type (%s)" % parms["type"])
 					
 	def DoCmdAdvice(self, parms):
 		self.PopupAdvice(parms["msg"][0])

@@ -658,7 +658,6 @@ class StoppingBlock (Block):
 			# we don't know the exit block - this means the OS is set to a different
 			# route and the signal should be red - assert that stopping block is active
 			logging.debug("===activating stopping relay for block %s %s because unable to identify next block" % (bname, direction))
-			logging.debug("blocks for train %s = %s" % (tr.GetName(), ",".join(tr.GetBlockNameList())))
 			self.Activate(True)
 			return
 		
