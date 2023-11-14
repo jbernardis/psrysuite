@@ -282,7 +282,7 @@ class TrainTrackerPanel(wx.Panel):
 		self.pendingTrains = []
 		self.selectedEngineers = [] 
 		self.idleEngineers = []
-		self.speeds = {}
+		#self.speeds = {}
 		self.schedName = None
 		self.trainSchedule = None
 		
@@ -764,7 +764,7 @@ class TrainTrackerPanel(wx.Panel):
 					except:
 						lid = None
 					try:
-						speed = p["speed"]
+						speed = int(p["speed"])
 					except:
 						speed = None
 					try:
@@ -1069,8 +1069,8 @@ class TrainTrackerPanel(wx.Panel):
 
 		self.atl.addTrain(ActiveTrain(tid, tInfo, loco, ldesc, llimit, eng, block))
 
-		if loco in self.speeds:
-			self.atl.setThrottle(loco, self.speeds[loco][0], self.speeds[loco][1])
+		#if loco in self.speeds:
+			#self.atl.setThrottle(loco, self.speeds[loco][0], self.speeds[loco][1])
 
 		if not runningExtra:		
 			self.pendingTrains.remove(tid)
@@ -1335,8 +1335,8 @@ class TrainTrackerPanel(wx.Panel):
 		desc = self.locos.getLoco(lid)
 		self.atl.updateTrain(at.tid, lid, desc, None, None)
 		
-		if lid in self.speeds:
-			self.atl.setThrottle(lid, self.speeds[lid][0], self.speeds[lid][1])
+		#if lid in self.speeds:
+			#self.atl.setThrottle(lid, self.speeds[lid][0], self.speeds[lid][1])
 		
 		tinfo = self.trainRoster.getTrain(at.tid)
 		if tinfo is not None:
