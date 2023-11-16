@@ -41,6 +41,49 @@ class Handler(BaseHTTPRequestHandler):
 			except ConnectionAbortedError:
 				logging.warning("Connection Aborted Error writing 400 response back to requester - ignoring")
 
+	def do_POST(self):
+		err = False
+		try:
+			content_length = int(self.headers['Content-Length'])
+		except KeyError:
+			logging.error("Received POST without content length - ignoring")
+			err = True
+			
+		try:
+			filename = self.headers["Filename"]
+		except KeyError:
+			logging.error("Received POST without file name - ignoring")
+			err = True
+
+		if err:
+			pass
+		else:
+			trdata = json.loads(self.rfile.read(content_length))
+			
+		if not err:
+			datafolder = os.path.join(os.getcwd(), "data")
+			fn = os.path.join(datafolder, filename)
+			with open(fn, "w") as jfp:
+				json.dump(trdata, jfp, indent=2)
+				
+			self.send_response(200)
+			self.send_header("Content-type", "text/plain")
+			self.end_headers()
+			try:
+				b = "File %s saved" % filename
+				self.wfile.write(b.encode())
+			except ConnectionAbortedError:
+				logging.warning("Connection Aborted Error writing 200 response back to requester - ignoring")
+		else:
+			self.send_response(400)
+			self.send_header("Content-type", "text/plain")
+			self.end_headers()
+			try:
+				b = "Error saving file %s" % filename
+				self.wfile.write(b.encode())
+			except ConnectionAbortedError:
+				logging.warning("Connection Aborted Error writing 400 response back to requester - ignoring")
+
 class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 	def serve_railroad(self):
 		self.haltServer = False
@@ -117,6 +160,24 @@ class HTTPServer:
 		elif verb == "getlayout":
 			fn = os.path.join(os.getcwd(), "data", "layout.json")
 			logging.info("Retrieving layout information from file (%s)" % fn)
+			try:
+				with open(fn, "r") as jfp:
+					j = json.load(jfp)
+			except FileNotFoundError:
+				logging.info("File not found")
+				return 400, "File Not Found"
+			
+			except:
+				logging.info("Unknown error")
+				return 400, "Unknown error encountered"
+			
+			jstr = json.dumps(j)
+			logging.info("Returning %d bytes" % len(jstr))
+			return 200, jstr
+		
+		elif verb == "getsnapshot":
+			fn = os.path.join(os.getcwd(), "data", "snapshot.json")
+			logging.info("Retrieving snapshot information from file (%s)" % fn)
 			try:
 				with open(fn, "r") as jfp:
 					j = json.load(jfp)

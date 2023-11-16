@@ -293,6 +293,7 @@ class MainFrame(wx.Frame):
 			self.Bind(wx.EVT_BUTTON, self.OnBAdviceLog, self.bAdvice)
 			
 			self.bSnapshot = wx.Button(self, wx.ID_ANY, "Snapshot", pos=(self.centerOffset+940, 25), size=BTNDIM)
+			self.bSnapshot.Enable(False)
 			self.Bind(wx.EVT_BUTTON, self.OnBSnapshot, self.bSnapshot)
 			
 		self.totalw = totalw
@@ -1884,24 +1885,18 @@ class MainFrame(wx.Frame):
 				self.PopupEvent("No trains to save")
 				return 
 			
-			datafolder = os.path.join(os.getcwd(), "data")
-			fn = os.path.join(datafolder, "snapshot.json")
-			with open(fn, "w") as jfp:
-				json.dump(trinfo, jfp, indent=2)
-			self.PopupEvent("%d trains saved in Snapshot" % lenTrInfo)
-			
+			rc = self.rrServer.Post("snapshot.json", trinfo)
+			if rc >= 400:
+				self.PopupEvent("Error saving snapshot")
+			else:
+				self.PopupEvent("%d trains saved in Snapshot" % lenTrInfo)
+							
 		elif rc == wx.ID_OPEN: #restore from snapshot
 			blks = [x for x in self.blocks.values() if x.IsOccupied()]
 
 			blkNames = [b.GetName() for b in blks]
-						
-			datafolder = os.path.join(os.getcwd(), "data")
-			fn = os.path.join(datafolder, "snapshot.json")
-			try:
-				with open(fn, "r") as jfp:
-					trjson = json.load(jfp)
-			except:
-				self.PopupEvent("Unable to open snapshot file")
+
+			trjson = self.Get("getsnapshot", {})
 				
 			foundTrainBlocks = []
 			foundTrains = {}
@@ -1965,6 +1960,7 @@ class MainFrame(wx.Frame):
 			self.sessionid = None
 			self.bSubscribe.SetLabel("Connect")
 			self.bRefresh.Enable(False)
+			self.bSnapshot.Enable(False)
 			self.bLoadTrains.Enable(False)
 			self.bLoadLocos.Enable(False)
 			self.bSaveTrains.Enable(False)
@@ -1990,6 +1986,7 @@ class MainFrame(wx.Frame):
 			self.subscribed = True
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
+			self.bSnapshot.Enable(True)
 			self.bLoadTrains.Enable(True)
 			self.bLoadLocos.Enable(True)
 			self.bSaveTrains.Enable(True)
@@ -2727,6 +2724,7 @@ class MainFrame(wx.Frame):
 					
 	def Get(self, cmd, parms):
 		return self.rrServer.Get(cmd, parms)
+					
 
 	def SendBlockDirRequests(self):
 		bdirs = []

@@ -21,7 +21,7 @@ class RRServer(object):
 		try:
 			r = requests.get(self.ipAddr + "/" + cmd, params=parms, timeout=4.0)
 		except requests.exceptions.ConnectionError:
-			logging.error("Unable to send request  is rr server running?")
+			logging.error("Unable to send get request is rr server running?")
 			return None
 		
 		if r.status_code >= 400:
@@ -29,4 +29,22 @@ class RRServer(object):
 			return None
 		
 		return r.json()
+				
+	def Post(self, fn, data):
+		headers = {
+		    'Filename': fn
+		}
+		try:
+			r = requests.post(self.ipAddr, headers=headers, json=data, timeout=4.0)
+		except requests.exceptions.ConnectionError:
+			logging.error("Unable to send post request is rr server running?")
+			print("error 1", flush=True)
+			return 400
+		
+		if r.status_code >= 400:
+			logging.error("HTTP Error %d" % r.status_code)
+			print("error 2", flush=True)
+			return r.status_code
+		
+		return r.status_code
 
