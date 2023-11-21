@@ -119,7 +119,7 @@ class ChooseSchedulesDlg(wx.Dialog):
 				
 
 class ManageScheduleDlg(wx.Dialog):
-	def __init__(self, parent, currentScheduleName, currentSchedule, alltrains, settings):
+	def __init__(self, parent, currentScheduleName, currentSchedule, alltrains, rrserver, settings):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		
@@ -127,6 +127,7 @@ class ManageScheduleDlg(wx.Dialog):
 		self.schedName = currentScheduleName
 		self.settings = settings
 		self.schedDir = os.path.join(os.getcwd(), "data", "schedules")
+		self.RRServer = rrserver
 		
 		self.allTrains = sorted([t for t in alltrains])		
 		self.setArrays(currentSchedule)
@@ -288,6 +289,9 @@ class ManageScheduleDlg(wx.Dialog):
 		self.Fit();
 		
 		self.setButtons()
+		
+	def Request(self, req):
+		return self.RRServer.SendRequest(req)
 		
 	def setTitle(self):
 		title = self.titleString
@@ -493,8 +497,8 @@ class ManageScheduleDlg(wx.Dialog):
 			pass
 
 	def getSchedFiles(self):
-		fxp = os.path.join(self.schedDir, "*.json")
-		return [os.path.splitext(os.path.split(x)[1])[0] for x in glob(fxp)]
+		d = [f for f in self.RRServer.Get("listdir", {"dir": os.path.join("data", "schedules")}) if f.lower().endswith(".json")]
+		return sorted([os.path.splitext(os.path.split(x)[1])[0] for x in d])
 	
 	def bDeletePressed(self, _):			
 		dlg = ChooseSchedulesDlg(self, self.getSchedFiles())
@@ -506,10 +510,10 @@ class ManageScheduleDlg(wx.Dialog):
 		
 		if rc != wx.ID_OK:
 			return 	
-		
-		for sched in scheds:	
-			path = os.path.join(os.getcwd(), "data", "schedules", sched + ".json")
-			os.unlink(path)
+
+		schedDir = os.path.join("data", "schedules")		
+		for sched in scheds:
+			self.RRServer.Get("delfile", {"file": sched+".json", "dir": schedDir})	
 	
 	def bLoadPressed(self, _):
 		if self.modified:
@@ -530,9 +534,9 @@ class ManageScheduleDlg(wx.Dialog):
 		if rc != wx.ID_OK:
 			return 		
 		
-		path = os.path.join(os.getcwd(), "data", "schedules", schedNm + ".json")
+		fn = schedNm + ".json"
 		sched = Schedule()
-		if not sched.load(path):
+		if not sched.load(fn, self.RRServer):
 			return 
 		
 		self.setModified(False)
@@ -607,7 +611,7 @@ class ManageScheduleDlg(wx.Dialog):
 		sched = Schedule()
 		sched.setNewSchedule(self.scheduleTrains)
 		sched.setNewExtras(self.extraTrains)
-		sched.save(os.path.join(os.getcwd(), "data", "schedules", self.schedName + ".json"))
+		sched.save(self.schedName + ".json", self.RRServer)
 		self.setTitle()
 		self.setModified(False)
 

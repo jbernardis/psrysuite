@@ -54,6 +54,12 @@ class Handler(BaseHTTPRequestHandler):
 		except KeyError:
 			logging.error("Received POST without file name - ignoring")
 			err = True
+			
+		try:
+			directory = self.headers["Directory"]
+		except KeyError:
+			logging.warning("Received POST without directory name - assuming \"data\"")
+			directory = "data"
 
 		if err:
 			pass
@@ -61,8 +67,8 @@ class Handler(BaseHTTPRequestHandler):
 			trdata = json.loads(self.rfile.read(content_length))
 			
 		if not err:
-			datafolder = os.path.join(os.getcwd(), "data")
-			fn = os.path.join(datafolder, filename)
+			folder = os.path.join(os.getcwd(), directory)
+			fn = os.path.join(folder, filename)
 			with open(fn, "w") as jfp:
 				json.dump(trdata, jfp, indent=2)
 				
@@ -192,7 +198,83 @@ class HTTPServer:
 			jstr = json.dumps(j)
 			logging.info("Returning %d bytes" % len(jstr))
 			return 200, jstr
+		
+		elif verb == "listdir":
+			try:
+				directory = cmd["dir"][0]
+			except:
+				directory = "data"
+							
+			fqdn = os.path.join(os.getcwd(), directory)
+			logging.info("Retrieving directory contents (%s)" % fqdn)
 
+			d = [x for x in os.listdir(fqdn) if not os.path.isdir(os.path.join(fqdn, x))]
+			logging.info("Returning %d bytes" % len(d))
+			return 200, json.dumps(d)
+		
+		elif verb == "getfile":
+			try:
+				fn = cmd["file"][0]
+			except:
+				fn = None
+				
+			try:
+				directory = cmd["dir"][0]
+			except:
+				directory = "data"
+
+			if fn is None:
+				logging.info("File name not specified")
+				return 400, "File name not specified"
+							
+			fqn = os.path.join(os.getcwd(), directory, fn)
+			logging.info("Retrieving file (%s)" % fqn)
+
+			try:
+				with open(fqn, "r") as fp:
+					d = fp.read()
+			except FileNotFoundError:
+				logging.info("File not found")
+				return 400, "File Not Found"
+			
+			except:
+				logging.info("Unknown error")
+				return 400, "Unknown error encountered"
+			
+			logging.info("Returning %d bytes" % len(d))
+			return 200, d
+		
+		elif verb == "delfile":
+			try:
+				fn = cmd["file"][0]
+			except:
+				fn = None
+				
+			try:
+				directory = cmd["dir"][0]
+			except:
+				directory = "data"
+
+			if fn is None:
+				logging.info("File name not specified")
+				return 400, "File name not specified"
+							
+			fqn = os.path.join(os.getcwd(), directory, fn)
+			logging.info("Deleting file (%s)" % fqn)
+
+			try:
+				os.unlink(fqn)
+			except FileNotFoundError:
+				logging.info("File not found")
+				return 400, "File Not Found"
+			
+			except:
+				logging.info("Unknown error")
+				return 400, "Unknown error encountered"
+			
+			logging.info("File %s deleted" % fqn)
+			return 200, "deleted file %s" % fqn
+	
 		elif verb == "getbits":
 			try:
 				address = int(cmd["address"][0], 16)

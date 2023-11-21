@@ -1,38 +1,9 @@
 
-call on signals initiated by tower operator
-
-verify the correct sequencing of subblocks
-    S11: S11A, S11B
-    R10: R10A, R10B, R10C
-    H30: H30A, H30B
-
-already verified these: eastbound => ABC ordering, westbound: CBA (S20 had B and C backwards - I reversed in software)
-    D11: D11A, D11B
-    D21: D21A, D21B
-    S10: S10A, S10B, S10C
-    S20: S20A, S20B, S20C
-    H10: H10A, H10B
-
-sniffer interface - a new process that sends messages to rrserver who then forwards them to all. - needs debugging
-
-
-tracker:
-	reports - the only thing we really need is train cards - it stays in tracker because it works in conjunction with schedules
-
-
-why was a single car train being reported as non-contiguous??
-train contiguous - do not show message is ?? train - disabled for now until we can figure out what's going on
-
 possibilities:
 	ar/atc/advisor - ??get rid of checkboxes and have always on???
 
 
 redesign ATC as a non-GUI program, add ATC frame to dispatcher (and display??) and use messages between the two to keep the display up to date
-
-
-why don't I see the AR/ARC on the active train display for a remote display?
-
-why don't I see speed on the active train display
 
 
 
@@ -58,21 +29,13 @@ Medium Approach   = Red/Flashing Yellow 101
 Slow Approach and                       100
 Restricting       = Flashing Red/Red(Red/Yellow)
 
+Everything seems to be OK now - maybe one here or there that's wrong, but largely correct
 
-Need to verify aspects with fixed tester program.  Also need to take note of bit order and make sure I am using the same order in server
+get signal bridge at east end junction working
 
-
-
-When a train passes westbound through N31, it changes to the identity of the train parkes in N32
-
-West and East stopping sections for P31/P32 seem to be reversed, should I change the definition of the stopping bliock, or just change the interpretation of the input bits
-
-over-ride button versus callon
 
 ability to suppress specific trains from active train display
 
-Do I have stop blocks backwards east of nassau in B and.or R blocks???
+ability to unlock all sidings in support of waybills - but not have this condition block signals
 
-refine aspect calculation debugging information
-
-revisit fleeting algorithm - should signals work as a group or as individual signals?  If I change the route through the OS, if a signal fleets back to green, should it go with the new route, or just be abandoned>
+tracker/engineers, and all aspects of train editor - get files through server so that they can be run anywhere

@@ -30,9 +30,10 @@ class RRServer(object):
 		
 		return r.json()
 				
-	def Post(self, fn, data):
+	def Post(self, fn, directory,  data):
 		headers = {
-		    'Filename': fn
+		    'Filename': fn,
+		    'Directory': directory
 		}
 		try:
 			r = requests.post(self.ipAddr, headers=headers, json=data, timeout=4.0)

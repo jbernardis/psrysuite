@@ -1,7 +1,8 @@
 
 import logging
-
 from rrserver.constants import nodeNames
+
+MAX_ERRORCOUNT = 10
 
 def setBit(obyte, obit, val):
     if val != 0:
@@ -40,6 +41,9 @@ class Node:
         self.nxbpulsect = settings.nxbpulsect
         self.first = True
         
+        self.errorCount = 0
+        self.disabled = False
+        
         self.inputMap = {}
         
         self.rrBus = None
@@ -75,6 +79,9 @@ class Node:
         return self.address
         
     def OutIn(self):
+        if self.disabled:
+            return 
+        
         if self.rrBus is None: 
             return # simulation mode
             
@@ -83,8 +90,13 @@ class Node:
             for i in range(self.bcount):
                 self.inb[i] = int.from_bytes(inb[i], "big")
         else:
-            msg = "Railroad IO error at node %s(0x%2x)" % (nodeNames[self.address], self.address)
+            self.errorCount += 1
+            msg = "Railroad IO error at node %s(0x%2x) (%dx)" % (nodeNames[self.address], self.address, self.errorCount)
             logging.error(msg)
+            self.rr.RailroadEvent({"alert": { "msg": [msg] }})
+            if self.errorCount >= MAX_ERRORCOUNT:
+                self.disabled = True
+                self.rr.RailroadEvent({"alert": { "msg": ["Node %s(0x%2x) disabled" % (nodeNames[self.address], self.address)] } })
                     
     def GetChangedInputs(self):
         results = []

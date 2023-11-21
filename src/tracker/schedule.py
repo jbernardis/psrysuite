@@ -1,4 +1,5 @@
 import json
+import os
 
 class Schedule():
 	def __init__(self):
@@ -43,16 +44,14 @@ class Schedule():
 	def setNewExtras(self, nex):
 		self.extras  = [t for t in nex]
 		
-	def save(self, fn):
+	def save(self, fn, rrserver):
 		j = {"schedule": self.schedule, "extras": self.extras}
-		with open(fn, "w") as fp:
-			json.dump(j, fp, indent=4, sort_keys=True)
+		rc = rrserver.Post(fn, os.path.join("data", "schedules"), j)
+		return rc < 400
 		
-	def load(self, fn):
-		try:
-			with open(fn, "r") as fp:
-				j = json.load(fp)
-		except:
+	def load(self, fn, rrserver):
+		j = rrserver.Get("getfile", {"dir": os.path.join("data", "schedules"), "file": fn})
+		if j is None:
 			self.schedule = []
 			self.extras = []
 			return False

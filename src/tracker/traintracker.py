@@ -1446,7 +1446,7 @@ class TrainTrackerPanel(wx.Panel):
 						
 				
 	def onManageSchedule(self, _):
-		dlg = ManageScheduleDlg(self, self.schedName, self.trainSchedule, self.trainRoster.getTrainList(), self.settings)
+		dlg = ManageScheduleDlg(self, self.schedName, self.trainSchedule, self.trainRoster.getTrainList(), self.RRServer, self.settings)
 		rc = dlg.ShowModal()
 		
 		if rc == wx.ID_OK:

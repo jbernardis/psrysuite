@@ -1885,7 +1885,7 @@ class MainFrame(wx.Frame):
 				self.PopupEvent("No trains to save")
 				return 
 			
-			rc = self.rrServer.Post("snapshot.json", trinfo)
+			rc = self.rrServer.Post("snapshot.json", "data", trinfo)
 			if rc >= 400:
 				self.PopupEvent("Error saving snapshot")
 			else:
