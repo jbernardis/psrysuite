@@ -1,5 +1,6 @@
 import requests
 import logging
+import json
 
 class RRServer(object):
 	def __init__(self):
@@ -28,7 +29,10 @@ class RRServer(object):
 			logging.error("HTTP Error %d" % r.status_code)
 			return None
 		
-		return r.json()
+		try:
+			return r.json()
+		except json.decoder.JSONDecodeError:
+			return r.text
 					
 	def Post(self, fn, directory,  data):
 		headers = {

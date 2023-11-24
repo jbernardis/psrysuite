@@ -1,11 +1,13 @@
-import json
-import copy
 
 class TrainRoster:
-	def __init__(self, fn):
-		self.filename = fn
-		with open(fn, "r") as fp:	
-			self.trains = json.load(fp)
+	def __init__(self, rrserver):
+		self.RRServer = rrserver
+		self.trains = rrserver.Get("gettrains", {})
+			
+		for tid in self.trains:
+			trn = self.trains[tid]
+			trn["block"] = None
+			trn["loco"] = trn["normalloco"]
 
 	def __iter__(self):
 		self.order = sorted(self.trains.keys())

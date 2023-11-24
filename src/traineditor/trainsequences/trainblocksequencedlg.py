@@ -1,10 +1,11 @@
 import wx
 import os
+import json
 
 from traineditor.trainsequences.traindlg import TrainDlg
 from traineditor.trainsequences.train import Trains
 from traineditor.trainsequences.blocksequence import BlockSequenceListCtrl
-from traineditor.trainsequences.layoutdata import LayoutData
+from traineditor.layoutdata import LayoutData
 
 SIMSCRIPTFN = "simscripts.json"
 ARSCRIPTFN =  "arscripts.json"
@@ -14,12 +15,13 @@ def StoppingSection(blk):
 		
 
 class TrainBlockSequencesDlg(wx.Dialog):
-	def __init__(self, parent):
+	def __init__(self, parent, rrserver):
 		wx.Frame.__init__(self, parent, style=wx.DEFAULT_FRAME_STYLE)
 		self.title = "PSRY Train Block Sequence Editor"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
+		self.RRServer = rrserver
 		
-		self.dataDir = os.path.join(os.getcwd(), "data")
+		##self.dataDir = os.path.join(os.getcwd(), "data")
 		
 		self.cbTrain = wx.ComboBox(self, wx.ID_ANY, "", size=(100, -1),
 			 choices=[],
@@ -118,7 +120,7 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		self.Fit()
 		self.Layout()
 
-		self.layout = LayoutData(self.dataDir)
+		self.layout = LayoutData(self.RRServer)
 		wx.CallAfter(self.Initialize)
 		
 	def Initialize(self):
@@ -134,7 +136,7 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		self.bValCurrent.Enable(flag)
 		
 	def loadTrains(self):
-		self.trains = Trains(self.dataDir)
+		self.trains = Trains(self.RRServer)
 		
 	def SetTrainChoices(self, trlist=None):
 		if trlist is not None:

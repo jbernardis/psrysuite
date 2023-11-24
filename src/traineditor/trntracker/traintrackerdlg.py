@@ -20,11 +20,12 @@ def formatLocation(info, tp):
 	return ("%s / %s" % (info[tp]["loc"], info[tp]["track"]))
 
 class TrainTrackerDlg(wx.Dialog):
-	def __init__(self, parent, browser):
+	def __init__(self, parent, rrserver, browser):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 
 		self.parent = parent
+		self.RRServer = rrserver
 		self.browser = browser
 		
 		self.titleString = "Edit Train Tracker Information"
@@ -35,8 +36,7 @@ class TrainTrackerDlg(wx.Dialog):
 		self.selectedTid = None
 		self.selectedStep = None
 
-		locofn = os.path.join(os.getcwd(), "data", "locos.json")	
-		self.locos = Locomotives(locofn)
+		self.locos = Locomotives(self.RRServer)
 		self.locoList = ["<none>"] + self.locos.getLocoListFull()
 		self.locoOnlyList = ["<none>"] + self.locos.getLocoList()
 
@@ -411,7 +411,7 @@ class TrainTrackerDlg(wx.Dialog):
 	def setRoster(self):
 		self.trainList = []
 		self.roster = {}
-		roster = TrainRoster(self.filename)
+		roster = TrainRoster(self.RRServer)
 
 		self.trainList = [t for t in roster]
 		for t in roster:
@@ -888,8 +888,7 @@ class TrainTrackerDlg(wx.Dialog):
 		
 	def bSavePressed(self, _):
 		if self.modified:
-			with open(self.filename, "r") as fp:	
-				self.trains = json.load(fp)
+			self.trains = self.RRServer.Get("gettrains", {})
 				
 			delList = []
 			for tr in self.trains:
@@ -904,15 +903,14 @@ class TrainTrackerDlg(wx.Dialog):
 					# new train - create an empty record with just placeholders for the non-tracker fields
 					self.trains[tr] = {
 							'sequence': [],
-							'startblock': 'C22',
+							'startblock': None,
 							'startsubblock': None,
 							'time': 5000
 							}
 					
 				self.trains[tr].update(self.roster[tr])
 		
-			with open(self.filename, "w") as fp:	
-				json.dump(self.trains, fp)
+			self.RRServer.Post("trains.json", "data", self.trains)
 				
 		self.setModified(False)
 		

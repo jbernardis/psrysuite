@@ -28,7 +28,10 @@ class RRServer(object):
 			logging.error("HTTP Error %d" % r.status_code)
 			return None
 		
-		return r.json()
+		try:
+			return r.json()
+		except:
+			return r.text
 				
 	def Post(self, fn, directory,  data):
 		headers = {

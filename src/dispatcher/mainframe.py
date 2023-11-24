@@ -2817,10 +2817,10 @@ class MainFrame(wx.Frame):
 		if not self.CheckTrainsContiguous(True):
 			return 
 		
-		dlg = ChooseItemDlg(self, True, True)
+		dlg = ChooseItemDlg(self, True, True, self.rrServer)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			file = dlg.GetFile()
+			file, directory = dlg.GetFile()
 			
 		dlg.Destroy()
 		if rc != wx.ID_OK:
@@ -2833,21 +2833,19 @@ class MainFrame(wx.Frame):
 		for trid, tr in self.trains.items():
 			if not trid.startswith("??"):
 				trDict[trid] = tr.GetBlockNameList()
-
-		with open(file, "w") as fp:
-			json.dump(trDict, fp, indent=4, sort_keys=True)
+		self.rrServer.Post(file, directory, trDict)
 
 		if len(trDict) == 1:
 			plural = ""
 		else:
 			plural = "s"			
-		self.PopupEvent("%d train%s saved to file %s" % (len(trDict), plural, os.path.basename(file)))
+		self.PopupEvent("%d train%s saved to file %s" % (len(trDict), plural, file))
 
 	def OnBLoadTrains(self, _):
-		dlg = ChooseItemDlg(self, True, False)
+		dlg = ChooseItemDlg(self, True, False, self.rrServer)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			file = dlg.GetFile()
+			file, directory = dlg.GetFile()
 			locations, allLocations = dlg.GetLocations()
 			
 		dlg.Destroy()
@@ -2856,15 +2854,16 @@ class MainFrame(wx.Frame):
 		
 		if file is None:
 			return
-
-		with open(file, "r") as fp:
-			trDict = json.load(fp)
+		
+		trDict = self.rrServer.Get("getfile", {"file": file, "dir": directory})
+		if trDict is None:
+			return
 			
 		if len(trDict) == 1:
 			plural = ""
 		else:
 			plural = "s"			
-		self.PopupEvent("%d train%s loaded from file %s" % (len(trDict), plural, os.path.basename(file)))
+		self.PopupEvent("%d train%s loaded from file %s" % (len(trDict), plural, file))
 
 		for tid, blist in trDict.items():
 			for bname in blist:
@@ -2951,10 +2950,10 @@ class MainFrame(wx.Frame):
 		if not self.CheckLocosUnique(True):
 			return 
 		
-		dlg = ChooseItemDlg(self, False, True)
+		dlg = ChooseItemDlg(self, False, True, self.rrServer)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			file = dlg.GetFile()
+			file, directory = dlg.GetFile()
 			
 		dlg.Destroy()
 		if rc != wx.ID_OK:
@@ -2969,20 +2968,19 @@ class MainFrame(wx.Frame):
 			if loco is not None and not loco.startswith("??"):
 				locoDict[loco] = tr.GetBlockNameList()
 
-		with open(file, "w") as fp:
-			json.dump(locoDict, fp, indent=4, sort_keys=True)
+		self.rrServer.Post(file, directory, locoDict)
 			
 		if len(locoDict) == 1:
 			plural = ""
 		else:
 			plural = "s"			
-		self.PopupEvent("%d locomotive%s saved to file %s" % (len(locoDict), plural, os.path.basename(file)))
+		self.PopupEvent("%d locomotive%s saved to file %s" % (len(locoDict), plural, file))
 
 	def OnBLoadLocos(self, _):
-		dlg = ChooseItemDlg(self, False, False)
+		dlg = ChooseItemDlg(self, False, False, self.rrServer)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			file = dlg.GetFile()
+			file, directory = dlg.GetFile()
 			locations, allLocations = dlg.GetLocations()
 			
 		dlg.Destroy()
@@ -2992,14 +2990,15 @@ class MainFrame(wx.Frame):
 		if file is None:
 			return
 
-		with open(file, "r") as fp:
-			locoDict = json.load(fp)
+		locoDict = self.rrServer.Get("getfile", {"file": file, "dir": directory})
+		if locoDict is None:
+			return
 
 		if len(locoDict) == 1:
 			plural = ""
 		else:
 			plural = "s"			
-		self.PopupEvent("%d locomotive%s loaded from file %s" % (len(locoDict), plural, os.path.basename(file)))
+		self.PopupEvent("%d locomotive%s loaded from file %s" % (len(locoDict), plural, file))
 
 		for lid, blist in locoDict.items():
 			for bname in blist:

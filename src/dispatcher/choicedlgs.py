@@ -1,13 +1,17 @@
 import wx  
 import os     
-from glob import glob
 
 class ChooseItemDlg(wx.Dialog):
-    def __init__(self, parent, trains, allowentry):
+    def __init__(self, parent, trains, allowentry, rrserver):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
+        self.RRServer = rrserver
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
         self.trains = trains
         self.allowentry = allowentry
+        
+        self.suffix = ".trn" if trains else ".loco"
+        self.directory = os.path.join("data", "trains" if self.trains else "locos")
+        
         if trains:
             if allowentry:
                 self.SetTitle("Choose/Enter train IDs file")
@@ -149,23 +153,15 @@ class ChooseItemDlg(wx.Dialog):
         self.cbOthers.SetValue(flag)
         
     def GetFiles(self):
-        if self.trains:
-            fxp = os.path.join(os.getcwd(), "data", "trains", "*.trn")
-        else:
-            fxp = os.path.join(os.getcwd(), "data", "locos", "*.loco")
-        self.files = [os.path.splitext(os.path.split(x)[1])[0] for x in glob(fxp)]
+        fl = self.RRServer.Get("listdir", {"dir": self.directory})
+        self.files = sorted([os.path.splitext(f)[0] for f in fl if f.lower().endswith(self.suffix)])
         
     def GetFile(self):
         fn = self.cbItems.GetValue()
         if fn is None or fn == "":
-            return None
+            return None, None
         
-        if self.trains:
-            fn = os.path.join(os.getcwd(), "data", "trains", fn+".trn")
-        else:
-            fn = os.path.join(os.getcwd(), "data", "locos", fn+".loco")
-            
-        return fn
+        return fn+self.suffix, self.directory
         
     def GetLocations(self):
         if self.allowentry:
@@ -217,11 +213,7 @@ class ChooseItemDlg(wx.Dialog):
             return 
                 
         for fn in l:
-            if self.trains:
-                path = os.path.join(os.getcwd(), "data", "trains", fn+".trn")
-            else:
-                path = os.path.join(os.getcwd(), "data", "locos", fn+".loco")
-            os.unlink(path)
+            self.RRServer.Get("delfile", {"file": fn+self.suffix, "dir": self.directory})
             
         self.GetFiles()
         self.cbItems.SetItems(self.files)

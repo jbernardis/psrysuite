@@ -7,7 +7,7 @@ wildcardTxt = "TXT file (*.txt)|*.txt|"	 \
 BTNSZ = (120, 46)
 
 class ManageEngineersDlg(wx.Dialog):
-	def __init__(self, parent, allEngs, actEngs, busyEngs, settings):
+	def __init__(self, parent, engineers, allEngs, actEngs, busyEngs, settings):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Manage Engineers")
 		self.titleString = "Manage Engineers"
 		self.Bind(wx.EVT_CLOSE, self.onClose)
@@ -21,6 +21,7 @@ class ManageEngineersDlg(wx.Dialog):
 		self.busyEngs = busyEngs
 		
 		self.parent = parent
+		self.engineers = engineers
 		self.settings = settings
 		
 		hsizer=wx.BoxSizer(wx.HORIZONTAL)
@@ -354,6 +355,7 @@ class ManageEngineersDlg(wx.Dialog):
 		newAvl = self.availableEngs + [eng]
 		self.availableEngs = sorted(newAvl)
 		self.allEngs.append(eng)
+		self.engineers.add(eng)
 		
 		self.lbAll.SetItems(self.availableEngs)
 		ix = self.availableEngs.index(eng)
@@ -372,6 +374,7 @@ class ManageEngineersDlg(wx.Dialog):
 		self.lbAll.Delete(sx)
 		self.allEngs.remove(eng)
 		self.availableEngs.remove(eng)
+		self.engineers.delete(eng)
 		self.setCounts()
 		sx = self.lbAll.GetSelection()
 		self.setAllSelection(sx)
@@ -385,11 +388,7 @@ class ManageEngineersDlg(wx.Dialog):
 		self.stCountActive.SetLabel("(%d Active)" % cActive)
 
 	def bSavePressed(self, _):
-		fn = os.path.join(os.getcwd(), "data", "engineers.txt")
-		with open(fn, "w") as ofp:
-			for ln in self.allEngs:
-				ofp.write("%s\n" % ln)
-		
+		self.engineers.save()
 		self.setModified(False)
 		self.reloadNeeded = True
 		

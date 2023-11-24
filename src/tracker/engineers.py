@@ -1,11 +1,21 @@
 
 
 class Engineers():
-	def __init__(self, fn):
-		with open(fn, "r") as x:
-			self.engineers = [e.strip() for e in x.readlines()]
-					
+	def __init__(self, rrserver):
+		self.RRServer = rrserver
+		j = rrserver.Get("getfile", {"dir": "data", "file": "engineers.txt"})
+		if j is None:
+			self.engineers = []
+
+		if type(j) is list:
+			self.engineers = sorted(j)
+		else:
+			self.engineers = sorted([n for n in j.split("\n") if len(n) > 0])
+
 		self.ex = 0
+		
+	def save(self):
+		self.RRServer.Post("engineers.txt", "data", self.engineers)	
 		
 	def contains(self, eng):
 		return eng in self.engineers
@@ -14,7 +24,7 @@ class Engineers():
 		if self.contains(eng):
 			return
 		
-		self.engineers.append(eng)
+		self.engineers = sorted(self.engineers + [eng])
 		
 	def delete(self, eng):
 		if not self.contains(eng):

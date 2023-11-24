@@ -1,10 +1,11 @@
 import json
 
 class Locomotives:
-	def __init__(self, fn):
-		self.filename = fn
-		with open(fn, "r") as fp:	
-			self.locos = json.load(fp)
+	def __init__(self, rrserver):
+		self.RRServer = rrserver
+		self.locos = rrserver.Get("getlocos", {})
+		for lid in self.locos:
+			self.locos[lid]["limit"] = 0
 			
 	def buildSortKey(self, lid):
 		return int(lid)

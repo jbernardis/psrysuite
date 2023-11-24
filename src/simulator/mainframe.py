@@ -41,7 +41,6 @@ class MainFrame(wx.Frame):
 		self.selectedScripts = []
 		self.startable = []
 		self.stoppable = []
-		self.layout = LayoutData(os.path.join(os.getcwd(), "data"))
 
 		icon = wx.Icon()
 		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "simulator.ico"), wx.BITMAP_TYPE_ANY))
@@ -131,6 +130,7 @@ class MainFrame(wx.Frame):
 
 		self.rrServer = RRServer()
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
+		self.layout = LayoutData(self.rrServer)
 
 		self.ClearDataStructures()
 

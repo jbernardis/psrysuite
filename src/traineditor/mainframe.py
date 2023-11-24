@@ -71,17 +71,17 @@ class MainFrame(wx.Frame):
 		self.Layout()
 		
 	def OnBTrainBlockSequences(self, _):
-		dlg = TrainBlockSequencesDlg(self)
+		dlg = TrainBlockSequencesDlg(self, self.RRServer)
 		dlg.ShowModal()
 		dlg.Destroy()
 		
 	def OnBTrainTrackerData(self, _):
-		dlg = TrainTrackerDlg(self, self.settings.browser)
+		dlg = TrainTrackerDlg(self, self.RRServer, self.settings.browser)
 		dlg.ShowModal()
 		dlg.Destroy()
 		
 	def OnBLocos(self, _):
-		dlg = ManageLocosDlg(self, self.settings.browser)
+		dlg = ManageLocosDlg(self, self.RRServer, self.settings.browser)
 		dlg.ShowModal()
 		dlg.Destroy()
 

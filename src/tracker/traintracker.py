@@ -246,6 +246,7 @@ class MainFrame(wx.Frame):
 			
 	def enableForConnection(self, connected):
 		self.menuDispatch.Enable(MENU_DISPATCH_DISCONNECT, connected)
+		self.menuManage.Enable(MENU_MANAGE_ENGINEERS, connected)
 		self.menuManage.Enable(MENU_MANAGE_SCHEDULE, connected)
 		self.menuFile.Enable(MENU_FILE_RESTORESNAPSHOT, connected)
 		
@@ -544,8 +545,10 @@ class TrainTrackerPanel(wx.Panel):
 		
 		self.completedTrains.clear()
 		self.completedTrainList.update()
-
-		self.loadEngineerFile(os.path.join(os.getcwd(), "data", "engineers.txt"))
+		
+		self.engineers = None
+		self.idleEngineers = []
+		self.updateEngQueue()
 
 		self.setExtraTrains()
 		
@@ -650,6 +653,7 @@ class TrainTrackerPanel(wx.Panel):
 		
 	def onConnectEvent(self, evt):
 		self.setConnected(True)
+		self.loadEngineerFile()
 		self.DisplayTimeValue()
 
 	def raiseDisconnectEvent(self): # thread context
@@ -920,18 +924,8 @@ class TrainTrackerPanel(wx.Panel):
 
 				self.atl.updateTrain(tid, rloco, ndesc, tInfo["block"], tInfo["eastbound"])
 
-	def loadEngineerFile(self, fn, preserveActive=False):
-		try:
-			self.engineers = Engineers(fn)
-		except FileNotFoundError:
-			dlg = wx.MessageDialog(self, 'Unable to open Engineer file %s' % fn,
-					'File Not Found',
-					wx.OK | wx.ICON_ERROR)
-			dlg.ShowModal()
-			dlg.Destroy()
-
-			self.engineers = None
-			
+	def loadEngineerFile(self, preserveActive=False):
+		self.engineers = Engineers(self.RRServer)
 		if not preserveActive:
 			self.idleEngineers = []
 			self.updateEngQueue()
@@ -1470,13 +1464,13 @@ class TrainTrackerPanel(wx.Panel):
 	def onManageEngineers(self, _):
 		busyEngineers = [x for x in self.atl.getEngineers() if x in self.selectedEngineers]
 		availableEngineers = [x for x in list(self.engineers) if x not in busyEngineers]
-		dlg = ManageEngineersDlg(self, availableEngineers, self.idleEngineers, busyEngineers, self.settings)
+		dlg = ManageEngineersDlg(self, self.engineers, availableEngineers, self.idleEngineers, busyEngineers, self.settings)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			newSelEngs = dlg.getValues()
 			
 		if dlg.IsReloadNeeded():
-			self.loadEngineerFile(os.path.join(os.getcwd(), "data", "engineers.txt"), preserveActive=True)
+			self.loadEngineerFile(preserveActive=True)
 
 		dlg.Destroy()
 		if rc != wx.ID_OK:
@@ -1489,8 +1483,12 @@ class TrainTrackerPanel(wx.Panel):
 		self.bRmEng.Enable(len(self.idleEngineers) > 0)
 		if len(self.pendingTrains) > 0 and (len(self.idleEngineers) > 0 or self.cbATC.IsChecked()):
 			self.bAssign.Enable(True)
-		self.chEngineer.SetSelection(0)
-		self.selectedEngineer = self.chEngineer.GetString(0)
+		if len(self.idleEngineers) == 0:
+			self.chEngineer.SetSelection(wx.NOT_FOUND)
+			self.selectedEngineer = None
+		else:
+			self.chEngineer.SetSelection(0)
+			self.selectedEngineer = self.chEngineer.GetString(0)
 		
 		self.selectedEngineers = [x for x in self.idleEngineers] + [x for x in busyEngineers if x in availableEngineers]
 		

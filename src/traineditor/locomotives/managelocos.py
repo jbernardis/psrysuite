@@ -1,6 +1,4 @@
 import wx
-import json
-import os
 
 from traineditor.locomotives.locomotives import Locomotives
 from traineditor.locomotives.modifylocodlg import ModifyLocoDlg
@@ -12,11 +10,12 @@ defaultProfile = {'acc': 1, 'dec': 1, 'fast': 80, 'medium': 58, 'slow': 10, 'sta
 
 
 class ManageLocosDlg(wx.Dialog):
-	def __init__(self, parent, browser):
+	def __init__(self, parent, rrserver, browser):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		
 		self.titleString = "Manage Locomotives"
+		self.RRServer = rrserver
 		self.browser = browser
 		
 		self.modified = None
@@ -197,7 +196,7 @@ class ManageLocosDlg(wx.Dialog):
 			if rc != wx.ID_YES:
 				return
 			
-		self.locos = Locomotives(os.path.join(os.getcwd(), "data", "locos.json"))
+		self.locos = Locomotives(self.RRServer)
 		self.extractLocoData(self.locos)
 
 		self.SetModified(False)
@@ -219,9 +218,7 @@ class ManageLocosDlg(wx.Dialog):
 		for l in ll:
 			locos[l] = self.locoList.getLocoInfo(l)
 			
-		with open(os.path.join(os.getcwd(), "data", "locos.json"), "w") as fp:
-			json.dump(locos, fp, indent=4, sort_keys=True)
-			
+		self.RRServer.Post("locos.json", "data", locos)
 		self.SetModified(False)
 		
 	def bRevertPressed(self, _):

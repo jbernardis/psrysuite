@@ -1,18 +1,20 @@
-Tony
-Dean
-Kevin
-Bill L
-Vince
-Andrew
-Francis
-Ron
-Tom L
-Tom N
-Paul
-Ameen
-Jeff
-Geoff
-Roger
-John
-Gene
-Stan
+[
+  "Ameen",
+  "Andrew",
+  "Bill L",
+  "Dean",
+  "Francis",
+  "Gene",
+  "Geoff",
+  "Jeff",
+  "John",
+  "Kevin",
+  "Paul",
+  "Roger",
+  "Ron",
+  "Stan",
+  "Tom L",
+  "Tom N",
+  "Tony",
+  "Vince"
+]

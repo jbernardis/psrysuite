@@ -37,5 +37,3 @@ get signal bridge at east end junction working
 ability to suppress specific trains from active train display
 
 ability to unlock all sidings in support of waybills - but not have this condition block signals
-
-tracker/engineers, and all aspects of train editor - get files through server so that they can be run anywhere
