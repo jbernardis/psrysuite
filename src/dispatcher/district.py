@@ -274,7 +274,7 @@ class District:
 				logging.debug("Unable to calculate aspect: Block %s cleared in opposite direction" % exitBlkNm)
 				return None
 
-		if exitBlk.AreHandSwitchesSet():
+		if exitBlk.AreHandSwitchesSet() and not self.frame.sidingsUnlocked:
 			if not silent:
 				self.frame.PopupEvent("Block %s is locked" % exitBlk.GetName())
 			logging.debug("Unable to calculate aspect: Block %s is locked" % exitBlkNm)

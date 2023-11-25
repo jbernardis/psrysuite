@@ -1134,13 +1134,27 @@ class Railroad():
 						logging.error("Unknown object name: %s in resume list" % o)
 						
 					else:
+						logging.debug("xi for handswitch %s" % o)
+						if o == "CSw21ab":
+							olist = ["CSw21a", "CSw21b"]
+						elif o == "PBSw15ab":
+							olist = ["PBSw15a", "PBSw15b"]
+						else:
+							olist = None
+							
 						unlock = obj.GetUnlock()
 						if unlock:
 							district, node, addr, bits = unlock
 							uflag = node.GetInputBit(bits[0][0], bits[0][1])
 							if obj.Lock(uflag == 1):
-								self.RailroadEvent(obj.GetEventMessage(lock=True))
-						
+								if olist is None:
+									self.RailroadEvent(obj.GetEventMessage(lock=True))
+								else:
+									for obn in olist:
+										obj2 = self.handswitches[obn]
+										obj2.Lock(uflag == 1)
+										self.RailroadEvent(obj2.GetEventMessage(lock=True))
+					
 				else:
 					bt = obj.Bits()
 					if len(bt) > 0:

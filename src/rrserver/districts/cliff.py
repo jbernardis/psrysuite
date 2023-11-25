@@ -363,20 +363,6 @@ class Cliff(District):
 	def CheckTurnoutPosition(self, tout):
 		self.rr.RailroadEvent({"turnout": [{"name": tout.Name(), "state": "N" if tout.IsNormal() else "R"}]})
 
- # def DetermineSignalLevers(self):
- # 	self.sigLever["C2"] = self.DetermineSignalLever(["C2L"], ["C2RA", "C2RB", "C2RC", "C2RD"])  # signal indicators
- # 	self.sigLever["C4"] = self.DetermineSignalLever(["C4LA", "C4LB", "C4LC", "C4LD"], ["C4R"])
- # 	self.sigLever["C6"] = self.DetermineSignalLever(["C6L"], ["C6RA", "C6RB", "C6RC", "C6RD", "C6RE", "C6RF", "C6RG", "C6RH", "C6GJ", "C6RK", "C6RL"])
- # 	self.sigLever["C8"] = self.DetermineSignalLever(["C8LA", "C8LB", "C8LC", "C8LD", "C8LE", "C8LF", "C8LG", "C8LH", "C8LJ", "C8LK", "C8LL"], ["C8R"])
- # 	self.sigLever["C10"] = self.DetermineSignalLever(["C10L"], ["C10R"])
- # 	self.sigLever["C12"] = self.DetermineSignalLever(["C12L"], ["C12R"])
- # 	self.sigLever["C14"] = self.DetermineSignalLever(["C14LA", "C14LB"], ["C14R"])
- # 	self.sigLever["C18"] = self.DetermineSignalLever(["C18L"], ["C18RA", "C18RB"])
- # 	self.sigLever["C22"] = self.DetermineSignalLever(["C22L"], ["C22R"])
- # 	self.sigLever["C24"] = self.DetermineSignalLever(["C24L"], ["C24R"])
- #
-
-
 	def SetHandswitchIn(self, hs, state):
 		hsname = hs.Name()
 		if hsname == "CSw21ab":

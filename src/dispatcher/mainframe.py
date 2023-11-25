@@ -61,6 +61,8 @@ wildcardTrain = "train files (*.trn)|*.trn|"	 \
 			"All files (*.*)|*.*"
 wildcardLoco = "locomotive files (*.loco)|*.loco|"	 \
 			"All files (*.*)|*.*"
+			
+SidingSwitches = [ "LSw11", "LSw13", "DSw9", "SSw1", "CSw3", "CSw11", "CSw15", "CSw19", "Csw21a", "CSw21b" ]
 
 class Node:
 	def __init__(self, screen, bitmapName, offset):
@@ -85,6 +87,7 @@ class MainFrame(wx.Frame):
 		self.procATC = None
 		self.pidAdvisor = None
 		self.OSSLocks = True
+		self.sidingsUnlocked = False
 		
 		self.shift = False
 		self.shiftXOffset = 0
@@ -273,9 +276,13 @@ class MainFrame(wx.Frame):
 			self.Bind(wx.EVT_BUTTON, self.OnBResetClock, self.bResetClock)
 			self.bResetClock.Enable(False)
 			
-			self.cbOSSLocks = wx.CheckBox(self, -1, "OSS Locks", (int(totalw/2-100/2), 85))
+			self.cbOSSLocks = wx.CheckBox(self, -1, "OSS Locks", (int(totalw/2-100/2), 75))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBOSSLocks, self.cbOSSLocks)
 			self.cbOSSLocks.SetValue(self.OSSLocks)
+			
+			self.cbSidingsUnlocked = wx.CheckBox(self, -1, "Unlock Sidings", (int(totalw/2-100/2), 95))
+			self.Bind(wx.EVT_CHECKBOX, self.OnCBSidingsUnlocked, self.cbSidingsUnlocked)
+			self.cbSidingsUnlocked.SetValue(self.sidingsUnlocked)
 
 			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(self.centerOffset+670, 25))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
@@ -861,6 +868,7 @@ class MainFrame(wx.Frame):
 		self.Request({"control": {"name": "foss.fleet", "value": f}})
 		
 		self.SendOSSLocks()
+		self.SendSidingsUnlocked()
 
 	def OnCBAutoRouter(self, evt):
 		self.AREnabled = self.cbAutoRouter.IsChecked()
@@ -896,6 +904,24 @@ class MainFrame(wx.Frame):
 		self.Request({"control": {"name": "osslocks", "value": 1 if self.OSSLocks else 0}})
 		self.districts.EvaluateDistrictLocks(self.OSSLocks)
 
+	def OnCBSidingsUnlocked(self, evt):
+		self.SendSidingsUnlocked()
+		
+	def SendSidingsUnlocked(self):
+		self.sidingsUnlocked = self.cbSidingsUnlocked.IsChecked()		
+		self.Request({"control": {"name": "sidingsunlocked", "value": 1 if self.sidingsUnlocked else 0}})
+		for sw in SidingSwitches:
+			if sw.startswith("C"):
+				if self.cliffControl == 0:
+					# local control - skip to the next switch
+					continue
+				if self.cliffControl == 1 and sw == "CSw3":
+					# cliff operator controls CSw3 only
+					continue
+				# otherwise, we modify this siding lock
+					
+			self.Request({'handswitch': {'name': sw+'.hand', 'status': 1 if self.sidingsUnlocked else 0}})
+			
 	def OnCBAdvisor(self, evt):
 		self.AdvisorEnabled = self.cbAdvisor.IsChecked()
 		if self.AdvisorEnabled:
