@@ -279,10 +279,12 @@ class MainFrame(wx.Frame):
 			self.cbOSSLocks = wx.CheckBox(self, -1, "OSS Locks", (int(totalw/2-100/2), 75))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBOSSLocks, self.cbOSSLocks)
 			self.cbOSSLocks.SetValue(self.OSSLocks)
+			self.cbOSSLocks.Enable(False)
 			
 			self.cbSidingsUnlocked = wx.CheckBox(self, -1, "Unlock Sidings", (int(totalw/2-100/2), 95))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBSidingsUnlocked, self.cbSidingsUnlocked)
 			self.cbSidingsUnlocked.SetValue(self.sidingsUnlocked)
+			self.cbSidingsUnlocked.Enable(False)
 
 			self.cbAutoRouter = wx.CheckBox(self, wx.ID_ANY, "Auto-Router", pos=(self.centerOffset+670, 25))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAutoRouter, self.cbAutoRouter)
@@ -1992,10 +1994,13 @@ class MainFrame(wx.Frame):
 			self.bSaveTrains.Enable(False)
 			self.bClearTrains.Enable(False)
 			self.bSaveLocos.Enable(False)
+
 			if self.IsDispatcher():
 				self.cbAutoRouter.Enable(False)
 				self.cbATC.Enable(False)
 				self.cbAdvisor.Enable(False)
+				self.cbOSSLocks.Enable(False)
+				self.cbSidingsUnlocked.Enable(False)
 			else:
 				self.ClearAllLocks()
 				self.AllSignalsNeutral()
@@ -2022,6 +2027,8 @@ class MainFrame(wx.Frame):
 				self.cbAutoRouter.Enable(True)
 				self.cbATC.Enable(True)
 				self.cbAdvisor.Enable(True)
+				self.cbOSSLocks.Enable(True)
+				self.cbSidingsUnlocked.Enable(True)
 				
 			self.RetrieveData()
 			#self.districts.Initialize()
@@ -2800,6 +2807,8 @@ class MainFrame(wx.Frame):
 			self.cbAutoRouter.Enable(False)
 			self.cbATC.Enable(False)
 			self.cbAdvisor.Enable(False)
+			self.cbOSSLocks.Enable(False)
+			self.cbSidingsUnlocked.Enable(False)
 		logging.info("Server socket closed")
 		self.breakerDisplay.UpdateDisplay()
 
