@@ -21,8 +21,6 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.RRServer = rrserver
 		
-		##self.dataDir = os.path.join(os.getcwd(), "data")
-		
 		self.cbTrain = wx.ComboBox(self, wx.ID_ANY, "", size=(100, -1),
 			 choices=[],
 			 style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER | wx.CB_SORT)

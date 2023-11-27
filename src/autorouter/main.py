@@ -8,8 +8,8 @@ if cmdFolder not in sys.path:
 ofp = open(os.path.join(os.getcwd(), "output", "autorouter.out"), "w")
 efp = open(os.path.join(os.getcwd(), "output", "autorouter.err"), "w")
 
-sys.stdout = ofp
-sys.stderr = efp
+#sys.stdout = ofp
+#sys.stderr = efp
 
 import logging
 logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "autorouter.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
@@ -42,8 +42,10 @@ class MainUnit:
 		logging.info("PSRY AutoRouter starting...")
 		self.sessionid = None
 		self.settings = Settings()
+		self.rrServer = RRServer()
+		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
 
-		self.trainSeq = Trains(os.path.join(os.getcwd(), "data"))
+		self.trainSeq = Trains(self.rrServer)
 		self.triggers = Triggers(self.trainSeq)
 
 		self.blocks = {}
@@ -55,11 +57,8 @@ class MainUnit:
 		self.OSQueue = {}
 		self.ReqQueue= RequestQueue(self)
 		self.listener = None
-		self.rrServer = None
 		self.commandQ = Queue()
 
-		self.rrServer = RRServer()
-		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
 		self.listener = Listener(self, self.settings.ipaddr, self.settings.socketport)
 		if not self.listener.connect():
 			logging.error("Unable to establish connection with server")

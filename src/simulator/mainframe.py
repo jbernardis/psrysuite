@@ -135,7 +135,7 @@ class MainFrame(wx.Frame):
 		self.ClearDataStructures()
 
 			
-		self.trains = Trains(os.path.join(os.getcwd(), "data"))
+		self.trains = Trains(self.rrServer)
 			
 		for tr in self.trains:
 			trid, script = GenerateSim(tr, self.layout)

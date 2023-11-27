@@ -57,13 +57,9 @@ class Train:
 		return {"eastbound": self.east, "startblock": self.startblock, "startsubblock": self.startsubblock, "time": self.startblocktime, "sequence": self.steps}
 	
 class Trains:
-	def __init__(self, ddir):
-		self.fn = os.path.join(ddir, "trains.json") 
-		try:
-			with open(self.fn, "r") as jfp:
-				TrainsJson = json.load(jfp)
-		except:
-			TrainsJson = {}
+	def __init__(self, rrserver):
+		self.RRServer = rrserver
+		TrainsJson = rrserver.Get("gettrains", {})
 			
 		self.trainlist = []
 		self.trainmap = {}

@@ -3,7 +3,6 @@ import json
 class LayoutData:
 	def __init__(self, rrserver):
 		self.layout = rrserver.Get("getlayout", {})
-		print(json.dumps(self.layout, indent=2), flush=True);
 
 		self.routes = self.layout["routes"]
 		self.subblocks = self.layout["subblocks"]
@@ -33,7 +32,6 @@ class LayoutData:
 
 		self.osblocks = sorted(self.osblocks)
 		self.blocks = sorted([x for x in self.blocks if x not in self.osblocks])
-		print("blocks = %s" % str(self.blocks), flush=True)
 		
 	def IsCrossoverPt(self, osBlk, blk):
 		return [osBlk, blk] in self.crossovers

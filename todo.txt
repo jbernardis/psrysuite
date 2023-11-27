@@ -34,6 +34,8 @@ Everything seems to be OK now - maybe one here or there that's wrong, but largel
 get signal bridge at east end junction working
 
 
-ability to suppress specific trains from active train display
+ability to suppress specific trains from active train display	
 
-ability to unlock all sidings in support of waybills - but not have this condition block signals
+make sure speed detection is working and that active trains and tracker are both updated properly
+
+when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)
