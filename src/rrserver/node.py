@@ -42,6 +42,7 @@ class Node:
         self.first = True
         
         self.errorCount = 0
+        self.goodCount = 0
         self.disabled = False
         
         self.inputMap = {}
@@ -89,14 +90,27 @@ class Node:
         if inb is not None:
             for i in range(self.bcount):
                 self.inb[i] = int.from_bytes(inb[i], "big")
+            self.goodCount += 1
+            if self.goodCount >= 5:
+                self.goodCount = 0
+                if self.errorCount > 0:
+                    self.errorCount -= 1
         else:
             self.errorCount += 1
+            self.goodCount = 0
             msg = "Railroad IO error at node %s(0x%2x) (%dx)" % (nodeNames[self.address], self.address, self.errorCount)
             logging.error(msg)
             self.rr.RailroadEvent({"alert": { "msg": [msg] }})
             if self.errorCount >= MAX_ERRORCOUNT:
                 self.disabled = True
                 self.rr.RailroadEvent({"alert": { "msg": ["Node %s(0x%2x) disabled" % (nodeNames[self.address], self.address)] } })
+                
+    def ReEnable(self):
+        msg = "Re-Enabling node %s(0x%2x)" % (nodeNames[self.address], self.address)
+        logging.info(msg)
+        self.goodCount = 0
+        self.errorCount = 0
+        self.disabled = False
                     
     def GetChangedInputs(self):
         results = []

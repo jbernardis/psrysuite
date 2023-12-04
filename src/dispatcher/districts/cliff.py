@@ -781,12 +781,12 @@ class Cliff (District):
 			
 		self.signals["C2LA"].SetMutexSignals(["C2LB", "C2LC", "C2LD"])
 		self.signals["C2LB"].SetMutexSignals(["C2LA", "C2LC", "C2LD"])
-		self.signals["C2LC"].SetMutexSignals(["C2LA", "C2LB", "C2LC"])
+		self.signals["C2LC"].SetMutexSignals(["C2LA", "C2LB", "C2LD"])
 		self.signals["C2LD"].SetMutexSignals(["C2LA", "C2LB", "C2LC"])
 
 		self.signals["C4RA"].SetMutexSignals(["C4RB", "C4RC", "C4RD"])
 		self.signals["C4RB"].SetMutexSignals(["C4RA", "C4RC", "C4RD"])
-		self.signals["C4RC"].SetMutexSignals(["C4RA", "C4RB", "C4RC"])
+		self.signals["C4RC"].SetMutexSignals(["C4RA", "C4RB", "C4RD"])
 		self.signals["C4RD"].SetMutexSignals(["C4RA", "C4RB", "C4RC"])
 
 		sigs = [ "C6LA", "C6LB", "C6LC", "C6LD", "C6LE","C6LF", "C6LG", "C6LH", "C6LJ", "C6LK", "C6LL" ]
