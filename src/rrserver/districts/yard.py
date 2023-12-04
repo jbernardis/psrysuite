@@ -341,10 +341,12 @@ class Yard(District):
 
 		District.OutIn(self)
 		
-		Y20  = self.rr.GetBlock("Y20")
-		Y20E = self.rr.GetBlock("Y20.E")
-		Y20H = (not Y20.IsOccupied()) and (not Y20E.IsOccupied()) and Y20.IsEast()
-		Y20D = Y20H and Y20.IsCleared() 
+		Y20 = self.rr.GetBlock("Y20")
+		Y10L = self.rr.GetSignal("Y10L")
+		Y20H = Y20.IsCleared() and (not Y20.IsOccupied()) and Y20.IsEast()
+		Y20D = Y20H and Y10L.Aspect() != 0
+		if Y20D:
+			Y20H = False 
 		if Y20H != self.Y20H or Y20D != self.Y20D:
 			self.Y20H = Y20H
 			self.Y20D = Y20D

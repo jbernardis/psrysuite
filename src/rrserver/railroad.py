@@ -22,6 +22,7 @@ from rrserver.rrobjects import Block, StopRelay, Signal, SignalLever, RouteIn, T
 
 class Railroad():
 	def __init__(self, parent, cbEvent, settings):
+		self.parent = parent
 		self.cbEvent = cbEvent
 		self.settings = settings
 		self.districts = {}
