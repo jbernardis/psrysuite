@@ -406,7 +406,9 @@ class Block:
 			return
 
 		if self.occupied == occupied:
-			# already in the requested state
+			# already in the requested state - refresh anyway
+			if refresh:
+				self.Draw()
 			return
 
 		self.occupied = occupied

@@ -124,7 +124,8 @@ class TrainList:
 				atc = trinfo["atc"]
 				signal = trinfo["signal"]
 				aspect = "%d" % trinfo["aspect"]
-				east = None if nameonly else trinfo["east"]
+				#east = None if nameonly else trinfo["east"]
+				east = trinfo["east"]
 				logging.debug("trinfo = %s" % str(trinfo))
 				clist = []
 				for b in blocks:

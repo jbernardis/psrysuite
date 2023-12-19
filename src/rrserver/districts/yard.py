@@ -343,13 +343,13 @@ class Yard(District):
 		
 		Y20 = self.rr.GetBlock("Y20")
 		Y10L = self.rr.GetSignal("Y10L")
-		Y20H = Y20.IsCleared() and (not Y20.IsOccupied()) and Y20.IsEast()
-		Y20D = Y20H and Y10L.Aspect() != 0
-		if Y20D:
-			Y20H = False 
-		if Y20H != self.Y20H or Y20D != self.Y20D:
-			self.Y20H = Y20H
+		Y20D = Y20.IsCleared() and (not Y20.IsOccupied()) and Y20.IsEast()
+		Y20H = Y20D and Y10L.Aspect() != 0
+		if Y20H:
+			Y20D = False 
+		if Y20D != self.Y20D or Y20H != self.Y20H:
 			self.Y20D = Y20D
+			self.Y20H = Y20H
 			self.rr.SetAspect("Y20H", 1 if Y20H else 0)
 			self.rr.SetAspect("Y20D", 1 if Y20D else 0)
 		

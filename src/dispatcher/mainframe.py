@@ -2017,13 +2017,13 @@ class MainFrame(wx.Frame):
 			self.subscribed = True
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
-			self.bSnapshot.Enable(True)
-			self.bLoadTrains.Enable(True)
-			self.bLoadLocos.Enable(True)
-			self.bSaveTrains.Enable(True)
-			self.bClearTrains.Enable(True)
 			self.bSaveLocos.Enable(True)
 			if self.IsDispatcher():
+				self.bSnapshot.Enable(True)
+				self.bLoadTrains.Enable(True)
+				self.bLoadLocos.Enable(True)
+				self.bSaveTrains.Enable(True)
+				self.bClearTrains.Enable(True)
 				self.cbAutoRouter.Enable(True)
 				self.cbATC.Enable(True)
 				self.cbAdvisor.Enable(True)
@@ -2398,7 +2398,6 @@ class MainFrame(wx.Frame):
 
 				if not blk.IsOccupied():
 					logging.warning("Set train for block %s, but that block is unoccupied" % block)
-					self.PopupAdvice("Set train for block %s, but that block is unoccupied" % block)
 					continue
 
 				oldName = None

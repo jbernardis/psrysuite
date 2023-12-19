@@ -275,12 +275,18 @@ class ActiveTrainListCtrl(wx.ListCtrl):
 			if at.throttle is None:
 				return ""
 			else:
-				return at.throttle
+				try:
+					return "%d" % at.throttle
+				except TypeError:
+					return "TE"
 		elif col == 9:
 			if at.limit is None:
 				return ""
 			else:
-				return "%d" % at.limit
+				try:
+					return "%d" % at.limit
+				except TypeError:
+					return "TE"
 		elif col == 10:
 			mins = int(at.time / 60)
 			secs = at.time % 60
