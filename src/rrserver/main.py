@@ -229,6 +229,11 @@ class ServerMain:
 		
 		for m in self.rr.GetCurrentValues():
 			self.socketServer.sendToOne(skt, addr, m)
+		
+		for opt, val in self.rr.GetControlOptions().items():
+			m = {"control": [{"name": opt, "value": val}]}
+			self.socketServer.sendToOne(skt, addr, m)
+			
 		self.socketServer.sendToOne(skt, addr, {"end": {"type": "layout"}})
 
 	def sendTrainInfo(self, addr, skt):

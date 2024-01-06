@@ -488,6 +488,9 @@ class Railroad():
 		self.controlOptions[name] = value
 		if name == "osslocks":
 			self.osslocks = value == 1
+			
+	def GetControlOptions(self):
+		return self.controlOptions
 
 	def GetControlOption(self, name):
 		try:

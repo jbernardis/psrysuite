@@ -1988,14 +1988,14 @@ class MainFrame(wx.Frame):
 			self.sessionid = None
 			self.bSubscribe.SetLabel("Connect")
 			self.bRefresh.Enable(False)
-			self.bSnapshot.Enable(False)
-			self.bLoadTrains.Enable(False)
-			self.bLoadLocos.Enable(False)
-			self.bSaveTrains.Enable(False)
-			self.bClearTrains.Enable(False)
-			self.bSaveLocos.Enable(False)
 
 			if self.IsDispatcher():
+				self.bSnapshot.Enable(False)
+				self.bLoadTrains.Enable(False)
+				self.bLoadLocos.Enable(False)
+				self.bSaveTrains.Enable(False)
+				self.bClearTrains.Enable(False)
+				self.bSaveLocos.Enable(False)
 				self.cbAutoRouter.Enable(False)
 				self.cbATC.Enable(False)
 				self.cbAdvisor.Enable(False)
@@ -2017,12 +2017,12 @@ class MainFrame(wx.Frame):
 			self.subscribed = True
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
-			self.bSaveLocos.Enable(True)
 			if self.IsDispatcher():
 				self.bSnapshot.Enable(True)
 				self.bLoadTrains.Enable(True)
 				self.bLoadLocos.Enable(True)
 				self.bSaveTrains.Enable(True)
+				self.bSaveLocos.Enable(True)
 				self.bClearTrains.Enable(True)
 				self.cbAutoRouter.Enable(True)
 				self.cbATC.Enable(True)
