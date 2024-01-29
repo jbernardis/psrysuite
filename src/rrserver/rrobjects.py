@@ -3,12 +3,12 @@ import logging
 from rrserver.constants import INPUT_BLOCK, INPUT_BREAKER, INPUT_SIGNALLEVER, INPUT_ROUTEIN, INPUT_HANDSWITCH, INPUT_TURNOUTPOS
 
 class Block:
-    def __init__(self, name, district, node, address):
+    def __init__(self, name, district, node, address, east):
         self.name = name
         self.district = district
         self.node = node
         self.address = address
-        self.east = True
+        self.east = east
         self.bits = []
         self.cleared = False
         self.occupied = False

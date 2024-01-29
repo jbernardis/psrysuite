@@ -51,22 +51,22 @@ class Latham(District):
 			self.rr.AddTurnoutPosition("LSw7", self, n, addr, [(0, 6), (0, 7)])
 			self.rr.AddTurnoutPosition("LSw9", self, n, addr, [(1, 0), (1, 1)])
 			
-			b = self.rr.AddBlock("L20",      self, n, addr, [(1, 2)])
-			sbe = self.rr.AddBlock("L20.E",    self, n, addr, [(1, 3)])
+			b = self.rr.AddBlock("L20",      self, n, addr, [(1, 2)], True)
+			sbe = self.rr.AddBlock("L20.E",    self, n, addr, [(1, 3)], True)
 			b.AddStoppingBlocks([sbe])
 			
-			b = self.rr.AddBlock("P21",      self, n, addr, [(1, 4)])
-			sbe = self.rr.AddBlock("P21.E",    self, n, addr, [(1, 5)])
+			b = self.rr.AddBlock("P21",      self, n, addr, [(1, 4)], True)
+			sbe = self.rr.AddBlock("P21.E",    self, n, addr, [(1, 5)], True)
 			b.AddStoppingBlocks([sbe])
 			
-			self.rr.AddBlock("LOSLAW",   self, n, addr, [(1, 6)]) #LOS1
-			self.rr.AddBlock("LOSLAM",   self, n, addr, [(1, 7)]) #LOS2
-			self.rr.AddBlock("LOSLAE",   self, n, addr, [(2, 0)]) #LOS3
-			self.rr.AddBlock("L11.W",    self, n, addr, [(2, 1)])
-			self.rr.AddBlock("L11",      self, n, addr, [(2, 2)])
-			self.rr.AddBlock("L21.W",    self, n, addr, [(2, 3)])
-			self.rr.AddBlock("L21",      self, n, addr, [(2, 4)])
-			self.rr.AddBlock("L21.E",    self, n, addr, [(2, 5)])
+			self.rr.AddBlock("LOSLAW",   self, n, addr, [(1, 6)], False) #LOS1
+			self.rr.AddBlock("LOSLAM",   self, n, addr, [(1, 7)], True) #LOS2
+			self.rr.AddBlock("LOSLAE",   self, n, addr, [(2, 0)], True) #LOS3
+			self.rr.AddBlock("L11.W",    self, n, addr, [(2, 1)], False)
+			self.rr.AddBlock("L11",      self, n, addr, [(2, 2)], False)
+			self.rr.AddBlock("L21.W",    self, n, addr, [(2, 3)], True)
+			self.rr.AddBlock("L21",      self, n, addr, [(2, 4)], True)
+			self.rr.AddBlock("L21.E",    self, n, addr, [(2, 5)], True)
 			
 			self.rr.AddBreaker("CBCliveden",       self, n, addr, [(2, 6)])
 			self.rr.AddBreaker("CBLatham",         self, n, addr, [(2, 7)])
@@ -115,24 +115,24 @@ class Latham(District):
 			self.rr.AddTurnoutPosition("LSw15", self, n, addr, [(0, 4), (0, 5)])
 			self.rr.AddTurnoutPosition("LSw17", self, n, addr, [(0, 6), (0, 7)])
 
-			b = self.rr.AddBlock("L31",      self, n, addr, [(1, 0)]) 
-			sbe = self.rr.AddBlock("L31.E",    self, n, addr, [(1, 1)]) 
+			b = self.rr.AddBlock("L31",      self, n, addr, [(1, 0)], True) 
+			sbe = self.rr.AddBlock("L31.E",    self, n, addr, [(1, 1)], True) 
 			b.AddStoppingBlocks([sbe])
 
-			self.rr.AddBlock("LOSCAW",   self, n, addr, [(1, 2)]) 
-			self.rr.AddBlock("LOSCAM",   self, n, addr, [(1, 3)]) 
-			self.rr.AddBlock("LOSCAE",   self, n, addr, [(1, 4)]) 
-			self.rr.AddBlock("D10.W",    self, n, addr, [(1, 5)]) 
-			self.rr.AddBlock("D10",      self, n, addr, [(1, 6)]) 
+			self.rr.AddBlock("LOSCAW",   self, n, addr, [(1, 2)], False) 
+			self.rr.AddBlock("LOSCAM",   self, n, addr, [(1, 3)], True) 
+			self.rr.AddBlock("LOSCAE",   self, n, addr, [(1, 4)], True) 
+			self.rr.AddBlock("D10.W",    self, n, addr, [(1, 5)], False) 
+			self.rr.AddBlock("D10",      self, n, addr, [(1, 6)], False) 
 	
-			sbw = self.rr.AddBlock("S21.W",    self, n, addr, [(2, 0)]) 
-			b = self.rr.AddBlock("S21",      self, n, addr, [(2, 1)]) 
-			sbe = self.rr.AddBlock("S21.E",    self, n, addr, [(2, 2)]) 
+			sbw = self.rr.AddBlock("S21.W",    self, n, addr, [(2, 0)], True) 
+			b = self.rr.AddBlock("S21",      self, n, addr, [(2, 1)], True) 
+			sbe = self.rr.AddBlock("S21.E",    self, n, addr, [(2, 2)], True) 
 			b.AddStoppingBlocks([sbe, sbw])
 			
-			self.rr.AddBlock("N25.W",    self, n, addr, [(2, 3)]) 
-			self.rr.AddBlock("N25",      self, n, addr, [(2, 4)]) 
-			self.rr.AddBlock("N25.E",    self, n, addr, [(2, 5)]) 
+			self.rr.AddBlock("N25.W",    self, n, addr, [(2, 3)], False) 
+			self.rr.AddBlock("N25",      self, n, addr, [(2, 4)], False) 
+			self.rr.AddBlock("N25.E",    self, n, addr, [(2, 5)], False) 
 
 	def Initialize(self):
 		District.Initialize(self)

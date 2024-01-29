@@ -41,13 +41,13 @@ class Yard(District):
 			self.rr.AddTurnoutPosition("YSw1", self, n, addr, [(0, 0), (0, 1)])
 			self.rr.AddTurnoutPosition("YSw3", self, n, addr, [(0, 2), (0, 3)])
 			
-			self.rr.AddBlock("Y21.W",   self, n, addr, [(0, 4)])
-			self.rr.AddBlock("Y21",     self, n, addr, [(0, 5)])
-			self.rr.AddBlock("Y21.E",   self, n, addr, [(0, 6)])
-			self.rr.AddBlock("YOSCJW",  self, n, addr, [(0, 7)]) #  CJOS1	
-			self.rr.AddBlock("YOSCJE",  self, n, addr, [(1, 0)]) #  CJOS2
-			sbw = self.rr.AddBlock("L10.W",   self, n, addr, [(1, 1)])
-			b = self.rr.AddBlock("L10",     self, n, addr, [(1, 2)])
+			self.rr.AddBlock("Y21.W",   self, n, addr, [(0, 4)], True)
+			self.rr.AddBlock("Y21",     self, n, addr, [(0, 5)], True)
+			self.rr.AddBlock("Y21.E",   self, n, addr, [(0, 6)], True)
+			self.rr.AddBlock("YOSCJW",  self, n, addr, [(0, 7)], False) #  CJOS1	
+			self.rr.AddBlock("YOSCJE",  self, n, addr, [(1, 0)], True) #  CJOS2
+			sbw = self.rr.AddBlock("L10.W",   self, n, addr, [(1, 1)], False)
+			b = self.rr.AddBlock("L10",     self, n, addr, [(1, 2)], False)
 			b.AddStoppingBlocks([sbw])
 		
 		
@@ -71,12 +71,12 @@ class Yard(District):
 			self.rr.AddTurnoutPosition("YSw9",  self, n, addr, [(0, 2), (0, 3)])
 			self.rr.AddTurnoutPosition("YSw11", self, n, addr, [(0, 4), (0, 5)])
 
-			self.rr.AddBlock("Y20",    self, n, addr, [(0, 6)])
-			self.rr.AddBlock("Y20.E",  self, n, addr, [(0, 7)])
-			self.rr.AddBlock("YOSEJW", self, n, addr, [(1, 0)]) #  KJOS1
-			self.rr.AddBlock("YOSEJE", self, n, addr, [(1, 1)]) #  KJOS2
-			self.rr.AddBlock("Y11.W" , self, n, addr, [(1, 2)])
-			self.rr.AddBlock("Y11",    self, n, addr, [(1, 3)])
+			self.rr.AddBlock("Y20",    self, n, addr, [(0, 6)], True)
+			self.rr.AddBlock("Y20.E",  self, n, addr, [(0, 7)], True)
+			self.rr.AddBlock("YOSEJW", self, n, addr, [(1, 0)], False) #  KJOS1
+			self.rr.AddBlock("YOSEJE", self, n, addr, [(1, 1)], True) #  KJOS2
+			self.rr.AddBlock("Y11.W" , self, n, addr, [(1, 2)], False)
+			self.rr.AddBlock("Y11",    self, n, addr, [(1, 3)], False)
 
 		# kale node
 		addr = KALE
@@ -104,16 +104,16 @@ class Yard(District):
 			self.rr.AddTurnoutPosition("YSw27", self, n, addr, [(1, 2), (1, 3)])
 			self.rr.AddTurnoutPosition("YSw29", self, n, addr, [(1, 4), (1, 5)])
 						
-			self.rr.AddBlock("Y30",    self, n, addr, [(1, 6)])
-			self.rr.AddBlock("YOSKL4", self, n, addr, [(1, 7)]) #KAOS1
-			self.rr.AddBlock("Y53",    self, n, addr, [(2, 0)])
-			self.rr.AddBlock("Y52",    self, n, addr, [(2, 1)])
-			self.rr.AddBlock("Y51",    self, n, addr, [(2, 2)])
-			self.rr.AddBlock("Y50",    self, n, addr, [(2, 3)])
-			self.rr.AddBlock("YOSKL2", self, n, addr, [(2, 4)]) #KAOS3
-			self.rr.AddBlock("YOSKL1", self, n, addr, [(2, 5)]) #KAOS4
-			self.rr.AddBlock("YOSKL3", self, n, addr, [(2, 6)]) #KAOS2
-			self.rr.AddBlock("Y10",    self, n, addr, [(2, 7)])
+			self.rr.AddBlock("Y30",    self, n, addr, [(1, 6)], False)
+			self.rr.AddBlock("YOSKL4", self, n, addr, [(1, 7)], True) #KAOS1
+			self.rr.AddBlock("Y53",    self, n, addr, [(2, 0)], True)
+			self.rr.AddBlock("Y52",    self, n, addr, [(2, 1)], True)
+			self.rr.AddBlock("Y51",    self, n, addr, [(2, 2)], True)
+			self.rr.AddBlock("Y50",    self, n, addr, [(2, 3)], True)
+			self.rr.AddBlock("YOSKL2", self, n, addr, [(2, 4)], False) #KAOS3
+			self.rr.AddBlock("YOSKL1", self, n, addr, [(2, 5)], True) #KAOS4
+			self.rr.AddBlock("YOSKL3", self, n, addr, [(2, 6)], False) #KAOS2
+			self.rr.AddBlock("Y10",    self, n, addr, [(2, 7)], False)
 		
 		# engine yard	
 		addr = YARD
@@ -173,15 +173,15 @@ class Yard(District):
 			self.rr.AddRouteIn("Y83E",  self, n, addr, [(4, 1)])
 			self.rr.AddRouteIn("Y84E",  self, n, addr, [(4, 2)])
 			
-			self.rr.AddBlock("Y70",    self, n, addr, [(4, 3)])  # waterman detectiuon
-			self.rr.AddBlock("YOSWYW", self, n, addr, [(4, 4)]) #  WOS1
+			self.rr.AddBlock("Y70",    self, n, addr, [(4, 3)], True)  # waterman detectiuon
+			self.rr.AddBlock("YOSWYW", self, n, addr, [(4, 4)], False) #  WOS1
 			# bit 5 is bad
-			self.rr.AddBlock("Y82",    self, n, addr, [(4, 6)])
-			self.rr.AddBlock("Y83",    self, n, addr, [(4, 7)])
-			self.rr.AddBlock("Y84",    self, n, addr, [(5, 0)])
-			self.rr.AddBlock("YOSWYE", self, n, addr, [(5, 1)]) #  WOS2
-			self.rr.AddBlock("Y87",    self, n, addr, [(5, 2)])
-			self.rr.AddBlock("Y81",    self, n, addr, [(5, 3)])
+			self.rr.AddBlock("Y82",    self, n, addr, [(4, 6)], True)
+			self.rr.AddBlock("Y83",    self, n, addr, [(4, 7)], True)
+			self.rr.AddBlock("Y84",    self, n, addr, [(5, 0)], True)
+			self.rr.AddBlock("YOSWYE", self, n, addr, [(5, 1)], False) #  WOS2
+			self.rr.AddBlock("Y87",    self, n, addr, [(5, 2)], False)
+			self.rr.AddBlock("Y81",    self, n, addr, [(5, 3)], True)
 			
 			# virtual signals - these do not physically exist and are given no bit positione
 			self.rr.AddSignal("Y40L",  self, n, addr, [])
@@ -196,7 +196,7 @@ class Yard(District):
 			self.rr.AddSignal("Y42LD", self, n, addr, [])
 
 			# virtual block - has no detection
-			self.rr.AddBlock("Y60",    self, n, addr, [])
+			self.rr.AddBlock("Y60",    self, n, addr, [], True)
 
 		addr = YARDSW			
 		with self.nodes[addr] as n:

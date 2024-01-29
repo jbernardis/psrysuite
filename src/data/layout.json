@@ -1,12 +1,12 @@
 {
   "blocks": {
     "B10": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "B10.W"
     },
     "B11": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "B11.W"
     },
@@ -26,12 +26,12 @@
       "sbwest": null
     },
     "BOSWE": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "BOSWW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -51,7 +51,7 @@
       "sbwest": "C12.W"
     },
     "C13": {
-      "east": 1,
+      "east": 0,
       "sbeast": "C13.E",
       "sbwest": "C13.W"
     },
@@ -61,17 +61,17 @@
       "sbwest": null
     },
     "C21": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C22": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C23": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "C23.W"
     },
@@ -86,52 +86,52 @@
       "sbwest": null
     },
     "C40": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C41": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C42": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C43": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C44": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C50": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C51": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C52": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C53": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "C54": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -141,12 +141,12 @@
       "sbwest": null
     },
     "COSCLEW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "COSCLW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -161,22 +161,22 @@
       "sbwest": null
     },
     "COSSHE": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "COSSHW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "D10": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "D10.W"
     },
     "D11": {
-      "east": 1,
+      "east": 0,
       "sbeast": "D11.E",
       "sbwest": "D11.W"
     },
@@ -196,7 +196,7 @@
       "sbwest": null
     },
     "DOSFOW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -206,7 +206,7 @@
       "sbwest": null
     },
     "DOSVJW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -216,7 +216,7 @@
       "sbwest": null
     },
     "F11": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "F11.W"
     },
@@ -236,22 +236,22 @@
       "sbwest": null
     },
     "H10": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "H10.W"
     },
     "H11": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "H11.W"
     },
     "H12": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "H13": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "H13.W"
     },
@@ -276,27 +276,27 @@
       "sbwest": null
     },
     "H30": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "H30.W"
     },
     "H31": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "H32": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "H33": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "H34": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -326,7 +326,7 @@
       "sbwest": null
     },
     "HOSEW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -336,12 +336,12 @@
       "sbwest": null
     },
     "HOSWW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "HOSWW2": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -356,7 +356,7 @@
       "sbwest": null
     },
     "KOSM": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -371,17 +371,17 @@
       "sbwest": null
     },
     "KOSW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "L10": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "L10.W"
     },
     "L11": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "L11.W"
     },
@@ -411,7 +411,7 @@
       "sbwest": null
     },
     "LOSCAW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -426,22 +426,22 @@
       "sbwest": null
     },
     "LOSLAW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "N10": {
-      "east": 1,
+      "east": 0,
       "sbeast": "N10.E",
       "sbwest": "N10.W"
     },
     "N11": {
-      "east": 1,
+      "east": 0,
       "sbeast": "N11.E",
       "sbwest": "N11.W"
     },
     "N12": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -461,17 +461,17 @@
       "sbwest": null
     },
     "N25": {
-      "east": 1,
+      "east": 0,
       "sbeast": "N25.E",
       "sbwest": "N25.W"
     },
     "N31": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "N32": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -496,17 +496,17 @@
       "sbwest": null
     },
     "NEOSRH": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "NEOSW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "NWOSCY": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -516,12 +516,12 @@
       "sbwest": null
     },
     "NWOSTY": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "NWOSW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -531,12 +531,12 @@
       "sbwest": null
     },
     "P10": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P10.E",
       "sbwest": null
     },
     "P11": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P11.E",
       "sbwest": "P11.W"
     },
@@ -561,17 +561,17 @@
       "sbwest": null
     },
     "P30": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P30.E",
       "sbwest": "P30.W"
     },
     "P31": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P31.E",
       "sbwest": "P31.W"
     },
     "P32": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P32.E",
       "sbwest": "P32.W"
     },
@@ -581,7 +581,7 @@
       "sbwest": null
     },
     "P40": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P40.E",
       "sbwest": null
     },
@@ -596,27 +596,27 @@
       "sbwest": "P42.W"
     },
     "P5": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "P50": {
-      "east": 1,
+      "east": 0,
       "sbeast": "P50.E",
       "sbwest": "P50.W"
     },
     "P6": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "P60": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "P61": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -636,37 +636,37 @@
       "sbwest": null
     },
     "P7": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "POSCJ1": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "POSCJ2": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "POSPJ1": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "POSPJ2": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "POSSJ1": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "POSSJ2": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -696,22 +696,22 @@
       "sbwest": null
     },
     "R10": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "R10.W"
     },
     "R11": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "R12": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "S10": {
-      "east": 1,
+      "east": 0,
       "sbeast": "S10.E",
       "sbwest": "S10.W"
     },
@@ -751,17 +751,17 @@
       "sbwest": null
     },
     "SOSHJW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "SOSW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "T12": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -771,17 +771,17 @@
       "sbwest": null
     },
     "V11": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "W10": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "W11": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -791,12 +791,12 @@
       "sbwest": null
     },
     "Y10": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "Y11": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": "Y11.W"
     },
@@ -811,7 +811,7 @@
       "sbwest": "Y21.W"
     },
     "Y30": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -866,7 +866,7 @@
       "sbwest": null
     },
     "Y87": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -876,7 +876,7 @@
       "sbwest": null
     },
     "YOSCJW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -886,7 +886,7 @@
       "sbwest": null
     },
     "YOSEJW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -896,12 +896,12 @@
       "sbwest": null
     },
     "YOSKL2": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "YOSKL3": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
@@ -911,12 +911,12 @@
       "sbwest": null
     },
     "YOSWYE": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
     "YOSWYW": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     }

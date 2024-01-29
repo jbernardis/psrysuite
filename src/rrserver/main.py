@@ -193,6 +193,7 @@ class ServerMain:
 		blks = self.rr.GetBlockInfo()
 		blocks = {}
 		for bnm, bdir in blks:
+			print("block %s direction: %s" % (bnm, bdir))
 			if bnm in sbList:
 				continue
 			

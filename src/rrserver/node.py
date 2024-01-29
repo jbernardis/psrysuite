@@ -39,6 +39,7 @@ class Node:
         self.topulsect = settings.topulsect
         self.nxbpulselen = settings.nxbpulselen
         self.nxbpulsect = settings.nxbpulsect
+        self.ioerrorthreshold = settings.ioerrorthreshold
         self.first = True
         
         self.errorCount = 0
@@ -100,7 +101,9 @@ class Node:
             self.goodCount = 0
             msg = "Railroad IO error at node %s(0x%2x) (%dx)" % (nodeNames[self.address], self.address, self.errorCount)
             logging.error(msg)
-            self.rr.RailroadEvent({"alert": { "msg": [msg] }})
+            if self.errorCount >= self.ioerrorthreshold:
+                self.rr.RailroadEvent({"alert": { "msg": [msg] }})
+                
             if self.errorCount >= MAX_ERRORCOUNT:
                 self.disabled = True
                 self.rr.RailroadEvent({"alert": { "msg": ["Node %s(0x%2x) disabled" % (nodeNames[self.address], self.address)] } })

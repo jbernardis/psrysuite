@@ -34,6 +34,7 @@ class Settings:
 		self.topulsect = 3
 		self.nxbpulselen = 4
 		self.nxbpulsect = 2
+		self.ioerrorthreshold = 5
 		self.pendingdetectionlosscycles = 2
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
@@ -66,6 +67,9 @@ class Settings:
 
 				elif opt == "nxbpulsect":
 					self.nxbpulsect = int(value)
+
+				elif opt == "ioerrorthreshold":
+					self.ioerrorthreshold = int(value)
 
 				elif opt == "pendingdetectionlosscycles":
 					self.pendingdetectionlosscycles = int(value)

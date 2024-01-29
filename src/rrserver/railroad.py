@@ -528,7 +528,7 @@ class Railroad():
 		
 		
 
-	def AddBlock(self, name, district, node, address, bits):
+	def AddBlock(self, name, district, node, address, bits, east):
 		try:
 			b = self.blocks[name]
 				
@@ -537,10 +537,11 @@ class Railroad():
 			b = None
 			
 		if b is None:
-			b = Block(name, district, node, address)
+			b = Block(name, district, node, address, east)
 		else:
 			if b.IsNullBlock():
 				b.SetBlockAddress(district, node, address)
+				b.SetDirection(east)
 			else:
 				logging.warning("Potential duplicate block: %s" % name)
 				
@@ -554,7 +555,7 @@ class Railroad():
 		try:
 			b = self.blocks[name]
 		except KeyError:
-			b = Block(name, None, None, None)
+			b = Block(name, None, None, None, True)
 			self.blocks[name] = b
 			
 		b.AddIndicator(district, node, address, bits)

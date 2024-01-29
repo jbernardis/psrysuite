@@ -59,18 +59,18 @@ class Cliff(District):
 			
 			self.rr.AddHandswitch("CSw3", self, n, addr, [(1, 0), (1, 1)])
 
-			self.rr.AddBlock("C11", self, n, addr, [(1, 2)])
-			self.rr.AddBlock("COSGMW", self, n, addr, [(1, 3)])
-			self.rr.AddBlock("C10", self, n, addr, [(1, 4)])
-			self.rr.AddBlock("C30", self, n, addr, [(1, 5)])
-			self.rr.AddBlock("C31", self, n, addr, [(1, 6)])
-			self.rr.AddBlock("COSGME", self, n, addr, [(1, 7)])
-			self.rr.AddBlock("C20", self, n, addr, [(2, 0)])
+			self.rr.AddBlock("C11", self, n, addr, [(1, 2)], True)
+			self.rr.AddBlock("COSGMW", self, n, addr, [(1, 3)], True)
+			self.rr.AddBlock("C10", self, n, addr, [(1, 4)], True)
+			self.rr.AddBlock("C30", self, n, addr, [(1, 5)], True)
+			self.rr.AddBlock("C31", self, n, addr, [(1, 6)], True)
+			self.rr.AddBlock("COSGME", self, n, addr, [(1, 7)], True)
+			self.rr.AddBlock("C20", self, n, addr, [(2, 0)], True)
 			
 			# virtual blocks with no detection
-			self.rr.AddBlock("G10", self, n, addr, [])
-			self.rr.AddBlock("G12", self, n, addr, [])
-			self.rr.AddBlock("G21", self, n, addr, [])
+			self.rr.AddBlock("G10", self, n, addr, [], True)
+			self.rr.AddBlock("G12", self, n, addr, [], True)
+			self.rr.AddBlock("G21", self, n, addr, [], True)
 
 		addr = CLIFF
 		with self.nodes[addr] as n:
@@ -129,14 +129,14 @@ class Cliff(District):
 			self.rr.AddRouteIn("CC44W",  self, n, addr, [(1, 2)])
 			self.rr.AddRouteIn("CC43W",  self, n, addr, [(1, 3)])
 			
-			self.rr.AddBlock("COSSHE", self, n, addr, [(1, 4)])
-			self.rr.AddBlock("C21",    self, n, addr, [(1, 5)])
-			self.rr.AddBlock("C40",    self, n, addr, [(1, 6)])
-			self.rr.AddBlock("C41",    self, n, addr, [(1, 7)])
-			self.rr.AddBlock("C42",    self, n, addr, [(2, 0)])
-			self.rr.AddBlock("C43",    self, n, addr, [(2, 1)])
-			self.rr.AddBlock("C44",    self, n, addr, [(2, 2)])
-			self.rr.AddBlock("COSSHW", self, n, addr, [(2, 3)])
+			self.rr.AddBlock("COSSHE", self, n, addr, [(1, 4)], False)
+			self.rr.AddBlock("C21",    self, n, addr, [(1, 5)], False)
+			self.rr.AddBlock("C40",    self, n, addr, [(1, 6)], False)
+			self.rr.AddBlock("C41",    self, n, addr, [(1, 7)], False)
+			self.rr.AddBlock("C42",    self, n, addr, [(2, 0)], False)
+			self.rr.AddBlock("C43",    self, n, addr, [(2, 1)], False)
+			self.rr.AddBlock("C44",    self, n, addr, [(2, 2)], False)
+			self.rr.AddBlock("COSSHW", self, n, addr, [(2, 3)], False)
 			
 			self.rr.AddSignalLever("C2",  self, n, addr, [(2, 6), (2, 5), (2, 4)])
 			self.rr.AddSignalLever("C4",  self, n, addr, [(3, 1), (3, 0), (2, 7)])
@@ -249,11 +249,11 @@ class Cliff(District):
 			self.rr.AddRouteIn("CC53W", self, n, addr, [(1, 0)])
 			self.rr.AddRouteIn("CC54W", self, n, addr, [(1, 1)])
 			
-			self.rr.AddBlock("C50", self, n, addr, [(1, 2)])
-			self.rr.AddBlock("C51", self, n, addr, [(1, 3)])
-			self.rr.AddBlock("C52", self, n, addr, [(1, 4)])
-			self.rr.AddBlock("C53", self, n, addr, [(1, 5)])
-			self.rr.AddBlock("C54", self, n, addr, [(1, 6)])
+			self.rr.AddBlock("C50", self, n, addr, [(1, 2)], False)
+			self.rr.AddBlock("C51", self, n, addr, [(1, 3)], False)
+			self.rr.AddBlock("C52", self, n, addr, [(1, 4)], False)
+			self.rr.AddBlock("C53", self, n, addr, [(1, 5)], False)
+			self.rr.AddBlock("C54", self, n, addr, [(1, 6)], False)
 
 		'''
 		which signals are affected by fleeting, for each of the control options
