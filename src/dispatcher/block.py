@@ -381,12 +381,12 @@ class Block:
 			print("setting sb %s(%s) occupied=%s" % (self.GetName(), blockend, occupied))
 			tr = self.GetTrain()
 			if tr is None:
-				print("main block doies not have a train")
+				print("main block does not have a train")
 			else:
 				print("Main block has train %s, but we are going to try identify anyway" % tr.GetName())
 			b.SetOccupied(occupied, refresh)
 			if occupied and self.train is None and self.frame.IsDispatcher():
-				tr = self.IdentifyTrain()
+				tr = self.IdentifyTrain(b.IsCleared())
 				if tr is None:
 					tr = self.frame.NewTrain()
 					# new trains take on the direction of the block
@@ -413,11 +413,12 @@ class Block:
 
 		self.occupied = occupied
 		if self.occupied:
+			previouslyCleared = self.cleared
 			self.cleared = False
 			self.frame.Request({"blockclear": { "block": self.GetName(), "clear": 0}})
 
 			if self.train is None and self.frame.IsDispatcher():
-				tr = self.IdentifyTrain()
+				tr = self.IdentifyTrain(previouslyCleared)
 				if tr is None:
 					tr = self.frame.NewTrain()
 					# new trains take on the direction of the block
@@ -475,8 +476,16 @@ class Block:
 		elif (not self.east) and self.sbWest:
 			self.sbWest.EvaluateStoppingSection()
 
-	def IdentifyTrain(self):
+	def IdentifyTrain(self, cleared):
+		print("============================================================================================")
 		print("identify train in block %s" % self.GetName())
+		if self.type == OVERSWITCH:
+			print("block is overswitch")
+			print("occupied: %s   Cleared: %s" % (self.occupied, cleared))
+			if not cleared:
+				# should not be entering an OS block without clearance
+				return None
+			
 		if self.east:
 			print("eastbound block")
 			'''
