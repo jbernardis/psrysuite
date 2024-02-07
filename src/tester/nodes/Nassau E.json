@@ -146,8 +146,8 @@
         "used": true
       },
       {
-        "label": "NSw41.R",
-        "used": true
+        "label": "(bad bit - see bit 3:2)",
+        "used": false
       },
       {
         "label": "NSw43.N",
@@ -176,8 +176,8 @@
     ],
     [
       {
-        "label": "NSw51.N",
-        "used": true
+        "label": "(bad bit - see bit 3:3)",
+        "used": false
       },
       {
         "label": "NSw51.R",
@@ -252,12 +252,12 @@
         "used": true
       },
       {
-        "label": "(unused)",
-        "used": false
+        "label": "NSw41.R - see bit 0:1",
+        "used": true
       },
       {
-        "label": "(unused)",
-        "used": false
+        "label": "NSw51.N - see bit 1:0",
+        "used": true
       },
       {
         "label": "(unused)",

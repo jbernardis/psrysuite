@@ -175,11 +175,11 @@ class Nassau(District):
 			self.rr.AddTurnout("NSw57", self, n, addr, [])	
 
 			# inputs
-			self.rr.AddTurnoutPosition("NSw41", self, n, addr, [(0, 0), (0, 1)])	
+			self.rr.AddTurnoutPosition("NSw41", self, n, addr, [(0, 0), (3, 2)]) # bit 0,1 is bad
 			self.rr.AddTurnoutPosition("NSw43", self, n, addr, [(0, 2), (0, 3)])	
 			self.rr.AddTurnoutPosition("NSw45", self, n, addr, [(0, 4), (0, 5)])	
 			self.rr.AddTurnoutPosition("NSw47", self, n, addr, [(0, 6), (0, 7)])	
-			self.rr.AddTurnoutPosition("NSw51", self, n, addr, [(1, 0), (1, 1)])	
+			self.rr.AddTurnoutPosition("NSw51", self, n, addr, [(3, 3), (1, 1)]) # bit 1,0 is bad	
 			self.rr.AddTurnoutPosition("NSw53", self, n, addr, [(1, 2), (1, 3)])	
 			self.rr.AddTurnoutPosition("NSw55", self, n, addr, [(1, 4), (1, 5)])	
 			self.rr.AddTurnoutPosition("NSw57", self, n, addr, [(1, 6), (1, 7)])	

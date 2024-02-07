@@ -40,6 +40,13 @@ class Train:
 		self.east = True
 		self.aspect = None
 		self.engineer = None
+		self.beingEdited = False
+		
+	def SetBeingEdited(self, flag):
+		self.beingEdited = flag
+		
+	def IsBeingEdited(self):
+		return self.beingEdited
 		
 	def dump(self):
 		print("Train %s: %s %s %s" % (self.name, self.loco, self.blockInfo(), self.signalInfo()))
@@ -170,9 +177,9 @@ class Train:
 		
 	def IsContiguous(self):
 		print("check for contiguous: %s" % self.GetName())
-		if self.GetName().startswith("??"):
+		#if self.GetName().startswith("??"):
 			# do not test for trains with temporary names
-			return True
+			#return True
 		
 		bnames = list(self.blocks.keys())
 		print("blocks: %s" % str(bnames))
@@ -227,9 +234,9 @@ class Train:
 			return False
 		return bn == self.blockOrder[-1]
 			
-	def FrontBlock(self, bn):
+	def FrontBlock(self):
 		if len(self.blockOrder) == 0:
-			return False
+			return None
 		bn = self.blockOrder[-1]
 		return self.blocks[bn]
 			

@@ -80,7 +80,6 @@ class Shore (District):
 		
 	def DoBlockAction(self, blk, blockend, state):
 		blknm = blk.GetName()
-		print("DBA: block (%s) state %s" % (blknm, state), flush=True)
 		if blknm == "S21" and blockend == "E" and not self.frame.GetBlockByName("KOSN20S21").GetEast():
 			District.DoBlockAction(self, self.frame.GetBlockByName("KOSN20S21"), None, state)
 		elif blknm == "S11" and blockend == "E" and not self.frame.GetBlockByName("KOSN10S11").GetEast():

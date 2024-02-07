@@ -75,7 +75,7 @@ class Turnout:
 	def AddBlock(self, blknm):
 		self.blockList.append(self.frame.blocks[blknm])
 
-	def Draw(self, blockstat=None, east=None):
+	def Draw(self, blockstat=None, east=None, unknownTrain=False):
 		if east is None:
 			east = self.eastFromBlock
 		if blockstat is None:
@@ -83,7 +83,7 @@ class Turnout:
 
 		if self.pos is not None:
 			tostat = NORMAL if self.normal else REVERSE
-			bmp = self.tiles.getBmp(tostat, blockstat, east, self.routeControlled or self.disabled or self.locked)
+			bmp = self.tiles.getBmp(tostat, blockstat, east, self.routeControlled or self.disabled or self.locked, unknownTrain=unknownTrain)
 			self.frame.DrawTile(self.screen, self.pos, bmp)
 
 		self.statusFromBlock = blockstat
@@ -276,9 +276,9 @@ class SlipSwitch(Turnout):
 	def GetStatus(self):
 		return self.status
 
-	def Draw(self, blkStat=None, east=None):
+	def Draw(self, blkStat=None, east=None, unknownTrain=False):
 		if blkStat is None:
 			blkStat = self.statusFromBlock
-		bmp = self.tiles.getBmp(self.status, blkStat, self.routeControlled or self.disabled or self.locked)
+		bmp = self.tiles.getBmp(self.status, blkStat, self.routeControlled or self.disabled or self.locked, unknownTrain=unknownTrain)
 		self.frame.DrawTile(self.screen, self.pos, bmp)
 		self.statusFromBlock = blkStat

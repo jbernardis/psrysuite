@@ -193,7 +193,6 @@ class ServerMain:
 		blks = self.rr.GetBlockInfo()
 		blocks = {}
 		for bnm, bdir in blks:
-			print("block %s direction: %s" % (bnm, bdir))
 			if bnm in sbList:
 				continue
 			
@@ -609,7 +608,6 @@ class ServerMain:
 
 	def DoBlockDirs(self, cmd):
 		data = json.loads(cmd["data"][0])
-		print("blockdirs command: %d blocks" % len(data), flush=True)
 		for b in data:
 			block = b["block"]
 			direction = b["dir"]
@@ -657,7 +655,6 @@ class ServerMain:
 		except (IndexError, KeyError):
 			east = True
 		block = cmd["block"][0]
-		print("inbound settrain: name: %s loco: %s blk: %s east: %s" % (trn, loco, block, east))
 
 		if trn and trn.startswith("??"):
 			# this is an unknown train - see if we have a known train in the same block
@@ -747,7 +744,6 @@ class ServerMain:
 			east = cmd["east"][0] == "1"
 		except (IndexError, KeyError):
 			east = None
-		print("inbound renametrain: on: %s nn: %s ol: %s nl: %s east: %s" % (oname, nname, oloco, nloco, east))
 
 		if self.trainList.RenameTrain(oname, nname, oloco, nloco, east):
 			for cmd in self.trainList.GetSetTrainCmds(nname, nameonly=True):

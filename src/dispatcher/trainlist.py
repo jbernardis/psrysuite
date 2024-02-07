@@ -83,6 +83,7 @@ class ActiveTrainList:
 class ActiveTrainsDlg(wx.Dialog):
 	def __init__(self, parent, dlgExit):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Active Trains", size=(1000, 500), style=wx.RESIZE_BORDER|wx.CAPTION|wx.CLOSE_BOX)
+		self.parent = parent
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.Bind(wx.EVT_SIZE, self.OnResize)
 		self.Bind(wx.EVT_IDLE,self.OnIdle)
@@ -133,6 +134,7 @@ class ActiveTrainsDlg(wx.Dialog):
 
 		self.trCtl = TrainListCtrl(self)
 		hsz.Add(self.trCtl)
+		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.DoubleClickTrain, self.trCtl)
 		
 		hsz.AddSpacer(20)
 		
@@ -147,6 +149,11 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.SetSizer(vsz)
 		self.Layout()
 		self.Fit()
+		
+	def DoubleClickTrain(self, evt):
+		tr = self.trCtl.GetActiveTrain(evt.Index)
+		blk = tr.FrontBlock()
+		self.parent.EditTrain(tr, blk)
 		
 	def OnSuppressYard(self, _):
 		self.suppressYards = self.cbYardTracks.GetValue()
@@ -325,6 +332,14 @@ class TrainListCtrl(wx.ListCtrl):
 				return False
 					
 		return True
+	
+	def GetActiveTrain(self, index):
+		try:
+			trid = self.filtered[index]
+		except:
+			return None
+		
+		return self.trains[trid]
 
 	def OnGetItemText(self, item, col):
 		trid = self.filtered[item]

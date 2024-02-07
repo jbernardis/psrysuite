@@ -117,6 +117,7 @@ class Block:
 		self.east = east
 		self.defaultEast = east
 		self.occupied = False
+		self.unknownTrain = False
 		self.cleared = False
 		self.turnouts = []
 		self.handswitches = []
@@ -137,6 +138,10 @@ class Block:
 
 	def SetTrain(self, train):
 		self.train = train
+		if train is None:
+			self.unknownTrain = False
+		else:
+			self.unknownTrain = train.GetName().startswith("??")
 
 	def SetEntrySignal(self, esig):
 		self.entrySignal = esig
@@ -259,6 +264,8 @@ class Block:
 
 	def determineStatus(self):
 		self.status = OCCUPIED if self.occupied else CLEARED if self.cleared else EMPTY
+		if self.occupied:
+			self.unknownTrain = self.train.GetName().startswith("??")
 
 	def NextBlock(self, reverse=False):
 		if self.east:
@@ -353,7 +360,7 @@ class Block:
 
 	def Draw(self):
 		for t, screen, pos, revflag in self.tiles:
-			bmp = t.getBmp(self.status, self.east, revflag)
+			bmp = t.getBmp(self.status, self.east, revflag, unknownTrain=self.unknownTrain)
 			self.frame.DrawTile(screen, pos, bmp)
 
 		for b in [self.sbEast, self.sbWest]:
@@ -361,7 +368,7 @@ class Block:
 				b.Draw()
 				
 		for t in self.turnouts:
-			t.Draw(self.status, self.east)
+			t.Draw(self.status, self.east, unknownTrain=self.unknownTrain)
 
 		self.district.DrawOthers(self)
 		self.DrawTrain()
@@ -378,16 +385,13 @@ class Block:
 			if b is None:
 				logging.warning("Stopping block %s not defined for block %s" % (blockend, self.GetName()))
 				return
-			print("setting sb %s(%s) occupied=%s" % (self.GetName(), blockend, occupied))
 			tr = self.GetTrain()
-			if tr is None:
-				print("main block does not have a train")
-			else:
-				print("Main block has train %s, but we are going to try identify anyway" % tr.GetName())
 			b.SetOccupied(occupied, refresh)
 			if occupied and self.train is None and self.frame.IsDispatcher():
 				tr = self.IdentifyTrain(b.IsCleared())
 				if tr is None:
+					self.GetCandidateTrains(self.GetName())
+													
 					tr = self.frame.NewTrain()
 					# new trains take on the direction of the block
 					east = self.GetEast()
@@ -420,6 +424,8 @@ class Block:
 			if self.train is None and self.frame.IsDispatcher():
 				tr = self.IdentifyTrain(previouslyCleared)
 				if tr is None:
+					self.GetCandidateTrains(self.GetName())
+								
 					tr = self.frame.NewTrain()
 					# new trains take on the direction of the block
 					east = self.GetEast()
@@ -446,6 +452,23 @@ class Block:
 
 		if refresh:
 			self.Draw()
+
+	def GetCandidateTrains(self, blkname):
+		self.frame.PopupEvent("Unable to identify train detected in block %s" % blkname)
+		if blkname not in self.frame.blockAdjacency:
+			return 
+		
+		#self.frame.PopupEvent("Adjacent blocks: %s" % (", ".join(self.frame.blockAdjacency[blkname])))
+		for bn in self.frame.blockAdjacency[blkname]:
+			try:
+				blk = self.frame.blocks[bn]
+			except:
+				blk = None
+			
+			if blk:
+				tr = blk.GetTrain()
+				if tr:
+					self.frame.PopupEvent("Block %s has candidate train %s" % (bn, tr.GetName()))
 
 	def CheckAllUnoccupied(self):
 		if self.occupied:
@@ -477,97 +500,78 @@ class Block:
 			self.sbWest.EvaluateStoppingSection()
 
 	def IdentifyTrain(self, cleared):
-		print("============================================================================================")
-		print("identify train in block %s" % self.GetName())
 		if self.type == OVERSWITCH:
-			print("block is overswitch")
-			print("occupied: %s   Cleared: %s" % (self.occupied, cleared))
 			if not cleared:
 				# should not be entering an OS block without clearance
 				return None
 			
 		if self.east:
-			print("eastbound block")
 			'''
 			first look west, then east, then create a new train
 			'''
 			if self.blkWest:
-				print("looking west into %s" % self.blkWest.GetName())
 				if self.blkWest.GetName() in ["KOSN10S11", "KOSN20S21"]:
 					blkWest = self.blkWest.blkWest
 					if blkWest:
 						tr = blkWest.GetTrain()
 						if tr:
 							self.CheckEWCross(tr, blkWest)	
-							print("returning 1: %s" % tr.GetName())					
 							return tr
 				else:
 					tr = self.blkWest.GetTrain()
 					if tr:
 						self.CheckEWCross(tr, self.blkWest)						
-						print("returning 2: %s" % tr.GetName())					
 						return tr
 			
 			if self.blkEast:
-				print("looking east into %s" % self.blkEast.GetName())
 				if self.blkEast.GetName() in ["KOSN10S11", "KOSN20S21"]:
 					blkEast = self.blkEast.blkEast
 					if blkEast:
 						tr = blkEast.GetTrain()
 						if tr:
 							self.CheckEWCross(tr, blkEast)							
-							print("returning 3: %s" % tr.GetName())					
 							return tr
 
 				else:
 					tr = self.blkEast.GetTrain()
 					if tr:
 						self.CheckEWCross(tr, self.blkEast)							
-						print("returning 4: %s" % tr.GetName())					
 						return tr
 		
 		else:
-			print("westbound block")
 			'''
 			first look east, then west, then create a new train
 			'''
 			if self.blkEast:
-				print("looking east into %s" % self.blkEast.GetName())
 				if self.blkEast.GetName() in ["KOSN10S11", "KOSN20S21"]:
 					blkEast = self.blkEast.blkEast
 					if blkEast:
 						tr = blkEast.GetTrain()
 						if tr:
 							self.CheckEWCross(tr, blkEast)						
-							print("returning 5: %s" % tr.GetName())					
 							return tr
 
 				else:
 					tr = self.blkEast.GetTrain()
 					if tr:
 						self.CheckEWCross(tr, self.blkEast)						
-						print("returning 6: %s" % tr.GetName())					
 						return tr
 					
 			if self.blkWest:
-				print("looking west into %s" % self.blkWest.GetName())
 				if self.blkWest.GetName() in ["KOSN10S11", "KOSN20S21"]:
 					blkWest = self.blkWest.blkWest
 					if blkWest:
 						tr = blkWest.GetTrain()
 						if tr:
 							self.CheckEWCross(tr, blkWest)						
-							print("returning 7: %s" % tr.GetName())					
 							return tr																																																				
 				else:
 					tr = self.blkWest.GetTrain()
 					if tr:
 						self.CheckEWCross(tr, self.blkWest)						
-						print("returning 8: %s" % tr.GetName())					
 						return tr		
 				
 
-		print("no train identified")			
 		return None
 		
 	def CheckEWCross(self, tr, blk):
@@ -742,7 +746,7 @@ class StoppingBlock (Block):
 		self.east = self.block.east
 		# self.frame.Request({"blockdir": { "block": self.GetName(), "dir": "E" if self.east else "W"}})
 		for t, screen, pos, revflag in self.tiles:
-			bmp = t.getBmp(self.status, self.east, revflag)
+			bmp = t.getBmp(self.status, self.east, revflag, unknownTrain=self.block.unknownTrain)
 			self.frame.DrawTile(screen, pos, bmp)
 
 	def determineStatus(self):
@@ -1019,13 +1023,13 @@ class OverSwitch (Block):
 		for t, screen, pos, revflag in self.tiles:
 			draw, stat = self.GetTileInRoute(screen, pos)
 			if draw:
-				bmp = t.getBmp(stat, self.east, revflag)
+				bmp = t.getBmp(stat, self.east, revflag, unknownTrain=self.unknownTrain)
 				self.frame.DrawTile(screen, pos, bmp)
 
 		for t in self.turnouts:
 			draw, stat = self.GetTileInRoute(t.GetScreen(), t.GetPos())
 			if draw:
-				t.Draw(stat, self.east)
+				t.Draw(stat, self.east, unknownTrain=self.unknownTrain)
 
 		self.district.DrawOthers(self)
 		self.DrawTrain()

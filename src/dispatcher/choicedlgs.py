@@ -284,7 +284,7 @@ class ChooseBlocksDlg(wx.Dialog):
         vszr = wx.BoxSizer(wx.VERTICAL)
         vszr.AddSpacer(20)
         
-        st = wx.StaticText(self, wx.ID_ANY, "Choose blocks to split")
+        st = wx.StaticText(self, wx.ID_ANY, "Choose block(s) to split to a new train")
         vszr.Add(st, 0, wx.ALIGN_CENTER_HORIZONTAL)
         vszr.AddSpacer(10)
         

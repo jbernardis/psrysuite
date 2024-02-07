@@ -499,8 +499,6 @@ class Railroad():
 			return 0
 		
 	def SetBlockDirection(self, blknm, direction):
-		if blknm == "S11":
-			print("Set Block Direction S11: %s" % direction, file=sys.stderr, flush=True)
 		try:
 			blk = self.blocks[blknm]
 		except KeyError:
