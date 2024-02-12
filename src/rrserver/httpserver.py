@@ -181,6 +181,24 @@ class HTTPServer:
 			logging.info("Returning %d bytes" % len(jstr))
 			return 200, jstr
 		
+		elif verb == "getengineers":
+			fn = os.path.join(os.getcwd(), "data", "engineers.txt")
+			logging.info("Retrieving engineer information from file (%s)" % fn)
+			try:
+				with open(fn, "r") as jfp:
+					j = json.load(jfp)
+			except FileNotFoundError:
+				logging.info("File not found")
+				return 400, "File Not Found"
+			
+			except:
+				logging.info("Unknown error")
+				return 400, "Unknown error encountered"
+			
+			jstr = json.dumps(j)
+			logging.info("Returning %d bytes" % len(jstr))
+			return 200, jstr
+		
 		elif verb == "getsnapshot":
 			fn = os.path.join(os.getcwd(), "data", "snapshot.json")
 			logging.info("Retrieving snapshot information from file (%s)" % fn)

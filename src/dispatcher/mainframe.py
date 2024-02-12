@@ -566,8 +566,8 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBCliff, self.rbCliffControl)
 		self.rbCliffControl.Hide()
 		self.widgetMap[NaCl].append([self.rbCliffControl, 0])
-		self.rbCliffControl.SetSelection(2)
-		self.cliffControl = 2
+		self.rbCliffControl.SetSelection(0)
+		self.cliffControl = 0
 
 		self.rbYardControl = wx.RadioBox(self, wx.ID_ANY, "Yard", (1450, voffset), wx.DefaultSize,
 				["Yard", "Dispatcher"], 1, wx.RA_SPECIFY_COLS)
@@ -640,12 +640,14 @@ class MainFrame(wx.Frame):
 		self.cbBankFleet = wx.CheckBox(self, -1, "Martinsville Fleeting", (900, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBBankFleet, self.cbBankFleet)
 		self.cbBankFleet.Hide()
+		self.cbBankFleet.Enable(self.cliffControl != 0)
 		self.widgetMap[NaCl].append([self.cbBankFleet, 0])
 		self.BankFleetSignals = ["C22L", "C24L", "C22R", "C24R"]
 
 		self.cbClivedenFleet = wx.CheckBox(self, -1, "Cliveden Fleeting", (1400, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBClivedenFleet, self.cbClivedenFleet)
 		self.cbClivedenFleet.Hide()
+		self.cbClivedenFleet.Enable(self.cliffControl != 0)
 		self.widgetMap[NaCl].append([self.cbClivedenFleet, 0])
 		self.ClivedenFleetSignals = ["C10L", "C12L", "C10R", "C12R", "C14L", "C14RA", "C14RB", "C18LA", "C18LB", "C18R"]
 
@@ -660,6 +662,7 @@ class MainFrame(wx.Frame):
 		self.cbCliffFleet = wx.CheckBox(self, -1, "Cliff Fleeting", (2100, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBCliffFleet, self.cbCliffFleet)
 		self.cbCliffFleet.Hide()
+		self.cbCliffFleet.Enable(self.cliffControl == 2)
 		self.widgetMap[NaCl].append([self.cbCliffFleet, 0])
 		self.CliffFleetSignals = [ "C2LA", "C2LB", "C2LC", "C2LD", "C2R",
 					"C4L", "C4RA", "C4RB", "C4RC", "C4RD",
@@ -1510,14 +1513,15 @@ class MainFrame(wx.Frame):
 						
 	def EditTrain(self, tr, blk):
 		oldName, oldLoco = tr.GetNameAndLoco()
+		oldEngineer = tr.GetEngineer()
 		oldATC = tr.IsOnATC() if self.IsDispatcher() else False
 		oldAR = tr.IsOnAR() if self.IsDispatcher() else False
 		dlgx = self.centerw - 500 - self.centerOffset
 		dlgy = self.totalh - 660
-		dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.trains, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, dlgx, dlgy)
+		dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.engineerList, self.trains, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, dlgx, dlgy)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			trainid, locoid, atc, ar, east = dlg.GetResults()
+			trainid, locoid, engineer, atc, ar, east = dlg.GetResults()
 		dlg.Destroy()
 		
 		if rc == wx.ID_CUT:	
@@ -1634,6 +1638,15 @@ class MainFrame(wx.Frame):
 
 		if oldName != trainid or oldLoco != locoid:
 			self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid, "east": "1" if east else "0"}})
+			
+		if oldEngineer != engineer:
+			tr.SetEngineer(engineer)
+			self.activeTrains.UpdateTrain(trainid)
+			parms = {"train": trainid, "reassign": 0 if oldEngineer is None else 1}
+			if engineer is not None:
+				parms["engineer"] = engineer
+			req = {"assigntrain": parms}
+			self.Request(req)
 			
 		if east != tr.GetEast():
 			tr.SetEast(east)
@@ -2066,6 +2079,14 @@ class MainFrame(wx.Frame):
 			trains = {}
 			
 		self.trainList = trains
+
+		engineers = self.Get("getengineers", {})
+		if engineers is None:
+			logging.error("Unable to retrieve engineers")
+			engineers = []
+			
+		self.engineerList = engineers
+		print("Engineer list: %s" % str(engineers))
 
 	def OnRefresh(self, _):
 		if not self.IsDispatcher():
@@ -2617,11 +2638,11 @@ class MainFrame(wx.Frame):
 			self.PopupEvent("Got end type (%s)" % parms["type"])
 					
 	def DoCmdAdvice(self, parms):
-		if self.IsDispatcher():
+		if self.IsDispatcher() or self.settings.showadvice:
 			self.PopupAdvice(parms["msg"][0])
 					
 	def DoCmdAlert(self, parms):
-		if self.IsDispatcher():
+		if self.IsDispatcher() or self.settings.showevents:
 			logging.info("ALERT: %s" % (str(parms)))
 			self.PopupEvent(parms["msg"][0])
 				

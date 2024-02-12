@@ -41,8 +41,12 @@ class Settings:
 		self.activesuppressyards = True
 		self.activesuppressunknown = False
 		self.activeonlyatc = False
+		self.activeonlyassigned = False
+		self.activeonlyassignedorunknown = False
 		self.clockstarttime = 355
 		self.matrixturnoutdelay = 2
+		self.showevents = False
+		self.showadvice = False
 		
 		self.debug = Debug()
 		
@@ -78,6 +82,12 @@ class Settings:
 				elif opt == 'activesuppressunknown':
 					self.activesuppressunknown = parseBoolean(value, False)
 
+				elif opt == 'activeonlysassignedorunknown':
+					self.activeonlyassignedorunknown = parseBoolean(value, False)
+
+				elif opt == 'activeonlysassigned':
+					self.activeonlyassigned = parseBoolean(value, False)
+
 				elif opt == 'activeonlyatc':
 					self.activeonlyatc = parseBoolean(value, False)
 
@@ -108,6 +118,10 @@ class Settings:
 			for opt, value in self.cfg.items("display"):
 				if opt == 'allowatcrequests':
 					self.allowatcrequests = parseBoolean(value, False)
+				elif opt == 'showevents':
+					self.showevents = parseBoolean(value, False)
+				elif opt == 'showadvice':
+					self.showadvice = parseBoolean(value, False)
 			
 		if self.cfg.has_section("debug"):
 			for opt, value in self.cfg.items("debug"):

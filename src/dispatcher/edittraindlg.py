@@ -4,7 +4,7 @@ import logging
 MAXSTEPS = 9
 
 class EditTrainDlg(wx.Dialog):
-	def __init__(self, parent, train, block, locos, trains, existingTrains, atcFlag, arFlag, dx, dy):
+	def __init__(self, parent, train, block, locos, trains, engineers, existingTrains, atcFlag, arFlag, dx, dy):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details", pos=(dx, dy))
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
 
@@ -25,13 +25,15 @@ class EditTrainDlg(wx.Dialog):
 		
 		self.locos = locos
 		self.trains = trains
+		self.noEngineer = "<none>"
+		self.engineers = [self.noEngineer] + sorted(engineers)
 		
 		locoList  = sorted(list(locos.keys()), key=self.BuildLocoKey)
 		trainList = sorted(list(trains.keys()))
 			
 		font = wx.Font(wx.Font(16, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
 
-		lblTrain = wx.StaticText(self, wx.ID_ANY, "Train:", size=(90, -1))
+		lblTrain = wx.StaticText(self, wx.ID_ANY, "Train:", size=(120, -1))
 		lblTrain.SetFont(font)
 		self.cbTrainID = wx.ComboBox(self, wx.ID_ANY, name,
 					choices=trainList,
@@ -45,7 +47,7 @@ class EditTrainDlg(wx.Dialog):
 		
 		self.chosenLoco = loco
 		
-		lblLoco  = wx.StaticText(self, wx.ID_ANY, "Loco:", size=(90, -1))
+		lblLoco  = wx.StaticText(self, wx.ID_ANY, "Loco:", size=(120, -1))
 		lblLoco.SetFont(font)
 		self.cbLocoID = wx.ComboBox(self, wx.ID_ANY, loco,
 					choices=locoList,
@@ -54,6 +56,22 @@ class EditTrainDlg(wx.Dialog):
 		
 		self.Bind(wx.EVT_COMBOBOX, self.OnLocoChoice, self.cbLocoID)
 		self.Bind(wx.EVT_TEXT, self.OnLocoText, self.cbLocoID)
+
+		self.chosenEngineer = train.GetEngineer()
+		if self.chosenEngineer is None:
+			self.chosenEngineer = self.noEngineer
+			
+		if self.chosenEngineer not in self.engineers:
+			self.engineers.append(self.chosenEngineer)
+		
+		lblEngineer  = wx.StaticText(self, wx.ID_ANY, "Engineer:", size=(120, -1))
+		lblEngineer.SetFont(font)
+		self.cbEngineer = wx.ComboBox(self, wx.ID_ANY, self.chosenEngineer,
+					choices=self.engineers,
+					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
+		self.cbEngineer.SetFont(font)
+		
+		self.Bind(wx.EVT_COMBOBOX, self.OnEngChoice, self.cbEngineer)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.Add(lblTrain)
@@ -67,6 +85,14 @@ class EditTrainDlg(wx.Dialog):
 		hsz.Add(lblLoco)
 		hsz.AddSpacer(10)
 		hsz.Add(self.cbLocoID)
+		vsz.Add(hsz)
+		
+		vsz.AddSpacer(10)
+		
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(lblEngineer)
+		hsz.AddSpacer(10)
+		hsz.Add(self.cbEngineer)
 		vsz.Add(hsz)
 
 		vsz.AddSpacer(20)
@@ -193,6 +219,10 @@ class EditTrainDlg(wx.Dialog):
 		self.chosenTrain = nm
 		self.ShowTrainLocoDesc()
 		evt.Skip()
+		
+	def OnEngChoice(self, evt):
+		self.chosenEngineer = evt.GetString()
+		print("choice: %s" % self.chosenEngineer, flush=True)
 
 	def ShowTrainLocoDesc(self):
 		if self.chosenLoco in self.locos and self.locos[self.chosenLoco]["desc"] != None:
@@ -255,6 +285,10 @@ class EditTrainDlg(wx.Dialog):
 	def GetResults(self):
 		t = self.chosenTrain
 		l = self.chosenLoco
+		e = self.chosenEngineer
+		if e == self.noEngineer:
+			e = None
+			
 		atc = False if not self.atcFlag else self.cbATC.GetValue()
 		ar = False if not self.arFlag else self.cbAR.GetValue()
 		try:
@@ -265,4 +299,4 @@ class EditTrainDlg(wx.Dialog):
 			east = self.startingEast # using the eastbound value of the train we came into here with
 		else:
 			east = tr["eastbound"]
-		return t, l, atc, ar, east
+		return t, l, e, atc, ar, east
