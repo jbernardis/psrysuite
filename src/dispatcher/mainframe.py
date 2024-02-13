@@ -55,7 +55,7 @@ MENU_AR_ADD_REQ  = 908
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
-allowedCommands = [ "settrain", "renametrain", "identify", "refresh", "atcrequest", "arrequest" ]
+allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest" ]
 
 wildcardTrain = "train files (*.trn)|*.trn|"	 \
 			"All files (*.*)|*.*"
@@ -2086,7 +2086,6 @@ class MainFrame(wx.Frame):
 			engineers = []
 			
 		self.engineerList = engineers
-		print("Engineer list: %s" % str(engineers))
 
 	def OnRefresh(self, _):
 		if not self.IsDispatcher():

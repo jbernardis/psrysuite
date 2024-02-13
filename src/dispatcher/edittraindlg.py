@@ -2,10 +2,12 @@ import wx
 import logging
 
 MAXSTEPS = 9
+BUTTONSIZE = (90, 30)
 
 class EditTrainDlg(wx.Dialog):
 	def __init__(self, parent, train, block, locos, trains, engineers, existingTrains, atcFlag, arFlag, dx, dy):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details", pos=(dx, dy))
+		self.parent = parent
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
 
 		self.existingTrains = existingTrains		
@@ -72,6 +74,9 @@ class EditTrainDlg(wx.Dialog):
 		self.cbEngineer.SetFont(font)
 		
 		self.Bind(wx.EVT_COMBOBOX, self.OnEngChoice, self.cbEngineer)
+		
+		self.bClearEng = wx.Button(self, wx.ID_ANY, "Clear", size=BUTTONSIZE)
+		self.Bind(wx.EVT_BUTTON, self.OnBClearEng, self.bClearEng)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.Add(lblTrain)
@@ -93,6 +98,8 @@ class EditTrainDlg(wx.Dialog):
 		hsz.Add(lblEngineer)
 		hsz.AddSpacer(10)
 		hsz.Add(self.cbEngineer)
+		hsz.AddSpacer(20)
+		hsz.Add(self.bClearEng)
 		vsz.Add(hsz)
 
 		vsz.AddSpacer(20)
@@ -141,14 +148,14 @@ class EditTrainDlg(wx.Dialog):
 
 		bsz = wx.BoxSizer(wx.HORIZONTAL)
 
-		self.bOK = wx.Button(self, wx.ID_ANY, "OK")
+		self.bOK = wx.Button(self, wx.ID_ANY, "OK", size=BUTTONSIZE)
 		self.bOK.SetDefault()
-		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
-		self.bSever = wx.Button(self, wx.ID_ANY, "Split")
+		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BUTTONSIZE)
+		self.bSever = wx.Button(self, wx.ID_ANY, "Split", size=BUTTONSIZE)
 		self.bSever.SetToolTip("Split this train into 2 sections")
-		self.bMerge = wx.Button(self, wx.ID_ANY, "Merge")
+		self.bMerge = wx.Button(self, wx.ID_ANY, "Merge", size=BUTTONSIZE)
 		self.bMerge.SetToolTip("Merge this train with another")
-		self.bReverse = wx.Button(self, wx.ID_ANY, "Reverse")
+		self.bReverse = wx.Button(self, wx.ID_ANY, "Reverse", size=BUTTONSIZE)
 		self.bReverse.SetToolTip("Reverse Direction on this train")
 
 		bsz.Add(self.bOK)
@@ -222,7 +229,10 @@ class EditTrainDlg(wx.Dialog):
 		
 	def OnEngChoice(self, evt):
 		self.chosenEngineer = evt.GetString()
-		print("choice: %s" % self.chosenEngineer, flush=True)
+		
+	def OnBClearEng(self, evt):
+		self.chosenEngineer = self.noEngineer
+		self.cbEngineer.SetValue(self.noEngineer)
 
 	def ShowTrainLocoDesc(self):
 		if self.chosenLoco in self.locos and self.locos[self.chosenLoco]["desc"] != None:

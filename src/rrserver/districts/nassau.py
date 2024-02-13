@@ -47,10 +47,10 @@ class Nassau(District):
 			self.rr.AddIndicator("NFleet",  self, n, addr, [(3, 2)])
 			self.rr.AddIndicator("nNFleet", self, n, addr, [(3, 3)]) # negated nassau fleet
 
-			self.rr.AddSignalLED("N14",  self, n, addr, [(3, 4), (3, 5), (3, 6)])
-			self.rr.AddSignalLED("N16",  self, n, addr, [(3, 7), (4, 0), (4, 1)])
-			self.rr.AddSignalLED("N18",  self, n, addr, [(4, 2), (4, 3), (4, 4)])
-			self.rr.AddSignalLED("N20",  self, n, addr, [(4, 5), (4, 6), (4, 7)])
+			self.rr.AddSignalLED("N14",  self, n, addr, [(3, 6), (3, 5), (3, 4)])
+			self.rr.AddSignalLED("N16",  self, n, addr, [(4, 1), (4, 0), (3, 7)])
+			self.rr.AddSignalLED("N18",  self, n, addr, [(4, 4), (4, 3), (4, 2)])
+			self.rr.AddSignalLED("N20",  self, n, addr, [(4, 7), (4, 6), (4, 5)])
 			
 			self.rr.AddTurnout("KSw1", self, n, addr, [(5, 0), (5, 1)])
 			self.rr.AddTurnout("KSw3", self, n, addr, [(5, 2), (5, 3)])
@@ -160,9 +160,9 @@ class Nassau(District):
 			
 			self.rr.AddStopRelay("B10.srel", self, n, addr, [(2, 6)])
 			
-			self.rr.AddSignalLED("N24",  self, n, addr, [(2, 7), (3, 0), (3, 1)])
-			self.rr.AddSignalLED("N26",  self, n, addr, [(3, 2), (3, 3), (3, 4)])
-			self.rr.AddSignalLED("N28",  self, n, addr, [(3, 5), (3, 6), (3, 7)])
+			self.rr.AddSignalLED("N24",  self, n, addr, [(3, 1), (3, 0), (2, 7)])
+			self.rr.AddSignalLED("N26",  self, n, addr, [(3, 4), (3, 3), (3, 2)])
+			self.rr.AddSignalLED("N28",  self, n, addr, [(3, 7), (3, 6), (3, 5)])
 			
 			# virtual turnouts - no output bits
 			self.rr.AddTurnout("NSw41", self, n, addr, [])	

@@ -655,6 +655,7 @@ class District:
 			if entrySig is not None:
 				if sig.GetName() == entrySig.GetName():
 					osblock.SetCleared(False, refresh=True)
+					self.frame.CheckTrainsInBlock(entryBlkNm, sig)
 
 		if osblock.IsBusy() and aspect == STOP:
 			return

@@ -423,10 +423,9 @@ class Cliff(District):
 			resumelist = []
 			
 		elif self.control == 1: # dispatcher runs bank/cliveden
-			skiplist = ["C2", "C4", "C6", "C8", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
+			skiplist = ["C10", "C12", "C14", "C18", "C22", "C24", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
 			if self.lastControl == 2:
-				resumelist = ["C10", "C12", "C14", "C18", "C22", "C24",
-					"CSw3"]
+				resumelist = ["C2", "C4", "C6", "C8", "CSw3"]
 			elif self.lastControl == 0:
 				resumelist = []
 			else:
@@ -438,7 +437,7 @@ class Cliff(District):
 				resumelist = ["C2", "C4", "C6", "C8", "C10", "C12", "C14", "C18", "C22", "C24",
 					"CSw3", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
 			elif self.lastControl == 1:
-				resumelist = ["C2", "C4", "C6", "C8", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
+				resumelist = ["C10", "C12", "C14", "C18", "C22", "C24", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
 			else:
 				resumelist= []
 				

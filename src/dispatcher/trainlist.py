@@ -1,6 +1,5 @@
 import wx
 import logging
-from enum import Flag
 
 YardBlocks = [
 	"C21", "C31", "C40", "C41", "C42", "C43", "C44", "C50", "C51", "C52", "C53", "C54",
@@ -233,7 +232,7 @@ class ActiveTrainsDlg(wx.Dialog):
 		
 class TrainListCtrl(wx.ListCtrl):
 	def __init__(self, parent):
-		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1066, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
+		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1266, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
 		self.parent = parent
 		self.trains = {}
 		self.order = []
@@ -260,7 +259,7 @@ class TrainListCtrl(wx.ListCtrl):
 		self.InsertColumn(6, "SB")
 		self.SetColumnWidth(6, 50)
 		self.InsertColumn(7, "Signal")
-		self.SetColumnWidth(7, 100)
+		self.SetColumnWidth(7, 300)
 		self.InsertColumn(8, "Throttle")
 		self.SetColumnWidth(8, 100)
 		self.InsertColumn(9, "Blocks")
@@ -269,7 +268,7 @@ class TrainListCtrl(wx.ListCtrl):
 		
 	def ChangeSize(self, sz):
 		self.SetSize(sz[0]-56, sz[1]-84)
-		self.SetColumnWidth(9, sz[0]-666)
+		self.SetColumnWidth(9, sz[0]-866)
 		
 	def AddTrain(self, tr):
 		nm = tr.GetName()
@@ -433,7 +432,7 @@ class TrainListCtrl(wx.ListCtrl):
 				return ""
 			resp = sig.GetName()
 			if aspect is not None:
-				resp += ":%d" % aspect
+				resp += ":%s" % sig.GetAspectName()
 			return resp 
 		
 		elif col == 8:

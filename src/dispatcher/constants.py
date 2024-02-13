@@ -150,14 +150,14 @@ def restrictedaspect(atype):
 
 def aspecttype(atype):
     if atype == RegAspects:
-        return "RegAspects"
+        return "Regular"
     if atype == RegSloAspects:
-        return "RegSloAspects"
+        return "Reg Slow"
     if atype == AdvAspects:
-        return "AdvAspects"
+        return "Advance"
     if atype == SloAspects:
-        return "SloAspects"
-    return "unknown aspect type"
+        return "Slow"
+    return "unknown"
         
         
 def routetype(rtype):
