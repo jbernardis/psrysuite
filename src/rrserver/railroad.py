@@ -390,7 +390,7 @@ class Railroad():
 			tout.UpdateLockBits(release=release)
 			self.RailroadEvent(tout.GetEventMessage(lock=True))
 		
-	def SetAspect(self, signame, aspect, callon=False):
+	def SetAspect(self, signame, aspect, callon=False, aspectType=None):
 		try:
 			sig = self.signals[signame]
 		except KeyError:
@@ -398,6 +398,8 @@ class Railroad():
 			return
 		
 		aspect = sig.district.VerifyAspect(signame, aspect)	
+		if aspectType is not None:
+			sig.SetAspectType(aspectType)
 		if not sig.SetAspect(aspect):
 			return 
 		

@@ -448,8 +448,8 @@
     ],
     [
       {
-        "label": "C14.Llvr",
-        "used": true
+        "label": "(bad bit - see bit 7:1)",
+        "used": false
       },
       {
         "label": "CFleet",
@@ -520,8 +520,8 @@
         "used": true
       },
       {
-        "label": "(unused)",
-        "used": false
+        "label": "C14.Llvr",
+        "used": true
       },
       {
         "label": "(unused)",

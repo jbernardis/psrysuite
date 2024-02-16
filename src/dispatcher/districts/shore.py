@@ -39,7 +39,7 @@ class Shore (District):
 				return
 			aspect = STOP
 
-		self.frame.Request({"signal": { "name": signm, "aspect": aspect}})
+		self.frame.Request({"signal": { "name": signm, "aspect": aspect, "aspecttype": sig.GetAspectType()}})
 		sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 
 	def DoSignalAction(self, sig, aspect, callon=False):

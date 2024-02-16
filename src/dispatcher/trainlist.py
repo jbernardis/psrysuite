@@ -40,6 +40,12 @@ class ActiveTrainList:
 		if self.dlgTrainList is not None:
 			self.dlgTrainList.RemoveTrain(trid)
 			
+	def RemoveAllTrains(self):
+		self.trains = {}
+		self.RegenerateLocoMap()
+		if self.dlgTrainList is not None:
+			self.dlgTrainList.RemoveAllTrains()
+			
 	def SetLoco(self, tr, loco):
 		tr.SetLoco(loco)
 		self.RegenerateLocoMap()
@@ -217,6 +223,9 @@ class ActiveTrainsDlg(wx.Dialog):
 	def RemoveTrain(self, trid):
 		self.trCtl.RemoveTrain(trid)
 		
+	def RemoveAllTrains(self):
+		self.trCtl.RemoveAllTrains()
+		
 	def OnResize(self, evt):
 		self.resized = True
 		
@@ -231,8 +240,8 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.dlgExit()
 		
 class TrainListCtrl(wx.ListCtrl):
-	def __init__(self, parent):
-		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1266, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
+	def __init__(self, parent, height=160):
+		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1266, height), style=wx.LC_REPORT + wx.LC_VIRTUAL)
 		self.parent = parent
 		self.trains = {}
 		self.order = []
@@ -243,6 +252,11 @@ class TrainListCtrl(wx.ListCtrl):
 		self.suppressNonATC = False
 		self.suppressNonAssigned = False		
 		self.SetFont(wx.Font(wx.Font(16, wx.FONTFAMILY_ROMAN, wx.BOLD, wx.NORMAL, faceName="Arial")))
+		
+		self.normalA = wx.ItemAttr()
+		self.normalB = wx.ItemAttr()
+		self.normalA.SetBackgroundColour(wx.Colour(225, 255, 240))
+		self.normalB.SetBackgroundColour(wx.Colour(138, 255, 197))
 
 		self.InsertColumn(0, "Train")
 		self.SetColumnWidth(0, 80)
@@ -322,6 +336,12 @@ class TrainListCtrl(wx.ListCtrl):
 		self.filterTrains()	
 		self.SetItemCount(len(self.filtered))	
 		self.RefreshItems(0, len(self.filtered)-1)
+		
+	def RemoveAllTrains(self):
+		self.trains = {}
+		self.order = []
+		self.filtered = []
+		self.SetItemCount(len(self.filtered))	
 		
 	def SetSuppressYardTracks(self, flag):
 		self.suppressYards = flag
@@ -414,7 +434,7 @@ class TrainListCtrl(wx.ListCtrl):
 			return tr.GetLoco()
 		
 		elif col == 3:
-			nm = tr.GetEngineer()
+			nm = "ATC" if tr.IsOnATC() else tr.GetEngineer()
 			return "" if nm is None else nm
 		
 		elif col == 4:
@@ -441,3 +461,9 @@ class TrainListCtrl(wx.ListCtrl):
 		
 		elif col == 9:
 			return ", ".join(tr.GetBlockNameList())
+
+	def OnGetItemAttr(self, item):	
+		if item % 2 == 1:
+			return self.normalB
+		else:
+			return self.normalA

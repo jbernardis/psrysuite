@@ -34,7 +34,7 @@ class Settings:
         self.dcctty = "COM6"
         
         self.dccsniffertty = "COM4"
-
+        
         
         self.cfg = configparser.ConfigParser()
         self.cfg.optionxform = str

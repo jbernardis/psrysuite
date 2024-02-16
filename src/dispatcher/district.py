@@ -206,6 +206,7 @@ class District:
 		currentMovement = sig.GetAspect() != 0  # does the CURRENT signal status allow movement
 		signm = sig.GetName()
 		rt, osblk = self.FindRoute(sig)
+		aspectType = sig.GetAspectType()
 
 		if callon:
 			aspect = 0 if currentMovement else restrictedaspect(sig.GetAspectType())
@@ -231,7 +232,7 @@ class District:
 					return False
 				aspect = 0
 
-		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "callon": 1 if callon else 0}})
+		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "aspecttype": aspectType, "callon": 1 if callon else 0}})
 		
 		if not callon:
 			sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
@@ -352,6 +353,8 @@ class District:
 	def CheckBlockSignals(self, blkNm, sigNm, blkEast):
 		blk = self.frame.blocks[blkNm]
 		clear = not blk.IsOccupied()
+		sig = self.frame.signals[sigNm]
+		atype = sig.GetAspectType()
 			
 		east = blk.GetEast()
 
@@ -385,12 +388,14 @@ class District:
 		else:
 			aspect = 0       # stop
 		
-		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect }})
+		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect, "aspecttype": atype }})
 
 
 	def CheckBlockSignalsAdv(self, blkNm, blkNxtNm, sigNm, blkEast):
 		blk = self.frame.blocks[blkNm]
 		clear = blk.IsCleared() # is the first block cleared
+		sig = self.frame.signals[sigNm]
+		atype = sig.GetAspectType()
 					
 		# now let's look at the OS to determine if it's cleared and what type of route is set up through it
 		east = blk.GetEast()
@@ -438,7 +443,7 @@ class District:
 		else:
 			aspect = 0       # stop
 		
-		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect }})
+		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect, "aspecttype": atype }})
 
 	def GetRouteDefinitions(self):
 		return [r.GetDefinition() for r in self.frame.routes.values()]
@@ -603,6 +608,7 @@ class District:
 
 	def DoSignalAction(self, sig, aspect, callon=False):
 		signm = sig.GetName()
+		atype = sig.GetAspectType()
 		
 		if callon:
 			sig.SetAspect(aspect, refresh=True, callon=True)
@@ -629,7 +635,7 @@ class District:
 			if aspect is None:
 				aspect = sig.GetAspect()
 				
-			self.frame.Request({"signal": {"name": signm, "aspect": aspect}})
+			self.frame.Request({"signal": {"name": signm, "aspect": aspect, "aspecttype": atype}})
 
 		if sig.GetAspect() == aspect:
 			# no change necessary
@@ -738,7 +744,7 @@ class District:
 		except KeyError:
 			return
 		
-		# we're not going to change signals that ate stopped, so end this here
+		# we're not going to change signals that are stopped, so end this here
 		currentAspect = psig.GetAspect()
 		if currentAspect == 0:
 			return
@@ -750,9 +756,10 @@ class District:
 		# stop if the aspect is unchanged or can't be calculated
 		newAspect = self.CalculateAspect(psig, nb, rt, silent=True)
 		if newAspect is None or newAspect == currentAspect:
-			return 
+			return
+		aspectType = psig.GetAspectType() 
 	
-		self.frame.Request({"signal": {"name": sigNm, "aspect": newAspect, "callon": 0}})
+		self.frame.Request({"signal": {"name": sigNm, "aspect": newAspect, "aspecttype": aspectType, "callon": 0}})
 
 		if self.showaspectcalculation:		
 			self.frame.PopupEvent("Calculated new aspect for signal %s = %s" % (psig.GetName(), newAspect))		
@@ -810,6 +817,8 @@ class District:
 		sig = self.frame.signals[signm]
 		if not sig:
 			return
+		
+		aspectType = sig.GetAspectType()
 
 		if movement:
 			if callon:
@@ -821,7 +830,7 @@ class District:
 		else:
 			aspect = 0
 
-		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "callon": 1 if callon else 0}})
+		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "aspecttype": aspectType, "callon": 1 if callon else 0}})
 	
 		if not callon:
 			sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)

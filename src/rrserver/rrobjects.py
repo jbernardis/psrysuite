@@ -1,6 +1,7 @@
 import logging
 
 from rrserver.constants import INPUT_BLOCK, INPUT_BREAKER, INPUT_SIGNALLEVER, INPUT_ROUTEIN, INPUT_HANDSWITCH, INPUT_TURNOUTPOS
+from dispatcher.constants import RegAspects
 
 class Block:
     def __init__(self, name, district, node, address, east):
@@ -350,6 +351,7 @@ class Signal:
         self.node = node
         self.address = address
         self.aspect = 0
+        self.aspectType = RegAspects
         self.bits = []
         self.led = []
         self.locked = False
@@ -376,6 +378,12 @@ class Signal:
         
         self.aspect = aspect
         return True
+    
+    def SetAspectType(self, atype):
+        self.aspectType = atype
+        
+    def GetAspectType(self):
+        return self.aspectType
         
     def Aspect(self):
         return self.aspect
@@ -415,7 +423,7 @@ class Signal:
         if lock:
             return {"signallock": [{ "name": self.name, "state": 1 if self.locked else 0}]}
         else:
-            return {"signal": [{ "name": self.name, "aspect": self.aspect, "callon": 1 if callon else 0}]}
+            return {"signal": [{ "name": self.name, "aspect": self.aspect, "aspecttype": self.aspectType, "callon": 1 if callon else 0}]}
         
     def dump(self):
         addr = "None" if self.address is None else ("%x" % self.address)

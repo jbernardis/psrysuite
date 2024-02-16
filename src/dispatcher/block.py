@@ -488,7 +488,8 @@ class Block:
 		self.EvaluateStoppingSections()
 		if self.type == OVERSWITCH and self.entrySignal is not None:
 			signm = self.entrySignal.GetName()
-			self.frame.Request({"signal": { "name": signm, "aspect": STOP}})
+			atype = self.entrySignal.GetAspectType()
+			self.frame.Request({"signal": { "name": signm, "aspect": STOP, "aspecttype": atype}})
 			self.entrySignal.SetLock(self.GetName(), 0)
 
 		self.frame.DoFleetPending(self)
@@ -503,10 +504,14 @@ class Block:
 			self.sbWest.EvaluateStoppingSection()
 
 	def IdentifyTrain(self, cleared):
-		if self.type == OVERSWITCH:
-			if not cleared:
-				# should not be entering an OS block without clearance
-				return None
+		#=======================================================================
+		# uncomment the following code to not identify trains that cross into a block against the signal
+		#
+		# if self.type == OVERSWITCH:
+		# 	if not cleared:
+		# 		# should not be entering an OS block without clearance
+		# 		return None
+		#=======================================================================
 			
 		if self.east:
 			'''
@@ -735,7 +740,7 @@ class StoppingBlock (Block):
 		if flag:
 			self.frame.PopupEvent("Stop Relay: %s %s by %s" % (bname, direction, tname))
 
-		self.frame.Request({"relay": { "block": self.block.GetName(), "status": 1 if flag else 0}})
+		self.frame.Request({"relay": { "block": self.block.GetName(), "state": 1 if flag else 0}})
 
 		if tr is None:
 			self.block.DrawTrain()
@@ -994,6 +999,7 @@ class OverSwitch (Block):
 		if occupied:
 			if self.entrySignal is not None:
 				signm = self.entrySignal.GetName()
+				atype = self.entrySignal.GetAspectType()
 				if self.route:
 					exitBlkName = self.route.GetExitBlock()
 					exitBlk = self.frame.GetBlockByName(exitBlkName)
@@ -1007,7 +1013,7 @@ class OverSwitch (Block):
 				else:
 					self.entrySignal.SetFleetPending(False, self, None, None)
 				# turn the signal we just passed red, but hold onto the lock to be cleared when we exit the block
-				self.frame.Request({"signal": { "name": signm, "aspect": STOP}})
+				self.frame.Request({"signal": { "name": signm, "aspect": STOP, "aspecttype": atype}})
 				self.district.LockTurnoutsForSignal(self.GetName(), self.entrySignal, False)
 		else:
 			if self.route and self.entrySignal is not None:

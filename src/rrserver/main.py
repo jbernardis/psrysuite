@@ -46,6 +46,8 @@ from rrserver.clientlist import ClientList
 from rrserver.trainlist import TrainList
 from rrserver.dccserver import DCCHTTPServer
 
+from dispatcher.constants import RegAspects
+
 class ServerMain:
 	def __init__(self):
 		self.socketServer = None
@@ -370,12 +372,19 @@ class ServerMain:
 			aspect = None
 			logging.error("Received signal command with no aspect - ignoring (%s)" % str(cmd))
 		try:
+			aspectType = int(cmd["aspecttype"][0])
+		except KeyError:
+			aspectType = None
+		try:
 			callon = int(cmd["callon"][0]) == 1
 		except:
 			callon = False
 	
 		if aspect is not None:
-			self.rr.SetAspect(signame, aspect, callon)
+			if aspectType is not None:
+				self.rr.SetAspect(signame, aspect, callon, aspectType=aspectType)
+			else:
+				self.rr.SetAspect(signame, aspect, callon)
 
 	def DoSignalLock(self, cmd):			
 		signame = cmd["name"][0]
@@ -460,8 +469,14 @@ class ServerMain:
 		self.socketServer.sendToAll(resp)
 
 	def DoRelay(self, cmd):
-		relay = cmd["block"][0]+".srel"
-		status = int(cmd["status"][0])
+		block = cmd["block"][0]
+		relay = block + ".srel"
+		status = int(cmd["state"][0])
+		
+		resp = {"relay": [{ "name": relay, "state": status}]}
+		addrList = self.clientList.GetFunctionAddress("DISPLAY")
+		for addr, skt in addrList:
+			self.socketServer.sendToOne(skt, addr, resp)
 
 		self.rr.SetRelay(relay, status)
 		
@@ -714,6 +729,14 @@ class ServerMain:
 
 	def DoAssignTrain(self, cmd):
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
+		train = p["train"]	
+		try:
+			engineer = p["engineer"]
+		except KeyError:
+			engineer = None
+			
+		self.trainList.UpdateEngineer(train, engineer)
+		
 		resp = {"assigntrain": [p]}
 		self.socketServer.sendToAll(resp)
 		

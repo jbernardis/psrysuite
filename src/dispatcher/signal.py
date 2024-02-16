@@ -121,7 +121,7 @@ class Signal:
 		if not callon:
 			if aspect != 0:
 				for signm in self.mutex:
-					self.frame.Request({"signal": {"name": signm, "aspect": 0, "callon": 0}})
+					self.frame.Request({"signal": {"name": signm, "aspect": 0, "aspecttype": self.aspectType, "callon": 0}})
 
 		if refresh:
 			self.Draw()
@@ -148,7 +148,7 @@ class Signal:
 		if self.aspect != 0:
 			return # it's already been taken for other purposes - do nothing
 		
-		self.frame.Request({"signal": { "name": self.GetName(), "aspect": newAspect }})
+		self.frame.Request({"signal": { "name": self.GetName(), "aspect": newAspect, "aspecttype": self.aspectType }})
 
 	def SetGuardBlock(self, blk):
 		self.guardBlock = blk

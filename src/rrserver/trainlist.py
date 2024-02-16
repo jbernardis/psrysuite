@@ -1,5 +1,6 @@
 import logging
 import json
+from tracker import engineers
 
 class TrainList:
 	def __init__(self, parent):
@@ -55,6 +56,12 @@ class TrainList:
 		
 		self.trains[train]["signal"] = signal
 		self.trains[train]["aspect"] = int(aspect)
+				
+	def UpdateEngineer(self, train, engineer):
+		if train not in self.trains:
+			return 
+		
+		self.trains[train]["engineer"] = engineer
 		
 
 	def FindTrainInBlock(self, block):
@@ -132,5 +139,16 @@ class TrainList:
 					clist.append({"block": b, "name": tr, "loco": loco, "atc": atc, "east": east, "nameonly": nameflag})
 				yield({"settrain": clist})
 				yield({"trainsignal": {"train": tr, "block": frontblock, "signal": signal, "aspect": aspect}})
+				
+				try:
+					eng = trinfo["engineer"]
+				except KeyError:
+					eng = None
+					
+				p = {"train": tr, "reassign": 0}
+				if eng is not None:
+					p["engineer"] = eng
+				
+				yield({"assigntrain": [p]})
 				
 				

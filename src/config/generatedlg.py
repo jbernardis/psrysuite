@@ -55,6 +55,10 @@ class GenerateDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnBGenTracker, self.bGenTracker)
         vsz.Add(self.bGenTracker, 0, wx.ALL, 10)
                     
+        self.bGenActive = wx.Button(genBox, wx.ID_ANY, "Active Trains", size=GENBTNSZ)
+        self.Bind(wx.EVT_BUTTON, self.OnBGenActive, self.bGenActive)
+        vsz.Add(self.bGenActive, 0, wx.ALL, 10)
+                    
         self.bGenEditor = wx.Button(genBox, wx.ID_ANY, "Train Editor", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenEditor, self.bGenEditor)
         vsz.Add(self.bGenEditor, 0, wx.ALL, 10)
@@ -236,6 +240,16 @@ class GenerateDlg(wx.Dialog):
             "dir":  "tracker",
             "main": "traintracker.py",
             "desc": "Tracker",
+            "icon": "tracker.ico"
+        }
+        self.generator(module, self.cbStartMenu.IsChecked())
+
+    def OnBGenActive(self, _):
+        module = {
+            "name": "PSRY Active Trains",
+            "dir":  "activetrains",
+            "main": "main.py",
+            "desc": "Active Trains",
             "icon": "tracker.ico"
         }
         self.generator(module, self.cbStartMenu.IsChecked())
