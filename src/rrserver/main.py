@@ -374,6 +374,7 @@ class ServerMain:
 		try:
 			aspectType = int(cmd["aspecttype"][0])
 		except KeyError:
+			logging.info("Received signal command with no aspecttype - assuming regular aspects (%s)" % str(cmd))
 			aspectType = None
 		try:
 			callon = int(cmd["callon"][0]) == 1

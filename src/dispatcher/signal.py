@@ -121,7 +121,12 @@ class Signal:
 		if not callon:
 			if aspect != 0:
 				for signm in self.mutex:
-					self.frame.Request({"signal": {"name": signm, "aspect": 0, "aspecttype": self.aspectType, "callon": 0}})
+					try:
+						msig = self.frame.signals[signm]
+						atype = msig.GetAspectType()
+					except KeyError:
+						atype = self.aspectType
+					self.frame.Request({"signal": {"name": signm, "aspect": 0, "aspecttype": atype, "callon": 0}})
 
 		if refresh:
 			self.Draw()
@@ -147,7 +152,7 @@ class Signal:
 	def DoFleeting(self, newAspect):
 		if self.aspect != 0:
 			return # it's already been taken for other purposes - do nothing
-		
+	
 		self.frame.Request({"signal": { "name": self.GetName(), "aspect": newAspect, "aspecttype": self.aspectType }})
 
 	def SetGuardBlock(self, blk):

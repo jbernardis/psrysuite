@@ -2060,7 +2060,9 @@ class MainFrame(wx.Frame):
 				
 			self.RetrieveData()
 			#self.districts.Initialize()
-			self.SendControlValues()
+			if self.IsDispatcher():
+				self.SendControlValues()
+				self.SendSignals()
 
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()
@@ -2086,6 +2088,10 @@ class MainFrame(wx.Frame):
 			engineers = []
 			
 		self.engineerList = engineers
+		
+	def SendSignals(self):
+		for signm, sig in self.signals.items():
+			self.Request({"signal": {"name": signm, "aspect": sig.GetAspect(), "aspecttype": sig.GetAspectType(), "callon": 0}})
 
 	def OnRefresh(self, _):
 		if not self.IsDispatcher():
