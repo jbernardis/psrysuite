@@ -59,7 +59,7 @@ class GenerateDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnBGenActive, self.bGenActive)
         vsz.Add(self.bGenActive, 0, wx.ALL, 10)
                     
-        self.bGenEditor = wx.Button(genBox, wx.ID_ANY, "Train Editor", size=GENBTNSZ)
+        self.bGenEditor = wx.Button(genBox, wx.ID_ANY, "Database Editor", size=GENBTNSZ)
         self.Bind(wx.EVT_BUTTON, self.OnBGenEditor, self.bGenEditor)
         vsz.Add(self.bGenEditor, 0, wx.ALL, 10)
                     
@@ -206,10 +206,10 @@ class GenerateDlg(wx.Dialog):
         
     def OnBGenEditor(self, _):
         module = {
-            "name": "PSRY Train Editor",
+            "name": "PSRY Database Editor",
             "dir":  "traineditor",
             "main": "main.py",
-            "desc": "Train Editor",
+            "desc": "Train/Locomotive/Engineer Editor",
             "icon": "editor.ico"
         }
         self.generator(module, self.cbStartMenu.IsChecked())

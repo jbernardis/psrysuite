@@ -1,4 +1,5 @@
-from dispatcher.constants import STOP, aspectname, aspecttype
+from dispatcher.constants import STOP, aspectname, aspecttype, aspectprofileindex
+
 
 
 class Signal:
@@ -66,6 +67,9 @@ class Signal:
 	
 	def GetAspectName(self):
 		return "%s (%s)" % (aspectname(self.aspect, self.aspectType), aspecttype(self.aspectType))
+	
+	def GetAspectProfileIndex(self):
+		return aspectprofileindex(self.aspect, self.aspectType)
 
 	def GetPos(self):
 		return self.pos

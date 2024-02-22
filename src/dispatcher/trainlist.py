@@ -8,6 +8,8 @@ YardBlocks = [
 	"P1", "P2", "P3", "P4", "P5", "P6", "P7",
 	"Y50", "Y51", "Y52", "Y53", "Y81", "Y82", "Y83", "Y84" ]
 
+profileIndex = ["stop", "slow", "medium", "fast"]
+
 class ActiveTrainList:
 	def __init__(self):
 		self.trains = {}
@@ -179,6 +181,9 @@ class ActiveTrainsDlg(wx.Dialog):
 		blk = tr.FrontBlock()
 		self.parent.EditTrain(tr, blk)
 		
+	def GetLocoInfo(self, loco):
+		return self.parent.GetLocoInfo(loco)
+		
 	def OnSuppressYard(self, _):
 		self.suppressYards = self.cbYardTracks.GetValue()
 		self.trCtl.SetSuppressYardTracks(self.suppressYards)
@@ -241,7 +246,7 @@ class ActiveTrainsDlg(wx.Dialog):
 		
 class TrainListCtrl(wx.ListCtrl):
 	def __init__(self, parent, height=160):
-		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1266, height), style=wx.LC_REPORT + wx.LC_VIRTUAL)
+		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1286, height), style=wx.LC_REPORT + wx.LC_VIRTUAL)
 		self.parent = parent
 		self.trains = {}
 		self.order = []
@@ -259,7 +264,7 @@ class TrainListCtrl(wx.ListCtrl):
 		self.normalB.SetBackgroundColour(wx.Colour(138, 255, 197))
 
 		self.InsertColumn(0, "Train")
-		self.SetColumnWidth(0, 80)
+		self.SetColumnWidth(0, 100)
 		self.InsertColumn(1, "E/W")
 		self.SetColumnWidth(1, 56)
 		self.InsertColumn(2, "Loco")
@@ -282,7 +287,7 @@ class TrainListCtrl(wx.ListCtrl):
 		
 	def ChangeSize(self, sz):
 		self.SetSize(sz[0]-56, sz[1]-84)
-		self.SetColumnWidth(9, sz[0]-866)
+		self.SetColumnWidth(9, sz[0]-886)
 		
 	def AddTrain(self, tr):
 		nm = tr.GetName()
@@ -380,9 +385,16 @@ class TrainListCtrl(wx.ListCtrl):
 			
 	def filterTrains(self):
 		self.filtered = []
-		for trid in sorted(self.order):
+		for trid in sorted(self.order, key=self.BuildTrainKey):
 			if not self.suppressed(trid):
 				self.filtered.append(trid)
+				
+	def BuildTrainKey(self, trid):
+		if trid.startswith("??"):
+			return "ZZ%s" % trid
+		else:
+			return "AA%s" % trid
+
 				
 	def suppressed(self, trid):
 		tr = self.trains[trid]
@@ -457,7 +469,28 @@ class TrainListCtrl(wx.ListCtrl):
 		
 		elif col == 8:
 			throttle = tr.GetThrottle()
-			return throttle
+			if throttle is None:
+				throttle = ""
+				
+			if throttle == "":
+				throttle = "<>"
+			
+			sig, aspect = tr.GetSignal()
+			if sig is None or aspect is None:
+				throttlelimit = 0
+			else:
+				throttlelimit = sig.GetAspectProfileIndex()
+			loco =  tr.GetLoco()
+			locoinfo = self.parent.GetLocoInfo(loco)
+			if locoinfo is None:
+				limit = 0
+			else:
+				try:
+					limit = locoinfo["prof"][profileIndex[throttlelimit]]
+				except (IndexError, KeyError):
+					limit = 0
+
+			return "%s - %d" % (throttle, limit)
 		
 		elif col == 9:
 			return ", ".join(tr.GetBlockNameList())

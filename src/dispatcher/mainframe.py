@@ -1893,10 +1893,11 @@ class MainFrame(wx.Frame):
 		self.advice.SetTextColour(wx.Colour(0, 0, 0))
 
 	def PopupEvent(self, message):
-		self.events.Append(message)
-		self.eventsList.append(message)
-		if self.dlgEvents is not None:
-			self.dlgEvents.AddItem(message)
+		if self.IsDispatcher() or self.settings.showevents:
+			self.events.Append(message)
+			self.eventsList.append(message)
+			if self.dlgEvents is not None:
+				self.dlgEvents.AddItem(message)
 		
 	def OnBEventsLog(self, _):
 		if self.dlgEvents is None:
@@ -1911,10 +1912,11 @@ class MainFrame(wx.Frame):
 		self.dlgEvents = None
 
 	def PopupAdvice(self, message):
-		self.advice.Append(message)
-		self.adviceList.append(message)
-		if self.dlgAdvice is not None:
-			self.dlgAdvice.AddItem(message)
+		if self.IsDispatcher() or self.settings.showadvice:
+			self.advice.Append(message)
+			self.adviceList.append(message)
+			if self.dlgAdvice is not None:
+				self.dlgAdvice.AddItem(message)
 		
 	def OnBAdviceLog(self, _):
 		if self.dlgAdvice is None:
@@ -2088,6 +2090,12 @@ class MainFrame(wx.Frame):
 			engineers = []
 			
 		self.engineerList = engineers
+		
+	def GetLocoInfo(self, loco):
+		try:
+			return self.locoList[loco]
+		except KeyError:
+			return None
 		
 	def SendSignals(self):
 		for signm, sig in self.signals.items():
@@ -2565,11 +2573,11 @@ class MainFrame(wx.Frame):
 				
 			tr.SetEngineer(engineer)
 			self.activeTrains.UpdateTrain(train)
-			
-			if reassigned:
-				self.PopupAdvice("Train %s has been reassigned to %s" % (train, engineer))
-			else:
-				self.PopupAdvice("Train %s has been assigned to %s" % (train, engineer))
+			#
+			# if reassigned:
+			# 	self.PopupAdvice("Train %s has been reassigned to %s" % (train, engineer))
+			# else:
+			# 	self.PopupAdvice("Train %s has been assigned to %s" % (train, engineer))
 				
 			tr.Draw()
 	

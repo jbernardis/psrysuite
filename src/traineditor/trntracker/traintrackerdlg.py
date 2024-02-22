@@ -476,7 +476,7 @@ class TrainTrackerDlg(wx.Dialog):
 
 	def bRevertPressed(self, _):
 		if self.modified:
-			dlg = wx.MessageDialog(self, "The current train roster has been modified but not saved.\nPress \"Yes\" to continue, or\n\Press \"No\" to cancel and save changes", 
+			dlg = wx.MessageDialog(self, "The current train roster has been modified but not saved.\nPress \"Yes\" to continue, or\nPress \"No\" to cancel and save changes", 
 					"Confirm loss of changes", wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
 			rc = dlg.ShowModal()
 		

@@ -29,13 +29,35 @@ Medium Approach   = Red/Flashing Yellow 101
 Slow Approach and                       100
 Restricting       = Flashing Red/Red(Red/Yellow)
 
-Everything seems to be OK now - maybe one here or there that's wrong, but largely correct
+show events/advice should allow for locale (Port vs Cliff vs Yard, etc)
+notes regarding locale:
+	Port locale, Yard locale, Cliff Locale, and then Everywhere else
+	allow for global on/off, and if on, allow for a locale
+	
+	popupAdvice:
+		dispatcher/mainframe 7 occurrences
+		
+	popupEvent:
+		dispatcher/districts:
+			bank 3
+			cliff 3
+			cliveden 3
+			latham 1
+			nassau 4
+			shore 1
+			yard 2
+		dispatcher:
+			block 2
+			district 23
+			mainframe 30
+			signal 1
+			
+			
+add fields to active train list: time since assigned, stopped > 5 minutes
+add new circus junction to display and update track diagram to include new track
 
-get signal bridge at east end junction working
+edit trains from active trains display process
 
-
-ability to suppress specific trains from active train display	
-
-make sure speed detection is working and that active trains and tracker are both updated properly
+work aspecttype into atc and use to set speed limits
 
 when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)

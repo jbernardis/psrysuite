@@ -11,7 +11,7 @@ from dispatcher.train import Train
 from activetrains.trainlist import ActiveTrainList
 from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
-from dispatcher.constants import aspectname, aspecttype, RegAspects
+from dispatcher.constants import aspectname, aspecttype, aspectprofileindex, RegAspects
 
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
@@ -59,6 +59,9 @@ class Signal:
 		
 	def SetAspectType(self, atype):
 		self.aspectType = atype
+	
+	def GetAspectProfileIndex(self):
+		return aspectprofileindex(self.aspect, self.aspectType)
 		
 	def GetAspectType(self):
 		return self.aspectType
@@ -95,10 +98,14 @@ class MainFrame(wx.Frame):
 
 			
 		logging.info("active train list process starting")
+		icon = wx.Icon()
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "dispatch.ico"), wx.BITMAP_TYPE_ANY))
+		self.SetIcon(icon)
+		
+		self.pngPSRY = wx.Image(os.path.join(os.getcwd(), "images", "PSLogo_mid.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+		mask = wx.Mask(self.pngPSRY, wx.BLUE)
+		self.pngPSRY.SetMask(mask)
 
-  # icon = wx.Icon()
-  # icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "dispatch.ico"), wx.BITMAP_TYPE_ANY))
-  # self.SetIcon(icon)
 
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.trains = {}
@@ -116,9 +123,15 @@ class MainFrame(wx.Frame):
 		
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20) 
-		hsz.Add(self.bSubscribe)
-		hsz.AddSpacer(100)
-		hsz.Add(self.bRefresh) 
+		hsz.Add(self.bSubscribe, 0, wx.ALIGN_CENTER_VERTICAL)
+		hsz.AddSpacer(30)
+		
+		b = wx.StaticBitmap(self, wx.ID_ANY, self.pngPSRY)
+		hsz.Add(b, 0, wx.ALIGN_CENTER_VERTICAL)
+		
+		hsz.AddSpacer(30)
+
+		hsz.Add(self.bRefresh, 0, wx.ALIGN_CENTER_VERTICAL) 
 		hsz.AddSpacer(20)
 		
 		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
@@ -189,7 +202,12 @@ class MainFrame(wx.Frame):
 		dlg = DescriptionDlg(self, tr.GetName(), desc)
 		dlg.ShowModal()
 		dlg.Destroy()
-
+		
+	def GetLocoInfo(self, loco):
+		try:
+			return self.locoList[loco]
+		except KeyError:
+			return None
 
 	def splash(self):
 		splashExec = os.path.join(os.getcwd(), "splash", "main.py")
@@ -251,6 +269,8 @@ class MainFrame(wx.Frame):
 			locos = {}
 			
 		self.locoList = locos
+		for l, li in locos.items():
+			print("%s: %s" % (l, li))
 
 		trains = self.Get("gettrains", {})
 		if trains is None:
@@ -384,10 +404,6 @@ class MainFrame(wx.Frame):
 						self.activeTrains.UpdateTrain(tr.GetName())
 						if tr.IsInNoBlocks():
 							trid = tr.GetName()
-							if not tr.IsBeingEdited():
-								self.PopupEvent("Train %s - detection lost from block %s" % (trid, block))
-							else:
-								tr.SetBeingEdited(False)
 							try:
 								self.activeTrains.RemoveTrain(trid)
 								del(self.trains[trid])
@@ -404,8 +420,6 @@ class MainFrame(wx.Frame):
 								delList.append([trid, tr])
 
 					for trid, tr in delList:
-						if not tr.IsBeingEdited():
-							self.PopupEvent("Train %s - detection lost from block %s" % (trid, block))
 						try:
 							self.activeTrains.RemoveTrain(trid)
 							del(self.trains[trid])
@@ -422,7 +436,7 @@ class MainFrame(wx.Frame):
 						if name in self.trains:
 							# merge the two trains under the new "name"
 							if not oldName.startswith("??"):
-								pass #self.PopupEvent("Merging train %s => %s block %s" % (oldName, name, blk.GetName))
+								pass
 
 							try:
 								bl = self.trains[oldName].GetBlockList()

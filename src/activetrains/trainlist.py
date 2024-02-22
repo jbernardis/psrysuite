@@ -161,6 +161,9 @@ class ActiveTrainsPanel(wx.Panel):
 		tr = self.trCtl.GetActiveTrain(evt.Index)
 		self.parent.TrainSelected(tr)
 		
+	def GetLocoInfo(self, loco):
+		return self.parent.GetLocoInfo(loco)
+		
 	def OnSuppressYard(self, _):
 		self.suppressYards = self.cbYardTracks.GetValue()
 		self.trCtl.SetSuppressYardTracks(self.suppressYards)
