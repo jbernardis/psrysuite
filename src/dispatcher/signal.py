@@ -78,6 +78,9 @@ class Signal:
 		return self.east
 
 	def Draw(self):
+		if self.tiles is None:
+			return 
+		
 		bmp = self.tiles.getBmp(self)
 		self.frame.DrawTile(self.screen, self.pos, bmp) 
 

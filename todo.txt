@@ -56,8 +56,6 @@ notes regarding locale:
 add fields to active train list: time since assigned, stopped > 5 minutes
 add new circus junction to display and update track diagram to include new track
 
-edit trains from active trains display process
-
 work aspecttype into atc and use to set speed limits
 
 when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)

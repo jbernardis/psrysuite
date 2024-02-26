@@ -5,7 +5,7 @@ from dispatcher.turnout import Turnout, SlipSwitch
 from dispatcher.signal import Signal
 from dispatcher.button import Button
 
-from dispatcher.constants import LaKr, SloAspects, SLOW, RESTRICTING, SLIPSWITCH, NORMAL, REVERSE, RegAspects, EMPTY
+from dispatcher.constants import LaKr, SloAspects, SLOW, RESTRICTING, SLIPSWITCH, NORMAL, REVERSE, RegAspects, AdvAspects, EMPTY
 
 
 class Nassau (District):
@@ -1044,7 +1044,9 @@ class Nassau (District):
 			[ "N14LB",SloAspects, False,   "left", (20, 14) ],
 			[ "N14LC",SloAspects, False,   "left", (20, 16) ],
 			[ "N14LD",SloAspects, False,   "left", (21, 18) ],
-
+			
+			[ "N11W", RegAspects, False,   "leftlong", (3, 16)],
+			[ "N21W", RegAspects, False,   "leftlong", (3, 18)],
 
 			[ "N28R", SloAspects, True,    "right", (32, 6) ],
 
@@ -1059,11 +1061,13 @@ class Nassau (District):
 
 			[ "N28L", SloAspects, False,   "leftlong", (44, 8) ],
 			[ "N26L", SloAspects, False,   "leftlong", (44, 10) ],
-			[ "N24L", SloAspects, False,   "left", (44, 12) ]
+			[ "N24L", SloAspects, False,   "left", (44, 12) ],
+			
+			[ "B20E", AdvAspects, True,    "rightlong", (48, 16) ]
 		]
 
 		for signm, atype, east, tileSet, pos in sigList:
-			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
+			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, None if tileSet is None else self.sigtiles[tileSet])
 
 		sigs = [ "N14LA", "N14LB", "N14LC", "N14LD" ]
 		for s in sigs:

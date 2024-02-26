@@ -352,16 +352,15 @@ class District:
 
 	def CheckBlockSignals(self, blkNm, sigNm, blkEast):
 		blk = self.frame.blocks[blkNm]
-		clear = not blk.IsOccupied()
+		clear = blk.IsCleared()
 		sig = self.frame.signals[sigNm]
 		atype = sig.GetAspectType()
-			
-		east = blk.GetEast()
 
+		east = blk.GetEast()
 		if east == blkEast:		
-			blkNxt = blk.blkEast
+			blkNxt = blk.blkEast if blkEast else blk.blkWest
 		else:
-			blkNxt = blk.blkWest
+			blkNxt = blk.blkWest if blkEast else blk.blkEast
 		
 		if blkNxt is None:
 			nxtclr = False
@@ -387,8 +386,9 @@ class District:
 			aspect = 0b001   # approach
 		else:
 			aspect = 0       # stop
-		
-		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect, "aspecttype": atype }})
+
+		if sig.SetAspect(aspect, refresh = True, callon = False):
+			self.frame.Request({"signal": { "name": sigNm, "aspect": aspect, "aspecttype": atype }})
 
 
 	def CheckBlockSignalsAdv(self, blkNm, blkNxtNm, sigNm, blkEast):
@@ -401,16 +401,16 @@ class District:
 		east = blk.GetEast()
 		
 		if east == blkEast:		
-			blkNxt = blk.blkEast
+			blkNxt = blk.blkEast if blkEast else blk.blkWest
 		else:
-			blkNxt = blk.blkWest
-		
+			blkNxt = blk.blkWest if blkEast else blk.blkEast
+				
 		if blkNxt is None:
 			nxtclr = False
 			nxtrte = None
 		
 		else:	
-			nxtclr = blkNxt.IsCleared()		
+			nxtclr = blkNxt.IsCleared()	
 			rt = blkNxt.GetRoute()
 			if rt is None:
 				nxtrte = None
@@ -429,6 +429,7 @@ class District:
 				nxtclradv = False
 			else:
 				nxtclradv = blknxt.IsCleared()
+				print("%s cleared: %s" % (blknxt.GetName(), nxtclradv))
 		
 		if east != blkEast or nxtEast != blkEast:
 			aspect = 0	# blocks going in opposite directions - just stop
@@ -443,7 +444,8 @@ class District:
 		else:
 			aspect = 0       # stop
 		
-		self.frame.Request({"signal": { "name": sigNm, "aspect": aspect, "aspecttype": atype }})
+		if sig.SetAspect(aspect, refresh=True, callon = False):
+			self.frame.Request({"signal": { "name": sigNm, "aspect": aspect, "aspecttype": atype }})
 
 	def GetRouteDefinitions(self):
 		return [r.GetDefinition() for r in self.frame.routes.values()]

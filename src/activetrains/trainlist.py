@@ -111,7 +111,7 @@ class ActiveTrainsPanel(wx.Panel):
 		
 		hsz.AddSpacer(30)
 		
-		self.cbUnknown = wx.CheckBox(self, wx.ID_ANY, "Suppress Unknown Trains")
+		self.cbUnknown = wx.CheckBox(self, wx.ID_ANY, "Show Only Known Trains")
 		self.cbUnknown.SetValue(self.suppressUnknown)
 		self.Bind(wx.EVT_CHECKBOX, self.OnSuppressUnknown, self.cbUnknown)
 		hsz.Add(self.cbUnknown)
@@ -154,6 +154,23 @@ class ActiveTrainsPanel(wx.Panel):
 		self.trCtl.SetSuppressNonATC(self.suppressNonATC)
 		self.trCtl.SetSuppressNonAssigned(self.suppressNonAssigned)
 		self.trCtl.SetSuppressNonAssignedAndKnown(self.suppressNonAssignedAndKnown)
+	
+		if self.suppressNonAssignedAndKnown:
+			self.cbAssignedOnly.Enable(False)
+			self.cbUnknown.Enable(False)
+			self.cbATCOnly.Enable(False)
+		elif self.suppressNonAssigned:
+			self.cbAssignedOrUnknown.Enable(False)
+			self.cbUnknown.Enable(False)
+			self.cbATCOnly.Enable(False)
+		elif self.suppressUnknown:
+			self.cbAssignedOrUnknown.Enable(False)
+			self.cbAssignedOnly.Enable(False)
+			self.cbATCOnly.Enable(False)
+		elif self.suppressNonATC:
+			self.cbAssignedOrUnknown.Enable(False)
+			self.cbAssignedOnly.Enable(False)
+			self.cbUnknown.Enable(False)
 
 		self.SetSizer(vsz)
 		
@@ -169,8 +186,12 @@ class ActiveTrainsPanel(wx.Panel):
 		self.trCtl.SetSuppressYardTracks(self.suppressYards)
 		
 	def OnSuppressNonATC(self, _):
-		self.suppressNonATC = self.cbATCOnly.GetValue()
+		flag = self.cbATCOnly.GetValue()
+		self.suppressNonATC = flag
 		self.trCtl.SetSuppressNonATC(self.suppressNonATC)
+		self.cbUnknown.Enable(not flag)
+		self.cbAssignedOrUnknown.Enable(not flag)
+		self.cbAssignedOnly.Enable(not flag)
 
 	def OnSuppressNonAssignedAndKnown(self, _):
 		flag = self.cbAssignedOrUnknown.GetValue()
@@ -178,6 +199,7 @@ class ActiveTrainsPanel(wx.Panel):
 		self.trCtl.SetSuppressNonAssignedAndKnown(self.suppressNonAssignedAndKnown)
 		self.cbUnknown.Enable(not flag)
 		self.cbAssignedOnly.Enable(not flag)
+		self.cbATCOnly.Enable(not flag)
 		
 	def OnSuppressUnknown(self, _):
 		flag = self.cbUnknown.GetValue()
@@ -185,6 +207,7 @@ class ActiveTrainsPanel(wx.Panel):
 		self.trCtl.SetSuppressUnknown(self.suppressUnknown)
 		self.cbAssignedOrUnknown.Enable(not flag)
 		self.cbAssignedOnly.Enable(not flag)
+		self.cbATCOnly.Enable(not flag)
 		
 	def OnSuppressNonAssigned(self, _):
 		flag = self.cbAssignedOnly.GetValue()
@@ -192,6 +215,7 @@ class ActiveTrainsPanel(wx.Panel):
 		self.trCtl.SetSuppressNonAssigned(self.suppressNonAssigned)
 		self.cbAssignedOrUnknown.Enable(not flag)
 		self.cbUnknown.Enable(not flag)
+		self.cbATCOnly.Enable(not flag)
 				
 	def AddTrain(self, tr):
 		self.trCtl.AddTrain(tr)

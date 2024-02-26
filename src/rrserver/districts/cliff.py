@@ -147,9 +147,9 @@ class Cliff(District):
 			self.rr.AddSignalLever("C14", self, n, addr, [(4, 6), (4, 7), (7, 1)])
 			self.rr.AddSignalLever("C18", self, n, addr, [(5, 2), (5, 3), (5, 4)])
 			self.rr.AddSignalLever("C22", self, n, addr, [(5, 5), (5, 6), (5, 7)])
+			self.rr.AddSignalLever("C24", self, n, addr, [(6, 0), (6, 1), (6, 2)])
 			
 			#===================================================================
-			# self.rr.AddSignalLever("C24", self, n, addr, [(6, 2), (6, 1), (6, 0)])
 			# self.rr.AddSignalLever("C2",  self, n, addr, [(2, 6), (2, 5), (2, 4)])
 			# self.rr.AddSignalLever("C4",  self, n, addr, [(3, 1), (3, 0), (2, 7)])
 			# self.rr.AddSignalLever("C6",  self, n, addr, [(3, 4), (3, 3), (3, 2)])

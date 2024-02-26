@@ -251,6 +251,10 @@ class MainFrame(wx.Frame):
 				logging.error("Unable to establish connection with server")
 				print("Unable to establish connection with server")
 				self.listener = None
+				
+				dlg = wx.MessageDialog(self, 'Unable to connect to server', 'Unable to Connect', wx.OK | wx.ICON_ERROR)
+				dlg.ShowModal()
+				dlg.Destroy()
 				return
 
 			self.listener.start()

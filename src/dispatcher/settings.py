@@ -76,21 +76,6 @@ class Settings:
 				elif opt == 'precheckshutdownserver':
 					self.precheckshutdownserver = parseBoolean(value, True)
 
-				elif opt == 'activesuppressyards':
-					self.activesuppressyards = parseBoolean(value, True)
-
-				elif opt == 'activesuppressunknown':
-					self.activesuppressunknown = parseBoolean(value, False)
-
-				elif opt == 'activeonlysassignedorunknown':
-					self.activeonlyassignedorunknown = parseBoolean(value, False)
-
-				elif opt == 'activeonlysassigned':
-					self.activeonlyassigned = parseBoolean(value, False)
-
-				elif opt == 'activeonlyatc':
-					self.activeonlyatc = parseBoolean(value, False)
-
 				elif opt == 'showcameras':
 					self.showcameras = parseBoolean(value, False)
 					
@@ -122,6 +107,48 @@ class Settings:
 					self.showevents = parseBoolean(value, False)
 				elif opt == 'showadvice':
 					self.showadvice = parseBoolean(value, False)
+
+		section = "activetrains"           
+		if self.cfg.has_section(section):
+			for opt, value in self.cfg.items(section):
+					if opt == 'lines':
+						self.activetrainlines = int(value)
+					elif opt == 'activesuppressyards':
+						self.activesuppressyards = parseBoolean(value, True)
+	
+					elif opt == 'activesuppressunknown':
+						self.activesuppressunknown = parseBoolean(value, False)
+	
+					elif opt == 'activeonlysassignedorunknown':
+						self.activeonlyassignedorunknown = parseBoolean(value, False)
+	
+					elif opt == 'activeonlysassigned':
+						self.activeonlyassigned = parseBoolean(value, False)
+	
+					elif opt == 'activeonlyatc':
+						self.activeonlyatc = parseBoolean(value, False)		
+		else:
+			print("Missing %s section - assuming defaults" % section)
+
+		"""
+		verify mutual exclusion of active train options
+		"""
+		ct = 0
+		ct += 1 if self.activesuppressunknown else 0
+		ct += 1 if self.activeonlyassignedorunknown else 0
+		ct += 1 if self.activeonlyassigned else 0
+		ct += 1 if self.activeonlyatc else 0
+		if ct > 1:
+			if self.activeonlyassignedorunknown:
+				self.activesuppressunknown = False
+				self.activeonlyassigned = False
+				self.activeonlyatc = False
+			elif self.activeonlyassigned:
+				self.activesuppressunknown = False
+				self.activeonlyatc = False
+			elif self.activesuppressunknown:
+				self.activeonlyatc = False				
+				
 			
 		if self.cfg.has_section("debug"):
 			for opt, value in self.cfg.items("debug"):
