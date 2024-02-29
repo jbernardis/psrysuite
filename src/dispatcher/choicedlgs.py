@@ -426,6 +426,7 @@ class ChooseSnapshotActionDlg(wx.Dialog):
         self.SetSizer(vszr)
         self.Layout()
         self.Fit();
+        self.CenterOnScreen()
         
     def OnBSave(self, _):
         self.EndModal(wx.ID_SAVE)

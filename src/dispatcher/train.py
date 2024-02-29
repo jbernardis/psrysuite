@@ -122,7 +122,7 @@ class Train:
 		self.aspect = sig.GetAspect()
 	
 	def GetSignal(self):
-		return self.signal, self.aspect
+		return self.signal, self.aspect, None if self.signal is None else self.signal.GetFrozenAspect()
 	
 	def SetThrottle(self, speed, speedtype):
 		self.throttle = formatThrottle(speed, speedtype)

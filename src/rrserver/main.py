@@ -7,13 +7,31 @@ lfn = os.path.join(os.getcwd(), "logs", "rrserver.log")
 
 import logging
 import logging.handlers
+from rrserver.settings import Settings
 should_roll_over = os.path.isfile(lfn)
+
+settings = Settings()
+
+logLevels = {
+	"DEBUG":	logging.DEBUG,
+	"INFO":		logging.INFO,
+	"WARNING":	logging.WARNING,
+	"ERROR":	logging.ERROR,
+	"CRITICAL":	logging.CRITICAL,
+}
+
+l = settings.debug.loglevel
+if l not in logLevels:
+	print("unknown logging level: %s.  Defaulting to DEBUG" % l, file=sys.stderr)
+	l = "DEBUG"
+	
+loglevel = logLevels[l]
 
 handler = logging.handlers.RotatingFileHandler(lfn, mode='a', backupCount=5)
 
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG, handlers=[handler])
+logging.basicConfig(format='%(asctime)s %(message)s', level=loglevel, handlers=[handler])
 console = logging.StreamHandler()
-console.setLevel(logging.DEBUG)
+console.setLevel(loglevel)
 formatter = logging.Formatter('%(asctime)s: %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
@@ -35,7 +53,6 @@ import threading
 
 from subprocess import Popen
 
-from rrserver.settings import Settings
 from rrserver.bus import Bus
 from rrserver.railroad import Railroad
 from rrserver.httpserver import HTTPServer
@@ -53,9 +70,7 @@ class ServerMain:
 		self.socketServer = None
 		self.dispServer = None
 		
-		self.settings = Settings()
-		
-		logging.info("PSRY Suite - Railroad server starting %s" % ("" if not self.settings.simulation else " - simulation mode"))
+		logging.info("PSRY Suite - Railroad server starting %s" % ("" if not settings.simulation else " - simulation mode"))
 		logging.info("Sending logging output  to %s" % lfn)
 		
 		self.commandsSeen = []
@@ -78,13 +93,13 @@ class ServerMain:
 		self.clients = {}
 
 		
-		if self.settings.ipaddr is not None:
-			if self.ip != self.settings.ipaddr:
-				logging.info("Using configured IP Address (%s) instead of retrieved IP Address: (%s)" % (self.settings.ipaddr, self.ip))
-				self.ip = self.settings.ipaddr
+		if settings.ipaddr is not None:
+			if self.ip != settings.ipaddr:
+				logging.info("Using configured IP Address (%s) instead of retrieved IP Address: (%s)" % (settings.ipaddr, self.ip))
+				self.ip = settings.ipaddr
 
 		logging.info("Creating railroad object")
-		self.rr = Railroad(self, self.rrEventReceipt, self.settings)
+		self.rr = Railroad(self, self.rrEventReceipt, settings)
 		self.clientList = ClientList(self)
 		self.trainList = TrainList(self)
 		
@@ -93,20 +108,20 @@ class ServerMain:
 	def Initialize(self):
 		self.CreateDispatchTable()
 		try:
-			self.dispServer = HTTPServer(self.ip, self.settings.serverport, self.dispCommandReceipt, self, self.rr)
+			self.dispServer = HTTPServer(self.ip, settings.serverport, self.dispCommandReceipt, self, self.rr)
 		except Exception as e:
 			logging.error("Unable to Create HTTP server for IP address %s (%s)" % (self.ip, str(e)))
 			self.Shutdown()
 			
 		logging.info("HTTP Server created")
 
-		logging.info("Starting Socket server at address: %s:%d" % (self.ip, self.settings.socketport))
-		self.socketServer = SktServer(self.ip, self.settings.socketport, self.socketEventReceipt)
+		logging.info("Starting Socket server at address: %s:%d" % (self.ip, settings.socketport))
+		self.socketServer = SktServer(self.ip, settings.socketport, self.socketEventReceipt)
 		self.socketServer.start()
 		
 		logging.info("socket server started - starting DCC HTTP Server")
 
-		if not self.settings.simulation:
+		if not settings.simulation:
 			logging.info("Starting DCC Server")		
 			continueInit = self.StartDCCServer()		
 		else:
@@ -120,8 +135,8 @@ class ServerMain:
 
 		
 	def DelayedStartup(self, _):
-		if not self.settings.simulation:
-			self.rrBus = Bus(self.settings.rrtty)
+		if not settings.simulation:
+			self.rrBus = Bus(settings.rrtty)
 			self.rr.setBus(self.rrBus)
 			pname = os.path.join(os.getcwd(), "dccsniffer", "main.py")
 			self.DCCSniffer = Popen([sys.executable, pname])
@@ -129,9 +144,9 @@ class ServerMain:
 			logging.info("started DCC sniffer process as PID %d" % pid)
 
 	def StartDCCServer(self):
-		self.DCCServer = DCCHTTPServer(self.settings.ipaddr, self.settings.dccserverport, self.settings.dcctty)
+		self.DCCServer = DCCHTTPServer(settings.ipaddr, settings.dccserverport, settings.dcctty)
 		if not self.DCCServer.IsConnected():
-			logging.error("Failed to open DCC bus on device %s.  Exiting..." % self.settings.dcctty)
+			logging.error("Failed to open DCC bus on device %s.  Exiting..." % settings.dcctty)
 			return False
 		else:
 			logging.info("DCC HTTP server successfully started")
@@ -152,7 +167,7 @@ class ServerMain:
 		logging.info("New Client connecting from address: %s:%s" % (addr[0], addr[1]))
 		self.socketServer.sendToOne(skt, addr, {"sessionID": sid})
 		self.clients[addr] = [skt, sid]
-		self.refreshClient(addr, skt)
+		#self.refreshClient(addr, skt) # don't do automatically - client will initiate
 		self.clientList.AddClient(addr, skt, sid, None)
 
 	def DelClient(self, cmd):
@@ -380,12 +395,16 @@ class ServerMain:
 			callon = int(cmd["callon"][0]) == 1
 		except:
 			callon = False
+		try:
+			frozenaspect = int(cmd["frozenaspect"][0])
+		except:
+			frozenaspect=None
 	
 		if aspect is not None:
 			if aspectType is not None:
-				self.rr.SetAspect(signame, aspect, callon, aspectType=aspectType)
+				self.rr.SetAspect(signame, aspect, frozenaspect, callon, aspectType=aspectType)
 			else:
-				self.rr.SetAspect(signame, aspect, callon)
+				self.rr.SetAspect(signame, aspect, frozenaspect, callon)
 
 	def DoSignalLock(self, cmd):			
 		signame = cmd["name"][0]
@@ -611,7 +630,7 @@ class ServerMain:
 		self.DoBusReopen()
 		
 	def DoBusReopen(self):
-		if self.settings.simulation:
+		if settings.simulation:
 			return 
 
 		self.pause = 12 # pause I/O for 12 (~5 seconds) cycles while port is re-opened		
@@ -901,7 +920,7 @@ class ServerMain:
 		except Exception as e:
 			logging.error("exception %s terminating socket server" % str(e))
 		
-		if not self.settings.simulation:
+		if not settings.simulation:
 			try:
 				self.DCCSniffer.kill()
 			except Exception as e:

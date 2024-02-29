@@ -1000,6 +1000,7 @@ class OverSwitch (Block):
 			if self.entrySignal is not None:
 				signm = self.entrySignal.GetName()
 				atype = self.entrySignal.GetAspectType()
+				aspect = self.entrySignal.GetAspect()
 				if self.route:
 					exitBlkName = self.route.GetExitBlock()
 					exitBlk = self.frame.GetBlockByName(exitBlkName)
@@ -1013,11 +1014,22 @@ class OverSwitch (Block):
 				else:
 					self.entrySignal.SetFleetPending(False, self, None, None)
 				# turn the signal we just passed red, but hold onto the lock to be cleared when we exit the block
-				self.frame.Request({"signal": { "name": signm, "aspect": STOP, "aspecttype": atype}})
+				# also retain the old aspect, used to govern train speed
+				self.entrySignal.SetFrozenAspect(aspect)
+				self.frame.Request({"signal": { "name": signm, "aspect": STOP, "aspecttype": atype, "frozenAspect": aspect}})
+				tr = self.GetTrain()
+				if tr is not None:
+					self.frame.activeTrains.UpdateTrain(tr.GetName())
 				self.district.LockTurnoutsForSignal(self.GetName(), self.entrySignal, False)
 		else:
 			if self.route and self.entrySignal is not None:
 				self.district.EvaluateDistrictLocks(self.entrySignal)
+			if self.entrySignal is not None and self.entrySignal.GetFrozenAspect() is not None:
+				self.entrySignal.SetFrozenAspect(None)
+				self.frame.Request({"signal": { "name": signm, "aspect": aspect, "aspecttype": atype, "frozenaspect": None}})
+				tr = self.GetTrain()
+				if tr is not None:
+					self.frame.activeTrains.UpdateTrain(tr.GetName())
 			self.entrySignal = None
 		
 	def GetTileInRoute(self, screen, pos):

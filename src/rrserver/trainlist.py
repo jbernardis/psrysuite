@@ -14,7 +14,6 @@ class TrainList:
 		self.trains[train]["atc"] = atcflag
 
 	def Update(self, train, loco, block, east):
-		logging.debug("train list update %s %s %s east=%s" % (train, loco, block, east))
 		if block is None:
 			return
 
@@ -23,16 +22,12 @@ class TrainList:
 			dellist = []
 			for tr in self.trains:
 				if block in self.trains[tr]["blocks"]:
-					logging.debug("deleting block %s from train %s" % (block, tr))
 					self.trains[tr]["blocks"].remove(block)
-					logging.debug("new block list = %s" % str(self.trains[tr]["blocks"]))
 					if len(self.trains[tr]["blocks"]) == 0:
 						dellist.append(tr)
-						logging.debug("adding train %s to the dellist" % tr)
 
 			for tr in dellist:
 				del(self.trains[tr])
-				logging.debug("removing train %s from the trainlist " % tr)
 
 		else:
 			if train in self.trains:
@@ -133,7 +128,6 @@ class TrainList:
 				aspect = "%d" % trinfo["aspect"]
 				#east = None if nameonly else trinfo["east"]
 				east = trinfo["east"]
-				logging.debug("trinfo = %s" % str(trinfo))
 				clist = []
 				for b in blocks:
 					clist.append({"block": b, "name": tr, "loco": loco, "atc": atc, "east": east, "nameonly": nameflag})

@@ -1,33 +1,14 @@
 
 possibilities:
 	ar/atc/advisor - ??get rid of checkboxes and have always on???
+	retire/get rid of advisor?????
 
 
 redesign ATC as a non-GUI program, add ATC frame to dispatcher (and display??) and use messages between the two to keep the display up to date
+	OR
+keep it the way it is, but don't try to manage the window with respect to the mainframe - just allow it to be moved and treat it as an external application (which it is)
 
 
-
-
-signal bits to mast heads: (is this still accurate, or does it represent the old tester with the reversed bit ordering)
-000 = Red
-100 = Red/Yellow
-010 = Yellow/Green
-110 = Red/Green
-001 = Yellow/Red
-101 = Red/Flashing Yellow
-011 = Green/Red
-111 = Red/Green
-
-as per Bill Schaffer:
-
-Clear             = Green/Red           011
-Approach Medium   = Yellow/Green        010
-Medium Clear      = Red/Green           111
-Approach Slow     = Red/Yellow          110xxxx
-Approach          = Yellow/Red          001
-Medium Approach   = Red/Flashing Yellow 101
-Slow Approach and                       100
-Restricting       = Flashing Red/Red(Red/Yellow)
 
 show events/advice should allow for locale (Port vs Cliff vs Yard, etc)
 notes regarding locale:
@@ -55,6 +36,8 @@ notes regarding locale:
 			
 add fields to active train list: time since assigned, stopped > 5 minutes
 add new circus junction to display and update track diagram to include new track
+
+when passing a signal and turning it red, the train should still be controlled by the signal aspect before it turned red until they pass out of the OS
 
 work aspecttype into atc and use to set speed limits
 

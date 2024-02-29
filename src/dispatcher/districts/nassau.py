@@ -189,8 +189,8 @@ class Nassau (District):
 		if blk.GetName() == "N21":
 			self.CheckBlockSignals("N21", "N21W", False)
 			
-	def DoSignalAction(self, sig, aspect, callon=False):
-		District.DoSignalAction(self, sig, aspect, callon=callon)
+	def DoSignalAction(self, sig, aspect, frozenaspect=None, callon=False):
+		District.DoSignalAction(self, sig, aspect, frozenaspect=frozenaspect, callon=callon)
 		signame = sig.GetName()
 		if signame in [ "N14LA", "N14LB", "N14LC", "N14LD", "N16L", "N18LA", "N18LB", "N20L" ]:
 			self.CheckBlockSignals("N11", "N11W", False)
@@ -1067,7 +1067,11 @@ class Nassau (District):
 		]
 
 		for signm, atype, east, tileSet, pos in sigList:
-			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, None if tileSet is None else self.sigtiles[tileSet])
+			sig = Signal(self, self.screen, self.frame, signm, atype, east, pos, None if tileSet is None else self.sigtiles[tileSet])
+			if signm in ["N11W", "N21W", "B20E"]:
+				sig.SetDisabled(True)
+				
+			self.signals[signm]  = sig
 
 		sigs = [ "N14LA", "N14LB", "N14LC", "N14LD" ]
 		for s in sigs:
@@ -1218,8 +1222,8 @@ class Nassau (District):
 		self.routes["NRtR10N12"] = Route(self.screen, block, "NRtR10N12", "R10", [ (30, 11), (31, 11), (32, 11), (33, 11), (34, 11), (35, 11), (36, 11), (37, 11), (38, 11), (39, 11), (40, 11), (41, 10), (42, 9), (43, 9) ], "N12", [SLOW, SLOW], ["NSw45:N", "NSw47:R", "NSw53:N", "NSw55:N"], ["N28L", "N26RC"])
 		self.routes["NRtR10N22"] = Route(self.screen, block, "NRtR10N22", "R10", [ (30, 13), (31, 13), (32, 13), (33, 13), (34, 13), (35, 13), (36, 13), (37, 13), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9), (43, 9) ], "N22", [SLOW, SLOW], ["NSw43:N", "NSw45:R", "NSw47:R"], ["N28L", "N24RA"])
 		self.routes["NRtR10N41"] = Route(self.screen, block, "NRtR10N41", "R10", [ (30, 15), (31, 15), (32, 15), (33, 15), (34, 15), (35, 15), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9), (43, 9) ], "N41", [SLOW, RESTRICTING], ["NSw41:R", "NSw43:R", "NSw45:R", "NSw47:R"], ["N28L", "N24RB"])
-		self.routes["NRtR10N42"] = Route(self.screen, block, "NRtR10N42", "R10", [ (30, 17), (31, 17), (32, 17), (33, 17), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9), (43, 9) ], "N42", [SLOW, RESTRICTING], ["NSw39:R", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:R"], ["N28L", "N24RC"])
-		self.routes["NRtR10W20"] = Route(self.screen, block, "NRtR10W20", "R10", [ (32, 19), (33, 18), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9), (43, 9) ], "W20", [RESTRICTING, RESTRICTING], ["NSw39:N", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:R"], ["N28L", "N24RD"])
+		self.routes["NRtR10N42"] = Route(self.screen, block, "NRtR10N42", "R10", [ (30, 17), (31, 17), (32, 17), (33, 17), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9), (43, 9) ], "N42", [SLOW, RESTRICTING], ["NSw39:N", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:R"], ["N28L", "N24RC"])
+		self.routes["NRtR10W20"] = Route(self.screen, block, "NRtR10W20", "R10", [ (32, 19), (33, 18), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9), (43, 9) ], "W20", [RESTRICTING, RESTRICTING], ["NSw39:R", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:R"], ["N28L", "N24RD"])
 
 		block = self.blocks["NEOSW"]
 		self.routes["NRtB10W11"] = Route(self.screen, block, "NRtB10W11", "B10", [ (33, 5), (34, 6), (35, 7), (36, 8), (37, 9), (38, 10), (39, 11), (40, 11), (41, 11), (42, 11), (43, 11) ], "W11", [RESTRICTING, RESTRICTING], ["NSw45:N", "NSw47:N", "NSw55:R", "NSw57:N"], ["N26L", "N28R"])
@@ -1228,8 +1232,8 @@ class Nassau (District):
 		self.routes["NRtB10N12"] = Route(self.screen, block, "NRtB10N12", "B10", [ (30, 11), (31, 11), (32, 11), (33, 11), (34, 11), (35, 11), (36, 11), (37, 11), (38, 11), (39, 11), (40, 11), (41, 11), (42, 11), (43, 11) ], "N12", [RESTRICTING, SLOW], ["NSw45:N", "NSw47:N", "NSw53:N", "NSw55:N", "NSw57:N"], ["N26L", "N26RC"])
 		self.routes["NRtB10N22"] = Route(self.screen, block, "NRtB10N22", "B10", [ (30, 13), (31, 13), (32, 13), (33, 13), (34, 13), (35, 13), (36, 13), (37, 13), (38, 13), (39, 12), (40, 11), (41, 11), (42, 11), (43, 11) ], "N22", [RESTRICTING, SLOW], ["NSw43:N", "NSw45:R", "NSw47:N", "NSw57:N"], ["N26L", "N24RA"])
 		self.routes["NRtB10N41"] = Route(self.screen, block, "NRtB10N41", "B10", [ (30, 15), (31, 15), (32, 15), (33, 15), (34, 15), (35, 15), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 11), (42, 11), (43, 11) ], "N41", [RESTRICTING, RESTRICTING], ["NSw41:R", "NSw43:R", "NSw45:R", "NSw47:N", "NSw57:N"], ["N26L", "N24RB"])
-		self.routes["NRtB10N42"] = Route(self.screen, block, "NRtB10N42", "B10", [ (30, 17), (31, 17), (32, 17), (33, 17), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 11), (42, 11), (43, 11) ], "N42", [RESTRICTING, RESTRICTING], ["NSw39:R", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:N", "NSw57:N"], ["N26L", "N24RC"])
-		self.routes["NRtB10W20"] = Route(self.screen, block, "NRtB10W20", "B10", [ (32, 19), (33, 18), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 11), (42, 11), (43, 11) ], "W20", [RESTRICTING, RESTRICTING], ["NSw39:N", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:N", "NSw57:N"], ["N26L", "N24RD"])
+		self.routes["NRtB10N42"] = Route(self.screen, block, "NRtB10N42", "B10", [ (30, 17), (31, 17), (32, 17), (33, 17), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 11), (42, 11), (43, 11) ], "N42", [RESTRICTING, RESTRICTING], ["NSw39:N", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:N", "NSw57:N"], ["N26L", "N24RC"])
+		self.routes["NRtB10W20"] = Route(self.screen, block, "NRtB10W20", "B10", [ (32, 19), (33, 18), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 11), (42, 11), (43, 11) ], "W20", [RESTRICTING, RESTRICTING], ["NSw39:R", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:N", "NSw57:N"], ["N26L", "N24RD"])
 
 		block = self.blocks["NEOSE"]
 		self.routes["NRtB20W11"] = Route(self.screen, block, "NRtB20W11", "W11", [ (33, 5), (34, 6), (35, 7), (36, 8), (37, 9), (38, 10), (39, 11), (40, 11), (41, 11), (42, 12), (43, 13) ], "B20", [RESTRICTING, RESTRICTING], ["NSw45:N", "NSw47:N", "NSw55:R", "NSw57:R"], ["N28R", "N24L"])
@@ -1238,8 +1242,8 @@ class Nassau (District):
 		self.routes["NRtB20N12"] = Route(self.screen, block, "NRtB20N12", "N12", [ (30, 11), (31, 11), (32, 11), (33, 11), (34, 11), (35, 11), (36, 11), (37, 11), (38, 11), (39, 11), (40, 11), (41, 11), (42, 12), (43, 13) ], "B20", [SLOW, RESTRICTING], ["NSw45:N", "NSw47:N", "NSw53:N", "NSw55:N", "NSw57:R"], ["N26RC", "N24L"])
 		self.routes["NRtB20N22"] = Route(self.screen, block, "NRtB20N22", "N22", [ (30, 13), (31, 13), (32, 13), (33, 13), (34, 13), (35, 13), (36, 13), (37, 13), (38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13) ], "B20", [SLOW, RESTRICTING], ["NSw43:N", "NSw45:N", "NSw57:N"], ["N24RA", "N24L"])
 		self.routes["NRtB20N41"] = Route(self.screen, block, "NRtB20N41", "N41", [ (30, 15), (31, 15), (32, 15), (33, 15), (34, 15), (35, 15), (36, 15), (37, 14), (38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13) ], "B20", [SLOW, RESTRICTING], ["NSw41:R", "NSw43:R", "NSw45:N", "NSw57:N"], ["N24RB", "N24L"])
-		self.routes["NRtB20N42"] = Route(self.screen, block, "NRtB20N42", "N42", [ (30, 17), (31, 17), (32, 17), (33, 17), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13) ], "B20", [SLOW, RESTRICTING], ["NSw39:R", "NSw41:N", "NSw43:R", "NSw45:N", "NSw57:N"], ["N24RC", "N24L"])
-		self.routes["NRtB20W20"] = Route(self.screen, block, "NRtB20W20", "W20", [ (32, 19), (33, 18), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13) ], "B20", [RESTRICTING, RESTRICTING], ["NSw39:N", "NSw41:N", "NSw43:R", "NSw45:N", "NSw57:N"], ["N24RD", "N24L"])
+		self.routes["NRtB20N42"] = Route(self.screen, block, "NRtB20N42", "N42", [ (30, 17), (31, 17), (32, 17), (33, 17), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13) ], "B20", [SLOW, RESTRICTING], ["NSw39:N", "NSw41:N", "NSw43:R", "NSw45:N", "NSw57:N"], ["N24RC", "N24L"])
+		self.routes["NRtB20W20"] = Route(self.screen, block, "NRtB20W20", "W20", [ (32, 19), (33, 18), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13) ], "B20", [RESTRICTING, RESTRICTING], ["NSw39:R", "NSw41:N", "NSw43:R", "NSw45:N", "NSw57:N"], ["N24RD", "N24L"])
 
 		self.signals["N28L"].AddPossibleRoutes("NEOSRH", [ "NRtR10W11", "NRtR10N32", "NRtR10N31", "NRtR10N12", "NRtR10N22", "NRtR10N41", "NRtR10N42", "NRtR10W20" ])
 		self.signals["N26L"].AddPossibleRoutes("NEOSW",  [ "NRtB10W11", "NRtB10N32", "NRtB10N31", "NRtB10N12", "NRtB10N22", "NRtB10N41", "NRtB10N42", "NRtB10W20" ])

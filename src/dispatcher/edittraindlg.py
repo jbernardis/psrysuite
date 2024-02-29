@@ -5,7 +5,7 @@ MAXSTEPS = 9
 BUTTONSIZE = (90, 30)
 
 class EditTrainDlg(wx.Dialog):
-	def __init__(self, parent, train, block, locos, trains, engineers, existingTrains, atcFlag, arFlag, dx, dy):
+	def __init__(self, parent, train, block, locos, trains, engineers, existingTrains, atcFlag, arFlag, lostTrains, dx, dy):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details", pos=(dx, dy))
 		self.parent = parent
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
@@ -29,6 +29,7 @@ class EditTrainDlg(wx.Dialog):
 		self.trains = trains
 		self.noEngineer = "<none>"
 		self.engineers = [self.noEngineer] + sorted(engineers)
+		self.lostTrains = lostTrains
 		
 		locoList  = sorted(list(locos.keys()), key=self.BuildLocoKey)
 		trainList = sorted(list(trains.keys()))
@@ -39,7 +40,7 @@ class EditTrainDlg(wx.Dialog):
 		lblTrain.SetFont(font)
 		self.cbTrainID = wx.ComboBox(self, wx.ID_ANY, name,
 					choices=trainList,
-					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
+					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER, size=(120, -1))
 		self.cbTrainID.SetFont(font)
 		
 		self.chosenTrain = name
@@ -53,7 +54,7 @@ class EditTrainDlg(wx.Dialog):
 		lblLoco.SetFont(font)
 		self.cbLocoID = wx.ComboBox(self, wx.ID_ANY, loco,
 					choices=locoList,
-					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
+					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER, size=(120, -1))
 		self.cbLocoID.SetFont(font)
 		
 		self.Bind(wx.EVT_COMBOBOX, self.OnLocoChoice, self.cbLocoID)
@@ -70,18 +71,28 @@ class EditTrainDlg(wx.Dialog):
 		lblEngineer.SetFont(font)
 		self.cbEngineer = wx.ComboBox(self, wx.ID_ANY, self.chosenEngineer,
 					choices=self.engineers,
-					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER)
+					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER, size=(120, -1))
 		self.cbEngineer.SetFont(font)
 		
 		self.Bind(wx.EVT_COMBOBOX, self.OnEngChoice, self.cbEngineer)
+		self.Bind(wx.EVT_TEXT, self.OnEngText, self.cbEngineer)
 		
 		self.bClearEng = wx.Button(self, wx.ID_ANY, "Clear", size=BUTTONSIZE)
 		self.Bind(wx.EVT_BUTTON, self.OnBClearEng, self.bClearEng)
+
+		lostCt = self.lostTrains.Count()
+		if lostCt > 0:		
+			self.bLostTrains = wx.Button(self, wx.ID_ANY, "Lost Trains", size=BUTTONSIZE)
+			self.Bind(wx.EVT_BUTTON, self.OnBLostTrains, self.bLostTrains)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.Add(lblTrain)
 		hsz.AddSpacer(10)
 		hsz.Add(self.cbTrainID)
+		if lostCt > 0:
+			hsz.AddSpacer(20)
+			hsz.Add(self.bLostTrains)
+		
 		vsz.Add(hsz)
 		
 		vsz.AddSpacer(10)
@@ -200,13 +211,9 @@ class EditTrainDlg(wx.Dialog):
 
 	def OnLocoText(self, evt):
 		lid = evt.GetString()
-		if not lid.isdigit():			
-			lid = "".join([c for c in lid if c.isdigit()])
-			pos = self.cbLocoID.GetInsertionPoint()
-			self.cbLocoID.ChangeValue(lid)
-			if pos > 0:
-				pos -= 1
-			self.cbLocoID.SetInsertionPoint(pos)
+		pos = self.cbLocoID.GetInsertionPoint()
+		self.cbLocoID.ChangeValue(lid)
+		self.cbLocoID.SetInsertionPoint(pos)
 			
 		self.chosenLoco = lid
 		if self.cbATC is not None:
@@ -229,10 +236,41 @@ class EditTrainDlg(wx.Dialog):
 		
 	def OnEngChoice(self, evt):
 		self.chosenEngineer = evt.GetString()
+
+	def OnEngText(self, evt):
+		nm = evt.GetString()
+		pos = self.cbEngineer.GetInsertionPoint()
+		self.cbEngineer.ChangeValue(nm)
+		self.cbEngineer.SetInsertionPoint(pos)
+		self.chosenEngineer = nm
+		evt.Skip()
 		
 	def OnBClearEng(self, evt):
 		self.chosenEngineer = self.noEngineer
 		self.cbEngineer.SetValue(self.noEngineer)
+		
+	def OnBLostTrains(self, evt):
+		l = self.lostTrains.GetList()
+		dlg = wx.SingleChoiceDialog(
+				self, 'Train / Loco / Engineer / Block', 'Previously Lost Trains', 
+				["%s / %s / %s / %s" % (t[0], t[1], t[2], t[3]) for t in l],
+				wx.CHOICEDLG_STYLE)
+
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			tstr = dlg.GetStringSelection()
+
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return
+		
+		trid, loco, engineer, _ = tstr.split(" / ")
+		
+		self.lostTrains.Remove(trid)
+
+		self.cbTrainID.SetValue(trid)
+		self.cbLocoID.SetValue(loco)
+		self.cbEngineer.SetValue(self.noEngineer if engineer is None or engineer == "None" else engineer)
 
 	def ShowTrainLocoDesc(self):
 		if self.chosenLoco in self.locos and self.locos[self.chosenLoco]["desc"] != None:

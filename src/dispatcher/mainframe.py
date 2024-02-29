@@ -17,6 +17,7 @@ from dispatcher.trackdiagram import TrackDiagram
 from dispatcher.tile import loadTiles
 from dispatcher.train import Train
 from dispatcher.trainlist import ActiveTrainList
+from dispatcher.losttrains import LostTrains
 
 from dispatcher.breaker import BreakerDisplay, BreakerName
 from dispatcher.toaster import Toaster
@@ -107,6 +108,7 @@ class MainFrame(wx.Frame):
 		self.locoList = []
 		self.trainList = []
 		self.activeTrains = ActiveTrainList()
+		self.lostTrains = LostTrains()
 			
 		self.settings = settings
 			
@@ -296,14 +298,17 @@ class MainFrame(wx.Frame):
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAdvisor, self.cbAdvisor)
 			self.cbAdvisor.Enable(False)
 			
-			self.bEvents = wx.Button(self, wx.ID_ANY, "Events Log", pos=(self.centerOffset+840, 25), size=BTNDIM)
-			self.Bind(wx.EVT_BUTTON, self.OnBEventsLog, self.bEvents)
-			self.bAdvice = wx.Button(self, wx.ID_ANY, "Advice Log", pos=(self.centerOffset+840, 65), size=BTNDIM)
-			self.Bind(wx.EVT_BUTTON, self.OnBAdviceLog, self.bAdvice)
-			
 			self.bSnapshot = wx.Button(self, wx.ID_ANY, "Snapshot", pos=(self.centerOffset+940, 25), size=BTNDIM)
 			self.bSnapshot.Enable(False)
 			self.Bind(wx.EVT_BUTTON, self.OnBSnapshot, self.bSnapshot)
+
+		if self.IsDispatcher() or self.settings.showevents:			
+			self.bEvents = wx.Button(self, wx.ID_ANY, "Events Log", pos=(self.centerOffset+840, 25), size=BTNDIM)
+			self.Bind(wx.EVT_BUTTON, self.OnBEventsLog, self.bEvents)
+
+		if self.IsDispatcher() or self.settings.showadvice:			
+			self.bAdvice = wx.Button(self, wx.ID_ANY, "Advice Log", pos=(self.centerOffset+840, 65), size=BTNDIM)
+			self.Bind(wx.EVT_BUTTON, self.OnBAdviceLog, self.bAdvice)
 			
 		self.totalw = totalw
 		self.totalh = diagramh + 280 # 1080 if diagram is full 800 height
@@ -558,8 +563,8 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBNassau, self.rbNassauControl)
 		self.rbNassauControl.Hide()
 		self.widgetMap[NaCl].append([self.rbNassauControl, 0])
-		self.rbNassauControl.SetSelection(2)
-		self.nassauControl = 2
+		self.rbNassauControl.SetSelection(0)
+		self.nassauControl = 0
 
 		self.rbCliffControl = wx.RadioBox(self, wx.ID_ANY, "Cliff", (1550, voffset), wx.DefaultSize,
 				["Cliff", "Dispatcher: Bank/Cliveden", "Dispatcher: All"], 1, wx.RA_SPECIFY_COLS)
@@ -1411,7 +1416,7 @@ class MainFrame(wx.Frame):
 				else:
 					lockers = ""
 					
-				self.PopupAdvice("%s -  %s   %s" % (sig.GetName(), sig.GetAspectName(), lockers))
+				self.PopupAdvice("%s -  %s   %s" % (sig.GetName(), sig.GetAspectName(), lockers), force=True)
 				return
 			
 			if sig.IsDisabled():
@@ -1518,7 +1523,7 @@ class MainFrame(wx.Frame):
 		oldAR = tr.IsOnAR() if self.IsDispatcher() else False
 		dlgx = self.centerw - 500 - self.centerOffset
 		dlgy = self.totalh - 660
-		dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.engineerList, self.trains, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, dlgx, dlgy)
+		dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.engineerList, self.trains, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, self.lostTrains, dlgx, dlgy)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			trainid, locoid, engineer, atc, ar, east = dlg.GetResults()
@@ -1677,7 +1682,7 @@ class MainFrame(wx.Frame):
 				state = "??"
 		else:
 			state = "Normal" if to.IsNormal() else "Reversed"
-		self.PopupAdvice("%s - %s   %s" % (to.GetName(), state, lockers))
+		self.PopupAdvice("%s - %s   %s" % (to.GetName(), state, lockers), force=True)
 
 
 	def VerifyTrainID(self, trainid):
@@ -1892,8 +1897,8 @@ class MainFrame(wx.Frame):
 		self.advice.SetBackgroundColour(wx.Colour(120, 255, 154))
 		self.advice.SetTextColour(wx.Colour(0, 0, 0))
 
-	def PopupEvent(self, message):
-		if self.IsDispatcher() or self.settings.showevents:
+	def PopupEvent(self, message, force=False):
+		if self.IsDispatcher() or self.settings.showevents or force:
 			self.events.Append(message)
 			self.eventsList.append(message)
 			if self.dlgEvents is not None:
@@ -1911,8 +1916,8 @@ class MainFrame(wx.Frame):
 		self.dlgEvents.Destroy()
 		self.dlgEvents = None
 
-	def PopupAdvice(self, message):
-		if self.IsDispatcher() or self.settings.showadvice:
+	def PopupAdvice(self, message, force=False):
+		if self.IsDispatcher() or self.settings.showadvice or force:
 			self.advice.Append(message)
 			self.adviceList.append(message)
 			if self.dlgAdvice is not None:
@@ -1937,17 +1942,7 @@ class MainFrame(wx.Frame):
 		rc = dlg.ShowModal()
 		dlg.Destroy()
 		if rc == wx.ID_SAVE:
-			trinfo = self.activeTrains.forSnapshot()
-			lenTrInfo = len(trinfo)
-			if lenTrInfo == 0:
-				self.PopupEvent("No trains to save")
-				return 
-			
-			rc = self.rrServer.Post("snapshot.json", "data", trinfo)
-			if rc >= 400:
-				self.PopupEvent("Error saving snapshot")
-			else:
-				self.PopupEvent("%d trains saved in Snapshot" % lenTrInfo)
+			self.TakeSnapshot()
 							
 		elif rc == wx.ID_OPEN: #restore from snapshot
 			blks = [x for x in self.blocks.values() if x.IsOccupied()]
@@ -2008,6 +2003,19 @@ class MainFrame(wx.Frame):
 				self.PopupEvent("Occupied Blocks not in snapshot: %s" % ", ".join(unknownBlocks))
 				
 			self.PopupEvent("%d trains restored from Snapshot" % len(foundTrains))
+
+	def TakeSnapshot(self):
+		trinfo = self.activeTrains.forSnapshot()
+		lenTrInfo = len(trinfo)
+		if lenTrInfo == 0:
+			self.PopupEvent("No trains to save")
+			return 
+		
+		rc = self.rrServer.Post("snapshot.json", "data", trinfo)
+		if rc >= 400:
+			self.PopupEvent("Error saving snapshot")
+		else:
+			self.PopupEvent("%d trains saved in Snapshot" % lenTrInfo)
 		
 	def OnSubscribe(self, _):
 		if self.subscribed:
@@ -2063,7 +2071,7 @@ class MainFrame(wx.Frame):
 			self.RetrieveData()
 			#self.districts.Initialize()
 			if self.IsDispatcher():
-				self.SendControlValues()
+				#self.SendControlValues()
 				self.SendSignals()
 
 		self.breakerDisplay.UpdateDisplay()
@@ -2286,6 +2294,11 @@ class MainFrame(wx.Frame):
 			sigName = p["name"]
 			aspect = p["aspect"]
 			try:
+				frozenaspect = p["frozenaspect"]
+			except:
+				frozenaspect = None
+				
+			try:
 				callon = int(p["callon"]) == 1
 			except:
 				callon = False
@@ -2295,9 +2308,10 @@ class MainFrame(wx.Frame):
 			except:
 				sig = None
 
-			if sig is not None and aspect != sig.GetAspect():
+			if sig is not None and (aspect != sig.GetAspect() or frozenaspect != sig.GetFrozenAspect()):
 				district = sig.GetDistrict()
-				district.DoSignalAction(sig, aspect, callon=callon)
+				district.DoSignalAction(sig, aspect, frozenaspect=frozenaspect, callon=callon)
+				self.activeTrains.UpdateForSignal(sig)
 
 	def DoCmdSigLever(self, parms):
 		if self.IsDispatcher():
@@ -2421,6 +2435,7 @@ class MainFrame(wx.Frame):
 							trid = tr.GetName()
 							if not tr.IsBeingEdited():
 								self.PopupEvent("Train %s - detection lost from block %s" % (trid, block))
+								self.lostTrains.Add(tr.GetName(), tr.GetLoco(). tr.GetEngineer(), block)
 							else:
 								tr.SetBeingEdited(False)
 							try:
@@ -2441,6 +2456,7 @@ class MainFrame(wx.Frame):
 					for trid, tr in delList:
 						if not tr.IsBeingEdited():
 							self.PopupEvent("Train %s - detection lost from block %s" % (trid, block))
+							self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), block)
 						try:
 							self.activeTrains.RemoveTrain(trid)
 							del(self.trains[trid])
@@ -2523,7 +2539,6 @@ class MainFrame(wx.Frame):
 				blk.EvaluateStoppingSections()
 				blk.Draw()   # this will redraw the train in this block only
 				tr.Draw() # necessary if this train appears in other blocks too
-						
 		
 	def DoCmdTrainComplete(self, parms):					
 		for p in parms:
@@ -2646,9 +2661,6 @@ class MainFrame(wx.Frame):
 			if self.busy:
 				del self.busy
 				self.busy = None
-				
-		else:
-			self.PopupEvent("Got end type (%s)" % parms["type"])
 					
 	def DoCmdAdvice(self, parms):
 		if self.IsDispatcher() or self.settings.showadvice:
@@ -2812,7 +2824,7 @@ class MainFrame(wx.Frame):
 			for sb in [sbw, sbe]:
 				if sb:
 					bdirs.append({ "block": sb.GetName(), "dir": "E" if b.GetEast() else "W"})
-			if len(bdirs) >= 100:
+			if len(bdirs) >= 10:
 				self.Request({"blockdirs": { "data": json.dumps(bdirs)}})
 				bdirs = []
 		if len(bdirs) > 0:
@@ -2824,7 +2836,7 @@ class MainFrame(wx.Frame):
 				b.SendRouteRequest()
 		rds = self.districts.GetRouteDefinitions()
 		rx = 0
-		step = 200
+		step = 10
 		while rx < len(rds):
 			self.Request({"routedefs": { "data": json.dumps(rds[rx:rx+step])}})
 			rx  += step
@@ -3105,6 +3117,7 @@ class MainFrame(wx.Frame):
 		killServer = False
 		if self.IsDispatcher():
 			dlg = ExitDlg(self)
+			dlg.CenterOnScreen()
 			rc = dlg.ShowModal()
 			if rc == wx.ID_OK:
 				killServer = dlg.GetResults()
@@ -3149,10 +3162,13 @@ class ExitDlg (wx.Dialog):
 
 		self.bTrains = wx.Button(self, wx.ID_ANY, "Save Trains")
 		self.bLocos  = wx.Button(self, wx.ID_ANY, "Save Locos")
+		self.bSnapshot  = wx.Button(self, wx.ID_ANY, "Take Snapshot")
 
 		vsz.Add(self.bTrains, 0, wx.ALIGN_CENTER)
 		vsz.AddSpacer(10)
 		vsz.Add(self.bLocos, 0, wx.ALIGN_CENTER)
+		vsz.AddSpacer(10)
+		vsz.Add(self.bSnapshot, 0, wx.ALIGN_CENTER)
 		vsz.AddSpacer(20)
 	
 		self.cbKillServer = wx.CheckBox(self, wx.ID_ANY, "Shutdown Server")
@@ -3174,6 +3190,7 @@ class ExitDlg (wx.Dialog):
 
 		self.Bind(wx.EVT_BUTTON, self.onSaveTrains, self.bTrains)
 		self.Bind(wx.EVT_BUTTON, self.onSaveLocos, self.bLocos)
+		self.Bind(wx.EVT_BUTTON, self.onSnapshot, self.bSnapshot)
 		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
 		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
 
@@ -3196,6 +3213,9 @@ class ExitDlg (wx.Dialog):
 
 	def onSaveLocos(self, _):
 		self.parent.SaveLocos()
+		
+	def onSnapshot(self, _):
+		self.parent.TakeSnapshot()
 		
 	def GetResults(self):
 		return self.cbKillServer.GetValue()

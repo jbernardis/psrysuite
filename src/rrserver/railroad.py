@@ -121,10 +121,10 @@ class Railroad():
 		for d in self.districts.values():
 			d.Initialize()
 			
-		self.SetControlOption("nassau", 0)
-		self.SetControlOption("cliff", 0)
-		self.SetControlOption("yard", 0)
-		self.SetControlOption("signal4", 0)
+		self.SetControlOption("nassau", self.settings.controlnassau)
+		self.SetControlOption("cliff", self.settings.controlcliff)
+		self.SetControlOption("yard", self.settings.controlyard)
+		self.SetControlOption("signal4", self.settings.controlsignal4l)
 		self.SetControlOption("bank.fleet", 0)
 		self.SetControlOption("carlton.fleet", 0)
 		self.SetControlOption("cliff.fleet", 0)
@@ -390,13 +390,14 @@ class Railroad():
 			tout.UpdateLockBits(release=release)
 			self.RailroadEvent(tout.GetEventMessage(lock=True))
 		
-	def SetAspect(self, signame, aspect, callon=False, aspectType=None):
+	def SetAspect(self, signame, aspect, frozenaspect=None, callon=False, aspectType=None):
 		try:
 			sig = self.signals[signame]
 		except KeyError:
 			logging.warning("Ignoring set aspect - unknown signal name: %s" % signame)
 			return
-		
+
+		sig.SetFrozenAspect(frozenaspect)		
 		aspect = sig.district.VerifyAspect(signame, aspect)	
 		if aspectType is not None:
 			sig.SetAspectType(aspectType)
@@ -1139,7 +1140,6 @@ class Railroad():
 						logging.error("Unknown object name: %s in resume list" % o)
 						
 					else:
-						logging.debug("xi for handswitch %s" % o)
 						if o == "CSw21ab":
 							olist = ["CSw21a", "CSw21b"]
 						elif o == "PBSw15ab":

@@ -42,7 +42,7 @@ class Shore (District):
 		self.frame.Request({"signal": { "name": signm, "aspect": aspect, "aspecttype": sig.GetAspectType()}})
 		sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 
-	def DoSignalAction(self, sig, aspect, callon=False):
+	def DoSignalAction(self, sig, aspect, frozenaspect=None, callon=False):
 		if not callon:
 			signm = sig.GetName()
 			if signm in ["S8L", "S8R"]:
@@ -74,7 +74,7 @@ class Shore (District):
 				if self.blocks["SOSHF"].IsBusy():
 					return
 			
-		District.DoSignalAction(self, sig, aspect, callon=callon)
+		District.DoSignalAction(self, sig, aspect, frozenaspect=frozenaspect, callon=callon)
 		self.drawCrossing()
 
 		

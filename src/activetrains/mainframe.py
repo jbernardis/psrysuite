@@ -273,8 +273,6 @@ class MainFrame(wx.Frame):
 			locos = {}
 			
 		self.locoList = locos
-		for l, li in locos.items():
-			print("%s: %s" % (l, li))
 
 		trains = self.Get("gettrains", {})
 		if trains is None:

@@ -429,7 +429,6 @@ class District:
 				nxtclradv = False
 			else:
 				nxtclradv = blknxt.IsCleared()
-				print("%s cleared: %s" % (blknxt.GetName(), nxtclradv))
 		
 		if east != blkEast or nxtEast != blkEast:
 			aspect = 0	# blocks going in opposite directions - just stop
@@ -608,9 +607,10 @@ class District:
 		else:
 			turnout.SetReverse(refresh=True, force=force)
 
-	def DoSignalAction(self, sig, aspect, callon=False):
+	def DoSignalAction(self, sig, aspect, frozenaspect=None, callon=False):
 		signm = sig.GetName()
 		atype = sig.GetAspectType()
+		sig.SetFrozenAspect(frozenaspect)
 		
 		if callon:
 			sig.SetAspect(aspect, refresh=True, callon=True)

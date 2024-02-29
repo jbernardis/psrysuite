@@ -23,7 +23,6 @@ class Debug:
 		self.showaspectcalculation = False
 		self.loglevel = "DEBUG"
 
-
 class Settings:
 	def __init__(self):
 		self.datafolder = os.path.join(os.getcwd(), "data")

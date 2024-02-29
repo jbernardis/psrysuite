@@ -29,6 +29,19 @@ class ActiveTrainList:
 		if self.dlgTrainList is not None:
 			self.dlgTrainList.UpdateTrain(trid)
 			
+	def UpdateForSignal(self, sig):
+		if sig is None:
+			return
+		
+		if self.dlgTrainList is None:
+			return 
+		
+		signame = sig.GetName()
+		for trid, tr in self.trains.items():
+			s, _, _ = tr.GetSignal()
+			if s and s.GetName() == signame:
+				self.dlgTrainList.UpdateTrain(trid)
+			
 	def RenameTrain(self, oldName, newName):
 		self.trains[newName] = self.trains[oldName]
 		del(self.trains[oldName])
@@ -349,7 +362,7 @@ class TrainListCtrl(wx.ListCtrl):
 		except ValueError:
 			logging.warning("Attempt to update a non-existent train: %s" % trid)
 			return 
-		
+	
 		self.filterTrains()	
 		self.SetItemCount(len(self.filtered))	
 		self.RefreshItems(0, len(self.filtered)-1)
@@ -484,7 +497,7 @@ class TrainListCtrl(wx.ListCtrl):
 			return u"\u2713" if tr.GetSBActive() else " "
 		
 		elif col == 7:
-			sig, aspect = tr.GetSignal()
+			sig, aspect, _ = tr.GetSignal()
 			if sig is None:
 				return ""
 			resp = sig.GetName()
@@ -500,11 +513,12 @@ class TrainListCtrl(wx.ListCtrl):
 			if throttle == "":
 				throttle = "<>"
 			
-			sig, aspect = tr.GetSignal()
+			sig, asp, fasp = tr.GetSignal()
+			aspect = fasp if fasp is not None else asp
 			if sig is None or aspect is None:
 				throttlelimit = 0
 			else:
-				throttlelimit = sig.GetAspectProfileIndex()
+				throttlelimit = sig.GetAspectProfileIndex(aspect)
 			loco =  tr.GetLoco()
 			locoinfo = self.parent.GetLocoInfo(loco)
 			if locoinfo is None:

@@ -1,7 +1,5 @@
 from dispatcher.constants import STOP, aspectname, aspecttype, aspectprofileindex
 
-
-
 class Signal:
 	def __init__(self, district, screen, frame, name, aspecttype, east, pos, tiles):
 		self.district = district
@@ -12,6 +10,7 @@ class Signal:
 		self.tiles = tiles
 		self.pos = pos
 		self.aspect = STOP
+		self.frozenAspect = None
 		self.aspectType = aspecttype
 		self.east = east
 		self.possibleRoutes = {}
@@ -68,8 +67,9 @@ class Signal:
 	def GetAspectName(self):
 		return "%s (%s)" % (aspectname(self.aspect, self.aspectType), aspecttype(self.aspectType))
 	
-	def GetAspectProfileIndex(self):
-		return aspectprofileindex(self.aspect, self.aspectType)
+	def GetAspectProfileIndex(self, aspect=None):
+		asp = self.aspect if aspect is None else aspect
+		return aspectprofileindex(asp, self.aspectType)
 
 	def GetPos(self):
 		return self.pos
@@ -146,6 +146,12 @@ class Signal:
 	def ForceNeutral(self):
 		self.aspect = 0
 		self.Draw()
+		
+	def SetFrozenAspect(self, fa):
+		self.frozenAspect = fa
+		
+	def GetFrozenAspect(self):
+		return self.frozenAspect
 
 	def SetFleetPending(self, flag, osblk, rtname, blk):
 		if not self.fleetEnabled:

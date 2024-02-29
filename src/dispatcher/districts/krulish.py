@@ -11,8 +11,8 @@ class Krulish (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
 
-	def DoSignalAction(self, sig, aspect, callon=False):
-		District.DoSignalAction(self, sig, aspect, callon=callon)
+	def DoSignalAction(self, sig, aspect, frozenaspect=None, callon=False):
+		District.DoSignalAction(self, sig, aspect, frozenaspect=frozenaspect, callon=callon)
 		signm = sig.GetName()
 
 		if signm == "N10W":

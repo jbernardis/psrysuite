@@ -194,7 +194,7 @@ class Nassau(District):
 			b = self.rr.AddBlock("B10",     self, n, addr, [(2, 7)], False)
 			b.AddStoppingBlocks([sbw])
 	
-			self.rr.AddTurnoutPosition("NSw39", self, n, addr, [(3, 0), (3, 1)])	
+			self.rr.AddTurnoutPosition("NSw39", self, n, addr, [(3, 1), (3, 0)])	
 			
 		addr = NASSAUNX
 		with self.nodes[addr] as n:

@@ -176,7 +176,7 @@ class SignalTile:
 		elif sig.aspectType == AdvAspects:
 			clearValues = [ 0b011, 0b111 ]
 		elif sig.aspectType == RegSloAspects:
-			clearValues = [ 0b011 ]
+			clearValues = [ 0b011, 0b111 ]
 		else: # assume RegAspects
 			clearValues = [ CLEAR ]
 			
