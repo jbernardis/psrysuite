@@ -45,6 +45,7 @@ class Signal:
 	def __init__(self, name):
 		self.name = name
 		self.aspect = 0
+		self.frozenAspect = None
 		self.aspectType = RegAspects
 		self.train = None
 		
@@ -57,11 +58,18 @@ class Signal:
 	def SetAspect(self, aspect):
 		self.aspect = aspect
 		
+	def GetFrozenAspect(self):
+		return self.frozenAspect
+	
+	def SetFrozenAspect(self, fa):
+		self.frozenAspect = fa
+		
 	def SetAspectType(self, atype):
 		self.aspectType = atype
-	
-	def GetAspectProfileIndex(self):
-		return aspectprofileindex(self.aspect, self.aspectType)
+		
+	def GetAspectProfileIndex(self, aspect=None):
+		asp = self.aspect if aspect is None else aspect
+		return aspectprofileindex(asp, self.aspectType)
 		
 	def GetAspectType(self):
 		return self.aspectType
@@ -345,6 +353,10 @@ class MainFrame(wx.Frame):
 			sigName = sig["name"]
 			aspect = sig["aspect"]
 			try:
+				frozenAspect = sig["frozenAspect"]
+			except KeyError:
+				frozenAspect = None
+			try:
 				aspectType = sig["aspecttype"]
 			except KeyError:
 				aspectType = RegAspects
@@ -357,6 +369,8 @@ class MainFrame(wx.Frame):
 				
 			s.SetAspect(aspect)
 			s.SetAspectType(aspectType)
+			s.SetFrozenAspect(frozenAspect)
+			self.activeTrains.UpdateForSignal(s)
 
 	def DoCmdTrainSignal(self, parms):							
 		trid = parms["train"]			

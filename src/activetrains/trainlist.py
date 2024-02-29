@@ -28,6 +28,19 @@ class ActiveTrainList:
 		if self.panelTrainList is not None:
 			self.panelTrainList.UpdateTrain(trid)
 			
+	def UpdateForSignal(self, sig):
+		if sig is None:
+			return
+		
+		if self.panelTrainList is None:
+			return 
+		
+		signame = sig.GetName()
+		for trid, tr in self.trains.items():
+			s, _, _ = tr.GetSignal()
+			if s and s.GetName() == signame:
+				self.panelTrainList.UpdateTrain(trid)
+			
 	def RenameTrain(self, oldName, newName):
 		self.trains[newName] = self.trains[oldName]
 		del(self.trains[oldName])
