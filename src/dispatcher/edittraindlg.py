@@ -265,8 +265,6 @@ class EditTrainDlg(wx.Dialog):
 			return
 		
 		trid, loco, engineer, _ = tstr.split(" / ")
-		
-		self.lostTrains.Remove(trid)
 
 		self.cbTrainID.SetValue(trid)
 		self.cbLocoID.SetValue(loco)
@@ -318,7 +316,8 @@ class EditTrainDlg(wx.Dialog):
 				dlg.ShowModal()
 				dlg.Destroy()
 				return
-
+		
+		self.lostTrains.Remove(self.chosenTrain)
 		self.EndModal(wx.ID_OK)
 		
 	def onSever(self, _):
