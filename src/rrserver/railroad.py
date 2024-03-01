@@ -398,33 +398,35 @@ class Railroad():
 			return
 
 		sig.SetFrozenAspect(frozenaspect)		
-		aspect = sig.district.VerifyAspect(signame, aspect)	
 		if aspectType is not None:
 			sig.SetAspectType(aspectType)
-		if not sig.SetAspect(aspect):
-			return 
-		
-		bits = sig.Bits()
-		lb = len(bits)
-		if lb == 0:	
-			sig.district.SetAspect(sig, aspect)
-		else:
-			if lb == 1:
-				vals = [1 if aspect != 0 else 0] 
-			elif lb == 2:
-				vals = [aspect & 0x02, aspect & 0x01] 
-			elif lb == 3:
-				vals = [aspect & 0x04, aspect & 0x02, aspect & 0x01] 
+			
+		if aspect is not None:
+			aspect = sig.district.VerifyAspect(signame, aspect)	
+			if not sig.SetAspect(aspect):
+				return 
+			
+			bits = sig.Bits()
+			lb = len(bits)
+			if lb == 0:	
+				sig.district.SetAspect(sig, aspect)
 			else:
-				logging.warning("Unknown bits length for signal %s: %d" % (sig.Name(), len(bits)))
-				return
-
-			for (vbyte, vbit), val in zip(bits, vals):
-				sig.node.SetOutputBit(vbyte, vbit, 1 if val != 0 else 0)
-
-		sig.UpdateIndicators() # make sure all indicators reflect this change
-		self.UpdateSignalLeverLEDs(sig, aspect, callon)
-		self.RailroadEvent(sig.GetEventMessage(callon=callon))
+				if lb == 1:
+					vals = [1 if aspect != 0 else 0] 
+				elif lb == 2:
+					vals = [aspect & 0x02, aspect & 0x01] 
+				elif lb == 3:
+					vals = [aspect & 0x04, aspect & 0x02, aspect & 0x01] 
+				else:
+					logging.warning("Unknown bits length for signal %s: %d" % (sig.Name(), len(bits)))
+					return
+	
+				for (vbyte, vbit), val in zip(bits, vals):
+					sig.node.SetOutputBit(vbyte, vbit, 1 if val != 0 else 0)
+	
+			sig.UpdateIndicators() # make sure all indicators reflect this change
+			self.UpdateSignalLeverLEDs(sig, aspect, callon)
+			self.RailroadEvent(sig.GetEventMessage(callon=callon))
 		
 	def UpdateSignalLeverLEDs(self, sig, aspect, callon):
 		r = self.reSigName.findall(sig.Name())

@@ -37,8 +37,7 @@ notes regarding locale:
 add fields to active train list: time since assigned, stopped > 5 minutes
 add new circus junction to display and update track diagram to include new track
 
-when passing a signal and turning it red, the train should still be controlled by the signal aspect before it turned red until they pass out of the OS
 
-work aspecttype into atc and use to set speed limits
+work aspecttype into atc and use to set speed limits, also work in frozenaspect, and try to think of a way to not stop a train when it moves into a new block for a few seconds  before thew next signal is changed
 
 when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)

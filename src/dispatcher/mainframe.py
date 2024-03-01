@@ -2106,8 +2106,11 @@ class MainFrame(wx.Frame):
 			return None
 		
 	def SendSignals(self):
+		"""
+		Tell server about all signal aspect types.  Do not send aspect as this will defeat any initialization done inside of rrserver
+		"""
 		for signm, sig in self.signals.items():
-			self.Request({"signal": {"name": signm, "aspect": sig.GetAspect(), "aspecttype": sig.GetAspectType(), "callon": 0}})
+			self.Request({"signal": {"name": signm, "aspect": None, "aspecttype": sig.GetAspectType(), "callon": 0}})
 
 	def OnRefresh(self, _):
 		if not self.IsDispatcher():

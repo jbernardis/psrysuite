@@ -385,7 +385,6 @@ class ServerMain:
 			aspect = int(cmd["aspect"][0])
 		except KeyError:
 			aspect = None
-			logging.error("Received signal command with no aspect - ignoring (%s)" % str(cmd))
 		try:
 			aspectType = int(cmd["aspecttype"][0])
 		except KeyError:
@@ -400,11 +399,10 @@ class ServerMain:
 		except:
 			frozenaspect=None
 	
-		if aspect is not None:
-			if aspectType is not None:
-				self.rr.SetAspect(signame, aspect, frozenaspect, callon, aspectType=aspectType)
-			else:
-				self.rr.SetAspect(signame, aspect, frozenaspect, callon)
+		if aspectType is not None:
+			self.rr.SetAspect(signame, aspect, frozenaspect, callon, aspectType=aspectType)
+		else:
+			self.rr.SetAspect(signame, aspect, frozenaspect, callon)
 
 	def DoSignalLock(self, cmd):			
 		signame = cmd["name"][0]
