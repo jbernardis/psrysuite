@@ -8,7 +8,7 @@ if cmdFolder not in sys.path:
 
 #settings = Settings()
 
-from mainframe import MainFrame
+from monitor.mainframe import MainFrame
 
 class App(wx.App):
 	def OnInit(self):

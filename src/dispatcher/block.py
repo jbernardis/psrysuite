@@ -199,6 +199,9 @@ class Block:
 			if hs.GetValue():
 				return True
 		return False
+		
+	def HasUnknownTrain(self):
+		return self.unknownTrain
 
 	def DrawTrain(self):
 		if len(self.trainLoc) == 0:
@@ -371,7 +374,7 @@ class Block:
 				b.Draw()
 				
 		for t in self.turnouts:
-			t.Draw(self.status, self.east, unknownTrain=self.unknownTrain)
+			t.Draw(self.status, self.east)
 
 		self.district.DrawOthers(self)
 		self.DrawTrain()
@@ -1050,7 +1053,10 @@ class OverSwitch (Block):
 		for t in self.turnouts:
 			draw, stat = self.GetTileInRoute(t.GetScreen(), t.GetPos())
 			if draw:
-				t.Draw(stat, self.east, unknownTrain=self.unknownTrain)
+				t.SetContainingBlock(self)
+				t.Draw(stat, self.east)
+			#else:
+				#t.SetContainingBlock(None)
 
 		self.district.DrawOthers(self)
 		self.DrawTrain()

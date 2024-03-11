@@ -17,6 +17,8 @@ logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "atc.log"), filem
 
 import json
 
+from dispatcher.constants import RegAspects
+
 from atc.settings import Settings
 from atc.turnout import Turnout
 from atc.signal import Signal
@@ -40,7 +42,7 @@ from atc.ticker import Ticker
 
 class MainFrame(wx.Frame):
 	def __init__(self):
-		wx.Frame.__init__(self, None, size=(900, 800), style=(wx.FRAME_NO_TASKBAR | wx.STAY_ON_TOP) & ~(wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.MAXIMIZE_BOX))  #wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
+		wx.Frame.__init__(self, None, size=(900, 800), style=(wx.STAY_ON_TOP | wx.CAPTION) & ~(wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.MAXIMIZE_BOX))
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		
 		self.sessionid = None
@@ -312,7 +314,7 @@ class MainFrame(wx.Frame):
 				signame = gs["signal"]
 				logging.info("Governing signal is %s" % signame)
 				if signame in self.signals:
-					aspect = self.signals[signame].GetAspect()
+					aspect, aspectType = self.signals[signame].GetAspect()
 					logging.info("Retrieved aspect = %s" % str(aspect))
 					
 				if "os" in gs and "route" in gs and aspect != 0:
@@ -323,9 +325,13 @@ class MainFrame(wx.Frame):
 						# either we don't know that OS or its not set to the needed route
 						logging.info("setting aspect to 0")
 						aspect = 0
+						aspectType = RegAspects
+						
+			else:
+				logging.error("Unable to interpret governing signal %s" % str(gs))
 	
-			logging.info("Using aspect %d" % aspect)
-			dccl.SetGoverningAspect(aspect)
+			logging.info("Using aspect %d/%d" % (aspect, aspectType))
+			dccl.SetGoverningAspect(aspect, aspectType)
 			dccl.SetPendingStop(dccl.GetGoverningAspect() == 0)	
 			
 			self.dccRemote.SelectLoco(dccl.GetLoco())
@@ -397,13 +403,23 @@ class MainFrame(wx.Frame):
 						b.SetClear(clear)
 
 			elif cmd == "signal":
+				print("ATC Signal command: %s" % str(parms), flush=True)
 				for p in parms:
 					sigName = p["name"]
-					aspect = int(p["aspect"])
+					try:
+						aspect = int(p["aspect"])
+					except:
+						aspect = 0  # stop if uncertain
+						
+					try:
+						aspectType = int(p["aspecttype"])
+					except:
+						aspectType = RegAspects
+						
 					if sigName not in self.signals:
-						self.signals[sigName] = Signal(self, sigName, aspect)
+						self.signals[sigName] = Signal(self, sigName, aspect, aspectType)
 					else:
-						self.signals[sigName].SetAspect(aspect)
+						self.signals[sigName].SetAspect(aspect, aspectType)
 
 			elif cmd == "signallock":
 				for p in parms:
@@ -452,11 +468,12 @@ class MainFrame(wx.Frame):
 
 						self.trains[name].AddBlock(block)
 						self.trains[name].SetEast(east)
-						self.blocks[block].SetEast(east)
+						self.blocks[block].SetDirection(east)
 
 						self.blocks[block].SetTrain(name, loco)
 						
 			elif cmd == "trainsignal":
+				print("ATC TrainSignal command: %s" % str(parms), flush=True)
 				train = parms["train"][0]
 				dccl = self.dccRemote.GetDCCLocoByTrain(train)
 				if dccl is None:
@@ -569,8 +586,8 @@ class MainFrame(wx.Frame):
 	def SignalLockChange(self, sigName, nLock):
 		logging.info("signal %s lock has changed %s" % (sigName, str(nLock)))
 
-	def SignalAspectChange(self, sigName, nAspect):
-		logging.info("signal %s aspect has changed %d" % (sigName, nAspect))
+	def SignalAspectChange(self, sigName, nAspect, nAspectType):
+		logging.info("signal %s aspect has changed %d/%d" % (sigName, nAspect, nAspectType))
 
 	def TurnoutLockChange(self, toName, nLock):
 		logging.info("turnout %s lock has changed %s" % (toName, str(nLock)))

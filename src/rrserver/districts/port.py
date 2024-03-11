@@ -298,6 +298,9 @@ class Port(District):
 			self.rr.AddSignalLever("PB14",  self, n, addr, [(5, 1), (5, 0), (4, 7)])
 				
 			self.rr.AddHandswitchUnlock("PBSw15ab",    self, n, addr, [(5, 2)])
+			
+			self.rr.AddTurnoutPosition("PBSw17", self, n, addr, [(5, 4), (5, 5)])
+			self.rr.AddBlock("P33",    self, n, addr, [(5, 6)], False)	
 
 	def SetAspect(self, sig, aspect):
 		if sig.Name() == "PA4L":

@@ -1,4 +1,5 @@
 import logging
+from dispatcher.constants import RegAspects
 
 FORWARD = 'F'
 REVERSE = 'R'
@@ -15,6 +16,7 @@ class DCCLoco:
 		self.bell = False
 		self.governingSignal = None
 		self.governingAspect = 0
+		self.governingAspectType = RegAspects
 		self.profiler = None
 		self.movedBeyondOrigin = False
 		self.headAtTerminus = False
@@ -184,7 +186,7 @@ class DCCLoco:
 	def SetGoverningSignal(self, sig):
 		self.governingSignal = sig
 		
-	def SetGoverningAspect(self, aspect):
+	def SetGoverningAspect(self, aspect, aspectType):
 		if self.inBlock:
 			# the signal aspect is "frozen" after we pass it so make no change here
 			return 
@@ -195,13 +197,14 @@ class DCCLoco:
 			self.step = 0 
 			return
 		
-		self.governingAspect = aspect	
+		self.governingAspect = aspect
+		self.governingAspectType = aspectType	
 		if self.profiler is None:
 			self.startSpeed = 0
 			self.targetSpeed = 0
 			self.step = 0
 		else:
-			self.startSpeed, self.targetSpeed, self.step = self.profiler(self.loco, aspect, self.speed)
+			self.startSpeed, self.targetSpeed, self.step = self.profiler(self.loco, aspect, aspectType, self.speed)
 		
 	def GetGoverningAspect(self):
 		if self.completed:

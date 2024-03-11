@@ -898,13 +898,13 @@ class MainFrame(wx.Frame):
 				self.procATC = Popen([sys.executable, atcExec])
 				self.pidATC = self.procATC.pid
 				logging.debug("atc server started as PID %d" % self.pidATC)
-				self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": 1600, "y": 31}}
+				self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": 1600, "y": 0}}
 				wx.CallLater(750, self.sendPendingATCShow)
 			else:
-				self.Request( {"atc": {"action": ["show"], "x": 1600, "y": 31}})
+				self.Request( {"atc": {"action": ["show"], "x": 1600, "y": 0}})
 
 		else:
-			self.Request({"atc": { "action": "hide", "x": 1600, "y": 31}})
+			self.Request({"atc": { "action": "hide", "x": 1600, "y": 0}})
 
 	def OnCBOSSLocks(self, evt):
 		self.SendOSSLocks()
@@ -2387,6 +2387,7 @@ class MainFrame(wx.Frame):
 				self.PopupEvent("Breaker: %s" % BreakerName(name))
 				self.breakerDisplay.AddBreaker(name)
 			else:
+				#self.PopupAdvice("Breaker Cleared: %s" % BreakerName(name))
 				self.breakerDisplay.DelBreaker(name)
 
 			if name in self.indicators:

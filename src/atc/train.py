@@ -4,7 +4,7 @@ class Train:
 		self.name = name
 		self.loco = loco
 		self.blocks = []
-		
+		self.east = True
 
 	def AddBlock(self, block):
 		if block in self.blocks:
@@ -12,6 +12,9 @@ class Train:
 
 		self.blocks.append(block)
 		self.parent.TrainAddBlock(self.name, block)
+		
+	def SetEast(self, flag):
+		self.east = flag
 		
 	def GetBlocks(self):
 		return self.blocks

@@ -3,6 +3,7 @@ import logging
 import json
 
 from atc.dccloco import DCCLoco, FORWARD, REVERSE
+from dispatcher.constants import aspectprofileindex
 
 
 class DCCRemote:
@@ -37,21 +38,23 @@ class DCCRemote:
 			
 		return False
 	
-	def Profiler(self, loco, aspect, speed):
+	def Profiler(self, loco, aspect, aspectType, speed):
 		if loco in self.profiles:
 			profile = self.profiles[loco]
 		else:
 			logging.info("loco %s not in profiles - using default profile %s" % (str(loco), type(loco)))
 			profile = self.defaultProfile
-			
-		if aspect == 0:
+
+		idx = aspectprofileindex(aspect, aspectType)			
+		if idx == 0:  #stop
 			return 0, 0, 0 if speed == 0 else -10
-		elif aspect == 0b011: #clear
-			target = profile["fast"]
-		elif aspect in [ 0b100, 0b110, 0b101 ]: # Restricting or Approach Slow
+		
+		if idx == 1: # restricting
 			target = profile["slow"]
-		else:
+		elif idx == 2: # approach
 			target = profile["medium"]
+		else: # clear
+			target = profile["fast"]
 			
 		start = profile["start"]
 		

@@ -417,33 +417,51 @@ class Port (District):
 
 		self.blocks["P32"] = Block(self, self.frame, "P32",
 			[
-				(self.tiles["diagleft"],      self.screen, (146, 31), False),
-				(self.tiles["diagleft"],      self.screen, (147, 30), False),
-				(self.tiles["turnrightdown"], self.screen, (148, 29), False),
-				(self.tiles["verticalnc"],    self.screen, (148, 28), False),
-				(self.tiles["vertical"],      self.screen, (148, 27), False),
-				(self.tiles["verticalnc"],    self.screen, (148, 26), False),
+				(self.tiles["horiznc"],       self.screen, (148, 33), False),
+				(self.tiles["turnleftright"], self.screen, (149, 33), False),
+				(self.tiles["diagleft"],      self.screen, (150, 32), False),
+				(self.tiles["diagleft"],      self.screen, (151, 31), False),
+				(self.tiles["diagleft"],      self.screen, (152, 30), False),
+				(self.tiles["turnrightdown"], self.screen, (153, 29), False),
+				(self.tiles["verticalnc"],    self.screen, (153, 28), False),
+				(self.tiles["vertical"],      self.screen, (153, 27), False),
+				(self.tiles["verticalnc"],    self.screen, (153, 26), False),
+				(self.tiles["horiz"],         self.screen, (145, 33), False),
+				(self.tiles["eobleftup"],     self.screen, (147, 32), False),
+				(self.tiles["horiz"],         self.screen, (147, 33), False),
 
-				(self.tiles["horiznc"],        LaKr,        (113, 21), False),
-				(self.tiles["turnrightright"], LaKr,        (114, 21), False),
-				(self.tiles["turnleftup"],     LaKr,        (115, 22), False),
-				(self.tiles["verticalnc"],     LaKr,        (115, 23), False),
-				(self.tiles["vertical"],       LaKr,        (115, 24), False),
-				(self.tiles["verticalnc"],     LaKr,        (115, 25), False),
-				(self.tiles["vertical"],       LaKr,        (115, 26), False),
+				(self.tiles["verticalnc"],    LaKr,        (111, 24), False),
+				(self.tiles["vertical"],      LaKr,        (111, 25), False),
+				(self.tiles["verticalnc"],    LaKr,        (111, 26), False),
 			], False)
-		self.blocks["P32"].AddTrainLoc(self.screen, (147, 29))
-		self.blocks["P32"].AddTrainLoc(LaKr, (113, 21))
+		self.blocks["P32"].AddTrainLoc(self.screen, (152, 30))
+		self.blocks["P32"].AddTrainLoc(LaKr, (110, 24))
 		self.blocks["P32"].AddStoppingBlock([
-				(self.tiles["eobleft"],  self.screen, (143, 33), False),
-				(self.tiles["turnleftright"], self.screen, (144, 33), False),
-				(self.tiles["diagleft"], self.screen, (145, 32), False),
+				(self.tiles["horiz"],         self.screen, (143, 33), False),
+				(self.tiles["horiznc"],       self.screen, (144, 33), False),
 			], False)
 		self.blocks["P32"].AddStoppingBlock([
-				(self.tiles["eobleft"],  LaKr,        (110, 21), False),
-				(self.tiles["horiznc"],  LaKr,        (111, 21), False),
-				(self.tiles["horiz"],    LaKr,        (112, 21), True),
+				(self.tiles["turnrightright"], LaKr,        (110, 21), False),
+				(self.tiles["turnleftup"],     LaKr,        (111, 22), False),
+				(self.tiles["vertical"],       LaKr,        (111, 23), False),
 			], True)
+
+		self.blocks["P33"] = Block(self, self.frame, "P33",
+			[
+				(self.tiles["turnrightup"],   self.screen, (147, 31), False),
+				(self.tiles["diagleft"],      self.screen, (148, 30), False),
+				(self.tiles["diagleft"],      self.screen, (149, 29), False),
+				(self.tiles["turnrightdown"], self.screen, (150, 28), False),
+				(self.tiles["vertical"],      self.screen, (150, 27), False),
+				(self.tiles["verticalnc"],    self.screen, (150, 26), False),
+
+				(self.tiles["verticalnc"],    LaKr,        (103, 23), False),
+				(self.tiles["vertical"],      LaKr,        (103, 24), False),
+				(self.tiles["verticalnc"],    LaKr,        (103, 25), False),
+				(self.tiles["vertical"],      LaKr,        (103, 26), False),
+			], False)
+		self.blocks["P33"].AddTrainLoc(self.screen, (146, 31))
+		self.blocks["P33"].AddTrainLoc(LaKr, (101, 24))
 
 		self.blocks["P40"] = Block(self, self.frame, "P40",
 			[
@@ -477,12 +495,12 @@ class Port (District):
 
 		self.blocks["P42"] = Block(self, self.frame, "P42",
 			[
+				(self.tiles["horiznc"],  self.screen, (145, 35), False),
 				(self.tiles["horiz"],    self.screen, (146, 35), False),
 				(self.tiles["horiznc"],  self.screen, (147, 35), False),
 				(self.tiles["horiz"],    self.screen, (148, 35), False),
 				(self.tiles["horiz"],    self.screen, (150, 35), False),
 				(self.tiles["horiznc"],  self.screen, (151, 35), False),
-				(self.tiles["horiz"],    self.screen, (152, 35), False),
 				(self.tiles["horiznc"],  self.screen, (153, 35), False),
 
 				(self.tiles["horiznc"],  LaKr,        (109, 15), False),
@@ -844,8 +862,9 @@ class Port (District):
 			[ "PBSw13b", "toleftleft",   ["POSCJ1", "POSCJ2"], (141, 33) ],
 
 			[ "PBSw5",   "torightright", ["P41"], (129, 35) ],
-			[ "PBSw15a", "toleftright",  ["P42"], (145, 35) ],
-			[ "PBSw15b", "toleftleft",   ["P42"], (149, 35) ],
+			[ "PBSw15a", "toleftright",  ["P42"], (149, 35) ],
+			[ "PBSw15b", "toleftleft",   ["P42"], (152, 35) ],
+			[ "PBSw17",  "toleftright",  [], (146, 33) ],
 
 			[ "PASw27",  "toleftup",     ["POSPJ1"], (118, 20) ],
 			[ "PASw29",  "toleftup",     ["POSPJ1"], (120, 22) ],
@@ -869,6 +888,11 @@ class Port (District):
 			for blknm in blks:
 				blocks[blknm].AddTurnout(trnout)
 				trnout.AddBlock(blknm)
+				
+			if tonm == "PBSw17":
+				b = blocks["P32"]
+				b.AddTurnout(trnout)
+				trnout.SetContainingBlock(b)
 			trnout.SetDisabled(True)
 			self.turnouts[tonm] = trnout
 
@@ -1331,12 +1355,12 @@ class Port (District):
 	def DefineHandSwitches(self):
 		self.handswitches = {}
 
-		hs = HandSwitch(self, self.screen, self.frame, self.blocks["P42"], "PBSw15a.hand", (145, 34), self.misctiles["handdown"])
+		hs = HandSwitch(self, self.screen, self.frame, self.blocks["P42"], "PBSw15a.hand", (149, 34), self.misctiles["handdown"])
 		hs.SetDisabled(True)
 		self.blocks["P42"].AddHandSwitch(hs)
 		self.handswitches["PBSw15a.hand"] = hs
 
-		hs = HandSwitch(self, self.screen, self.frame, self.blocks["P42"], "PBSw15b.hand", (149, 36), self.misctiles["handup"])
+		hs = HandSwitch(self, self.screen, self.frame, self.blocks["P42"], "PBSw15b.hand", (152, 36), self.misctiles["handup"])
 		hs.SetDisabled(True)
 		self.blocks["P42"].AddHandSwitch(hs)
 		self.handswitches["PBSw15b.hand"] = hs

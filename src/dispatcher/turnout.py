@@ -1,5 +1,4 @@
-from dispatcher.constants import NORMAL, REVERSE, EMPTY, TURNOUT, SLIPSWITCH
-
+from dispatcher.constants import NORMAL, REVERSE, EMPTY, OCCUPIED, TURNOUT, SLIPSWITCH
 
 class Turnout:
 	def __init__(self, district, frame, name, screen, tiles, pos):
@@ -18,8 +17,8 @@ class Turnout:
 		self.controllingTurnout = None
 		self.opposite = False
 		self.ttype = TURNOUT
-		self.block = None
 		self.blockList = []
+		self.containingBlock = None
 		self.locked = False
 		self.lockedBy = []
 		if pos is None:
@@ -33,6 +32,9 @@ class Turnout:
 
 	def IsDisabled(self):
 		return self.disabled
+	
+	def SetContainingBlock(self, blk):
+		self.containingBlock = blk
 
 	def SetLock(self, signame, flag=True, refresh=False):
 		if flag:
@@ -75,14 +77,20 @@ class Turnout:
 	def AddBlock(self, blknm):
 		self.blockList.append(self.frame.blocks[blknm])
 
-	def Draw(self, blockstat=None, east=None, unknownTrain=False):
+	def Draw(self, blockstat=None, east=None):
 		if east is None:
 			east = self.eastFromBlock
 		if blockstat is None:
 			blockstat = self.statusFromBlock
 
 		if self.pos is not None:
+			if self.containingBlock is not None and blockstat == OCCUPIED:
+				unknownTrain = self.containingBlock.HasUnknownTrain()
+			else:
+				unknownTrain = False
+
 			tostat = NORMAL if self.normal else REVERSE
+				
 			bmp = self.tiles.getBmp(tostat, blockstat, east, self.routeControlled or self.disabled or self.locked, unknownTrain=unknownTrain)
 			self.frame.DrawTile(self.screen, self.pos, bmp)
 
@@ -170,9 +178,6 @@ class Turnout:
 
 	def GetScreen(self):
 		return self.screen
-
-	def GetBlock(self):
-		return self.block
 
 	def GetPos(self):
 		return self.pos
@@ -279,6 +284,12 @@ class SlipSwitch(Turnout):
 	def Draw(self, blkStat=None, east=None, unknownTrain=False):
 		if blkStat is None:
 			blkStat = self.statusFromBlock
+			
+		if self.containingBlock is not None and blkStat == OCCUPIED:
+			unknownTrain = self.containingBlock.HasUnknownTrain()
+		else:
+			unknownTrain = False
+
 		bmp = self.tiles.getBmp(self.status, blkStat, self.routeControlled or self.disabled or self.locked, unknownTrain=unknownTrain)
 		self.frame.DrawTile(self.screen, self.pos, bmp)
 		self.statusFromBlock = blkStat

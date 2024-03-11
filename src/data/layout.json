@@ -575,6 +575,11 @@
       "sbeast": "P32.E",
       "sbwest": "P32.W"
     },
+    "P33": {
+      "east": 0,
+      "sbeast": null,
+      "sbwest": null
+    },
     "P4": {
       "east": 1,
       "sbeast": null,

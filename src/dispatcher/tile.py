@@ -243,6 +243,16 @@ def loadTiles(bitmaps):
 		"green": b.eobright.routed,
 		"red": b.eobright.occupied,
 		"yellow": b.eobright.unknown})
+	tiles["eobdown"] = Tile("eobdown", {
+		"white": b.eobdown.normal,
+		"green": b.eobdown.routed,
+		"red": b.eobdown.occupied,
+		"yellow": b.eobdown.unknown})
+	tiles["eobleftup"] = Tile("eobleftup", {
+		"white": b.eobleftup.normal,
+		"green": b.eobleftup.routed,
+		"red": b.eobleftup.occupied,
+		"yellow": b.eobleftup.unknown})
 	tiles["diagleft"] = Tile("diagleft", {
 		"white": b.diagleft.normal,
 		"green": b.diagleft.routed,
