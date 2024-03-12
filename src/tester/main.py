@@ -12,7 +12,7 @@ from tester.bus import Bus
 from tester.outbyte import OutByte, EVT_OUTPUTCHANGE
 from tester.inbyte import InByte
 from tester.choosenode import ChooseNodeDlg
-from tester.settings import Settings
+from dispatcher.settings import Settings
 
 ofp = open(os.path.join(os.getcwd(), "output", "tester.out"), "w")
 efp = open(os.path.join(os.getcwd(), "output", "tester.err"), "w")
@@ -54,7 +54,7 @@ class MyFrame(wx.Frame):
         self.ibytes = []
         
         if not refOnly:
-            self.bus = Bus(self.settings.rrtty)
+            self.bus = Bus(self.settings.rrserver.rrtty)
         
         with open(fn, "r") as jfp:
             node = json.load(jfp)
@@ -196,7 +196,7 @@ class MyFrame(wx.Frame):
             self.ticker = wx.Timer(self)
             
             if not self.bus.isOpen():
-                dlg = wx.MessageDialog(self, "Unable to open serial port %s to railroad" % self.settings.rrtty,
+                dlg = wx.MessageDialog(self, "Unable to open serial port %s to railroad" % self.settings.rrserver.rrtty,
                                        "Serial Port Exception",
                                        wx.OK | wx.ICON_ERROR)
                 dlg.ShowModal()

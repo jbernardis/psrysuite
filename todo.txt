@@ -28,6 +28,10 @@ notes regarding locale:
 			
 add fields to active train list: time since assigned, stopped > 5 minutes
 
-merge all settings.py files into a single module
+add the following configurable fields to config tool:
+	debug level
+	show aspect calc flag (?)
+	
+consider mosving ini values showcameras and pages from dispatcher section to display section
 
 when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)

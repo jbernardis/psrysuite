@@ -5,7 +5,7 @@ import os
 import json
 import logging
 
-from simulator.settings import Settings
+from dispatcher.settings import Settings
 
 
 from simulator.listener import Listener

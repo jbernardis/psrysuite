@@ -18,7 +18,7 @@ class Yard (District):
 		self.buttonToRoute = None
 		self.sw17 = None
 		self.sw21 = None
-		self.matrixturnoutdelay = frame.settings.matrixturnoutdelay
+		self.matrixturnoutdelay = frame.settings.dispatcher.matrixturnoutdelay
 
 	def Draw(self):
 		District.Draw(self)

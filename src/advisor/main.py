@@ -17,7 +17,7 @@ from queue import Queue
 
 import json
 
-from advisor.settings import Settings
+from dispatcher.settings import Settings
 
 from advisor.triggers import Triggers, TriggerPointFront, TriggerPointRear
 from advisor.routerequest import RouteRequest

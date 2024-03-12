@@ -18,10 +18,9 @@ from queue import Queue
 
 import json
 
+from dispatcher.settings import Settings
+
 from autorouter.fifo import Fifo
-
-from autorouter.settings import Settings
-
 from autorouter.triggers import Triggers, TriggerPointFront, TriggerPointRear
 from autorouter.routerequest import RouteRequest
 from autorouter.requestqueue import RequestQueue

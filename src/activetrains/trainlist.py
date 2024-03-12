@@ -95,11 +95,11 @@ class ActiveTrainsPanel(wx.Panel):
 		self.parent = parent
 		
 		self.settings = parent.settings
-		self.suppressYards =   self.settings.activesuppressyards
-		self.suppressUnknown = self.settings.activesuppressunknown
-		self.suppressNonATC =  self.settings.activeonlyatc
-		self.suppressNonAssigned =  self.settings.activeonlyassigned
-		self.suppressNonAssignedAndKnown = self.settings.activeonlyassignedorunknown
+		self.suppressYards =   self.settings.activetrains.suppressyards
+		self.suppressUnknown = self.settings.activetrains.suppressunknown
+		self.suppressNonATC =  self.settings.activetrains.onlyatc
+		self.suppressNonAssigned =  self.settings.activetrains.onlyassigned
+		self.suppressNonAssignedAndKnown = self.settings.activetrains.onlyassignedorunknown
 		
 		self.resized = False
 

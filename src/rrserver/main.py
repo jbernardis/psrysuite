@@ -7,7 +7,7 @@ lfn = os.path.join(os.getcwd(), "logs", "rrserver.log")
 
 import logging
 import logging.handlers
-from rrserver.settings import Settings
+from dispatcher.settings import Settings
 should_roll_over = os.path.isfile(lfn)
 
 settings = Settings()
@@ -70,7 +70,7 @@ class ServerMain:
 		self.socketServer = None
 		self.dispServer = None
 		
-		logging.info("PSRY Suite - Railroad server starting %s" % ("" if not settings.simulation else " - simulation mode"))
+		logging.info("PSRY Suite - Railroad server starting %s" % ("" if not settings.rrserver.simulation else " - simulation mode"))
 		logging.info("Sending logging output  to %s" % lfn)
 		
 		self.commandsSeen = []
@@ -81,6 +81,7 @@ class ServerMain:
 		self.pidDCCSniffer = None
 		self.timeValue = None
 		self.clockStatus = 2
+		self.busInterval = settings.rrserver.businterval
 		
 		self.cmdQ = queue.Queue()
 
@@ -121,7 +122,7 @@ class ServerMain:
 		
 		logging.info("socket server started - starting DCC HTTP Server")
 
-		if not settings.simulation:
+		if not settings.rrserver.simulation:
 			logging.info("Starting DCC Server")		
 			continueInit = self.StartDCCServer()		
 		else:
@@ -135,8 +136,8 @@ class ServerMain:
 
 		
 	def DelayedStartup(self, _):
-		if not settings.simulation:
-			self.rrBus = Bus(settings.rrtty)
+		if not settings.rrserver.simulation:
+			self.rrBus = Bus(settings.rrserver.rrtty)
 			self.rr.setBus(self.rrBus)
 			pname = os.path.join(os.getcwd(), "dccsniffer", "main.py")
 			self.DCCSniffer = Popen([sys.executable, pname])
@@ -144,9 +145,9 @@ class ServerMain:
 			logging.info("started DCC sniffer process as PID %d" % pid)
 
 	def StartDCCServer(self):
-		self.DCCServer = DCCHTTPServer(settings.ipaddr, settings.dccserverport, settings.dcctty)
+		self.DCCServer = DCCHTTPServer(settings.ipaddr, settings.dccserverport, settings.rrserver.dcctty)
 		if not self.DCCServer.IsConnected():
-			logging.error("Failed to open DCC bus on device %s.  Exiting..." % settings.dcctty)
+			logging.error("Failed to open DCC bus on device %s.  Exiting..." % settings.rrserver.dcctty)
 			return False
 		else:
 			logging.info("DCC HTTP server successfully started")
@@ -628,7 +629,7 @@ class ServerMain:
 		self.DoBusReopen()
 		
 	def DoBusReopen(self):
-		if settings.simulation:
+		if settings.rrserver.simulation:
 			return 
 
 		self.pause = 12 # pause I/O for 12 (~5 seconds) cycles while port is re-opened		
@@ -887,7 +888,7 @@ class ServerMain:
 
 	def AtInterval(self):
 		if self.forever:
-			threading.Timer(0.4, self.AtInterval).start()
+			threading.Timer(self.busInterval, self.AtInterval).start()
 			if self.delay is None or self.delay <= 0:
 				self.cmdQ.put({"cmd": ["interval"]})
 			elif self.delay > 0:
@@ -918,7 +919,7 @@ class ServerMain:
 		except Exception as e:
 			logging.error("exception %s terminating socket server" % str(e))
 		
-		if not settings.simulation:
+		if not settings.rrserver.simulation:
 			try:
 				self.DCCSniffer.kill()
 			except Exception as e:

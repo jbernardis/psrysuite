@@ -4,7 +4,7 @@ import requests
 
 from monitor.getbitsdlg import GetBitsDlg
 from monitor.setinputbitsdlg import SetInputBitsDlg
-from monitor.settings import Settings
+from dispatcher.settings import Settings
 from monitor.sessionsdlg import SessionsDlg
 from monitor.trainsdlg import TrainsDlg
 
@@ -153,7 +153,7 @@ class MainFrame(wx.Frame):
 		
 		vsz.AddSpacer(20)
 		
-		if self.settings.simulation:		
+		if self.settings.rrserver.simulation:		
 			hsz = wx.BoxSizer(wx.HORIZONTAL)
 			hsz.AddSpacer(20)
 	
@@ -165,7 +165,7 @@ class MainFrame(wx.Frame):
 			
 			vsz.AddSpacer(20)
 			
-		if self.settings.simulation:		
+		if self.settings.rrserver.simulation:		
 			hsz = wx.BoxSizer(wx.HORIZONTAL)
 			hsz.AddSpacer(20)
 			
@@ -189,7 +189,7 @@ class MainFrame(wx.Frame):
 			
 			vsz.AddSpacer(20)
 			
-		if self.settings.simulation:		
+		if self.settings.rrserver.simulation:		
 			hsz = wx.BoxSizer(wx.HORIZONTAL)
 			hsz.AddSpacer(20)
 	
@@ -218,7 +218,7 @@ class MainFrame(wx.Frame):
 			
 			vsz.AddSpacer(20)
 
-		if self.settings.simulation:			
+		if self.settings.rrserver.simulation:			
 			hsz = wx.BoxSizer(wx.HORIZONTAL)
 			hsz.AddSpacer(20)
 			
@@ -252,7 +252,7 @@ class MainFrame(wx.Frame):
 		self.bSessions.Enable(flag)
 		self.bTrains.Enable(flag)
 		self.bGetBits.Enable(flag)
-		if self.settings.simulation:
+		if self.settings.rrserver.simulation:
 			self.bOccupy.Enable(flag)
 			self.bBreaker.Enable(flag)
 			self.bClearAll.Enable(flag)
@@ -337,7 +337,7 @@ class MainFrame(wx.Frame):
 		else:
 			self.connected = True
 
-		if self.settings.simulation:			
+		if self.settings.rrserver.simulation:			
 			b = layout["blocks"]
 			
 			bl = [bn for bn in b.keys()]

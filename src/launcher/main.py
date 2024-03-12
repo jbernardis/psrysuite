@@ -6,7 +6,7 @@ if cmdFolder not in sys.path:
 
 from subprocess import Popen, STARTUPINFO, STARTF_USESHOWWINDOW, DEVNULL
    
-from launcher.settings import Settings
+from dispatcher.settings import Settings
 
 SW_MINIMIZE = 6
 infoMinimize = STARTUPINFO()

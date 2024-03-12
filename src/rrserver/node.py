@@ -35,11 +35,11 @@ class Node:
         self.outb = [0 for _ in range(bcount)]
         self.inb = [0 for _ in range(bcount)]
         self.lastinb = [0 for _ in range(bcount)]
-        self.topulselen = settings.topulselen
-        self.topulsect = settings.topulsect
-        self.nxbpulselen = settings.nxbpulselen
-        self.nxbpulsect = settings.nxbpulsect
-        self.ioerrorthreshold = settings.ioerrorthreshold
+        self.topulselen = settings.rrserver.topulselen
+        self.topulsect = settings.rrserver.topulsect
+        self.nxbpulselen = settings.rrserver.nxbpulselen
+        self.nxbpulsect = settings.rrserver.nxbpulsect
+        self.ioerrorthreshold = settings.rrserver.ioerrorthreshold
         self.first = True
         
         self.errorCount = 0

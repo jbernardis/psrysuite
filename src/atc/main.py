@@ -18,8 +18,8 @@ logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "atc.log"), filem
 import json
 
 from dispatcher.constants import RegAspects
+from dispatcher.settings import Settings
 
-from atc.settings import Settings
 from atc.turnout import Turnout
 from atc.signal import Signal
 from atc.block import Block

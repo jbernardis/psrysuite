@@ -4,7 +4,7 @@ cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
-from activetrains.settings import Settings
+from dispatcher.settings import Settings
 from activetrains.mainframe import MainFrame
 
 settings = Settings()

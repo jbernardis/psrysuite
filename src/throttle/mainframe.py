@@ -3,7 +3,7 @@ import wx
 import wx.lib.agw.knobctrl as KC
 import wx.lib.gizmos as gizmos
 
-from throttle.settings import Settings
+from dispatcher.settings import Settings
 from throttle.dccserver import DCCServer
 from throttle.rrserver import RRServer
 from throttle.dccremote import DCCRemote

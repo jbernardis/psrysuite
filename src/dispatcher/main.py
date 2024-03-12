@@ -9,7 +9,7 @@ from dispatcher.mainframe import MainFrame
 
 settings = Settings()
 
-if settings.dispatch:
+if settings.dispatcher.dispatch:
 	fn = "dispatch"
 else:
 	fn = "display"

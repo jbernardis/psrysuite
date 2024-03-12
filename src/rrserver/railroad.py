@@ -60,10 +60,10 @@ class Railroad():
 		self.reSigName = re.compile("([A-Z][0-9]*)([A-Z])")
 		
 		self.pulsedOutputs = {} 
-		self.topulselen = self.settings.topulselen
-		self.topulsect = self.settings.topulsect
-		self.nxbpulselen = self.settings.nxbpulselen
-		self.nxbpulsect = self.settings.nxbpulsect
+		self.topulselen = self.settings.rrserver.topulselen
+		self.topulsect = self.settings.rrserver.topulsect
+		self.nxbpulselen = self.settings.rrserver.nxbpulselen
+		self.nxbpulsect = self.settings.rrserver.nxbpulsect
 		
 		
 		self.fleetedSignals = {}
@@ -121,10 +121,10 @@ class Railroad():
 		for d in self.districts.values():
 			d.Initialize()
 			
-		self.SetControlOption("nassau", self.settings.controlnassau)
-		self.SetControlOption("cliff", self.settings.controlcliff)
-		self.SetControlOption("yard", self.settings.controlyard)
-		self.SetControlOption("signal4", self.settings.controlsignal4l)
+		self.SetControlOption("nassau", self.settings.control.nassau)
+		self.SetControlOption("cliff", self.settings.control.cliff)
+		self.SetControlOption("yard", self.settings.control.yard)
+		self.SetControlOption("signal4", self.settings.control.signal4l)
 		self.SetControlOption("bank.fleet", 0)
 		self.SetControlOption("carlton.fleet", 0)
 		self.SetControlOption("cliff.fleet", 0)
@@ -330,7 +330,7 @@ class Railroad():
 			turnout.node.SetOutputBit(Nbyte, Nbit, Nval)
 			turnout.node.SetOutputBit(Rbyte, Rbit, Rval)
 		
-		if self.settings.simulation:
+		if self.settings.rrserver.simulation:
 			'''
 			if simulation, set the corresponding input bits to show switch position change
 			if there is no position information, defer to the district logic
@@ -357,7 +357,7 @@ class Railroad():
 		self.pulsedOutputs[bname] = PulseCounter(Bbyte, Bbit, self.nxbpulsect, self.nxbpulselen, btn.node)
 		
 		btn.node.SetOutputBit(Bbyte, Bbit, 1)
-		if self.settings.simulation:
+		if self.settings.rrserver.simulation:
 			'''
 			let the district code determine the course of action to simulate the route
 			'''
@@ -1178,7 +1178,7 @@ class PendingDetectionLoss:
 	def __init__(self, railroad):
 		self.pendingDetectionLoss = {}
 		self.railroad = railroad
-		self.pendingDetectionLossCycles = railroad.settings.pendingdetectionlosscycles
+		self.pendingDetectionLossCycles = railroad.settings.rrserver.pendingdetectionlosscycles
 				
 	def Add(self, block, obj):
 		self.pendingDetectionLoss[block] = [obj, self.pendingDetectionLossCycles]

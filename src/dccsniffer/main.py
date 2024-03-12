@@ -14,7 +14,7 @@ import json
 import logging
 logging.basicConfig(filename=os.path.join(os.getcwd(), "logs", "dccsniffer.log"), filemode='w', format='%(asctime)s %(message)s', level=logging.DEBUG)
 
-from dccsniffer.settings import Settings
+from dispatcher.settings import Settings
 from dccsniffer.sniffer import Sniffer
 from dccsniffer.rrserver import RRServer
 from dccsniffer.listener import Listener
@@ -29,9 +29,9 @@ class MainUnit:
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
 		
 		self.sniffer = Sniffer()
-		self.sniffer.connect(self.settings.dccsniffertty)
+		self.sniffer.connect(self.settings.dccsniffer.tty)
 		if not self.sniffer.isConnected():
-			logging.error("Unable to connect to port %s for DCC sniffer" % self.settings.dccsniffertty)
+			logging.error("Unable to connect to port %s for DCC sniffer" % self.settings.dccsniffer.tty)
 
 		else:			
 			self.listener = Listener(self, self.settings.ipaddr, self.settings.socketport)

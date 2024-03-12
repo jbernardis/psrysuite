@@ -112,7 +112,7 @@ class MainFrame(wx.Frame):
 			
 		self.settings = settings
 			
-		logging.info("%s process starting" % "dispatcher" if self.settings.dispatch else "display")
+		logging.info("%s process starting" % "dispatcher" if self.settings.dispatcher.dispatch else "display")
 
 		icon = wx.Icon()
 		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "dispatch.ico"), wx.BITMAP_TYPE_ANY))
@@ -127,10 +127,10 @@ class MainFrame(wx.Frame):
 		
 		self.delayedRequests = DelayedRequests()
 
-		self.title = "PSRY Dispatcher" if self.settings.dispatch else "PSRY Monitor"
+		self.title = "PSRY Dispatcher" if self.settings.dispatcher.dispatch else "PSRY Monitor"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.bitmaps = BitMaps(os.path.join(os.getcwd(), "images", "bitmaps"))
-		singlePage = self.settings.pages == 1
+		singlePage = self.settings.dispatcher.pages == 1
 		self.bmpw, self.bmph = self.bitmaps.diagrams.HydeYardPort.GetSize()
 		self.diagrams = {
 			HyYdPt: Node(HyYdPt, self.bitmaps.diagrams.HydeYardPort, 0),
@@ -142,7 +142,7 @@ class MainFrame(wx.Frame):
 		ht = None # diagram height.  None => use bitmap size.  use a number < 800 to trim bottom off of diagram bitmaps
 		self.diagramWidth = 2560
 
-		if self.settings.pages == 1:  # set up a single ultra-wide display accross 3 monitors
+		if self.settings.dispatcher.pages == 1:  # set up a single ultra-wide display accross 3 monitors
 			dp = TrackDiagram(self, [self.diagrams[sn] for sn in screensList], ht)
 			dp.SetPosition((16, 120))
 			_, diagramh = dp.GetSize()
@@ -176,7 +176,7 @@ class MainFrame(wx.Frame):
 
 		self.ToasterSetup()
 
-		if self.settings.showcameras:
+		if self.settings.dispatcher.showcameras:
 			self.DrawCameras()
 
 		voffset = topSpace+diagramh+10
@@ -184,7 +184,7 @@ class MainFrame(wx.Frame):
 		self.DefineWidgets(voffset)
 		self.DefineControlDisplay(voffset)
 		
-		if self.settings.pages == 3:
+		if self.settings.dispatcher.pages == 3:
 			self.currentScreen = None
 			self.SwapToScreen(LaKr)
 		else:
@@ -302,11 +302,11 @@ class MainFrame(wx.Frame):
 			self.bSnapshot.Enable(False)
 			self.Bind(wx.EVT_BUTTON, self.OnBSnapshot, self.bSnapshot)
 
-		if self.IsDispatcher() or self.settings.showevents:			
+		if self.IsDispatcher() or self.settings.display.showevents:			
 			self.bEvents = wx.Button(self, wx.ID_ANY, "Events Log", pos=(self.centerOffset+840, 25), size=BTNDIM)
 			self.Bind(wx.EVT_BUTTON, self.OnBEventsLog, self.bEvents)
 
-		if self.IsDispatcher() or self.settings.showadvice:			
+		if self.IsDispatcher() or self.settings.display.showadvice:			
 			self.bAdvice = wx.Button(self, wx.ID_ANY, "Advice Log", pos=(self.centerOffset+840, 65), size=BTNDIM)
 			self.Bind(wx.EVT_BUTTON, self.OnBAdviceLog, self.bAdvice)
 			
@@ -323,7 +323,7 @@ class MainFrame(wx.Frame):
 	def OnKeyDown(self, evt):
 		kcd = evt.GetKeyCode()
 		if kcd == wx.WXK_PAGEUP:
-			if self.settings.pages == 3:
+			if self.settings.dispatcher.pages == 3:
 				if self.currentScreen == LaKr:
 					self.SwapToScreen(HyYdPt)
 				elif self.currentScreen == NaCl:
@@ -335,7 +335,7 @@ class MainFrame(wx.Frame):
 				self.SetPosition((self.shiftXOffset, self.shiftYOffset))
 				
 		elif kcd == wx.WXK_PAGEDOWN:
-			if self.settings.pages == 3:
+			if self.settings.dispatcher.pages == 3:
 				if self.currentScreen == HyYdPt:
 					self.SwapToScreen(LaKr)
 				elif self.currentScreen == LaKr:
@@ -417,7 +417,7 @@ class MainFrame(wx.Frame):
 			
 	def OnBResetClock(self, _):
 		self.tickerCount = 0
-		self.timeValue = self.settings.clockstarttime
+		self.timeValue = self.settings.dispatcher.clockstarttime
 		self.DisplayTimeValue()
 		
 	def OnBStartClock(self, _):
@@ -439,7 +439,7 @@ class MainFrame(wx.Frame):
 			self.ToD = False
 			self.bStartClock.Enable(True)
 			self.bResetClock.Enable(True)
-			self.timeValue = self.settings.clockstarttime
+			self.timeValue = self.settings.dispatcher.clockstarttime
 			
 		self.clockRunning = False
 		self.bStartClock.SetLabel("Start")
@@ -1207,7 +1207,7 @@ class MainFrame(wx.Frame):
 		return self.signalLeverMap[slname]
 
 	def IsDispatcher(self):
-		return self.settings.dispatch
+		return self.settings.dispatcher.dispatch
 
 	def resolveObjects(self):
 		for _, bk in self.blocks.items():
@@ -1470,7 +1470,7 @@ class MainFrame(wx.Frame):
 						self.menuTrain = tr
 						addedMenuItem = False
 						if not self.IsDispatcher():
-							if self.settings.allowatcrequests:
+							if self.settings.display.allowatcrequests:
 								if tr.IsOnATC():
 									menu.Append( MENU_ATC_REM_REQ, "Request: ATC Remove" )
 									self.Bind(wx.EVT_MENU, self.OnATCRemReq, id=MENU_ATC_REM_REQ)
@@ -1898,7 +1898,7 @@ class MainFrame(wx.Frame):
 		self.advice.SetTextColour(wx.Colour(0, 0, 0))
 
 	def PopupEvent(self, message, force=False):
-		if self.IsDispatcher() or self.settings.showevents or force:
+		if self.IsDispatcher() or self.settings.display.showevents or force:
 			self.events.Append(message)
 			self.eventsList.append(message)
 			if self.dlgEvents is not None:
@@ -1917,7 +1917,7 @@ class MainFrame(wx.Frame):
 		self.dlgEvents = None
 
 	def PopupAdvice(self, message, force=False):
-		if self.IsDispatcher() or self.settings.showadvice or force:
+		if self.IsDispatcher() or self.settings.display.showadvice or force:
 			self.advice.Append(message)
 			self.adviceList.append(message)
 			if self.dlgAdvice is not None:
@@ -2490,6 +2490,7 @@ class MainFrame(wx.Frame):
 							for blk in bl.values():
 								self.trains[name].AddToBlock(blk)
 							self.activeTrains.UpdateTrain(name)
+
 						else:
 							tr.SetName(name)
 							if name in self.trainList:
@@ -2537,8 +2538,10 @@ class MainFrame(wx.Frame):
 				
 				if loco:
 					self.activeTrains.SetLoco(tr, loco)
-				
-				self.activeTrains.UpdateTrain(tr.GetName())
+	
+				tid = tr.GetName()			
+				self.activeTrains.UpdateTrain(tid)
+				self.lostTrains.Remove(tid)
 
 				blk.EvaluateStoppingSections()
 				blk.Draw()   # this will redraw the train in this block only
@@ -2648,14 +2651,14 @@ class MainFrame(wx.Frame):
 	def DoCmdSessionID(self, parms):
 		self.sessionid = int(parms)
 		logging.info("connected to railroad server with session ID %d" % self.sessionid)
-		self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatch else "DISPLAY"}})
+		self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatcher.dispatch else "DISPLAY"}})
 		self.DoRefresh()
 		self.districts.OnConnect()
 		self.ShowTitle()
 
 	def DoCmdEnd(self, parms):
 		if parms["type"] == "layout":
-			if self.settings.dispatch:
+			if self.settings.dispatcher.dispatch:
 				self.SendBlockDirRequests()
 				self.SendOSRoutes()
 				self.SendCrossoverPoints()
@@ -2667,11 +2670,11 @@ class MainFrame(wx.Frame):
 				self.busy = None
 					
 	def DoCmdAdvice(self, parms):
-		if self.IsDispatcher() or self.settings.showadvice:
+		if self.IsDispatcher() or self.settings.display.showadvice:
 			self.PopupAdvice(parms["msg"][0])
 					
 	def DoCmdAlert(self, parms):
-		if self.IsDispatcher() or self.settings.showevents:
+		if self.IsDispatcher() or self.settings.display.showevents:
 			logging.info("ALERT: %s" % (str(parms)))
 			self.PopupEvent(parms["msg"][0])
 				
@@ -2711,7 +2714,12 @@ class MainFrame(wx.Frame):
 
 		
 	def DoCmdATC(self, parms):
-		trnm = parms["train"][0]
+		try:
+			trnm = parms["train"][0]
+		except KeyError:
+			logging.warning("Train parameter not found in ATC command: %s" % str(parms))
+			return 
+		
 		try:
 			tr = self.trains[trnm]
 		except KeyError:
@@ -3176,7 +3184,7 @@ class ExitDlg (wx.Dialog):
 		vsz.AddSpacer(20)
 	
 		self.cbKillServer = wx.CheckBox(self, wx.ID_ANY, "Shutdown Server")
-		self.cbKillServer.SetValue(self.parent.settings.precheckshutdownserver)
+		self.cbKillServer.SetValue(self.parent.settings.dispatcher.precheckshutdownserver)
 
 		vsz.Add(self.cbKillServer, 0, wx.ALIGN_CENTER)
 

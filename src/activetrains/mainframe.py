@@ -145,7 +145,7 @@ class MainFrame(wx.Frame):
 		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		vsz.AddSpacer(10)
 		
-		panel = self.activeTrains.CreateTrainListPanel(self, self.settings.activetrainlines)
+		panel = self.activeTrains.CreateTrainListPanel(self, self.settings.activetrains.lines)
 		vsz.Add(panel, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
 		vsz.AddSpacer(20)
