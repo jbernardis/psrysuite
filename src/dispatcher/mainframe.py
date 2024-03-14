@@ -2439,7 +2439,7 @@ class MainFrame(wx.Frame):
 							trid = tr.GetName()
 							if not tr.IsBeingEdited():
 								self.PopupEvent("Train %s - detection lost from block %s" % (trid, block))
-								self.lostTrains.Add(tr.GetName(), tr.GetLoco(). tr.GetEngineer(), block)
+								self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), block)
 							else:
 								tr.SetBeingEdited(False)
 							try:

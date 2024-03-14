@@ -1029,7 +1029,7 @@ class OverSwitch (Block):
 				self.district.EvaluateDistrictLocks(self.entrySignal)
 			if self.entrySignal is not None and self.entrySignal.GetFrozenAspect() is not None:
 				self.entrySignal.SetFrozenAspect(None)
-				self.frame.Request({"signal": { "name": signm, "aspect": aspect, "aspecttype": atype, "frozenaspect": None}})
+				self.frame.Request({"signal": { "name": self.entrySignal.GetName(), "aspect": aspect, "aspecttype": atype, "frozenaspect": None}})
 				tr = self.GetTrain()
 				if tr is not None:
 					self.frame.activeTrains.UpdateTrain(tr.GetName())

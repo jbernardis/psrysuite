@@ -195,7 +195,6 @@ class Settings:
 		self.display.allowatcrequests = True
 		self.display.showevents = False
 		self.display.showadvice = False
-		self.display.locale = "All"
 		if self.cfg.has_section(section):
 			for opt, value in self.cfg.items(section):
 				if opt == 'allowatcrequests':
@@ -204,8 +203,6 @@ class Settings:
 					self.display.showevents = parseBoolean(value, False)
 				elif opt == 'showadvice':
 					self.display.showadvice = parseBoolean(value, False)
-				elif opt == 'locale':
-					self.display.locale = value
 		else:
 			print("Missing %s section - assuming defaults" % section)
 
@@ -227,10 +224,10 @@ class Settings:
 					elif opt == 'suppressunknown':
 						self.activetrains.suppressunknown = parseBoolean(value, False)
 	
-					elif opt == 'onlysassignedorunknown':
+					elif opt == 'onlyassignedorunknown':
 						self.activetrains.onlyassignedorunknown = parseBoolean(value, False)
 	
-					elif opt == 'onlysassigned':
+					elif opt == 'onlyassigned':
 						self.activetrains.onlyassigned = parseBoolean(value, False)
 	
 					elif opt == 'onlyatc':
@@ -377,7 +374,6 @@ class Settings:
 		self.cfg.set(section, "allowatcrequests", "True" if self.display.allowatcrequests else "False")
 		self.cfg.set(section, "showevents", "True" if self.display.showevents else "False")
 		self.cfg.set(section, "showadvice", "True" if self.display.showadvice else "False")
-		self.cfg.set(section, "locale", self.display.locale)
 
 		section = "activetrains" 
 		try:

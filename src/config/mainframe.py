@@ -169,18 +169,6 @@ class MainFrame(wx.Frame):
 		boxsizer.Add(self.cbShowAdvice, 0, wx.LEFT, 40)
 		self.cbShowAdvice.SetValue(self.settings.display.showadvice)
 		
-		
-		boxsizer.AddSpacer(10)
-		
-		self.locales = ["All", "Cliff", "Port", "Yard"]	
-		self.rbLocale = wx.RadioBox(dispBox, wx.ID_ANY, "Locale", choices=self.locales)
-		boxsizer.Add(self.rbLocale, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
-		try:
-			ix = self.locales.index(self.settings.display.locale)
-		except ValueError:
-			ix = 0
-		self.rbLocale.SetSelection(ix)
-		
 		boxsizer.AddSpacer(10)
 		
 		dispBox.SetSizer(boxsizer)
@@ -407,8 +395,6 @@ class MainFrame(wx.Frame):
 		self.settings.display.allowatcrequests = self.cbAllowATCRequests.IsChecked()
 		self.settings.display.showevents = self.cbShowEvents.IsChecked()
 		self.settings.display.showadvice = self.cbShowAdvice.IsChecked()
-		ix = self.rbLocale.GetSelection()
-		self.settings.display.locale = self.locales[ix]
 		
 		self.settings.activetrains.suppressyards = self.cbSuppressYards.IsChecked()		
 		ix = self.rbShowOnly.GetSelection()
