@@ -115,10 +115,10 @@ class Yard (District):
 
 			btn.Press(refresh=True)
 			self.frame.ClearButtonAfter(2, btn)
-			if btn.SendTurnouts():
-				self.MatrixTurnoutRequest(tolist, interval=self.matrixturnoutdelay)
-			else:
+			if bname in self.watermanGroup:
 				self.frame.Request({"nxbutton": { "button": bname}})
+			else:
+				self.MatrixTurnoutRequest(tolist, interval=self.matrixturnoutdelay)
 
 	def DefineBlocks(self):
 		self.blocks = {}
@@ -926,44 +926,44 @@ class Yard (District):
 		self.osButtons = {}
 
 		buttons = [
-			["YWWB1", (32, 30), False],
-			["YWWB2", (32, 32), False],
-			["YWWB3", (32, 34), False],
-			["YWWB4", (32, 36), False],
+			["YWWB1", (32, 30)],
+			["YWWB2", (32, 32)],
+			["YWWB3", (32, 34)],
+			["YWWB4", (32, 36)],
 
-			["YWEB1", (45, 30), False],
-			["YWEB2", (45, 32), False],
-			["YWEB3", (45, 34), False],
-			["YWEB4", (45, 36), False],
+			["YWEB1", (45, 30)],
+			["YWEB2", (45, 32)],
+			["YWEB3", (45, 34)],
+			["YWEB4", (45, 36)],
 
-			["YY51W", (88, 13), True],
-			["YY50W", (88, 15), True],
+			["YY51W", (88, 13)],
+			["YY50W", (88, 15)],
 
-			["YY51E", (96, 13), True],
-			["YY50E", (96, 15), True],
-			["YY60", (95, 5), True],
-			["YY53", (95, 7), True],
-			["YY52", (95, 9), True],
-			["YY70", (96, 11), True],
-			["YY10W", (106, 11), True],
-			["YY20W", (106, 13), True],
+			["YY51E", (96, 13)],
+			["YY50E", (96, 15)],
+			["YY60", (95, 5)],
+			["YY53", (95, 7)],
+			["YY52", (95, 9)],
+			["YY70", (96, 11)],
+			["YY10W", (106, 11)],
+			["YY20W", (106, 13)],
 
-			["YY10E", (114, 11), True],
-			["YY20E", (114, 13), True],
-			["YY30", (111, 7), True],
-			["YY87", (113, 9), True],
-			["YY11W", (121, 11), True],
-			["YY21W", (121, 13), True],
+			["YY10E", (114, 11)],
+			["YY20E", (114, 13)],
+			["YY30", (111, 7)],
+			["YY87", (113, 9)],
+			["YY11W", (121, 11)],
+			["YY21W", (121, 13)],
 
-			["YY11E", (129, 11), True],
-			["YY21E", (129, 13), True],
-			["YL10", (136, 11), True],
-			["YL20", (136, 13), True],
-			["YP50", (136, 15), True]
+			["YY11E", (129, 11)],
+			["YY21E", (129, 13)],
+			["YL10", (136, 11)],
+			["YL20", (136, 13)],
+			["YP50", (136, 15)]
 		]
 
-		for bname, pos, sendtos in buttons:
-			self.buttons[bname] = Button(self, self.screen, self.frame, bname, pos, self.btntiles, sendtos)
+		for bname, pos in buttons:
+			self.buttons[bname] = Button(self, self.screen, self.frame, bname, pos, self.btntiles)
 
 		self.osButtons["YOSWYW"] = [ "YWWB1", "YWWB2", "YWWB3", "YWWB4" ]
 		self.osButtons["YOSWYE"] = [ "YWEB1", "YWEB2", "YWEB3", "YWEB4" ]
@@ -984,6 +984,8 @@ class Yard (District):
 
 		self.westGroup["YOSKL"] = [ "YY60", "YY53", "YY52", "YY70", "YY51E", "YY50E" ]
 		self.eastGroup["YOSKL"] = [ "YY10W", "YY20W"]
+		
+		self.watermanGroup = ["YWWB1", "YWWB2", "YWWB3", "YWWB4", "YWEB1", "YWEB2", "YWEB3", "YWEB4"]
 
 		for n in ["YOSCJ", "YOSKL", "YOSEJ"]:
 			self.westButton[n] = self.eastButton[n] = None

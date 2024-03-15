@@ -1,5 +1,5 @@
 class Button:
-	def __init__(self, district, screen, frame, name, pos, tiles, sendTurnouts=True):
+	def __init__(self, district, screen, frame, name, pos, tiles):
 		self.district = district
 		self.screen = screen
 		self.frame = frame
@@ -12,10 +12,6 @@ class Button:
 		self.off = False
 		self.acknowledged = False
 		self.invalid = False
-		self.sendTurnouts = sendTurnouts
-		
-	def SendTurnouts(self):
-		return self.sendTurnouts
 
 	def GetDistrict(self):
 		return self.district
