@@ -103,19 +103,19 @@ class Shore (District):
 			bwstat, bestat = bestat, bwstat
 
 		if osstat == OCCUPIED:
-			bmpw = bmpe = "red-cross"
+			bmpw = bmpe = "yellow-cross" if self.blocks["SOSHF"].HasUnknownTrain() else "red-cross"
 		elif osstat == CLEARED:
 			bmpw = bmpe = "green-cross"
 		else:
 			if bwstat == OCCUPIED:
-				bmpw = "red-main"
+				bmpw = "yellow-main" if self.blocks["SOSW"].HasUnknownTrain() else "red-main"
 			elif bwstat == CLEARED:
 				bmpw = "green-main"
 			else:
 				bmpw = "white-main"
 
 			if bestat == OCCUPIED:
-				bmpe = "red-main"
+				bmpe = "yellow-main" if self.blocks["SOSE"].HasUnknownTrain() else "red-main"
 			elif bestat == CLEARED:
 				bmpe = "green-main"
 			else:

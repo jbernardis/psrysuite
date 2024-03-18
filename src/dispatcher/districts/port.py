@@ -90,9 +90,10 @@ class Port (District):
 
 	def DrawOthers(self, block):
 		if block.GetName() in ["POSSP2", "POSSP3", "POSSP4", "POSSP5"]:
-			self.drawCrossover()
+			self.drawCrossover(block)
 
-	def drawCrossover(self):
+	def drawCrossover(self, block):
+		unk = False if block is None else block.HasUnknownTrain()
 		s9 = NORMAL if self.sw9.IsNormal() else REVERSE
 		s3 = NORMAL if self.sw3.IsNormal() else REVERSE
 
@@ -104,7 +105,7 @@ class Port (District):
 			blkstat = EMPTY
 
 		bmp = "diagright" if s9 == REVERSE else "diagleft" if s3 == REVERSE else "cross"
-		bmp = self.misctiles["crossover"].getBmp(blkstat, bmp)
+		bmp = self.misctiles["crossover"].getBmp(blkstat, bmp, unknownTrain = unk)
 		self.frame.DrawTile(self.screen, (104, 29), bmp)
 
 

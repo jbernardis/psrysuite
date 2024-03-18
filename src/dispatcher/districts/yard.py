@@ -22,13 +22,14 @@ class Yard (District):
 
 	def Draw(self):
 		District.Draw(self)
-		self.drawCrossover()
+		self.drawCrossover(None)
 
 	def DrawOthers(self, block):
 		if block.GetName() in ["YOSKL1", "YOSKL2", "YOSKL3"]:
-			self.drawCrossover()
+			self.drawCrossover(block)
 
-	def drawCrossover(self):
+	def drawCrossover(self, block):
+		unk = False if block is None else block.HasUnknownTrain()
 		s17 = NORMAL if self.sw17.IsNormal() else REVERSE
 		s21 = NORMAL if self.sw21.IsNormal() else REVERSE
 
@@ -40,7 +41,7 @@ class Yard (District):
 			blkstat = EMPTY
 
 		bmp = "diagright" if s17 == REVERSE else "diagleft" if s21 == REVERSE else "cross"
-		bmp = self.misctiles["crossover"].getBmp(blkstat, bmp)
+		bmp = self.misctiles["crossover"].getBmp(blkstat, bmp, unk)
 		self.frame.DrawTile(self.screen, (104, 12), bmp)
 
 	def DoTurnoutAction(self, turnout, state, force=False):
@@ -55,7 +56,7 @@ class Yard (District):
 			District.DoTurnoutAction(self, turnout, state, force=force)
 
 		if tn in [ "YSw17", "YSw19", "YSw21" ]:
-			self.drawCrossover()
+			self.drawCrossover(turnout.GetContainingBlock())
 			if tn == "YSw17":
 				trnout = self.turnouts["YSw19"]
 				trnout.UpdateStatus()

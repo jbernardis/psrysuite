@@ -51,7 +51,10 @@ class MiscTile:
 	def getBmp(self, status, tag, unknownTrain=False):
 		prefix = ""
 		if status == OCCUPIED:
-			prefix = "red-"
+			if unknownTrain:
+				prefix = "yellow-"
+			else:
+				prefix = "red-"
 		elif status == CLEARED:
 			prefix = "green-"
 		elif status == EMPTY:
@@ -749,9 +752,11 @@ def loadTiles(bitmaps):
 			"white-diagright": b.diagright.normal,
 			"green-diagright": b.diagright.routed,
 			"red-diagright": b.diagright.occupied,
+			"yellow-diagright": b.diagright.unknown,
 			"white-diagleft": b.diagleft.normal,
 			"green-diagleft": b.diagleft.routed,
 			"red-diagleft": b.diagleft.occupied,
+			"yellow-diagleft": b.diagleft.unknown,
 			"cross": bmisc.cross
 		})
 	misctiles["handdown"] = MiscTile("handdown",
@@ -769,9 +774,11 @@ def loadTiles(bitmaps):
 			"white-main": b.straight.normal,
 			"green-main": b.straight.routed,
 			"red-main": b.straight.occupied,
+			"yellow-main": b.straight.unknown,
 			"white-cross": b.diagright.normal,
 			"green-cross": b.diagright.routed,
 			"red-cross": b.diagright.occupied,
+			"yellow-cross": b.diagright.unknown,
 		})
 	misctiles["indicator"] = MiscTile("indicator",
 		{

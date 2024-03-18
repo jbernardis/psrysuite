@@ -35,6 +35,9 @@ class Turnout:
 	
 	def SetContainingBlock(self, blk):
 		self.containingBlock = blk
+	
+	def GetContainingBlock(self):
+		return self.containingBlock
 
 	def SetLock(self, signame, flag=True, refresh=False):
 		if flag:

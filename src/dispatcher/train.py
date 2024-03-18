@@ -136,6 +136,9 @@ class Train:
 	def GetBlockList(self):
 		return self.blocks
 
+	def GetBlockCount(self):
+		return len(self.blocks)
+
 	def GetNameAndLoco(self):
 		return self.name, self.loco
 	

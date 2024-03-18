@@ -358,14 +358,17 @@ class TrainListCtrl(wx.ListCtrl):
 		
 	def UpdateTrain(self, trid):
 		try:
-			tx = self.order.index(trid)
-		except ValueError:
+			tr = self.trains[trid]
+		except KeyError:
 			logging.warning("Attempt to update a non-existent train: %s" % trid)
 			return 
-	
-		self.filterTrains()	
-		self.SetItemCount(len(self.filtered))	
-		self.RefreshItems(0, len(self.filtered)-1)
+		
+		if tr.GetBlockCount() == 0:
+			self.RemoveTrain(trid)
+		else:
+			self.filterTrains()	
+			self.SetItemCount(len(self.filtered))	
+			self.RefreshItems(0, len(self.filtered)-1)
 		
 	def RemoveTrain(self, trid):
 		try:

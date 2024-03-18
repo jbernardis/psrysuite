@@ -2662,6 +2662,9 @@ class MainFrame(wx.Frame):
 				self.SendBlockDirRequests()
 				self.SendOSRoutes()
 				self.SendCrossoverPoints()
+				
+			self.trains = {}
+			self.activeTrains.RemoveAllTrains()
 			self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 			
 		elif parms["type"] == "trains":
