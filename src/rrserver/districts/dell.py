@@ -3,6 +3,7 @@ import logging
 from rrserver.district import District
 from rrserver.constants import  DELL, FOSS
 from rrserver.node import Node
+from dispatcher.constants import SloAspects
 
 class Dell(District):
 	def __init__(self, rr, name, settings):
@@ -81,7 +82,8 @@ class Dell(District):
 			# bit 2:0 is bad
 			self.rr.AddStopRelay("R10.srel", self, n, FOSS, [(2, 1)])
 			self.rr.AddOutputDevice("RXO", self, n, FOSS, [(2, 2)]) # rocky hill crossing gate/signal
-			self.rr.AddSignal("R10W", self, n, FOSS, [(2, 3), (2, 4), (2, 5)])
+			s = self.rr.AddSignal("R10W", self, n, FOSS, [(2, 3), (2, 4), (2, 5)])
+			s.SetAspectType(SloAspects)
 
 			#inputs	
 			sbw = self.rr.AddBlock("D21.W",     self, n, DELL, [(0, 0)], True) 
@@ -161,19 +163,10 @@ class Dell(District):
 			self.RXO = RXO
 			self.rr.SetODevice("RXO", self.RXO)
 			
-		# determine the state of signal R10W
-		r10a = self.rr.GetBlock("R10A")
-		r10w = self.rr.GetBlock("R10.W")
-		clr = (not r10a.IsOccupied()) and (not r10w.IsOccupied())
-		neosrh = self.rr.GetBlock("NEOSRH")
-		nxtclr = neosrh.IsCleared()
+		# determine the state of signal R10W it should mirror signal N28L
 		
-		if clr and nxtclr:
-			aspect = 0b110
-		elif clr and  not nxtclr:
-			aspect = 0b001
-		else:
-			aspect = 0
+		msig = self.rr.GetSignal("N28L")
+		aspect = msig.Aspect()
 
 		sig = self.rr.GetSignal("R10W")
 		if sig.Aspect() != aspect:

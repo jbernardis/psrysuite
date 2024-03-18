@@ -104,7 +104,7 @@ class Block:
 		occ = self.occupied
 		for b in self.subBlocks:
 			occ = True if b.IsOccupied(recurse=False) else occ
-			
+
 		return occ
 	
 	def SetCleared(self, flag):

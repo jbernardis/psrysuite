@@ -197,6 +197,8 @@ class Nassau (District):
 			self.CheckBlockSignals("N21", "N21W", False)
 		elif signame in [ "N28R", "N26RA", "N26RB", "N26RC", "N24RA", "N24RB", "N24RC", "N24RD" ]:
 			self.CheckBlockSignalsAdv("B20", "B21", "B20E", True)
+		elif signame == "R10W":
+			sig.SetAspect(aspect, refresh=True)
 
 	def DoTurnoutAction(self, turnout, state, force=False):
 		tn = turnout.GetName()
@@ -1063,12 +1065,13 @@ class Nassau (District):
 			[ "N26L", SloAspects, False,   "leftlong", (44, 10) ],
 			[ "N24L", SloAspects, False,   "left", (44, 12) ],
 			
-			[ "B20E", AdvAspects, True,    "rightlong", (48, 16) ]
+			[ "B20E", AdvAspects, True,    "rightlong", (48, 16) ],
+			[ "R10W", SloAspects, False,   "leftlong", (53, 16) ]
 		]
 
 		for signm, atype, east, tileSet, pos in sigList:
 			sig = Signal(self, self.screen, self.frame, signm, atype, east, pos, None if tileSet is None else self.sigtiles[tileSet])
-			if signm in ["N11W", "N21W", "B20E"]:
+			if signm in ["N11W", "N21W", "B20E", "R10W"]:
 				sig.SetDisabled(True)
 				
 			self.signals[signm]  = sig
