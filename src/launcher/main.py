@@ -38,34 +38,26 @@ for i in range(len(sys.argv)):
 if mode == "remotedispatcher":
     print("Launch mode: remote dispatcher")
     
-    settings.SetSimulation(False)
-    settings.SetDispatcher(True)
-    
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-    dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
+    dispProc = Popen([interpreter, dispExec, "--dispatch"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
  
 elif mode == "dispatcher":
     print("Launch mode: dispatcher suite")
     
-    settings.SetSimulation(False)
-    settings.SetDispatcher(True)
-    
     svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
-    svrProc = Popen([interpfg, svrExec], startupinfo=infoMinimize)
+    svrProc = Popen([interpfg, svrExec, "--nosim"], startupinfo=infoMinimize)
     print("server started as PID %d" % svrProc.pid)
     
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-    dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
+    dispProc = Popen([interpreter, dispExec, "--dispatch"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
  
 elif mode == "simulation":
     print("launch mode: simulation")
-    settings.SetDispatcher(True)
-    settings.SetSimulation(True)
     
     svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
-    svrProc = Popen([interpfg, svrExec], startupinfo=infoMinimize)
+    svrProc = Popen([interpfg, svrExec, "--sim"], startupinfo=infoMinimize)
     print("server started as PID %d" % svrProc.pid)
     
     simExec = os.path.join(os.getcwd(), "simulator", "main.py")
@@ -73,35 +65,32 @@ elif mode == "simulation":
     print("simulator started as PID %d" % simProc.pid)
     
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-    dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
+    dispProc = Popen([interpreter, dispExec, "--dispatch"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
     
     monExec = os.path.join(os.getcwd(), "monitor", "main.py")
-    monProc = Popen([interpreter, monExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
+    monProc = Popen([interpreter, monExec, "--sim"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("monitor started as PID %d" % monProc.pid)
 
 elif mode == "display":
     print("launch mode: display")
-    settings.SetDispatcher(False)
-    
+   
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-    dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
+    dispProc = Popen([interpreter, dispExec, "--display"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
             
 elif mode == "dispatcheronly":
     print("launch mode: dispatcher only")
-    settings.SetDispatcher(True)
     
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
-    dispProc = Popen([interpreter, dispExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
+    dispProc = Popen([interpreter, dispExec, "--dispatch"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
              
 elif mode == "serveronly":
     print("launch mode: server only")
-    settings.SetSimulation(False)
     
     svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
-    svrProc = Popen([interpfg, svrExec], startupinfo=infoMinimize)
+    svrProc = Popen([interpfg, svrExec, "--nosim"], startupinfo=infoMinimize)
     print("server started as PID %d" % svrProc.pid)
             
 else:

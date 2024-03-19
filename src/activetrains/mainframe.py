@@ -223,7 +223,7 @@ class MainFrame(wx.Frame):
 		logging.debug("displaying splash screen as PID %d" % pid)
 		
 	def ShowTitle(self):
-		self.SetTitle("Active Train Display - %s" % ("connected" if self.subscribed else "NOT connected"))
+		self.SetTitle("Active Train Display - %s" % ("NOT connected" if not self.subscribed else "connected" if self.sessionid is None else ("Session ID %d" % self.sessionid)))
 
 	def NewTrain(self):
 		tr = Train(None)
@@ -626,6 +626,7 @@ class MainFrame(wx.Frame):
 		logging.info("connected to railroad server with session ID %d" % self.sessionid)
 		self.Request({"identify": {"SID": self.sessionid, "function": "DISPLAY"}})
 		self.DoRefresh()
+		self.ShowTitle()
 
 	def DoCmdEnd(self, parms):
 		if parms["type"] == "layout":

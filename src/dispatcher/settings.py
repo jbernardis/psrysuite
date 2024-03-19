@@ -1,7 +1,8 @@
 import configparser
 import os
 import logging
-import wx
+import sys
+import getopt
 
 INIFILE = "psry.ini"
 GLOBAL = "global"
@@ -37,7 +38,6 @@ class Settings:
 		self.cfg.optionxform = str
 		if not self.cfg.read(self.inifile):
 			logging.warning("Settings file %s does not exist.  Using default values" % INIFILE)
-			return
 		
 		section = "rrserver"
 		self.rrserver = SNode()
@@ -298,14 +298,30 @@ class Settings:
 
 		else:
 			logging.warning("Missing global section - assuming defaults")
+			
+		try:
+			opts, _ = getopt.getopt(sys.argv[1:],"",["dispatch","display", "simulate"])
+		except getopt.GetoptError:
+			print ('Invalid command line arguments - ignoring')
+			logging.error('Invalid command line arguments - ignoring')
+			return 
 		
-	def SetSimulation(self, flag=True):
-		self.cfg.set("rrserver", "simulation", "True" if flag else "False")
-		self.saveSettings()
-		
-	def SetDispatcher(self, flag=True):
-		self.cfg.set("dispatcher", "dispatch", "True" if flag else "False")		
-		self.saveSettings()
+		for opt, _ in opts:
+			if opt == "--display":
+				self.dispatcher.dispatch = False
+				logging.info("Ovwerriding dispatch flag from command line: False")
+
+			elif opt == "--dispatch":
+				self.dispatcher.dispatch = True
+				logging.info("Ovwerriding dispatch flag from command line: True")
+				
+			elif opt in [ "--simulate", "--sim" ]:
+				self.rrserver.simulation = True
+				logging.info("Ovwerriding simulation flag from command line: True")
+				
+			elif opt in [ "--nosimulate", "--nosim" ]:
+				self.rrserver.simulation = False
+				logging.info("Ovwerriding simulation flag from command line: False")
 		
 	def SaveAll(self):
 		self.cfg = configparser.ConfigParser()
@@ -419,7 +435,3 @@ class Settings:
 		self.cfg.write(cfp)
 		cfp.close()
 		return True
-		
-	def saveSettings(self):
-		with open(self.inifile, 'w') as cfp:
-			self.cfg.write(cfp)
