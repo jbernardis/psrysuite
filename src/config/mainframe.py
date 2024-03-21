@@ -177,6 +177,22 @@ class MainFrame(wx.Frame):
 		
 		vszrl.AddSpacer(20)
 		
+		vszrl.Add(wx.StaticText(self, wx.ID_ANY, "Backup Directory:"))
+		
+		self.teBackupDir = wx.TextCtrl(self, wx.ID_ANY, self.settings.backupdir, size=(200, -1), style=wx.TE_READONLY)
+		self.bBackupDir = wx.Button(self, wx.ID_ANY, "...", size=(50, -1))
+		self.Bind(wx.EVT_BUTTON, self.OnBBackupDir, self.bBackupDir)
+		
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(self.teBackupDir)
+		hsz.AddSpacer(10)
+		hsz.Add(self.bBackupDir)
+		
+		vszrl.AddSpacer(5)
+		vszrl.Add(hsz)
+		
+
+		
 		
 
 		vszrr = wx.BoxSizer(wx.VERTICAL)
@@ -367,6 +383,20 @@ class MainFrame(wx.Frame):
 				link.description = module["desc"]
 				link.icon_location = (os.path.join(psrypath, "icons", module["icon"]), 0)
 
+	def OnBBackupDir(self, _):
+		startDir = self.teBackupDir.GetValue()
+		dlg = wx.DirDialog(self, "Choose a backup directory:", defaultPath=startDir, style=wx.DD_DEFAULT_STYLE)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			path = dlg.GetPath()
+
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+		
+		self.teBackupDir.SetValue(path)
+
+		
 		
 	def OnBGenerate(self, _):
 		dlg = GenerateDlg(self, self.GenShortcut)
@@ -384,6 +414,7 @@ class MainFrame(wx.Frame):
 		self.settings.serverport = int(self.teRRPort.GetValue())
 		self.settings.dccserverport = int(self.teDCCPort.GetValue())
 		self.settings.socketport = int(self.teBroadcastPort.GetValue())
+		self.settings.backupdir = self.teBackupDir.GetValue()
 		
 		self.settings.rrserver.rrtty = self.teRRComPort.GetValue()
 		self.settings.rrserver.dcctty = self.teDCCComPort.GetValue()

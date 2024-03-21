@@ -2439,7 +2439,7 @@ class MainFrame(wx.Frame):
 							trid = tr.GetName()
 							if not tr.IsBeingEdited():
 								self.PopupEvent("Train %s - detection lost from block %s" % (trid, block))
-								self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), block)
+								self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block)
 							else:
 								tr.SetBeingEdited(False)
 							try:
@@ -2460,7 +2460,7 @@ class MainFrame(wx.Frame):
 					for trid, tr in delList:
 						if not tr.IsBeingEdited():
 							self.PopupEvent("Train %s - detection lost from block %s" % (trid, block))
-							self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), block)
+							self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block)
 						try:
 							self.activeTrains.RemoveTrain(trid)
 							del(self.trains[trid])
@@ -2984,7 +2984,9 @@ class MainFrame(wx.Frame):
 		rc1 = self.CheckTrainsContiguous()
 		rc2 = self.CheckLocosUnique()
 		if rc1 and rc2:
-			self.PopupEvent("All trains OK")
+			dlg = wx.MessageDialog(self, "All Trains are OK", "All Trains OK", wx.OK | wx.ICON_INFORMATION)
+			dlg.ShowModal()
+			dlg.Destroy()
 		
 	def CheckTrainsContiguous(self, query=False):
 		t = [tr for tr in self.trains.values() if not tr.IsContiguous()]

@@ -346,8 +346,19 @@ class Cliff(District):
 				return [x for x in gp if x != rtnm]
 			
 		return None
+	
+	def GetRouteInMsg(self, rt):
+		rtNm = rt.Name()
+		try:
+			tolist = self.routeMap[rtNm]
+		except KeyError:
+			return None
+		
+		msg = {"turnout": [{"name": x[0], "state": x[1]} for x in tolist] }
+		return msg
 			
 	def RouteIn(self, rt, stat):
+		rt.SetState(stat)
 		rtNm = rt.Name()
 		if stat == 0:
 			return 

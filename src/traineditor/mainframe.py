@@ -1,6 +1,6 @@
 import os
 import wx
-from traineditor.settings import Settings 
+from dispatcher.settings import Settings 
 from traineditor.rrserver import RRServer
 from traineditor.trainsequences.trainblocksequencedlg import TrainBlockSequencesDlg
 from traineditor.trntracker.traintrackerdlg import TrainTrackerDlg

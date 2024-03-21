@@ -381,6 +381,12 @@ class Nassau(District):
 		
 		return tolist
 	
+	def GetRouteInMsg(self, rt):
+		if rt.Name() in self.coachRoutes:		
+			return {"turnout": [{"name": x[0], "state": x[1]} for x in self.routeMap[rt.name]] }
+		
+		return None
+	
 	def SelectRouteIn(self, rt):
 		if rt.Name() in self.coachRoutes:		
 			offRtList = [x for x in self.coachRoutes if x != rt.Name()]
@@ -389,6 +395,7 @@ class Nassau(District):
 		return None
 	
 	def RouteIn(self, rt, stat):
+		rt.SetState(stat)
 		if stat == 1:
 			if rt.name == self.currentCoachRoute:
 				return 

@@ -856,6 +856,15 @@ class Railroad():
 				for m in ml:
 					if m is not None:
 						yield m
+		
+		'''
+		routes in are essentially a set of turnouts - send that information
+		'''
+		for r in self.routesIn.values():
+			if r.GetState() == 1:
+				msg = r.district.GetRouteInMsg(r)
+				if msg is not None:
+					yield msg
 					
 		for s in self.breakers.values():
 			if not s.HasProxy(): # skip breakers that use a proxy

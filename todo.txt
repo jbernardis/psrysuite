@@ -3,7 +3,6 @@ ar/atc/advisor - ??get rid of checkboxes and have always on???
 
 retire/get rid of advisor?????   tracker????
 
-		
 add fields to active train list: time since assigned, stopped > 5 minutes
 
 add the following configurable fields to config tool:

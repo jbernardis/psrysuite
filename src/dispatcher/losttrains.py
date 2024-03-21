@@ -3,11 +3,11 @@ class LostTrains:
 	def __init__(self):
 		self.trains = {}
 		
-	def Add(self, train, loco, engineer, block):
+	def Add(self, train, loco, engineer, east, block):
 		if train.startswith("??"):
 			return False
 		
-		self.trains[train] = (loco, engineer, block)
+		self.trains[train] = (loco, engineer, east, block)
 		return True
 		
 	def Remove(self, train):
@@ -19,7 +19,7 @@ class LostTrains:
 		return True
 	
 	def GetList(self):
-		return [(train, info[0], info[1], info[2]) for train, info in self.trains.items()]
+		return [(train, info[0], info[1], info[2], info[3]) for train, info in self.trains.items()]
 	
 	def Count(self):
 		return len(self.trains)

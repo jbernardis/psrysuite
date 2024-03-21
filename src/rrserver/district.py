@@ -48,6 +48,9 @@ class District:
 	def RouteIn(self, rt, stat):
 		pass
 	
+	def GetRouteInMsg(self, r):
+		return None
+	
 	def ShowBreakerState(self, _):
 		pass
 	

@@ -220,14 +220,14 @@ class SlipSwitch(Turnout):
 
 		return self.status[self.controller] != NORMAL
 
-	def SetReverse(self, refresh=False):
+	def SetReverse(self, refresh=False, force=False):
 		if self.controller is None:
 			return False
 
 		if not self.IsNormal():
 			return False
 
-		if self.IsLocked():
+		if self.IsLocked() and not force:
 			return False
 		
 		self.normal = False
@@ -244,14 +244,14 @@ class SlipSwitch(Turnout):
 			self.Draw()
 		return True
 
-	def SetNormal(self, refresh=False):
+	def SetNormal(self, refresh=False, force=False):
 		if self.controller is None:
 			return False
 
 		if self.IsNormal():
 			return False
 
-		if self.IsLocked():
+		if self.IsLocked() and not force:
 			return False
 		
 		self.normal = True

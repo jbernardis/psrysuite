@@ -427,9 +427,17 @@ class Port (District):
 				(self.tiles["verticalnc"],    self.screen, (153, 28), False),
 				(self.tiles["vertical"],      self.screen, (153, 27), False),
 				(self.tiles["verticalnc"],    self.screen, (153, 26), False),
-				(self.tiles["horiz"],         self.screen, (145, 33), False),
-				(self.tiles["eobleftup"],     self.screen, (147, 32), False),
+				(self.tiles["vertical"],      self.screen, (153, 25), False),
+				(self.tiles["verticalnc"],    self.screen, (153, 24), False),
+				(self.tiles["vertical"],      self.screen, (153, 23), False),
+				(self.tiles["horiznc"],       self.screen, (146, 33), False),
 				(self.tiles["horiz"],         self.screen, (147, 33), False),
+				
+				(self.tiles["diagleft"],      self.screen, (146, 32), False),
+				(self.tiles["diagleft"],   self.screen, (147, 31), False),
+				(self.tiles["diagleft"],      self.screen, (148, 30), False),
+				(self.tiles["diagleft"],      self.screen, (149, 29), False),
+				(self.tiles["turnrightdown"], self.screen, (150, 28), False),
 
 				(self.tiles["verticalnc"],    LaKr,        (111, 24), False),
 				(self.tiles["vertical"],      LaKr,        (111, 25), False),
@@ -449,19 +457,18 @@ class Port (District):
 
 		self.blocks["P33"] = Block(self, self.frame, "P33",
 			[
-				(self.tiles["turnrightup"],   self.screen, (147, 31), False),
-				(self.tiles["diagleft"],      self.screen, (148, 30), False),
-				(self.tiles["diagleft"],      self.screen, (149, 29), False),
-				(self.tiles["turnrightdown"], self.screen, (150, 28), False),
-				(self.tiles["vertical"],      self.screen, (150, 27), False),
-				(self.tiles["verticalnc"],    self.screen, (150, 26), False),
+				(self.tiles["eobdown"],       self.screen, (150, 27), False),
+				(self.tiles["vertical"],      self.screen, (150, 26), False),
+				(self.tiles["verticalnc"],    self.screen, (150, 25), False),
+				(self.tiles["vertical"],      self.screen, (150, 24), False),
+				(self.tiles["verticalnc"],    self.screen, (150, 23), False),
 
 				(self.tiles["verticalnc"],    LaKr,        (103, 23), False),
 				(self.tiles["vertical"],      LaKr,        (103, 24), False),
 				(self.tiles["verticalnc"],    LaKr,        (103, 25), False),
 				(self.tiles["vertical"],      LaKr,        (103, 26), False),
 			], False)
-		self.blocks["P33"].AddTrainLoc(self.screen, (146, 31))
+		self.blocks["P33"].AddTrainLoc(self.screen, (148, 24))
 		self.blocks["P33"].AddTrainLoc(LaKr, (101, 24))
 
 		self.blocks["P40"] = Block(self, self.frame, "P40",
@@ -865,7 +872,7 @@ class Port (District):
 			[ "PBSw5",   "torightright", ["P41"], (129, 35) ],
 			[ "PBSw15a", "toleftright",  ["P42"], (149, 35) ],
 			[ "PBSw15b", "toleftleft",   ["P42"], (152, 35) ],
-			[ "PBSw17",  "toleftright",  [], (146, 33) ],
+			[ "PBSw17",  "toleftright",  [], (145, 33) ],
 
 			[ "PASw27",  "toleftup",     ["POSPJ1"], (118, 20) ],
 			[ "PASw29",  "toleftup",     ["POSPJ1"], (120, 22) ],

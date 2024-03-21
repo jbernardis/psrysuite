@@ -267,6 +267,7 @@ class Settings:
 		self.serverport = 9000
 		self.socketport = 9001
 		self.dccserverport = 9002
+		self.backupdir = os.getcwd()
 		if self.cfg.has_section(GLOBAL):
 			for opt, value in self.cfg.items(GLOBAL):
 				if opt == 'socketport':
@@ -295,6 +296,10 @@ class Settings:
 						
 				elif opt == 'ipaddr':
 					self.ipaddr = value
+					
+				elif opt == 'backupdir':
+					self.backupdir = value
+					
 
 		else:
 			logging.warning("Missing global section - assuming defaults")
@@ -423,6 +428,7 @@ class Settings:
 		self.cfg.set(section, "serverport", "%d" % self.serverport)
 		self.cfg.set(section, "dccserverport", "%d" % self.dccserverport)
 		self.cfg.set(section, "socketport", "%d" % self.socketport)
+		self.cfg.set(section, "backupdir", self.backupdir)
 		
 		
 		

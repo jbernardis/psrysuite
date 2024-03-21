@@ -300,8 +300,14 @@ class Yard(District):
 		
 		offRtList = [x for x in rtl if x != rt.name]
 		return offRtList
+	
+	def GetRouteInMsg(self, rt):
+		rtNm = rt.Name()
+		
+		return {"turnout": [{"name": x[0], "state": x[1]} for x in self.routeMap[rtNm]] }
 		
 	def RouteIn(self, rt, stat):
+		rt.SetState(stat)
 		group = "east" if rt.name in self.routes["east"] else "west" if rt.name in self.routes["west"] else None
 		if group is None:
 			return 
