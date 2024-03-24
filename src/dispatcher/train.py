@@ -41,6 +41,19 @@ class Train:
 		self.aspect = None
 		self.engineer = None
 		self.beingEdited = False
+		self.time = None
+		
+	def SetTime(self, t):
+		self.time = t
+		
+	def AddTime(self, delta=1):
+		if self.time is not None:
+			self.time += delta
+			return True
+		return False
+			
+	def GetTime(self):
+		return self.time
 		
 	def SetBeingEdited(self, flag):
 		self.beingEdited = flag
@@ -106,6 +119,10 @@ class Train:
 		logging.info("changing loco to %s for train %s" % (loco, self.name))
 		
 	def SetEngineer(self, engineer):
+		if engineer is None:
+			self.time = None
+		elif self.engineer is None:
+			self.time = 0
 		self.engineer = engineer
 		
 	def GetEngineer(self):

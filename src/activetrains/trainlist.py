@@ -87,6 +87,14 @@ class ActiveTrainList:
 	def RefreshTrain(self, trid):
 		if self.panelTrainList is not None:
 			self.panelTrainList.RefreshTrain(trid)
+			
+	def ticker(self):
+		refresh = False
+		for tr in self.trains.values():
+			if tr.AddTime(1):
+				refresh = True
+		if refresh and self.panelTrainList is not None:
+			self.panelTrainList.RefreshAll()
 		
 
 class ActiveTrainsPanel(wx.Panel):
@@ -102,6 +110,8 @@ class ActiveTrainsPanel(wx.Panel):
 		self.suppressNonAssignedAndKnown = self.settings.activetrains.onlyassignedorunknown
 		
 		self.resized = False
+		self.Bind(wx.EVT_SIZE, self.OnResize)
+		self.Bind(wx.EVT_IDLE,self.OnIdle)
 
 		vsz = wx.BoxSizer(wx.VERTICAL)	   
 		vsz.AddSpacer(10)
@@ -153,11 +163,11 @@ class ActiveTrainsPanel(wx.Panel):
 		hsz.AddSpacer(20)
 
 		self.trCtl = TrainListCtrl(self, lines*32)
-		hsz.Add(self.trCtl)
+		hsz.Add(self.trCtl, 0, wx.EXPAND)
 		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.DoubleClickTrain, self.trCtl)
-		
+
 		hsz.AddSpacer(20)
-		
+
 		vsz.Add(hsz)
 		
 		vsz.AddSpacer(10)
@@ -170,6 +180,18 @@ class ActiveTrainsPanel(wx.Panel):
 
 		self.SetSizer(vsz)
 		
+		
+	def OnResize(self, evt):
+		self.resized = True
+		evt.Skip()
+		
+	def OnIdle(self, evt):
+		if not self.resized:
+			return 
+		
+		self.resized = False
+		self.trCtl.ChangeSize(self.GetSize())
+
 	def DoubleClickTrain(self, evt):
 		tr = self.trCtl.GetActiveTrain(evt.Index)
 		self.parent.TrainSelected(tr)
@@ -221,6 +243,9 @@ class ActiveTrainsPanel(wx.Panel):
 		
 	def RefreshTrain(self, trid):
 		self.trCtl.UpdateTrain(trid)
+		
+	def RefreshAll(self):
+		self.trCtl.RefreshAll()
 		
 	def RenameTrain(self, oldName, newName):
 		self.trCtl.RenameTrain(oldName, newName)

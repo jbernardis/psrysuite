@@ -88,6 +88,14 @@ class ActiveTrainList:
 		if self.dlgTrainList is not None:
 			self.dlgTrainList.RefreshTrain(trid)
 			
+	def ticker(self):
+		refresh = False
+		for tr in self.trains.values():
+			if tr.AddTime(1):
+				refresh = True
+		if refresh and self.dlgTrainList is not None:
+			self.dlgTrainList.RefreshAll()
+			
 	def forSnapshot(self):
 		result = {}
 		for trid, tr in self.trains.items():
@@ -243,6 +251,9 @@ class ActiveTrainsDlg(wx.Dialog):
 	def RefreshTrain(self, trid):
 		self.trCtl.UpdateTrain(trid)
 		
+	def RefreshAll(self):
+		self.trCtl.RefreshAll()
+		
 	def RenameTrain(self, oldName, newName):
 		self.trCtl.RenameTrain(oldName, newName)
 		
@@ -267,7 +278,7 @@ class ActiveTrainsDlg(wx.Dialog):
 		
 class TrainListCtrl(wx.ListCtrl):
 	def __init__(self, parent, height=160):
-		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1286, height), style=wx.LC_REPORT + wx.LC_VIRTUAL)
+		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1366, height), style=wx.LC_REPORT + wx.LC_VIRTUAL)
 		self.parent = parent
 		self.trains = {}
 		self.order = []
@@ -304,11 +315,14 @@ class TrainListCtrl(wx.ListCtrl):
 		self.SetColumnWidth(8, 100)
 		self.InsertColumn(9, "Blocks")
 		self.SetColumnWidth(9, 400)
+		self.InsertColumn(10, "Time")
+		self.SetColumnWidth(10, 80)
 		self.SetItemCount(0)
 		
 	def ChangeSize(self, sz):
+		print("change size: %d %d => %d %d" % (sz[0], sz[1], sz[0]-56, sz[1]-84))
 		self.SetSize(sz[0]-56, sz[1]-84)
-		self.SetColumnWidth(9, sz[0]-886)
+		self.SetColumnWidth(9, sz[0]-966-56)
 		
 	def AddTrain(self, tr):
 		nm = tr.GetName()
@@ -352,6 +366,11 @@ class TrainListCtrl(wx.ListCtrl):
 			self.filterTrains()	
 			self.SetItemCount(len(self.filtered))	
 			self.RefreshItems(0, len(self.filtered)-1)
+			
+	def RefreshAll(self):
+		self.filterTrains()	
+		self.SetItemCount(len(self.filtered))	
+		self.RefreshItems(0, len(self.filtered)-1)
 		
 	def RemoveTrain(self, trid):
 		try:
@@ -535,6 +554,15 @@ class TrainListCtrl(wx.ListCtrl):
 		
 		elif col == 9:
 			return ", ".join(tr.GetBlockNameList())
+		
+		elif col == 10:
+			t = tr.GetTime()
+			if t is None:
+				return ""
+			
+			mins = int(t / 60)
+			secs = t % 60
+			return "%2d:%02d" % (mins, secs)
 
 	def OnGetItemAttr(self, item):	
 		if item % 2 == 1:

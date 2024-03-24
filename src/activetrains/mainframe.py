@@ -85,7 +85,7 @@ class Signal:
 		
 class MainFrame(wx.Frame):
 	def __init__(self, settings):
-		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE)
+		wx.Frame.__init__(self, None, size=(1500, 800), style=wx.DEFAULT_FRAME_STYLE)
 		self.listener = None
 		self.sessionid = None
 		self.subscribed = False
@@ -145,8 +145,8 @@ class MainFrame(wx.Frame):
 		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		vsz.AddSpacer(10)
 		
-		panel = self.activeTrains.CreateTrainListPanel(self, self.settings.activetrains.lines)
-		vsz.Add(panel, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		self.ActiveTrainsPanel = self.activeTrains.CreateTrainListPanel(self, self.settings.activetrains.lines)
+		vsz.Add(self.ActiveTrainsPanel, 1, wx.EXPAND)
 		
 		vsz.AddSpacer(20)
 		
@@ -159,7 +159,14 @@ class MainFrame(wx.Frame):
 		self.Bind(EVT_DELIVERY, self.onDeliveryEvent)
 		self.Bind(EVT_DISCONNECT, self.onDisconnectEvent)
 		
+		self.Bind(wx.EVT_TIMER, self.onTicker)
+		self.ticker = wx.Timer(self)
+		self.ticker.Start(1000)
+		
 		self.splash()
+		
+	def onTicker(self, _):
+		self.activeTrains.ticker()
 		
 	def TrainSelected(self, tr):
 		trid = tr.GetName()

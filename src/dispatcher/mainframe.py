@@ -1311,6 +1311,7 @@ class MainFrame(wx.Frame):
 	def onTicker1Sec(self):
 		self.ClearExpiredButtons()
 		self.breakerDisplay.ticker()
+		self.activeTrains.ticker()
 		
 	def onTicker1Min(self):
 		logging.info("ticker 1 minute, timevalue = %d" % self.timeValue )
