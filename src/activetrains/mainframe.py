@@ -335,6 +335,7 @@ class MainFrame(wx.Frame):
 			"ar":				self.DoCmdAR,
 			"sessionID":		self.DoCmdSessionID,
 			"end":				self.DoCmdEnd,
+			"traintimesreport":	self.DoCmdTrainTimesReport,
 		}
 
 	def onDeliveryEvent(self, evt):
@@ -640,7 +641,21 @@ class MainFrame(wx.Frame):
 			self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 			
 		elif parms["type"] == "trains":
-			pass
+			self.Request({"traintimesrequest": {}})
+
+	def DoCmdTrainTimesReport(self, parms):
+		print("train times report: %s" % str(parms), flush=True)
+		trains = parms["trains"]
+		times = parms["times"]
+		for trid, tm in zip(trains, times):
+			try:
+				tr = self.trains[trid]
+			except:
+				tr = None
+			if tr:
+				tm = int(tm)
+				tr.SetTime(None if tm == -1 else tm)
+			
 
 	def raiseDisconnectEvent(self): # thread context
 		evt = DisconnectEvent()

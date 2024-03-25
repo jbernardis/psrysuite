@@ -56,7 +56,7 @@ MENU_AR_ADD_REQ  = 908
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
-allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest" ]
+allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest", "traintimesrequest" ]
 
 wildcardTrain = "train files (*.trn)|*.trn|"	 \
 			"All files (*.*)|*.*"
@@ -2187,6 +2187,8 @@ class MainFrame(wx.Frame):
 			"setroute":			self.DoCmdNOOP,
 			"turnoutlock":		self.DoCmdNOOP,
 			"signallock":		self.DoCmdSignalLock,
+			"traintimesrequest":	self.DoCmdTrainTimesRequest,
+			"traintimesreport":		self.DoCmdTrainTimesReport,
 		}
 		
 	def DoCmdNOOP(self, _):
@@ -2669,9 +2671,30 @@ class MainFrame(wx.Frame):
 			self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 			
 		elif parms["type"] == "trains":
+			if not self.settings.dispatcher.dispatch:
+				self.Request({"traintimesrequest": {}})
+				
 			if self.busy:
 				del self.busy
 				self.busy = None
+				
+	def DoCmdTrainTimesRequest(self, parms):
+		trains, times = self.activeTrains.GetTrainTimes()
+		resp = {"traintimesreport": {"trains": trains, "times": times}}
+		self.Request(resp)
+		
+
+	def DoCmdTrainTimesReport(self, parms):
+		trains = parms["trains"]
+		times = parms["times"]
+		for trid, tm in zip(trains, times):
+			try:
+				tr = self.trains[trid]
+			except:
+				tr = None
+			if tr:
+				tm = int(tm)
+				tr.SetTime(None if tm == -1 else tm)
 					
 	def DoCmdAdvice(self, parms):
 		if self.IsDispatcher() or self.settings.display.showadvice:

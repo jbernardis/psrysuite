@@ -287,6 +287,8 @@ class ServerMain:
 			"delclient":	self.DelClient,
 			"identify": 	self.DoIdentify,
 			"refresh":		self.DoRefresh,
+			"traintimesrequest":	self.DoTrainTimesRequest,
+			"traintimesreport":		self.DoTrainTimesReport,
 			
 			"routedef": 	self.DoRouteDef,
 			"routedefs":	self.DoRouteDefs,
@@ -674,6 +676,16 @@ class ServerMain:
 			self.sendRouteDefs(addr, skt)
 		elif reftype == "subblocks":
 			self.sendSubBlocks(addr, skt)
+			
+	def DoTrainTimesRequest(self, cmd):
+		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		for addr, skt in addrList:
+			self.socketServer.sendToOne(skt, addr, {"traintimesrequest": {}})
+			
+	def DoTrainTimesReport(self, cmd):
+		addrList = self.clientList.GetFunctionAddress("DISPLAY")
+		for addr, skt in addrList:
+			self.socketServer.sendToOne(skt, addr, {"traintimesreport": {"trains": cmd["trains"], "times": cmd["times"]}})
 	
 	def DoSetTrain(self, cmd):
 		try:

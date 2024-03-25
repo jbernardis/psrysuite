@@ -96,6 +96,17 @@ class ActiveTrainList:
 		if refresh and self.dlgTrainList is not None:
 			self.dlgTrainList.RefreshAll()
 			
+	def GetTrainTimes(self):
+		trains = []
+		times = []
+		for trid, tr in self.trains.items():
+			tm = tr.GetTime()
+			if tm is None:
+				tm = -1
+			trains.append(trid)
+			times.append(tm)
+		return trains, times
+			
 	def forSnapshot(self):
 		result = {}
 		for trid, tr in self.trains.items():
@@ -320,7 +331,6 @@ class TrainListCtrl(wx.ListCtrl):
 		self.SetItemCount(0)
 		
 	def ChangeSize(self, sz):
-		print("change size: %d %d => %d %d" % (sz[0], sz[1], sz[0]-56, sz[1]-84))
 		self.SetSize(sz[0]-56, sz[1]-84)
 		self.SetColumnWidth(9, sz[0]-966-56)
 		
