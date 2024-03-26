@@ -211,6 +211,7 @@ class MainFrame(wx.Frame):
 		self.bCheckTrains = wx.Button(self, wx.ID_ANY, "Check Trains", pos=(self.centerOffset+150, 75), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBCheckTrains, self.bCheckTrains)
 		self.bCheckTrains.SetToolTip("Check trains for continuity and for locomotive number uniqueness")
+		self.bCheckTrains.Enable(False)
 
 		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Train IDs", pos=(self.centerOffset+250, 15), size=BTNDIM)
 		self.bLoadTrains.Enable(False)
@@ -240,6 +241,7 @@ class MainFrame(wx.Frame):
 		self.bActiveTrains = wx.Button(self, wx.ID_ANY, "Active Trains", pos=(self.centerOffset+350, 75), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBActiveTrains, self.bActiveTrains)
 		self.bActiveTrains.SetToolTip("Show the active train window")
+		self.bActiveTrains.Enable(False)
 		
 		if not self.IsDispatcher():
 			self.bLoadTrains.Hide()
@@ -2027,6 +2029,9 @@ class MainFrame(wx.Frame):
 			self.sessionid = None
 			self.bSubscribe.SetLabel("Connect")
 			self.bRefresh.Enable(False)
+			self.bActiveTrains.Enable(False)
+			self.activeTrains.HideTrainList()
+			self.bCheckTrains.Enable(False)
 
 			if self.IsDispatcher():
 				self.bSnapshot.Enable(False)
@@ -2034,6 +2039,7 @@ class MainFrame(wx.Frame):
 				self.bLoadLocos.Enable(False)
 				self.bSaveTrains.Enable(False)
 				self.bClearTrains.Enable(False)
+				self.bActiveTrains.Enable(False)
 				self.bSaveLocos.Enable(False)
 				self.cbAutoRouter.Enable(False)
 				self.cbATC.Enable(False)
@@ -2056,6 +2062,8 @@ class MainFrame(wx.Frame):
 			self.subscribed = True
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
+			self.bActiveTrains.Enable(True)
+			self.bCheckTrains.Enable(True)
 			if self.IsDispatcher():
 				self.bSnapshot.Enable(True)
 				self.bLoadTrains.Enable(True)
