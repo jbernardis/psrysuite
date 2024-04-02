@@ -39,9 +39,8 @@ class MainUnit:
 		self.sessionid = None
 		self.settings = Settings()
 		
-		self.trainSeq = Trains(os.path.join(os.getcwd(), "data"))
-		self.triggers = Triggers(self.trainSeq)
-
+		self.listener = None
+		self.rrServer = None
 		self.blocks = {}
 		self.turnouts = {}
 		self.signals = {}
@@ -49,10 +48,8 @@ class MainUnit:
 		self.osList = {}
 		self.trains = {}
 		self.OSQueue = {}
-		self.listener = None
-		self.rrServer = None
+		
 		self.commandQ = Queue()
-
 		self.rrServer = RRServer()
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
 		self.listener = Listener(self, self.settings.ipaddr, self.settings.socketport)
@@ -61,6 +58,8 @@ class MainUnit:
 			self.listener = None
 			return
 
+		self.trainSeq = Trains(self.rrServer)
+		self.triggers = Triggers(self.trainSeq)
 		
 		self.blocks["KOSN10S11"] = Block(self, "KOSN10S11", 0, 'W', True)
 		self.blocks["KOSN20S21"] = Block(self, "KOSN20S21", 0, 'E', True)

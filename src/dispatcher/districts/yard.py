@@ -86,6 +86,14 @@ class Yard (District):
 			return
 
 		District.PerformSignalAction(self, sig, callon=callon)
+			
+	def SetUpRoute(self, osblk, route):
+		controlOpt = self.frame.rbYardControl.GetSelection()
+		if controlOpt == 0:  # Yard local control
+			self.frame.PopupEvent("Yard control is local")
+			return
+		
+		District.SetUpRoute(self, osblk, route)
 
 	def PerformButtonAction(self, btn):
 		controlOpt = self.frame.rbYardControl.GetSelection()

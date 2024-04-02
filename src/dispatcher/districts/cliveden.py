@@ -20,6 +20,14 @@ class Cliveden (District):
 			return
 
 		District.PerformHandSwitchAction(self, hs)
+		
+	def SetUpRoute(self, osblk, route):
+		controlOpt = self.frame.rbCliffControl.GetSelection()
+		if controlOpt == 0:  # Cliveden local control
+			self.frame.PopupEvent("Cliveden control is local")
+			return
+		
+		District.SetUpRoute(self, osblk, route)
 
 	def PerformTurnoutAction(self, turnout, force=False):
 		controlOpt = self.frame.rbCliffControl.GetSelection()

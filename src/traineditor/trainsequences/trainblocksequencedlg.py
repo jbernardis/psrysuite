@@ -366,6 +366,7 @@ class TrainBlockSequencesDlg(wx.Dialog):
 
 				
 	def OnBSave(self, _):
+		print("tgrain sequence edit - save")
 		self.trains.Save()
 		self.SetModified(False)
 		

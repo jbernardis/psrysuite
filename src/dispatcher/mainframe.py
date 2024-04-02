@@ -18,6 +18,7 @@ from dispatcher.tile import loadTiles
 from dispatcher.train import Train
 from dispatcher.trainlist import ActiveTrainList
 from dispatcher.losttrains import LostTrains
+from dispatcher.routetraindlg import RouteTrainDlg
 
 from dispatcher.breaker import BreakerDisplay, BreakerName
 from dispatcher.toaster import Toaster
@@ -52,6 +53,7 @@ MENU_ATC_REM_REQ = 905
 MENU_ATC_ADD_REQ = 906
 MENU_AR_REM_REQ  = 907
 MENU_AR_ADD_REQ  = 908
+MENU_TRAIN_ROUTE = 910
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
@@ -103,6 +105,7 @@ class MainFrame(wx.Frame):
 		self.adviceList = []
 		self.dlgEvents = None
 		self.dlgAdvice = None
+		self.routeTrainDlgs = {}
 		self.busy = None
 		
 		self.locoList = []
@@ -130,7 +133,7 @@ class MainFrame(wx.Frame):
 		self.title = "PSRY Dispatcher" if self.settings.dispatcher.dispatch else "PSRY Monitor"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.bitmaps = BitMaps(os.path.join(os.getcwd(), "images", "bitmaps"))
-		singlePage = self.settings.dispatcher.pages == 1
+		singlePage = self.settings.display.pages == 1
 		self.bmpw, self.bmph = self.bitmaps.diagrams.HydeYardPort.GetSize()
 		self.diagrams = {
 			HyYdPt: Node(HyYdPt, self.bitmaps.diagrams.HydeYardPort, 0),
@@ -142,7 +145,7 @@ class MainFrame(wx.Frame):
 		ht = None # diagram height.  None => use bitmap size.  use a number < 800 to trim bottom off of diagram bitmaps
 		self.diagramWidth = 2560
 
-		if self.settings.dispatcher.pages == 1:  # set up a single ultra-wide display accross 3 monitors
+		if self.settings.display.pages == 1:  # set up a single ultra-wide display accross 3 monitors
 			dp = TrackDiagram(self, [self.diagrams[sn] for sn in screensList], ht)
 			dp.SetPosition((16, 120))
 			_, diagramh = dp.GetSize()
@@ -176,7 +179,7 @@ class MainFrame(wx.Frame):
 
 		self.ToasterSetup()
 
-		if self.settings.dispatcher.showcameras:
+		if self.settings.display.showcameras:
 			self.DrawCameras()
 
 		voffset = topSpace+diagramh+10
@@ -184,7 +187,7 @@ class MainFrame(wx.Frame):
 		self.DefineWidgets(voffset)
 		self.DefineControlDisplay(voffset)
 		
-		if self.settings.dispatcher.pages == 3:
+		if self.settings.display.pages == 3:
 			self.currentScreen = None
 			self.SwapToScreen(LaKr)
 		else:
@@ -325,7 +328,7 @@ class MainFrame(wx.Frame):
 	def OnKeyDown(self, evt):
 		kcd = evt.GetKeyCode()
 		if kcd == wx.WXK_PAGEUP:
-			if self.settings.dispatcher.pages == 3:
+			if self.settings.display.pages == 3:
 				if self.currentScreen == LaKr:
 					self.SwapToScreen(HyYdPt)
 				elif self.currentScreen == NaCl:
@@ -337,7 +340,7 @@ class MainFrame(wx.Frame):
 				self.SetPosition((self.shiftXOffset, self.shiftYOffset))
 				
 		elif kcd == wx.WXK_PAGEDOWN:
-			if self.settings.dispatcher.pages == 3:
+			if self.settings.display.pages == 3:
 				if self.currentScreen == HyYdPt:
 					self.SwapToScreen(LaKr)
 				elif self.currentScreen == LaKr:
@@ -1469,9 +1472,12 @@ class MainFrame(wx.Frame):
 						return 
 					
 					if right:
+						addedMenuItem = False
+						
 						menu = wx.Menu()
 						self.menuTrain = tr
-						addedMenuItem = False
+						
+						self.Bind(wx.EVT_MENU, self.OnTrainRouting, id=MENU_TRAIN_ROUTE)
 						if not self.IsDispatcher():
 							if self.settings.display.allowatcrequests:
 								if tr.IsOnATC():
@@ -1512,12 +1518,114 @@ class MainFrame(wx.Frame):
 									self.Bind(wx.EVT_MENU, self.OnARAdd, id=MENU_AR_ADD)
 								addedMenuItem = True
 
+						trid = self.menuTrain.GetName()
+						hasSequence = trid in self.trainList
+
 						if addedMenuItem:
+							if hasSequence:
+								menu.Append( MENU_TRAIN_ROUTE, "Train Routing" )
 							self.PopupMenu( menu, (screenpos[0], screenpos[1]+50) )
-						menu.Destroy()
+							
+							menu.Destroy()
+						else:
+							menu.Destroy()
+							if hasSequence:
+								self.RouteTrain(self.menuTrain)
 
 					else:
 						self.EditTrain(tr, blk)
+						
+	def OnTrainRouting(self, _):
+		self.RouteTrain(self.menuTrain)
+		
+	def RouteTrain(self, tr):
+		trainid, _ = tr.GetNameAndLoco()
+		if trainid in self.routeTrainDlgs:
+			self.routeTrainDlgs[trainid].Raise()
+		else:
+			dlg = RouteTrainDlg(self, tr, self.trainList[trainid], self.IsDispatcher())
+			dlg.Show()
+			self.routeTrainDlgs[trainid] = dlg
+			
+			dlg.UpdateTrainStatus()
+			
+	def UpdateRouteDialogs(self, tid):
+		try:
+			dlg = self.routeTrainDlgs[tid]
+		except KeyError:
+			return
+		
+		dlg.UpdateTrainStatus()
+		
+	def SetRouteThruOS(self, osname, rtname, blkname, signame):
+		osblk = self.blocks[osname]
+		OSClear = osblk.IsCleared()	
+		currentRoute = osblk.GetRoute()
+		desiredRoute = self.routes[rtname]
+		
+		# determine all route characteristics
+		ends = desiredRoute.GetEndPoints()
+		if ends[0] == blkname:
+			exitBlk = ends[0]
+		else:
+			exitBlk = ends[1]
+			
+		if exitBlk in self.blocks:
+			b = self.blocks[exitBlk]
+			exitState = b.GetStatus()
+			exitClear = b.IsCleared()
+			for sbNm in [exitBlk+".E", exitBlk+".W"]:
+				if sbNm in self.blocks:
+					sb = self.blocks[sbNm]
+					exitState += sb.GetStatus()
+					exitClear += sb.IsCleared()
+					
+		else:
+			exitState = 0
+			exitClear = 0
+			
+		if currentRoute is not None and currentRoute.GetName() == rtname:
+			return True, "Already at correct route"
+		
+		if (currentRoute is None or currentRoute.GetName() != rtname) and OSClear:
+			return False, "Unable to set route at present"
+
+		if exitState != 0 or exitClear != 0:
+			return False, "Unable to set route at present"
+					
+		if currentRoute is not None and currentRoute.GetName() == rtname and not OSClear and exitState != 0:
+			return False, "Unable to set route at present"
+		
+		tolist = desiredRoute.GetSetTurnouts()
+		for toname, _ in tolist:
+			trn = self.turnouts[toname]
+			if trn.IsLocked():
+				return False, "Turnout %s is locked" % toname
+
+		district = osblk.GetDistrict()
+		district.SetUpRoute(osblk, desiredRoute)
+		return True, None
+		
+	def SetRouteSignal(self, osname, rtname, blkname, signame):
+		osblk = self.blocks[osname]
+		currentRoute = osblk.GetRoute()
+		signal = self.signals[signame]
+			
+		if currentRoute is None or currentRoute.GetName() != rtname:
+			return False, "Incorrect route, Set route first"
+		
+		aspect = signal.GetAspect()
+		if aspect != 0:
+			return True, "Signal already permits movement"
+			
+		district = osblk.GetDistrict()
+		district.PerformSignalAction(signal)
+		return True, None
+			
+	def CloseRouteTrainDlg(self, trainid):
+		if trainid in self.routeTrainDlgs:
+			self.routeTrainDlgs[trainid].Destroy()
+			del(self.routeTrainDlgs[trainid])
 						
 	def EditTrain(self, tr, blk):
 		oldName, oldLoco = tr.GetNameAndLoco()
@@ -2552,6 +2660,7 @@ class MainFrame(wx.Frame):
 	
 				tid = tr.GetName()			
 				self.activeTrains.UpdateTrain(tid)
+				self.UpdateRouteDialogs(tid)
 				self.lostTrains.Remove(tid)
 
 				blk.EvaluateStoppingSections()

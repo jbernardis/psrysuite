@@ -9,18 +9,18 @@ class Report:
 		self.initialized = False
 		self.parent = parent
 		
-		browserCmd = browser + " --app=%s"
+		browserCmd = browser.replace("\\", "/")  + " --app=%s"
 
 		try:
 			self.browser = webbrowser.get(browserCmd)
 		except webbrowser.Error:
-			dlg = wx.MessageDialog(self.parent, "Unable to find an available browser at\n%s" % self.settings.browser,
+			dlg = wx.MessageDialog(self.parent, "Unable to find an available browser at\n%s" % browserCmd,
 					"Report Initialization failed",
 					wx.OK | wx.ICON_ERROR)
 			dlg.ShowModal()
 			dlg.Destroy()
 			return
-		
+
 		self.initialized = True
 		
 	def Initialized(self):

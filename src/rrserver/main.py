@@ -5,12 +5,14 @@ if cmdFolder not in sys.path:
 
 lfn = os.path.join(os.getcwd(), "logs", "rrserver.log")
 
+
 import logging
 import logging.handlers
 from dispatcher.settings import Settings
 should_roll_over = os.path.isfile(lfn)
 
 settings = Settings()
+
 
 logLevels = {
 	"DEBUG":	logging.DEBUG,
@@ -44,6 +46,7 @@ efp = open(os.path.join(os.getcwd(), "output", "rrserver.err"), "w")
 
 sys.stdout = ofp
 sys.stderr = efp
+
 
 import json
 import socket

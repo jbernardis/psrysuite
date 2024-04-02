@@ -57,6 +57,7 @@ elif mode == "simulation":
     print("launch mode: simulation")
     
     svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
+    print("server exec = (%s)" % svrExec)
     svrProc = Popen([interpfg, svrExec, "--sim"], startupinfo=infoMinimize)
     print("server started as PID %d" % svrProc.pid)
     

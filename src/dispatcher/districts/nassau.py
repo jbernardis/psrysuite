@@ -158,6 +158,27 @@ class Nassau (District):
 				return True
 
 		return False
+			
+	def SetUpRoute(self, osblk, route):
+		controlOpt = self.frame.rbNassauControl.GetSelection()
+		if controlOpt == 0:  # nassau local control
+			self.frame.PopupEvent("Nassau control is local")
+			return
+		
+		rname = route.GetName()
+		
+		if controlOpt == 1 and not self.CheckIfRouteContains(rname, ["N12", "N22", "N31", "N41"]):  # dispatcher: main only
+			self.frame.PopupEvent("Nassau control is main only")
+			return
+		
+		District.SetUpRoute(self, osblk, route)
+		
+	def CheckIfRouteContains(self, rname, blockList):
+		for b in blockList:
+			if b in rname:
+				return True
+			
+		return False		
 
 	def PerformButtonAction(self, btn):
 		controlOpt = self.frame.rbNassauControl.GetSelection()

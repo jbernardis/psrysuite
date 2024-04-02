@@ -3,12 +3,13 @@ ar/atc/advisor - ??get rid of checkboxes and have always on???
 
 retire/get rid of advisor?????   tracker????
 
-add fields to active train list: time since assigned, stopped > 5 minutes
+add fields to active train list: stopped > 5 minutes
 
 add the following configurable fields to config tool:
 	debug level
 	show aspect calc flag (?)
-	
-consider mosving ini values showcameras and pages from dispatcher section to display section
+	dispatch/display
+
+ability to prune entries out of the lost trains list
 
 when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)

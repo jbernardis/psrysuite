@@ -19,7 +19,7 @@ class Cliff (District):
 			if controlOpt == 0:
 				msg = "Cliff control is local"
 			else:
-				msg = "Cliff control is Bank/Cliveden only"
+				msg = "Dispatcher control is Bank/Cliveden only"
 			self.frame.PopupEvent(msg)
 			return
 
@@ -31,11 +31,31 @@ class Cliff (District):
 			if controlOpt == 0:
 				msg = "Cliff control is local"
 			else:
-				msg = "Cliff control is Bank/Cliveden only"
+				msg = "Dispatcher control is Bank/Cliveden only"
 			self.frame.PopupEvent(msg)
 			return
 
 		District.PerformSignalAction(self, sig, callon=callon)
+			
+	def SetUpRoute(self, osblk, route):
+		controlOpt = self.frame.rbCliffControl.GetSelection()
+		if controlOpt == 0:  # Cliff local control
+			self.frame.PopupEvent("Cliff control is local")
+			return
+		
+		if controlOpt == 1:  # Cliff local control
+			self.frame.PopupEvent("Dispatcher control is Bank/Cliveden only")
+			return
+		
+		rtname = route.GetName()
+		
+		if rtname not in self.routeButtons:
+			self.frame.PopupEvent("Unknown route: %s" % rtname)
+			return
+		
+		bname = self.routeButtons[rtname]
+		btn = self.frame.buttons[bname]
+		self.PerformButtonAction(btn)
 
 	def PerformButtonAction(self, btn):
 		controlOpt = self.frame.rbCliffControl.GetSelection()
@@ -46,7 +66,7 @@ class Cliff (District):
 			if controlOpt == 0:
 				msg = "Cliff control is local"
 			else:
-				msg = "Cliff control is Bank/Cliveden only"
+				msg = "Dispatcher control is Bank/Cliveden only"
 			self.frame.PopupEvent(msg)
 			return
 
@@ -824,6 +844,9 @@ class Cliff (District):
 
 		self.routes = {}
 		self.osSignals = {}
+				
+				
+		self.routeButtons = {}
 
 		# Green Mountain West
 		block = self.blocks["COSGMW"]
@@ -831,6 +854,11 @@ class Cliff (District):
 		self.routes["CRtC11C10"] = Route(self.screen, block, "CRtC11C10", "C11", [ (119, 30), (120, 30), (121, 30), (122, 30), (123, 30), (124, 30), (125, 30) ], "C10", [MAIN, MAIN], ["CSw39:N", "CSw41:N"], ["C4L", "C4RC"])
 		self.routes["CRtC11C30"] = Route(self.screen, block, "CRtC11C30", "C11", [ (119, 30), (120, 30), (121, 30), (122, 31), (123, 32), (124, 32), (125, 32) ], "C30", [SLOW, SLOW], ["CSw37:R", "CSw39:R", "CSw41:N"], ["C4L", "C4RB"])
 		self.routes["CRtC11C31"] = Route(self.screen, block, "CRtC11C31", "C11", [ (119, 30), (120, 30), (121, 30), (122, 31), (123, 32), (124, 33), (125, 34) ], "C31", [RESTRICTING, SLOW], ["CSw37:N", "CSw39:R", "CSw41:N"], ["C4L", "C4RA"])
+
+		self.routeButtons["CRtC11G21"] = "CG21W"
+		self.routeButtons["CRtC11C10"] = "CC10W"
+		self.routeButtons["CRtC11C30"] = "CC30W"
+		self.routeButtons["CRtC11C31"] = "CC31W"
 
 		self.signals["C4L"].AddPossibleRoutes("COSGMW", [ "CRtC11G21", "CRtC11C10", "CRtC11C30", "CRtC11C31" ])
 		self.signals["C4RD"].AddPossibleRoutes("COSGMW", [ "CRtC11G21" ])
@@ -847,6 +875,11 @@ class Cliff (District):
 		self.routes["CRtC10C20"] = Route(self.screen, block, "CRtC10C20", "C10", [ (146, 30), (147, 30), (148, 30), (149, 30), (150, 30), (151, 30) ], "C20", [MAIN, MAIN], ["CSw31:N", "CSw33:N"], ["C2LB", "C2R"])
 		self.routes["CRtC30C20"] = Route(self.screen, block, "CRtC30C20", "C30", [ (146, 32), (147, 32), (148, 31), (149, 30), (150, 30), (151, 30) ], "C20", [SLOW, SLOW], ["CSw31:N", "CSw33:R"], ["C2LA", "C2R"])
 
+		self.routeButtons["CRtG12C20"] = "CG12E"
+		self.routeButtons["CRtG10C20"] = "CG10E"
+		self.routeButtons["CRtC10C20"] = "CC10E"
+		self.routeButtons["CRtC30C20"] = "CC30E"
+
 		self.signals["C2LD"].AddPossibleRoutes("COSGME", [ "CRtG12C20" ])
 		self.signals["C2LC"].AddPossibleRoutes("COSGME", [ "CRtG10C20" ])
 		self.signals["C2LB"].AddPossibleRoutes("COSGME", [ "CRtC10C20" ])
@@ -855,6 +888,7 @@ class Cliff (District):
 
 		self.osSignals["COSGME"] = [ "C2LA", "C2LB", "C2LC", "C2LD", "C2R" ]
 
+				
 		# Sheffield Yard East
 		block = self.blocks["COSSHE"]
 		self.routes["CRtC20C44"] = Route(self.screen, block, "CRtC20C44", "C20", [ (144, 3), (145, 3), (146, 3), (147, 3), (148, 3), (149, 3), (150, 3), (151, 3), (152, 3), (153, 3), (154, 3)  ], "C44", [SLOW, SLOW], ["CSw43:N", "CSw49:N"], ["C6R", "C6LF"])
@@ -873,6 +907,18 @@ class Cliff (District):
 		self.routes["CRtC20C54"] = Route(self.screen, block, "CRtC20C54", "C20",
 				[ (133, 23), (134, 22), (135, 21), (136, 20), (137, 19), (138, 18), (139, 17), (140, 16), (141, 15), (142, 14), (143, 13), (144, 12), (145, 11), (146, 10), (147, 9), (148, 8), (149, 7), (150, 6), (151, 5), (152, 4), (153, 3), (154, 3)  ], "C54", [SLOW, SLOW], ["CSw43:R", "CSw45:R", "CSw47:R", "CSw51:R", "CSw63:N", "CSw65:N", "CSw67:N", "CSw71:N"], ["C6R", "C6LL"])
 
+		self.routeButtons["CRtC20C44"] = "CC44E"
+		self.routeButtons["CRtC20C43"] = "CC43E"
+		self.routeButtons["CRtC20C42"] = "CC42E"
+		self.routeButtons["CRtC20C41"] = "CC41E"
+		self.routeButtons["CRtC20C40"] = "CC40E"
+		self.routeButtons["CRtC20C21"] = "CC21E"
+		self.routeButtons["CRtC20C50"] = "CC50E"
+		self.routeButtons["CRtC20C51"] = "CC51E"
+		self.routeButtons["CRtC20C52"] = "CC52E"
+		self.routeButtons["CRtC20C53"] = "CC53E"
+		self.routeButtons["CRtC20C54"] = "CC54E"
+		
 		self.signals["C6R"].AddPossibleRoutes("COSSHE", [ "CRtC20C44", "CRtC20C43", "CRtC20C42", "CRtC20C41", "CRtC20C40", "CRtC20C21", "CRtC20C50", "CRtC20C51", "CRtC20C52", "CRtC20C53", "CRtC20C54" ])
 		self.signals["C6LA"].AddPossibleRoutes("COSSHE", [ "CRtC20C21" ])
 		self.signals["C6LB"].AddPossibleRoutes("COSSHE", [ "CRtC20C40" ])
@@ -906,6 +952,19 @@ class Cliff (District):
 		self.routes["CRtC54C22"] = Route(self.screen, block, "CRtC54C22", "C54", [
 				(106, 13), (107, 13), (108, 13), (109, 13), (110, 13), (111, 13), (112, 13), (113, 13), (114, 14), (115, 15), (116, 16), (117, 17), (118, 18), (119, 19), (120, 20), (121, 21), (122, 22), (123, 23)  ], "C22", [SLOW, SLOW], ["CSw55:N", "CSw61:N", "CSw73:R", "CSw75:N", "CSw77:N", "CSw81:N"], ["C8RL", "C8L"])
 
+
+		self.routeButtons["CRtC44C22"] = "CC44W"
+		self.routeButtons["CRtC43C22"] = "CC43W"
+		self.routeButtons["CRtC42C22"] = "CC42W"
+		self.routeButtons["CRtC41C22"] = "CC41W"
+		self.routeButtons["CRtC40C22"] = "CC40W"
+		self.routeButtons["CRtC21C22"] = "CC21W"
+		self.routeButtons["CRtC50C22"] = "CC50W"
+		self.routeButtons["CRtC51C22"] = "CC51W"
+		self.routeButtons["CRtC52C22"] = "CC52W"
+		self.routeButtons["CRtC53C22"] = "CC53W"
+		self.routeButtons["CRtC54C22"] = "CC54W"
+		
 		self.signals["C8L"].AddPossibleRoutes("COSSHW", [ "CRtC44C22", "CRtC43C22", "CRtC42C22", "CRtC41C22", "CRtC40C22", "CRtC21C22", "CRtC50C22", "CRtC51C22", "CRtC52C22", "CRtC53C22", "CRtC54C22" ])
 		self.signals["C8RA"].AddPossibleRoutes("COSSHW", [ "CRtC21C22" ])
 		self.signals["C8RB"].AddPossibleRoutes("COSSHW", [ "CRtC40C22" ])

@@ -78,6 +78,8 @@ class ActiveTrainList:
 				self.dlgTrainList.AddTrain(tr)
 				
 			self.dlgTrainList.Show()
+		else:
+			self.dlgTrainList.Raise()
 	
 	def HideTrainList(self):
 		if self.dlgTrainList is not None:
@@ -191,6 +193,11 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.trCtl = TrainListCtrl(self)
 		hsz.Add(self.trCtl)
 		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.DoubleClickTrain, self.trCtl)
+		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ClickTrain, self.trCtl)
+		self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.RClickTrain, self.trCtl)
+		self.trCtl.Bind(wx.EVT_LEFT_DOWN, self.ClickLeft)
+		self.trCtl.Bind(wx.EVT_RIGHT_DOWN, self.ClickRight)
+		self.clickleft = True
 		
 		hsz.AddSpacer(20)
 		
@@ -209,10 +216,35 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.Layout()
 		self.Fit()
 		
+	def ClickLeft(self, evt):
+		self.clickLeft = True
+		evt.Skip()
+		
+	def ClickRight(self, evt):
+		self.clickLeft = False
+		evt.Skip()
+		
+	def ClickTrain(self, evt):
+		if self.clickLeft:
+			self.EditTrain(evt.Index)
+		else:
+			self.RouteTrain(evt.Index)
+		
+	def RClickTrain(self, evt):
+		self.RouteTrain(evt.Index)
+		
 	def DoubleClickTrain(self, evt):
-		tr = self.trCtl.GetActiveTrain(evt.Index)
+		self.EditTrain(evt.Index)
+		
+	def EditTrain(self, idx):
+		tr = self.trCtl.GetActiveTrain(idx)
 		blk = tr.FrontBlock()
 		self.parent.EditTrain(tr, blk)
+		
+	def RouteTrain(self, idx):
+		tr = self.trCtl.GetActiveTrain(idx)
+		if tr.GetName() in self.parent.trainList:
+			self.parent.RouteTrain(tr)
 		
 	def GetLocoInfo(self, loco):
 		return self.parent.GetLocoInfo(loco)

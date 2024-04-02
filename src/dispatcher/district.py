@@ -45,6 +45,7 @@ class District:
 		logging.info("Creating district %s" % name)
 		dbg = self.frame.GetDebugFlags()
 		self.showaspectcalculation = dbg.showaspectcalculation
+		self.matrixturnoutdelay = self.frame.settings.dispatcher.matrixturnoutdelay
 
 	def SetTiles(self, tiles, totiles, sstiles, sigtiles, misctiles, btntiles):
 		self.tiles = tiles
@@ -167,6 +168,9 @@ class District:
 					
 				first = False
 				self.frame.Request(req)
+				
+	def SetUpRoute(self, osblk, route):
+		self.MatrixTurnoutRequest(route.GetSetTurnouts(), interval=self.matrixturnoutdelay)
 
 	def PerformTurnoutAction(self, turnout, force=False):
 		turnout = turnout.GetControlledBy()

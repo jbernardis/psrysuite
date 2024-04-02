@@ -114,10 +114,10 @@ class Trains:
 					"origin": { "loc": None, "track": None },
 					"terminus": { "loc": None, "track": None }
 					}
-			
+				
 			TrainsJson[tid].update(tr.ToJSON())
 			
-		self.RRServer.Post("trainsnew.json", "data", TrainsJson)
+		self.RRServer.Post("trains.json", "data", TrainsJson)
 		
 	def GetTrainList(self):
 		return [tr.GetTrainID() for tr in self.trainlist]
