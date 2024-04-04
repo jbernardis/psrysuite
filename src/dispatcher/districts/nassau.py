@@ -171,7 +171,8 @@ class Nassau (District):
 			self.frame.PopupEvent("Nassau control is main only")
 			return
 		
-		District.SetUpRoute(self, osblk, route)
+		bn1, bn2 = self.routeButtons[rname]
+		self.frame.Request({"nxbutton": { "entry": bn1,  "exit": bn2}})
 		
 	def CheckIfRouteContains(self, rname, blockList):
 		for b in blockList:
@@ -944,7 +945,7 @@ class Nassau (District):
 		self.buttons["NNXBtnN42E"] = Button(self, self.screen, self.frame, "NNXBtnN42E", (29, 17), self.btntiles)
 		self.buttons["NNXBtnW20E"] = Button(self, self.screen, self.frame, "NNXBtnW20E", (31, 19), self.btntiles)
 		self.westGroup["NOSE"] = ["NNXBtnW11", "NNXBtnN32E", "NNXBtnN31E", "NNXBtnN12E", "NNXBtnN22E", "NNXBtnN41E", "NNXBtnN42E", "NNXBtnW20E"]
-
+		
 		self.NXMap = {
 			"NNXBtnT12": {
 				"NNXBtnW10":  "NRtT12W10"
@@ -1051,6 +1052,7 @@ class Nassau (District):
 		self.signals = {}
 		self.routes = {}
 		self.osSignals = {}
+		self.routeButtons = {}
 		sigList = [
 			[ "N20R", SloAspects, True,    "right", (16, 6) ],
 			[ "N18R", SloAspects, True,    "right", (9, 10) ],
@@ -1155,10 +1157,12 @@ class Nassau (District):
 
 		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
-
+		
+		
 		block = self.blocks["NWOSTY"]
 		self.routes["NRtT12W10"] = Route(self.screen, block, "NRtT12W10", "W10", [ (17, 5), (18, 5), (19, 5) ], "T12", [RESTRICTING, RESTRICTING], ["NSw25:N"], ["N20R", "N20L"])
-
+		self.routeButtons["NRtT12W10"] = ["NNXBtnT12", "NNXBtnW10"]
+		
 		block = self.blocks["NWOSCY"]
 		self.routes["NRtN60N31"] = Route(self.screen, block, "NRtN60N31", "N31", [ (10, 9), (11, 9), (12, 9), (13, 9), (14, 9), (15, 9), (16, 9), (17, 9), (18, 9), (19, 9) ], "N60", [RESTRICTING, RESTRICTING], ["NSw21:N", "NSw23:N", "NSw27:N"], ["N18LB", "N18R"])
 		self.routes["NRtN60N32"] = Route(self.screen, block, "NRtN60N32", "N32", [ (10, 9), (11, 9), (12, 9), (13, 9), (14, 9), (15, 9), (16, 8), (17, 7), (18, 7), (19, 7) ], "N60", [RESTRICTING, RESTRICTING], ["NSw21:N", "NSw23:R", "NSw25:N", "NSw27:N"], ["N18LA", "N18R"])
@@ -1168,6 +1172,14 @@ class Nassau (District):
 		self.routes["NRtN60N41"] = Route(self.screen, block, "NRtN60N41", "N41", [ (10, 9), (11, 10), (12, 11), (13, 12), (14, 13), (15, 14), (16, 15), (17, 15), (18, 15), (19, 15) ], "N60", [RESTRICTING, RESTRICTING], ["NSw27:R", "NSw29:R", "NSw31:R", "NSw33:R"], ["N14LB", "N18R"])
 		self.routes["NRtN60N42"] = Route(self.screen, block, "NRtN60N42", "N42", [ (10, 9), (11, 10), (12, 11), (13, 12), (14, 13), (15, 14), (16, 15), (17, 16), (18, 17), (19, 17) ], "N60", [RESTRICTING, RESTRICTING], ["NSw27:R", "NSw29:R", "NSw31:R", "NSw33:N", "NSw35:R"], ["N14LC", "N18R"])
 		self.routes["NRtN60W20"] = Route(self.screen, block, "NRtN60W20", "W20", [ (10, 9), (11, 10), (12, 11), (13, 12), (14, 13), (15, 14), (16, 15), (17, 16), (18, 17), (19, 18), (20, 19) ], "N60", [RESTRICTING, RESTRICTING], ["NSw27:R", "NSw29:R", "NSw31:R", "NSw33:N", "NSw35:N"], ["N14LD", "N18R"])
+		self.routeButtons["NRtN60N31"] = ["NNXBtnN60", "NNXBtnN31W"]
+		self.routeButtons["NRtN60N32"] = ["NNXBtnN60", "NNXBtnN32W"]
+		self.routeButtons["NRtN60W10"] = ["NNXBtnN60", "NNXBtnW10"]
+		self.routeButtons["NRtN60N12"] = ["NNXBtnN60", "NNXBtnN12W"]
+		self.routeButtons["NRtN60N22"] = ["NNXBtnN60", "NNXBtnN22W"]
+		self.routeButtons["NRtN60N41"] = ["NNXBtnN60", "NNXBtnN41W"]
+		self.routeButtons["NRtN60N42"] = ["NNXBtnN60", "NNXBtnN42W"]
+		self.routeButtons["NRtN60W20"] = ["NNXBtnN60", "NNXBtnW20W"]
 
 		block = self.blocks["NWOSW"]
 		self.routes["NRtN11N31"] = Route(self.screen, block, "NRtN11N31", "N31", [ (9, 11), (10, 11), (11, 11), (12, 11), (13, 11), (14, 10), (15, 9), (16, 9), (17, 9), (18, 9), (19, 9) ], "N11", [RESTRICTING, RESTRICTING], ["NSw19:N", "NSw21:R", "NSw23:N", "NSw27:N", "NSw29:N"], ["N18LB", "N16R"])
@@ -1178,6 +1190,14 @@ class Nassau (District):
 		self.routes["NRtN11N41"] = Route(self.screen, block, "NRtN11N41", "N41", [ (9, 11), (10, 11), (11, 11), (12, 11), (13, 12), (14, 13), (15, 14), (16, 15), (17, 15), (18, 15), (19, 15) ], "N11", [RESTRICTING, RESTRICTING], ["NSw19:N", "NSw27:N", "NSw29:R", "NSw31:R", "NSw33:R"], ["N14LB", "N16R"])
 		self.routes["NRtN11N42"] = Route(self.screen, block, "NRtN11N42", "N42", [ (9, 11), (10, 11), (11, 11), (12, 11), (13, 12), (14, 13), (15, 14), (16, 15), (17, 16), (18, 17), (19, 17) ], "N11", [RESTRICTING, RESTRICTING], ["NSw19:N", "NSw27:N", "NSw29:R", "NSw31:R", "NSw33:N", "NSw35:R"], ["N14LC", "N16R"])
 		self.routes["NRtN11W20"] = Route(self.screen, block, "NRtN11W20", "W20", [ (9, 11), (10, 11), (11, 11), (12, 11), (13, 12), (14, 13), (15, 14), (16, 15), (17, 16), (18, 17), (19, 18), (20, 19) ], "N11", [RESTRICTING, RESTRICTING], ["NSw19:N", "NSw27:N", "NSw29:R", "NSw31:R", "NSw33:N", "NSw35:N"], ["N14LD", "N16R"])
+		self.routeButtons["NRtN11N31"] = ["NNXBtnN11", "NNXBtnN31W"]
+		self.routeButtons["NRtN11N32"] = ["NNXBtnN11", "NNXBtnN32W"]
+		self.routeButtons["NRtN11W10"] = ["NNXBtnN11", "NNXBtnW10"]
+		self.routeButtons["NRtN11N12"] = ["NNXBtnN11", "NNXBtnN12W"]
+		self.routeButtons["NRtN11N22"] = ["NNXBtnN11", "NNXBtnN22W"]
+		self.routeButtons["NRtN11N41"] = ["NNXBtnN11", "NNXBtnN41W"]
+		self.routeButtons["NRtN11N42"] = ["NNXBtnN11", "NNXBtnN42W"]
+		self.routeButtons["NRtN11W20"] = ["NNXBtnN11", "NNXBtnW20W"]
 
 		block = self.blocks["NWOSE"]
 		self.routes["NRtN21N31"] = Route(self.screen, block, "NRtN21N31", "N21", [ (9, 13), (10, 12), (11, 11), (12, 11), (13, 11), (14, 10), (15, 9), (16, 9), (17, 9), (18, 9), (19, 9) ], "N31", [RESTRICTING, RESTRICTING], ["NSw19:R", "NSw21:R", "NSw23:N", "NSw27:N", "NSw29:N"], ["N14R", "N18LB"])
@@ -1188,6 +1208,14 @@ class Nassau (District):
 		self.routes["NRtN21N41"] = Route(self.screen, block, "NRtN21N41", "N21", [ (9, 13), (10, 13), (11, 13), (12, 13), (13, 13), (14, 13), (15, 14), (16, 15), (17, 15), (18, 15), (19, 15) ], "N41", [RESTRICTING, RESTRICTING], ["NSw19:N", "NSw29:N", "NSw31:R", "NSw33:R"], ["N14R", "N14LB"])
 		self.routes["NRtN21N42"] = Route(self.screen, block, "NRtN21N42", "N21", [ (9, 13), (10, 13), (11, 13), (12, 13), (13, 13), (14, 13), (15, 14), (16, 15), (17, 16), (18, 17), (19, 17) ], "N42", [RESTRICTING, RESTRICTING], ["NSw19:N", "NSw29:N", "NSw31:R", "NSw33:N", "NSw35:R"], ["N14R", "N14LC"])
 		self.routes["NRtN21W20"] = Route(self.screen, block, "NRtN21W20", "N21", [ (9, 13), (10, 13), (11, 13), (12, 13), (13, 13), (14, 13), (15, 14), (16, 15), (17, 16), (18, 17), (19, 18), (20, 19) ], "W20", [RESTRICTING, RESTRICTING], ["NSw19:N", "NSw29:N", "NSw31:R", "NSw33:N", "NSw35:N"], ["N14R", "N14LD"])
+		self.routeButtons["NRtN21N31"] = ["NNXBtnN21", "NNXBtnN31W"]
+		self.routeButtons["NRtN21N32"] = ["NNXBtnN21", "NNXBtnN32W"]
+		self.routeButtons["NRtN21W10"] = ["NNXBtnN21", "NNXBtnW10"]
+		self.routeButtons["NRtN21N12"] = ["NNXBtnN21", "NNXBtnN12W"]
+		self.routeButtons["NRtN21N22"] = ["NNXBtnN21", "NNXBtnN22W"]
+		self.routeButtons["NRtN21N41"] = ["NNXBtnN21", "NNXBtnN41W"]
+		self.routeButtons["NRtN21N42"] = ["NNXBtnN21", "NNXBtnN42W"]
+		self.routeButtons["NRtN21W20"] = ["NNXBtnN21", "NNXBtnW20W"]
 
 		self.signals["N20R"].AddPossibleRoutes("NWOSTY", [ "NRtT12W10" ])
 		self.signals["N18R"].AddPossibleRoutes("NWOSCY", [ "NRtN60N31", "NRtN60N32", "NRtN60W10", "NRtN60N12", "NRtN60N22", "NRtN60N41", "NRtN60N42", "NRtN60W20" ])
@@ -1248,6 +1276,14 @@ class Nassau (District):
 		self.routes["NRtR10N41"] = Route(self.screen, block, "NRtR10N41", "R10", [ (30, 15), (31, 15), (32, 15), (33, 15), (34, 15), (35, 15), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9), (43, 9) ], "N41", [SLOW, RESTRICTING], ["NSw41:R", "NSw43:R", "NSw45:R", "NSw47:R"], ["N28L", "N24RB"])
 		self.routes["NRtR10N42"] = Route(self.screen, block, "NRtR10N42", "R10", [ (30, 17), (31, 17), (32, 17), (33, 17), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9), (43, 9) ], "N42", [SLOW, RESTRICTING], ["NSw39:R", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:R"], ["N28L", "N24RC"])
 		self.routes["NRtR10W20"] = Route(self.screen, block, "NRtR10W20", "R10", [ (32, 19), (33, 18), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9), (43, 9) ], "W20", [RESTRICTING, RESTRICTING], ["NSw39:N", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:R"], ["N28L", "N24RD"])
+		self.routeButtons["NRtR10W11"] = ["NNXBtnR10", "NNXBtnW11"]
+		self.routeButtons["NRtR10N32"] = ["NNXBtnR10", "NNXBtnN32E"]
+		self.routeButtons["NRtR10N31"] = ["NNXBtnR10", "NNXBtnN31E"]
+		self.routeButtons["NRtR10N12"] = ["NNXBtnR10", "NNXBtnN12E"]
+		self.routeButtons["NRtR10N22"] = ["NNXBtnR10", "NNXBtnN22E"]
+		self.routeButtons["NRtR10N41"] = ["NNXBtnR10", "NNXBtnN41E"]
+		self.routeButtons["NRtR10N42"] = ["NNXBtnR10", "NNXBtnN42E"]
+		self.routeButtons["NRtR10W20"] = ["NNXBtnR10", "NNXBtnW20E"]
 
 		block = self.blocks["NEOSW"]
 		self.routes["NRtB10W11"] = Route(self.screen, block, "NRtB10W11", "B10", [ (33, 5), (34, 6), (35, 7), (36, 8), (37, 9), (38, 10), (39, 11), (40, 11), (41, 11), (42, 11), (43, 11) ], "W11", [RESTRICTING, RESTRICTING], ["NSw45:N", "NSw47:N", "NSw55:R", "NSw57:N"], ["N26L", "N28R"])
@@ -1258,6 +1294,14 @@ class Nassau (District):
 		self.routes["NRtB10N41"] = Route(self.screen, block, "NRtB10N41", "B10", [ (30, 15), (31, 15), (32, 15), (33, 15), (34, 15), (35, 15), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 11), (42, 11), (43, 11) ], "N41", [RESTRICTING, RESTRICTING], ["NSw41:R", "NSw43:R", "NSw45:R", "NSw47:N", "NSw57:N"], ["N26L", "N24RB"])
 		self.routes["NRtB10N42"] = Route(self.screen, block, "NRtB10N42", "B10", [ (30, 17), (31, 17), (32, 17), (33, 17), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 11), (42, 11), (43, 11) ], "N42", [RESTRICTING, RESTRICTING], ["NSw39:R", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:N", "NSw57:N"], ["N26L", "N24RC"])
 		self.routes["NRtB10W20"] = Route(self.screen, block, "NRtB10W20", "B10", [ (32, 19), (33, 18), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 11), (42, 11), (43, 11) ], "W20", [RESTRICTING, RESTRICTING], ["NSw39:N", "NSw41:N", "NSw43:R", "NSw45:R", "NSw47:N", "NSw57:N"], ["N26L", "N24RD"])
+		self.routeButtons["NRtB10W11"] = ["NNXBtnB10", "NNXBtnW11"]
+		self.routeButtons["NRtB10N32"] = ["NNXBtnB10", "NNXBtnN32E"]
+		self.routeButtons["NRtB10N31"] = ["NNXBtnB10", "NNXBtnN31E"]
+		self.routeButtons["NRtB10N12"] = ["NNXBtnB10", "NNXBtnN12E"]
+		self.routeButtons["NRtB10N22"] = ["NNXBtnB10", "NNXBtnN22E"]
+		self.routeButtons["NRtB10N41"] = ["NNXBtnB10", "NNXBtnN41E"]
+		self.routeButtons["NRtB10N42"] = ["NNXBtnB10", "NNXBtnN42E"]
+		self.routeButtons["NRtB10W20"] = ["NNXBtnB10", "NNXBtnW20E"]
 
 		block = self.blocks["NEOSE"]
 		self.routes["NRtB20W11"] = Route(self.screen, block, "NRtB20W11", "W11", [ (33, 5), (34, 6), (35, 7), (36, 8), (37, 9), (38, 10), (39, 11), (40, 11), (41, 11), (42, 12), (43, 13) ], "B20", [RESTRICTING, RESTRICTING], ["NSw45:N", "NSw47:N", "NSw55:R", "NSw57:R"], ["N28R", "N24L"])
@@ -1268,6 +1312,14 @@ class Nassau (District):
 		self.routes["NRtB20N41"] = Route(self.screen, block, "NRtB20N41", "N41", [ (30, 15), (31, 15), (32, 15), (33, 15), (34, 15), (35, 15), (36, 15), (37, 14), (38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13) ], "B20", [SLOW, RESTRICTING], ["NSw41:R", "NSw43:R", "NSw45:N", "NSw57:N"], ["N24RB", "N24L"])
 		self.routes["NRtB20N42"] = Route(self.screen, block, "NRtB20N42", "N42", [ (30, 17), (31, 17), (32, 17), (33, 17), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13) ], "B20", [SLOW, RESTRICTING], ["NSw39:R", "NSw41:N", "NSw43:R", "NSw45:N", "NSw57:N"], ["N24RC", "N24L"])
 		self.routes["NRtB20W20"] = Route(self.screen, block, "NRtB20W20", "W20", [ (32, 19), (33, 18), (34, 17), (35, 16), (36, 15), (37, 14), (38, 13), (39, 13), (40, 13), (41, 13), (42, 13), (43, 13) ], "B20", [RESTRICTING, RESTRICTING], ["NSw39:N", "NSw41:N", "NSw43:R", "NSw45:N", "NSw57:N"], ["N24RD", "N24L"])
+		self.routeButtons["NRtB20W11"] = ["NNXBtnB20", "NNXBtnW11"]
+		self.routeButtons["NRtB20N32"] = ["NNXBtnB20", "NNXBtnN32E"]
+		self.routeButtons["NRtB20N31"] = ["NNXBtnB20", "NNXBtnN31E"]
+		self.routeButtons["NRtB20N12"] = ["NNXBtnB20", "NNXBtnN12E"]
+		self.routeButtons["NRtB20N22"] = ["NNXBtnB20", "NNXBtnN22E"]
+		self.routeButtons["NRtB20N41"] = ["NNXBtnB20", "NNXBtnN41E"]
+		self.routeButtons["NRtB20N42"] = ["NNXBtnB20", "NNXBtnN42E"]
+		self.routeButtons["NRtB20W20"] = ["NNXBtnB20", "NNXBtnW20E"]
 
 		self.signals["N28L"].AddPossibleRoutes("NEOSRH", [ "NRtR10W11", "NRtR10N32", "NRtR10N31", "NRtR10N12", "NRtR10N22", "NRtR10N41", "NRtR10N42", "NRtR10W20" ])
 		self.signals["N26L"].AddPossibleRoutes("NEOSW",  [ "NRtB10W11", "NRtB10N32", "NRtB10N31", "NRtB10N12", "NRtB10N22", "NRtB10N41", "NRtB10N42", "NRtB10W20" ])

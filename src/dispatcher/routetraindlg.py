@@ -15,21 +15,33 @@ class RouteTrainDlg(wx.Dialog):
 		self.sequence = trinfo["sequence"]
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		
-		self.SetTitle("Route Status for Train %s" % train.GetName())
+		self.SetTitle("Route Status")
 		
 		self.font = wx.Font(wx.Font(14, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+		self.fontTrainID = wx.Font(wx.Font(22, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
 		self.bmpArrow = self.parent.bitmaps.arrow
 		self.bmpClear = self.parent.bitmaps.clear
 		self.lastStepx = None
 
 		vsz = wx.BoxSizer(wx.VERTICAL)
-		vsz.AddSpacer(20)
-		vsz.Add(self.AddHeaders())
-		vsz.AddSpacer(10)
 
 		name, loco = train.GetNameAndLoco()
 		self.name = name
+		
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		st = wx.StaticText(self, wx.ID_ANY, "Train:")
+		st.SetFont(self.font)
+		hsz.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
+		hsz.AddSpacer(10)
+		st = wx.StaticText(self, wx.ID_ANY, train.GetName())
+		st.SetFont(self.fontTrainID)
+		hsz.Add(st)
+		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
+		vsz.AddSpacer(20)
+		vsz.Add(self.AddHeaders())
+		vsz.AddSpacer(10)
+		
 		self.bmps = []		
 		vsz.Add(self.AddLine(None, None, None, trinfo["startblock"]))
 		
@@ -69,9 +81,20 @@ class RouteTrainDlg(wx.Dialog):
 		self.SetSizer(hsz)
 		self.Layout()
 		self.Fit()
+		self.CenterOnScreen()
+
 
 	def OnBRoute(self, evt):
 		if self.lastStepx is None:
+			return
+		
+		if self.lastStepx >= len(self.sequence):
+			if self.trinfo["startblock"] == self.sequence[-1]["block"]:
+				self.ClearArrow(self.lastStepx)
+				self.lastStepx = 0
+				self.SetArrow(self.lastStepx)
+				
+		if self.lastStepx >= len(self.sequence):
 			return
 
 		sx = self.lastStepx				
@@ -99,24 +122,44 @@ class RouteTrainDlg(wx.Dialog):
 		'''
 		trainBlocks = self.train.GetBlockList()
 		stepx = 0
+		found = False
 		i = 1
 		for step in self.sequence:
 			if step["block"] in trainBlocks or step["os"] in trainBlocks:
 				stepx = i
+				found = True
+			elif found:
+				break
 			i += 1
+	
+		# if the train is in the last block, and if the last block is the same as the start block, and the train
+		# is not in the next to last block, then put the train in the first block
+		
+		if stepx == len(self.sequence) and self.trinfo["startblock"] == self.sequence[-1]["block"] and self.sequence[-2]["block"] not in trainBlocks:
+			stepx = 0
 			
 		if stepx == 0 and self.trinfo["startblock"] not in trainBlocks:
 			stepx = None
-			
-		if stepx is None:
 			self.msg.SetLabel("Train is in unexpected block")
-		elif stepx != self.lastStepx:
-			self.bmps[stepx].SetBitmap(self.bmpArrow)
+		else:
+			self.msg.SetLabel("")
+			if stepx != self.lastStepx:
+				self.SetArrow(stepx)
 			
-			if self.lastStepx is not None:
-				self.bmps[self.lastStepx].SetBitmap(self.bmpClear)
+		if stepx != self.lastStepx:
+			self.ClearArrow(self.lastStepx)
 			
 		self.lastStepx = stepx
+		
+	def SetArrow(self, sx):
+		if sx is None:
+			return
+		self.bmps[sx].SetBitmap(self.bmpArrow)
+		
+	def ClearArrow(self, sx):
+		if sx is None:
+			return
+		self.bmps[sx].SetBitmap(self.bmpClear)
 		
 	def onClose(self, evt):
 		self.parent.CloseRouteTrainDlg(self.name)

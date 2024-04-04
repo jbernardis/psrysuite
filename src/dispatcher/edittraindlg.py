@@ -1,6 +1,8 @@
 import wx
 import logging
 
+from dispatcher.losttrains import LostTrainsDlg
+
 MAXSTEPS = 9
 BUTTONSIZE = (90, 30)
 
@@ -250,37 +252,40 @@ class EditTrainDlg(wx.Dialog):
 		self.cbEngineer.SetValue(self.noEngineer)
 		
 	def OnBLostTrains(self, evt):
-		l = self.lostTrains.GetList()
-		dlg = wx.SingleChoiceDialog(
-				self, 'Train / Loco / Engineer / Block', 'Previously Lost Trains', 
-				["%s / %s / %s / %s / %s" % (t[0], "E" if t[3] else "W", t[1], t[2], t[4]) for t in l],
-				wx.CHOICEDLG_STYLE)
-
-		while True:
-			rc = dlg.ShowModal()
-			if rc != wx.ID_OK:
-				dlg.Destroy()
-				return
+		dlg = LostTrainsDlg(self, self.lostTrains)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			trname = dlg.GetResult()
 			
-			tstr = dlg.GetStringSelection()
-			trid, east, loco, engineer, _ = tstr.split(" / ")
-			east = True if east == "E" else False
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return
+
+		tr = self.lostTrains.GetTrain(trname)
+		if tr is None:
+			self.parent.PopupEvent("Unable to identify lost train")
+			return
+
+		loco, engineer, east, _ = tr
+		east = True if east == 'E' else False
 	
-			rc = wx.ID_YES		
-			if east != self.startingEast:
-				mdlg = wx.MessageDialog(self,  'Trains are moving in opposite directions.\nPress "Yes" to proceed',
-	                               'Opposite Directions',
-	                               wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
-	                               )
-				rc = mdlg.ShowModal()
-				mdlg.Destroy()
-	
-			if rc == wx.ID_YES:
-				self.cbTrainID.SetValue(trid)
-				self.cbLocoID.SetValue(loco)
-				self.cbEngineer.SetValue(self.noEngineer if engineer is None or engineer == "None" else engineer)
-				dlg.Destroy()
-				return
+		rc = wx.ID_YES		
+		if east != self.startingEast:
+			mdlg = wx.MessageDialog(self,  'Trains are moving in opposite directions.\nPress "Yes" to proceed',
+	                              'Opposite Directions',
+	                              wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
+	                              )
+			rc = mdlg.ShowModal()
+			mdlg.Destroy()
+
+
+		if rc == wx.ID_YES:
+			self.startingEast = east
+			self.cbTrainID.SetValue(trname)
+			self.cbLocoID.SetValue(loco)
+			self.cbEngineer.SetValue(self.noEngineer if engineer is None or engineer == "None" else engineer)
+			dlg.Destroy()
+			return
 
 	def ShowTrainLocoDesc(self):
 		if self.chosenLoco in self.locos and self.locos[self.chosenLoco]["desc"] != None:

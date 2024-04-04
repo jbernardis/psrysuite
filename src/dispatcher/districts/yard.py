@@ -93,7 +93,12 @@ class Yard (District):
 			self.frame.PopupEvent("Yard control is local")
 			return
 		
-		District.SetUpRoute(self, osblk, route)
+		try:
+			bname = self.routeToButton[route.GetName()]
+		except KeyError:
+			District.SetUpRoute(self, osblk, route)
+		else:
+			self.frame.Request({"nxbutton": { "button": bname}})
 
 	def PerformButtonAction(self, btn):
 		controlOpt = self.frame.rbYardControl.GetSelection()
@@ -913,6 +918,12 @@ class Yard (District):
 		self.buttonToRoute["YWEB2"] = "YRtY87Y82"
 		self.buttonToRoute["YWEB3"] = "YRtY87Y83"
 		self.buttonToRoute["YWEB4"] = "YRtY87Y84"
+
+		# set up a mapping from route name to buttons for waterman only		
+		self.routeToButton = {}
+		for b, r in self.buttonToRoute.items():
+			if b not in ["YY50W", "YY51W"]:
+				self.routeToButton[r] = b
 
 		self.signals["Y40L"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y81", "YRtY70Y82", "YRtY70Y83", "YRtY70Y84" ])
 		self.signals["Y40RA"].AddPossibleRoutes("YOSWYW", [ "YRtY70Y81" ])

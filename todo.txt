@@ -11,6 +11,6 @@ add the following configurable fields to config tool:
 	dispatch/display
 	browser
 
-ability to prune entries out of the lost trains list
-
 when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)
+
+observed repeated sending of route setup messages for waterman.  Suspect that I do not have accurate definiitons of each route and I keep trying to set it to what I want, but the controller sees no need for action

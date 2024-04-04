@@ -44,6 +44,10 @@ from dispatcher.rrserver import RRServer
 from dispatcher.edittraindlg import EditTrainDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
 
+#===============================================================================
+# from utilities.testroutesdlg import TestRoutesDlg
+#===============================================================================
+
 MENU_ATC_REMOVE  = 900
 MENU_ATC_STOP    = 901
 MENU_ATC_ADD     = 902
@@ -486,6 +490,19 @@ class MainFrame(wx.Frame):
 			self.Request({"clock": { "value": self.timeValue, "status": self.clockStatus}})
 					
 	def OnThrottle(self, _):
+	#===========================================================================
+	# 	dlg = TestRoutesDlg(self)
+	# 	dlg.ShowModal()
+	# 	dlg.Destroy()
+	# 	
+	# def TestSetupRoute(self, rname):
+	# 	rt = self.routes[rname]
+	# 	osblk = rt.GetOS()
+	# 	district = osblk.GetDistrict()
+	# 	district.SetUpRoute(osblk, rt)
+	# 	
+	# def xxx(self, _):
+	#===========================================================================
 		throttleExec = os.path.join(os.getcwd(), "throttle", "main.py")
 		throttleProc = Popen([sys.executable, throttleExec])
 		logging.info("Throttle started as PID %d" % throttleProc.pid)
@@ -1524,6 +1541,8 @@ class MainFrame(wx.Frame):
 						if addedMenuItem:
 							if hasSequence:
 								menu.Append( MENU_TRAIN_ROUTE, "Train Routing" )
+							else:
+								self.PopupEvent("Train %s has no block sequence defined" % trid)
 							self.PopupMenu( menu, (screenpos[0], screenpos[1]+50) )
 							
 							menu.Destroy()
@@ -1531,6 +1550,8 @@ class MainFrame(wx.Frame):
 							menu.Destroy()
 							if hasSequence:
 								self.RouteTrain(self.menuTrain)
+							else:
+								self.PopupEvent("Train %s has no block sequence defined" % trid)
 
 					else:
 						self.EditTrain(tr, blk)
@@ -2047,8 +2068,6 @@ class MainFrame(wx.Frame):
 		self.dlgAdvice = None
 
 	def OnBSnapshot(self, _):
-		self.Request({"dumptrains": {}})
-		self.DoCmdDumpTrains({})
 		dlg = ChooseSnapshotActionDlg(self)	
 		rc = dlg.ShowModal()
 		dlg.Destroy()
@@ -2553,9 +2572,10 @@ class MainFrame(wx.Frame):
 				if name is None:
 					if tr:
 						tr.RemoveFromBlock(blk)
-						self.activeTrains.UpdateTrain(tr.GetName())
+						trid = tr.GetName()
+						self.activeTrains.UpdateTrain(trid)
+						self.UpdateRouteDialogs(trid)
 						if tr.IsInNoBlocks():
-							trid = tr.GetName()
 							if not tr.IsBeingEdited():
 								self.PopupEvent("Train %s - detection lost from block %s" % (trid, block))
 								self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block)
