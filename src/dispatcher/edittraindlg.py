@@ -225,6 +225,11 @@ class EditTrainDlg(wx.Dialog):
 		
 	def OnTrainChoice(self, evt):
 		self.chosenTrain = evt.GetString()
+		if self.chosenTrain in self.trains:
+			tr = self.trains[self.chosenTrain]
+			self.startingEast = tr["eastbound"]
+		else:
+			self.startingEast = None
 		self.ShowTrainLocoDesc()
 
 	def OnTrainText(self, evt):
@@ -267,7 +272,6 @@ class EditTrainDlg(wx.Dialog):
 			return
 
 		loco, engineer, east, _ = tr
-		east = True if east == 'E' else False
 	
 		rc = wx.ID_YES		
 		if east != self.startingEast:
@@ -302,7 +306,7 @@ class EditTrainDlg(wx.Dialog):
 				else:
 					self.stTrainInfo[lx].SetLabel("%-12.12s  %-4.4s  %s" % (track[lx][0], "(%d)" % track[lx][2], track[lx][1]))
 					
-			details = "Eastbound" if tr["eastbound"] else "Westbound"
+			details = "Eastbound" if self.startingEast else "Westbound"
 			if tr["cutoff"]:
 				details += " via cutoff"
 			self.stFlags.SetLabel(details)
@@ -355,12 +359,5 @@ class EditTrainDlg(wx.Dialog):
 			
 		atc = False if not self.atcFlag else self.cbATC.GetValue()
 		ar = False if not self.arFlag else self.cbAR.GetValue()
-		try:
-			tr = self.trains[self.chosenTrain]
-		except KeyError:
-			tr = None
-		if tr is None:
-			east = self.startingEast # using the eastbound value of the train we came into here with
-		else:
-			east = tr["eastbound"]
-		return t, l, e, atc, ar, east
+
+		return t, l, e, atc, ar, self.startingEast

@@ -128,16 +128,22 @@ class MainFrame(wx.Frame):
 		topBorder = dispBox.GetBordersForSizer()[0]
 		boxsizer = wx.BoxSizer(wx.VERTICAL)
 		boxsizer.AddSpacer(topBorder+10)
-
-		self.rbPages = wx.RadioBox(dispBox, wx.ID_ANY, "Pages", choices=["1", "3"])
-		boxsizer.Add(self.rbPages, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
-		self.rbPages.SetSelection(0 if self.settings.display.pages == 1 else 1)
+		
+		self.cbDispatch = wx.CheckBox(dispBox, wx.ID_ANY, "Dispatcher Mode")
+		boxsizer.Add(self.cbDispatch, 0, wx.LEFT, 40)
+		self.cbDispatch.SetValue(self.settings.dispatcher.dispatch)
 		
 		boxsizer.AddSpacer(10)
 		
 		self.cbShowCameras = wx.CheckBox(dispBox, wx.ID_ANY, "Show Cameras")
 		boxsizer.Add(self.cbShowCameras, 0, wx.LEFT, 40)
 		self.cbShowCameras.SetValue(self.settings.display.showcameras)
+		
+		boxsizer.AddSpacer(10)
+
+		self.rbPages = wx.RadioBox(dispBox, wx.ID_ANY, "Pages", choices=["1", "3"])
+		boxsizer.Add(self.rbPages, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+		self.rbPages.SetSelection(0 if self.settings.display.pages == 1 else 1)
 		
 		boxsizer.AddSpacer(10)
 		
@@ -174,25 +180,6 @@ class MainFrame(wx.Frame):
 		dispBox.SetSizer(boxsizer)
 		
 		vszrl.Add(dispBox, 0, wx.EXPAND)
-		
-		vszrl.AddSpacer(20)
-		
-		vszrl.Add(wx.StaticText(self, wx.ID_ANY, "Backup Directory:"))
-		
-		self.teBackupDir = wx.TextCtrl(self, wx.ID_ANY, self.settings.backupdir, size=(200, -1), style=wx.TE_READONLY)
-		self.bBackupDir = wx.Button(self, wx.ID_ANY, "...", size=(50, -1))
-		self.Bind(wx.EVT_BUTTON, self.OnBBackupDir, self.bBackupDir)
-		
-		hsz = wx.BoxSizer(wx.HORIZONTAL)
-		hsz.Add(self.teBackupDir)
-		hsz.AddSpacer(10)
-		hsz.Add(self.bBackupDir)
-		
-		vszrl.AddSpacer(5)
-		vszrl.Add(hsz)
-		
-
-		
 		
 
 		vszrr = wx.BoxSizer(wx.VERTICAL)
@@ -295,6 +282,40 @@ class MainFrame(wx.Frame):
 		hszr.Add(vszrr, 1, wx.EXPAND)
 		
 		vszr.Add(hszr)
+		
+		vszrfile = wx.BoxSizer(wx.VERTICAL)
+				
+		vszrfile.Add(wx.StaticText(self, wx.ID_ANY, "Backup Directory:"))
+		
+		self.teBackupDir = wx.TextCtrl(self, wx.ID_ANY, self.settings.backupdir, size=(450, -1), style=wx.TE_READONLY)
+		self.bBackupDir = wx.Button(self, wx.ID_ANY, "...", size=(40, -1))
+		self.Bind(wx.EVT_BUTTON, self.OnBBackupDir, self.bBackupDir)
+		
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(self.teBackupDir)
+		hsz.AddSpacer(10)
+		hsz.Add(self.bBackupDir)
+		
+		vszrfile.AddSpacer(5)
+		vszrfile.Add(hsz)
+		
+		vszrfile.Add(wx.StaticText(self, wx.ID_ANY, "Browser Location:"))
+		
+		self.teBrowser = wx.TextCtrl(self, wx.ID_ANY, self.settings.browser, size=(450, -1), style=wx.TE_READONLY)
+		self.bBrowser = wx.Button(self, wx.ID_ANY, "...", size=(40, -1))
+		self.Bind(wx.EVT_BUTTON, self.OnBBrowser, self.bBrowser)
+		
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(self.teBrowser)
+		hsz.AddSpacer(10)
+		hsz.Add(self.bBrowser)
+		
+		vszrfile.AddSpacer(5)
+		vszrfile.Add(hsz)
+		
+		vszr.AddSpacer(20)
+		vszr.Add(vszrfile, 9, wx.ALIGN_CENTER_HORIZONTAL)
+		
 
 		vszr.AddSpacer(20)
 
@@ -396,6 +417,34 @@ class MainFrame(wx.Frame):
 		
 		self.teBackupDir.SetValue(path)
 
+	def OnBBrowser(self, _):
+		wildcard = "All files (*.*)|*.*"
+		startPath = self.teBrowser.GetValue()
+		spath = os.path.split(startPath)
+		sdir = spath[0]
+		if len(spath) == 1:
+			sfile = ""
+		else:
+			sfile = spath[1]
+
+		dlg = wx.FileDialog(
+			self, message="Choose browser executable",
+			defaultDir=sdir,
+			defaultFile=sfile,
+			wildcard=wildcard,
+			style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST |wx.FD_PREVIEW)
+
+			
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			path = dlg.GetPath()
+
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+		
+		self.teBrowser.SetValue(path)
+
 		
 		
 	def OnBGenerate(self, _):
@@ -415,9 +464,13 @@ class MainFrame(wx.Frame):
 		self.settings.dccserverport = int(self.teDCCPort.GetValue())
 		self.settings.socketport = int(self.teBroadcastPort.GetValue())
 		self.settings.backupdir = self.teBackupDir.GetValue()
+		self.settings.browser = self.teBrowser.GetValue()
 		
+		self.settings.dispatcher.dispatch = self.cbDispatch.IsChecked()
+
 		self.settings.rrserver.rrtty = self.teRRComPort.GetValue()
 		self.settings.rrserver.dcctty = self.teDCCComPort.GetValue()
+		
 		self.settings.dccsniffer.tty = self.teSnifferComPort.GetValue()
 		
 		self.settings.display.showcameras = self.cbShowCameras.IsChecked()		

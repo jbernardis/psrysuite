@@ -254,17 +254,6 @@ class Yard(District):
 			return b0+b1
 			
 		return aspect
- 
- #
- # def DetermineSignalLevers(self):
- # 	self.sigLever["Y2"] = self.DetermineSignalLever(["Y2L"], ["Y2R"])
- # 	self.sigLever["Y4"] = self.DetermineSignalLever(["Y4LA", "Y4LB"], ["Y4R"])
- # 	self.sigLever["Y8"] = self.DetermineSignalLever(["Y8L"], ["Y8RA", "Y8RB", "Y8RC"])
- # 	self.sigLever["Y10"] = self.DetermineSignalLever(["Y10L"], ["Y10R"])
- # 	self.sigLever["Y22"] = self.DetermineSignalLever(["Y22L"], ["Y22R"])
- # 	self.sigLever["Y24"] = self.DetermineSignalLever([], ["Y24RA", "Y24RB"])
- # 	self.sigLever["Y26"] = self.DetermineSignalLever(["Y26L"], ["Y26RA", "Y26RB", "Y26RC"])
- # 	self.sigLever["Y34"] = self.DetermineSignalLever(["Y34LA", "Y34LB"], ["Y34R"])
 
 	def PressButton(self, btn):
 		try:

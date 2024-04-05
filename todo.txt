@@ -8,8 +8,6 @@ add fields to active train list: stopped > 5 minutes
 add the following configurable fields to config tool:
 	debug level
 	show aspect calc flag (?)
-	dispatch/display
-	browser
 
 when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)
 

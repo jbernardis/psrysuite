@@ -274,7 +274,6 @@ class ServerMain:
 		self.socketServer.sendToOne(skt, addr, {"subblocks": subs})
 
 	def rrEventReceipt(self, cmd):
-		logging.info("RR Event to all receipt: %s" % str(cmd))
 		self.socketServer.sendToAll(cmd)
 
 	def dispCommandReceipt(self, cmd): # thread context

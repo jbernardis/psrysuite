@@ -1659,6 +1659,7 @@ class MainFrame(wx.Frame):
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			trainid, locoid, engineer, atc, ar, east = dlg.GetResults()
+
 		dlg.Destroy()
 		
 		if rc == wx.ID_CUT:	
@@ -1765,7 +1766,7 @@ class MainFrame(wx.Frame):
 			tr.SetEast(nd)
 			self.activeTrains.RefreshTrain(tr.GetName())
 			tr.SetBlocksDirection()
-			req = {"renametrain": { "oldname": tr.GetName(), "newname": tr.GetName(), "east": "1" if nd else "0"}}
+			req = {"renametrain": { "oldname": tr.GetName(), "newname": tr.GetName(), "east": "1" if nd else "0", "context": "reverse"}}
 			self.Request(req)
 
 			return
@@ -1774,7 +1775,7 @@ class MainFrame(wx.Frame):
 			return
 
 		if oldName != trainid or oldLoco != locoid:
-			self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid, "east": "1" if east else "0"}})
+			self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid, "east": "1" if east else "0", "context": "rename"}})
 			
 		if oldEngineer != engineer:
 			tr.SetEngineer(engineer)
@@ -1784,11 +1785,7 @@ class MainFrame(wx.Frame):
 				parms["engineer"] = engineer
 			req = {"assigntrain": parms}
 			self.Request(req)
-			
-		if east != tr.GetEast():
-			tr.SetEast(east)
-			tr.Draw()
-			
+
 		if self.IsDispatcher() and atc != oldATC:
 			if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
 				tr.SetATC(atc)
@@ -2633,11 +2630,14 @@ class MainFrame(wx.Frame):
 						else:
 							tr.SetName(name)
 							if name in self.trainList:
-								tr.SetEast(self.trainList[name]["eastbound"])
+								if east is None:
+									tr.SetEast(self.trainList[name]["eastbound"])
+								else:
+									tr.SetEast(east)
 							
 							self.trains[name] = tr
 							self.activeTrains.RenameTrain(oldName, name)
-							self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0"}})
+							self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0", "context": "settrainmerge"}})
 
 						try:
 							self.activeTrains.RemoveTrain(oldName)
@@ -3069,7 +3069,7 @@ class MainFrame(wx.Frame):
 			tr.SetName(newname)
 			self.activeTrains.RenameTrain(oldname, newname)
 			newnames.append([oldname, newname])
-			self.Request({"renametrain": { "oldname": oldname, "newname": newname}}) #, "oldloco": oldLoco, "newloco": locoid}})
+			self.Request({"renametrain": { "oldname": oldname, "newname": newname, "context": "cleartrains"}}) #, "oldloco": oldLoco, "newloco": locoid}})
 		
 		for oname, nname in newnames:
 			tr = self.trains[oname]
@@ -3135,7 +3135,7 @@ class MainFrame(wx.Frame):
 					if blk.IsOccupied():
 						tr = blk.GetTrain()
 						oldName, _ = tr.GetNameAndLoco()
-						self.Request({"renametrain": { "oldname": oldName, "newname": tid, "east": 1 if tr.GetEast() else 0}})
+						self.Request({"renametrain": { "oldname": oldName, "newname": tid, "east": 1 if tr.GetEast() else 0, "context": "loadtrains"}})
 					else:
 						self.PopupEvent("Block %s not occupied, expecting train %s" % (bname, tid))
 						
@@ -3272,7 +3272,7 @@ class MainFrame(wx.Frame):
 					if blk.IsOccupied():
 						tr = blk.GetTrain()
 						oldName, oldLoco = tr.GetNameAndLoco()
-						self.Request({"renametrain": { "oldname": oldName, "newname": oldName, "oldloco": oldLoco, "newloco": lid, "east": 1 if tr.GetEast() else 0}})
+						self.Request({"renametrain": { "oldname": oldName, "newname": oldName, "oldloco": oldLoco, "newloco": lid, "east": 1 if tr.GetEast() else 0, "context": "loadlocos"}})
 					else:
 						self.PopupEvent("Block %s not occupied, expecting locomotive %s" % (bname, lid))
 						
