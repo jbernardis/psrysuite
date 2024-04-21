@@ -1,0 +1,13 @@
+[
+{"movetrain": {"block": ["P2"]}},
+{"settrain": {"block": "P2", "name": "71", "loco": "64", "east": 1}},
+{"delay": {"sec": 5}},
+
+{"movetrain": {"block": ["POSSP5"]}},
+{"delay": {"ms": 1500}},
+
+{"movetrain": {"block": ["P40"]}}
+
+
+
+]

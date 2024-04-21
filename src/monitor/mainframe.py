@@ -1,6 +1,10 @@
 import os
 import wx
 import requests
+import json
+import time
+
+import pprint
 
 from monitor.getbitsdlg import GetBitsDlg
 from monitor.setinputbitsdlg import SetInputBitsDlg
@@ -8,10 +12,6 @@ from dispatcher.settings import Settings
 from monitor.sessionsdlg import SessionsDlg
 from monitor.trainsdlg import TrainsDlg
 
-
-'''
-http://192.168.1.144:9000/simulate?action=breaker&breaker=CBLatham&state=1
-'''
 
 Nodes = [
 	["Yard", 0x11],
@@ -241,6 +241,17 @@ class MainFrame(wx.Frame):
 			
 			vsz.AddSpacer(20)
 			
+		if self.settings.rrserver.simulation:
+			hsz = wx.BoxSizer(wx.HORIZONTAL)
+			hsz.AddSpacer(20)
+			self.bScript = wx.Button(self, wx.ID_ANY, "Script", size=(100, 46))
+			self.Bind(wx.EVT_BUTTON, self.OnScript, self.bScript)
+			hsz.Add(self.bScript)
+
+			vsz.Add(hsz)
+			
+			vsz.AddSpacer(20)
+			
 
 		self.SetSizer(vsz)
 		self.Fit()
@@ -289,6 +300,55 @@ class MainFrame(wx.Frame):
 		if chx == wx.NOT_FOUND:
 			return
 		self.rrServer.SendRequest({"simulate": {"action": "turnoutpos", "turnout": self.chTurnout.GetString(chx), "normal": 1 if self.cbNormal.IsChecked() else 0}})
+		
+	def OnScript(self, _):
+		dlg = wx.FileDialog(
+			self, message="Select script file file",
+			defaultDir=os.path.join(os.getcwd(), "monitor", "scripts"),
+			defaultFile="",
+			wildcard="Monitor Script File (*.scr)|*.scr",
+			style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_PREVIEW)
+
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			path = dlg.GetPath()
+			
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return
+		
+		with open(path, "r") as jfp:
+			try:
+				script = json.load(jfp)
+			except json.JSONDecodeError as e:
+				dlg = wx.MessageDialog(self, str(e), 'JSON Decode Error', wx.OK | wx.ICON_ERROR)
+				dlg.ShowModal()
+				dlg.Destroy()
+				script = []
+			
+		for c in script:
+			cmd = list(c.keys())[0]
+			parms = c[cmd]
+			if cmd == "delay":
+				try:
+					secs = parms["sec"]
+				except KeyError:
+					secs = None
+				try:
+					msecs = parms["ms"]
+				except KeyError:
+					msecs = None
+					
+				if secs is None:
+					if msecs is None:
+						secs = 1
+					else:
+						secs = msecs / 1000.0
+				
+				time.sleep(secs)
+			else:
+				self.rrServer.SendRequest(c)
+			#time.sleep(2)
 
 	def OnSetInputBit(self, _):
 		dlg = SetInputBitsDlg(self, self.rrServer, Nodes)
