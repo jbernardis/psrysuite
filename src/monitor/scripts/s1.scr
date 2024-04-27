@@ -1,13 +1,22 @@
 [
-{"movetrain": {"block": ["P2"]}},
-{"settrain": {"block": "P2", "name": "71", "loco": "64", "east": 1}},
-{"delay": {"sec": 5}},
-
-{"movetrain": {"block": ["POSSP5"]}},
-{"delay": {"ms": 1500}},
-
-{"movetrain": {"block": ["P40"]}}
-
-
-
+	{"movetrain": {"block": ["P2"]}},
+	{"settrain": {"block": "P2", "name": "71", "loco": "64", "east": 1}},
+	{"delay": {"sec": 5}},
+	
+	{"movetrain": {"block": ["POSSP5"]}},
+	{"delay": {"ms": 1500}},
+	
+	{"movetrain": {"block": ["P40"]}},
+	{"delay": {"sec": 5}},
+	
+	{"turnout": {"name": ["YSw27"], "status": ["R"]}},
+	{"delay": {"sec": 5}},
+	
+	{"turnout": {"name": ["YSw27"], "status": ["N"]}},
+	{"delay": {"sec": 5}},
+	
+	{"signal": {"name": ["L18L"], "aspect": ["-1"], "aspecttype": ["50"], "callon": ["0"]}},
+	
+	
+	{"delay": {"ms": 5}}
 ]

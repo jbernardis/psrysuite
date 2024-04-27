@@ -960,6 +960,14 @@ class Railroad():
 			return self.signals[signm]
 		except KeyError:
 			return None
+		
+	def GetSignalLevers(self):
+		rv = {}
+		for n, sl in self.signalLevers.items():
+			node = sl.Node()
+			ivals = node.GetInputBits(sl.Bits())
+			rv[n] = ivals
+		return rv
 
 	def GetOutputDevice(self, onm):
 		try:

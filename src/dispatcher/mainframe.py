@@ -923,10 +923,10 @@ class MainFrame(wx.Frame):
 				self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": 1600, "y": 0}}
 				wx.CallLater(750, self.sendPendingATCShow)
 			else:
-				self.Request( {"atc": {"action": ["show"], "x": 1600, "y": 0}})
+				self.Request( {"atc": {"action": ["show"]}})
 
 		else:
-			self.Request({"atc": { "action": "hide", "x": 1600, "y": 0}})
+			self.Request({"atc": { "action": "hide"}})
 
 	def OnCBOSSLocks(self, evt):
 		self.SendOSSLocks()

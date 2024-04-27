@@ -324,6 +324,15 @@ class HTTPServer:
 			else:
 				jstr = json.dumps(tl)
 				return 200, jstr
+			
+		elif verb == "signallevers":
+			sl = self.rr.GetSignalLevers()
+			if sl is None:
+				logging.info("Unknown error")
+				return 400, "Unable to retrieve signal levers"
+			else:
+				jstr = json.dumps(sl)
+				return 200, jstr
 		
 				
 		elif verb == "sessions":

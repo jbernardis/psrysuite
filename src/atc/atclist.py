@@ -1,5 +1,6 @@
 import wx
 import os
+import logging
 
 ONVAL = "1"
 OFFVAL = "0"
@@ -54,7 +55,8 @@ class ATCListCtrl(wx.ListCtrl):
 		self.normalB = wx.ItemAttr()
 		self.normalA.SetBackgroundColour(wx.Colour(225, 255, 240))
 		self.normalB.SetBackgroundColour(wx.Colour(138, 255, 197))
-
+		
+		self.startWidth = self.GetSize()[0]
 
 	def loadImages(self, imgFolder):
 		png = wx.Image(os.path.join(imgFolder, "sigred.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
@@ -154,6 +156,9 @@ class ATCListCtrl(wx.ListCtrl):
 			#self.parent.reportDoubleClick(tx)
 		else:
 			self.parent.ReportSelection(None if tx is None else self.trainNames[tx])
+		
+	def ChangeSize(self, sz):
+		self.SetSize(self.startWidth, sz[1]-60)
 
 	def OnItemSelected(self, event):
 		self.setSelection(event.Index)

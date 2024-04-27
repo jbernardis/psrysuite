@@ -42,8 +42,12 @@ from atc.ticker import Ticker
 
 class MainFrame(wx.Frame):
 	def __init__(self):
-		wx.Frame.__init__(self, None, size=(900, 800), style=(wx.STAY_ON_TOP | wx.CAPTION) & ~(wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.MAXIMIZE_BOX))
+		wx.Frame.__init__(self, None, size=(900, 800), style=wx.STAY_ON_TOP | wx.CAPTION | wx.RESIZE_BORDER)
+		#wx.Frame.__init__(self, None, size=(900, 800), style=(wx.STAY_ON_TOP | wx.CAPTION) & ~(wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.MAXIMIZE_BOX))
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
+		self.Bind(wx.EVT_SIZE, self.OnResize)
+		self.Bind(wx.EVT_IDLE,self.OnIdle)
+		self.resized = False
 		
 		self.sessionid = None
 		self.settings = Settings()
@@ -122,6 +126,7 @@ class MainFrame(wx.Frame):
 		self.Fit()
 		
 		wx.CallAfter(self.Initialize)
+		self.startingWidth = self.GetSize()[0]
 		
 	def LoadImages(self, imgFolder):
 		png = wx.Image(os.path.join(imgFolder, "headlight.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
@@ -556,18 +561,24 @@ class MainFrame(wx.Frame):
 					self.atcList.RefreshTrain(dccl)
 					
 				elif action == "hide":
-					if "x" in parms:
-						self.posx = int(parms["x"][0])
-					if "y" in parms:
-						self.posy = int(parms["y"][0])
 					self.Hide()
 				
-				elif action in ["show", "reset" ]:
+				elif action == "reset":
 					if "x" in parms:
 						self.posx = int(parms["x"][0])
 					if "y" in parms:
 						self.posy = int(parms["y"][0])
 					self.SetPos()
+					self.Show()
+				
+				elif action == "show":
+					if "x" in parms or "y" in parms:
+						if "x" in parms:
+							self.posx = int(parms["x"][0])
+						if "y" in parms:
+							self.posy = int(parms["y"][0])
+						self.SetPos()
+
 					self.Show()
 
 			else:
@@ -753,6 +764,19 @@ class MainFrame(wx.Frame):
 			self.EnableButtons(False)
 			
 		self.RRRequest({"atcstatus": {"action": "remove", "train": train}})
+		
+	def OnResize(self, evt):
+		self.resized = True
+		
+	def OnIdle(self, evt):
+		if not self.resized:
+			return 
+		
+		self.resized = False
+		sz = self.GetSize()
+		sz[0] = self.startingWidth
+		self.atcList.ChangeSize(sz)
+		self.SetSize(sz)
 		
 	def OnClose(self, evt):
 		#self.kill()

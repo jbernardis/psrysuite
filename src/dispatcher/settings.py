@@ -318,19 +318,19 @@ class Settings:
 		for opt, _ in opts:
 			if opt == "--display":
 				self.dispatcher.dispatch = False
-				print("Ovwerriding dispatch flag from command line: False")
+				print("Overriding dispatch flag. Using command line: False")
 
 			elif opt == "--dispatch":
 				self.dispatcher.dispatch = True
-				print("Ovwerriding dispatch flag from command line: True")
+				print("Overriding dispatch flag. Using command line: True")
 				
 			elif opt in [ "--simulate", "--sim" ]:
 				self.rrserver.simulation = True
-				print("Ovwerriding simulation flag from command line: True")
+				print("Overriding simulation flag. Using command line: True")
 				
 			elif opt in [ "--nosimulate", "--nosim" ]:
 				self.rrserver.simulation = False
-				print("Ovwerriding simulation flag from command line: False")
+				print("Overriding simulation flag. Using command line: False")
 		
 	def SaveAll(self):
 		self.cfg = configparser.ConfigParser()

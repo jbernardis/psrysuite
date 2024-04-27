@@ -470,6 +470,9 @@ class SignalLever:
 	def SetBits(self, bits):
 		self.bits = bits
 		
+	def Node(self):
+		return self.node
+		
 	def Bits(self):
 		return self.bits
 
@@ -514,6 +517,9 @@ class SignalLever:
 			bt = bits[2]
 			if bt:
 				node.SetOutputBit(bt[0], bt[1], 1 if self.state == 'L' else 0)
+				
+	def GetState(self):
+		return self.state
 				
 	def GetEventMessages(self):
 		return [self.GetEventMessage()]

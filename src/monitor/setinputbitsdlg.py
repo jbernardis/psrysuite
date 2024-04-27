@@ -1,14 +1,14 @@
 import wx
 
 class SetInputBitsDlg(wx.Dialog):
-    def __init__(self, parent, rrServer, Nodes):
+    def __init__(self, parent, Nodes):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "Set Input Bits")
         self.Bind(wx.EVT_CLOSE, self.onCancel)
  
-        self.rrServer = rrServer
         self.Nodes = Nodes
 
-        vsz = wx.BoxSizer(wx.VERTICAL)       
+        vsz = wx.BoxSizer(wx.VERTICAL)   
+        self.parent = parent    
         vsz.AddSpacer(20)
         
         font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
@@ -102,7 +102,7 @@ class SetInputBitsDlg(wx.Dialog):
                 vals.append(1 if self.values[i].IsChecked() else 0)
                 
         req = {"setinbit": {"address": "0x%x" % node, "byte": vbytes, "bit": vbits, "value": vals}}
-        self.rrServer.SendRequest(req)
+        self.parent.Request(req)
 
          
     def onCancel(self, _):

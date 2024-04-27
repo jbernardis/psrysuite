@@ -33,14 +33,8 @@ class TrainsDlg(wx.Dialog):
         self.Layout()
         self.Fit()
         
-        self.Bind(wx.EVT_TIMER, self.OnTicker)
-        self.ticker = wx.Timer(self)
-        
     def OnRefresh(self, _):
         self.trCtl.RefreshTrains()
-
-    def OnTicker(self, _):
-        pass
            
     def OnClose(self, _):
         self.dlgExit()
