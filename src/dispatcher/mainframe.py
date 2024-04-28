@@ -5,6 +5,7 @@ from wx.lib.gizmos.ledctrl import LEDNumberCtrl
 import os
 import sys
 import json
+import re
 import logging
 import time
 from subprocess import Popen
@@ -1439,7 +1440,15 @@ class MainFrame(wx.Frame):
 				else:
 					lockers = ""
 					
-				self.PopupAdvice("%s -  %s   %s" % (sig.GetName(), sig.GetAspectName(), lockers), force=True)
+				signm = sig.GetName()
+				lvrNames = re.findall('[A-Z]+[0-9]+', signm)
+				lvrState = ""
+				if len(lvrNames) == 1:
+					sl = self.Get("signallevers", {})
+					if lvrNames[0] in sl:
+						lvrState = " - Lever: %s" % self.formatSigLvr(sl[lvrNames[0]])
+
+				self.PopupAdvice("%s -  %s   %s%s" % (sig.GetName(), sig.GetAspectName(), lockers, lvrState), force=True)
 				return
 			
 			if sig.IsDisabled():
@@ -1554,8 +1563,24 @@ class MainFrame(wx.Frame):
 								self.PopupEvent("Train %s has no block sequence defined" % trid)
 
 					else:
-						self.EditTrain(tr, blk)
-						
+						self.EditTrain(tr, blk)					
+		
+	def formatSigLvr(self, data):
+		dl = 0 if data[0] is None else data[0]
+		dc = 0 if data[1] is None else data[1]
+		dr = 0 if data[2] is None else data[2]
+		
+		callon = " C" if dc != 0 else "  "
+		
+		if dl != 0 and dr == 0:
+			return "L" + callon
+		elif dl == 0 and dr != 0:
+			return "R" + callon
+		elif dl == 0 and dr == 0:
+			return "N" + callon
+		else:
+			return "?" + callon
+		
 	def OnTrainRouting(self, _):
 		self.RouteTrain(self.menuTrain)
 		
