@@ -1310,7 +1310,7 @@ class MainFrame(wx.Frame):
 		blkMap = {}
 		for b in bl.values():
 			tl = b.GetTrainLoc()
-			for scrn, pos in tl:
+			for scrn, pos, _ in tl:
 				lkey = (scrn, pos[1])
 				if lkey not in blkMap.keys():
 					blkMap[lkey] = []

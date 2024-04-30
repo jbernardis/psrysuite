@@ -599,6 +599,11 @@ class District:
 	# these requests are blocks, signals, and turnouts
 	def DoBlockAction(self, blk, blockend, state):
 		bname = blk.GetName()
+		if blk.IsOS() and blk.route is None:
+			# self.frame.PopupEvent("Ignoring Block command for OS %s: route not set" % bname)
+			logging.info("Ignoring Block command for OS %s: route not set" % bname)
+			return 
+		
 		blk.SetOccupied(occupied=state == OCCUPIED, blockend=blockend, refresh=True)
 
 		osList = self.frame.GetOSForBlock(bname)
@@ -615,7 +620,7 @@ class District:
 		signm = sig.GetName()
 		atype = sig.GetAspectType()
 		sig.SetFrozenAspect(frozenaspect)
-		
+
 		if callon:
 			sig.SetAspect(aspect, refresh=True, callon=True)
 			return
@@ -792,7 +797,7 @@ class District:
 							sigl = sig
 						elif sig[len(sigPrefix)] == "R":
 							sigr = sig
-							
+
 				if state == "L":
 					if sigl is not None:
 						signm = sigl
@@ -816,7 +821,7 @@ class District:
 							signm = sigr
 							movement = False
 							break
-
+						
 		if signm is None:
 			return
 

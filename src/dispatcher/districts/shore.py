@@ -98,9 +98,12 @@ class Shore (District):
 		osstat = self.blocks["SOSHF"].GetStatus()
 		bwstat = self.blocks["SOSW"].GetStatus()
 		bestat = self.blocks["SOSE"].GetStatus()
+		wunknowntrain =  self.blocks["SOSW"].HasUnknownTrain()
+		eunknowntrain =  self.blocks["SOSE"].HasUnknownTrain()
 
 		if self.turnouts["SSw3"].IsReverse() or self.turnouts["SSw5"].IsReverse():
 			bwstat, bestat = bestat, bwstat
+			wunknowntrain, eunknowntrain = eunknowntrain, wunknowntrain
 
 		if osstat == OCCUPIED:
 			bmpw = bmpe = "yellow-cross" if self.blocks["SOSHF"].HasUnknownTrain() else "red-cross"
@@ -108,14 +111,14 @@ class Shore (District):
 			bmpw = bmpe = "green-cross"
 		else:
 			if bwstat == OCCUPIED:
-				bmpw = "yellow-main" if self.blocks["SOSW"].HasUnknownTrain() else "red-main"
+				bmpw = "yellow-main" if wunknowntrain else "red-main"
 			elif bwstat == CLEARED:
 				bmpw = "green-main"
 			else:
 				bmpw = "white-main"
 
 			if bestat == OCCUPIED:
-				bmpe = "yellow-main" if self.blocks["SOSE"].HasUnknownTrain() else "red-main"
+				bmpe = "yellow-main" if eunknowntrain else "red-main"
 			elif bestat == CLEARED:
 				bmpe = "green-main"
 			else:
@@ -294,7 +297,8 @@ class Shore (District):
 				(self.tiles["eobright"],  self.screen, (109, 19), False),
 			],
 			False)
-		self.blocks["SOSW"].AddTrainLoc(self.screen, (94, 11))
+		self.blocks["SOSW"].AddTrainLoc(self.screen, (94, 11), ["SRtS10S11", "SRtS10H30", "SRtS10H10"])
+		self.blocks["SOSW"].AddTrainLoc(self.screen, (94, 13), ["SRtS10H20", "SRtS10S21", "SRtS10P32"])
 
 		self.blocks["SOSE"] = OverSwitch(self, self.frame, "SOSE", 
 			[
@@ -363,7 +367,8 @@ class Shore (District):
 				(self.tiles["eobright"],  self.screen, (109, 19), False),
 			],
 			True)
-		self.blocks["SOSE"].AddTrainLoc(self.screen, (94, 13))
+		self.blocks["SOSE"].AddTrainLoc(self.screen, (94, 11), ["SRtS20S11", "SRtS20H30", "SRtS20H10"])
+		self.blocks["SOSE"].AddTrainLoc(self.screen, (94, 13), ["SRtS20H20", "SRtS20S21", "SRtS20P32"])
 
 		self.blocks["F10"] = Block(self, self.frame, "F10",
 			[

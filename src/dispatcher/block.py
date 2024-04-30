@@ -1,6 +1,7 @@
 import logging
 
 from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, BLOCK, OVERSWITCH, STOPPINGBLOCK, MAIN, STOP
+from pickle import TRUE
 
 
 class Route:
@@ -159,8 +160,8 @@ class Block:
 			self.sbWest = StoppingBlock(self, tiles, eastend)
 		self.determineStatus()
 
-	def AddTrainLoc(self, screen, loc):
-		self.trainLoc.append([screen, loc])
+	def AddTrainLoc(self, screen, loc, routes=None):
+		self.trainLoc.append([screen, loc, routes])
 
 	def GetTrain(self):
 		return self.train
@@ -225,10 +226,17 @@ class Block:
 		if self.sbWest and self.sbWest.IsOccupied():
 			anyOccupied = True
 
-		for screen, loc in self.trainLoc:
-			if anyOccupied:
+		for screen, loc, routes in self.trainLoc:
+			drawTrain = True # assume that we draw the train here
+			if routes and self.IsOS():
+				if self.route is None:
+					drawTrain = False  # this OS has no route - do not show a train
+				elif self.route.GetName() not in routes:
+					drawTrain = False  # the current route through this OS is not in the list
+					
+			if anyOccupied and drawTrain:
 				self.frame.DrawTrain(screen, loc, trainID, locoID, sbActive, atc, ar)
-			else:
+			elif drawTrain:  # don't clear trains from alternate routes that are not surrently set
 				self.frame.ClearTrain(screen, loc)
 
 	def StoppingRelayActivated(self):
@@ -363,6 +371,9 @@ class Block:
 			return True
 
 		return False
+	
+	def IsOS(self):
+		return self.type == OVERSWITCH
 
 	def Draw(self):
 		for t, screen, pos, revflag in self.tiles:
@@ -857,7 +868,7 @@ class OverSwitch (Block):
 			newName = "<None>"
 		else:
 			newName = route.GetName()
-
+			
 		if oldName == newName:
 			return  # no change
 

@@ -5475,8 +5475,8 @@
       ],
       "os": "POSSJ1",
       "signals": [
-        "PB2L",
-        "PB4R"
+        "PB4L",
+        "PB2R"
       ],
       "turnouts": [
         [
@@ -5737,8 +5737,8 @@
       ],
       "os": "POSSJ2",
       "signals": [
-        "PB4L",
-        "PB2R"
+        "PB2L",
+        "PB4R"
       ],
       "turnouts": [
         [
