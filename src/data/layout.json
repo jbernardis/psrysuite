@@ -211,7 +211,7 @@
       "sbwest": null
     },
     "F10": {
-      "east": 1,
+      "east": 0,
       "sbeast": "F10.E",
       "sbwest": null
     },
@@ -741,7 +741,7 @@
       "sbwest": null
     },
     "SOSHF": {
-      "east": 1,
+      "east": 0,
       "sbeast": null,
       "sbwest": null
     },
