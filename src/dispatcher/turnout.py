@@ -81,6 +81,8 @@ class Turnout:
 		self.blockList.append(self.frame.blocks[blknm])
 
 	def Draw(self, blockstat=None, east=None):
+		if self.name == "PBSw15a":
+			print("entering draw turnout for 15a", flush=True)
 		if east is None:
 			east = self.eastFromBlock
 		if blockstat is None:
@@ -93,7 +95,7 @@ class Turnout:
 				unknownTrain = False
 
 			tostat = NORMAL if self.normal else REVERSE
-				
+
 			bmp = self.tiles.getBmp(tostat, blockstat, east, self.routeControlled or self.disabled or self.locked, unknownTrain=unknownTrain)
 			self.frame.DrawTile(self.screen, self.pos, bmp)
 

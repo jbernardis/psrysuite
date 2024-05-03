@@ -1,6 +1,6 @@
 from dispatcher.district import District
 
-from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.block import Block, OverSwitch, Route, OSProxy
 from dispatcher.turnout import Turnout, SlipSwitch
 from dispatcher.signal import Signal
 from dispatcher.button import Button
@@ -672,6 +672,7 @@ class Yard (District):
 
 	def DefineSignals(self):
 		self.signals = {}
+		self.osProxies = {}
 
 		sigList = [
 			[ "Y2L",  RegAspects, True,    "right", (129, 12) ],
@@ -818,6 +819,19 @@ class Yard (District):
 
 		self.osSignals["YOSCJW"] = [ "Y2L", "Y2R", "Y4RA", "Y4RB" ]
 		self.osSignals["YOSCJE"] = [ "Y2L", "Y4L", "Y4RA", "Y4RB" ]
+		
+		p = OSProxy(self, "YOSCJW")
+		self.osProxies["YOSCJW"] = p
+		p.AddRoute(self.routes["YRtY11L10"])
+		p.AddRoute(self.routes["YRtY11L20"])
+		p.AddRoute(self.routes["YRtY11P50"])
+
+		p = OSProxy(self, "YOSCJE")
+		self.osProxies["YOSCJE"] = p
+		p.AddRoute(self.routes["YRtY21L20"])
+		p.AddRoute(self.routes["YRtY21P50"])
+		p.AddRoute(self.routes["YRtY11L20"])
+		p.AddRoute(self.routes["YRtY11P50"])
 
 		# east end junction
 		block = self.blocks["YOSEJW"] 
@@ -843,6 +857,22 @@ class Yard (District):
 
 		self.osSignals["YOSEJW"] = [ "Y8LA", "Y8LB", "Y8LC", "Y8R" ]
 		self.osSignals["YOSEJE"] = [ "Y8LA", "Y8LB", "Y8LC", "Y10L", "Y10R" ]
+		
+		p = OSProxy(self, "YOSEJW")
+		self.osProxies["YOSEJW"] = p
+		p.AddRoute(self.routes["YRtY10Y11"])
+		p.AddRoute(self.routes["YRtY10Y21"])
+		p.AddRoute(self.routes["YRtY87Y11"])
+		p.AddRoute(self.routes["YRtY87Y21"])
+		p.AddRoute(self.routes["YRtY30Y11"])
+		p.AddRoute(self.routes["YRtY30Y21"])
+		
+		p = OSProxy(self, "YOSEJE")
+		self.osProxies["YOSEJE"] = p
+		p.AddRoute(self.routes["YRtY20Y21"])
+		p.AddRoute(self.routes["YRtY30Y21"])
+		p.AddRoute(self.routes["YRtY87Y21"])
+		p.AddRoute(self.routes["YRtY10Y21"])
 
 		# Kale interlocking
 		block = self.blocks["YOSKL1"]
@@ -884,6 +914,32 @@ class Yard (District):
 		self.osSignals["YOSKL2"] = [ "Y22R", "Y24LA", "Y24LB", "Y26LA", "Y26LB", "Y26LC" ]
 		self.osSignals["YOSKL1"] = [ "Y26R", "Y24LA", "Y24LB", "Y26LA", "Y26LB", "Y26LC" ]
 		self.osSignals["YOSKL3"] = [ "Y22L", "Y22R", "Y26R" ]
+
+		p = OSProxy(self, "YOSKL1")
+		self.osProxies["YOSKL1"] = p
+		p.AddRoute(self.routes["YRtY20Y50"])
+		p.AddRoute(self.routes["YRtY20Y51"])
+		p.AddRoute(self.routes["YRtY20Y52"])
+		p.AddRoute(self.routes["YRtY20Y53"])
+		p.AddRoute(self.routes["YRtY20Y70"])
+		p.AddRoute(self.routes["YRtY10Y70"])
+		p.AddRoute(self.routes["YRtY10Y50"])
+		p.AddRoute(self.routes["YRtY10Y51"])
+
+		p = OSProxy(self, "YOSKL2")
+		self.osProxies["YOSKL2"] = p
+		p.AddRoute(self.routes["YRtY10Y50"])
+		p.AddRoute(self.routes["YRtY10Y51"])
+		p.AddRoute(self.routes["YRtY10Y52"])
+		p.AddRoute(self.routes["YRtY10Y53"])
+		p.AddRoute(self.routes["YRtY10Y70"])
+		p.AddRoute(self.routes["YRtY20Y52"])
+		p.AddRoute(self.routes["YRtY20Y53"])
+
+		p = OSProxy(self, "YOSKL3")
+		self.osProxies["YOSKL3"] = p
+		p.AddRoute(self.routes["YRtY10Y60"])
+		p.AddRoute(self.routes["YRtY20Y60"])
 
 		# Kale west end
 		block = self.blocks["YOSKL4"]
@@ -939,7 +995,7 @@ class Yard (District):
 		self.osSignals["YOSWYW"] = [ "Y40L", "Y40RA", "Y40RB", "Y40RC", "Y40RD" ]
 		self.osSignals["YOSWYE"] = [ "Y42R", "Y42LA", "Y42LB", "Y42LC", "Y42LD" ]
 
-		return self.signals, self.blockSigs, self.osSignals, self.routes
+		return self.signals, self.blockSigs, self.osSignals, self.routes, self.osProxies
 	
 	def DefineButtons(self):
 		self.buttons = {}

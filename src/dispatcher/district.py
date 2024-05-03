@@ -891,7 +891,8 @@ class District:
 
 	def DefineSignals(self):
 		self.signals = {}
-		return {}, {}, {}
+		self.osProxies = {}
+		return {}, {}, {}, {}, {}
 
 	def DefineButtons(self):
 		self.buttons = {}
@@ -923,6 +924,44 @@ class District:
 			blocks.update(b.ToJson())
 
 		return blocks
+		
+	def CheckOSProxies(self, block, state):
+  # self.frame.PopupEvent("check proxies for %s  %s" % (block, str(state)))
+		if block not in self.osProxies:
+			return block
+		
+		if state == self.osProxies[block].IsOccupied():
+			return None
+		
+		preCounts = self.GetOSProxyCounts()
+		
+		self.osProxies[block].SetOccupied(state)
+		postCounts = self.GetOSProxyCounts()
+  # self.frame.PopupEvent("PRE:  %s" % str(preCounts))
+  # self.frame.PopupEvent("POST: %s" % str(postCounts))
+		
+		for rn in preCounts:
+			# there SHOULD only be a single route, MAX, that changes
+			if postCounts[rn] > preCounts[rn] and preCounts[rn] == 0:
+				return self.routes[rn].GetOSName()
+			
+			elif postCounts[rn] == 0 and preCounts[rn] > 0:
+				return self.routes[rn].GetOSName()
+		
+		# no differences - just absorb the block command
+		return None
+			
+			
+	def GetOSProxyCounts(self):
+		counts = {}
+		for pn, prx in self.osProxies.items():
+			for osb in prx.osList:
+				rte = osb.GetRoute()
+				if rte is not None:
+					if prx.HasRoute(rte.GetName()):
+						counts[rte.GetName()] = counts.get(rte.GetName(), 0) + (1 if prx.IsOccupied() else 0)
+				
+		return counts
 
 
 class Districts:
@@ -974,14 +1013,16 @@ class Districts:
 		blocksigs = {}
 		ossigs = {}
 		routes = {}
+		osProxies = {}
 		for t in self.districts.values():
-			sl, bsl, osl, rtl = t.DefineSignals()
+			sl, bsl, osl, rtl, ospr = t.DefineSignals()
 			sigs.update(sl)
 			blocksigs.update(bsl)
 			ossigs.update(osl)
 			routes.update(rtl)
+			osProxies.update(ospr)
 
-		return sigs, blocksigs, ossigs, routes
+		return sigs, blocksigs, ossigs, routes, osProxies
 
 	def DefineButtons(self):
 		btns = {}

@@ -1164,7 +1164,7 @@ class MainFrame(wx.Frame):
 
 		self.blocks, self.osBlocks = self.districts.DefineBlocks()
 		self.turnouts = self.districts.DefineTurnouts(self.blocks)
-		self.signals, self.blocksignals, self.ossignals, self.routes =  self.districts.DefineSignals()
+		self.signals, self.blocksignals, self.ossignals, self.routes, self.osProxies =  self.districts.DefineSignals()
 		self.buttons =  self.districts.DefineButtons()
 		self.handswitches =  self.districts.DefineHandSwitches()
 		self.indicators = self.districts.DefineIndicators()
@@ -2399,6 +2399,12 @@ class MainFrame(wx.Frame):
 		for p in parms:
 			block = p["name"]
 			state = p["state"]
+			
+			if block in self.osProxies:
+				district = self.osProxies[block].GetDistrict()
+				block = district.CheckOSProxies(block, state)
+				if block is None:
+					return
 
 			blk = None
 			try:
@@ -2413,8 +2419,8 @@ class MainFrame(wx.Frame):
 					except KeyError:
 						blk = None
 
-			stat = OCCUPIED if state == 1 else EMPTY
 			if blk is not None:
+				stat = OCCUPIED if state == 1 else EMPTY
 				if state == 1:
 					blk.SetLastEntered(blockend)
 					
@@ -3338,7 +3344,10 @@ class MainFrame(wx.Frame):
 			pass
 		
 		if killServer:
-			self.rrServer.SendRequest({"quit": {}})
+			try:
+				self.rrServer.SendRequest({"quit": {}})
+			except:
+				pass
 			
 		self.Destroy()
 		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Display"))

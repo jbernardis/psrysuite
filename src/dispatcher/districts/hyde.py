@@ -1,6 +1,6 @@
 from dispatcher.district import District
 
-from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.block import Block, OverSwitch, Route, OSProxy
 from dispatcher.turnout import Turnout
 from dispatcher.signal import Signal
 from dispatcher.button import Button
@@ -626,6 +626,7 @@ class Hyde (District):
 
 	def DefineSignals(self):
 		self.signals = {}
+		self.osProxies = {}
 
 		sigList = [
 			[ "H4LA", RegAspects, False, "left",  (32, 14) ],
@@ -736,6 +737,23 @@ class Hyde (District):
 		self.routes["HRtH30H31"] = Route(self.screen, block, "HRtH30H31", "H31", [ (28, 5), (29, 5), (30, 5), (31, 5) ], "H30", [RESTRICTING, MAIN], ["HSw7:N"], ["H8L", "H8R"])
 		self.buttonToRoute["HWWB1"] = "HRtH30H31"
 
+#===============================================================================
+# 		# OS Proxies are only needed here because of common track between HOSWW and HOSWW2		
+# 		p = OSProxy(self, "HOSWW")
+# 		self.osProxies["HOSWW"] = p
+# 		p.AddRoute(self.routes["HRtH11H12"])
+# 		p.AddRoute(self.routes["HRtH11H31"])
+# 		p.AddRoute(self.routes["HRtH11H32"])
+# 		p.AddRoute(self.routes["HRtH11H33"])
+# 		p.AddRoute(self.routes["HRtH11H34"])
+# 		p.AddRoute(self.routes["HRtH30H31"])
+# 
+# 		p = OSProxy(self, "HOSWW2")
+# 		self.osProxies["HOSWW2"] = p
+# 		p.AddRoute(self.routes["HRtH30H31"])
+#===============================================================================
+
+
 		block = self.blocks["HOSWE"]
 		self.routes["HRtH21H22"] = Route(self.screen, block, "HRtH21H22", "H21", [ (21, 15), (22, 15), (23, 15), (24, 15), (25, 15), (26, 15), (27, 15), (28, 15), (29, 15), (30, 15), (31, 15) ], "H22", [MAIN, RESTRICTING], ["HSw9:N", "HSw11:N"], ["H4R", "H4LA"])
 		self.routes["HRtH21H41"] = Route(self.screen, block, "HRtH21H41", "H21", [ (21, 15), (22, 15), (23, 16), (24, 17), (25, 18), (26, 19), (27, 20), (28, 21), (29, 21), (30, 21), (31, 21) ], "H41", [DIVERGING, RESTRICTING], ["HSw9:R","HSw11:R"], ["H4R", "H4LD"])
@@ -806,7 +824,7 @@ class Hyde (District):
 					"HOSWE": ["H4LA", "H4LB", "H4LC", "H4LD", "H4R"],
 					"HOSEW": ["H12L", "H12RA", "H12RB", "H12RC", "H12RD", "H12RE"],
 					"HOSEE": ["H10L", "H10RA", "H10RB", "H10RC", "H10RD", "H10RE"]}
-		return self.signals, self.blockSigs, self.osSignals, self.routes
+		return self.signals, self.blockSigs, self.osSignals, self.routes, self.osProxies
 
 	def DefineIndicators(self):
 		self.indicators = {}

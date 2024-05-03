@@ -1,6 +1,6 @@
 from dispatcher.district import District
 
-from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.block import Block, OverSwitch, Route, OSProxy
 from dispatcher.turnout import Turnout
 from dispatcher.signal import Signal
 from dispatcher.handswitch import HandSwitch
@@ -295,9 +295,11 @@ class Latham (District):
 			[ "LSw15",  "toleftleft",  ["LOSCAW", "LOSCAM"], (33, 11) ],
 			[ "LSw15b", "toleftright", ["LOSCAM"], (31, 13) ],
 			[ "LSw17",  "toleftleft",  ["LOSCAM", "LOSCAE"], (34, 13) ],
-
-			[ "LSw11", "toleftright",  ["L11"], (23, 11) ],
-			[ "LSw13", "toleftleft",   ["L31"], (27, 15) ],
+		]
+		
+		hsList = [
+			[ "LSw11", "toleftright",  "L11", (23, 11) ],
+			[ "LSw13", "toleftleft",   "L31", (27, 15) ],
 		]
 
 		for tonm, tileSet, blks, pos in toList:
@@ -305,6 +307,14 @@ class Latham (District):
 			for blknm in blks:
 				blocks[blknm].AddTurnout(trnout)
 				trnout.AddBlock(blknm)
+			self.turnouts[tonm] = trnout
+
+		for tonm, tileSet, blknm, pos in hsList:
+			trnout = Turnout(self, self.frame, tonm, self.screen, self.totiles[tileSet], pos)
+			blk = blocks[blknm]
+			blk.AddTurnout(trnout)
+			trnout.AddBlock(blknm)
+			trnout.SetContainingBlock(blk)
 			self.turnouts[tonm] = trnout
 
 		self.turnouts["LSw3"].SetPairedTurnout(self.turnouts["LSw3b"])
@@ -320,6 +330,7 @@ class Latham (District):
 
 	def DefineSignals(self):
 		self.signals = {}
+		self.osProxies = {}
 
 		sigList = [
 			[ "L8R",  RegAspects, True,    "right", (8, 12) ],
@@ -409,6 +420,37 @@ class Latham (District):
 		self.osSignals["LOSLAW"] = [ "L8R", "L8L", "L6L", "L4L" ]
 		self.osSignals["LOSLAM"] = [ "L6RA", "L6RB", "L8L", "L6L", "L4L" ]
 		self.osSignals["LOSLAE"] = [ "L4R", "L8L", "L6L", "L4L" ]
+		
+		p = OSProxy(self, "LOSLAW")
+		self.osProxies["LOSLAW"] = p
+		p.AddRoute(self.routes["LRtL10L11"])
+		p.AddRoute(self.routes["LRtL20L11"])
+		p.AddRoute(self.routes["LRtP11L11"])
+		p.AddRoute(self.routes["LRtP21L11"])
+		p.AddRoute(self.routes["LRtL10L21"])
+		p.AddRoute(self.routes["LRtL10L31"])
+
+		p = OSProxy(self, "LOSLAM")
+		self.osProxies["LOSLAM"] = p
+		p.AddRoute(self.routes["LRtL10L21"])
+		p.AddRoute(self.routes["LRtL20L21"])
+		p.AddRoute(self.routes["LRtP11L21"])
+		p.AddRoute(self.routes["LRtP21L21"])
+		p.AddRoute(self.routes["LRtP11L11"])
+		p.AddRoute(self.routes["LRtP11L31"])
+		p.AddRoute(self.routes["LRtL20L11"])
+		p.AddRoute(self.routes["LRtL20L31"])
+		p.AddRoute(self.routes["LRtL10L31"])
+		p.AddRoute(self.routes["LRtP21L11"])
+
+		p = OSProxy(self, "LOSLAE")
+		self.osProxies["LOSLAE"] = p
+		p.AddRoute(self.routes["LRtL10L31"])
+		p.AddRoute(self.routes["LRtL20L31"])
+		p.AddRoute(self.routes["LRtP11L31"])
+		p.AddRoute(self.routes["LRtP21L31"])
+		p.AddRoute(self.routes["LRtP21L21"])
+		p.AddRoute(self.routes["LRtP21L11"])
 
 		# Carlton OS
 		block=self.blocks["LOSCAW"]
@@ -434,8 +476,23 @@ class Latham (District):
 		self.osSignals["LOSCAW"] = [ "L18R", "L18L" ]
 		self.osSignals["LOSCAM"] = [ "L16R", "L18L", "L14L" ]
 		self.osSignals["LOSCAE"] = [ "L14R", "L14L" ]
+		
+		p = OSProxy(self, "LOSCAW")
+		self.osProxies["LOSCAW"] = p
+		p.AddRoute(self.routes["LRtL11D10"])
+		p.AddRoute(self.routes["LRtL21D10"])
 
-		return self.signals, self.blockSigs, self.osSignals, self.routes
+		p = OSProxy(self, "LOSCAM")
+		self.osProxies["LOSCAM"] = p
+		p.AddRoute(self.routes["LRtL21D10"])
+		p.AddRoute(self.routes["LRtL21D20"])
+
+		p = OSProxy(self, "LOSCAE")
+		self.osProxies["LOSCAE"] = p
+		p.AddRoute(self.routes["LRtL21D20"])
+		p.AddRoute(self.routes["LRtL31D20"])
+
+		return self.signals, self.blockSigs, self.osSignals, self.routes, self.osProxies
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

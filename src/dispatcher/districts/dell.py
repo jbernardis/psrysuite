@@ -1,6 +1,6 @@
 from dispatcher.district import District
 
-from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.block import Block, OverSwitch, Route, OSProxy
 from dispatcher.turnout import Turnout, SlipSwitch
 from dispatcher.signal import Signal
 from dispatcher.handswitch import HandSwitch
@@ -189,14 +189,16 @@ class Dell (District):
 
 	def DefineTurnouts(self,  blocks):
 		self.turnouts = {}
+		
+		hsList = [		
+			[ "DSw9",  "toleftleft",   "D21", (63, 13) ],
+		]
 
 		toList = [
 			[ "DSw1",  "torightleft",  ["DOSVJE", "DOSVJW"], (49, 11) ],
 			[ "DSw5",  "toleftleft",   ["DOSVJE", "DOSVJW"], (51, 11) ],
 			[ "DSw7",  "torightleft",  ["DOSVJE", "DOSVJW"], (54, 13) ],
-			[ "DSw7b", "torightright", ["DOSVJE", "DOSVJW"], (52, 11) ],
-			[ "DSw9",  "toleftleft",   ["D21"], (63, 13) ],
-		
+			[ "DSw7b", "torightright", ["DOSVJE", "DOSVJW"], (52, 11) ],		
 			[ "DSw11",  "toleftright", ["DOSFOE", "DOSFOW"], (67, 13) ],
 			[ "DSw11b", "toleftleft",  ["DOSFOE", "DOSFOW"], (69, 11) ],
 		]
@@ -206,6 +208,15 @@ class Dell (District):
 			for blknm in blks:
 				blocks[blknm].AddTurnout(trnout)
 				trnout.AddBlock(blknm)
+			self.turnouts[tonm] = trnout
+
+		for tonm, tileSet, blknm, pos in hsList:
+			trnout = Turnout(self, self.frame, tonm, self.screen, self.totiles[tileSet], pos)
+			blk = blocks[blknm]
+			blk.AddTurnout(trnout)
+			blocks[blknm].AddTurnout(trnout)
+			trnout.AddBlock(blknm)
+			trnout.SetContainingBlock(blk)
 			self.turnouts[tonm] = trnout
 
 		trnout = SlipSwitch(self, self.frame, "DSw3", self.screen, self.totiles["ssright"], (49, 13))
@@ -225,6 +236,7 @@ class Dell (District):
 
 	def DefineSignals(self):
 		self.signals = {}
+		self.osProxies = {}
 
 		sigList = [
 			[ "D6RA",  RegAspects, True,   "right", (46, 10) ],
@@ -319,8 +331,36 @@ class Dell (District):
 		self.osSignals["DOSVJW"] = [ "D4RA", "D4RB", "D6RA", "D6RB", "D6L"  ]
 		self.osSignals["DOSFOE"] = [ "D10R", "D10L", "D12L" ]
 		self.osSignals["DOSFOW"] = [ "D10R", "D12R", "D12L" ]
+			
+		p = OSProxy(self, "DOSFOE")
+		self.osProxies["DOSFOE"] = p
+		p.AddRoute(self.routes["DRtD21S20"])
+		p.AddRoute(self.routes["DRtD21S10"])
+			
+		p = OSProxy(self, "DOSFOW")
+		self.osProxies["DOSFOW"] = p
+		p.AddRoute(self.routes["DRtD11S10"])
+		p.AddRoute(self.routes["DRtD21S10"])
+			
+		p = OSProxy(self, "DOSVJE")
+		self.osProxies["DOSVJE"] = p
+		p.AddRoute(self.routes["DRtH13D21"])
+		p.AddRoute(self.routes["DRtD10D21"])
+		p.AddRoute(self.routes["DRtD20D21"])
+		p.AddRoute(self.routes["DRtH23D21"])
+		p.AddRoute(self.routes["DRtD20D11"])
+		p.AddRoute(self.routes["DRtH23D11"])
+			
+		p = OSProxy(self, "DOSVJW")
+		self.osProxies["DOSVJW"] = p
+		p.AddRoute(self.routes["DRtH13D11"])
+		p.AddRoute(self.routes["DRtD10D11"])
+		p.AddRoute(self.routes["DRtD20D11"])
+		p.AddRoute(self.routes["DRtH23D11"])
+		p.AddRoute(self.routes["DRtH13D21"])
+		p.AddRoute(self.routes["DRtD10D21"])
 
-		return self.signals, self.blockSigs, self.osSignals, self.routes
+		return self.signals, self.blockSigs, self.osSignals, self.routes, self.osProxies
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

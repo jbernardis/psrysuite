@@ -644,7 +644,7 @@ class Cliff (District):
 		self.turnouts = {}
 
 		hsList = [
-			[ "CSw3",   "toleftleft",   ["C30"], (142, 32) ],
+			[ "CSw3",   "toleftleft",   "C30", (142, 32) ],
 		]
 		toList = [
 			[ "CSw31",  "torightleft",  ["COSGME"], (150, 30) ],
@@ -675,14 +675,23 @@ class Cliff (District):
 			[ "CSw81",  "toleftdown",   ["COSSHW"], (121, 21) ],
 		]
 
-		for tonm, tileSet, blks, pos in hsList+toList:
+		for tonm, tileSet, blks, pos in toList:
 			trnout = Turnout(self, self.frame, tonm, self.screen, self.totiles[tileSet], pos)
 			for blknm in blks:
 				blocks[blknm].AddTurnout(trnout)
 				trnout.AddBlock(blknm)
 			self.turnouts[tonm] = trnout
 
+		for tonm, tileSet, blknm, pos in hsList:
+			trnout = Turnout(self, self.frame, tonm, self.screen, self.totiles[tileSet], pos)
+			blk = blocks[blknm]
+			blk.AddTurnout(trnout)
+			trnout.AddBlock(blknm)
+			trnout.SetContainingBlock(blk)
+			self.turnouts[tonm] = trnout
+
 		self.turnouts["CSw3"].SetDisabled(True)
+		
 		for tonm in [x[0] for x in toList]:
 			self.turnouts[tonm].SetRouteControl(True)
 
@@ -741,6 +750,7 @@ class Cliff (District):
 
 	def DefineSignals(self):
 		self.signals = {}
+		self.osProxies = {}
 
 		sigList = [
 			[ "C2LD", RegAspects,    True,  "right",     (145, 27) ],
@@ -980,7 +990,7 @@ class Cliff (District):
 
 		self.osSignals["COSSHW"] = [ "C8L", "C8RA", "C8RB", "C8RC", "C8RD", "C8RE", "C8RF", "C8RG", "C8RH", "C8RJ", "C8RK", "C8RL" ]
 
-		return self.signals, self.blockSigs, self.osSignals, self.routes
+		return self.signals, self.blockSigs, self.osSignals, self.routes, self.osProxies
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

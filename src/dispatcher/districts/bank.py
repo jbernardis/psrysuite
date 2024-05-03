@@ -1,6 +1,6 @@
 from dispatcher.district import District
 
-from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.block import Block, OverSwitch, Route, OSProxy
 from dispatcher.turnout import Turnout
 from dispatcher.signal import Signal
 from dispatcher.handswitch import HandSwitch
@@ -141,18 +141,29 @@ class Bank (District):
 
 		toList = [
 			[ "CSw17",  "torightleft",  ["BOSE"], (71, 13) ],
-			[ "CSw19",  "torightright",  ["B21"], (63, 13) ],
-			[ "CSw21a", "torightleft",   ["B11"], (66, 11) ],
-			[ "CSw21b", "torightleft",   ["B11"], (63, 11) ],
 			[ "CSw23",  "torightright",  ["BOSWW", "BOSWE"], (54, 11) ],
 			[ "CSw23b", "torightleft",   ["BOSWW", "BOSWE"], (56, 13) ],
 		]
 
+		hslist = [
+			[ "CSw19",  "torightright",  "B21", (63, 13) ],
+			[ "CSw21a", "torightleft",   "B11", (66, 11) ],
+			[ "CSw21b", "torightleft",   "B11", (63, 11) ],
+		]
+		
 		for tonm, tileSet, blks, pos in toList:
 			trnout = Turnout(self, self.frame, tonm, self.screen, self.totiles[tileSet], pos)
 			for blknm in blks:
 				blocks[blknm].AddTurnout(trnout)
 				trnout.AddBlock(blknm)
+			self.turnouts[tonm] = trnout
+
+		for tonm, tileSet, blknm, pos in hslist:
+			trnout = Turnout(self, self.frame, tonm, self.screen, self.totiles[tileSet], pos)
+			blk = blocks[blknm]
+			blk.AddTurnout(trnout)
+			trnout.AddBlock(blknm)
+			trnout.SetContainingBlock(blk)
 			self.turnouts[tonm] = trnout
 
 		self.turnouts["CSw23"].SetPairedTurnout(self.turnouts["CSw23b"])
@@ -165,6 +176,7 @@ class Bank (District):
 		
 	def DefineSignals(self):
 		self.signals = {}
+		self.osProxies = {}
 
 		sigList = [
 			[ "C18LA",  RegAspects, True,    "right", (68, 12) ],
@@ -239,9 +251,19 @@ class Bank (District):
 
 		self.osSignals["BOSWW"] = [ "C22L", "C22R", "C24R" ]
 		self.osSignals["BOSWE"] = [ "C24L", "C24R" ]
-		self.osSignals["BOSE"] = [ "C18LB", "C18LA", "C18R" ]
+		self.osSignals["BOSE"] = [ "C18LB", "C18LA", "C18R" ]	
 
-		return self.signals, self.blockSigs, self.osSignals, self.routes
+		p = OSProxy(self, "BOSWW")
+		self.osProxies["BOSWW"] = p
+		p.AddRoute(self.routes["BRtB10B21"])
+		p.AddRoute(self.routes["BRtB10B11"])
+
+		p = OSProxy(self, "BOSWE")
+		self.osProxies["BOSWE"] = p
+		p.AddRoute(self.routes["BRtB10B21"])
+		p.AddRoute(self.routes["BRtB20B21"])
+
+		return self.signals, self.blockSigs, self.osSignals, self.routes, self.osProxies
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

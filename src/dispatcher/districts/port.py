@@ -1,6 +1,6 @@
 from dispatcher.district import District
 
-from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.block import Block, OverSwitch, Route, OSProxy
 from dispatcher.turnout import Turnout, SlipSwitch
 from dispatcher.signal import Signal
 from dispatcher.handswitch import HandSwitch
@@ -869,11 +869,6 @@ class Port (District):
 			[ "PBSw13",  "toleftright",  ["POSCJ1", "POSCJ2"], (139, 35) ],
 			[ "PBSw13b", "toleftleft",   ["POSCJ1", "POSCJ2"], (141, 33) ],
 
-			[ "PBSw5",   "torightright", ["P41"], (129, 35) ],
-			[ "PBSw15a", "toleftright",  ["P42"], (149, 35) ],
-			[ "PBSw15b", "toleftleft",   ["P42"], (152, 35) ],
-			[ "PBSw17",  "toleftright",  [], (145, 33) ],
-
 			[ "PASw27",  "toleftup",     ["POSPJ1"], (118, 20) ],
 			[ "PASw29",  "toleftup",     ["POSPJ1"], (120, 22) ],
 			[ "PASw31",  "torightleft",  ["POSPJ1"], (122, 24) ],
@@ -897,10 +892,24 @@ class Port (District):
 				blocks[blknm].AddTurnout(trnout)
 				trnout.AddBlock(blknm)
 				
-			if tonm == "PBSw17":
-				b = blocks["P32"]
-				b.AddTurnout(trnout)
-				trnout.SetContainingBlock(b)
+			trnout.SetDisabled(True)
+			self.turnouts[tonm] = trnout
+
+		# handswitches and other manually operated turnouts
+		hslist = [
+			[ "PBSw5",   "torightright", "P41", (129, 35) ],
+			[ "PBSw15a", "toleftright",  "P42", (149, 35) ],
+			[ "PBSw15b", "toleftleft",   "P42", (152, 35) ],
+			[ "PBSw17",  "toleftright",  "P32", (145, 33) ],
+		]
+		
+		for tonm, tileSet, blk, pos in hslist:
+			trnout = Turnout(self, self.frame, tonm, self.screen, self.totiles[tileSet], pos)
+				
+			b = blocks[blk]
+			b.AddTurnout(trnout)
+			trnout.SetContainingBlock(b)
+			
 			trnout.SetDisabled(True)
 			self.turnouts[tonm] = trnout
 
@@ -966,6 +975,8 @@ class Port (District):
 
 	def DefineSignals(self):
 		self.signals = {}
+		self.osProxies = {}
+		
 		sigList = [
 			[ "PA12R",  RegAspects, True,    "right",     (98, 21) ],
 			[ "PA12LA", RegAspects, False,   "left",      (107, 17) ],
@@ -1132,6 +1143,18 @@ class Port (District):
 
 		self.osSignals["POSCJ1"] = [ "PB14L", "PB14R", "PB12R" ]
 		self.osSignals["POSCJ2"] = [ "PB12L", "PB12R", "PB14R" ]
+		
+		p = OSProxy(self, "POSCJ1")
+		self.osProxies["POSCJ1"] = p
+		p.AddRoute(self.routes["PRtP31P32"])
+		p.AddRoute(self.routes["PRtP31P42"])
+		p.AddRoute(self.routes["PRtP41P32"])
+		
+		p = OSProxy(self, "POSCJ2")
+		self.osProxies["POSCJ2"] = p
+		p.AddRoute(self.routes["PRtP41P32"])
+		p.AddRoute(self.routes["PRtP41P42"])
+		p.AddRoute(self.routes["PRtP31P42"])
 
 		# routes for south junction
 		block = self.blocks["POSSJ1"]
@@ -1152,6 +1175,18 @@ class Port (District):
 
 		self.osSignals["POSSJ1"] = [ "PB4R", "PB4L", "PB2R" ]
 		self.osSignals["POSSJ2"] = [ "PB2R", "PB2L", "PB4R" ]
+		
+		p = OSProxy(self, "POSSJ1")
+		self.osProxies["POSSJ1"] = p
+		p.AddRoute(self.routes["PRtP30P31"])
+		p.AddRoute(self.routes["PRtP30P41"])
+		p.AddRoute(self.routes["PRtP40P31"])
+		
+		p = OSProxy(self, "POSSJ2")
+		self.osProxies["POSSJ2"] = p
+		p.AddRoute(self.routes["PRtP40P41"])
+		p.AddRoute(self.routes["PRtP40P31"])
+		p.AddRoute(self.routes["PRtP30P41"])
 
 		# routes for parsons junction
 		block = self.blocks["POSPJ1"]
@@ -1218,6 +1253,30 @@ class Port (District):
 
 		self.osSignals["POSPJ1"] = [ "PA34RA", "PA34RB", "PA34RC", "PA34RD", "PA34LA", "PA34LB" ]
 		self.osSignals["POSPJ2"] = [ "PA32RA", "PA32RB", "PA32L", "PA34LA", "PA34LB" ]
+		
+		p = OSProxy(self, "POSPJ1")
+		self.osProxies["POSPJ1"] = p
+		p.AddRoute(self.routes["PRtV11P50"])
+		p.AddRoute(self.routes["PRtP60P50"])
+		p.AddRoute(self.routes["PRtP61P50"])
+		p.AddRoute(self.routes["PRtP10P50"])
+		p.AddRoute(self.routes["PRtV11P11"])
+		p.AddRoute(self.routes["PRtP60P11"])
+		p.AddRoute(self.routes["PRtP61P11"])
+		p.AddRoute(self.routes["PRtP10P11"])
+		p.AddRoute(self.routes["PRtP20P50"])
+		p.AddRoute(self.routes["PRtP20P11"])
+		p.AddRoute(self.routes["PRtP30P50"])
+		p.AddRoute(self.routes["PRtP30P11"])
+		
+		p = OSProxy(self, "POSPJ2")
+		self.osProxies["POSPJ2"] = p
+		p.AddRoute(self.routes["PRtP20P50"])
+		p.AddRoute(self.routes["PRtP20P11"])
+		p.AddRoute(self.routes["PRtP30P50"])
+		p.AddRoute(self.routes["PRtP30P11"])
+		p.AddRoute(self.routes["PRtP20P21"])
+		p.AddRoute(self.routes["PRtP30P21"])
 
 		# routes for southport
 		block = self.blocks["POSSP1"]
@@ -1358,8 +1417,71 @@ class Port (District):
 		self.osSignals["POSSP3"] = [ "PA12R", "PA10RA", "PA10RB", "PA8R", "PA6R", "PA4RA", "PA4RB", "PA8L" ]
 		self.osSignals["POSSP4"] = [ "PA6R", "PA4RA", "PA4RB", "PA6LA", "PA6LB", "PA6LC" ]
 		self.osSignals["POSSP5"] = [ "PA6R", "PA4RA", "PA4RB", "PA4L" ]
+		
+		p = OSProxy(self, "POSSP1")
+		self.osProxies["POSSP1"] = p
+		p.AddRoute(self.routes["PRtP7V10"])
+		p.AddRoute(self.routes["PRtP7P60"])
+		p.AddRoute(self.routes["PRtP7P61"])
+		p.AddRoute(self.routes["PRtP7P20"])
+		p.AddRoute(self.routes["PRtP7P10"])
+		
+		p = OSProxy(self, "POSSP2")
+		self.osProxies["POSSP2"] = p
+		p.AddRoute(self.routes["PRtP7P10"])
+		p.AddRoute(self.routes["PRtP6P10"])
+		p.AddRoute(self.routes["PRtP5P10"])
+		p.AddRoute(self.routes["PRtP4P10"])
+		p.AddRoute(self.routes["PRtP3P10"])
+		p.AddRoute(self.routes["PRtP2P10"])
+		p.AddRoute(self.routes["PRtP1P10"])
+		p.AddRoute(self.routes["PRtP6P20"])
+		p.AddRoute(self.routes["PRtP5P20"])
+		
+		p = OSProxy(self, "POSSP3")
+		self.osProxies["POSSP3"] = p
+		p.AddRoute(self.routes["PRtP7P20"])
+		p.AddRoute(self.routes["PRtP6P20"])
+		p.AddRoute(self.routes["PRtP5P20"])
+		p.AddRoute(self.routes["PRtP4P20"])
+		p.AddRoute(self.routes["PRtP3P20"])
+		p.AddRoute(self.routes["PRtP2P20"])
+		p.AddRoute(self.routes["PRtP1P20"])
+		p.AddRoute(self.routes["PRtP4P10"])
+		
+		p = OSProxy(self, "POSSP4")
+		self.osProxies["POSSP4"] = p
+		p.AddRoute(self.routes["PRtP3P62"])
+		p.AddRoute(self.routes["PRtP3P63"])
+		p.AddRoute(self.routes["PRtP3P64"])
+		p.AddRoute(self.routes["PRtP2P62"])
+		p.AddRoute(self.routes["PRtP2P63"])
+		p.AddRoute(self.routes["PRtP2P64"])
+		p.AddRoute(self.routes["PRtP1P62"])
+		p.AddRoute(self.routes["PRtP1P63"])
+		p.AddRoute(self.routes["PRtP1P64"])
+		p.AddRoute(self.routes["PRtP3P10"])
+		p.AddRoute(self.routes["PRtP3P20"])
+		p.AddRoute(self.routes["PRtP3P40"])
+		
+		p = OSProxy(self, "POSSP5")
+		self.osProxies["POSSP5"] = p
+		p.AddRoute(self.routes["PRtP3P40"])
+		p.AddRoute(self.routes["PRtP2P40"])
+		p.AddRoute(self.routes["PRtP1P40"])
+		p.AddRoute(self.routes["PRtP1P62"])
+		p.AddRoute(self.routes["PRtP1P63"])
+		p.AddRoute(self.routes["PRtP1P64"])
+		p.AddRoute(self.routes["PRtP1P10"])
+		p.AddRoute(self.routes["PRtP1P20"])
+		p.AddRoute(self.routes["PRtP2P62"])
+		p.AddRoute(self.routes["PRtP2P63"])
+		p.AddRoute(self.routes["PRtP2P64"])
+		p.AddRoute(self.routes["PRtP2P10"])
+		p.AddRoute(self.routes["PRtP2P20"])
 
-		return self.signals, self.blockSigs, self.osSignals, self.routes
+
+		return self.signals, self.blockSigs, self.osSignals, self.routes, self.osProxies
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}

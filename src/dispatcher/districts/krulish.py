@@ -1,6 +1,6 @@
 from dispatcher.district import District
 
-from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.block import Block, OverSwitch, Route, OSProxy
 from dispatcher.turnout import Turnout
 from dispatcher.signal import Signal
 
@@ -273,6 +273,8 @@ class Krulish (District):
 		self.signals = {}
 		self.routes = {}
 		self.osSignals = {}
+		self.osProxies = {}
+		
 		sigList = [
 			[ "K8R",  RegAspects, True,    "rightlong", (141, 12) ],
 			[ "K4R",  RegAspects, True,    "rightlong", (141, 14) ],
@@ -354,5 +356,28 @@ class Krulish (District):
 		self.osSignals["KOSE"] = [ "K2R", "K2L" ]
 		self.osSignals["KOSN10S11"] = [ "N10W", "S11E" ]
 		self.osSignals["KOSN20S21"] = [ "N20W", "S21E" ]
+		
+		p = OSProxy(self, "KOSW")
+		self.osProxies["KOSW"] = p
+		p.AddRoute(self.routes["KRtN10K10"])
+		p.AddRoute(self.routes["KRtN10N11"])
+		p.AddRoute(self.routes["KRtN10N21"])
+		p.AddRoute(self.routes["KRtN25K10"])
+		p.AddRoute(self.routes["KRtN25N11"])
+		
+		p = OSProxy(self, "KOSM")
+		self.osProxies["KOSM"] = p
+		p.AddRoute(self.routes["KRtN10K10"])
+		p.AddRoute(self.routes["KRtN10N11"])
+		p.AddRoute(self.routes["KRtN25K10"])
+		p.AddRoute(self.routes["KRtN25N21"])
+		p.AddRoute(self.routes["KRtN25N11"])
+		p.AddRoute(self.routes["KRtN10N21"])
+		
+		p = OSProxy(self, "KOSE")
+		self.osProxies["KOSE"] = p
+		p.AddRoute(self.routes["KRtN10N21"])
+		p.AddRoute(self.routes["KRtN20N21"])
+		p.AddRoute(self.routes["KRtN25N21"])
 
-		return self.signals, self.blockSigs, self.osSignals, self.routes
+		return self.signals, self.blockSigs, self.osSignals, self.routes, self.osProxies

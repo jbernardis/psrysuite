@@ -1,6 +1,6 @@
 from dispatcher.district import District
 
-from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.block import Block, OverSwitch, Route, OSProxy
 from dispatcher.turnout import Turnout, SlipSwitch
 from dispatcher.signal import Signal
 from dispatcher.button import Button
@@ -1053,6 +1053,8 @@ class Nassau (District):
 		self.routes = {}
 		self.osSignals = {}
 		self.routeButtons = {}
+		self.osProxies = {}
+		
 		sigList = [
 			[ "N20R", SloAspects, True,    "right", (16, 6) ],
 			[ "N18R", SloAspects, True,    "right", (9, 10) ],
@@ -1216,6 +1218,71 @@ class Nassau (District):
 		self.routeButtons["NRtN21N41"] = ["NNXBtnN21", "NNXBtnN41W"]
 		self.routeButtons["NRtN21N42"] = ["NNXBtnN21", "NNXBtnN42W"]
 		self.routeButtons["NRtN21W20"] = ["NNXBtnN21", "NNXBtnW20W"]
+		
+		p = OSProxy(self, "NWOSCY")
+		self.osProxies["NWOSCY"] = p
+		p.AddRoute(self.routes["NRtN60N31"])
+		p.AddRoute(self.routes["NRtN60N32"])
+		p.AddRoute(self.routes["NRtN60W10"])
+		p.AddRoute(self.routes["NRtN60N12"])
+		p.AddRoute(self.routes["NRtN60N22"])
+		p.AddRoute(self.routes["NRtN60N41"])
+		p.AddRoute(self.routes["NRtN60N42"])
+		p.AddRoute(self.routes["NRtN60W20"])
+		p.AddRoute(self.routes["NRtN11W10"])
+		p.AddRoute(self.routes["NRtN11N32"])
+		p.AddRoute(self.routes["NRtN11N31"])
+		p.AddRoute(self.routes["NRtN21W10"])
+		p.AddRoute(self.routes["NRtN21N31"])
+		p.AddRoute(self.routes["NRtN21N32"])
+
+		p = OSProxy(self, "NWOSW")
+		self.osProxies["NWOSW"] = p
+		p.AddRoute(self.routes["NRtN11N31"])
+		p.AddRoute(self.routes["NRtN11N32"])
+		p.AddRoute(self.routes["NRtN11W10"])
+		p.AddRoute(self.routes["NRtN11N12"])
+		p.AddRoute(self.routes["NRtN11N22"])
+		p.AddRoute(self.routes["NRtN11N41"])
+		p.AddRoute(self.routes["NRtN11N42"])
+		p.AddRoute(self.routes["NRtN11W20"])		
+		p.AddRoute(self.routes["NRtN21W10"])
+		p.AddRoute(self.routes["NRtN21N31"])
+		p.AddRoute(self.routes["NRtN21N32"])
+		p.AddRoute(self.routes["NRtN21N12"])
+		p.AddRoute(self.routes["NRtN60N12"])
+		p.AddRoute(self.routes["NRtN60N22"])
+		p.AddRoute(self.routes["NRtN60N41"])
+		p.AddRoute(self.routes["NRtN60N42"])
+		p.AddRoute(self.routes["NRtN60W20"])
+
+		p = OSProxy(self, "NWOSE")
+		self.osProxies["NWOSE"] = p
+		p.AddRoute(self.routes["NRtN21N31"])
+		p.AddRoute(self.routes["NRtN21N32"])
+		p.AddRoute(self.routes["NRtN21W10"])
+		p.AddRoute(self.routes["NRtN21N12"])
+		p.AddRoute(self.routes["NRtN21N22"])
+		p.AddRoute(self.routes["NRtN21N41"])
+		p.AddRoute(self.routes["NRtN21N42"])
+		p.AddRoute(self.routes["NRtN21W20"])
+		p.AddRoute(self.routes["NRtN21W10"])
+		p.AddRoute(self.routes["NRtN21N31"])
+		p.AddRoute(self.routes["NRtN21N32"])
+		p.AddRoute(self.routes["NRtN21N12"])
+		p.AddRoute(self.routes["NRtN60N12"])
+		p.AddRoute(self.routes["NRtN60N22"])
+		p.AddRoute(self.routes["NRtN60N41"])
+		p.AddRoute(self.routes["NRtN60N42"])
+		p.AddRoute(self.routes["NRtN60W20"])
+		p.AddRoute(self.routes["NRtN60N22"])
+		p.AddRoute(self.routes["NRtN60N41"])
+		p.AddRoute(self.routes["NRtN60N42"])
+		p.AddRoute(self.routes["NRtN60W20"])
+		p.AddRoute(self.routes["NRtN11N22"])
+		p.AddRoute(self.routes["NRtN11N41"])
+		p.AddRoute(self.routes["NRtN11N42"])
+		p.AddRoute(self.routes["NRtN11W20"])
 
 		self.signals["N20R"].AddPossibleRoutes("NWOSTY", [ "NRtT12W10" ])
 		self.signals["N18R"].AddPossibleRoutes("NWOSCY", [ "NRtN60N31", "NRtN60N32", "NRtN60W10", "NRtN60N12", "NRtN60N22", "NRtN60N41", "NRtN60N42", "NRtN60W20" ])
@@ -1360,6 +1427,61 @@ class Nassau (District):
 		self.osSignals["NEOSRH"] = [ "N28L", "N28R", "N26RA", "N26RB", "N26RC", "N24RA", "N24RB", "N24RC", "N24RD" ]
 		self.osSignals["NEOSW"] = [ "N26L", "N28R", "N26RA", "N26RB", "N26RC", "N24RA", "N24RB", "N24RC", "N24RD" ]
 		self.osSignals["NEOSE"] = [ "N24L", "N28R", "N26RA", "N26RB", "N26RC", "N24RA", "N24RB", "N24RC", "N24RD" ]
+		
+		p = OSProxy(self, "NEOSRH")
+		self.osProxies["NEOSRH"] = p
+		p.AddRoute(self.routes["NRtR10W11"])
+		p.AddRoute(self.routes["NRtR10N32"])
+		p.AddRoute(self.routes["NRtR10N31"])
+		p.AddRoute(self.routes["NRtR10N12"])
+		p.AddRoute(self.routes["NRtR10N22"])
+		p.AddRoute(self.routes["NRtR10N41"])
+		p.AddRoute(self.routes["NRtR10N42"])
+		p.AddRoute(self.routes["NRtR10W20"])
+		p.AddRoute(self.routes["NRtB10W11"])
+		p.AddRoute(self.routes["NRtB20W11"])
+		
+		p = OSProxy(self, "NEOSW")
+		self.osProxies["NEOSW"] = p
+		p.AddRoute(self.routes["NRtB10W11"])
+		p.AddRoute(self.routes["NRtB10N32"])
+		p.AddRoute(self.routes["NRtB10N31"])
+		p.AddRoute(self.routes["NRtB10N12"])
+		p.AddRoute(self.routes["NRtB10N22"])
+		p.AddRoute(self.routes["NRtB10N41"])
+		p.AddRoute(self.routes["NRtB10N42"])
+		p.AddRoute(self.routes["NRtB10W20"])
+		p.AddRoute(self.routes["NRtR10N32"])
+		p.AddRoute(self.routes["NRtR10N31"])
+		p.AddRoute(self.routes["NRtR10N12"])
+		p.AddRoute(self.routes["NRtR10N22"])
+		p.AddRoute(self.routes["NRtR10N41"])
+		p.AddRoute(self.routes["NRtR10N42"])
+		p.AddRoute(self.routes["NRtR10W20"])
+		p.AddRoute(self.routes["NRtB20W11"])
+		p.AddRoute(self.routes["NRtB20N32"])
+		p.AddRoute(self.routes["NRtB20N31"])
+		p.AddRoute(self.routes["NRtB20N12"])
+		
+		p = OSProxy(self, "NEOSE")
+		self.osProxies["NEOSE"] = p
+		p.AddRoute(self.routes["NRtB20W11"])
+		p.AddRoute(self.routes["NRtB20N32"])
+		p.AddRoute(self.routes["NRtB20N31"])
+		p.AddRoute(self.routes["NRtB20N12"])
+		p.AddRoute(self.routes["NRtB20N22"])
+		p.AddRoute(self.routes["NRtB20N41"])
+		p.AddRoute(self.routes["NRtB20N42"])
+		p.AddRoute(self.routes["NRtB20W20"])
+		p.AddRoute(self.routes["NRtR10N22"])
+		p.AddRoute(self.routes["NRtR10N41"])
+		p.AddRoute(self.routes["NRtR10N42"])
+		p.AddRoute(self.routes["NRtR10W20"])
+		p.AddRoute(self.routes["NRtB10N22"])
+		p.AddRoute(self.routes["NRtB10N41"])
+		p.AddRoute(self.routes["NRtB10N42"])
+		p.AddRoute(self.routes["NRtB10W20"])
 
-		return self.signals, self.blockSigs, self.osSignals, self.routes
+
+		return self.signals, self.blockSigs, self.osSignals, self.routes, self.osProxies
 

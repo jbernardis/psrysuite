@@ -849,6 +849,31 @@ class StoppingBlock (Block):
 			self.Draw()
 
 
+class OSProxy:
+	def __init__(self, district, name):
+		self.district = district
+		self.name = name
+		self.occupied = False
+		self.routes = {}
+		self.osList = ()
+		
+	def GetDistrict(self):
+		return self.district
+		
+	def SetOccupied(self, flag=True):
+		self.occupied = flag
+		
+	def IsOccupied(self):
+		return self.occupied
+		
+	def AddRoute(self, route):
+		self.routes[route.GetName()] = route
+		self.osList = set(route.GetOS() for route in self.routes.values())
+		
+	def HasRoute(self, rtnm):
+		return rtnm in self.routes
+		
+		
 class OverSwitch (Block):
 	def __init__(self, district, frame, name, tiles, east=True):
 		Block.__init__(self, district, frame, name, tiles, east)

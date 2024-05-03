@@ -1,6 +1,6 @@
 from dispatcher.district import District
 
-from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.block import Block, OverSwitch, OSProxy, Route
 from dispatcher.turnout import Turnout
 from dispatcher.signal import Signal
 from dispatcher.handswitch import HandSwitch
@@ -76,7 +76,7 @@ class Shore (District):
 			
 		District.DoSignalAction(self, sig, aspect, frozenaspect=frozenaspect, callon=callon)
 		self.drawCrossing()
-
+		
 		
 	def DoBlockAction(self, blk, blockend, state):
 		blknm = blk.GetName()
@@ -469,8 +469,11 @@ class Shore (District):
 	def DefineTurnouts(self, blocks):
 		self.turnouts = {}
 
+		hsList = [
+			[ "SSw1",  "torightleft",  "S10", (77, 11) ],
+		]
+			
 		toList = [
-			[ "SSw1",  "torightleft",  ["S10"], (77, 11) ],
 			[ "SSw3",  "torightright", ["SOSW", "SOSE"], (84, 11) ],
 			[ "SSw3b",  "torightleft", ["SOSW", "SOSE"], (86, 13) ],
 			[ "SSw5",   "toleftleft",  ["SOSW", "SOSE"], (89, 11) ],
@@ -494,6 +497,14 @@ class Shore (District):
 				trnout.AddBlock(blknm)
 			self.turnouts[tonm] = trnout
 
+		for tonm, tileSet, blknm, pos in hsList:
+			trnout = Turnout(self, self.frame, tonm, self.screen, self.totiles[tileSet], pos)
+			blk = blocks[blknm]
+			blk.AddTurnout(trnout)
+			trnout.AddBlock(blknm)
+			trnout.SetContainingBlock(blk)
+			self.turnouts[tonm] = trnout
+
 		self.turnouts["SSw3"].SetPairedTurnout(self.turnouts["SSw3b"])
 		self.turnouts["SSw5"].SetPairedTurnout(self.turnouts["SSw5b"])
 		self.turnouts["SSw15"].SetPairedTurnout(self.turnouts["SSw15b"])
@@ -505,6 +516,7 @@ class Shore (District):
 
 	def DefineSignals(self):
 		self.signals = {}
+		self.osProxies = {}
 
 		sigList = [
 			[ "S12R", RegAspects, True,    "rightlong", (83, 12) ],
@@ -662,9 +674,55 @@ class Shore (District):
 		self.osSignals["SOSHJM"] = [ "S18R", "S20L", "S18LA", "S18LB" ]
 		self.osSignals["SOSHJE"] = [ "S16R", "S20L", "S18LA", "S18LB", "S16L" ]
 
+		p = OSProxy(self, "SOSE")
+		self.osProxies["SOSE"] = p
+		p.AddRoute(self.routes["SRtS20S21"])
+		p.AddRoute(self.routes["SRtS20S11"])
+		p.AddRoute(self.routes["SRtS20H30"])
+		p.AddRoute(self.routes["SRtS20H10"])
+		p.AddRoute(self.routes["SRtS20H20"])
+		p.AddRoute(self.routes["SRtS20P32"])
+		p.AddRoute(self.routes["SRtS10S21"])
+		p.AddRoute(self.routes["SRtS10H20"])
+		p.AddRoute(self.routes["SRtS10P32"])
+
+		p = OSProxy(self, "SOSW")
+		self.osProxies["SOSW"] = p
+		p.AddRoute(self.routes["SRtS10S21"])
+		p.AddRoute(self.routes["SRtS10S11"])
+		p.AddRoute(self.routes["SRtS10H30"])
+		p.AddRoute(self.routes["SRtS10H10"])
+		p.AddRoute(self.routes["SRtS10H20"])
+		p.AddRoute(self.routes["SRtS10P32"])
+		p.AddRoute(self.routes["SRtS20S11"])
+		p.AddRoute(self.routes["SRtS20H30"])
+		p.AddRoute(self.routes["SRtS20H10"])
+		
+		p = OSProxy(self, "SOSHJE")
+		self.osProxies["SOSHJE"] = p
+		p.AddRoute(self.routes["SRtP42H11"])
+		p.AddRoute(self.routes["SRtP42H21"])
+		p.AddRoute(self.routes["SRtP42H40"])
+		p.AddRoute(self.routes["SRtP42N25"])
+		
+		p = OSProxy(self, "SOSHJM")
+		self.osProxies["SOSHJM"] = p
+		p.AddRoute(self.routes["SRtH20H11"])
+		p.AddRoute(self.routes["SRtH20H21"])
+		p.AddRoute(self.routes["SRtH20H40"])
+		p.AddRoute(self.routes["SRtP42H21"])
+		p.AddRoute(self.routes["SRtP42H40"])
+		p.AddRoute(self.routes["SRtP42H11"])
+		
+		p = OSProxy(self, "SOSHJW")
+		self.osProxies["SOSHJW"] = p
+		p.AddRoute(self.routes["SRtH10H11"])
+		p.AddRoute(self.routes["SRtH20H11"])
+		p.AddRoute(self.routes["SRtP42H11"])
+		
 		self.blocks["SOSHF"].SetRoute(self.routes["SRtF10F11"])
 
-		return self.signals, self.blockSigs, self.osSignals, self.routes
+		return self.signals, self.blockSigs, self.osSignals, self.routes, self.osProxies
 
 	def DefineHandSwitches(self):
 		self.handswitches = {}
