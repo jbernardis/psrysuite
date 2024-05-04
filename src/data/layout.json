@@ -51,7 +51,7 @@
       "sbwest": "C12.W"
     },
     "C13": {
-      "east": 1,
+      "east": 0,
       "sbeast": "C13.E",
       "sbwest": "C13.W"
     },

@@ -393,7 +393,11 @@ class MainFrame(wx.Frame):
 			for pnl in self.panels.values():
 				pnl.SetShift(False)
 				
+		elif kcd == wx.WXK_F1:
+			self.GetOSProxyInfo()
+				
 		else:
+			self.PopupEvent("Key Code: %d" % kcd)
 			evt.Skip()
 
 	def OnKeyUp(self, evt):
@@ -2010,7 +2014,24 @@ class MainFrame(wx.Frame):
 					pos[0] += offset
 					w.SetPosition(pos)
 					w.Show()
-
+					
+	def GetOSProxyInfo(self):
+		counts = {}
+		pnames = {}
+		for pn, p in self.osProxies.items():
+			rn, occ = p.Evaluate()
+			if rn and occ:
+				counts[rn] = counts.get(rn, 0) + 1
+				if rn in pnames:
+					pnames[rn].append(pn)
+				else:
+					pnames[rn] = [pn]
+		
+		for rn in counts.keys():
+			ct = counts[rn]
+			pn = ", ".join(pnames[rn])
+			self.PopupEvent(f'{rn}: {ct} ({pn})')
+			
 	def GetBlockStatus(self, blknm):
 		try:
 			blk = self.blocks[blknm]

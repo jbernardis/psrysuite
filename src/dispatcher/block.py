@@ -872,6 +872,31 @@ class OSProxy:
 		
 	def HasRoute(self, rtnm):
 		return rtnm in self.routes
+	
+	def Evaluate(self):
+		routeName = None
+		rlist = self.routes.keys()
+		for osb in self.osList:
+			rte = osb.GetRoute()
+			if rte is not None:
+				rtname = rte.GetName()
+				if rtname in rlist:
+					routeName = rtname
+					
+		return routeName, self.occupied
+	
+	def __str__(self):
+		rtes = []
+		rlist = self.routes.keys()
+		for osb in self.osList:
+			rte = osb.GetRoute()
+			if rte is not None:
+				rtname = rte.GetName()
+				if rtname in rlist:
+					rtes.append(rtname)
+		o = "True" if self.occupied else "False"
+		orlist = ", ".join(rtes)
+		return f'OS: {self.name} occupied: {o} OS routes: {orlist}'
 		
 		
 class OverSwitch (Block):

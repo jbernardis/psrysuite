@@ -81,8 +81,6 @@ class Turnout:
 		self.blockList.append(self.frame.blocks[blknm])
 
 	def Draw(self, blockstat=None, east=None):
-		if self.name == "PBSw15a":
-			print("entering draw turnout for 15a", flush=True)
 		if east is None:
 			east = self.eastFromBlock
 		if blockstat is None:
