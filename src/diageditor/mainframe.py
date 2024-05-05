@@ -19,7 +19,7 @@ class MainFrame(wx.Frame):
 		self.editor = None
 		
 		icon = wx.Icon()
-		icon.CopyFromBitmap(wx.Bitmap(os.path.join(cmdFolder, "images", "diagedit.ico"), wx.BITMAP_TYPE_ANY))
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "diagedit.ico"), wx.BITMAP_TYPE_ANY))
 		self.SetIcon(icon)
 		
 		self.startDirectory = os.getcwd()

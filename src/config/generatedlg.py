@@ -42,7 +42,11 @@ class GenerateDlg(wx.Dialog):
 		self.bGenDisplay = wx.Button(genBox, wx.ID_ANY, "Display", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenDisplay, self.bGenDisplay)
 		vsz.Add(self.bGenDisplay, 0, wx.ALL, 10)
-		
+
+		self.bGenActive = wx.Button(genBox, wx.ID_ANY, "Active Trains", size=GENBTNSZ)
+		self.Bind(wx.EVT_BUTTON, self.OnBGenActive, self.bGenActive)
+		vsz.Add(self.bGenActive, 0, wx.ALL, 10)
+
 		hsz.Add(vsz)
 		
 		vsz = wx.BoxSizer(wx.VERTICAL)
@@ -50,15 +54,15 @@ class GenerateDlg(wx.Dialog):
 		self.bGenThrottle = wx.Button(genBox, wx.ID_ANY, "Throttle", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenThrottle, self.bGenThrottle)
 		vsz.Add(self.bGenThrottle, 0, wx.ALL, 10)
-					
+
 		self.bGenTracker = wx.Button(genBox, wx.ID_ANY, "Tracker", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenTracker, self.bGenTracker)
 		vsz.Add(self.bGenTracker, 0, wx.ALL, 10)
-					
-		self.bGenActive = wx.Button(genBox, wx.ID_ANY, "Active Trains", size=GENBTNSZ)
-		self.Bind(wx.EVT_BUTTON, self.OnBGenActive, self.bGenActive)
-		vsz.Add(self.bGenActive, 0, wx.ALL, 10)
-					
+
+		self.bDiagEdit = wx.Button(genBox, wx.ID_ANY, "Diagram Editor", size=GENBTNSZ)
+		self.Bind(wx.EVT_BUTTON, self.OnBDiagEdit, self.bDiagEdit)
+		vsz.Add(self.bDiagEdit, 0, wx.ALL, 10)
+
 		self.bGenEditor = wx.Button(genBox, wx.ID_ANY, "Database Editor", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenEditor, self.bGenEditor)
 		vsz.Add(self.bGenEditor, 0, wx.ALL, 10)
@@ -217,7 +221,17 @@ class GenerateDlg(wx.Dialog):
 			"icon": "editor.ico"
 		}
 		self.generator(module, self.cbStartMenu.IsChecked())
-		
+
+	def OnBDiagEdit(self, _):
+		module = {
+			"name": "PSRY Diagram Editor",
+			"dir":  "diageditor",
+			"main": "mainframe.py",
+			"desc": "Track Diagram Editor",
+			"icon": "diagedit.ico"
+		}
+		self.generator(module, self.cbStartMenu.IsChecked())
+
 	def OnBGenMonitor(self, _):
 		module = {
 			"name": "PSRY Monitor for Server",
