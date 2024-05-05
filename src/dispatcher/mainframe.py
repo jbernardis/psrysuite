@@ -18,7 +18,7 @@ from dispatcher.trackdiagram import TrackDiagram
 from dispatcher.tile import loadTiles
 from dispatcher.train import Train
 from dispatcher.trainlist import ActiveTrainList
-from dispatcher.losttrains import LostTrains
+from dispatcher.losttrains import LostTrains, LostTrainsRecoveryDlg
 from dispatcher.routetraindlg import RouteTrainDlg
 
 from dispatcher.breaker import BreakerDisplay, BreakerName
@@ -111,7 +111,6 @@ class MainFrame(wx.Frame):
 		self.dlgEvents = None
 		self.dlgAdvice = None
 		self.routeTrainDlgs = {}
-		self.busy = None
 		
 		self.locoList = []
 		self.trainList = []
@@ -216,40 +215,45 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_BUTTON, self.OnEditTrains, self.bEditTrains)
 		self.bEditTrains.SetToolTip("Open up the train editor window")
 
-		self.bCheckTrains = wx.Button(self, wx.ID_ANY, "Check Trains", pos=(self.centerOffset+150, 75), size=BTNDIM)
+		self.bCheckTrains = wx.Button(self, wx.ID_ANY, "Check Trains", pos=(self.centerOffset+250, 15), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBCheckTrains, self.bCheckTrains)
 		self.bCheckTrains.SetToolTip("Check trains for continuity and for locomotive number uniqueness")
 		self.bCheckTrains.Enable(False)
 
-		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Train IDs", pos=(self.centerOffset+250, 15), size=BTNDIM)
+		self.bLoadTrains = wx.Button(self, wx.ID_ANY, "Load Train IDs", pos=(self.centerOffset+2000, 15), size=BTNDIM)
 		self.bLoadTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadTrains, self.bLoadTrains)
 		self.bLoadTrains.SetToolTip("Load train IDs from a file")
 		
-		self.bSaveTrains = wx.Button(self, wx.ID_ANY, "Save Train IDs", pos=(self.centerOffset+250, 45), size=BTNDIM)
+		self.bSaveTrains = wx.Button(self, wx.ID_ANY, "Save Train IDs", pos=(self.centerOffset+2000, 45), size=BTNDIM)
 		self.bSaveTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBSaveTrains, self.bSaveTrains)
 		self.bSaveTrains.SetToolTip("Save train IDs to a file")
 		
-		self.bClearTrains = wx.Button(self, wx.ID_ANY, "Clear Train IDs", pos=(self.centerOffset+250, 75), size=BTNDIM)
+		self.bClearTrains = wx.Button(self, wx.ID_ANY, "Clear Train IDs", pos=(self.centerOffset+2000, 75), size=BTNDIM)
 		self.bClearTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBClearTrains, self.bClearTrains)
 		self.bClearTrains.SetToolTip("Repolace train IDs from active trains with temporary names")
 		
-		self.bLoadLocos = wx.Button(self, wx.ID_ANY, "Load Loco #s", pos=(self.centerOffset+350, 15), size=BTNDIM)
+		self.bLoadLocos = wx.Button(self, wx.ID_ANY, "Load Loco #s", pos=(self.centerOffset+2100, 15), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBLoadLocos, self.bLoadLocos)
 		self.bLoadLocos.Enable(False)
 		self.bLoadLocos.SetToolTip("Load locomotive IDs from a file")
 		
-		self.bSaveLocos = wx.Button(self, wx.ID_ANY, "Save Loco #s", pos=(self.centerOffset+350, 45), size=BTNDIM)
+		self.bSaveLocos = wx.Button(self, wx.ID_ANY, "Save Loco #s", pos=(self.centerOffset+2100, 45), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBSaveLocos, self.bSaveLocos)
 		self.bSaveLocos.Enable(False)
 		self.bSaveLocos.SetToolTip("Save locomotive IDs to a file")
 		
-		self.bActiveTrains = wx.Button(self, wx.ID_ANY, "Active Trains", pos=(self.centerOffset+350, 75), size=BTNDIM)
+		self.bActiveTrains = wx.Button(self, wx.ID_ANY, "Active Trains", pos=(self.centerOffset+250, 45), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnBActiveTrains, self.bActiveTrains)
 		self.bActiveTrains.SetToolTip("Show the active train window")
 		self.bActiveTrains.Enable(False)
+		
+		self.bLostTrains = wx.Button(self, wx.ID_ANY, "Lost Trains", pos=(self.centerOffset+250, 75), size=BTNDIM)
+		self.Bind(wx.EVT_BUTTON, self.OnBLostTrains, self.bLostTrains)
+		self.bLostTrains.SetToolTip("Recover lost trains")
+		self.bLostTrains.Enable(False)
 		
 		if not self.IsDispatcher():
 			self.bLoadTrains.Hide()
@@ -259,9 +263,9 @@ class MainFrame(wx.Frame):
 			self.bClearTrains.Hide()
 			self.bEditTrains.Hide()
 
-		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(self.centerOffset+2200, 25), style=wx.TE_READONLY)
-		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(60, -1), pos=(self.centerOffset+2300, 25), style=wx.TE_READONLY)
-		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(60, -1), pos=(self.centerOffset+2380, 25), style=wx.TE_READONLY)
+		self.scrn = wx.TextCtrl(self, wx.ID_ANY, "", size=(80, -1), pos=(self.centerOffset+2260, 25), style=wx.TE_READONLY)
+		self.xpos = wx.TextCtrl(self, wx.ID_ANY, "", size=(60, -1), pos=(self.centerOffset+2360, 25), style=wx.TE_READONLY)
+		self.ypos = wx.TextCtrl(self, wx.ID_ANY, "", size=(60, -1), pos=(self.centerOffset+2440, 25), style=wx.TE_READONLY)
 		
 		self.bResetScreen = wx.Button(self, wx.ID_ANY, "Reset Screen", pos=(int(totalw/2+100), 80), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnResetScreen, self.bResetScreen)
@@ -308,7 +312,7 @@ class MainFrame(wx.Frame):
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBAdvisor, self.cbAdvisor)
 			self.cbAdvisor.Enable(False)
 			
-			self.bSnapshot = wx.Button(self, wx.ID_ANY, "Snapshot", pos=(self.centerOffset+940, 25), size=BTNDIM)
+			self.bSnapshot = wx.Button(self, wx.ID_ANY, "Snapshot", pos=(self.centerOffset+2100, 75), size=BTNDIM)
 			self.bSnapshot.Enable(False)
 			self.Bind(wx.EVT_BUTTON, self.OnBSnapshot, self.bSnapshot)
 
@@ -520,6 +524,9 @@ class MainFrame(wx.Frame):
 	def OnBActiveTrains(self, _):		
 		self.activeTrains.ShowTrainList(self)
 		
+	def OnBLostTrains(self, _):
+		self.RecoverLostTrains()
+	
 	def DefineControlDisplay(self, voffset):
 		if self.IsDispatcher():
 			return 
@@ -925,7 +932,7 @@ class MainFrame(wx.Frame):
 				self.procATC = Popen([sys.executable, atcExec])
 				self.pidATC = self.procATC.pid
 				logging.debug("atc server started as PID %d" % self.pidATC)
-				self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": 1600, "y": 0}}
+				self.pendingATCShowCmd = {"atc": {"action": ["show"], "x": 1560, "y": 0}}
 				wx.CallLater(750, self.sendPendingATCShow)
 			else:
 				self.Request( {"atc": {"action": ["show"]}})
@@ -1802,7 +1809,7 @@ class MainFrame(wx.Frame):
 		
 		if rc != wx.ID_OK:
 			return
-
+		
 		if oldName != trainid or oldLoco != locoid:
 			self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid, "east": "1" if east else "0", "context": "rename"}})
 			
@@ -1828,6 +1835,41 @@ class MainFrame(wx.Frame):
 				self.Request({"ar": {"action": "add" if ar else "remove", "train": trainid}})
 
 		tr.Draw()
+		
+	def RecoverLostTrains(self):
+		ltList = self.lostTrains.GetList()
+		recoverable = []
+		for trid, locoid, engineer, east, block in ltList:
+			if self.blocks[block].HasUnknownTrain():
+				recoverable.append([trid, locoid, engineer, east, block])
+
+		if len(recoverable) == 0:
+			self.PopupAdvice("No trains to recover")
+			return 
+				
+		dlg = LostTrainsRecoveryDlg(self, recoverable)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			torecover = dlg.GetResult()
+
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return 
+		
+		for trid, locoid, engineer, east, block in torecover:
+			if self.blocks[block].HasUnknownTrain():
+				tr = self.blocks[block].GetTrain()
+				oldName, oldLoco = tr.GetNameAndLoco()
+				self.PopupAdvice("Recovering train %s/%s in block %s.  Assign to %s" % (trid, locoid, block, engineer))
+				self.Request({"renametrain": { "oldname": oldName, "newname": trid, "oldloco": oldLoco, "newloco": locoid, "east": "1" if east else "0", "context": "recover"}})
+				
+				tr.SetEngineer(engineer)
+				self.activeTrains.UpdateTrain(trid)
+				parms = {"train": trid, "reassign": 0, "engineer": engineer}
+				req = {"assigntrain": parms}
+				self.Request(req)
+				
+				self.lostTrains.Remove(trid)
 						
 	def ShowTurnoutInfo(self, to):
 		l = to.GetLockedBy()
@@ -2200,6 +2242,7 @@ class MainFrame(wx.Frame):
 			self.bSubscribe.SetLabel("Connect")
 			self.bRefresh.Enable(False)
 			self.bActiveTrains.Enable(False)
+			self.bLostTrains.Enable(False)
 			self.activeTrains.HideTrainList()
 			self.bCheckTrains.Enable(False)
 
@@ -2209,7 +2252,6 @@ class MainFrame(wx.Frame):
 				self.bLoadLocos.Enable(False)
 				self.bSaveTrains.Enable(False)
 				self.bClearTrains.Enable(False)
-				self.bActiveTrains.Enable(False)
 				self.bSaveLocos.Enable(False)
 				self.cbAutoRouter.Enable(False)
 				self.cbATC.Enable(False)
@@ -2233,6 +2275,7 @@ class MainFrame(wx.Frame):
 			self.bSubscribe.SetLabel("Disconnect")
 			self.bRefresh.Enable(True)
 			self.bActiveTrains.Enable(True)
+			self.bLostTrains.Enable(True)
 			self.bCheckTrains.Enable(True)
 			if self.IsDispatcher():
 				self.bSnapshot.Enable(True)
@@ -2300,7 +2343,6 @@ class MainFrame(wx.Frame):
 		self.DoRefresh()
 		
 	def DoRefresh(self):
-		self.busy = wx.BusyCursor()
 		if self.IsDispatcher():
 			self.Request({"clock": { "value": self.timeValue, "status": self.clockStatus}})
 
@@ -2863,15 +2905,10 @@ class MainFrame(wx.Frame):
 			if not self.settings.dispatcher.dispatch:
 				self.Request({"traintimesrequest": {}})
 				
-			if self.busy:
-				del self.busy
-				self.busy = None
-				
 	def DoCmdTrainTimesRequest(self, parms):
 		trains, times = self.activeTrains.GetTrainTimes()
 		resp = {"traintimesreport": {"trains": trains, "times": times}}
 		self.Request(resp)
-		
 
 	def DoCmdTrainTimesReport(self, parms):
 		trains = parms["trains"]
