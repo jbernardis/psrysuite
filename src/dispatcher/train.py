@@ -136,7 +136,7 @@ class Train:
 	
 	def SetSignal(self, sig):
 		self.signal = sig
-		self.aspect = sig.GetAspect()
+		self.aspect = 0 if sig is None else sig.GetAspect()
 	
 	def GetSignal(self):
 		return self.signal, self.aspect, None if self.signal is None else self.signal.GetFrozenAspect()
@@ -148,7 +148,14 @@ class Train:
 		return self.throttle
 
 	def GetBlockNameList(self):
-		return list(self.blocks.keys())
+		bnl = []
+		for bn, blk in self.blocks.items():
+			if blk.IsOS():
+				bnl.append(blk.GetRouteName()[3:])
+			else:
+				bnl.append(bn)
+
+		return bnl
 
 	def GetBlockList(self):
 		return self.blocks

@@ -15,6 +15,7 @@ wildcard = "Bitmap (*.bmp)|*.bmp"
 class MainFrame(wx.Frame):
 	def __init__(self):
 		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE)
+		self.currentPalletteTile = None
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.editor = None
 		
@@ -22,7 +23,7 @@ class MainFrame(wx.Frame):
 		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "diagedit.ico"), wx.BITMAP_TYPE_ANY))
 		self.SetIcon(icon)
 		
-		self.startDirectory = os.getcwd()
+		self.startDirectory = os.path.join(os.getcwd(), "images", "bitmaps", "diagrams")
 		
 		self.pallette = Pallette(self, self.ReportTileSelection, cmdFolder)
 		self.pallette.Show()
@@ -57,13 +58,14 @@ class MainFrame(wx.Frame):
 			style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_PREVIEW)
 
 		rc = dlg.ShowModal()
+		path = None
 		if rc == wx.ID_OK:
 			path = dlg.GetPath()
 			
 		if rc != wx.ID_OK:
 			return
 
-		self.UpdateDirectory(path)	
+		self.UpdateDirectory(path)
 		self.editor = EditTrackDlg(self, path, self.closeEditor, cmdFolder)
 		self.editor.SetCurrentTile(self.currentPalletteTile)
 		self.editor.Show()

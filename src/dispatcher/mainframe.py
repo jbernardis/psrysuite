@@ -2060,6 +2060,7 @@ class MainFrame(wx.Frame):
 	def GetOSProxyInfo(self):
 		counts = {}
 		pnames = {}
+		self.PopupEvent("in getosproxyinfo")
 		for pn, p in self.osProxies.items():
 			rn, occ = p.Evaluate()
 			if rn and occ:

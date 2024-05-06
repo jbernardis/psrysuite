@@ -20,7 +20,7 @@ from dispatcher.constants import aspectname, aspecttype, aspectprofileindex, Reg
 BTNDIM = (80, 23) if sys.platform.lower() == "win32" else (100, 23)
 MAXSTEPS = 9
 
-ignoredCommands = ["breaker", "setroute", "fleet", "control", "siglever", "signallock",
+ignoredCommands = ["breaker", "fleet", "control", "siglever", "signallock",
 				"blockclear", "blockdir", "turnout", "turnoutlock", "clock"]
 
 class Block:
@@ -28,6 +28,8 @@ class Block:
 		self.name = name
 		self.east = True
 		self.train = None
+		self.isOS = False
+		self.route = None
 		
 	def GetName(self):
 		return self.name
@@ -40,6 +42,20 @@ class Block:
 	
 	def SetEast(self, flag=True):
 		self.east = flag
+
+	def SetRoute(self, rtname):
+		self.route = rtname
+		self.isOS = True
+
+	def IsOS(self):
+		return self.isOS
+
+	def GetRouteName(self):
+		if self.route is None:
+			return None
+		else:
+			return self.route
+
 		
 class Signal:
 	def __init__(self, name):
@@ -82,7 +98,7 @@ class Signal:
 		
 	def GetTrain(self):
 		return self.train
-		
+
 class MainFrame(wx.Frame):
 	def __init__(self, settings):
 		wx.Frame.__init__(self, None, size=(1500, 800), style=wx.DEFAULT_FRAME_STYLE)
@@ -327,6 +343,7 @@ class MainFrame(wx.Frame):
 			"signal":			self.DoCmdSignal,
 			"trainsignal":		self.DoCmdTrainSignal,
 			"settrain":			self.DoCmdSetTrain,
+			"setroute":			self.DoCmdSetRoute,
 			"assigntrain":		self.DoCmdAssignTrain,
 			"relay":			self.DoCmdRelay,
 			"dccspeed":			self.DoCmdDCCSpeed,
@@ -403,6 +420,20 @@ class MainFrame(wx.Frame):
 		elif tr is not None and sig is None:
 			tr.SetSignal(None)
 			self.activeTrains.UpdateTrain(trid)
+
+	def DoCmdSetRoute(self, parms):
+		for p in parms:
+			blknm = p["block"]
+			rtnm = p["route"]
+			try:
+				block = self.blocks[blknm]
+			except:
+				block = None
+
+			if block is None:
+				logging.error("Unable to find block %s from setroute message" % blknm)
+			else:
+				block.SetRoute(rtnm)
 
 	def DoCmdSetTrain(self, parms):
 		for p in parms:
@@ -639,14 +670,20 @@ class MainFrame(wx.Frame):
 	def DoCmdEnd(self, parms):
 		if parms["type"] == "layout":
 			self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
-			
+
 		elif parms["type"] == "trains":
 			self.Request({"traintimesrequest": {}})
 
 	def DoCmdTrainTimesReport(self, parms):
-		print("train times report: %s" % str(parms), flush=True)
-		trains = parms["trains"]
-		times = parms["times"]
+		try:
+			trains = parms["trains"]
+			times = parms["times"]
+		except KeyError:
+			trains = None
+
+		if trains is None:
+			return
+
 		for trid, tm in zip(trains, times):
 			try:
 				tr = self.trains[trid]

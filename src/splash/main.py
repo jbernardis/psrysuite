@@ -2,7 +2,7 @@ import wx
 import os
 
 
-versiondate = "4-May-2024"
+versiondate = "6-May-2024"
 
 class MainFrame(wx.Frame):
 	def __init__(self):

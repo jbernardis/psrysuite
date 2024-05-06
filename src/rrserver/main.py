@@ -687,8 +687,9 @@ class ServerMain:
 	def DoTrainTimesReport(self, cmd):
 		addrList = self.clientList.GetFunctionAddress("DISPLAY")
 		for addr, skt in addrList:
-			self.socketServer.sendToOne(skt, addr, {"traintimesreport": {"trains": cmd["trains"], "times": cmd["times"]}})
-	
+			#self.socketServer.sendToOne(skt, addr, {"traintimesreport": {"trains": cmd["trains"], "times": cmd["times"]}})
+			self.socketServer.sendToOne(skt, addr, {"traintimesreport": cmd})
+
 	def DoSetTrain(self, cmd):
 		try:
 			trn = cmd["name"][0]
