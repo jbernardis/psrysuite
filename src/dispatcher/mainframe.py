@@ -2669,7 +2669,7 @@ class MainFrame(wx.Frame):
 						self.UpdateRouteDialogs(trid)
 						if tr.IsInNoBlocks():
 							if not tr.IsBeingEdited():
-								self.PopupEvent("Train %s - detection lost from block %s" % (trid, block))
+								self.PopupEvent("Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
 								self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block)
 							else:
 								tr.SetBeingEdited(False)
@@ -2690,7 +2690,7 @@ class MainFrame(wx.Frame):
 
 					for trid, tr in delList:
 						if not tr.IsBeingEdited():
-							self.PopupEvent("Train %s - detection lost from block %s" % (trid, block))
+							self.PopupEvent("Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
 							self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block)
 						try:
 							self.activeTrains.RemoveTrain(trid)

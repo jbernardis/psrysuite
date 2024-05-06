@@ -50,11 +50,11 @@ class Block:
 	def IsOS(self):
 		return self.isOS
 
-	def GetRouteName(self):
+	def GetRouteDesignator(self):
 		if self.route is None:
 			return None
 		else:
-			return self.route
+			return "{%s}" % self.route[3:]
 
 		
 class Signal:

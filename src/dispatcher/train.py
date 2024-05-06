@@ -151,7 +151,7 @@ class Train:
 		bnl = []
 		for bn, blk in self.blocks.items():
 			if blk.IsOS():
-				bnl.append(blk.GetRouteName()[3:])
+				bnl.append(blk.GetRouteDesignator())
 			else:
 				bnl.append(bn)
 

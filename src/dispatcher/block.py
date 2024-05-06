@@ -295,6 +295,9 @@ class Block:
 
 	def GetName(self):
 		return self.name
+
+	def GetRouteDesignator(self):
+		return self.name
 	
 	def GetAdjacentBlocks(self):
 		return self.blkEast, self.blkWest
@@ -407,8 +410,8 @@ class Block:
 			if occupied and self.train is None and self.frame.IsDispatcher():
 				tr = self.IdentifyTrain(b.IsCleared())
 				if tr is None:
-					self.GetCandidateTrains(self.GetName())
-													
+					self.frame.PopupEvent("Unable to identify train detected in block %s" % self.GetName())
+
 					tr = self.frame.NewTrain()
 					# new trains take on the direction of the block
 					east = self.GetEast()
@@ -441,8 +444,8 @@ class Block:
 			if self.train is None and self.frame.IsDispatcher():
 				tr = self.IdentifyTrain(previouslyCleared)
 				if tr is None:
-					self.GetCandidateTrains(self.GetName())
-								
+					self.frame.PopupEvent("Unable to identify train detected in block %s" % self.GetRouteDesignator())
+
 					tr = self.frame.NewTrain()
 					# new trains take on the direction of the block
 					east = self.GetEast()
@@ -469,23 +472,6 @@ class Block:
 
 		if refresh:
 			self.Draw()
-
-	def GetCandidateTrains(self, blkname):
-		self.frame.PopupEvent("Unable to identify train detected in block %s" % blkname)
-		if blkname not in self.frame.blockAdjacency:
-			return 
-		
-		#self.frame.PopupEvent("Adjacent blocks: %s" % (", ".join(self.frame.blockAdjacency[blkname])))
-		for bn in self.frame.blockAdjacency[blkname]:
-			try:
-				blk = self.frame.blocks[bn]
-			except:
-				blk = None
-			
-			if blk:
-				tr = blk.GetTrain()
-				if tr:
-					self.frame.PopupEvent("Block %s has candidate train %s" % (bn, tr.GetName()))
 
 	def CheckAllUnoccupied(self):
 		if self.occupied:
@@ -1006,6 +992,12 @@ class OverSwitch (Block):
 
 	def GetRouteName(self):
 		return self.rtName
+
+	def GetRouteDesignator(self):
+		if self.route is None:
+			return self.GetName()
+		else:
+			return "{%s}" % self.GetRouteName()[3:]
 
 	def GetRouteType(self, reverse=False):
 		if self.route is None:
