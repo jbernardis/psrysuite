@@ -123,18 +123,24 @@ class MainFrame(wx.Frame):
 		
 		vszrl.AddSpacer(20)
 
-		
+
+
 		dispBox = wx.StaticBox(self, wx.ID_ANY, "Dispatcher/Display")
 		topBorder = dispBox.GetBordersForSizer()[0]
 		boxsizer = wx.BoxSizer(wx.VERTICAL)
 		boxsizer.AddSpacer(topBorder+10)
-		
-		self.cbDispatch = wx.CheckBox(dispBox, wx.ID_ANY, "Dispatcher Mode")
-		boxsizer.Add(self.cbDispatch, 0, wx.LEFT, 40)
-		self.cbDispatch.SetValue(self.settings.dispatcher.dispatch)
-		
+
+		self.rbMode = wx.RadioBox(dispBox, wx.ID_ANY, "Pages", choices=["Dispatch", "Satellite", "Display"])
+		boxsizer.Add(self.rbMode, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+		rbv = 0 if self.settings.dispatcher.dispatch else 1 if self.settings.dispatcher.satellite else 2
+		self.rbMode.SetSelection(rbv)
+
+		# self.cbDispatch = wx.CheckBox(dispBox, wx.ID_ANY, "Dispatcher Mode")
+		# boxsizer.Add(self.cbDispatch, 0, wx.LEFT, 40)
+		# self.cbDispatch.SetValue(self.settings.dispatcher.dispatch)
+		#
 		boxsizer.AddSpacer(10)
-		
+
 		self.cbShowCameras = wx.CheckBox(dispBox, wx.ID_ANY, "Show Cameras")
 		boxsizer.Add(self.cbShowCameras, 0, wx.LEFT, 40)
 		self.cbShowCameras.SetValue(self.settings.display.showcameras)
@@ -445,8 +451,6 @@ class MainFrame(wx.Frame):
 		
 		self.teBrowser.SetValue(path)
 
-		
-		
 	def OnBGenerate(self, _):
 		dlg = GenerateDlg(self, self.GenShortcut)
 		dlg.ShowModal()
@@ -465,8 +469,10 @@ class MainFrame(wx.Frame):
 		self.settings.socketport = int(self.teBroadcastPort.GetValue())
 		self.settings.backupdir = self.teBackupDir.GetValue()
 		self.settings.browser = self.teBrowser.GetValue()
-		
-		self.settings.dispatcher.dispatch = self.cbDispatch.IsChecked()
+
+		rbv = self.rbMode.GetSelection()
+		self.settings.dispatcher.dispatch = rbv == 0
+		self.settings.dispatcher.satellite = rbv == 1
 
 		self.settings.rrserver.rrtty = self.teRRComPort.GetValue()
 		self.settings.rrserver.dcctty = self.teDCCComPort.GetValue()
@@ -503,10 +509,8 @@ class MainFrame(wx.Frame):
 		self.settings.control.nassau = self.rbCtlNassau.GetSelection()
 		self.settings.control.yard = self.rbCtlYard.GetSelection()
 		self.settings.control.signal4l = self.rbCtlSignal4L.GetSelection()
-		
-		
-		
-		if self.settings.SaveAll():		
+
+		if self.settings.SaveAll():
 			dlg = wx.MessageDialog(self, "Configuration Data has been saved", "Data Saved", wx.OK | wx.ICON_INFORMATION)
 		else:
 			dlg = wx.MessageDialog(self, "Unable to save configuration data", "Save Failed", wx.OK | wx.ICON_ERROR)
@@ -514,7 +518,6 @@ class MainFrame(wx.Frame):
 		dlg.ShowModal()
 		dlg.Destroy()
 
-		
 	def OnClose(self, _):
 		self.Destroy()
 

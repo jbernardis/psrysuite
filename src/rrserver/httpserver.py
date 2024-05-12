@@ -324,7 +324,7 @@ class HTTPServer:
 			else:
 				jstr = json.dumps(tl)
 				return 200, jstr
-			
+
 		elif verb == "signallevers":
 			sl = self.rr.GetSignalLevers()
 			if sl is None:
@@ -333,8 +333,16 @@ class HTTPServer:
 			else:
 				jstr = json.dumps(sl)
 				return 200, jstr
-		
-				
+
+		elif verb == "stoprelays":
+			rl = self.rr.GetRelays()
+			if rl is None:
+				logging.info("Unknown error")
+				return 400, "Unable to retrieve relay status"
+			else:
+				jstr = json.dumps(rl)
+				return 200, jstr
+
 		elif verb == "sessions":
 			tl = self.main.GetSessions()
 			if tl is None:

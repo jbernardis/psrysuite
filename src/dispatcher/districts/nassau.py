@@ -17,7 +17,7 @@ class Nassau (District):
 		self.NELocks = [False, False, False]
 
 	def PerformSignalAction(self, sig, callon=False):
-		controlOpt = self.frame.rbNassauControl.GetSelection()
+		controlOpt = self.frame.nassauControl
 		if controlOpt == 0:  # nassau local control
 			self.frame.PopupEvent("Nassau control is local")
 			return
@@ -160,7 +160,7 @@ class Nassau (District):
 		return False
 			
 	def SetUpRoute(self, osblk, route):
-		controlOpt = self.frame.rbNassauControl.GetSelection()
+		controlOpt = self.frame.nassauControl
 		if controlOpt == 0:  # nassau local control
 			self.frame.PopupEvent("Nassau control is local")
 			return
@@ -182,7 +182,7 @@ class Nassau (District):
 		return False		
 
 	def PerformButtonAction(self, btn):
-		controlOpt = self.frame.rbNassauControl.GetSelection()
+		controlOpt = self.frame.nassauControl
 		if controlOpt == 0:  # nassau local control
 			btn.Press(refresh=False)
 			btn.Invalidate(refresh=True)

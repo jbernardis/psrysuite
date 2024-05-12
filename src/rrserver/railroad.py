@@ -248,6 +248,9 @@ class Railroad():
 		vbyte, vbit = od.Bits()[0]
 		od.node.SetOutputBit(vbyte, vbit, 1 if state != 0 else 0)
 
+	def GetRelays(self):
+		return {rn: self.stopRelays[rn].IsActivated() for rn in self.stopRelays.keys()}
+
 	def SetRelay(self, relayname, state):
 		'''
 		turn a stopping relay on/off
@@ -262,6 +265,7 @@ class Railroad():
 		if len(bits) > 0:		
 			vbyte, vbit = bits[0]
 			r.node.SetOutputBit(vbyte, vbit, 1 if state != 0 else 0)
+			r.Activate(state != 0)
 		
 	def GetRouteIn(self, rtnm):
 		try:

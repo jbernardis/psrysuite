@@ -436,5 +436,3 @@ class ChooseSnapshotActionDlg(wx.Dialog):
         
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)
-       
-

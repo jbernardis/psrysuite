@@ -52,7 +52,14 @@ elif mode == "dispatcher":
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
     dispProc = Popen([interpreter, dispExec, "--dispatch"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
- 
+
+elif mode == "satellite":
+    print("launch mode: satellite")
+
+    dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
+    dispProc = Popen([interpreter, dispExec, "--satellite"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
+    print("satellite dispatcher started as PID %d" % dispProc.pid)
+
 elif mode == "simulation":
     print("launch mode: simulation")
     

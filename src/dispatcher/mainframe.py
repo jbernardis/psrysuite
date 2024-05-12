@@ -20,6 +20,7 @@ from dispatcher.train import Train
 from dispatcher.trainlist import ActiveTrainList
 from dispatcher.losttrains import LostTrains, LostTrainsRecoveryDlg
 from dispatcher.routetraindlg import RouteTrainDlg
+from dispatcher.inspectdlg import InspectDlg
 
 from dispatcher.breaker import BreakerDisplay, BreakerName
 from dispatcher.toaster import Toaster
@@ -64,6 +65,7 @@ MENU_TRAIN_ROUTE = 910
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
 allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest", "traintimesrequest" ]
+disallowedSatelliteCommands = [ "relay" ]
 
 wildcardTrain = "train files (*.trn)|*.trn|"	 \
 			"All files (*.*)|*.*"
@@ -119,7 +121,7 @@ class MainFrame(wx.Frame):
 			
 		self.settings = settings
 			
-		logging.info("%s process starting" % "dispatcher" if self.settings.dispatcher.dispatch else "display")
+		logging.info("%s process starting" % "dispatcher" if self.IsDispatcher() else "satellite" if self.IsSatellite() else "display")
 
 		icon = wx.Icon()
 		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "dispatch.ico"), wx.BITMAP_TYPE_ANY))
@@ -131,10 +133,14 @@ class MainFrame(wx.Frame):
 		self.buttonMap = {}
 		self.signalMap = {}
 		self.handswitchMap = {}
+
+		self.yardControl = 0
+		self.nassauControl = 0
+		self.cliffControl = 0
 		
 		self.delayedRequests = DelayedRequests()
 
-		self.title = "PSRY Dispatcher" if self.settings.dispatcher.dispatch else "PSRY Monitor"
+		self.title = "PSRY Dispatcher" if self.IsDispatcher() else "Satellite" if self.IsSatellite() else "PSRY Monitor"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.bitmaps = BitMaps(os.path.join(os.getcwd(), "images", "bitmaps"))
 		singlePage = self.settings.display.pages == 1
@@ -398,10 +404,12 @@ class MainFrame(wx.Frame):
 				pnl.SetShift(False)
 				
 		elif kcd == wx.WXK_F1:
-			self.GetOSProxyInfo()
-				
+			dlg = InspectDlg(self)
+			dlg.ShowModal()
+			dlg.Destroy()
+
 		else:
-			self.PopupEvent("Key Code: %d" % kcd)
+			#self.PopupEvent("Key Code: %d" % kcd)
 			evt.Skip()
 
 	def OnKeyUp(self, evt):
@@ -558,6 +566,7 @@ class MainFrame(wx.Frame):
 			return
 		
 		if name == "yard":
+			self.yardControl = value
 			if value == 0:
 				self.stYardControl.SetLabel("YARD: Local")
 			elif value == 1:
@@ -570,6 +579,7 @@ class MainFrame(wx.Frame):
 				self.stSignal4Control.SetLabel("SIGNAL 4: Dispatch")
 				
 		elif name == "nassau":
+			self.nassauControl = value
 			if value == 0:
 				self.stNassauControl.SetLabel("NASSAU: Local")
 			elif value == 1:
@@ -578,6 +588,7 @@ class MainFrame(wx.Frame):
 				self.stNassauControl.SetLabel("NASSAU: Dispatch All")
 				
 		elif name == "cliff":
+			self.cliffControl = value
 			if value == 0:
 				self.stCliffControl.SetLabel("CLIFF: Local")
 			elif value == 1:
@@ -752,6 +763,7 @@ class MainFrame(wx.Frame):
 		elif name == "yard":
 			self.rbYardControl.SetSelection(value)
 			self.cbYardFleet.Enable(value != 0)
+			self.yardControl = value
 			
 		elif name == "signal4":
 			self.rbS4Control.SetSelection(value)
@@ -1243,6 +1255,12 @@ class MainFrame(wx.Frame):
 	def IsDispatcher(self):
 		return self.settings.dispatcher.dispatch
 
+	def IsSatellite(self):
+		return self.settings.dispatcher.satellite
+
+	def IsDispatcherOrSatellite(self):
+		return self.settings.dispatcher.dispatch or self.settings.dispatcher.satellite
+
 	def resolveObjects(self):
 		for _, bk in self.blocks.items():
 			sgWest, sgEast = bk.GetSBSignals()
@@ -1410,7 +1428,7 @@ class MainFrame(wx.Frame):
 			if to.IsDisabled():
 				return
 
-			if self.IsDispatcher():
+			if self.IsDispatcherOrSatellite():
 				to.GetDistrict().PerformTurnoutAction(to, force=shift)
 			return
 
@@ -1434,7 +1452,7 @@ class MainFrame(wx.Frame):
 			if right or shift:  # only process left clicks here
 				return
 			
-			if self.IsDispatcher():
+			if self.IsDispatcherOrSatellite():
 				btn.GetDistrict().PerformButtonAction(btn)
 			return
 
@@ -1465,7 +1483,7 @@ class MainFrame(wx.Frame):
 			if sig.IsDisabled():
 				return
 
-			if self.IsDispatcher():
+			if self.IsDispatcherOrSatellite():
 				sig.GetDistrict().PerformSignalAction(sig, callon=shift)
 			return
 
@@ -1481,7 +1499,7 @@ class MainFrame(wx.Frame):
 			if hs.IsDisabled():
 				return
 			
-			if self.IsDispatcher():
+			if self.IsDispatcherOrSatellite():
 				hs.GetDistrict().PerformHandSwitchAction(hs)
 			return
 
@@ -2060,21 +2078,19 @@ class MainFrame(wx.Frame):
 	def GetOSProxyInfo(self):
 		counts = {}
 		pnames = {}
-		self.PopupEvent("in getosproxyinfo")
+		osnames = {}
 		for pn, p in self.osProxies.items():
-			rn, occ = p.Evaluate()
+			rn, occ, osname = p.Evaluate()
 			if rn and occ:
 				counts[rn] = counts.get(rn, 0) + 1
+				osnames[rn] = osname
 				if rn in pnames:
 					pnames[rn].append(pn)
 				else:
 					pnames[rn] = [pn]
-		
-		for rn in counts.keys():
-			ct = counts[rn]
-			pn = ", ".join(pnames[rn])
-			self.PopupEvent(f'{rn}: {ct} ({pn})')
-			
+
+		return {rn: {"count": counts[rn], "os": osnames[rn], "segments": pnames[rn]} for rn in counts.keys()}
+
 	def GetBlockStatus(self, blknm):
 		try:
 			blk = self.blocks[blknm]
@@ -2838,9 +2854,9 @@ class MainFrame(wx.Frame):
 				
 			tr.Draw()
 	
-	def DoCmdClock(self, parms):				
+	def DoCmdClock(self, parms):
 		if self.IsDispatcher():
-			return 
+			return
 		
 		self.timeValue = int(parms[0]["value"])
 		status = int(parms[0]["status"])
@@ -2886,14 +2902,14 @@ class MainFrame(wx.Frame):
 	def DoCmdSessionID(self, parms):
 		self.sessionid = int(parms)
 		logging.info("connected to railroad server with session ID %d" % self.sessionid)
-		self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.settings.dispatcher.dispatch else "DISPLAY"}})
+		self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.IsDispatcher() else "SATELLITE" if self.IsSatellite() else "DISPLAY"}})
 		self.DoRefresh()
 		self.districts.OnConnect()
 		self.ShowTitle()
 
 	def DoCmdEnd(self, parms):
 		if parms["type"] == "layout":
-			if self.settings.dispatcher.dispatch:
+			if self.IsDispatcher():
 				self.SendBlockDirRequests()
 				self.SendOSRoutes()
 				self.SendCrossoverPoints()
@@ -2903,7 +2919,7 @@ class MainFrame(wx.Frame):
 			self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 			
 		elif parms["type"] == "trains":
-			if not self.settings.dispatcher.dispatch:
+			if not self.IsDispatcher():
 				self.Request({"traintimesrequest": {}})
 				
 	def DoCmdTrainTimesRequest(self, parms):
@@ -2924,11 +2940,11 @@ class MainFrame(wx.Frame):
 				tr.SetTime(None if tm == -1 else tm)
 					
 	def DoCmdAdvice(self, parms):
-		if self.IsDispatcher() or self.settings.display.showadvice:
+		if self.IsDispatcherOrSatellite() or self.settings.display.showadvice:
 			self.PopupAdvice(parms["msg"][0])
 					
 	def DoCmdAlert(self, parms):
-		if self.IsDispatcher() or self.settings.display.showevents:
+		if self.IsDispatcherOrSatellite() or self.settings.display.showevents:
 			logging.info("ALERT: %s" % (str(parms)))
 			self.PopupEvent(parms["msg"][0])
 				
@@ -3065,10 +3081,12 @@ class MainFrame(wx.Frame):
 		except RuntimeError:
 			logging.info("Runtime error caught while trying to post disconnect event - not a problem if this is during shutdown")
 
+	def SendAlertRequest(self, msg):
+		self.Request({"alert": {"msg": [msg]}})
+
 	def Request(self, req, force=False):
 		command = list(req.keys())[0]
-		if self.IsDispatcher() or command in allowedCommands:
-			
+		if self.CommandAllowed(command):
 			if self.subscribed or force:
 				if "delay" in req[command] and req[command]["delay"] > 0:
 					self.delayedRequests.Append(req)
@@ -3077,6 +3095,15 @@ class MainFrame(wx.Frame):
 					self.rrServer.SendRequest(req)
 		else:
 			logging.info("disallowing command %s from non dispatcher" % command)
+
+	def CommandAllowed(self, cmd):
+		if self.IsDispatcher():
+			return True
+
+		if self.IsSatellite():
+			return cmd not in disallowedSatelliteCommands
+
+		return cmd in allowedCommands
 					
 	def Get(self, cmd, parms):
 		return self.rrServer.Get(cmd, parms)
@@ -3409,7 +3436,7 @@ class MainFrame(wx.Frame):
 				pass
 			
 		self.Destroy()
-		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Display"))
+		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Satellite" if self.IsSatellite() else "Display"))
 		
 
 	def GetDebugFlags(self):

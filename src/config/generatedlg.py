@@ -38,10 +38,14 @@ class GenerateDlg(wx.Dialog):
 		self.bGenSimulation = wx.Button(genBox, wx.ID_ANY, "Simulation", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenSimulation, self.bGenSimulation)
 		vsz.Add(self.bGenSimulation, 0, wx.ALL, 10)
-					
+
 		self.bGenDisplay = wx.Button(genBox, wx.ID_ANY, "Display", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenDisplay, self.bGenDisplay)
 		vsz.Add(self.bGenDisplay, 0, wx.ALL, 10)
+
+		self.bGenSatellite = wx.Button(genBox, wx.ID_ANY, "Satellite", size=GENBTNSZ)
+		self.Bind(wx.EVT_BUTTON, self.OnBGenSatellite, self.bGenSatellite)
+		vsz.Add(self.bGenSatellite, 0, wx.ALL, 10)
 
 		self.bGenActive = wx.Button(genBox, wx.ID_ANY, "Active Trains", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenActive, self.bGenActive)
@@ -135,18 +139,29 @@ class GenerateDlg(wx.Dialog):
 		self.SetSizer(hszr)
 		self.Fit()
 		self.Layout()
-		
+
 	def OnBGenDispatch(self, _):
 		module = {
 			"name": "PSRY Dispatcher Suite",
-			"dir":  "launcher",
+			"dir": "launcher",
 			"main": "main.py",
 			"desc": "Launcher for Local Dispatcher",
 			"icon": "launcher.ico",
 			"parameter": "dispatcher"
 		}
 		self.generator(module, self.cbStartMenu.IsChecked())
-		
+
+	def OnBGenSatellite(self, _):
+		module = {
+			"name": "PSRY Satellite",
+			"dir": "launcher",
+			"main": "main.py",
+			"desc": "Launcher for Dispatcher Satellite",
+			"icon": "launcher.ico",
+			"parameter": "satellite"
+		}
+		self.generator(module, self.cbStartMenu.IsChecked())
+
 	def OnBGenRemoteDispatch(self, _):
 		module = {
 			"name": "PSRY Remote Dispatcher",

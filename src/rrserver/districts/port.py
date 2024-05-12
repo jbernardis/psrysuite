@@ -202,9 +202,9 @@ class Port(District):
 			self.rr.AddBlock("P30.E",  self, n, addr, [(2, 0)], False)
 			self.rr.AddBlock("POSPJ1", self, n, addr, [(2, 1)], False)
 			self.rr.AddBlock("POSPJ2", self, n, addr, [(2, 2)], False)
-			sbw = self.rr.AddBlock("P50.W",  self, n, addr, [(2, 3)], False)
+			sbw = self.rr.AddBlock("P50.W",  self, n, addr, [(2, 5)], False)
 			b = self.rr.AddBlock("P50",    self, n, addr, [(2, 4)], False)
-			sbe = self.rr.AddBlock("P50.E",  self, n, addr, [(2, 5)], False)
+			sbe = self.rr.AddBlock("P50.E",  self, n, addr, [(2, 3)], False)
 			b.AddStoppingBlocks([sbe, sbw])
 			
 			sbw = self.rr.AddBlock("P11.W",  self, n, addr, [(2, 6)], False)

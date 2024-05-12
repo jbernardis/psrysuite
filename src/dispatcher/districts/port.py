@@ -1082,7 +1082,7 @@ class Port (District):
 			"P42": ("PB12R",  "S16R"),
 			"P30": ("PB4L",   "PA32RB"),
 			"P40": ("PB2L",   None),			
-			"P50": ("Y4RA",  "PA34LA")
+			"P50": ("PA34LA", "Y4RA")
 		}
 
 		for blknm, siglist in blockSbSigs.items():
@@ -1109,7 +1109,7 @@ class Port (District):
 			"P41": ("PB2R",   "PB12L"),			
 			"P42": ("PB12R",  "S16R"),
 			
-			"P50": ("Y4RA",   "PA34LA"),
+			"P50": ("PA34LA", "Y4RA"),
 			"P60": ("PA12LB", "PA34RB"),
 			"P61": ("PA12LC", "PA34RC"),
 			"P62": ("PA6LA",  None),

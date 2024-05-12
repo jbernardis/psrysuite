@@ -31,13 +31,12 @@ class Settings:
 	def __init__(self):
 		self.datafolder = os.path.join(os.getcwd(), "data")
 		self.inifile = os.path.join(self.datafolder, INIFILE)
-		
+
 		
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
 		if not self.cfg.read(self.inifile):
 			print("Settings file %s does not exist.  Using default values" % INIFILE)
-		
 		section = "rrserver"
 		self.rrserver = SNode()
 		self.rrserver.simulation = False
@@ -141,6 +140,7 @@ class Settings:
 		section = "dispatcher"
 		self.dispatcher = SNode()
 		self.dispatcher.dispatch = True
+		self.dispatcher.satellite = False
 		self.dispatcher.precheckshutdownserver = True
 		self.dispatcher.clockstarttime = 355
 		self.dispatcher.matrixturnoutdelay = 2
@@ -148,6 +148,9 @@ class Settings:
 			for opt, value in self.cfg.items(section):
 				if opt == 'dispatch':
 					self.dispatcher.dispatch = parseBoolean(value, False)
+
+				elif opt == 'satellite':
+					self.dispatcher.satellite = parseBoolean(value, False)
 
 				elif opt == 'precheckshutdownserver':
 					self.dispatcher.precheckshutdownserver = parseBoolean(value, True)
@@ -168,10 +171,13 @@ class Settings:
 						s = 355
 					self.dispatcher.clockstarttime = s
 
-
 		else:
 			print("Missing %s section - assuming defaults" % section)
-			
+
+		if self.dispatcher.dispatch and self.dispatcher.satellite:
+			print("Cannot have bpoth dispatch and satellite enabled at the same time.  Assuming dispatch only")
+			self.dispatcher.satellite = False
+
 		section = "display"
 		self.display = SNode()
 		self.display.pages = 3
@@ -208,7 +214,7 @@ class Settings:
 			print("Missing %s section - assuming defaults" % section)
 
 		section = "activetrains" 
-		self.activetrains = SNode()     
+		self.activetrains = SNode()
 		self.activetrains.lines = 4     
 		self.activetrains.suppressyards = True
 		self.activetrains.suppressunknown = False
@@ -246,7 +252,7 @@ class Settings:
 		ct += 1 if self.activetrains.onlyatc else 0
 		if ct > 1:
 			if self.activetrains.onlyassignedorunknown:
-				self.activetraiuns.suppressunknown = False
+				self.activetrains.suppressunknown = False
 				self.activetrains.onlyassigned = False
 				self.activetrains.onlyatc = False
 			elif self.activetrains.onlyassigned:
@@ -310,20 +316,27 @@ class Settings:
 			print("Missing global section - assuming defaults")
 			
 		try:
-			opts, _ = getopt.getopt(sys.argv[1:],"",["dispatch","display", "simulate"])
+			opts, _ = getopt.getopt(sys.argv[1:],"",["dispatch","display", "simulate", "satellite"])
 		except getopt.GetoptError:
 			print ('Invalid command line arguments - ignoring')
 			return 
 		
 		for opt, _ in opts:
+			print("command line option: %s" % opt, flush=True)
 			if opt == "--display":
 				self.dispatcher.dispatch = False
 				print("Overriding dispatch flag. Using command line: False")
 
 			elif opt == "--dispatch":
 				self.dispatcher.dispatch = True
+				self.dispatcher.satellite = False
 				print("Overriding dispatch flag. Using command line: True")
-				
+
+			elif opt == "--satellite":
+				self.dispatcher.dispatch = False
+				self.dispatcher.satellite = True
+				print("Overriding satellite flag. Using command line: True")
+
 			elif opt in [ "--simulate", "--sim" ]:
 				self.rrserver.simulation = True
 				print("Overriding simulation flag. Using command line: True")
@@ -333,6 +346,7 @@ class Settings:
 				print("Overriding simulation flag. Using command line: False")
 		
 	def SaveAll(self):
+		print("entering saveall", flush=True)
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
 		if not self.cfg.read(self.inifile):
@@ -376,14 +390,15 @@ class Settings:
 		self.cfg.set(section, "yard",     "%d" % self.control.yard)
 		self.cfg.set(section, "signal4l", "%d" % self.control.signal4l)
 
-		
 		section = "dispatcher"
 		try:
 			self.cfg.add_section(section)
 		except configparser.DuplicateSectionError:
 			pass
 
+		print("set dispatch/satellite to %s/%s" % (self.dispatcher.dispatch, self.dispatcher.satellite), flush=True)
 		self.cfg.set(section, "dispatch", "True" if self.dispatcher.dispatch else "False")
+		self.cfg.set(section, "satellite", "True" if self.dispatcher.satellite else "False")
 		self.cfg.set(section, "precheckshutdownserver", "True" if self.dispatcher.precheckshutdownserver else "False")
 		self.cfg.set(section, "clockstarttime",   "%d" % self.dispatcher.clockstarttime)
 		self.cfg.set(section, "matrixturnoutdelay",   "%d" % self.dispatcher.matrixturnoutdelay)
@@ -437,7 +452,7 @@ class Settings:
 		
 		
 		
-		try:		
+		try:
 			cfp = open(self.inifile, 'w')
 		except:
 			print("Unable to open settings file %s for writing" % self.inifile)

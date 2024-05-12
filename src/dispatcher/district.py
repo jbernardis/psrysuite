@@ -926,7 +926,6 @@ class District:
 		return blocks
 		
 	def CheckOSProxies(self, block, state):
-  # self.frame.PopupEvent("check proxies for %s  %s" % (block, str(state)))
 		if block not in self.osProxies:
 			return block
 		
@@ -937,9 +936,7 @@ class District:
 		
 		self.osProxies[block].SetOccupied(state)
 		postCounts = self.GetOSProxyCounts()
-  # self.frame.PopupEvent("PRE:  %s" % str(preCounts))
-  # self.frame.PopupEvent("POST: %s" % str(postCounts))
-		
+
 		for rn in preCounts:
 			# there SHOULD only be a single route, MAX, that changes
 			if postCounts[rn] > preCounts[rn] and preCounts[rn] == 0:

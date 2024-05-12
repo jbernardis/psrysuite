@@ -13,7 +13,7 @@ class Cliveden (District):
 		District.__init__(self, name, frame, screen)
 		
 	def PerformHandSwitchAction(self, hs):
-		controlOpt = self.frame.rbCliffControl.GetSelection()
+		controlOpt = self.frame.cliffControl
 		if controlOpt == 0:  # cliff local control or limited to bank/cliveden (handled in those districts)
 			msg = "Cliff control is local"
 			self.frame.PopupEvent(msg)
@@ -22,7 +22,7 @@ class Cliveden (District):
 		District.PerformHandSwitchAction(self, hs)
 		
 	def SetUpRoute(self, osblk, route):
-		controlOpt = self.frame.rbCliffControl.GetSelection()
+		controlOpt = self.frame.cliffControl
 		if controlOpt == 0:  # Cliveden local control
 			self.frame.PopupEvent("Cliveden control is local")
 			return
@@ -30,7 +30,7 @@ class Cliveden (District):
 		District.SetUpRoute(self, osblk, route)
 
 	def PerformTurnoutAction(self, turnout, force=False):
-		controlOpt = self.frame.rbCliffControl.GetSelection()
+		controlOpt = self.frame.cliffControl
 		if controlOpt == 0:  # Cliveden local control
 			self.frame.PopupEvent("Cliveden control is local")
 			return
@@ -38,7 +38,7 @@ class Cliveden (District):
 		District.PerformTurnoutAction(self, turnout, force=force)
 
 	def PerformSignalAction(self, sig, callon=False):
-		controlOpt = self.frame.rbCliffControl.GetSelection()
+		controlOpt = self.frame.cliffControl
 		if controlOpt == 0:  # Cliveden local control
 			self.frame.PopupEvent("Cliveden control is local")
 			return

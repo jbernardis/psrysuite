@@ -80,7 +80,7 @@ class Yard (District):
 			"YSw27", "YSw29", "YSw33", "YSw113", "YSw115", "YSw116", "YSw131", "YSw132", "YSw134"])
 
 	def PerformSignalAction(self, sig, callon=False):
-		controlOpt = self.frame.rbYardControl.GetSelection()
+		controlOpt = self.frame.yardControl
 		if controlOpt == 0:  # Yard local control
 			self.frame.PopupEvent("Yard control is local")
 			return
@@ -88,7 +88,7 @@ class Yard (District):
 		District.PerformSignalAction(self, sig, callon=callon)
 			
 	def SetUpRoute(self, osblk, route):
-		controlOpt = self.frame.rbYardControl.GetSelection()
+		controlOpt = self.frame.yardControl
 		if controlOpt == 0:  # Yard local control
 			self.frame.PopupEvent("Yard control is local")
 			return
@@ -101,7 +101,7 @@ class Yard (District):
 			self.frame.Request({"nxbutton": { "button": bname}})
 
 	def PerformButtonAction(self, btn):
-		controlOpt = self.frame.rbYardControl.GetSelection()
+		controlOpt = self.frame.yardControl
 		if controlOpt == 0:  # yard local control
 			btn.Press(refresh=False)
 			btn.Invalidate(refresh=True)

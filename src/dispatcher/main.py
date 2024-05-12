@@ -11,6 +11,8 @@ settings = Settings()
 
 if settings.dispatcher.dispatch:
 	fn = "dispatch"
+elif settings.dispatcher.satellite:
+	fn = "satellite"
 else:
 	fn = "display"
 

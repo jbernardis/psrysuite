@@ -410,7 +410,8 @@ class Block:
 			if occupied and self.train is None and self.frame.IsDispatcher():
 				tr = self.IdentifyTrain(b.IsCleared())
 				if tr is None:
-					self.frame.PopupEvent("Unable to identify train detected in block %s" % self.GetName())
+					#self.frame.PopupEvent("Unable to identify train detected in block %s" % self.GetName())
+					self.frame.SendAlertRequest("Unable to identify train detected in block %s" % self.GetName())
 
 					tr = self.frame.NewTrain()
 					# new trains take on the direction of the block
@@ -444,7 +445,8 @@ class Block:
 			if self.train is None and self.frame.IsDispatcher():
 				tr = self.IdentifyTrain(previouslyCleared)
 				if tr is None:
-					self.frame.PopupEvent("Unable to identify train detected in block %s" % self.GetRouteDesignator())
+					#self.frame.PopupEvent("Unable to identify train detected in block %s" % self.GetRouteDesignator())
+					self.frame.SendAlertRequest("Unable to identify train detected in block %s" % self.GetName())
 
 					tr = self.frame.NewTrain()
 					# new trains take on the direction of the block
@@ -659,30 +661,20 @@ class StoppingBlock (Block):
 		bname = self.block.GetName()
 		direction = "East" if self.eastend else "West"
 
-		if self.block.east:
-			blk = self.block.blkEast
-			if district.CrossingEastWestBoundary(blk, mainBlk):
-				signm = self.block.sbSigWest
-			else:
-				signm = self.block.sbSigEast
-		else:
-			blk = self.block.blkWest
-			if district.CrossingEastWestBoundary(blk, mainBlk):
-				signm = self.block.sbSigEast
-			else:
-				signm = self.block.sbSigWest
-		
-		if not signm:
-			logging.debug("No action on stopping block because no signal identified")
-			return 
-		
+		blk = self.block.blkEast if self.block.east else self.block.blkWest
 		if blk is None:
 			logging.debug("no known exit block from %s" % mainBlk.GetName())
 			# we don't know the exit block - this means the OS is set to a different
 			# route and the signal should be red - assert that stopping block is active
-			logging.debug("===activating stopping relay for block %s %s because unable to identify next block" % (bname, direction))
+			logging.debug("===activating stopping relay for block %s %s because unable to identify next block" % (
+			bname, direction))
 			self.Activate(True)
 			return
+
+		signm = self.block.sbSigEast if self.block.east else self.block.sbSigWest
+		if not signm:
+			logging.debug("No action on stopping block because no signal identified")
+			return 
 		
 		logging.debug("evaluate stopping section, %s -> %s" % (mainBlk.GetName(), blk.GetName()))
 		
@@ -715,6 +707,7 @@ class StoppingBlock (Block):
 		
 		# in all other cases, activate based solely on the signal value
 		sv = self.frame.GetSignalByName(signm).GetAspect()
+
 		# activate the stopping block if the signal is red, deactivate if not
 		if sv == 0:
 			logging.debug("===activating stopping relay for block %s %s because signal aspect = %x" % (bname, direction, sv))
@@ -861,6 +854,7 @@ class OSProxy:
 	
 	def Evaluate(self):
 		routeName = None
+		osName = None
 		rlist = self.routes.keys()
 		for osb in self.osList:
 			rte = osb.GetRoute()
@@ -868,8 +862,9 @@ class OSProxy:
 				rtname = rte.GetName()
 				if rtname in rlist:
 					routeName = rtname
+					osName = rte.GetOSName()
 					
-		return routeName, self.occupied
+		return routeName, self.occupied, osName
 	
 	def __str__(self):
 		rtes = []

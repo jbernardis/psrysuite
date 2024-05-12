@@ -14,7 +14,7 @@ class Cliff (District):
 		District.__init__(self, name, frame, screen)
 		
 	def PerformHandSwitchAction(self, hs):
-		controlOpt = self.frame.rbCliffControl.GetSelection()
+		controlOpt = self.frame.cliffControl
 		if controlOpt != 2:  # cliff local control or limited to bank/cliveden (handled in those districts)
 			if controlOpt == 0:
 				msg = "Cliff control is local"
@@ -26,7 +26,7 @@ class Cliff (District):
 		District.PerformHandSwitchAction(self, hs)
 
 	def PerformSignalAction(self, sig, callon=False):
-		controlOpt = self.frame.rbCliffControl.GetSelection()
+		controlOpt = self.frame.cliffControl
 		if controlOpt != 2:  # cliff local control or limited to bank/cliveden (handled in those districts)
 			if controlOpt == 0:
 				msg = "Cliff control is local"
@@ -38,7 +38,7 @@ class Cliff (District):
 		District.PerformSignalAction(self, sig, callon=callon)
 			
 	def SetUpRoute(self, osblk, route):
-		controlOpt = self.frame.rbCliffControl.GetSelection()
+		controlOpt = self.frame.cliffControl
 		if controlOpt == 0:  # Cliff local control
 			self.frame.PopupEvent("Cliff control is local")
 			return
@@ -58,7 +58,7 @@ class Cliff (District):
 		self.PerformButtonAction(btn)
 
 	def PerformButtonAction(self, btn):
-		controlOpt = self.frame.rbCliffControl.GetSelection()
+		controlOpt = self.frame.cliffControl
 		if controlOpt != 2:  # cliff local control or limited to bank/cliveden (handled in those districts)
 			btn.Press(refresh=False)
 			btn.Invalidate(refresh=True)

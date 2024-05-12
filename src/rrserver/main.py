@@ -509,14 +509,14 @@ class ServerMain:
 		resp = {"clock": [{ "value": value, "status": status}]}
 		self.timeValue = value
 		self.clockStatus = status
-		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER")
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)
 			
 	def DoDCCSpeed(self, cmd):
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"dccspeed": [p]}
-		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("TRACKER")
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("TRACKER")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)
 			
@@ -594,7 +594,7 @@ class ServerMain:
 			self.CrossoverPoints.append(b.split(":"))
 			
 	def DoGenLayout(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		if len(addrList) == 0:
 			logging.error("Cannot generate layout information until dispatcher has connected")
 		else:
@@ -622,7 +622,7 @@ class ServerMain:
 		self.rr.SetControlOption(name, value)
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"control": [p]}
-		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)
 		
@@ -680,7 +680,7 @@ class ServerMain:
 			self.sendSubBlocks(addr, skt)
 			
 	def DoTrainTimesRequest(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"traintimesrequest": {}})
 			
@@ -775,7 +775,7 @@ class ServerMain:
 		self.socketServer.sendToAll(resp)
 		
 	def GetTrainList(self):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"dumptrains": ""})
 		return self.trainList.GetTrainList()
@@ -807,7 +807,7 @@ class ServerMain:
 				self.socketServer.sendToAll(cmd)
 
 	def DoCheckTrains(self, cnd):				
-		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"checktrains": {}})
 		
@@ -821,12 +821,12 @@ class ServerMain:
 		self.socketServer.sendToAll(resp)
 	
 	def DoAdvice(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"advice": cmd})
 	
 	def DoAlert(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"alert": cmd})
 				
@@ -880,17 +880,17 @@ class ServerMain:
 			self.pidADV = None
 			
 	def DoATC(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atc": cmd})
 				
 	def DoATCRequest(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atcrequest": cmd})
 				
 	def DoARRequest(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"arrequest": cmd})
 					
