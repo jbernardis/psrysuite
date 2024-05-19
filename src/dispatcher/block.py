@@ -136,6 +136,7 @@ class Block:
 		self.entrySignal = None
 		self.entryAspect = 0
 		self.lastSubBlockEntered = None
+		self.dbg = self.frame.GetDebugFlags()
 
 	def SetTrain(self, train):
 		self.train = train
@@ -506,6 +507,9 @@ class Block:
 			self.sbWest.EvaluateStoppingSection()
 
 	def IdentifyTrain(self, cleared):
+		if self.dbg.identifytrain:
+			self.frame.DebugMessage("========New Train Identification========")
+			self.frame.DebugMessage("Attempting to identify train in block %s" % self.GetName())
 		#=======================================================================
 		# uncomment the following code to not identify trains that cross into a block against the signal
 		#
@@ -519,68 +523,159 @@ class Block:
 			'''
 			first look west, then east, then create a new train
 			'''
+			if self.dbg.identifytrain:
+				self.frame.DebugMessage("Eastbound block - look west first")
 			if self.blkWest:
 				if self.blkWest.GetName() in ["KOSN10S11", "KOSN20S21"]:
+					if self.dbg.identifytrain:
+						self.frame.DebugMessage("Special case for null blocks KOSN10S11 and KOSN20S21")
+
 					blkWest = self.blkWest.blkWest
 					if blkWest:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Using block %s instead of null block" % blkWest.GetName())
 						tr = blkWest.GetTrain()
 						if tr:
-							self.CheckEWCross(tr, blkWest)	
+							self.CheckEWCross(tr, blkWest)
+							if self.dbg.identifytrain:
+								self.frame.DebugMessage("Returning train %s" % tr.GetName())
 							return tr
+						else:
+							if self.dbg.identifytrain:
+								self.frame.DebugMessage("Block %s did not have a train to consider" % blkWest.GetName())
+					else:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("No block west to examine")
 				else:
+					if self.dbg.identifytrain:
+						self.frame.DebugMessage("Looking at block %s" % self.blkWest.GetName())
 					tr = self.blkWest.GetTrain()
 					if tr:
-						self.CheckEWCross(tr, self.blkWest)						
+						self.CheckEWCross(tr, self.blkWest)
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Returning train %s" % tr.GetName())
 						return tr
-			
+					else:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkWest.GetName())
+
+			if self.dbg.identifytrain:
+				self.frame.DebugMessage("Eastbound block - nothing found west - now look east")
 			if self.blkEast:
 				if self.blkEast.GetName() in ["KOSN10S11", "KOSN20S21"]:
+					if self.dbg.identifytrain:
+						self.frame.DebugMessage("Special case for null blocks KOSN10S11 and KOSN20S21")
+
 					blkEast = self.blkEast.blkEast
 					if blkEast:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Using block %s instead of null block" % blkEast.GetName())
 						tr = blkEast.GetTrain()
 						if tr:
-							self.CheckEWCross(tr, blkEast)							
+							self.CheckEWCross(tr, blkEast)
+							if self.dbg.identifytrain:
+								self.frame.DebugMessage("Returning train %s" % tr.GetName())
 							return tr
+						else:
+							if self.dbg.identifytrain:
+								self.frame.DebugMessage("Block %s did not have a train to consider" % blkEast.GetName())
+					else:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("No block east to examine")
 
 				else:
+					if self.dbg.identifytrain:
+						self.frame.DebugMessage("Looking at block %s" % self.blkEast.GetName())
 					tr = self.blkEast.GetTrain()
 					if tr:
-						self.CheckEWCross(tr, self.blkEast)							
+						self.CheckEWCross(tr, self.blkEast)
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Returning train %s" % tr.GetName())
 						return tr
-		
+					else:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkEast.GetName())
+
 		else:
 			'''
 			first look east, then west, then create a new train
 			'''
+			if self.dbg.identifytrain:
+				self.frame.DebugMessage("Westbound block - look east first")
 			if self.blkEast:
 				if self.blkEast.GetName() in ["KOSN10S11", "KOSN20S21"]:
+					if self.dbg.identifytrain:
+						self.frame.DebugMessage("Special case for null blocks KOSN10S11 and KOSN20S21")
+
 					blkEast = self.blkEast.blkEast
 					if blkEast:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Using block %s instead of null block" % blkEast.GetName())
 						tr = blkEast.GetTrain()
 						if tr:
-							self.CheckEWCross(tr, blkEast)						
+							self.CheckEWCross(tr, blkEast)
+							if self.dbg.identifytrain:
+								self.frame.DebugMessage("Returning train %s" % tr.GetName())
 							return tr
+						else:
+							if self.dbg.identifytrain:
+								self.frame.DebugMessage("Block %s did not have a train to consider" % blkEast.GetName())
+					else:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("No block east to examine")
 
 				else:
+					if self.dbg.identifytrain:
+						self.frame.DebugMessage("Looking at block %s" % self.blkEast.GetName())
 					tr = self.blkEast.GetTrain()
 					if tr:
-						self.CheckEWCross(tr, self.blkEast)						
+						self.CheckEWCross(tr, self.blkEast)
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Returning train %s" % tr.GetName())
 						return tr
-					
+					else:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkEast.GetName())
+
+			if self.dbg.identifytrain:
+				self.frame.DebugMessage("Westbound block - nothing found east - now look west")
 			if self.blkWest:
 				if self.blkWest.GetName() in ["KOSN10S11", "KOSN20S21"]:
+					if self.dbg.identifytrain:
+						self.frame.DebugMessage("Special case for null blocks KOSN10S11 and KOSN20S21")
+
 					blkWest = self.blkWest.blkWest
 					if blkWest:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Using block %s instead of null block" % blkWest.GetName())
 						tr = blkWest.GetTrain()
 						if tr:
-							self.CheckEWCross(tr, blkWest)						
-							return tr																																																				
+							self.CheckEWCross(tr, blkWest)
+							if self.dbg.identifytrain:
+								self.frame.DebugMessage("Returning train %s" % tr.GetName())
+							return tr
+						else:
+							if self.dbg.identifytrain:
+								self.frame.DebugMessage("Block %s did not have a train to consider" % blkWest.GetName())
+					else:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("No block west to examine")
+
 				else:
+					if self.dbg.identifytrain:
+						self.frame.DebugMessage("Looking at block %s" % self.blkWest.GetName())
 					tr = self.blkWest.GetTrain()
 					if tr:
-						self.CheckEWCross(tr, self.blkWest)						
-						return tr		
-				
+						self.CheckEWCross(tr, self.blkWest)
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Returning train %s" % tr.GetName())
+						return tr
+					else:
+						if self.dbg.identifytrain:
+							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkWest.GetName())
+
+		if self.dbg.identifytrain:
+			self.frame.DebugMessage("Unable to identify a train")
 
 		return None
 		
@@ -590,6 +685,8 @@ class Block:
 		else:
 			rc = self.district.CrossingEastWestBoundary(blk, self)
 		if rc:
+			if self.dbg.identifytrain:
+				self.frame.DebugMessage("Train %s crossed an E/W boundary - reversing train direction" % tr.GetName())
 			tr.SetEast(not tr.GetEast())
 			self.frame.Request({"renametrain": { "oldname": tr.GetName(), "newname": tr.GetName(), "east": "1" if tr.GetEast() else "0"}})	
 

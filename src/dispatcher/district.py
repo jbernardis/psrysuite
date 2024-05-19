@@ -43,8 +43,7 @@ class District:
 		self.eastButton = {}
 		self.westButton = {}
 		logging.info("Creating district %s" % name)
-		dbg = self.frame.GetDebugFlags()
-		self.showaspectcalculation = dbg.showaspectcalculation
+		self.dbg = self.frame.GetDebugFlags()
 		self.matrixturnoutdelay = self.frame.settings.dispatcher.matrixturnoutdelay
 
 	def SetTiles(self, tiles, totiles, sstiles, sigtiles, misctiles, btntiles):
@@ -337,15 +336,15 @@ class District:
 		aType = sig.GetAspectType()
 		aspect = self.GetAspect(aType, rType, nbStatus, nbRType, nnbClear)
 
-		if self.showaspectcalculation:
-			self.frame.PopupEvent("======== New aspect calculation ========")		
-			self.frame.PopupEvent("OS: %s Route: %s  Sig: %s" % (osblk.GetName(), rt.GetName(), sig.GetName()))
-			self.frame.PopupEvent("exit block name = %s   RT: %s" % (exitBlkNm, routetype(rType)))
-			self.frame.PopupEvent("NB: %s Status: %s  NRT: %s" % (nbName, statusname(nbStatus), routetype(nbRType)))
-			self.frame.PopupEvent("Next route = %s" % nbRtName)
-			self.frame.PopupEvent("next exit block = %s" % nxbNm)
-			self.frame.PopupEvent("NNB: %s  NNBC: %s" % (nnbName, nnbClear))
-			self.frame.PopupEvent("Aspect = %s (%x)" % (aspectname(aspect, aType), aspect))
+		if self.dbg.showaspectcalculation:
+			self.frame.DebugMessage("======== New aspect calculation ========")
+			self.frame.DebugMessage("OS: %s Route: %s  Sig: %s" % (osblk.GetName(), rt.GetName(), sig.GetName()))
+			self.frame.DebugMessage("exit block name = %s   RT: %s" % (exitBlkNm, routetype(rType)))
+			self.frame.DebugMessage("NB: %s Status: %s  NRT: %s" % (nbName, statusname(nbStatus), routetype(nbRType)))
+			self.frame.DebugMessage("Next route = %s" % nbRtName)
+			self.frame.DebugMessage("next exit block = %s" % nxbNm)
+			self.frame.DebugMessage("NNB: %s  NNBC: %s" % (nnbName, nnbClear))
+			self.frame.DebugMessage("Aspect = %s (%x)" % (aspectname(aspect, aType), aspect))
 		
 		logging.debug("Calculated aspect = %s   aspect type = %s route type = %s next block status = %s next block route type = %s next next block clear = %s" %
 					(aspectname(aspect, aType), aspecttype(aType), routetype(rType), statusname(nbStatus), routetype(nbRType), nnbClear))
@@ -703,8 +702,8 @@ class District:
 		if not self.frame.IsDispatcher():
 			return
 		
-		if self.showaspectcalculation:		
-			self.frame.PopupEvent("Evaluating prior signals for signal %s" % sig.GetName())
+		if self.dbg.showaspectcalculation:
+			self.frame.DebugMessage("Evaluating prior signals for signal %s" % sig.GetName())
 		rt, osblk = self.FindRoute(sig)
 		if osblk is None:
 			return
@@ -772,8 +771,8 @@ class District:
 	
 		self.frame.Request({"signal": {"name": sigNm, "aspect": newAspect, "aspecttype": aspectType, "callon": 0}})
 
-		if self.showaspectcalculation:		
-			self.frame.PopupEvent("Calculated new aspect for signal %s = %s" % (psig.GetName(), newAspect))		
+		if self.dbg.showaspectcalculation:
+			self.frame.DebugMessage("Calculated new aspect for signal %s = %s" % (psig.GetName(), newAspect))
 		
 	def EvaluateDistrictLocks(self, sig, ossLocks=None):
 		pass
@@ -940,10 +939,21 @@ class District:
 		for rn in preCounts:
 			# there SHOULD only be a single route, MAX, that changes
 			if postCounts[rn] > preCounts[rn] and preCounts[rn] == 0:
+				if self.dbg.blockoccupancy:
+					self.frame.DebugMessage("%s is the first OS section to be occupied for route %s-%s" %
+										(block, self.routes[rn].GetOSName(), rn))
 				return self.routes[rn].GetOSName()
 			
 			elif postCounts[rn] == 0 and preCounts[rn] > 0:
+				if self.dbg.blockoccupancy:
+					self.frame.DebugMessage("%s is the last OS section to be unoccupied for route %s-%s" %
+										(block, self.routes[rn].GetOSName(), rn))
 				return self.routes[rn].GetOSName()
+
+			elif postCounts[rn] != preCounts[rn]:
+				if self.dbg.blockoccupancy:
+					self.frame.DebugMessage("%s: count changed from %d to %d for route %s-%s" %
+										(block, preCounts[rn], postCounts[rn], self.routes[rn].GetOSName(), rn))
 		
 		# no differences - just absorb the block command
 		return None

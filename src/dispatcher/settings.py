@@ -25,6 +25,8 @@ class SNode:
 class Debug:
 	def __init__(self):
 		self.showaspectcalculation = False
+		self.blockoccupancy = False
+		self.identifytrain = False
 		self.loglevel = "DEBUG"
 
 class Settings:
@@ -266,6 +268,10 @@ class Settings:
 			for opt, value in self.cfg.items("debug"):
 				if opt == 'showaspectcalculation':
 					self.debug.showaspectcalculation = parseBoolean(value, False)
+				elif opt == 'blockoccupancy':
+					self.debug.blockoccupancy = parseBoolean(value, False)
+				elif opt == 'identifytrain':
+					self.debug.identifytrain = parseBoolean(value, False)
 				elif opt == 'loglevel':
 					self.debug.loglevel = value
 				
@@ -434,6 +440,7 @@ class Settings:
 		except configparser.DuplicateSectionError:
 			pass
 		self.cfg.set(section, "showaspectcalculation", "True" if self.debug.showaspectcalculation else "False")
+		self.cfg.set(section, "blockoccupancy", "True" if self.debug.blockoccupancy else "False")
 		self.cfg.set(section, "loglevel", self.debug.loglevel)
 
 		

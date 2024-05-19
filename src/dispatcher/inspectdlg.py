@@ -1,16 +1,31 @@
 import wx  
 import os     
+import logging
 
 BSIZE = (120, 40)
 class InspectDlg(wx.Dialog):
-    def __init__(self, parent):
+    def __init__(self, parent, settings):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
+        self.CenterOnScreen()
         self.parent = parent
+        self.settings = settings
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
 
         self.SetTitle("Inspection Dialog")
 
         btnszr = wx.BoxSizer(wx.VERTICAL)
+
+        btnszr.AddSpacer(20)
+
+        bLogLevel = wx.Button(self, wx.ID_ANY, "Logging Level", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnBLogLevel, bLogLevel)
+        btnszr.Add(bLogLevel)
+
+        btnszr.AddSpacer(20)
+
+        bDebug = wx.Button(self, wx.ID_ANY, "Debugging Flags", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnBDebug, bDebug)
+        btnszr.Add(bDebug)
 
         btnszr.AddSpacer(20)
 
@@ -41,6 +56,22 @@ class InspectDlg(wx.Dialog):
         self.SetSizer(szr)
         self.Layout()
         self.Fit()
+
+    def OnBLogLevel(self, _):
+        dlg = LogLevelDlg(self)
+        rc = dlg.ShowModal()
+        if rc == wx.ID_OK:
+            dlg.ApplyResults()
+
+        dlg.Destroy()
+
+    def OnBDebug(self, _):
+        dlg = DebugFlagsDlg(self, self.settings)
+        rc = dlg.ShowModal()
+        if rc == wx.ID_OK:
+            dlg.ApplyResults()
+
+        dlg.Destroy()
 
     def OnBProxies(self, _):
         pi = self.parent.GetOSProxyInfo()
@@ -85,6 +116,166 @@ class InspectDlg(wx.Dialog):
     def OnCancel(self, _):
         self.EndModal(wx.ID_EXIT)
 
+
+class DebugFlagsDlg(wx.Dialog):
+    def __init__(self, parent, settings):
+        wx.Dialog.__init__(self, parent, wx.ID_ANY, "Debugging Flags")
+        self.Bind(wx.EVT_CLOSE, self.OnCancel)
+        self.parent = parent
+        self.settings = settings
+
+        vszr = wx.BoxSizer(wx.VERTICAL)
+        vszr.AddSpacer(20)
+
+        self.cbEvalAspect = wx.CheckBox(self, wx.ID_ANY, "Show aspect calculation")
+        vszr.Add(self.cbEvalAspect)
+        self.cbEvalAspect.SetValue(self.settings.debug.showaspectcalculation)
+
+        vszr.AddSpacer(10)
+
+        self.cbBlockOccupancy = wx.CheckBox(self, wx.ID_ANY, "Block Occupancy")
+        vszr.Add(self.cbBlockOccupancy)
+        self.cbBlockOccupancy.SetValue(self.settings.debug.blockoccupancy)
+
+        vszr.AddSpacer(10)
+
+        self.cbTrainID = wx.CheckBox(self, wx.ID_ANY, "Train Identification")
+        vszr.Add(self.cbTrainID)
+        self.cbTrainID.SetValue(self.settings.debug.identifytrain)
+
+        btnszr = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.bOK = wx.Button(self, wx.ID_ANY, "OK", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnOK, self.bOK)
+        btnszr.Add(self.bOK)
+
+        btnszr.AddSpacer(20)
+
+        self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, self.bCancel)
+        btnszr.Add(self.bCancel)
+
+        vszr.AddSpacer(20)
+        vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
+        vszr.AddSpacer(20)
+
+        hszr = wx.BoxSizer(wx.HORIZONTAL)
+        hszr.AddSpacer(20)
+        hszr.Add(vszr)
+        hszr.AddSpacer(20)
+
+        self.SetSizer(hszr)
+        self.Layout()
+        self.Fit()
+        self.CenterOnScreen()
+
+    def OnCancel(self, _):
+        self.EndModal(wx.ID_CANCEL)
+
+    def OnOK(self, _):
+        self.EndModal(wx.ID_OK)
+
+    def ApplyResults(self):
+        messages = []
+        nv = self.cbEvalAspect.GetValue()
+        if nv != self.settings.debug.showaspectcalculation:
+            self.settings.debug.showaspectcalculation = nv
+            messages.append("Show Aspect Calculation => %s" % nv)
+
+        nv = self.cbBlockOccupancy.GetValue()
+        if nv != self.settings.debug.blockoccupancy:
+            self.settings.debug.blockoccupancy = nv
+            messages.append("Block Occupancy => %s" % nv)
+
+        nv = self.cbTrainID.GetValue()
+        if nv != self.settings.debug.identifytrain:
+            self.settings.debug.identifytrain = nv
+            messages.append("Train Identification => %s" % nv)
+
+        if len(messages) == 0:
+            dlg = wx.MessageDialog(self, "No Flags Changed",
+                                   "No Changes",
+                                   wx.OK | wx.ICON_INFORMATION
+                                   )
+        else:
+            dlg = wx.MessageDialog(self, "\n".join(messages),
+                                   "Flags Modified",
+                                   wx.OK | wx.ICON_INFORMATION
+                                   )
+        dlg.ShowModal()
+        dlg.Destroy()
+
+
+
+class LogLevelDlg(wx.Dialog):
+    def __init__(self, parent):
+        wx.Dialog.__init__(self, parent, wx.ID_ANY, "Set Log Level")
+        self.Bind(wx.EVT_CLOSE, self.OnCancel)
+        self.CenterOnScreen()
+
+        vszr = wx.BoxSizer(wx.VERTICAL)
+
+        font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+
+        self.logLevels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        self.logLevelValues = [logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL]
+
+        self.rbMode = wx.RadioBox(self, wx.ID_ANY, "Log Level", choices=self.logLevels,
+                                  majorDimension=1, style=wx.RA_SPECIFY_COLS)
+        vszr.AddSpacer(20)
+        vszr.Add(self.rbMode, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+        l = logging.getLogger().getEffectiveLevel()
+        try:
+            lvl = self.logLevelValues.index(l)
+        except ValueError:
+            lvl = 4
+        self.rbMode.SetSelection(lvl)
+
+        btnszr = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.bOK = wx.Button(self, wx.ID_ANY, "OK", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnOK, self.bOK)
+        btnszr.Add(self.bOK)
+
+        btnszr.AddSpacer(20)
+
+        self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, self.bCancel)
+        btnszr.Add(self.bCancel)
+
+        vszr.AddSpacer(20)
+        vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
+        vszr.AddSpacer(20)
+
+        hszr = wx.BoxSizer(wx.HORIZONTAL)
+        hszr.AddSpacer(20)
+        hszr.Add(vszr)
+        hszr.AddSpacer(20)
+
+        self.SetSizer(hszr)
+        self.Layout()
+        self.Fit();
+
+    def OnOK(self, _):
+        self.EndModal(wx.ID_OK)
+
+    def OnCancel(self, _):
+        self.EndModal(wx.ID_CANCEL)
+
+    def ApplyResults(self):
+        lvl = self.rbMode.GetSelection()
+        logging.getLogger().setLevel(self.logLevelValues[lvl])
+
+        dlg = wx.MessageDialog(self, "Logging Level has been set to %s" % self.logLevels[lvl],
+                               "Logging Level Changed",
+                               wx.OK | wx.ICON_INFORMATION)
+        dlg.CenterOnScreen()
+        dlg.ShowModal()
+        dlg.Destroy()
+
+
 class ListDlg(wx.Dialog):
     def __init__(self, parent, data, sz, title):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, title)
@@ -106,6 +297,7 @@ class ListDlg(wx.Dialog):
 
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)
+
 
 class OSProxyDlg(wx.Dialog):
     def __init__(self, parent, data):

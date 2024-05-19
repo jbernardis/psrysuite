@@ -404,7 +404,7 @@ class MainFrame(wx.Frame):
 				pnl.SetShift(False)
 				
 		elif kcd == wx.WXK_F1:
-			dlg = InspectDlg(self)
+			dlg = InspectDlg(self, self.settings)
 			dlg.ShowModal()
 			dlg.Destroy()
 
@@ -2131,6 +2131,9 @@ class MainFrame(wx.Frame):
 		self.advice.SetBackgroundColour(wx.Colour(120, 255, 154))
 		self.advice.SetTextColour(wx.Colour(0, 0, 0))
 
+	def DebugMessage(self, message):
+		self.PopupEvent(message, force=True)
+
 	def PopupEvent(self, message, force=False):
 		if self.IsDispatcher() or self.settings.display.showevents or force:
 			self.events.Append(message)
@@ -2487,9 +2490,9 @@ class MainFrame(wx.Frame):
 					return
 
 			blk = None
+			blockend = None
 			try:
 				blk = self.blocks[block]
-				blockend = None
 			except KeyError:
 				if block.endswith(".E") or block.endswith(".W"):
 					blockend = block[-1]
@@ -2500,6 +2503,9 @@ class MainFrame(wx.Frame):
 						blk = None
 
 			if blk is not None:
+				if self.settings.debug.blockoccupancy:
+					msg = "Block %s%s occupancy %s" % (block, "" if blockend is None else ".%s" % blockend, state)
+					self.PopupEvent(msg)
 				stat = OCCUPIED if state == 1 else EMPTY
 				if state == 1:
 					blk.SetLastEntered(blockend)
