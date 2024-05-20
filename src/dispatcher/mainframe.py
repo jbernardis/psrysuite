@@ -1672,10 +1672,11 @@ class MainFrame(wx.Frame):
 			return False, "Unable to set route at present"
 		
 		tolist = desiredRoute.GetSetTurnouts()
-		for toname, _ in tolist:
+		for toname, wantedState in tolist:
 			trn = self.turnouts[toname]
-			if trn.IsLocked():
-				return False, "Turnout %s is locked" % toname
+			wantedNormal = wantedState == "N"
+			if trn.IsLocked() and wantedNormal != trn.IsNormal():
+				return False, "Turnout %s is locked and not in wanted state (%s)" % (toname, wantedState)
 
 		district = osblk.GetDistrict()
 		district.SetUpRoute(osblk, desiredRoute)

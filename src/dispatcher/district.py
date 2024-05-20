@@ -706,35 +706,52 @@ class District:
 			self.frame.DebugMessage("Evaluating prior signals for signal %s" % sig.GetName())
 		rt, osblk = self.FindRoute(sig)
 		if osblk is None:
+			if self.dbg.showaspectcalculation:
+				self.frame.DebugMessage("No OS block identified")
 			return
 		
 		# we're going backwards, so look in that same direction
 		currentDirection = not sig.GetEast()
+		if self.dbg.showaspectcalculation:
+			self.frame.DebugMessage("Starting in direction %s" % ("east" if currentDirection else "west"))
 		exitBlkNm = rt.GetExitBlock(reverse = currentDirection!=osblk.GetEast())
 
 		try:
 			exitBlk = self.frame.blocks[exitBlkNm]
 		except KeyError:
-			return 
-		
+			return
+
+		if self.dbg.showaspectcalculation:
+			self.frame.DebugMessage("Now looking at previous block %s" % exitBlkNm)
+
 		if self.CrossingEastWestBoundary(osblk, exitBlk):
 			currentDirection = not currentDirection
-			
+			if self.dbg.showaspectcalculation:
+				self.frame.DebugMessage("Changing direction %s because of E/W boundary" % ("east" if currentDirection else "west"))
+
 		nb = exitBlk.NextBlock(reverse = currentDirection!=exitBlk.GetEast())
 		if nb is None:
-			return 
+			if self.dbg.showaspectcalculation:
+				self.frame.DebugMessage("No next OS block identified")
+			return
 		
 		nbName = nb.GetName()
 		if nb.GetBlockType() != OVERSWITCH:
+			if self.dbg.showaspectcalculation:
+				self.frame.DebugMessage("Next block is not an OS block - returning")
 			return
 
 		rt = nb.GetRoute()
 		if rt is None:
-			return 
+			if self.dbg.showaspectcalculation:
+				self.frame.DebugMessage("OS block %s does not have a route - returning" % nbName)
+			return
 		
 		if self.CrossingEastWestBoundary(nb, exitBlk):
 			currentDirection = not currentDirection
-			
+			if self.dbg.showaspectcalculation:
+				self.frame.DebugMessage("Changing direction %s because of E/W boundary" % ("east" if currentDirection else "west"))
+
 		sigs = rt.GetSignals()
 		ep = rt.GetEndPoints()
 		if len(sigs) != 2 or len(ep) != 2:
@@ -742,13 +759,18 @@ class District:
 			return 
 		
 		if exitBlkNm not in ep:
+			if self.dbg.showaspectcalculation:
+				self.frame.DebugMessage("unknown exit block: %s - returnins" % exitBlkNm)
 			return
 		
 		if exitBlkNm == ep[0]:
 			sigNm = sigs[1]
 		elif exitBlkNm == ep[1]:
 			sigNm = sigs[0]
-			
+
+		if self.dbg.showaspectcalculation:
+			self.frame.DebugMessage("Considering signal %s" % sigNm)
+
 		try:
 			psig = self.frame.signals[sigNm]
 		except KeyError:
@@ -757,15 +779,24 @@ class District:
 		# we're not going to change signals that are stopped, so end this here
 		currentAspect = psig.GetAspect()
 		if currentAspect == 0:
+			if self.dbg.showaspectcalculation:
+				self.frame.DebugMessage("Signal %s is Stopped - finished" % sigNm)
 			return
 		
 		if sigNm.startswith("P"):
 			# skip anything to do with Port - we don't control it
+			if self.dbg.showaspectcalculation:
+				self.frame.DebugMessage("Ignoring Port signals")
 			return
 
 		# stop if the aspect is unchanged or can't be calculated
 		newAspect = self.CalculateAspect(psig, nb, rt, silent=True)
 		if newAspect is None or newAspect == currentAspect:
+			if self.dbg.showaspectcalculation:
+				if newAspect is None:
+					self.frame.DebugMessage("Unable to calculate a new aspect for signal %s" % sigNm)
+				else:
+					self.frame.DebugMessage("Aspect for signal %s is unchanged - finished" % sigNm)
 			return
 		aspectType = psig.GetAspectType() 
 	
