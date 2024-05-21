@@ -62,16 +62,20 @@ class InspectDlg(wx.Dialog):
         rc = dlg.ShowModal()
         if rc == wx.ID_OK:
             dlg.ApplyResults()
-
-        dlg.Destroy()
+            dlg.Destroy()
+            self.EndModal(wx.ID_EXIT)
+        else:
+            dlg.Destroy()
 
     def OnBDebug(self, _):
         dlg = DebugFlagsDlg(self, self.settings)
         rc = dlg.ShowModal()
         if rc == wx.ID_OK:
             dlg.ApplyResults()
-
-        dlg.Destroy()
+            dlg.Destroy()
+            self.EndModal(wx.ID_EXIT)
+        else:
+            dlg.Destroy()
 
     def OnBProxies(self, _):
         pi = self.parent.GetOSProxyInfo()

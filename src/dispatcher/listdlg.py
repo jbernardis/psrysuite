@@ -10,6 +10,7 @@ class ListDlg(wx.Dialog):
         self.dataclear = dataclear
         
         self.SetTitle(title)
+        self.title = title
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         
         font = wx.Font(wx.Font(18, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial"))
@@ -70,7 +71,7 @@ class ListDlg(wx.Dialog):
         wildcard = "All files (*.*)|*.*"
 
         dlg = wx.FileDialog(
-            self, message="Save file as ...", defaultDir=os.getcwd(),
+            self, message="Save %s as ..." % self.title, defaultDir=os.getcwd(),
             defaultFile="", wildcard=wildcard, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
             )
 
@@ -87,6 +88,13 @@ class ListDlg(wx.Dialog):
         with open(path, "w") as ofp:
             ofp.write(self.tcList.GetValue())
 
+        dlg = wx.MessageDialog(self,
+                "%s successfully saved to %s" % (self.title, path),
+                "%s Saved" % self.title,
+                wx.OK | wx.ICON_INFORMATION)
+
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def OnClose(self, _):
         self.DoClose()
