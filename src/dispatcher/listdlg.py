@@ -1,4 +1,5 @@
 import wx
+import os
 
 class ListDlg(wx.Dialog):
     def __init__(self, parent, title, dataList, dlgexit, dataclear):
@@ -30,13 +31,19 @@ class ListDlg(wx.Dialog):
         self.bClear = wx.Button(self, wx.ID_ANY, "Clear")
         self.Bind(wx.EVT_BUTTON, self.OnBClear, self.bClear)
         bsz.Add(self.bClear)
-        
+
         bsz.AddSpacer(50)
-        
+
         self.bExit = wx.Button(self, wx.ID_ANY, "Close")
         self.Bind(wx.EVT_BUTTON, self.OnBExit, self.bExit)
         bsz.Add(self.bExit)
-        
+
+        bsz.AddSpacer(50)
+
+        self.bSave = wx.Button(self, wx.ID_ANY, "Save")
+        self.Bind(wx.EVT_BUTTON, self.OnBSave, self.bSave)
+        bsz.Add(self.bSave)
+
         vsz.Add(bsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
         
         vsz.AddSpacer(20)
@@ -58,6 +65,28 @@ class ListDlg(wx.Dialog):
     def OnBClear(self, _):
         self.tcList.Clear()
         self.dataclear()
+
+    def OnBSave(self, _):
+        wildcard = "All files (*.*)|*.*"
+
+        dlg = wx.FileDialog(
+            self, message="Save file as ...", defaultDir=os.getcwd(),
+            defaultFile="", wildcard=wildcard, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
+            )
+
+        rc = dlg.ShowModal()
+        path = None
+        if rc == wx.ID_OK:
+            path = dlg.GetPath()
+
+        dlg.Destroy()
+
+        if rc != wx.ID_OK:
+            return
+
+        with open(path, "w") as ofp:
+            ofp.write(self.tcList.GetValue())
+
 
     def OnClose(self, _):
         self.DoClose()
