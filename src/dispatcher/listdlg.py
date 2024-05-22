@@ -71,7 +71,7 @@ class ListDlg(wx.Dialog):
         wildcard = "All files (*.*)|*.*"
 
         dlg = wx.FileDialog(
-            self, message="Save %s as ..." % self.title, defaultDir=os.getcwd(),
+            self, message="Save %s as ..." % self.title, defaultDir=os.path.join(os.getcwd(), "output"),
             defaultFile="", wildcard=wildcard, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
             )
 

@@ -2516,6 +2516,8 @@ class MainFrame(wx.Frame):
 					district.DoBlockAction(blk, blockend, stat)
 					if self.IsDispatcher():
 						self.CheckTrainsInBlock(block, None)
+			else:
+				logging.info("Ignoring block command for unknown block: %s" % block)
 
 	def DoCmdBlockDir(self, parms):
 		for p in parms:

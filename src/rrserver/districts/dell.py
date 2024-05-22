@@ -86,37 +86,38 @@ class Dell(District):
 			s.SetAspectType(SloAspects)
 
 			#inputs	
-			sbw = self.rr.AddBlock("D21.W",     self, n, DELL, [(0, 0)], True) 
-			sba = self.rr.AddBlock("D21A",      self, n, DELL, [(0, 1)], True) 
-			sbb = self.rr.AddBlock("D21B",      self, n, DELL, [(0, 2)], True) 
-			b = self.rr.AddBlock("D21",       self, n, DELL, [], True) # virtual definition for D21
-			sbe = self.rr.AddBlock("D21.E",     self, n, DELL, [(0, 3)], True) 
+			sbw = self.rr.AddBlock("D21.W",     self, n, FOSS, [(0, 0)], True)
+			sba = self.rr.AddBlock("D21A",      self, n, FOSS, [(0, 1)], True)
+			sbb = self.rr.AddBlock("D21B",      self, n, FOSS, [(0, 2)], True)
+			b = self.rr.AddBlock("D21",       self, n, FOSS, [], True) # virtual definition for D21
+			sbe = self.rr.AddBlock("D21.E",     self, n, FOSS, [(0, 3)], True)
 			b.AddStoppingBlocks([sbe, sbw])
 			b.AddSubBlocks([sba, sbb])
 			
-			self.rr.AddBlock("DOSFOW",    self, n, DELL, [(0, 4)], False) 
-			self.rr.AddBlock("DOSFOE",    self, n, DELL, [(0, 5)], True) 
-			sbw = self.rr.AddBlock("S10.W",     self, n, DELL, [(0, 6)], False) 
-			sba = self.rr.AddBlock("S10A",      self, n, DELL, [(0, 7)], False) 
+			self.rr.AddBlock("DOSFOW",    self, n, FOSS, [(0, 4)], False)
+			self.rr.AddBlock("DOSFOE",    self, n, FOSS, [(0, 5)], True)
+			sbw = self.rr.AddBlock("S10.W",     self, n, FOSS, [(0, 6)], False)
+			sba = self.rr.AddBlock("S10A",      self, n, FOSS, [(0, 7)], False)
 
-			sbb = self.rr.AddBlock("S10B",      self, n, DELL, [(1, 0)], False) 
-			sbc = self.rr.AddBlock("S10C",      self, n, DELL, [(1, 1)], False) 
-			sbe = self.rr.AddBlock("S10.E",     self, n, DELL, [(1, 2)], False) 
-			b = self.rr.AddBlock("S10",       self, n, DELL, [], False) # virtual definition for S10
+			sbb = self.rr.AddBlock("S10B",      self, n, FOSS, [(1, 0)], False)
+			sbc = self.rr.AddBlock("S10C",      self, n, FOSS, [(1, 1)], False)
+			sbe = self.rr.AddBlock("S10.E",     self, n, FOSS, [(1, 2)], False)
+			b = self.rr.AddBlock("S10",       self, n, FOSS, [], False) # virtual definition for S10
 			b.AddStoppingBlocks([sbe, sbw])
 			b.AddSubBlocks([sba, sbb, sbc])
 			
-			sbw = self.rr.AddBlock("R10.W",     self, n, DELL, [(1, 3)], False) 
-			sba = self.rr.AddBlock("R10A",      self, n, DELL, [(1, 4)], False) 
-			sbb = self.rr.AddBlock("R10B",      self, n, DELL, [(1, 5)], False) 
-			sbc = self.rr.AddBlock("R10C",      self, n, DELL, [(1, 6)], False) 
-			b = self.rr.AddBlock("R10",       self, n, DELL, [], False) 
+			sbw = self.rr.AddBlock("R10.W",     self, n, FOSS, [(1, 3)], False)
+			sba = self.rr.AddBlock("R10A",      self, n, FOSS, [(1, 4)], False)
+			sbb = self.rr.AddBlock("R10B",      self, n, FOSS, [(1, 5)], False)
+			sbc = self.rr.AddBlock("R10C",      self, n, FOSS, [(1, 6)], False)
+			b = self.rr.AddBlock("R10",       self, n, FOSS, [], False)
 			b.AddStoppingBlocks([sbw])
 			b.AddSubBlocks([sba, sbb, sbc])
 			
-			self.rr.AddBlock("R11",       self, n, DELL, [(1, 7)], False) 
+			self.rr.AddBlock("R11",       self, n, FOSS, [(1, 7)], False)
 			
-			self.rr.AddBlock("R12",       self, n, DELL, [(2, 0)], False) 
+			self.rr.AddBlock("R12",       self, n, FOSS, [(2, 0)], False)
+			self.rr.AddTurnoutPosition("RSw1", self, n, FOSS, [(2, 1), (2, 2)])
 
 		
 	def OutIn(self):

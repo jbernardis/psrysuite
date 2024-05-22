@@ -136,6 +136,7 @@ class Block:
 		self.entrySignal = None
 		self.entryAspect = 0
 		self.lastSubBlockEntered = None
+		self.conditionalTrack = None
 		self.dbg = self.frame.GetDebugFlags()
 
 	def SetTrain(self, train):
@@ -163,6 +164,9 @@ class Block:
 
 	def AddTrainLoc(self, screen, loc, routes=None):
 		self.trainLoc.append([screen, loc, routes])
+
+	def AddConditionalTrack(self, trk):
+		self.conditionalTrack = trk
 
 	def GetTrain(self):
 		return self.train
@@ -381,7 +385,11 @@ class Block:
 
 	def Draw(self):
 		for t, screen, pos, revflag in self.tiles:
-			bmp = t.getBmp(self.status, self.east, revflag, unknownTrain=self.unknownTrain)
+			forceEmpty = False
+			if self.conditionalTrack:
+				if pos in self.conditionalTrack:
+					forceEmpty = not self.EvaluateTurnout(self.conditionalTrack[pos])
+			bmp = t.getBmp(EMPTY if forceEmpty else self.status, self.east, revflag, unknownTrain=self.unknownTrain)
 			self.frame.DrawTile(screen, pos, bmp)
 
 		for b in [self.sbEast, self.sbWest]:
@@ -396,6 +404,16 @@ class Block:
 
 	def AddTurnout(self, turnout):
 		self.turnouts.append(turnout)
+
+	def EvaluateTurnout(self, toinfo):
+		toName, toStatus = toinfo
+		for to in self.turnouts:
+			if toName == to.GetName():
+				s = "N" if to.IsNormal() else "R" if to.IsReverse() else None
+				print("found turnout %s, compare %s to %s" % (toName, s, toStatus))
+				return s == toStatus
+
+		return False
 
 	def SetOccupied(self, occupied=True, blockend=None, refresh=False):
 		if not occupied:

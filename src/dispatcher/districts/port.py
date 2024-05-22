@@ -88,6 +88,12 @@ class Port (District):
 			trnout.UpdateStatus()
 			trnout.Draw()
 
+		elif tn == "PBSw17":
+			cb = turnout.GetContainingBlock()
+			if cb is not None:
+				cb.Draw()
+
+
 	def DrawOthers(self, block):
 		if block.GetName() in ["POSSP2", "POSSP3", "POSSP4", "POSSP5"]:
 			self.drawCrossover(block)
@@ -454,6 +460,28 @@ class Port (District):
 				(self.tiles["turnleftup"],     LaKr,        (111, 22), False),
 				(self.tiles["vertical"],       LaKr,        (111, 23), False),
 			], True)
+		self.blocks["P32"].AddConditionalTrack({
+			(146, 33): ["PBSw17", "N"],
+			(147, 33): ["PBSw17", "N"],
+			(148, 33): ["PBSw17", "N"],
+			(149, 33): ["PBSw17", "N"],
+			(150, 32): ["PBSw17", "N"],
+			(151, 31): ["PBSw17", "N"],
+			(152, 30): ["PBSw17", "N"],
+			(153, 29): ["PBSw17", "N"],
+			(153, 28): ["PBSw17", "N"],
+			(153, 27): ["PBSw17", "N"],
+			(153, 26): ["PBSw17", "N"],
+			(153, 25): ["PBSw17", "N"],
+			(153, 24): ["PBSw17", "N"],
+			(153, 23): ["PBSw17", "N"],
+
+			(146, 32): ["PBSw17", "R"],
+			(147, 31): ["PBSw17", "R"],
+			(148, 30): ["PBSw17", "R"],
+			(149, 29): ["PBSw17", "R"],
+			(150, 28): ["PBSw17", "R"],
+		})
 
 		self.blocks["P33"] = Block(self, self.frame, "P33",
 			[

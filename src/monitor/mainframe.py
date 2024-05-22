@@ -641,7 +641,6 @@ class MainFrame(wx.Frame):
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
 		self.EnableButtons(False)	
 
-		
 		self.delayedRequests = DelayedRequests()				
 		self.Bind(wx.EVT_TIMER, self.OnTicker)
 		self.ticker = wx.Timer(self)
@@ -676,7 +675,7 @@ class MainFrame(wx.Frame):
 			self.chBlock.SetItems(self.blockList)
 			self.chBlock.SetSelection(0)
 	
-			tolist = {"NSw13": 1, "NSw15": 1, "NSw17": 1, "PBSw17": 1}	
+			tolist = {"NSw13": 1, "NSw15": 1, "NSw17": 1, "PBSw17": 1, "RSw1": 1}
 			leverlist = {}	
 			r = layout["routes"]
 			self.routes = r

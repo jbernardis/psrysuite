@@ -269,6 +269,11 @@ class Nassau (District):
 				# our control was changed under the clearance.  Re-clear the block				
 				updBlk.SetCleared(True, True)
 
+		if tn == "RSw1":
+			cb = turnout.GetContainingBlock()
+			if cb is not None:
+				cb.Draw()
+
 		if tn == "NSw27":
 			trnout = self.turnouts["NSw29"]
 			trnout.UpdateStatus()
@@ -449,10 +454,16 @@ class Nassau (District):
 
 		self.blocks["R10"] = Block(self, self.frame, "R10",
 			[
-				(self.tiles["horiznc"],  self.screen, (47, 9), False),
-				(self.tiles["horiz"],    self.screen, (48, 9), False),
-				(self.tiles["horiznc"],  self.screen, (49, 9), False),
+				(self.tiles["horiznc"],        self.screen, (47, 9), False),
+				(self.tiles["horiz"],          self.screen, (48, 9), False),
+				(self.tiles["horiznc"],        self.screen, (49, 9), False),
+				(self.tiles["turnleftright"],  self.screen, (50, 9), False),
+				(self.tiles["horiznc"],        self.screen, (52, 8), False),
+				(self.tiles["horiz"],          self.screen, (53, 8), False),
+				(self.tiles["diagleft"],       self.screen, (52, 7), False),
+				(self.tiles["turnleftleft"],   self.screen, (53, 6), False),
 			], False)
+		self.blocks["R10"].AddConditionalTrack({(52, 7): ["RSw1", "N"], (53, 6): ["RSw1", "N"], (52, 8): ["RSw1", "R"], (53, 8): ["RSw1", "R"]})
 		self.blocks["R10"].AddStoppingBlock([
 				(self.tiles["horiznc"],  self.screen, (45, 9), False),
 				(self.tiles["horiz"],    self.screen, (46, 9), False),
@@ -844,6 +855,20 @@ class Nassau (District):
 				blocks[blknm].AddTurnout(trnout)
 				trnout.AddBlock(blknm)
 				trnout.SetDisabled(True)
+			self.turnouts[tonm] = trnout
+
+		hslist = [
+			["RSw1", "torightup", "R10", (51, 8)],
+		]
+
+		for tonm, tileSet, blk, pos in hslist:
+			trnout = Turnout(self, self.frame, tonm, self.screen, self.totiles[tileSet], pos)
+
+			b = blocks[blk]
+			b.AddTurnout(trnout)
+			trnout.SetContainingBlock(b)
+
+			trnout.SetDisabled(True)
 			self.turnouts[tonm] = trnout
 
 		trnout = SlipSwitch(self, self.frame, "NSw29", self.screen, self.totiles["ssleft"], (12, 11))
