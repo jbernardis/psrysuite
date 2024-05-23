@@ -1854,7 +1854,36 @@ class MainFrame(wx.Frame):
 				self.Request({"ar": {"action": "add" if ar else "remove", "train": trainid}})
 
 		tr.Draw()
-		
+
+	def StealTrainID(self, trid):
+		logging.info("Removing train ID %s" % trid)
+		tr = self.trains[trid]
+
+		newTr = Train()
+		east = tr.GetEast()
+		newTr.SetEast(east)
+		newName = newTr.GetName()
+		newLoco = tr.GetLoco()
+
+		blockDict = tr.GetBlockList()
+		blockList = [b for b in blockDict.keys()]  # if b != bname]
+
+		for bn in blockList:
+			b = blockDict[bn]
+			tr.RemoveFromBlock(b)
+			newTr.AddToBlock(b)
+			b.SetTrain(newTr)
+			b.SetEast(east)
+			self.Request({"settrain": {"block": b.GetName()}})
+			self.Request(
+				{"settrain": {"block": b.GetName(), "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
+			if self.IsDispatcher():
+				self.CheckTrainsInBlock(b.GetName(), None)
+
+		self.trains[newName] = newTr
+
+		self.activeTrains.AddTrain(newTr)
+
 	def RecoverLostTrains(self):
 		ltList = self.lostTrains.GetList()
 		recoverable = []

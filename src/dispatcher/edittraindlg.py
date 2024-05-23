@@ -276,12 +276,11 @@ class EditTrainDlg(wx.Dialog):
 		rc = wx.ID_YES		
 		if east != self.startingEast:
 			mdlg = wx.MessageDialog(self,  'Trains are moving in opposite directions.\nPress "Yes" to proceed',
-	                              'Opposite Directions',
-	                              wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
-	                              )
+									'Opposite Directions',
+									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
+									)
 			rc = mdlg.ShowModal()
 			mdlg.Destroy()
-
 
 		if rc == wx.ID_YES:
 			self.startingEast = east
@@ -292,7 +291,7 @@ class EditTrainDlg(wx.Dialog):
 			return
 
 	def ShowTrainLocoDesc(self):
-		if self.chosenLoco in self.locos and self.locos[self.chosenLoco]["desc"] != None:
+		if self.chosenLoco in self.locos and self.locos[self.chosenLoco]["desc"] is not None:
 			self.stDescr.SetLabel(self.locos[self.chosenLoco]["desc"])
 		else:
 			self.stDescr.SetLabel("")
@@ -322,6 +321,7 @@ class EditTrainDlg(wx.Dialog):
 	def onOK(self, _):
 		if self.chosenTrain != self.name and self.chosenTrain in self.existingTrains:
 			blist = self.existingTrains[self.chosenTrain].GetBlockNameList()
+			plural = "s\n" if len(blist) > 1 else " "
 			bstr = ", ".join(blist)
 			
 			adje, adjw = self.block.GetAdjacentBlocks()
@@ -332,11 +332,14 @@ class EditTrainDlg(wx.Dialog):
 					break
 
 			if not adjacent:
-				dlg = wx.MessageDialog(self, "Train %s already exists on the layout\nin block(s) %s" % (self.chosenTrain, bstr),
-						   'Duplicate Train', wx.OK | wx.ICON_ERROR)
-				dlg.ShowModal()
+				dlg = wx.MessageDialog(self, "Train %s already exists on the layout in block%s%s\n\nPress \"YES\" to acquire this train ID for THIS train" % (self.chosenTrain, plural, bstr),
+						'Duplicate Train', wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+				rc = dlg.ShowModal()
 				dlg.Destroy()
-				return
+				if rc == wx.ID_YES:
+					self.parent.StealTrainID(self.chosenTrain)
+				else:
+					return
 		
 		self.lostTrains.Remove(self.chosenTrain)
 		self.EndModal(wx.ID_OK)
