@@ -8,3 +8,7 @@ when committing to python 3.12, make sure to update requirements.txt for correct
 change everywhere that shows an internal OS name to show the route name instead
 
 move all dialog boxes to center of screen (unless that are fixed elsewhere for another reason)
+
+automate management of single track if dispatcher all or dispatcher cliveden/martinsville:
+    EB train entering B11 or B21 or leaves COSCLW
+    WB train entering C23, C12 or leaving BOSE

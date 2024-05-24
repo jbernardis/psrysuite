@@ -6,7 +6,8 @@ from tracker.schedule import Schedule
 BTNSZ = (120, 46)
 wildcardJson = "JSON file (*.json)|*.json|"	 \
 				"All files (*.*)|*.*"
-				
+
+
 class ChooseScheduleDlg(wx.Dialog):
 	def __init__(self, parent, schedules, allowentry):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")

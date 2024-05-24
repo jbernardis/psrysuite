@@ -410,7 +410,6 @@ class Block:
 		for to in self.turnouts:
 			if toName == to.GetName():
 				s = "N" if to.IsNormal() else "R" if to.IsReverse() else None
-				print("found turnout %s, compare %s to %s" % (toName, s, toStatus))
 				return s == toStatus
 
 		return False

@@ -242,13 +242,36 @@ class District:
 			
 		return True
 
+	def AutomatedBlockSetup(self, trainqueue, osnm, rtnm, blknm, signm):
+		rtnmCurrent = self.frame.blocks[osnm].GetRouteName()
+		if rtnmCurrent != rtnm:
+			rc, alreadyset, msg = self.frame.SetRouteThruOS(osnm, rtnm, blknm, "")
+			if rc:
+				if alreadyset:
+					self.frame.SetRouteSignal(osnm, rtnm, "", signm)
+				else:
+					self.frame.DelaySignalRequest(signm, osnm, rtnm, 5)
+			else:
+				trainqueue.Append(osnm, rtnm, signm, blknm)
+
+		else:  # route is what we want -= just set signal
+			rc, msg = self.frame.SetRouteSignal(osnm, rtnm, "", signm)
+			if not rc:
+				trainqueue.Append(osnm, rtnm, signm, blknm)
+
+	def AutomatedBlockTrigger(self, trainqueue):
+		rv = trainqueue.Get()
+		if rv:
+			osnm, rtnm, signm, blknm = rv
+			self.AutomatedBlockSetup(trainqueue, osnm, rtnm, blknm, signm)
+
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
 		if sig is None or rt is None:
 			logging.error("unable to calculate aspect because either signal or route or both is None")
 			if sig is not None:
 				logging.error("Signal was not none = %s" % sig.GetName())
 			if rt is not None:
-				logging.error("Route was not none = %s" % sig.GetName())
+				logging.error("Route was not none = %s" % rt.GetName())
 			return None
 		
 		logging.debug("Calculating aspect for signal %s route %s" % (sig.GetName(), rt.GetName()))

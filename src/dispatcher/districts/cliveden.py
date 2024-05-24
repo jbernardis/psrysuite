@@ -5,13 +5,14 @@ from dispatcher.turnout import Turnout
 from dispatcher.signal import Signal
 from dispatcher.handswitch import HandSwitch
 
-from dispatcher.constants import MAIN, DIVERGING, RegAspects
+from dispatcher.constants import MAIN, DIVERGING, RegAspects, OCCUPIED, EMPTY
 
 
 class Cliveden (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
-		
+		self.C13Queue = self.frame.C13Queue
+
 	def PerformHandSwitchAction(self, hs):
 		controlOpt = self.frame.cliffControl
 		if controlOpt == 0:  # cliff local control or limited to bank/cliveden (handled in those districts)
@@ -20,7 +21,29 @@ class Cliveden (District):
 			return
 
 		District.PerformHandSwitchAction(self, hs)
-		
+
+	def DoBlockAction(self, blk, blockend, state):
+		blknm = blk.GetName()
+		controlOpt = self.frame.cliffControl
+		c13auto = self.frame.c13auto
+
+		# we need to know the east/west direction both before and after the block command is applied.  Before is
+		# applicable when the block is being exited before it gets set back to its default direction, and after
+		# is applicable on block entry when the train's direction is applied to the block
+		blkEastBefore = blk.GetEast()
+		District.DoBlockAction(self, blk, blockend, state)
+		blkEastAfter = blk.GetEast()
+
+		if controlOpt != 0 and c13auto:
+			# we are in either dispatcher all or dispatcher bank/cliveden mode
+			if not blkEastAfter and blknm in [ "C23", "C12" ] and blockend is None and state == OCCUPIED:
+				rtname = "CRtC13" + blknm
+				signm = "C14RA" if blknm == "C12" else "C14RB"
+				self.AutomatedBlockSetup(self.C13Queue, "COSCLW", rtname, "C13", signm)
+
+			elif blkEastBefore and blknm == "COSCLW" and state == EMPTY:
+				self.AutomatedBlockTrigger(self.C13Queue)
+
 	def SetUpRoute(self, osblk, route):
 		controlOpt = self.frame.cliffControl
 		if controlOpt == 0:  # Cliveden local control

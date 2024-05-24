@@ -98,10 +98,16 @@ class RouteTrainDlg(wx.Dialog):
 			return
 
 		sx = self.lastStepx				
-		rc, msg = self.parent.SetRouteThruOS(self.sequence[sx]["os"], self.sequence[sx]["route"], self.sequence[sx]["block"], self.sequence[sx]["signal"])
+		rc, alreadyset, msg = self.parent.SetRouteThruOS(self.sequence[sx]["os"], self.sequence[sx]["route"], self.sequence[sx]["block"], self.sequence[sx]["signal"])
 		
 		if not rc or (rc and msg is not None):
 			self.parent.PopupEvent(msg)
+
+		if rc:
+			if alreadyset:
+				self.parent.SetRouteSignal(self.sequence[sx]["os"], self.sequence[sx]["route"], "", self.sequence[sx]["signal"])
+			else:
+				self.parent.DelaySignalRequest(self.sequence[sx]["signal"], self.sequence[sx]["os"], self.sequence[sx]["route"], 5)
 
 	def OnBSignal(self, evt):
 		if self.lastStepx is None:

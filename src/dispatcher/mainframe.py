@@ -26,6 +26,8 @@ from dispatcher.breaker import BreakerDisplay, BreakerName
 from dispatcher.toaster import Toaster
 from dispatcher.listdlg import ListDlg
 from dispatcher.delayedrequest import DelayedRequests
+from dispatcher.delayedsignal import DelayedSignals
+from dispatcher.trainqueue import TrainQueue
 
 from dispatcher.districts.yard import Yard
 from dispatcher.districts.hyde import Hyde
@@ -137,8 +139,11 @@ class MainFrame(wx.Frame):
 		self.yardControl = 0
 		self.nassauControl = 0
 		self.cliffControl = 0
-		
+		self.c13auto = self.settings.control.c13auto
+
 		self.delayedRequests = DelayedRequests()
+		self.delayedSignals = DelayedSignals()
+		self.C13Queue = TrainQueue()
 
 		self.title = "PSRY Dispatcher" if self.IsDispatcher() else "Satellite" if self.IsSatellite() else "PSRY Monitor"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
@@ -203,7 +208,6 @@ class MainFrame(wx.Frame):
 		else:
 			self.PlaceWidgets()
 
-		#self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(self.centerOffset+50, 15), size=BTNDIM)
 		self.bSubscribe = wx.Button(self, wx.ID_ANY, "Connect", pos=(int(totalw/2-185), 80), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnSubscribe, self.bSubscribe)
 		self.bSubscribe.SetToolTip("Connect to/Disconnect from the Railroad server")
@@ -701,6 +705,12 @@ class MainFrame(wx.Frame):
 		self.widgetMap[NaCl].append([self.cbClivedenFleet, 0])
 		self.ClivedenFleetSignals = ["C10L", "C12L", "C10R", "C12R", "C14L", "C14RA", "C14RB", "C18LA", "C18LB", "C18R"]
 
+		self.cbC13Auto = wx.CheckBox(self, -1, "Automate block C13", (900, voffset+50))
+		self.Bind(wx.EVT_CHECKBOX, self.OnCBC13Auto, self.cbC13Auto)
+		self.cbC13Auto.Hide()
+		self.cbC13Auto.Enable(self.cliffControl != 0)
+		self.widgetMap[NaCl].append([self.cbC13Auto, 0])
+
 		self.cbYardFleet = wx.CheckBox(self, -1, "Yard Fleeting", (1650, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBYardFleet, self.cbYardFleet)
 		self.cbYardFleet.Hide()
@@ -783,7 +793,11 @@ class MainFrame(wx.Frame):
 				f = 1 if value != 0 else 0
 				for signm in self.CliffFleetSignals:
 					self.Request({"fleet": { "name": signm, "value": f}})
-			
+
+		elif name == "c13auto":
+			self.c13auto = (value != 0)
+			self.cbC13Auto.SetValue(self.c13auto)
+
 		elif name == "hyde.fleet":
 			self.cbHydeFleet.SetValue(value != 0)			
 			f = 1 if value != 0 else 0
@@ -842,6 +856,7 @@ class MainFrame(wx.Frame):
 		self.cbCliffFleet.Enable(ctl == 2)
 		self.cbBankFleet.Enable(ctl != 0)
 		self.cbClivedenFleet.Enable(ctl != 0)
+		self.cbC13Auto.Enable(ctl != 0)
 		self.Request({"control": { "name": "cliff", "value": ctl}})
 		self.cliffControl = ctl
 		
@@ -1000,6 +1015,7 @@ class MainFrame(wx.Frame):
 		self.cbCliffFleet.Enable(ctl == 2)
 		self.cbBankFleet.Enable(ctl != 0)
 		self.cbClivedenFleet.Enable(ctl != 0)
+		self.cbC13Auto.Enable(ctl != 0)
 		self.Request({"control": { "name": "cliff", "value": ctl}})
 		self.cliffControl = ctl
 
@@ -1058,6 +1074,9 @@ class MainFrame(wx.Frame):
 		for signm in self.ClivedenFleetSignals:
 			self.Request({"fleet": { "name": signm, "value": f}})
 		self.Request({"control": {"name": "cliveden.fleet", "value": f}})
+
+	def OnCBC13Auto(self, _):
+		self.c13auto = self.cbC13Auto.IsChecked()
 
 	def OnCBCarltonFleet(self, _):
 		f = 1 if self.cbCarltonFleet.IsChecked() else 0
@@ -1359,6 +1378,7 @@ class MainFrame(wx.Frame):
 			self.onTicker1Min()
 			
 		self.delayedRequests.CheckForExpiry(self.Request)
+		self.delayedSignals.CheckForExpiry()
 
 	def onTicker1Sec(self):
 		self.ClearExpiredButtons()
@@ -1644,7 +1664,7 @@ class MainFrame(wx.Frame):
 			exitBlk = ends[0]
 		else:
 			exitBlk = ends[1]
-			
+
 		if exitBlk in self.blocks:
 			b = self.blocks[exitBlk]
 			exitState = b.GetStatus()
@@ -1660,27 +1680,27 @@ class MainFrame(wx.Frame):
 			exitClear = 0
 			
 		if currentRoute is not None and currentRoute.GetName() == rtname:
-			return True, "Already at correct route"
+			return True, True, "Already at correct route"
 		
 		if (currentRoute is None or currentRoute.GetName() != rtname) and OSClear:
-			return False, "Unable to set route at present"
+			return False, False, "Unable to set route at present"
 
 		if exitState != 0 or exitClear != 0:
-			return False, "Unable to set route at present"
+			return False, False, "Unable to set route at present"
 					
 		if currentRoute is not None and currentRoute.GetName() == rtname and not OSClear and exitState != 0:
-			return False, "Unable to set route at present"
+			return False, False, "Unable to set route at present"
 		
 		tolist = desiredRoute.GetSetTurnouts()
 		for toname, wantedState in tolist:
 			trn = self.turnouts[toname]
 			wantedNormal = wantedState == "N"
 			if trn.IsLocked() and wantedNormal != trn.IsNormal():
-				return False, "Turnout %s is locked and not in wanted state (%s)" % (toname, wantedState)
+				return False, False, "Turnout %s is locked and not in wanted state (%s)" % (toname, wantedState)
 
 		district = osblk.GetDistrict()
 		district.SetUpRoute(osblk, desiredRoute)
-		return True, None
+		return True, False, None
 		
 	def SetRouteSignal(self, osname, rtname, blkname, signame):
 		osblk = self.blocks[osname]
@@ -1697,7 +1717,10 @@ class MainFrame(wx.Frame):
 		district = osblk.GetDistrict()
 		district.PerformSignalAction(signal)
 		return True, None
-			
+
+	def DelaySignalRequest(self, signm, osnm, rtnm, maxtime):
+		self.delayedSignals.Append(signm, osnm, rtnm, maxtime)
+
 	def CloseRouteTrainDlg(self, trainid):
 		if trainid in self.routeTrainDlgs:
 			self.routeTrainDlgs[trainid].Destroy()
@@ -2454,7 +2477,7 @@ class MainFrame(wx.Frame):
 			"checktrains":		self.DoCmdCheckTrains,
 			"dumptrains":		self.DoCmdDumpTrains,
 			"relay":			self.DoCmdNOOP,
-			"setroute":			self.DoCmdNOOP,
+			"setroute":			self.DoCmdSetRoute,
 			"turnoutlock":		self.DoCmdNOOP,
 			"signallock":		self.DoCmdSignalLock,
 			"traintimesrequest":	self.DoCmdTrainTimesRequest,
@@ -2572,6 +2595,17 @@ class MainFrame(wx.Frame):
 						blk = None
 			if blk is not None:
 				blk.SetEast(direction, broadcast=False)
+
+	def DoCmdSetRoute(self, parms):
+		for p in parms:
+			rtnm = p["route"]
+			osnm, signm = self.delayedSignals.GetSignal(rtnm)
+
+			if osnm is not None and signm is not None:
+				osblk = self.blocks[osnm]
+				signal = self.signals[signm]
+				district = osblk.GetDistrict()
+				district.PerformSignalAction(signal)
 
 	def DoCmdBlockClear(self, parms):
 		pass

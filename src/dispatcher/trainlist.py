@@ -215,6 +215,7 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.SetSizer(vsz)
 		self.Layout()
 		self.Fit()
+		self.CenterOnScreen()
 		
 	def ClickLeft(self, evt):
 		self.clickLeft = True

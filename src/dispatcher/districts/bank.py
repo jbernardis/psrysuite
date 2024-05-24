@@ -5,12 +5,13 @@ from dispatcher.turnout import Turnout
 from dispatcher.signal import Signal
 from dispatcher.handswitch import HandSwitch
 
-from dispatcher.constants import RESTRICTING, MAIN, DIVERGING, RegAspects
+from dispatcher.constants import RESTRICTING, MAIN, DIVERGING, RegAspects, OCCUPIED, EMPTY
 
 
 class Bank (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
+		self.C13Queue = self.frame.C13Queue
 		
 	def PerformHandSwitchAction(self, hs):
 		controlOpt = self.frame.cliffControl
@@ -282,11 +283,30 @@ class Bank (District):
 		return self.handswitches
 	
 	def DoBlockAction(self, blk, blockend, state):
-		District.DoBlockAction(self, blk, blockend, state)
 		blknm = blk.GetName()
+		controlOpt = self.frame.cliffControl
+		c13auto = self.frame.c13auto
+
+		# we need to know the east/west direction both before and after the block command is applied.  Before is
+		# applicable when the block is being exited before it gets set back to its default direction, and after
+		# is applicable on block entry when the train's direction is applied to the block
+		blkEastBefore = blk.GetEast()
+		District.DoBlockAction(self, blk, blockend, state)
+		blkEastAfter = blk.GetEast()
+
+		if controlOpt != 0 and c13auto:
+			# we are in either dispatcher all or dispatcher bank/cliveden mode
+			if blkEastAfter and blknm in [ "B11", "B21" ] and blockend is None and state == OCCUPIED:
+				rtname = "BRt" + blknm + "C13"
+				signm = "C18LA" if blknm == "B11" else "C18LB"
+				self.AutomatedBlockSetup(self.C13Queue, "BOSE", rtname, "C13", signm)
+
+			elif not blkEastBefore and blknm == "BOSE" and state == EMPTY:
+				self.AutomatedBlockTrigger(self.C13Queue)
+
 		if blknm in [ "B20", "B21" ]:
 			self.CheckBlockSignalsAdv("B20", "B21", "B20E", True)
-			
+
 	def DoSignalAction(self, sig, aspect, frozenaspect=None, callon=False):
 		District.DoSignalAction(self, sig, aspect, frozenaspect=frozenaspect, callon=callon)
 		signame = sig.GetName()

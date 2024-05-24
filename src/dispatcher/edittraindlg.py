@@ -199,6 +199,7 @@ class EditTrainDlg(wx.Dialog):
 		self.SetSizer(hsz)
 		self.Layout()
 		self.Fit()
+		self.CenterOnScreen()
 		
 		self.ShowTrainLocoDesc()
 

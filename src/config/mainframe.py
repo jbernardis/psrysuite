@@ -247,7 +247,7 @@ class MainFrame(wx.Frame):
 		self.ctlCliff = ["Cliff", "Dispatcher Bank/Cliveden", "Dispatcher All"]	
 		self.rbCtlCliff = wx.RadioBox(controlBox, wx.ID_ANY, "Cliff", choices=self.ctlCliff,
 					majorDimension=1, style=wx.RA_SPECIFY_COLS)
-		boxsizer.Add(self.rbCtlCliff, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+		boxsizer.Add(self.rbCtlCliff, 2, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 		self.rbCtlCliff.SetSelection(self.settings.control.cliff)
 
 		boxsizer.AddSpacer(10)
@@ -255,7 +255,7 @@ class MainFrame(wx.Frame):
 		self.ctlNassau = ["Nassau", "Dispatcher Main", "Dispatcher All"]	
 		self.rbCtlNassau = wx.RadioBox(controlBox, wx.ID_ANY, "Nassau", choices=self.ctlNassau,
 					majorDimension=1, style=wx.RA_SPECIFY_COLS)
-		boxsizer.Add(self.rbCtlNassau, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+		boxsizer.Add(self.rbCtlNassau, 2, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 		self.rbCtlNassau.SetSelection(self.settings.control.nassau)
 		
 		boxsizer.AddSpacer(10)
@@ -263,7 +263,7 @@ class MainFrame(wx.Frame):
 		self.ctlYard = ["Yard", "Dispatcher"]	
 		self.rbCtlYard = wx.RadioBox(controlBox, wx.ID_ANY, "Yard", choices=self.ctlYard,
 					majorDimension=1, style=wx.RA_SPECIFY_COLS)
-		boxsizer.Add(self.rbCtlYard, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+		boxsizer.Add(self.rbCtlYard, 2, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 		self.rbCtlYard.SetSelection(self.settings.control.yard)
 		
 		boxsizer.AddSpacer(10)
@@ -271,9 +271,15 @@ class MainFrame(wx.Frame):
 		self.ctlSignal4L = ["Port", "Dispatcher"]	
 		self.rbCtlSignal4L = wx.RadioBox(controlBox, wx.ID_ANY, "Signal 4L", choices=self.ctlSignal4L,
 					majorDimension=1, style=wx.RA_SPECIFY_COLS)
-		boxsizer.Add(self.rbCtlSignal4L, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+		boxsizer.Add(self.rbCtlSignal4L, 2, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 		self.rbCtlSignal4L.SetSelection(self.settings.control.signal4l)
 		
+		boxsizer.AddSpacer(10)
+
+		self.cbC13Auto = wx.CheckBox(controlBox, wx.ID_ANY, "Automate Block C13")
+		self.cbC13Auto.SetValue(self.settings.control.c13auto)
+		boxsizer.Add(self.cbC13Auto, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+
 		boxsizer.AddSpacer(10)
 
 		controlBox.SetSizer(boxsizer)
@@ -509,6 +515,7 @@ class MainFrame(wx.Frame):
 		self.settings.control.nassau = self.rbCtlNassau.GetSelection()
 		self.settings.control.yard = self.rbCtlYard.GetSelection()
 		self.settings.control.signal4l = self.rbCtlSignal4L.GetSelection()
+		self.settings.control.c13auto = self.cbC13Auto.IsChecked()
 
 		if self.settings.SaveAll():
 			dlg = wx.MessageDialog(self, "Configuration Data has been saved", "Data Saved", wx.OK | wx.ICON_INFORMATION)
