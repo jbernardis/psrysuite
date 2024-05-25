@@ -20,9 +20,8 @@ class Shore (District):
 				if signm in ["S12R", "S12LA", "S12LB", "S12LC", "S4R", "S4LA", "S4LB", "S4LC" ]:
 					if osblk.IsBusy():
 						self.ReportOSBusy(osblk.GetName())
-						return
-			District.PerformSignalAction(self, sig, callon=callon)
-			return
+						return False
+			return District.PerformSignalAction(self, sig, callon=callon)
 
 		aspect = sig.GetAspect()
 		signm = sig.GetName()
@@ -30,17 +29,18 @@ class Shore (District):
 		if movement:
 			if osblk.IsBusy() or self.blocks["SOSW"].IsBusy() or self.blocks["SOSE"].IsBusy():
 				self.ReportOSBusy(osblk.GetName())
-				return
+				return False
 			aspect = RESTRICTING
 		else:  # stopping
 			esig = osblk.GetEntrySignal()	
 			if esig is not None and esig.GetName() != signm:
 				self.frame.PopupEvent("Incorrect signal")
-				return
+				return False
 			aspect = STOP
 
 		self.frame.Request({"signal": { "name": signm, "aspect": aspect, "aspecttype": sig.GetAspectType()}})
 		sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
+		return True
 
 	def DoSignalAction(self, sig, aspect, frozenaspect=None, callon=False):
 		if not callon:

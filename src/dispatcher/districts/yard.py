@@ -83,9 +83,9 @@ class Yard (District):
 		controlOpt = self.frame.yardControl
 		if controlOpt == 0:  # Yard local control
 			self.frame.PopupEvent("Yard control is local")
-			return
+			return False
 
-		District.PerformSignalAction(self, sig, callon=callon)
+		return District.PerformSignalAction(self, sig, callon=callon)
 			
 	def SetUpRoute(self, osblk, route):
 		controlOpt = self.frame.yardControl

@@ -13,7 +13,7 @@ class Cliff (District):
 	def __init__(self, name, frame, screen):
 		District.__init__(self, name, frame, screen)
 		
-	def PerformHandSwitchAction(self, hs):
+	def PerformHandSwitchAction(self, hs, nv=None):
 		controlOpt = self.frame.cliffControl
 		if controlOpt != 2:  # cliff local control or limited to bank/cliveden (handled in those districts)
 			if controlOpt == 0:
@@ -23,7 +23,7 @@ class Cliff (District):
 			self.frame.PopupEvent(msg)
 			return
 
-		District.PerformHandSwitchAction(self, hs)
+		District.PerformHandSwitchAction(self, hs, nv)
 
 	def PerformSignalAction(self, sig, callon=False):
 		controlOpt = self.frame.cliffControl
@@ -33,9 +33,9 @@ class Cliff (District):
 			else:
 				msg = "Dispatcher control is Bank/Cliveden only"
 			self.frame.PopupEvent(msg)
-			return
+			return False
 
-		District.PerformSignalAction(self, sig, callon=callon)
+		return District.PerformSignalAction(self, sig, callon=callon)
 			
 	def SetUpRoute(self, osblk, route):
 		controlOpt = self.frame.cliffControl

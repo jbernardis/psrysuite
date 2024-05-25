@@ -18,9 +18,9 @@ class Latham (District):
 			controlOpt = self.frame.rbS4Control.GetSelection()
 			if controlOpt == 0:  # port controls this signal
 				self.frame.PopupEvent("Signal 4 control is with Port")
-				return
+				return False
 
-		District.PerformSignalAction(self, sig, callon=callon)
+		return District.PerformSignalAction(self, sig, callon=callon)
 
 	def DetermineRoute(self, blocks):
 		s3 = 'N' if self.turnouts["LSw3"].IsNormal() else 'R'

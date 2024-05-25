@@ -16,6 +16,7 @@ EWCrossoverPoints = [
 	["YOSWYE", "Y87"],
 ]
 
+
 class District:
 	def __init__(self, name, frame, screen):
 		self.sigLeverMap = None
@@ -836,6 +837,7 @@ class District:
 		osblknms = self.sigLeverMap[signame]
 		signm = None
 
+		movement = False
 		for osblknm in osblknms:
 			osblk = self.frame.blocks[osblknm]
 			route = osblk.GetRoute()

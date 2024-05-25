@@ -1715,8 +1715,8 @@ class MainFrame(wx.Frame):
 			return True, "Signal already permits movement"
 			
 		district = osblk.GetDistrict()
-		district.PerformSignalAction(signal)
-		return True, None
+		rc = district.PerformSignalAction(signal)
+		return rc, None
 
 	def DelaySignalRequest(self, signm, osnm, rtnm, maxtime):
 		self.delayedSignals.Append(signm, osnm, rtnm, maxtime)

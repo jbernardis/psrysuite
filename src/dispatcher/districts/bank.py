@@ -13,14 +13,14 @@ class Bank (District):
 		District.__init__(self, name, frame, screen)
 		self.C13Queue = self.frame.C13Queue
 		
-	def PerformHandSwitchAction(self, hs):
+	def PerformHandSwitchAction(self, hs, nv=None):
 		controlOpt = self.frame.cliffControl
 		if controlOpt == 0:  # cliff local control or limited to bank/cliveden (handled in those districts)
 			msg = "Cliff control is local"
 			self.frame.PopupEvent(msg)
 			return
 
-		District.PerformHandSwitchAction(self, hs)
+		District.PerformHandSwitchAction(self, hs, nv)
 		
 	def SetUpRoute(self, osblk, route):
 		controlOpt = self.frame.cliffControl
@@ -42,9 +42,9 @@ class Bank (District):
 		controlOpt = self.frame.cliffControl
 		if controlOpt == 0:  # bank local control
 			self.frame.PopupEvent("Bank control is local")
-			return
+			return False
 
-		District.PerformSignalAction(self, sig, callon=callon)
+		return District.PerformSignalAction(self, sig, callon=callon)
 
 	def DetermineRoute(self, blocks):
 		self.FindTurnoutCombinations(blocks, ["CSw17", "CSw23"])

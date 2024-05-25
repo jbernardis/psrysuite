@@ -20,10 +20,14 @@ class Nassau (District):
 		controlOpt = self.frame.nassauControl
 		if controlOpt == 0:  # nassau local control
 			self.frame.PopupEvent("Nassau control is local")
-			return
+			return False
 
 		signm = sig.GetName()
+
 		if controlOpt == 1:
+			mainOnly = False
+
+		else:
 			mainOnly = False
 			if signm == "N28L":
 				if not self.CheckIfMainRoute("NEOSRH"):
@@ -46,14 +50,12 @@ class Nassau (District):
 			elif signm not in [ "N26RC", "N24RA", "N16L", "N14LA" ]:  # dispatcher: main only
 				mainOnly = True
 
-			if mainOnly:
-				self.frame.PopupEvent("Nassau control is main only")
-				return
+		if mainOnly:
+			self.frame.PopupEvent("Nassau control is main only")
+			return False
 
-		if not District.PerformSignalAction(self, sig, callon=callon):
-			return
-		#self.EvaluateDistrictLocks(sig)
-		
+		return District.PerformSignalAction(self, sig, callon=callon)
+
 	def EvaluateDistrictLocks(self, sig, ossLocks=None):
 		if sig is None:
 			'''
