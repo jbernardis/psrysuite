@@ -18,9 +18,11 @@ def parseBoolean(val, defaultVal):
 	
 	return defaultVal
 
+
 class SNode:
 	def __init__(self):
 		pass
+
 
 class Debug:
 	def __init__(self):
@@ -29,12 +31,12 @@ class Debug:
 		self.identifytrain = False
 		self.loglevel = "DEBUG"
 
+
 class Settings:
 	def __init__(self):
 		self.datafolder = os.path.join(os.getcwd(), "data")
 		self.inifile = os.path.join(self.datafolder, INIFILE)
 
-		
 		self.cfg = configparser.ConfigParser()
 		self.cfg.optionxform = str
 		if not self.cfg.read(self.inifile):
@@ -85,8 +87,7 @@ class Settings:
 
 		else:
 			print("Missing %s section - assuming defaults" % section)
-			
-			
+
 		section = "dccsniffer"
 		self.dccsniffer = SNode()
 		self.dccsniffer.tty = "COM4"
@@ -98,7 +99,6 @@ class Settings:
 		else:
 			print("Missing dccsniffer section - assuming defaults")
 
-			
 		section = "control"
 		self.control = SNode()
 		self.control.nassau = 2
@@ -164,7 +164,7 @@ class Settings:
 				elif opt == 'matrixturnoutdelay':
 					try:
 						s = int(value)
-					except:
+					except ValueError:
 						print("invalid value in ini file for matrix turnout delay: %s" % value)
 						s = 2
 					self.dispatcher.matrixturnoutdelay = s
@@ -172,7 +172,7 @@ class Settings:
 				elif opt == 'clockstarttime':
 					try:
 						s = int(value)
-					except:
+					except ValueError:
 						print("invalid value in ini file for clock start timer: %s" % value)
 						s = 355
 					self.dispatcher.clockstarttime = s
@@ -196,7 +196,7 @@ class Settings:
 				if opt == 'pages':
 					try:
 						s = int(value)
-					except:
+					except ValueError:
 						print("invalid value in ini file for pages: (%s)" % value)
 						s = 3
 
@@ -229,22 +229,22 @@ class Settings:
 		self.activetrains.onlyassignedorunknown = False
 		if self.cfg.has_section(section):
 			for opt, value in self.cfg.items(section):
-					if opt == 'lines':
-						self.activetrains.lines = int(value)
-					elif opt == 'suppressyards':
-						self.activetrains.suppressyards = parseBoolean(value, True)
-	
-					elif opt == 'suppressunknown':
-						self.activetrains.suppressunknown = parseBoolean(value, False)
-	
-					elif opt == 'onlyassignedorunknown':
-						self.activetrains.onlyassignedorunknown = parseBoolean(value, False)
-	
-					elif opt == 'onlyassigned':
-						self.activetrains.onlyassigned = parseBoolean(value, False)
-	
-					elif opt == 'onlyatc':
-						self.activetrains.onlyatc = parseBoolean(value, False)		
+				if opt == 'lines':
+					self.activetrains.lines = int(value)
+				elif opt == 'suppressyards':
+					self.activetrains.suppressyards = parseBoolean(value, True)
+
+				elif opt == 'suppressunknown':
+					self.activetrains.suppressunknown = parseBoolean(value, False)
+
+				elif opt == 'onlyassignedorunknown':
+					self.activetrains.onlyassignedorunknown = parseBoolean(value, False)
+
+				elif opt == 'onlyassigned':
+					self.activetrains.onlyassigned = parseBoolean(value, False)
+
+				elif opt == 'onlyatc':
+					self.activetrains.onlyatc = parseBoolean(value, False)
 		else:
 			print("Missing %s section - assuming defaults" % section)
 
@@ -278,8 +278,7 @@ class Settings:
 					self.debug.identifytrain = parseBoolean(value, False)
 				elif opt == 'loglevel':
 					self.debug.loglevel = value
-				
-		
+
 		self.ipaddr = "192.168.1.138"
 		self.serverport = 9000
 		self.socketport = 9001
@@ -291,7 +290,7 @@ class Settings:
 				if opt == 'socketport':
 					try:
 						s = int(value)
-					except:
+					except ValueError:
 						print("invalid value in ini file for socket port: (%s)" % value)
 						s = 9001
 					self.socketport = s
@@ -299,7 +298,7 @@ class Settings:
 				elif opt == 'serverport':
 					try:
 						s = int(value)
-					except:
+					except ValueError:
 						print("invalid value in ini file for server port: (%s)" % value)
 						s = 9000
 					self.serverport = s
@@ -307,7 +306,7 @@ class Settings:
 				elif opt == 'dccserverport':
 					try:
 						s = int(value)
-					except:
+					except ValueError:
 						print("invalid value in ini file for DCC server port: (%s)" % value)
 						s = 9002
 					self.dccserverport = s
@@ -320,13 +319,15 @@ class Settings:
 					
 				elif opt == 'browser':
 					self.browser = value
-					
 
 		else:
 			print("Missing global section - assuming defaults")
-			
+
+		"""
+		process the command line next and override the settings file with the options seen there
+		"""
 		try:
-			opts, _ = getopt.getopt(sys.argv[1:],"",["dispatch","display", "simulate", "satellite"])
+			opts, _ = getopt.getopt(sys.argv[1:],"",["dispatch","display", "simulate", "sim", "nosimulate", "nosim", "satellite"])
 		except getopt.GetoptError:
 			print ('Invalid command line arguments - ignoring')
 			return 
@@ -335,25 +336,26 @@ class Settings:
 			print("command line option: %s" % opt, flush=True)
 			if opt == "--display":
 				self.dispatcher.dispatch = False
-				print("Overriding dispatch flag. Using command line: False")
+				self.dispatcher.satellite = False
+				print("Overriding dispatcher mode from command line: display")
 
 			elif opt == "--dispatch":
 				self.dispatcher.dispatch = True
 				self.dispatcher.satellite = False
-				print("Overriding dispatch flag. Using command line: True")
+				print("Overriding dispatcher mode from command line: dispatch")
 
 			elif opt == "--satellite":
 				self.dispatcher.dispatch = False
 				self.dispatcher.satellite = True
-				print("Overriding satellite flag. Using command line: True")
+				print("Overriding dispatcher mode from command line: satellite")
 
 			elif opt in [ "--simulate", "--sim" ]:
 				self.rrserver.simulation = True
-				print("Overriding simulation flag. Using command line: True")
+				print("Overriding simulation flag from command line: True")
 				
 			elif opt in [ "--nosimulate", "--nosim" ]:
 				self.rrserver.simulation = False
-				print("Overriding simulation flag. Using command line: False")
+				print("Overriding simulation flag from command line: False")
 		
 	def SaveAll(self):
 		print("entering saveall", flush=True)
@@ -379,7 +381,6 @@ class Settings:
 		self.cfg.set(section, "ioerrorthreshold", "%d" % self.rrserver.ioerrorthreshold)
 		self.cfg.set(section, "pendingdetectionlosscycles", "%d" % self.rrserver.pendingdetectionlosscycles)
 
-
 		section = "dccsniffer"
 		try:
 			self.cfg.add_section(section)
@@ -388,7 +389,6 @@ class Settings:
 		
 		self.cfg.set(section, "tty", self.dccsniffer.tty)
 
-		
 		section = "control"
 		try:
 			self.cfg.add_section(section)
@@ -448,7 +448,6 @@ class Settings:
 		self.cfg.set(section, "blockoccupancy", "True" if self.debug.blockoccupancy else "False")
 		self.cfg.set(section, "loglevel", self.debug.loglevel)
 
-		
 		section = GLOBAL
 		try:
 			self.cfg.add_section(section)
@@ -461,9 +460,7 @@ class Settings:
 		self.cfg.set(section, "socketport", "%d" % self.socketport)
 		self.cfg.set(section, "backupdir", self.backupdir)
 		self.cfg.set(section, "browser", self.browser)
-		
-		
-		
+
 		try:
 			cfp = open(self.inifile, 'w')
 		except:
