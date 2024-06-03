@@ -117,11 +117,11 @@ class MainFrame(wx.Frame):
 
 	def onSignalLever(self, evt):
 		print("main signal %s for lever %s panel %s" % (evt.position, evt.name, evt.panel))
-		self.rrServer.SendRequest({'siglever': {'name': evt.name, 'state': evt.position, 'callon': 0, "silent": 0}})
+		self.rrServer.SendRequest({'siglever': {'name': evt.name, 'state': evt.position, 'callon': 0, "silent": 0, 'source': 'ctc'}})
 
 	def onTurnoutLever(self, evt):
 		print("main turnout %s for lever %s panel %s" % (evt.position, evt.name, evt.panel))
-		self.rrServer.SendRequest({'turnoutlever': {'name': evt.name, 'state': evt.position, 'force': 0}})
+		self.rrServer.SendRequest({'turnoutlever': {'name': evt.name, 'state': evt.position, 'force': 0, 'source': 'ctc'}})
 
 	def raiseDeliveryEvent(self, data):  # thread context
 		try:

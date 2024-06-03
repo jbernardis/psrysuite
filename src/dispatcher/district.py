@@ -639,7 +639,7 @@ class District:
 		else:
 			turnout.SetReverse(refresh=True, force=force)
 
-	def DoTurnoutLeverAction(self, turnout, state, force=False):
+	def DoTurnoutLeverAction(self, turnout, state, force=False, source=None):
 		turnout = turnout.GetControlledBy()
 		if turnout.IsLocked() and not force:
 			self.ReportTurnoutLocked(turnout.GetName())
@@ -670,6 +670,10 @@ class District:
 			if aspect != 0:
 				logging.info("DoSignalAction returning because no possible routes")
 				return
+
+		if osblock is None:
+			logging.info("DoSignalAction returning because unable to identify os block")
+			return
 
 		if aspect < 0:
 			aspect = self.CalculateAspect(sig, osblock, self.frame.routes[rname], silent=True)
@@ -840,12 +844,43 @@ class District:
 	def EvaluateDistrictLocks(self, sig, ossLocks=None):
 		pass
 
-	def DoSignalLeverAction(self, signame, state, callon, silent=1):
+	def DoSignalLeverAction(self, signame, state, callon, silent=1, source=None):
+		signm, movement, osblk, route = self.LeverToSigname(signame, state)
+		if signm is None:
+			if silent == 0:
+				self.frame.PopupEvent("No Available Route")
+			return
+
+		sig = self.frame.signals[signm]
+		if not sig:
+			if silent == 0:
+				self.frame.PopupEvent("No Available S1gnal")
+			return
+		
+		aspectType = sig.GetAspectType()
+
+		if movement:
+			if callon:
+				aspect = restrictedaspect(sig.GetAspectType())
+			else:
+				aspect = self.CalculateAspect(sig, osblk, route)
+				if aspect is None:
+					return
+		else:
+			aspect = 0
+
+		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "aspecttype": aspectType, "callon": 1 if callon else 0}})
+	
+		if not callon:
+			sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
+
+	def LeverToSigname(self, signame, state):
 		sigPrefix = signame.split(".")[0]
 		osblknms = self.sigLeverMap[signame]
 		signm = None
-
 		movement = False
+		osblk = None
+		route = None
 		for osblknm in osblknms:
 			osblk = self.frame.blocks[osblknm]
 			route = osblk.GetRoute()
@@ -884,34 +919,8 @@ class District:
 							signm = sigr
 							movement = False
 							break
-						
-		if signm is None:
-			if silent == 0:
-				self.frame.PopupEvent("No Available Route")
-			return
+		return signm, movement, osblk, route
 
-		sig = self.frame.signals[signm]
-		if not sig:
-			if silent == 0:
-				self.frame.PopupEvent("No Available S1gnal")
-			return
-		
-		aspectType = sig.GetAspectType()
-
-		if movement:
-			if callon:
-				aspect = restrictedaspect(sig.GetAspectType())
-			else:
-				aspect = self.CalculateAspect(sig, osblk, route)
-				if aspect is None:
-					return
-		else:
-			aspect = 0
-
-		self.frame.Request({"signal": {"name": signm, "aspect": aspect, "aspecttype": aspectType, "callon": 1 if callon else 0}})
-	
-		if not callon:
-			sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 
 	def LockTurnoutsForSignal(self, osblknm, sig, flag):
 		signm = sig.GetName()

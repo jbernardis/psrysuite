@@ -109,6 +109,7 @@ class SigLever(wx.Panel):
 			mask = wx.Mask(png, wx.BLUE)
 			png.SetMask(mask)
 			SigLever.images[f] = png
+
 	def onSize(self, _):
 		self.initBuffer()
 
@@ -152,7 +153,7 @@ class SigLever(wx.Panel):
 					revt = SignalLeverEvent(position=LEFT, label=self.label, name=self.name, panel=self.panel, lever=self)
 					self.bmpPlate = SigLever.images[SIGLEFT] if self.enabled else SigLever.images[SIGLEFTDISABLED]
 					self.requestedState = LEFT
-					wx.CallLater(5000, self.checkIfCompleted)
+					wx.CallLater(3000, self.checkIfCompleted)
 			else:
 				if self.state == LEFT:
 					revt = SignalLeverEvent(position=NEUTRAL, label=self.label, name=self.name, panel=self.panel, lever=self)
@@ -164,7 +165,7 @@ class SigLever(wx.Panel):
 					revt = SignalLeverEvent(position=RIGHT, label=self.label, name=self.name, panel=self.panel, lever=self)
 					self.bmpPlate = SigLever.images[SIGRIGHT] if self.enabled else SigLever.images[SIGRIGHTDISABLED]
 					self.requestedState = RIGHT
-					wx.CallLater(5000, self.checkIfCompleted)
+					wx.CallLater(3000, self.checkIfCompleted)
 
 			self.Refresh()
 			if revt is not None:

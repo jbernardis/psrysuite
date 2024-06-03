@@ -17,44 +17,55 @@ class Nassau (District):
 		self.NELocks = [False, False, False]
 
 	def PerformSignalAction(self, sig, callon=False):
+		signm = sig.GetName()
+		if not self.CheckControlOption(signm):
+			return False
+
+		return District.PerformSignalAction(self, sig, callon=callon)
+
+	def DoSignalLeverAction(self, signame, state, callon, silent=1, source=None):
+		if source == 'ctc':
+			signm, movement, osblk, route = self.LeverToSigname(signame, state)
+			if signm is None:
+				if silent == 0:
+					self.frame.PopupEvent("No Available Route")
+				return False
+
+			if not self.CheckControlOption(signm):
+				return False
+
+		return District.DoSignalLeverAction(self, signame, state, callon, silent, source)
+
+	def CheckControlOption(self, signm):
 		controlOpt = self.frame.nassauControl
 		if controlOpt == 0:  # nassau local control
 			self.frame.PopupEvent("Nassau control is local")
 			return False
 
-		signm = sig.GetName()
+		if controlOpt == 2:
+			return True # dispatcher all - proceed
 
-		if controlOpt == 1:
-			mainOnly = False
-
+		# else dispatcher main only
+		if signm == "N28L":
+			mainOnly = self.CheckIfMainRoute("NEOSRH")
+		elif signm  in ["N26L", "N26RC"]:
+			mainOnly = self.CheckIfMainRoute("NEOSW")
+		elif signm in ["N24L", "N24RA"]:
+			mainOnly = self.CheckIfMainRoute("NEOSE")
+		elif signm == "N18R":
+			mainOnly = self.CheckIfMainRoute("NWOSCY")
+		elif signm in ["N16R", "N16L"]:
+			mainOnly = self.CheckIfMainRoute("NWOSW")
+		elif signm in ["N14R", "N14LA"]:
+			mainOnly = self.CheckIfMainRoute("NWOSE")
 		else:
 			mainOnly = False
-			if signm == "N28L":
-				if not self.CheckIfMainRoute("NEOSRH"):
-					mainOnly = True
-			elif signm == "N26L":
-				if not self.CheckIfMainRoute("NEOSW"):
-					mainOnly = True
-			elif signm == "N24L":
-				if not self.CheckIfMainRoute("NEOSE"):
-					mainOnly = True
-			elif signm == "N18R":
-				if not self.CheckIfMainRoute("NWOSCY"):
-					mainOnly = True
-			elif signm == "N16R":
-				if not self.CheckIfMainRoute("NWOSW"):
-					mainOnly = True
-			elif signm == "N14R":
-				if not self.CheckIfMainRoute("NWOSE"):
-					mainOnly = True
-			elif signm not in [ "N26RC", "N24RA", "N16L", "N14LA" ]:  # dispatcher: main only
-				mainOnly = True
 
 		if mainOnly:
-			self.frame.PopupEvent("Nassau control is main only")
-			return False
+			return True
 
-		return District.PerformSignalAction(self, sig, callon=callon)
+		self.frame.PopupEvent("Nassau control is main only")
+		return False
 
 	def EvaluateDistrictLocks(self, sig, ossLocks=None):
 		if sig is None:

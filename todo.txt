@@ -12,3 +12,7 @@ move all dialog boxes to center of screen (unless that are fixed elsewhere for a
 automate management of single track if dispatcher all or dispatcher cliveden/martinsville:
     EB train entering B11 or B21 or leaves COSCLW
     WB train entering C23, C12 or leaving BOSE
+
+ CTC panels, proper handling of
+    1) signal 4 control option
+    2) crossing into harpers ferry at shore

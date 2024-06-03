@@ -18,6 +18,11 @@ class CTCPanel(wx.Dialog):
 
 		self.SetBackgroundColour(wx.Colour(0, 0, 0))
 
+		label = wx.StaticText(self, wx.ID_ANY, name)
+		labelFont = wx.Font(wx.Font(14, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+		label.SetFont(labelFont)
+		label.SetForegroundColour(wx.Colour(192, 192, 0))
+
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(5)
 		for sig in self.signals:
@@ -40,6 +45,8 @@ class CTCPanel(wx.Dialog):
 			hsz2.AddSpacer(5)
 
 		vsz = wx.BoxSizer(wx.VERTICAL)
+		vsz.AddSpacer(5)
+		vsz.Add(label, 1, wx.ALIGN_CENTER_HORIZONTAL)
 		vsz.AddSpacer(5)
 		vsz.Add(hsz)
 		vsz.AddSpacer(5)

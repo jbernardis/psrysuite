@@ -2525,7 +2525,6 @@ class MainFrame(wx.Frame):
 
 	def DoCmdTurnoutLever(self, parms):
 		for p in parms:
-			print("Do turnout lever: %s" % str(p))
 			turnout = p["name"]
 			state = p["state"]
 			try:
@@ -2534,13 +2533,18 @@ class MainFrame(wx.Frame):
 				force = False
 
 			try:
-				to = self.turnouts[turnout]
+				tout = self.turnouts[turnout]
 			except KeyError:
-				to = None
+				tout = None
 
-			if to is not None and state != to.GetStatus():
-				district = to.GetDistrict()
-				district.DoTurnoutLeverAction(to, state, force=force)
+			try:
+				source = p["source"]
+			except KeyError:
+				source = None
+
+			if tout is not None and state != tout.GetStatus():
+				district = tout.GetDistrict()
+				district.DoTurnoutLeverAction(tout, state, force=force, source=source)
 
 	def DoCmdFleet(self, parms):
 		for p in parms:
@@ -2671,11 +2675,16 @@ class MainFrame(wx.Frame):
 				except (KeyError, ValueError):
 					silent = 1
 
+				try:
+					source = p["source"]
+				except KeyError:
+					source = None
+
 				district = self.GetSignalLeverDistrict(signame)
 				if district is None:
 					# unable to find district for signal lever
 					return
-				district.DoSignalLeverAction(signame, state, callon=callon, silent=silent)
+				district.DoSignalLeverAction(signame, state, callon=callon, silent=silent, source=source)
 				
 	def DoCmdSignalLock(self, parms):
 		if self.IsDispatcher():

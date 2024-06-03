@@ -68,6 +68,24 @@ class Cliveden (District):
 
 		return District.PerformSignalAction(self, sig, callon=callon)
 
+	def DoSignalLeverAction(self, signame, state, callon, silent=1, source=None):
+		controlOpt = self.frame.cliffControl
+		if source == "ctc":
+			if controlOpt == 0:
+				self.frame.PopupEvent("Cliff control is local")
+				return False
+
+		return District.DoSignalLeverAction(self, signame, state, callon, silent, source)
+
+	def DoTurnoutLeverAction(self, turnout, state, force=False, source=None):
+		controlOpt = self.frame.cliffControl
+		if source == "ctc":
+			if controlOpt == 0:
+				self.frame.PopupEvent("Cliff control is local")
+				return False
+
+		return District.DoTurnoutLeverAction(self, turnout, state, force, source)
+
 	def DetermineRoute(self, blocks):
 		self.FindTurnoutCombinations(blocks, ["CSw9", "CSw13"])
 

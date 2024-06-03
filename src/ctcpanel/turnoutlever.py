@@ -145,12 +145,17 @@ class TurnoutLever(wx.Panel):
 			self.Refresh()
 			if revt is not None:
 				wx.QueueEvent(self, revt)
-
+				wx.CallLater(3000, self.checkIfCompleted)
 
 		evt.Skip()
 
 	def checkIfCompleted(self):
-		pass
+		if self.requestedState is None:
+			return
+
+		self.bmpPlate = self.images[SWNEUTRAL]
+		self.requestedState = None
+		self.Refresh()
 
 	def inHotSpot(self, x, y):
 		return 5 <= x <= 55 and 17 <= y <= 60
