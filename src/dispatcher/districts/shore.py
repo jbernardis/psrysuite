@@ -577,6 +577,20 @@ class Shore (District):
 			self.blocks[blknm].SetSBSignals(siglist)
 			self.blocks[blknm].SetSignals(siglist)
 
+
+		self.sigLeverMap = {
+			"S4.lvr" : ["SOSE", "SOSW"],
+			"S8.lvr":  ["SOSHF"],
+			"S12.lvr": ["SOSE", "SOSW"],
+			"S16.lvr": ["SOSHJE"],
+			"S18.lvr": ["SOSHJE", "SOSHJM"],
+			"S20.lvr": ["SOSHJE", "SOSHJM", "SOSHJW"],
+		}
+
+		for sl in self.sigLeverMap:
+			self.frame.AddSignalLever(sl, self)
+
+
 		self.routes = {}
 		self.osSignals = {}
 

@@ -639,6 +639,14 @@ class District:
 		else:
 			turnout.SetReverse(refresh=True, force=force)
 
+	def DoTurnoutLeverAction(self, turnout, state, force=False):
+		turnout = turnout.GetControlledBy()
+		if turnout.IsLocked() and not force:
+			self.ReportTurnoutLocked(turnout.GetName())
+			return
+
+		self.frame.Request({"turnout": {"name": turnout.GetName(), "status": state, "force": force}})
+
 	def DoSignalAction(self, sig, aspect, frozenaspect=None, callon=False):
 		signm = sig.GetName()
 		atype = sig.GetAspectType()
@@ -832,7 +840,7 @@ class District:
 	def EvaluateDistrictLocks(self, sig, ossLocks=None):
 		pass
 
-	def DoSignalLeverAction(self, signame, state, callon):
+	def DoSignalLeverAction(self, signame, state, callon, silent=1):
 		sigPrefix = signame.split(".")[0]
 		osblknms = self.sigLeverMap[signame]
 		signm = None
@@ -841,7 +849,7 @@ class District:
 		for osblknm in osblknms:
 			osblk = self.frame.blocks[osblknm]
 			route = osblk.GetRoute()
-			
+
 			if route:
 				sigs = route.GetSignals()
 				sigl = None
@@ -878,10 +886,14 @@ class District:
 							break
 						
 		if signm is None:
+			if silent == 0:
+				self.frame.PopupEvent("No Available Route")
 			return
 
 		sig = self.frame.signals[signm]
 		if not sig:
+			if silent == 0:
+				self.frame.PopupEvent("No Available S1gnal")
 			return
 		
 		aspectType = sig.GetAspectType()

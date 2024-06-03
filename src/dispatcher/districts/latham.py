@@ -352,6 +352,18 @@ class Latham (District):
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 
+		self.sigLeverMap = {
+			"L4.lvr" : ["LOSLAW", "LOSLAM", "LOSLAE"],
+			"L6.lvr":  ["LOSLAW", "LOSLAM", "LOSLAE"],
+			"L8.lvr":  ["LOSLAW", "LOSLAM", "LOSLAE"],
+			"L14.lvr": ["LOSCAE", "LOSCAM"],
+			"L16.lvr": ["LOSCAM"],
+			"L18.lvr": ["LOSCAM", "LOSCAW"],
+		}
+
+		for sl in self.sigLeverMap:
+			self.frame.AddSignalLever(sl, self)
+
 		self.signals["L6RA"].SetMutexSignals(["L6RB"])
 		self.signals["L6RB"].SetMutexSignals(["L6RA"])
 

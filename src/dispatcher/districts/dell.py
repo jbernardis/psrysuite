@@ -284,6 +284,16 @@ class Dell (District):
 		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSignals(siglist)
 
+		self.sigLeverMap = {
+			"D4.lvr" : ["DOSVJE", "DOSVJW"],
+			"D6.lvr":  ["DOSVJE", "DOSVJW"],
+			"D10.lvr": ["DOSFOE", "DOSFOW"],
+			"D12.lvr": ["DOSFOE", "DOSFOW"],
+		}
+
+		for sl in self.sigLeverMap:
+			self.frame.AddSignalLever(sl, self)
+
 		self.routes = {}
 		self.osSignals = {}
 

@@ -308,6 +308,17 @@ class Krulish (District):
 			"N25": ("S16L",  "K4R")
 		}
 
+
+		self.sigLeverMap = {
+			"K2.lvr" : ["KOSW", "KOSM", "KOSE"],
+			"K4.lvr":  ["KOSM"],
+			"K8.lvr":  ["KOSW", "KOSM"]
+		}
+
+		for sl in self.sigLeverMap:
+			self.frame.AddSignalLever(sl, self)
+
+
 		for blknm, siglist in self.blockSigs.items():
 			self.blocks[blknm].SetSBSignals(siglist)
 			self.blocks[blknm].SetSignals(siglist)

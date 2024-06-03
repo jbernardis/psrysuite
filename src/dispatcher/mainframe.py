@@ -444,6 +444,7 @@ class MainFrame(wx.Frame):
 		
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})
+		self.Request({"ctccmd": {"action": "resetscreen", "screen": self.currentScreen}})
 			
 	def OnBResetClock(self, _):
 		self.tickerCount = 0
@@ -2108,6 +2109,8 @@ class MainFrame(wx.Frame):
 				else:
 					w.Hide()
 
+		self.Request({"ctccmd": {"action": "setscreen", "screen": screen}})
+
 		return True
 
 	def PlaceWidgets(self):
@@ -2449,6 +2452,7 @@ class MainFrame(wx.Frame):
 	def CreateDispatchTable(self):					
 		self.dispatch = {
 			"turnout":			self.DoCmdTurnout,
+			"turnoutlever":		self.DoCmdTurnoutLever,
 			"fleet":			self.DoCmdFleet,
 			"block":			self.DoCmdBlock,
 			"blockdir":			self.DoCmdBlockDir,
@@ -2518,6 +2522,25 @@ class MainFrame(wx.Frame):
 				district = to.GetDistrict()
 				st = REVERSE if state == "R" else NORMAL
 				district.DoTurnoutAction(to, st, force=force)
+
+	def DoCmdTurnoutLever(self, parms):
+		for p in parms:
+			print("Do turnout lever: %s" % str(p))
+			turnout = p["name"]
+			state = p["state"]
+			try:
+				force = p["force"]
+			except:
+				force = False
+
+			try:
+				to = self.turnouts[turnout]
+			except KeyError:
+				to = None
+
+			if to is not None and state != to.GetStatus():
+				district = to.GetDistrict()
+				district.DoTurnoutLeverAction(to, state, force=force)
 
 	def DoCmdFleet(self, parms):
 		for p in parms:
@@ -2640,15 +2663,19 @@ class MainFrame(wx.Frame):
 				signame = p["name"]
 				state = p["state"]
 				try:
-					callon = p["callon"]
-				except KeyError:
+					callon = int(p["callon"])
+				except (KeyError, ValueError):
 					callon = 0
+				try:
+					silent = int(p["silent"])
+				except (KeyError, ValueError):
+					silent = 1
 
 				district = self.GetSignalLeverDistrict(signame)
 				if district is None:
 					# unable to find district for signal lever
 					return
-				district.DoSignalLeverAction(signame, state, callon == 1)
+				district.DoSignalLeverAction(signame, state, callon=callon, silent=silent)
 				
 	def DoCmdSignalLock(self, parms):
 		if self.IsDispatcher():
