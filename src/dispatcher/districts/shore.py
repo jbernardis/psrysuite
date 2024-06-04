@@ -76,7 +76,21 @@ class Shore (District):
 			
 		District.DoSignalAction(self, sig, aspect, frozenaspect=frozenaspect, callon=callon)
 		self.drawCrossing()
-		
+
+	def DoSignalLeverAction(self, signame, state, callon, silent=1, source=None):
+		if source == "ctc":
+			if signame == "S8.lvr":
+				for osname in ["SOSE", "SOSW"]:
+					if self.blocks[osname].IsBusy():
+						self.ReportOSBusy(osname)
+						return False
+
+			elif signame in ["S12.lvr", "S4.lvr"]:
+				if self.blocks["SOSHF"].IsBusy():
+					self.ReportOSBusy("SOSHF")
+					return False
+
+		return District.DoSignalLeverAction(self, signame, state, callon, silent, source)
 		
 	def DoBlockAction(self, blk, blockend, state):
 		blknm = blk.GetName()
