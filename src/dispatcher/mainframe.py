@@ -48,9 +48,8 @@ from dispatcher.rrserver import RRServer
 from dispatcher.edittraindlg import EditTrainDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
 
-#===============================================================================
-# from utilities.testroutesdlg import TestRoutesDlg
-#===============================================================================
+from ctcmanager.ctcmanager import CTCManager
+
 
 MENU_ATC_REMOVE  = 900
 MENU_ATC_STOP    = 901
@@ -100,6 +99,8 @@ class MainFrame(wx.Frame):
 		self.pidAdvisor = None
 		self.OSSLocks = True
 		self.sidingsUnlocked = False
+		self.CTCManager = None
+		self.CTCVisible = False
 		
 		self.shift = False
 		self.shiftXOffset = 0
@@ -158,11 +159,11 @@ class MainFrame(wx.Frame):
 		topSpace = 120
 		
 		ht = None # diagram height.  None => use bitmap size.  use a number < 800 to trim bottom off of diagram bitmaps
-		self.diagramWidth = 2560
+		self.diagramWidth = 2544
 
 		if self.settings.display.pages == 1:  # set up a single ultra-wide display accross 3 monitors
 			dp = TrackDiagram(self, [self.diagrams[sn] for sn in screensList], ht)
-			dp.SetPosition((16, 120))
+			dp.SetPosition((8, 120))
 			_, diagramh = dp.GetSize()
 			self.panels = {self.diagrams[sn].screen : dp for sn in screensList}  # all 3 screens just point to the same diagram
 			totalw = self.diagramWidth*3
@@ -189,8 +190,17 @@ class MainFrame(wx.Frame):
 			b = wx.Button(self, wx.ID_ANY, "Nassau/Bank/Cliff",   pos=(1790, voffset), size=(200, 50))
 			self.Bind(wx.EVT_BUTTON, lambda event: self.SwapToScreen(NaCl), b)
 			self.bScreenNaCl = b
-			totalw = self.diagramWidth+20
+			totalw = self.diagramWidth
 			self.centerOffset = 0
+
+		self.CTCManager = CTCManager(self, self.settings, self.diagrams)
+		for screen, pos, bmp in self.CTCManager.GetBitmaps():
+			offset = self.diagrams[screen].offset
+			self.panels[screen].DrawCTCBitmap(pos[0], pos[1], offset, bmp)
+		for label, font, screen, lblx, lbly in self.CTCManager.GetLabels():
+			offset = self.diagrams[screen].offset
+			self.panels[screen].DrawCTCLabel(lblx, lbly, offset, font, label)
+
 
 		self.ToasterSetup()
 
@@ -201,9 +211,9 @@ class MainFrame(wx.Frame):
 		self.widgetMap = {HyYdPt: [], LaKr: [], NaCl: []}
 		self.DefineWidgets(voffset)
 		self.DefineControlDisplay(voffset)
-		
+
+		self.currentScreen = None
 		if self.settings.display.pages == 3:
-			self.currentScreen = None
 			self.SwapToScreen(LaKr)
 		else:
 			self.PlaceWidgets()
@@ -406,11 +416,17 @@ class MainFrame(wx.Frame):
 			self.SetShift(False)
 			for pnl in self.panels.values():
 				pnl.SetShift(False)
-				
+
 		elif kcd == wx.WXK_F1:
 			dlg = InspectDlg(self, self.settings)
 			dlg.ShowModal()
 			dlg.Destroy()
+
+		elif kcd == wx.WXK_F2:
+			self.CTCVisible = not self.CTCVisible
+			for dp in self.panels.values():
+				dp.ShowCTC(self.CTCVisible)
+			self.CTCManager.SetVisible(self.CTCVisible)
 
 		else:
 			#self.PopupEvent("Key Code: %d" % kcd)
@@ -435,8 +451,9 @@ class MainFrame(wx.Frame):
 		self.ResetScreen()
 		
 	def ResetScreen(self):
-		self.SetMaxSize((self.totalw+WIDTHADJUST, self.totalh))
-		self.SetSize((self.totalw+WIDTHADJUST, self.totalh))
+		print("set max screen width to %s" % (self.totalw+16), flush=True)
+		self.SetMaxSize((self.totalw+16+WIDTHADJUST, self.totalh))
+		self.SetSize((self.totalw+16+WIDTHADJUST, self.totalh))
 		self.SetPosition((-self.centerOffset, 0))
 		
 		self.shiftXOffset = -self.centerOffset
@@ -444,8 +461,9 @@ class MainFrame(wx.Frame):
 		
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})
-		self.Request({"ctccmd": {"action": "resetscreen", "screen": self.currentScreen}})
-			
+		if self.CTCManager is not None:
+			self.CTCManager.ResetScreen(self.currentScreen)
+
 	def OnBResetClock(self, _):
 		self.tickerCount = 0
 		self.timeValue = self.settings.dispatcher.clockstarttime
@@ -544,7 +562,7 @@ class MainFrame(wx.Frame):
 		if self.IsDispatcher():
 			return 
 		
-		f = wx.Font(16, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")
+		f = wx.Font(16, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")
 		
 		self.stCliffControl = wx.StaticText(self, wx.ID_ANY, "CLIFF: Dispatch All", pos=(2100, voffset+10))
 		self.stCliffControl.Hide()
@@ -1429,12 +1447,12 @@ class MainFrame(wx.Frame):
 			if self.buttonsToClear[bx][1].GetName() == bnm:
 				self.buttonsToClear[bx][0] = secs
 
-	def ProcessClick(self, screen, pos, shift=False, right=False, screenpos=None):
+	def ProcessClick(self, screen, pos, rawpos, shift=False, right=False, screenpos=None):
 		self.SetShift(False, propagate=True)
 		# ignore screen clicks if not connected
 		if not self.subscribed:
 			return
-		
+
 		#logging.debug("%s click %s %d, %d %s" % ("right" if right else "left", screen, pos[0], pos[1], "shift" if shift else ""))
 		try:
 			to = self.turnoutMap[(screen, pos)]
@@ -1614,7 +1632,11 @@ class MainFrame(wx.Frame):
 
 					else:
 						self.EditTrain(tr, blk)					
-		
+				return
+
+		if self.CTCManager is not None:
+			self.CTCManager.CheckHotSpots(self.currentScreen, rawpos[0], rawpos[1])
+
 	def formatSigLvr(self, data):
 		dl = 0 if data[0] is None else data[0]
 		dc = 0 if data[1] is None else data[1]
@@ -2109,7 +2131,8 @@ class MainFrame(wx.Frame):
 				else:
 					w.Hide()
 
-		self.Request({"ctccmd": {"action": "setscreen", "screen": screen}})
+		if self.CTCManager is not None:
+			self.CTCManager.SetScreen(screen)
 
 		return True
 
@@ -2453,6 +2476,7 @@ class MainFrame(wx.Frame):
 		self.dispatch = {
 			"turnout":			self.DoCmdTurnout,
 			"turnoutlever":		self.DoCmdTurnoutLever,
+			"turnoutlock":		self.DoCmdTurnoutLock,
 			"fleet":			self.DoCmdFleet,
 			"block":			self.DoCmdBlock,
 			"blockdir":			self.DoCmdBlockDir,
@@ -2482,7 +2506,6 @@ class MainFrame(wx.Frame):
 			"dumptrains":		self.DoCmdDumpTrains,
 			"relay":			self.DoCmdNOOP,
 			"setroute":			self.DoCmdSetRoute,
-			"turnoutlock":		self.DoCmdNOOP,
 			"signallock":		self.DoCmdSignalLock,
 			"traintimesrequest":	self.DoCmdTrainTimesRequest,
 			"traintimesreport":		self.DoCmdTrainTimesReport,
@@ -2522,6 +2545,13 @@ class MainFrame(wx.Frame):
 				district = to.GetDistrict()
 				st = REVERSE if state == "R" else NORMAL
 				district.DoTurnoutAction(to, st, force=force)
+
+		if self.CTCManager is not None:
+			self.CTCManager.DoCmdTurnout(parms)
+
+	def DoCmdTurnoutLock(self, parms):
+		if self.CTCManager is not None:
+			self.CTCManager.DoCmdTurnoutLock(parms)
 
 	def DoCmdTurnoutLever(self, parms):
 		for p in parms:
@@ -2660,6 +2690,9 @@ class MainFrame(wx.Frame):
 				district = sig.GetDistrict()
 				district.DoSignalAction(sig, aspect, frozenaspect=frozenaspect, callon=callon)
 				self.activeTrains.UpdateForSignal(sig)
+
+		if self.CTCManager is not None:
+			self.CTCManager.DoCmdSignal(parms)
 
 	def DoCmdSigLever(self, parms):
 		if self.IsDispatcher():

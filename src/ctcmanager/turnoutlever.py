@@ -1,5 +1,4 @@
 import wx
-import wx.lib.newevent
 import os
 
 SWNORMAL= "SwNormal"
@@ -15,23 +14,17 @@ LAMPGREEN = "LampGreen"
 NORMAL = "N"
 REVERSE= "R"
 
-(TurnoutLeverEvent,   EVT_TURNOUT_LEVER)  = wx.lib.newevent.NewEvent()
 
-
-class TurnoutLever(wx.Panel):
+class TurnoutLever:
 	images = None
 
-	def __init__(self, parent, label, name, panel):
-		self.parent = parent
+	def __init__(self, frame, label, name, screen, pos):
+		self.frame = frame
 		self.label = label
 		self.name = name
-		self.panel = panel
-		wx.Panel.__init__(self, parent, size=(60, 85))
+		self.screen = screen
+		self.pos = [x for x in pos]
 		self.buffer = None
-		self.Bind(wx.EVT_SIZE, self.onSize)
-		self.Bind(wx.EVT_PAINT, self.onPaint)
-		self.Bind(wx.EVT_MOTION, self.onMouseMove)
-		self.Bind(wx.EVT_LEFT_DOWN, self.onMouseClick)
 
 		if TurnoutLever.images is None:
 			TurnoutLever.loadBitmaps()
@@ -46,12 +39,13 @@ class TurnoutLever(wx.Panel):
 		self.requestedState = None
 
 		if len(self.label) == 1:
-			self.labelx = 27
+			ox = 26
 		elif len(self.label) == 2:
-			self.labelx = 24
+			ox = 23
 		else:
-			self.labelx = 21
-		self.labely = 19
+			ox = 20
+		self.labelx = self.pos[0]+ox
+		self.labely = self.pos[1]+19
 		self.labelFont = wx.Font(wx.Font(10, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
 
 	def Enable(self, flag=True):
@@ -66,8 +60,6 @@ class TurnoutLever(wx.Panel):
 		else:
 			self.bmpN = TurnoutLever.images[LAMPOFF]
 			self.bmpR = TurnoutLever.images[LAMPOFF]
-
-		self.Refresh()
 
 	def SetTurnoutState(self, state):
 		self.requestedState = None
@@ -85,7 +77,16 @@ class TurnoutLever(wx.Panel):
 				SWNEUTRALDISABLED]
 			self.state = REVERSE
 			print("set to reverse")
-		self.Refresh()
+
+	def GetBitmaps(self):
+		return [
+			[self.screen, (self.pos[0], self.pos[1]+17), self.bmpPlate],
+			[self.screen, (self.pos[0], self.pos[1]), self.bmpN],
+			[self.screen, (self.pos[0]+40, self.pos[1]), self.bmpR]
+		]
+
+	def GetLabel(self):
+		return self.label, self.labelFont, self.screen, self.labelx, self.labely
 
 	@classmethod
 	def loadBitmaps(self):
@@ -99,55 +100,32 @@ class TurnoutLever(wx.Panel):
 			png.SetMask(mask)
 			TurnoutLever.images[f] = png
 
-	def onSize(self, _):
-		self.initBuffer()
-
-	def onPaint(self, _):
-		dc = wx.PaintDC(self)
-		self.drawImage(dc)
-
-	def onMouseMove(self, evt):
-		x, y = evt.GetPosition()
-		if self.inHotSpot(x, y) is not None:
-			self.SetCursor(wx.Cursor(wx.CURSOR_HAND))
-		else:
-			self.SetCursor(wx.Cursor(wx.CURSOR_ARROW))
-
-	def onMouseClick(self, evt):
-		if not self.parent.IsConnected():
-			evt.Skip()
-			return
-
+	def LeverClick(self, direction):
+		self.parent.PopupEvent("mouse click turnout %s.%s" % (self.name, direction))
 		if not self.enabled:
-			evt.Skip()
-			return
+			return False
 
 		if self.requestedState is not None:
-			evt.Skip()
-			return
+			return False
 
-		x, y = evt.GetPosition()
-		if self.inHotSpot(x, y):
-			click = NORMAL if x < 30 else REVERSE
-			print("click: %s %s %s" % (click, self.state, self.requestedState))
-			revt = None
-			if click == NORMAL:
-				if self.state == REVERSE:
-					revt = TurnoutLeverEvent(position=NORMAL, label=self.label, name=self.name, panel=self.panel, lever=self)
-					self.bmpPlate = TurnoutLever.images[SWNORMAL] if self.enabled else TurnoutLever.images[SWNORMALDISABLED]
-					self.requestedState = NORMAL
-			else:
-				if self.state == NORMAL:
-					revt = TurnoutLeverEvent(position=REVERSE, label=self.label, name=self.name, panel=self.panel, lever=self)
-					self.bmpPlate = TurnoutLever.images[SWREVERSE] if self.enabled else TurnoutLever.images[SWREVERSEDISABLED]
-					self.requestedState = REVERSE
+		revt = None
+		if direction == NORMAL:
+			if self.state == REVERSE:
+				revt = TurnoutLeverEvent(position=NORMAL, label=self.label, name=self.name, panel=self.panel, lever=self)
+				self.bmpPlate = TurnoutLever.images[SWNORMAL] if self.enabled else TurnoutLever.images[SWNORMALDISABLED]
+				self.requestedState = NORMAL
+		else:
+			if self.state == NORMAL:
+				revt = TurnoutLeverEvent(position=REVERSE, label=self.label, name=self.name, panel=self.panel, lever=self)
+				self.bmpPlate = TurnoutLever.images[SWREVERSE] if self.enabled else TurnoutLever.images[SWREVERSEDISABLED]
+				self.requestedState = REVERSE
 
-			self.Refresh()
-			if revt is not None:
-				wx.QueueEvent(self, revt)
-				wx.CallLater(3000, self.checkIfCompleted)
+		if revt is not None:
+			wx.QueueEvent(self, revt)
+			wx.CallLater(3000, self.checkIfCompleted)
+			return True
 
-		evt.Skip()
+		return False
 
 	def checkIfCompleted(self):
 		if self.requestedState is None:
@@ -155,28 +133,27 @@ class TurnoutLever(wx.Panel):
 
 		self.bmpPlate = self.images[SWNEUTRAL]
 		self.requestedState = None
-		self.Refresh()
 
 	def inHotSpot(self, x, y):
 		return 5 <= x <= 55 and 17 <= y <= 60
-
-	def initBuffer(self):
-		self.w, self.h = self.GetClientSize()
-		if self.w <= 0 or self.h <= 0:
-			return
-		self.buffer = wx.Bitmap(self.w, self.h)
-		self.redrawImage()
-
-	def redrawImage(self):
-		dc = wx.ClientDC(self)
-		self.drawImage(dc)
-
-	def drawImage(self, dc):
-		dc.DrawBitmap(self.bmpN, 0,  0, False)
-		dc.DrawBitmap(self.bmpR, 40, 0, False)
-		dc.DrawBitmap(self.bmpPlate, 0, 17, False)
-		if self.label is not None:
-			dc.SetTextForeground(wx.Colour(255, 255, 0))
-			dc.SetTextBackground(wx.Colour(0, 0, 0))
-			dc.SetFont(self.labelFont)
-			dc.DrawText(self.label, self.labelx, self.labely)
+	#
+	# def initBuffer(self):
+	# 	self.w, self.h = self.GetClientSize()
+	# 	if self.w <= 0 or self.h <= 0:
+	# 		return
+	# 	self.buffer = wx.Bitmap(self.w, self.h)
+	# 	self.redrawImage()
+	#
+	# def redrawImage(self):
+	# 	dc = wx.ClientDC(self)
+	# 	self.drawImage(dc)
+	#
+	# def drawImage(self, dc):
+	# 	dc.DrawBitmap(self.bmpN, 0,  0, False)
+	# 	dc.DrawBitmap(self.bmpR, 40, 0, False)
+	# 	dc.DrawBitmap(self.bmpPlate, 0, 17, False)
+	# 	if self.label is not None:
+	# 		dc.SetTextForeground(wx.Colour(255, 255, 0))
+	# 		dc.SetTextBackground(wx.Colour(0, 0, 0))
+	# 		dc.SetFont(self.labelFont)
+	# 		dc.DrawText(self.label, self.labelx, self.labely)

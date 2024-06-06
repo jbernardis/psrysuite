@@ -12,11 +12,14 @@ class TrackDiagram(wx.Panel):
 		self.xoffset.append(9999)
 
 		self.showPosition = True
+		self.showCTC = False
 
 		self.tiles = {}
 		self.text = {}
 		self.trains = {}
 		self.bitmaps = {}
+		self.ctcbitmaps = {}
+		self.ctclabels = {}
 		self.tx = 0
 		self.ty = 0
 		self.scr = -1
@@ -24,7 +27,7 @@ class TrackDiagram(wx.Panel):
 
 		self.SetCursor(wx.Cursor(wx.CURSOR_ARROW))
 
-		w = 0;
+		w = 0
 			
 		for b in self.bgbmps:
 			w += b.GetWidth()
@@ -33,6 +36,8 @@ class TrackDiagram(wx.Panel):
 			h = self.bgbmps[0].GetHeight()  # assume all the same height
 		else:
 			h = ht
+
+		print("setting diagram size to %d wide" % w, flush=True)
 
 		self.SetSize((w, h))
 		self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
@@ -44,6 +49,13 @@ class TrackDiagram(wx.Panel):
 		self.Bind(wx.EVT_CHAR_HOOK, self.OnKeyDown)
 		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 		self.Bind(wx.EVT_ENTER_WINDOW, lambda event: self.SetFocus())
+
+	def ShowCTC(self, flag=True):
+		if flag == self.showCTC:
+			return
+
+		self.showCTC = flag
+		self.Refresh()
 
 	def DrawBackground(self, dc):
 		for i in range(len(self.bgbmps)):
@@ -95,10 +107,12 @@ class TrackDiagram(wx.Panel):
 		self.shift_down = flag		
 
 	def OnLeftUp(self, evt):
-		self.frame.ProcessClick(self.scr, (self.tx, self.ty), shift=self.shift_down, screenpos=evt.GetPosition())
+		pt = evt.GetPosition()
+		self.frame.ProcessClick(self.scr, (self.tx, self.ty), (pt.x, pt.y), shift=self.shift_down, screenpos=evt.GetPosition())
 
 	def OnRightUp(self, evt):
-		self.frame.ProcessClick(self.scr, (self.tx, self.ty), shift=self.shift_down, right=True, screenpos=evt.GetPosition())
+		pt = evt.GetPosition()
+		self.frame.ProcessClick(self.scr, (self.tx, self.ty), (pt.x, pt.y), shift=self.shift_down, right=True, screenpos=evt.GetPosition())
 
 	def DrawTile(self, x, y, offset, bmp):
 		self.tiles[(x*16+offset, y*16)] = bmp;
@@ -110,6 +124,14 @@ class TrackDiagram(wx.Panel):
 
 	def DrawFixedBitmap(self, x, y, offset, bmp):
 		self.bitmaps[x+offset, y] = bmp
+		self.Refresh()
+
+	def DrawCTCBitmap(self, x, y, offset, bmp):
+		self.ctcbitmaps[x+offset, y] = bmp
+		self.Refresh()
+
+	def DrawCTCLabel(self, x, y, offset, font, lbl):
+		self.ctclabels[x+offset, y] = (lbl, font)
 		self.Refresh()
 
 	def ClearText(self, x, y, offset):
@@ -173,3 +195,14 @@ class TrackDiagram(wx.Panel):
 			dc.SetTextForeground(wx.Colour(255, 255, 255))
 			dc.SetTextBackground(wx.Colour(255, 0, 0))
 			dc.DrawText(tinfo[1], x, y)
+
+		if self.showCTC:
+			for bx, bmp in self.ctcbitmaps.items():
+				dc.DrawBitmap(bmp, bx[0], bx[1])
+			dc.SetTextForeground(wx.Colour(255, 255, 0))
+			dc.SetTextBackground(wx.Colour(0, 0, 0))
+			for bx, lblinfo  in self.ctclabels.items():
+				txt, fnt = lblinfo
+				dc.SetFont(fnt)
+				dc.DrawText(txt, bx[0], bx[1])
+

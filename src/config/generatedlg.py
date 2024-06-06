@@ -51,10 +51,6 @@ class GenerateDlg(wx.Dialog):
 		self.Bind(wx.EVT_BUTTON, self.OnBGenActive, self.bGenActive)
 		vsz.Add(self.bGenActive, 0, wx.ALL, 10)
 
-		self.bGenCTC = wx.Button(genBox, wx.ID_ANY, "CTC Panels", size=GENBTNSZ)
-		self.Bind(wx.EVT_BUTTON, self.OnBGenCTC, self.bGenCTC)
-		vsz.Add(self.bGenCTC, 0, wx.ALL, 10)
-
 		hsz.Add(vsz)
 		
 		vsz = wx.BoxSizer(wx.VERTICAL)
@@ -228,16 +224,6 @@ class GenerateDlg(wx.Dialog):
 			"main": "main.py",
 			"desc": "Throttle",
 			"icon": "throttle.ico"
-		}
-		self.generator(module, self.cbStartMenu.IsChecked())
-
-	def OnBGenCTC(self, _):
-		module = {
-			"name": "PSRY CTC Panels",
-			"dir": "ctcpanel",
-			"main": "testmain.py",
-			"desc": "CTC Panels",
-			"icon": "ctc.ico"
 		}
 		self.generator(module, self.cbStartMenu.IsChecked())
 

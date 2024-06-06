@@ -2,7 +2,7 @@
   "order": ["Latham", "Dell", "Shore", "Krulish", "Nassau", "Cliff"],
 
   "Latham": {
-    "position": [130, 650],
+    "position": [130, 540],
     "screen": "LaKr",
     "signals": [
       {"name": "L4.lvr", "label": "4"},
@@ -23,7 +23,7 @@
     ]
   },
  "Dell": {
-    "position": [700, 650],
+    "position": [700, 540],
     "screen": "LaKr",
     "signals": [
       {"name": "D4.lvr", "label": "4"},
@@ -40,7 +40,7 @@
     ]
   },
  "Shore": {
-    "position": [1170, 650],
+    "position": [1170, 540],
     "screen": "LaKr",
     "signals": [
       {"name": "S4.lvr", "label": "4"},
@@ -63,7 +63,7 @@
     ]
   },
  "Krulish": {
-    "position": [2200, 650],
+    "position": [2200, 540],
     "screen": "LaKr",
     "signals": [
       {"name": "K2.lvr", "label": "2"},
@@ -78,7 +78,7 @@
     ]
   },
  "Nassau": {
-    "position": [190, 650],
+    "position": [190, 540],
     "screen": "NaCl",
     "signals": [
       {"name": "N14.lvr", "label": "14"},
@@ -92,7 +92,7 @@
     "turnouts": []
   },
  "Cliff": {
-   "position": [1170, 650],
+   "position": [1170, 540],
    "screen": "NaCl",
    "signals": [
       {"name": "C24.lvr", "label": "24"},
