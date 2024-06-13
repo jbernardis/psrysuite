@@ -124,7 +124,6 @@ class Railroad():
 		self.SetControlOption("nassau", self.settings.control.nassau)
 		self.SetControlOption("cliff", self.settings.control.cliff)
 		self.SetControlOption("yard", self.settings.control.yard)
-		self.SetControlOption("signal4", self.settings.control.signal4l)
 		self.SetControlOption("c13auto", self.settings.control.c13auto)
 		self.SetControlOption("bank.fleet", 0)
 		self.SetControlOption("carlton.fleet", 0)

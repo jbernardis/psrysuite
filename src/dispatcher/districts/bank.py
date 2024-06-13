@@ -317,10 +317,12 @@ class Bank (District):
 			if blkEastAfter and blknm in [ "B11", "B21" ] and blockend is None and state == OCCUPIED:
 				rtname = "BRt" + blknm + "C13"
 				signm = "C18LA" if blknm == "B11" else "C18LB"
-				self.AutomatedBlockSetup(self.C13Queue, "BOSE", rtname, "C13", signm)
+				self.AutomatedBlockEnqueue(self.C13Queue, "BOSE", rtname, "C13", signm)
+				self.AutomatedBlockEnqueue(self.C13Queue, "COSCLW", "CRtC13C12", "C12", "C14L")
+				self.AutomatedBlockProcess(self.C13Queue)
 
 			elif not blkEastBefore and blknm == "BOSE" and state == EMPTY:
-				self.AutomatedBlockTrigger(self.C13Queue)
+				self.AutomatedBlockProcess(self.C13Queue)
 
 		if blknm in [ "B20", "B21" ]:
 			self.CheckBlockSignalsAdv("B20", "B21", "B20E", True)
@@ -330,4 +332,9 @@ class Bank (District):
 		signame = sig.GetName()
 		if signame in [ "C18R", "C22R", "C24R", "C22L", "C24L" ]:
 			self.CheckBlockSignalsAdv("B20", "B21", "B20E", True)
+
+	def ticker(self):
+		self.AutomatedBlockProcess(self.C13Queue)
+		District.ticker(self)
+
 

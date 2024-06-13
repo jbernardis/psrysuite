@@ -13,3 +13,8 @@ automate management of single track if dispatcher all or dispatcher cliveden/mar
     EB train entering B11 or B21 or leaves COSCLW
     WB train entering C23, C12 or leaving BOSE
 
+
+cliff fleeting - physical lever controls martinsville, cliveden and green mountain - NOT SHEFFIELD
+when the cliff control is set to all, cliff controls everything.
+When it is set to dispatch all, the dispatcher controls everything
+When set to dispatcher controls bank/cliveden, cliff only controls sheffield, green mountain, and cliveden.  Dispatcher controls single track and martinsville/bank

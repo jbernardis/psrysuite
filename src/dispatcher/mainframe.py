@@ -193,14 +193,14 @@ class MainFrame(wx.Frame):
 			totalw = self.diagramWidth
 			self.centerOffset = 0
 
-		self.CTCManager = CTCManager(self, self.settings, self.diagrams)
-		for screen, pos, bmp in self.CTCManager.GetBitmaps():
-			offset = self.diagrams[screen].offset
-			self.panels[screen].DrawCTCBitmap(pos[0], pos[1], offset, bmp)
-		for label, font, screen, lblx, lbly in self.CTCManager.GetLabels():
-			offset = self.diagrams[screen].offset
-			self.panels[screen].DrawCTCLabel(lblx, lbly, offset, font, label)
-
+		if self.IsDispatcherOrSatellite():
+			self.CTCManager = CTCManager(self, self.settings, self.diagrams)
+			for screen, fg, pos, bmp in self.CTCManager.GetBitmaps():
+				offset = self.diagrams[screen].offset
+				self.panels[screen].DrawCTCBitmap(fg, pos[0], pos[1], offset, bmp)
+			for label, font, screen, lblx, lbly in self.CTCManager.GetLabels():
+				offset = self.diagrams[screen].offset
+				self.panels[screen].DrawCTCLabel(lblx, lbly, offset, font, label)
 
 		self.ToasterSetup()
 
@@ -423,10 +423,11 @@ class MainFrame(wx.Frame):
 			dlg.Destroy()
 
 		elif kcd == wx.WXK_F2:
-			self.CTCVisible = not self.CTCVisible
-			for dp in self.panels.values():
-				dp.ShowCTC(self.CTCVisible)
-			self.CTCManager.SetVisible(self.CTCVisible)
+			if self.CTCManager is not None:
+				self.CTCVisible = not self.CTCVisible
+				for dp in self.panels.values():
+					dp.ShowCTC(self.CTCVisible)
+				self.CTCManager.SetVisible(self.CTCVisible)
 
 		else:
 			#self.PopupEvent("Key Code: %d" % kcd)
@@ -451,7 +452,6 @@ class MainFrame(wx.Frame):
 		self.ResetScreen()
 		
 	def ResetScreen(self):
-		print("set max screen width to %s" % (self.totalw+16), flush=True)
 		self.SetMaxSize((self.totalw+16+WIDTHADJUST, self.totalh))
 		self.SetSize((self.totalw+16+WIDTHADJUST, self.totalh))
 		self.SetPosition((-self.centerOffset, 0))
@@ -461,8 +461,6 @@ class MainFrame(wx.Frame):
 		
 		if self.ATCEnabled:
 			self.Request({"atc": { "action": "reset"}})
-		if self.CTCManager is not None:
-			self.CTCManager.ResetScreen(self.currentScreen)
 
 	def OnBResetClock(self, _):
 		self.tickerCount = 0
@@ -578,12 +576,7 @@ class MainFrame(wx.Frame):
 		self.stNassauControl.Hide()
 		self.stNassauControl.SetFont(f)
 		self.widgetMap[NaCl].append([self.stNassauControl, 1])
-		
-		self.stSignal4Control = wx.StaticText(self, wx.ID_ANY, "SIGNAL 4: Port", pos=(150, voffset+10))
-		self.stSignal4Control.Hide()
-		self.stSignal4Control.SetFont(f)
-		self.widgetMap[LaKr].append([self.stSignal4Control, 1])
-		
+
 	def UpdateControlDisplay(self, name, value):
 		if self.IsDispatcher():
 			return
@@ -595,12 +588,6 @@ class MainFrame(wx.Frame):
 			elif value == 1:
 				self.stYardControl.SetLabel("YARD: Dispatch")
 
-		elif name == "signal4":
-			if value == 0:
-				self.stSignal4Control.SetLabel("SIGNAL 4: Port")
-			elif value == 1:
-				self.stSignal4Control.SetLabel("SIGNAL 4: Dispatch")
-				
 		elif name == "nassau":
 			self.nassauControl = value
 			if value == 0:
@@ -647,12 +634,6 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_RADIOBOX, self.OnRBYard, self.rbYardControl)
 		self.rbYardControl.Hide()
 		self.widgetMap[HyYdPt].append([self.rbYardControl, 0])
-
-		self.rbS4Control = wx.RadioBox(self, wx.ID_ANY, "Signal 4L/4R", (150, voffset), wx.DefaultSize,
-				["Port", "Dispatcher"], 1, wx.RA_SPECIFY_COLS)
-		self.Bind(wx.EVT_RADIOBOX, self.OnRBS4, self.rbS4Control)
-		self.rbS4Control.Hide()
-		self.widgetMap[LaKr].append([self.rbS4Control, 0])
 
 		self.cbLathamFleet = wx.CheckBox(self, -1, "Latham Fleeting", (300, voffset+10))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBLathamFleet, self.cbLathamFleet)
@@ -722,7 +703,7 @@ class MainFrame(wx.Frame):
 		self.cbClivedenFleet.Hide()
 		self.cbClivedenFleet.Enable(self.cliffControl != 0)
 		self.widgetMap[NaCl].append([self.cbClivedenFleet, 0])
-		self.ClivedenFleetSignals = ["C10L", "C12L", "C10R", "C12R", "C14L", "C14RA", "C14RB", "C18LA", "C18LB", "C18R"]
+		self.ClivedenFleetSignals = ["C10L", "C12L", "C10R", "C12R"]
 
 		self.cbC13Auto = wx.CheckBox(self, -1, "Automate block C13", (900, voffset+50))
 		self.Bind(wx.EVT_CHECKBOX, self.OnCBC13Auto, self.cbC13Auto)
@@ -793,10 +774,7 @@ class MainFrame(wx.Frame):
 			self.rbYardControl.SetSelection(value)
 			self.cbYardFleet.Enable(value != 0)
 			self.yardControl = value
-			
-		elif name == "signal4":
-			self.rbS4Control.SetSelection(value)
-			
+
 		elif name == "cliff.fleet":
 			ctl = self.rbCliffControl.GetSelection()
 			self.cliffControl = ctl
@@ -810,7 +788,7 @@ class MainFrame(wx.Frame):
 			elif ctl == 1:
 				self.cbCliffFleet.SetValue(value != 0)
 				f = 1 if value != 0 else 0
-				for signm in self.CliffFleetSignals:
+				for signm in self.CliffFleetSignals + self.ClivedenFleetSignals:
 					self.Request({"fleet": { "name": signm, "value": f}})
 
 		elif name == "c13auto":
@@ -852,7 +830,7 @@ class MainFrame(wx.Frame):
 			
 		elif name == "cliveden.fleet":
 			self.cbClivedenFleet.SetValue(value != 0)
-			
+
 		elif name == "carlton.fleet":
 			self.cbCarltonFleet.SetValue(value != 0)
 			
@@ -874,7 +852,7 @@ class MainFrame(wx.Frame):
 		ctl = self.rbCliffControl.GetSelection()
 		self.cbCliffFleet.Enable(ctl == 2)
 		self.cbBankFleet.Enable(ctl != 0)
-		self.cbClivedenFleet.Enable(ctl != 0)
+		self.cbClivedenFleet.Enable(ctl == 2)
 		self.cbC13Auto.Enable(ctl != 0)
 		self.Request({"control": { "name": "cliff", "value": ctl}})
 		self.cliffControl = ctl
@@ -883,9 +861,6 @@ class MainFrame(wx.Frame):
 		self.cbYardFleet.Enable(ctl != 0)
 		self.Request({"control": { "name": "yard", "value": ctl}})
 
-		ctl = self.rbS4Control.GetSelection()
-		self.Request({"control": { "name": "signal4", "value": ctl}})
-			
 		f = 1 if self.cbCliffFleet.IsChecked() else 0
 		for signm in self.CliffFleetSignals:
 			self.Request({"fleet": { "name": signm, "value": f}})
@@ -945,7 +920,6 @@ class MainFrame(wx.Frame):
 		for signm in self.CarltonFleetSignals:
 			self.Request({"fleet": { "name": signm, "value": f}})
 		self.Request({"control": {"name": "carlton.fleet", "value": f}})
-			
 
 		f = 1 if self.cbValleyJctFleet.IsChecked() else 0
 		for signm in self.ValleyJctFleetSignals:
@@ -972,8 +946,7 @@ class MainFrame(wx.Frame):
 		# ATC must run on the same machine as this dispatcher because it has a windowing interface
 		self.ATCEnabled = self.cbATC.IsChecked()
 		if self.ATCEnabled:
-			#self.pidATC = 1
-			if self.procATC is None or self.procATC.poll() is not None:			
+			if self.procATC is None or self.procATC.poll() is not None:
 				atcExec = os.path.join(os.getcwd(), "atc", "main.py")
 				self.procATC = Popen([sys.executable, atcExec])
 				self.pidATC = self.procATC.pid
@@ -1033,7 +1006,7 @@ class MainFrame(wx.Frame):
 		ctl = evt.GetInt()
 		self.cbCliffFleet.Enable(ctl == 2)
 		self.cbBankFleet.Enable(ctl != 0)
-		self.cbClivedenFleet.Enable(ctl != 0)
+		self.cbClivedenFleet.Enable(ctl == 2)
 		self.cbC13Auto.Enable(ctl != 0)
 		self.Request({"control": { "name": "cliff", "value": ctl}})
 		self.cliffControl = ctl
@@ -1042,9 +1015,6 @@ class MainFrame(wx.Frame):
 		ctl = evt.GetInt()
 		self.cbYardFleet.Enable(ctl != 0)
 		self.Request({"control": { "name": "yard", "value": ctl}})
-
-	def OnRBS4(self, evt):
-		self.Request({"control": { "name": "signal4", "value": evt.GetInt()}})
 
 	def OnCBLathamFleet(self, _):
 		f = 1 if self.cbLathamFleet.IsChecked() else 0
@@ -1080,7 +1050,6 @@ class MainFrame(wx.Frame):
 		for signm in self.NassauFleetSignals:
 			self.Request({"fleet": { "name": signm, "value": f}})
 		self.Request({"control": {"name": "nassau.fleet", "value": f}})
-		
 
 	def OnCBBankFleet(self, _):
 		f = 1 if self.cbBankFleet.IsChecked() else 0
@@ -1207,7 +1176,7 @@ class MainFrame(wx.Frame):
 		self.Bind(EVT_DISCONNECT, self.onDisconnectEvent)
 
 		self.tiles, self.totiles, self.sstiles, self.sigtiles, self.misctiles = loadTiles(self.bitmaps)
-		self.districts = Districts()
+		self.districts = Districts(self)
 		self.signalLeverMap = {}
 		self.districts.AddDistrict(Yard("Yard", self, HyYdPt))
 		self.districts.AddDistrict(Latham("Latham", self, LaKr))
@@ -1279,7 +1248,6 @@ class MainFrame(wx.Frame):
 			splashExec = os.path.join(os.getcwd(), "splash", "main.py")
 			pid = Popen([sys.executable, splashExec]).pid
 			logging.debug("displaying splash screen as PID %d" % pid)
-
 
 	def AddSignalLever(self, slname, district):
 		self.signalLeverMap[slname] = district
@@ -1403,6 +1371,7 @@ class MainFrame(wx.Frame):
 		self.ClearExpiredButtons()
 		self.breakerDisplay.ticker()
 		self.activeTrains.ticker()
+		self.districts.ticker()
 		
 	def onTicker1Min(self):
 		logging.info("ticker 1 minute, timevalue = %d" % self.timeValue )
@@ -1725,7 +1694,7 @@ class MainFrame(wx.Frame):
 		district.SetUpRoute(osblk, desiredRoute)
 		return True, False, None
 		
-	def SetRouteSignal(self, osname, rtname, blkname, signame):
+	def SetRouteSignal(self, osname, rtname, blkname, signame, silent=False):
 		osblk = self.blocks[osname]
 		currentRoute = osblk.GetRoute()
 		signal = self.signals[signame]
@@ -1738,7 +1707,7 @@ class MainFrame(wx.Frame):
 			return True, "Signal already permits movement"
 			
 		district = osblk.GetDistrict()
-		rc = district.PerformSignalAction(signal)
+		rc = district.PerformSignalAction(signal, silent=silent)
 		return rc, None
 
 	def DelaySignalRequest(self, signm, osnm, rtnm, maxtime):
@@ -2130,9 +2099,6 @@ class MainFrame(wx.Frame):
 						w.Hide()
 				else:
 					w.Hide()
-
-		if self.CTCManager is not None:
-			self.CTCManager.SetScreen(screen)
 
 		return True
 
@@ -3069,8 +3035,12 @@ class MainFrame(wx.Frame):
 		self.Request(resp)
 
 	def DoCmdTrainTimesReport(self, parms):
-		trains = parms["trains"]
-		times = parms["times"]
+		try:
+			trains = parms["trains"]
+			times = parms["times"]
+		except KeyError:
+			return
+
 		for trid, tm in zip(trains, times):
 			try:
 				tr = self.trains[trid]
@@ -3236,6 +3206,14 @@ class MainFrame(wx.Frame):
 					self.rrServer.SendRequest(req)
 		else:
 			logging.info("disallowing command %s from non dispatcher" % command)
+
+	def UpdateCTCBitmaps(self, bmps):
+		for screen, fg, pos, bmp in bmps:
+			offset = self.diagrams[screen].offset
+			self.panels[screen].DrawCTCBitmap(fg, pos[0], pos[1], offset, bmp)
+
+	def CheckCTCCompleted(self, ms, cb):
+		wx.CallLater(ms, cb)
 
 	def CommandAllowed(self, cmd):
 		if self.IsDispatcher():

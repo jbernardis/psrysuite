@@ -22,7 +22,8 @@ class Cliff(District):
 		self.optFleet = None
 		self.released = False
 		self.control = 2
-		
+		self.lastControl = 0
+
 		addr = GREENMTN
 		with self.nodes[addr] as n:
 			# outputs
@@ -276,13 +277,23 @@ class Cliff(District):
 		'''
 		self.fleetedSignals = [
 			[],
-			["C10L", "C10R", "C12L", "C12R", "C14L", "C14RA", "C14RB",
-				"C18R", "C18LA", "C18LB", "C22L", "C22R", "C24L", "C24R" ],
+			["C22L", "C22R", "C24L", "C24R" ],
 			["C8L", "C8RA", "C8RB", "C8RC", "C8RD", "C8RE", "C8RF", "C8RG", "C8RH", "C8RJ", "C8RK", "C8RL", 
 				"C6R", "C6LA", "C6LB", "C6LC", "C6LD", "C6LE", "C6LF", "C6LG", "C6LH", "C6LJ", "C6LK", "C6LL", 
+				"C4L", "C4RA", "C4RB", "C4RC", "C4RD", "C2R", "C2LA", "C2LB", "C2LC", "C2LD"],
+				["C10L", "C10R", "C12L", "C12R", "C22L", "C22R", "C24L", "C24R" ]
+		]
+
+		self.fleetedSignalsCliff = [
+			["C8L", "C8RA", "C8RB", "C8RC", "C8RD", "C8RE", "C8RF", "C8RG", "C8RH", "C8RJ", "C8RK", "C8RL",
+				"C6R", "C6LA", "C6LB", "C6LC", "C6LD", "C6LE", "C6LF", "C6LG", "C6LH", "C6LJ", "C6LK", "C6LL",
 				"C4L", "C4RA", "C4RB", "C4RC", "C4RD", "C2R", "C2LA", "C2LB", "C2LC", "C2LD",
-				"C10L", "C10R", "C12L", "C12R", "C14L", "C14RA", "C14RB",
-				"C18R", "C18LA", "C18LB", "C22L", "C22R", "C24L", "C24R" ]
+				"C10L", "C10R", "C12L", "C12R", "C22L", "C22R", "C24L", "C24R"],
+			["C8L", "C8RA", "C8RB", "C8RC", "C8RD", "C8RE", "C8RF", "C8RG", "C8RH", "C8RJ", "C8RK", "C8RL",
+				"C6R", "C6LA", "C6LB", "C6LC", "C6LD", "C6LE", "C6LF", "C6LG", "C6LH", "C6LJ", "C6LK", "C6LL",
+				"C4L", "C4RA", "C4RB", "C4RC", "C4RD", "C2R", "C2LA", "C2LB", "C2LC", "C2LD",
+				"C10L", "C10R", "C12L", "C12R"],
+				[]
 		]
 
 		self.routeMap = {
@@ -398,7 +409,6 @@ class Cliff(District):
 			if hsb.Lock(state != 0):
 				self.rr.RailroadEvent(hsb.GetEventMessage(lock=True))
 
-
 	def OutIn(self):
 		self.lastControl = self.control
 		self.control = self.rr.GetControlOption("cliff")  # 0 => Cliff, 1 => Dispatcher bank/cliveden, 2 => Dispatcher All
@@ -415,15 +425,13 @@ class Cliff(District):
 			optClivedenFleet = self.rr.GetControlOption("bank.fleet")  # 0 => no fleeting, 1 => fleeting
 			optFleet = self.rr.GetControlOption("cliff.fleet")  # 0 => no fleeting, 1 => fleeting
 						
-		dispatchList = self.fleetedSignals[self.control]
-		panelList = [x for x in self.fleetedSignals[2] if x not in dispatchList]
-		
+		dispatchList = self.fleetedSignalsCliff[self.control]
 		if optFleet != self.optFleet:
 			self.optFleet = optFleet
 			self.nodes[CLIFF].SetOutputBit(2, 5, 1-optFleet)   # fleet indicator
 			self.nodes[CLIFF].SetOutputBit(2, 6, optFleet)   # fleet indicator
 			if self.control in [0, 1]:  # the only control options that have local fleeting ability
-				for signame in panelList:
+				for signame in dispatchList:
 					self.rr.RailroadEvent({"fleet": [{"name": signame, "value": optFleet}]})
 
 		rlReq = self.nodes[CLIFF].GetInputBit(6, 3)
@@ -441,15 +449,19 @@ class Cliff(District):
 		return self.released
 
 	def GetControlOption(self):
+		"""
+		skiplist is a list of objects that we ignore from the physical control panel beacuse of control settings
+		resumelist is a list of things we had been ignoring but which now come into play
+		"""
 		if self.control == 2: # Dispatcher ALL
 			skiplist = ["C2", "C4", "C6", "C8", "C10", "C12", "C14", "C18", "C22", "C24",
 					"CSw3", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
 			resumelist = []
 			
 		elif self.control == 1: # dispatcher runs bank/cliveden
-			skiplist = ["C10", "C12", "C14", "C18", "C22", "C24", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
+			skiplist = ["C14", "C18", "C22", "C24", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
 			if self.lastControl == 2:
-				resumelist = ["C2", "C4", "C6", "C8", "CSw3"]
+				resumelist = ["C2", "C4", "C6", "C8", "C10", "C12", "CSw3"]
 			elif self.lastControl == 0:
 				resumelist = []
 			else:
@@ -464,5 +476,5 @@ class Cliff(District):
 				resumelist = ["C10", "C12", "C14", "C18", "C22", "C24", "CSw11", "CSw15", "CSw19", "CSw21a", "CSw21b", "CSw21ab"]
 			else:
 				resumelist= []
-				
+
 		return skiplist, resumelist

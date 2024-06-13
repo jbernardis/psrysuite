@@ -48,6 +48,9 @@ class TurnoutLever:
 		self.labely = self.pos[1]+19
 		self.labelFont = wx.Font(wx.Font(10, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
 
+	def Refresh(self):
+		self.frame.UpdateCTCBitmaps(self.GetBitmaps())
+
 	def Enable(self, flag=True):
 		self.enabled = flag
 		self.bmpPlate = TurnoutLever.images[SWNEUTRAL] if self.enabled else TurnoutLever.images[SWNEUTRALDISABLED]
@@ -61,6 +64,8 @@ class TurnoutLever:
 			self.bmpN = TurnoutLever.images[LAMPOFF]
 			self.bmpR = TurnoutLever.images[LAMPOFF]
 
+		self.Refresh()
+
 	def SetTurnoutState(self, state):
 		self.requestedState = None
 
@@ -69,20 +74,21 @@ class TurnoutLever:
 			self.bmpN = TurnoutLever.images[LAMPGREEN]
 			self.bmpPlate = TurnoutLever.images[SWNEUTRAL] if self.enabled else TurnoutLever.images[SWNEUTRALDISABLED]
 			self.state = NORMAL
-			print("set to normal")
-		if state == REVERSE:
+
+		elif state == REVERSE:
 			self.bmpR = TurnoutLever.images[LAMPRED]
 			self.bmpN = TurnoutLever.images[LAMPOFF]
 			self.bmpPlate = TurnoutLever.images[SWNEUTRAL] if self.enabled else TurnoutLever.images[
 				SWNEUTRALDISABLED]
 			self.state = REVERSE
-			print("set to reverse")
+
+		self.Refresh()
 
 	def GetBitmaps(self):
 		return [
-			[self.screen, (self.pos[0], self.pos[1]+17), self.bmpPlate],
-			[self.screen, (self.pos[0], self.pos[1]), self.bmpN],
-			[self.screen, (self.pos[0]+40, self.pos[1]), self.bmpR]
+			[self.screen, True, (self.pos[0], self.pos[1]+17), self.bmpPlate],
+			[self.screen, False, (self.pos[0], self.pos[1]), self.bmpN],
+			[self.screen, False, (self.pos[0]+40, self.pos[1]), self.bmpR]
 		]
 
 	def GetLabel(self):
@@ -101,7 +107,6 @@ class TurnoutLever:
 			TurnoutLever.images[f] = png
 
 	def LeverClick(self, direction):
-		self.parent.PopupEvent("mouse click turnout %s.%s" % (self.name, direction))
 		if not self.enabled:
 			return False
 
@@ -111,21 +116,24 @@ class TurnoutLever:
 		revt = None
 		if direction == NORMAL:
 			if self.state == REVERSE:
-				revt = TurnoutLeverEvent(position=NORMAL, label=self.label, name=self.name, panel=self.panel, lever=self)
+				self.frame.Request(
+					{'turnoutlever': {'name': self.name, 'state': direction, 'force': 0, 'source': 'ctc'}})
 				self.bmpPlate = TurnoutLever.images[SWNORMAL] if self.enabled else TurnoutLever.images[SWNORMALDISABLED]
 				self.requestedState = NORMAL
+			else:
+				return False
 		else:
 			if self.state == NORMAL:
-				revt = TurnoutLeverEvent(position=REVERSE, label=self.label, name=self.name, panel=self.panel, lever=self)
+				self.frame.Request(
+					{'turnoutlever': {'name': self.name, 'state': direction, 'force': 0, 'source': 'ctc'}})
 				self.bmpPlate = TurnoutLever.images[SWREVERSE] if self.enabled else TurnoutLever.images[SWREVERSEDISABLED]
 				self.requestedState = REVERSE
+			else:
+				return False
 
-		if revt is not None:
-			wx.QueueEvent(self, revt)
-			wx.CallLater(3000, self.checkIfCompleted)
-			return True
-
-		return False
+		self.Refresh()
+		self.frame.CheckCTCCompleted(3000, self.checkIfCompleted)
+		return True
 
 	def checkIfCompleted(self):
 		if self.requestedState is None:
@@ -133,27 +141,4 @@ class TurnoutLever:
 
 		self.bmpPlate = self.images[SWNEUTRAL]
 		self.requestedState = None
-
-	def inHotSpot(self, x, y):
-		return 5 <= x <= 55 and 17 <= y <= 60
-	#
-	# def initBuffer(self):
-	# 	self.w, self.h = self.GetClientSize()
-	# 	if self.w <= 0 or self.h <= 0:
-	# 		return
-	# 	self.buffer = wx.Bitmap(self.w, self.h)
-	# 	self.redrawImage()
-	#
-	# def redrawImage(self):
-	# 	dc = wx.ClientDC(self)
-	# 	self.drawImage(dc)
-	#
-	# def drawImage(self, dc):
-	# 	dc.DrawBitmap(self.bmpN, 0,  0, False)
-	# 	dc.DrawBitmap(self.bmpR, 40, 0, False)
-	# 	dc.DrawBitmap(self.bmpPlate, 0, 17, False)
-	# 	if self.label is not None:
-	# 		dc.SetTextForeground(wx.Colour(255, 255, 0))
-	# 		dc.SetTextBackground(wx.Colour(0, 0, 0))
-	# 		dc.SetFont(self.labelFont)
-	# 		dc.DrawText(self.label, self.labelx, self.labely)
+		self.Refresh()

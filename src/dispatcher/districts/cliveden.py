@@ -15,7 +15,7 @@ class Cliveden (District):
 
 	def PerformHandSwitchAction(self, hs, nv=None):
 		controlOpt = self.frame.cliffControl
-		if controlOpt == 0:  # cliff local control or limited to bank/cliveden (handled in those districts)
+		if controlOpt in [0, 1]:  # cliff local control or limited to bank/cliveden (handled in those districts)
 			msg = "Cliff control is local"
 			self.frame.PopupEvent(msg)
 			return
@@ -39,30 +39,39 @@ class Cliveden (District):
 			if not blkEastAfter and blknm in [ "C23", "C12" ] and blockend is None and state == OCCUPIED:
 				rtname = "CRtC13" + blknm
 				signm = "C14RA" if blknm == "C12" else "C14RB"
-				self.AutomatedBlockSetup(self.C13Queue, "COSCLW", rtname, "C13", signm)
+				self.AutomatedBlockEnqueue(self.C13Queue, "COSCLW", rtname, "C13", signm)
+				self.AutomatedBlockEnqueue(self.C13Queue, "BOSE", "BRtB11C13", "B11", "C18R")
+				self.AutomatedBlockProcess(self.C13Queue)
 
 			elif blkEastBefore and blknm == "COSCLW" and state == EMPTY:
-				self.AutomatedBlockTrigger(self.C13Queue)
+				self.AutomatedBlockProcess(self.C13Queue)
+
+	def ticker(self):
+		self.AutomatedBlockProcess(self.C13Queue)
+		District.ticker(self)
 
 	def SetUpRoute(self, osblk, route):
+		osname = osblk.GetName()
 		controlOpt = self.frame.cliffControl
-		if controlOpt == 0:  # Cliveden local control
+		if (controlOpt == 1 and osname != "COSCLW") or controlOpt == 0:
 			self.frame.PopupEvent("Cliveden control is local")
 			return
 		
 		District.SetUpRoute(self, osblk, route)
 
 	def PerformTurnoutAction(self, turnout, force=False):
+		toname = turnout.GetName()
 		controlOpt = self.frame.cliffControl
-		if controlOpt == 0:  # Cliveden local control
+		if (controlOpt == 1 and toname != "CSw13") or controlOpt == 0:
 			self.frame.PopupEvent("Cliveden control is local")
 			return
 
 		District.PerformTurnoutAction(self, turnout, force=force)
 
 	def PerformSignalAction(self, sig, callon=False):
+		signame = sig.GetName()
 		controlOpt = self.frame.cliffControl
-		if controlOpt == 0:  # Cliveden local control
+		if (controlOpt == 1 and signame not in ["C14RA", "C14RB", "C14L"]) or controlOpt == 0:
 			self.frame.PopupEvent("Cliveden control is local")
 			return False
 
@@ -71,7 +80,7 @@ class Cliveden (District):
 	def DoSignalLeverAction(self, signame, state, callon, silent=1, source=None):
 		controlOpt = self.frame.cliffControl
 		if source == "ctc":
-			if controlOpt == 0:
+			if controlOpt in [0, 1]:
 				self.frame.PopupEvent("Cliff control is local")
 				return False
 
@@ -80,7 +89,7 @@ class Cliveden (District):
 	def DoTurnoutLeverAction(self, turnout, state, force=False, source=None):
 		controlOpt = self.frame.cliffControl
 		if source == "ctc":
-			if controlOpt == 0:
+			if controlOpt in [0, 1]:
 				self.frame.PopupEvent("Cliff control is local")
 				return False
 

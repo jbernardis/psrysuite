@@ -44,15 +44,15 @@ class CTCPanel:
 		width = totalWidthsig if totalWidthsig > totalWidthtrn else totalWidthtrn
 		self.center = int(width/2)
 
-		print("Maps for %s" %  name)
-		print("Signals:")
-		for s, hs in self.sigHS.items():
-			print("   %s: %d-%d  %d-%d" % (s, hs[0], hs[1], hs[2], hs[3]))
-		print("")
-		print("Turnouts:")
-		for t, hs in self.trnHS.items():
-			print("   %s: %d-%d  %d-%d" % (t, hs[0], hs[1], hs[2], hs[3]))
-		print("==============================================================", flush=True)
+		# print("Maps for %s" %  name)
+		# print("Signals:")
+		# for s, hs in self.sigHS.items():
+		# 	print("   %s: %d-%d  %d-%d" % (s, hs[0], hs[1], hs[2], hs[3]))
+		# print("")
+		# print("Turnouts:")
+		# for t, hs in self.trnHS.items():
+		# 	print("   %s: %d-%d  %d-%d" % (t, hs[0], hs[1], hs[2], hs[3]))
+		# print("==============================================================", flush=True)
 
 	def GetBitmaps(self):
 		for sig in self.signals:
@@ -70,43 +70,28 @@ class CTCPanel:
 		for sw in self.turnouts:
 			yield self.trnLeverMap[sw["name"]].GetLabel()
 
-
 	def CheckHotSpots(self, x, y):
 		if 550 <= y <= 610:
-			self.frame.PopupEvent("Signal")
 			for sig in self.signals:
 				lxmin, lxmax, rxmin, rxmax = self.sigHS[sig["name"]]
-				self.frame.PopupEvent("compare %s x %s to left range %d %d" % (sig["name"], x, lxmin, lxmax))
 				if lxmin <= x <= lxmax:
 					self.sigLeverMap[sig["name"]].LeverClick(LEFT)
 					return
-				self.frame.PopupEvent("compare %s x %s to right range %d %d" % (sig["name"], x, rxmin, rxmax))
+
 				if rxmin <= x <= rxmax:
 					self.sigLeverMap[sig["name"]].LeverClick(RIGHT)
 					return
 
 		elif 630 <= y <= 690:
-			self.frame.PopupEvent("turnout")
 			for sw in self.turnouts:
 				nxmin, nxmax, rxmin, rxmax = self.trnHS[sw["name"]]
-				self.frame.PopupEvent("compare %s x %s to normal range %d %d" % (sw["name"], x, nxmin, nxmax))
 				if nxmin <= x <= nxmax:
 					self.trnLeverMap[sw["name"]].LeverClick(NORMAL)
 					return
-				self.frame.PopupEvent("compare %s x %s to reverse range %d %d" % (sw["name"], x, rxmin, rxmax))
+
 				if rxmin <= x <= rxmax:
 					self.trnLeverMap[sw["name"]].LeverClick(REVERSE)
 					return
-
-	def SetHidden(self, flag):
-		pass
-		# if flag:
-		# 	self.Hide()
-		# else:
-		# 	self.Show()
-
-	def AssertPosition(self):
-		pass #self.SetPosition(self.position)
 
 	def GetSignalLeverMap(self):
 		return self.sigLeverMap

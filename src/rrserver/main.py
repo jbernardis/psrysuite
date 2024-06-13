@@ -580,7 +580,7 @@ class ServerMain:
 			ends = [None, None]
 
 		self.routeDefs[name] = (RouteDef(name, osNm, ends, signals, turnouts))
-		
+
 	def DoRouteDefs(self, cmd):
 		data = json.loads(cmd["data"][0])
 		for r in data:
@@ -600,7 +600,7 @@ class ServerMain:
 				ends = [None, None]
 
 			self.routeDefs[name] = (RouteDef(name, osNm, ends, signals, turnouts))
-			
+
 	def DoCrossOver(self, cmd):
 		self.CrossoverPoints = []
 		for b in cmd["data"]:

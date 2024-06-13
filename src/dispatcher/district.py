@@ -76,6 +76,9 @@ class District:
 	def DrawOthers(self, block):
 		pass
 
+	def ticker(self):
+		pass
+
 	def DetermineRoute(self, blocks):
 		pass
 
@@ -206,7 +209,7 @@ class District:
 		# print("no route found")
 		return None, None
 
-	def PerformSignalAction(self, sig, callon=False):
+	def PerformSignalAction(self, sig, callon=False, silent=False):
 		currentMovement = sig.GetAspect() != 0  # does the CURRENT signal status allow movement
 		signm = sig.GetName()
 		rt, osblk = self.FindRoute(sig)
@@ -225,7 +228,7 @@ class District:
 	
 			# this is a valid signal for the current route	
 			if not currentMovement:  # we are trying to change the signal to allow movement
-				aspect = self.CalculateAspect(sig, osblk, rt)
+				aspect = self.CalculateAspect(sig, osblk, rt, silent=silent)
 				if aspect is None:
 					return False
 	
@@ -243,28 +246,31 @@ class District:
 			
 		return True
 
-	def AutomatedBlockSetup(self, trainqueue, osnm, rtnm, blknm, signm):
+	def AutomatedBlockProcess(self, trainqueue):
+		rv = trainqueue.Peek()
+		if rv is None:
+			return
+
+		osnm, rtnm, signm, blknm = rv
 		rtnmCurrent = self.frame.blocks[osnm].GetRouteName()
 		if rtnmCurrent != rtnm:
 			rc, alreadyset, msg = self.frame.SetRouteThruOS(osnm, rtnm, blknm, "")
 			if rc:
 				if alreadyset:
-					self.frame.SetRouteSignal(osnm, rtnm, "", signm)
+					rc, msg = self.frame.SetRouteSignal(osnm, rtnm, "", signm, silent=True)
+					if rc:
+						trainqueue.Pop()
 				else:
 					self.frame.DelaySignalRequest(signm, osnm, rtnm, 5)
-			else:
-				trainqueue.Append(osnm, rtnm, signm, blknm)
+					trainqueue.Pop()
 
 		else:  # route is what we want -= just set signal
-			rc, msg = self.frame.SetRouteSignal(osnm, rtnm, "", signm)
-			if not rc:
-				trainqueue.Append(osnm, rtnm, signm, blknm)
+			rc, msg = self.frame.SetRouteSignal(osnm, rtnm, "", signm, silent=True)
+			if rc:
+				trainqueue.Pop()
 
-	def AutomatedBlockTrigger(self, trainqueue):
-		rv = trainqueue.Get()
-		if rv:
-			osnm, rtnm, signm, blknm = rv
-			self.AutomatedBlockSetup(trainqueue, osnm, rtnm, blknm, signm)
+	def AutomatedBlockEnqueue(self, trainqueue, osnm, rtnm, blknm, signm):
+		trainqueue.Append(osnm, rtnm, signm, blknm)
 
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
 		if sig is None or rt is None:
@@ -472,9 +478,6 @@ class District:
 		
 		if sig.SetAspect(aspect, refresh=True, callon = False):
 			self.frame.Request({"signal": { "name": sigNm, "aspect": aspect, "aspecttype": atype }})
-
-	def GetRouteDefinitions(self):
-		return [r.GetDefinition() for r in self.frame.routes.values()]
 
 	def anyTurnoutLocked(self, toList):
 		rv = False
@@ -1049,7 +1052,8 @@ class District:
 
 
 class Districts:
-	def __init__(self):
+	def __init__(self, frame):
+		self.frame = frame
 		self.districts = {}
 
 	def AddDistrict(self, district):
@@ -1070,6 +1074,10 @@ class Districts:
 	def Draw(self):
 		for t in self.districts.values():
 			t.Draw()
+
+	def ticker(self):
+		for t in self.districts.values():
+			t.ticker()
 
 	def EvaluateDistrictLocks(self, ossLocks):
 		for t in self.districts.values():
@@ -1130,11 +1138,8 @@ class Districts:
 		return indicators
 
 	def GetRouteDefinitions(self):
-		rtes = []
-		for t in self.districts.values():
-			rtes.extend(t.GetRouteDefinitions())
-		return rtes
-			
+		return [r.GetDefinition() for r in self.frame.routes.values()]
+
 	def GetCrossoverPoints(self):
 		return EWCrossoverPoints
 

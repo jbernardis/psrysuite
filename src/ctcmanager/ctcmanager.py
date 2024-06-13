@@ -1,8 +1,7 @@
-import wx
-import wx.lib.newevent
 import json
 import re
 import os
+import logging
 
 from ctcmanager.ctcpanel import CTCPanel
 
@@ -17,19 +16,12 @@ class CTCManager:
 			with open(os.path.join(os.getcwd(), "data", "ctc.json"), "r") as jfp:
 				self.ctcdata = json.load(jfp)
 		except FileNotFoundError:
-			print("unable to open CTC panel data file ctc.json")
+			logging.error("unable to open CTC panel data file ctc.json")
 			exit(1)
 
 		self.ctcPanels = {}
 		self.sigLeverMap = {}
 		self.turnoutLeverMap = {}
-
-		# if self.settings.display.pages == 1:
-		# 	for pname in self.ctcdata["order"]:
-		# 		if self.ctcdata[pname]["screen"] == "LaKr":
-		# 			self.ctcdata[pname]["position"][0] += 2560
-		# 		elif self.ctcdata[pname]["screen"] == "NaCl":
-		# 			self.ctcdata[pname]["position"][0] += 5120
 
 		for pname in self.ctcdata["order"]:
 			screen = self.ctcdata[pname]["screen"]
@@ -52,34 +44,12 @@ class CTCManager:
 			for lbl in ctc.GetLabels():
 				yield lbl
 
-	def onSignalLever(self, evt):
-		self.frame.Request({'siglever': {'name': evt.name, 'state': evt.position, 'callon': 0, "silent": 0, 'source': 'ctc'}})
-
-	def onTurnoutLever(self, evt):
-		self.frame.Request({'turnoutlever': {'name': evt.name, 'state': evt.position, 'force': 0, 'source': 'ctc'}})
-
-	def SetScreen(self, scrName):
-		self.AdjustForScreen(scrName)
-
-	def ResetScreen(self, scrName):
-		self.AdjustPosition(scrName)
-
-	def AdjustForScreen(self, scrName):
-		for cn in self.ctcdata["order"]:
-			m = scrName == self.ctcdata[cn]["screen"]
-			self.ctcPanels[cn].SetHidden(not m)
-
 	def CheckHotSpots(self, scrName, x, y):
 		if not self.visible:
 			return
-		self.frame.PopupEvent("hot spots at %s %d %d" % (scrName, x, y))
 		for cn in self.ctcdata["order"]:
 			if scrName is None or scrName == self.ctcdata[cn]["screen"]:
 				self.ctcPanels[cn].CheckHotSpots(x, y)
-
-	def AdjustPosition(self, scrName):
-		for cn in self.ctcdata["order"]:
-			self.ctcPanels[cn].AssertPosition()
 
 	def DoCmdSignal(self, parms):
 		for p in parms:
@@ -87,7 +57,7 @@ class CTCManager:
 			aspect = int(p["aspect"])
 			z = re.match("([A-Za-z]+)([0-9]+)([A-Z])", signm)
 			if z is None or len(z.groups()) != 3:
-				print("Unable to determine lever name from signal name %s" % signm)
+				logging.info("Unable to determine lever name from signal name %s" % signm)
 				return
 
 			nm, nbr, lr = z.groups()
@@ -96,10 +66,6 @@ class CTCManager:
 				self.sigLeverMap[lvrID].SetSignalAspect(aspect, lr)
 			except KeyError:
 				pass
-
-	def DoCmdSignalLock(self, parms):
-		for p in parms:
-			print("signal lock %s" % str(p))
 
 	def DoCmdTurnout(self, parms):
 		for p in parms:
@@ -115,7 +81,6 @@ class CTCManager:
 
 	def DoCmdTurnoutLock(self, parms):
 		for p in parms:
-			print("turnout lock: %s" % str(p))
 			tonm = p["name"]
 			try:
 				state = int(p["state"])
@@ -129,4 +94,3 @@ class CTCManager:
 
 			if tl:
 				tl.Enable(state == 0)
-

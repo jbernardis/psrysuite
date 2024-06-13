@@ -18,7 +18,8 @@ class TrackDiagram(wx.Panel):
 		self.text = {}
 		self.trains = {}
 		self.bitmaps = {}
-		self.ctcbitmaps = {}
+		self.ctcfgbitmaps = {}
+		self.ctcbgbitmaps = {}
 		self.ctclabels = {}
 		self.tx = 0
 		self.ty = 0
@@ -36,8 +37,6 @@ class TrackDiagram(wx.Panel):
 			h = self.bgbmps[0].GetHeight()  # assume all the same height
 		else:
 			h = ht
-
-		print("setting diagram size to %d wide" % w, flush=True)
 
 		self.SetSize((w, h))
 		self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
@@ -126,8 +125,11 @@ class TrackDiagram(wx.Panel):
 		self.bitmaps[x+offset, y] = bmp
 		self.Refresh()
 
-	def DrawCTCBitmap(self, x, y, offset, bmp):
-		self.ctcbitmaps[x+offset, y] = bmp
+	def DrawCTCBitmap(self, fg, x, y, offset, bmp):
+		if fg:
+			self.ctcfgbitmaps[x+offset, y] = bmp
+		else:
+			self.ctcbgbitmaps[x+offset, y] = bmp
 		self.Refresh()
 
 	def DrawCTCLabel(self, x, y, offset, font, lbl):
@@ -197,7 +199,9 @@ class TrackDiagram(wx.Panel):
 			dc.DrawText(tinfo[1], x, y)
 
 		if self.showCTC:
-			for bx, bmp in self.ctcbitmaps.items():
+			for bx, bmp in self.ctcbgbitmaps.items():
+				dc.DrawBitmap(bmp, bx[0], bx[1])
+			for bx, bmp in self.ctcfgbitmaps.items():
 				dc.DrawBitmap(bmp, bx[0], bx[1])
 			dc.SetTextForeground(wx.Colour(255, 255, 0))
 			dc.SetTextBackground(wx.Colour(0, 0, 0))

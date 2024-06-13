@@ -267,14 +267,6 @@ class MainFrame(wx.Frame):
 		self.rbCtlYard.SetSelection(self.settings.control.yard)
 		
 		boxsizer.AddSpacer(10)
-	
-		self.ctlSignal4L = ["Port", "Dispatcher"]	
-		self.rbCtlSignal4L = wx.RadioBox(controlBox, wx.ID_ANY, "Signal 4L", choices=self.ctlSignal4L,
-					majorDimension=1, style=wx.RA_SPECIFY_COLS)
-		boxsizer.Add(self.rbCtlSignal4L, 2, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
-		self.rbCtlSignal4L.SetSelection(self.settings.control.signal4l)
-		
-		boxsizer.AddSpacer(10)
 
 		self.cbC13Auto = wx.CheckBox(controlBox, wx.ID_ANY, "Automate Block C13")
 		self.cbC13Auto.SetValue(self.settings.control.c13auto)
@@ -285,7 +277,6 @@ class MainFrame(wx.Frame):
 		controlBox.SetSizer(boxsizer)
 		
 		vszrr.Add(controlBox, 0, wx.EXPAND)
-
 
 		vszr = wx.BoxSizer(wx.VERTICAL)
 		hszr = wx.BoxSizer(wx.HORIZONTAL)
@@ -327,11 +318,9 @@ class MainFrame(wx.Frame):
 		
 		vszr.AddSpacer(20)
 		vszr.Add(vszrfile, 9, wx.ALIGN_CENTER_HORIZONTAL)
-		
 
 		vszr.AddSpacer(20)
 
-		
 		self.bSave = wx.Button(self, wx.ID_ANY, "Save", size=(200, 60))
 		vszr.Add(self.bSave, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		self.Bind(wx.EVT_BUTTON, self.OnBSave, self.bSave)
@@ -446,7 +435,6 @@ class MainFrame(wx.Frame):
 			wildcard=wildcard,
 			style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST |wx.FD_PREVIEW)
 
-			
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			path = dlg.GetPath()
@@ -514,7 +502,6 @@ class MainFrame(wx.Frame):
 		self.settings.control.cliff = self.rbCtlCliff.GetSelection()
 		self.settings.control.nassau = self.rbCtlNassau.GetSelection()
 		self.settings.control.yard = self.rbCtlYard.GetSelection()
-		self.settings.control.signal4l = self.rbCtlSignal4L.GetSelection()
 		self.settings.control.c13auto = self.cbC13Auto.IsChecked()
 
 		if self.settings.SaveAll():
