@@ -716,6 +716,10 @@ class ServerMain:
 			east = True if cmd["east"][0] == "1" else False
 		except (IndexError, KeyError):
 			east = True
+		try:
+			rear = True if cmd["rear"][0] == "1" else False
+		except (IndexError, KeyError):
+			rear = False
 		block = cmd["block"][0]
 
 		if trn and trn.startswith("??"):
@@ -748,7 +752,7 @@ class ServerMain:
 		#self.rr.OccupyBlock(block, 0 if trn is None else 1)
 		
 		# train information is always echoed back to all listeners
-		resp = {"settrain": [{"name": trn, "loco": loco, "block": block, "east": east}]}
+		resp = {"settrain": [{"name": trn, "loco": loco, "block": block, "east": east, "rear": rear}]}
 		self.socketServer.sendToAll(resp)
 
 		self.trainList.Update(trn, loco, block, east)

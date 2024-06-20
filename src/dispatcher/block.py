@@ -426,9 +426,8 @@ class Block:
 			tr = self.GetTrain()
 			b.SetOccupied(occupied, refresh)
 			if occupied and self.train is None and self.frame.IsDispatcher():
-				tr = self.IdentifyTrain(b.IsCleared())
+				tr, rear = self.IdentifyTrain(b.IsCleared())
 				if tr is None:
-					#self.frame.PopupEvent("Unable to identify train detected in block %s" % self.GetName())
 					self.frame.SendAlertRequest("Unable to identify train detected in block %s" % self.GetName())
 
 					tr = self.frame.NewTrain()
@@ -442,7 +441,8 @@ class Block:
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
-				req = {"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": "1" if east else "0"}}
+				req = {"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": "1" if east else "0",
+									"rear": "1" if rear else "0"}}
 				self.frame.Request(req)
 			if refresh:
 				self.Draw()
@@ -461,9 +461,8 @@ class Block:
 			self.frame.Request({"blockclear": { "block": self.GetName(), "clear": 0}})
 
 			if self.train is None and self.frame.IsDispatcher():
-				tr = self.IdentifyTrain(previouslyCleared)
+				tr, rear = self.IdentifyTrain(previouslyCleared)
 				if tr is None:
-					#self.frame.PopupEvent("Unable to identify train detected in block %s" % self.GetRouteDesignator())
 					self.frame.SendAlertRequest("Unable to identify train detected in block %s" % self.GetName())
 
 					tr = self.frame.NewTrain()
@@ -477,7 +476,8 @@ class Block:
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
-				req = {"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": "1" if east else "0"}}
+				req = {"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": "1" if east else "0",
+									"rear": "1" if rear else "0"}}
 				self.frame.Request(req)
 		else:
 			for b in [self.sbEast, self.sbWest]:
@@ -524,6 +524,10 @@ class Block:
 			self.sbWest.EvaluateStoppingSection()
 
 	def IdentifyTrain(self, cleared):
+		"""
+		returns the identified train, or NOne if no traiun identified
+		Also return False if this block is to be added to the front of the train, True otherwise
+		"""
 		if self.dbg.identifytrain:
 			self.frame.DebugMessage("========New Train Identification========")
 			self.frame.DebugMessage("Attempting to identify train in block %s" % self.GetName())
@@ -533,7 +537,7 @@ class Block:
 		# if self.type == OVERSWITCH:
 		# 	if not cleared:
 		# 		# should not be entering an OS block without clearance
-		# 		return None
+		# 		return None, False
 		#=======================================================================
 			
 		if self.east:
@@ -556,7 +560,7 @@ class Block:
 							self.CheckEWCross(tr, blkWest)
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Returning train %s" % tr.GetName())
-							return tr
+							return tr, False
 						else:
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Block %s did not have a train to consider" % blkWest.GetName())
@@ -571,7 +575,7 @@ class Block:
 						self.CheckEWCross(tr, self.blkWest)
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Returning train %s" % tr.GetName())
-						return tr
+						return tr, False
 					else:
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkWest.GetName())
@@ -591,8 +595,8 @@ class Block:
 						if tr:
 							self.CheckEWCross(tr, blkEast)
 							if self.dbg.identifytrain:
-								self.frame.DebugMessage("Returning train %s" % tr.GetName())
-							return tr
+								self.frame.DebugMessage("Returning train %s rear" % tr.GetName())
+							return tr, True
 						else:
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Block %s did not have a train to consider" % blkEast.GetName())
@@ -607,8 +611,8 @@ class Block:
 					if tr:
 						self.CheckEWCross(tr, self.blkEast)
 						if self.dbg.identifytrain:
-							self.frame.DebugMessage("Returning train %s" % tr.GetName())
-						return tr
+							self.frame.DebugMessage("Returning train %s rear" % tr.GetName())
+						return tr, True
 					else:
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkEast.GetName())
@@ -633,7 +637,7 @@ class Block:
 							self.CheckEWCross(tr, blkEast)
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Returning train %s" % tr.GetName())
-							return tr
+							return tr, False
 						else:
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Block %s did not have a train to consider" % blkEast.GetName())
@@ -649,7 +653,7 @@ class Block:
 						self.CheckEWCross(tr, self.blkEast)
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Returning train %s" % tr.GetName())
-						return tr
+						return tr, False
 					else:
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkEast.GetName())
@@ -669,8 +673,8 @@ class Block:
 						if tr:
 							self.CheckEWCross(tr, blkWest)
 							if self.dbg.identifytrain:
-								self.frame.DebugMessage("Returning train %s" % tr.GetName())
-							return tr
+								self.frame.DebugMessage("Returning train %s rear" % tr.GetName())
+							return tr, True
 						else:
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Block %s did not have a train to consider" % blkWest.GetName())
@@ -685,8 +689,8 @@ class Block:
 					if tr:
 						self.CheckEWCross(tr, self.blkWest)
 						if self.dbg.identifytrain:
-							self.frame.DebugMessage("Returning train %s" % tr.GetName())
-						return tr
+							self.frame.DebugMessage("Returning train %s rear" % tr.GetName())
+						return tr, True
 					else:
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkWest.GetName())
@@ -694,7 +698,7 @@ class Block:
 		if self.dbg.identifytrain:
 			self.frame.DebugMessage("Unable to identify a train")
 
-		return None
+		return None, False
 		
 	def CheckEWCross(self, tr, blk):
 		if self.type == OVERSWITCH:
@@ -1019,7 +1023,8 @@ class OverSwitch (Block):
 
 		if self.route is not None:
 			self.route.ReleaseSignalLocks()  # release locks along the old route
-			self.route.RemoveClearStatus()
+			# this should never affect the appearance on other blocks.
+			# self.route.RemoveClearStatus()
 			self.route.RemoveOccupiedStatus()
 
 		self.route = route
@@ -1068,7 +1073,7 @@ class OverSwitch (Block):
 					exitBlk.SetNextBlockEast(self)
 			self.SetNextBlockWest(exitBlk)
 		self.Draw()
-		
+
 	def EvaluateStoppingSections(self):
 		return
 

@@ -1,4 +1,5 @@
 import logging
+import traceback
 	
 ST_FWD    = "f"
 ST_FWD128 = "F"
@@ -6,7 +7,8 @@ ST_REV    = "r"
 ST_REV128 = "R"
 ST_STOP   = "s"
 ST_ESTOP  = "e"
-		
+
+
 def formatThrottle(speed, speedType):
 	speedStr = "%3d" % int(speed)
 
@@ -24,6 +26,7 @@ def formatThrottle(speed, speedType):
 
 class Train:
 	tx = 0
+
 	def __init__(self, name=None):
 		if name:
 			self.name = name
@@ -149,7 +152,8 @@ class Train:
 
 	def GetBlockNameList(self):
 		bnl = []
-		for bn, blk in self.blocks.items():
+		for bn in self.blockOrder:
+			blk = self.blocks[bn]
 			if blk.IsOS():
 				bnl.append(blk.GetRouteDesignator())
 			else:
@@ -181,15 +185,18 @@ class Train:
 			blk.SetEast(self.east)
 			blk.Draw()
 
-	def AddToBlock(self, blk):
+	def AddToBlock(self, blk, rear=False):
 		bn = blk.GetName()
 		if bn in self.blocks:
 			return
 
 		self.blocks[bn] = blk
 		blk.SetTrain(self)
-		self.blockOrder.append(bn)
-		logging.debug("Added block %s to train %s, new block list = %s" % (bn, self.name, str(self.blockOrder)))
+		if rear:
+			self.blockOrder.insert(0, bn)
+		else:
+			self.blockOrder.append(bn)
+		logging.debug("Added block %s to %s of train %s, new block list = %s" % ("rear" if rear else "front", bn, self.name, str(self.blockOrder)))
 
 	def RemoveFromBlock(self, blk):
 		bn = blk.GetName()
@@ -203,11 +210,6 @@ class Train:
 		return True
 		
 	def IsContiguous(self):
-		print("check for contiguous: %s" % self.GetName())
-		#if self.GetName().startswith("??"):
-			# do not test for trains with temporary names
-			#return True
-		
 		bnames = list(self.blocks.keys())
 		print("blocks: %s" % str(bnames))
 		countBlocks = len(bnames)
@@ -223,7 +225,6 @@ class Train:
 		blkAdj = ""
 		for blk in self.blocks.values():
 			adje, adjw = blk.GetAdjacentBlocks()
-			print("adjacent to block %s = %s, %s" % (blk.GetName(), "None" if adje is None else adje.GetName(), "None" if adjw is None else adjw.GetName()))
 			adjc = 0
 			blkAdj += "%s: %s,%s  " % (blk.GetName(), "None" if adje is None else adje.GetName(), "None" if adjw is None else adjw.GetName())
 			for adj in adje, adjw:

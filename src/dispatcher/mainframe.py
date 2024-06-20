@@ -116,7 +116,8 @@ class MainFrame(wx.Frame):
 		self.dlgEvents = None
 		self.dlgAdvice = None
 		self.routeTrainDlgs = {}
-		
+		self.dlgInspect = None
+
 		self.locoList = []
 		self.trainList = []
 		self.activeTrains = ActiveTrainList()
@@ -418,9 +419,11 @@ class MainFrame(wx.Frame):
 				pnl.SetShift(False)
 
 		elif kcd == wx.WXK_F1:
-			dlg = InspectDlg(self, self.settings)
-			dlg.ShowModal()
-			dlg.Destroy()
+			if self.dlgInspect is None:
+				self.dlgInspect = InspectDlg(self, self.CloseInspect, self.settings)
+				self.dlgInspect.Show()
+			else:
+				self.dlgInspect.Raise()
 
 		elif kcd == wx.WXK_F2:
 			if self.CTCManager is not None:
@@ -432,6 +435,10 @@ class MainFrame(wx.Frame):
 		else:
 			#self.PopupEvent("Key Code: %d" % kcd)
 			evt.Skip()
+
+	def CloseInspect(self):
+		self.dlgInspect.Destroy()
+		self.dlgInspect = None
 
 	def OnKeyUp(self, evt):
 		kcd = evt.GetKeyCode()
@@ -2587,10 +2594,18 @@ class MainFrame(wx.Frame):
 					blk.SetLastEntered(blockend)
 					
 				if blk.GetStatus(blockend) != stat:
+					tr = blk.GetTrain()
 					district = blk.GetDistrict()
 					district.DoBlockAction(blk, blockend, stat)
 					if self.IsDispatcher():
 						self.CheckTrainsInBlock(block, None)
+						if tr is not None and stat == EMPTY:
+							tr.RemoveFromBlock(blk)
+							trblk = tr.FrontBlock()
+							if trblk is not None:
+								nm = trblk.GetName()
+								self.CheckTrainsInBlock(nm, None)
+
 			else:
 				logging.info("Ignoring block command for unknown block: %s" % block)
 
@@ -2777,6 +2792,16 @@ class MainFrame(wx.Frame):
 				east = None
 
 			try:
+				rear = p["rear"]
+			except KeyError:
+				rear = False
+
+			try:
+				nameonly = p["nameonly"]
+			except KeyError:
+				nameonly = False
+
+			try:
 				blk = self.blocks[block]
 			except:
 				logging.warning("unable to identify block (%s)" % block)
@@ -2887,10 +2912,10 @@ class MainFrame(wx.Frame):
 					# and block is set to the same thing
 					blk.SetEast(east)
 					
-				tr.AddToBlock(blk)
+				tr.AddToBlock(blk, rear=rear)
 				blk.SetTrain(tr)
 
-				if self.IsDispatcher():
+				if self.IsDispatcher() and not nameonly:
 					self.CheckTrainsInBlock(block, None)
 				
 				if loco:

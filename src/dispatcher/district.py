@@ -150,7 +150,7 @@ class District:
 				rteSet = rte.GetSetTurnouts()
 				if all(x in toMap for x in rteSet):
 					rteMap[osName] = rte
-		
+
 		for osn, rte in rteMap.items():
 			if rte is None:
 				self.blocks[osn].SetRoute(None)

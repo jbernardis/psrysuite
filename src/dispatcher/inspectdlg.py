@@ -3,11 +3,15 @@ import os
 import logging
 
 BSIZE = (120, 40)
+skipBlocks = ["KOSN10S11", "KOSN20S21"]
+
+
 class InspectDlg(wx.Dialog):
-    def __init__(self, parent, settings):
+    def __init__(self, parent, closer, settings):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
         self.CenterOnScreen()
         self.parent = parent
+        self.closer = closer
         self.settings = settings
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
 
@@ -45,6 +49,12 @@ class InspectDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnBLevers, bLevers)
         btnszr.Add(bLevers)
 
+        btnszr.AddSpacer(10)
+
+        bResetBlks = wx.Button(self, wx.ID_ANY, "Reset Blocks", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnBResetBlks, bResetBlks)
+        btnszr.Add(bResetBlks)
+
         btnszr.AddSpacer(20)
 
         szr = wx.BoxSizer(wx.HORIZONTAL)
@@ -62,20 +72,14 @@ class InspectDlg(wx.Dialog):
         rc = dlg.ShowModal()
         if rc == wx.ID_OK:
             dlg.ApplyResults()
-            dlg.Destroy()
-            self.EndModal(wx.ID_EXIT)
-        else:
-            dlg.Destroy()
+        dlg.Destroy()
 
     def OnBDebug(self, _):
         dlg = DebugFlagsDlg(self, self.settings)
         rc = dlg.ShowModal()
         if rc == wx.ID_OK:
             dlg.ApplyResults()
-            dlg.Destroy()
-            self.EndModal(wx.ID_EXIT)
-        else:
-            dlg.Destroy()
+        dlg.Destroy()
 
     def OnBProxies(self, _):
         pi = self.parent.GetOSProxyInfo()
@@ -117,8 +121,24 @@ class InspectDlg(wx.Dialog):
         else:
             return " ? " + callon
 
+    def OnBResetBlks(self, _):
+        resetList = []
+        blks = sorted([bn for bn, blk in self.parent.blocks.items() if (blk.IsCleared() and bn not in skipBlocks)])
+        dlg = CheckListDlg(self, blks, "Chooce Block(s) to reset")
+        rc = dlg.ShowModal()
+        if rc == wx.ID_OK:
+            resetList = dlg.GetCheckedItems()
+
+        dlg.Destroy()
+        if rc != wx.ID_OK:
+            return
+
+        for bn in resetList:
+            blk = self.parent.blocks[bn]
+            blk.RemoveClearStatus()
+
     def OnCancel(self, _):
-        self.EndModal(wx.ID_EXIT)
+        self.closer()
 
 
 class DebugFlagsDlg(wx.Dialog):
@@ -209,7 +229,6 @@ class DebugFlagsDlg(wx.Dialog):
                                    )
         dlg.ShowModal()
         dlg.Destroy()
-
 
 
 class LogLevelDlg(wx.Dialog):
@@ -322,6 +341,7 @@ class OSProxyDlg(wx.Dialog):
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)
 
+
 class OSProxyListCtrl(wx.ListCtrl):
     def __init__(self, parent, ospdict):
         wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(700, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
@@ -368,3 +388,76 @@ class OSProxyListCtrl(wx.ListCtrl):
             return self.normalB
         else:
             return self.normalA
+
+
+class CheckListDlg(wx.Dialog):
+    def __init__(self, parent, items, title):
+        self.choices = items
+        wx.Dialog.__init__(self, parent, wx.ID_ANY, title)
+        self.Bind(wx.EVT_CLOSE, self.OnCancel)
+
+        vszr = wx.BoxSizer(wx.VERTICAL)
+        vszr.AddSpacer(20)
+
+        cb = wx.CheckListBox(self, wx.ID_ANY, size=(160, -1), choices=items)
+        self.cbItems = cb
+        vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
+        vszr.AddSpacer(20)
+
+        btnszr = wx.BoxSizer(wx.HORIZONTAL)
+
+        bAll = wx.Button(self, wx.ID_ANY, "All")
+        self.Bind(wx.EVT_BUTTON, self.OnBAll, bAll)
+
+        bNone = wx.Button(self, wx.ID_ANY, "None")
+        self.Bind(wx.EVT_BUTTON, self.OnBNone, bNone)
+
+        btnszr.Add(bAll)
+        btnszr.AddSpacer(20)
+        btnszr.Add(bNone)
+
+        vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
+        vszr.AddSpacer(20)
+
+        btnszr = wx.BoxSizer(wx.HORIZONTAL)
+
+        bOK = wx.Button(self, wx.ID_ANY, "OK")
+        self.Bind(wx.EVT_BUTTON, self.OnBOK, bOK)
+
+        bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
+
+        btnszr.Add(bOK)
+        btnszr.AddSpacer(20)
+        btnszr.Add(bCancel)
+
+        vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
+        vszr.AddSpacer(20)
+
+        hszr = wx.BoxSizer(wx.HORIZONTAL)
+        hszr.AddSpacer(20)
+        hszr.Add(vszr)
+
+        hszr.AddSpacer(20)
+
+        self.SetSizer(hszr)
+        self.Layout()
+        self.Fit()
+
+    def OnBAll(self, evt):
+        self.cbItems.SetCheckedItems(range(len(self.choices)))
+
+    def OnBNone(self, evt):
+        self.cbItems.SetCheckedItems([])
+
+    def OnCancel(self, _):
+        self.EndModal(wx.ID_CANCEL)
+
+    def OnBOK(self, _):
+        self.EndModal(wx.ID_OK)
+
+    def GetCheckedItems(self):
+        return self.cbItems.GetCheckedStrings()

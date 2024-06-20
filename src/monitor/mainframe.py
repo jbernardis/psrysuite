@@ -92,6 +92,7 @@ breakerNames = {
 	"CBSheffieldB":		"Sheffield B",
 }
 
+
 class MainFrame(wx.Frame):
 	def __init__(self):
 		wx.Frame.__init__(self, None, style=wx.DEFAULT_FRAME_STYLE)
@@ -101,7 +102,10 @@ class MainFrame(wx.Frame):
 		self.dlgSessions = None
 		self.dlgTrains = None
 		self.dlgSigLvrs = None
-		
+
+		self.blockList = []
+		self.routes = {}
+
 		self.settings = Settings()
 		if self.settings.rrserver.simulation:		
 			self.SetTitle("PSRY Monitor for Railroad Server in simulation mode")
@@ -255,45 +259,6 @@ class MainFrame(wx.Frame):
 			
 			vsz.AddSpacer(20)
 
-		#=======================================================================
-		# if self.settings.rrserver.simulation:			
-		# 	hsz = wx.BoxSizer(wx.HORIZONTAL)
-		# 	hsz.AddSpacer(20)
-		# 	
-		# 	self.bRoute= wx.Button(self, wx.ID_ANY, "Route", size=(100, 46))
-		# 	self.Bind(wx.EVT_BUTTON, self.OnRoute, self.bRoute)
-		# 	hsz.Add(self.bRoute)
-		# 	
-		# 	hsz.AddSpacer(20)
-		# 	self.chRoutes = wx.Choice(self, wx.ID_ANY, choices=[])
-		# 	hsz.Add(self.chRoutes, 0, wx.TOP, 10)
-		# 	self.chRoutes.SetSelection(wx.NOT_FOUND)
-		# 	
-		# 	hsz.AddSpacer(20)
-		# 	
-		# 	vsz.Add(hsz)
-		# 	
-		# 	vsz.AddSpacer(20)
-		#=======================================================================
-		#===============================================================================
-		# 		Cliff (do I need to do this?? - cliff tower has levers(does it???) and these are already done)
-		# 		self.osButtons["COSGMW"] = [ "CG21W", "CC10W", "CC30W", "CC31W" ] <= these are switch levers
-		# 		self.osButtons["COSGME"] = [ "CG12E", "CG10E", "CC10E", "CC30E" ] <= these are switch levers
-		# 		self.osButtons["COSSHE"] = [
-		# 			"CC44E", "CC43E", "CC42E", "CC41E", "CC40E", "CC21E", "CC50E", "CC51E", "CC52E", "CC53E", "CC54E"]
-		# 		self.osButtons["COSSHW"] = [
-		# 			"CC44W", "CC43W", "CC42W", "CC41W", "CC40W", "CC21W", "CC50W", "CC51W", "CC52W", "CC53W", "CC54W" ]
-		# 		
-		# 		Hyde (do I need to do this - there is no hyde operator and there are no buttons we need to emulate))
-		# 		self.osButtons["HOSWW"] = [ "HWWB2", "HWWB3", "HWWB4", "HWWB5", "HWWB6" ]
-		# 		self.osButtons["HOSWW2"] = [ "HWWB1" ]
-		# 		self.osButtons["HOSWE"] = [ "HWEB1", "HWEB2", "HWEB3", "HWEB4" ]
-		# 		self.osButtons["HOSEW"] = [ "HEWB1", "HEWB2", "HEWB3", "HEWB4", "HEWB5" ]
-		# 		self.osButtons["HOSEE"] = [ "HEEB1", "HEEB2", "HEEB3", "HEEB4", "HEEB5" ]
-		# 
-		#===============================================================================
-
-			
 		if self.settings.rrserver.simulation:
 			self.BuildMatrixMap()			
 			hsz = wx.BoxSizer(wx.HORIZONTAL)
@@ -375,7 +340,8 @@ class MainFrame(wx.Frame):
 		self.SetSizer(vsz)
 		self.Fit()
 		self.Layout()
-		
+
+
 		wx.CallAfter(self.Initialize)
 		
 	def BuildMatrixMap(self):
@@ -397,7 +363,6 @@ class MainFrame(wx.Frame):
 			}
 		}		
 
-		
 	def EnableButtons(self, flag=True):
 		self.bSessions.Enable(flag)
 		self.bTrains.Enable(flag)
@@ -649,7 +614,7 @@ class MainFrame(wx.Frame):
 	def OnTicker(self, _):
 		self.delayedRequests.CheckForExpiry(self.Request)
 
-	def ConnectToServer(self):		
+	def ConnectToServer(self):
 		layout = self.rrServer.Get("getlayout", {})
 		if layout is None:
 			self.connected =False
@@ -670,8 +635,8 @@ class MainFrame(wx.Frame):
 					bl.append(b[bn]["sbeast"])
 				if b[bn]["sbwest"] is not None:
 					bl.append(b[bn]["sbwest"])
-					
-			self.blockList = sorted(bl)
+
+			self.blockList = sorted(bl, key=self.BuildBlockKey)
 			self.chBlock.SetItems(self.blockList)
 			self.chBlock.SetSelection(0)
 	
@@ -689,33 +654,51 @@ class MainFrame(wx.Frame):
 						if node in [ "C", "N", "P", "Y" ]:  # cliff, nassau, port, yard
 							leverlist[levers[0]] = 1
 					
-			self.turnoutList = sorted([t for t in tolist.keys()])
+			self.turnoutList = sorted([t for t in tolist.keys()], key=self.BuildTurnoutKey)
 			self.chTurnout.SetItems(self.turnoutList)
 			self.chTurnout.SetSelection(0)
 			
 			llist = [l for l in leverlist.keys()]
 			lvrs = {n: SigLever(n) for n in llist}
 			self.sigLevers = {n: sl for n,sl in lvrs.items() if sl.IsValid()}
-			self.leverList = sorted([l for l in self.sigLevers.keys()], key=self.BuildLeverKey)
+			self.leverList = sorted([l for l in self.sigLevers.keys()], key=self.BuildSignalLeverKey)
 			
 			self.chSigLvr.SetItems(self.leverList)
 			self.chSigLvr.SetSelection(0)
-			
-			#===================================================================
-			# self.routeList = sorted([r for r in self.routes.keys()])
-			# self.chRoutes.SetItems(self.routeList)
-			# self.chRoutes.SetSelection(0)
-			#===================================================================
 
 		self.EnableButtons(self.connected)			
 		return self.connected
 
-		
-	def BuildLeverKey(self, slnm):
+	def BuildBlockKey(self, blk):
+		z = re.match("([A-Za-z]+)([0-9]*)(\\.[EW])?", blk)
+		if z is None:
+			return blk
+
+		if len(z.groups()) != 3:
+			return blk
+
+		base, nbr, suffix = z.groups()
+		if nbr != "":
+			nbr = "%03d" % int(nbr)
+
+		if suffix is None:
+			suffix = ".M"
+
+		return base+nbr+suffix
+
+	def BuildSignalLeverKey(self, slnm):
 		z = re.match("([A-Za-z]+)([0-9]+)", slnm)
 		if z is None or len(z.groups()) != 2:
 			return slnm
-		
+
+		nm, nbr = z.groups()
+		return "%s%03d" % (nm, int(nbr))
+
+	def BuildTurnoutKey(self, tonm):
+		z = re.match("([A-Za-z]+)([0-9]+)", tonm)
+		if z is None or len(z.groups()) != 2:
+			return tonm
+
 		nm, nbr = z.groups()
 		return "%s%03d" % (nm, int(nbr))
 

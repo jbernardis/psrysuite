@@ -1158,7 +1158,7 @@ class Port (District):
 			"P30": ("PB4L",   "PA32RB"),
 			"P31": ("PB4R",   "PB14L"),
 			"P32": ("PB14R",  "S4LC"),
-			"P40": ("PB2L",   "PA4L"),
+			"P40": ("PA4L",   "PB2L"),
 			"P41": ("PB2R",   "PB12L"),			
 			"P42": ("PB12R",  "S16R"),
 			
