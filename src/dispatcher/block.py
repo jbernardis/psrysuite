@@ -918,12 +918,11 @@ class StoppingBlock (Block):
 		self.cleared = False
 		self.determineStatus()
 		self.Draw()
-		
-	
+
 	def SetLastEntered(self, subblk):
 		self.block.SetLastEntered(subblk)
 
-	def SetOccupied(self, occupied=True, refresh=False):
+	def SetOccupied(self, occupied=True, blockend=None, refresh=False):
 		if self.occupied == occupied:
 			# already in the requested state
 			return

@@ -2599,7 +2599,7 @@ class MainFrame(wx.Frame):
 					district.DoBlockAction(blk, blockend, stat)
 					if self.IsDispatcher():
 						self.CheckTrainsInBlock(block, None)
-						if tr is not None and stat == EMPTY:
+						if tr is not None and not blk.IsOccupied():
 							tr.RemoveFromBlock(blk)
 							trblk = tr.FrontBlock()
 							if trblk is not None:
