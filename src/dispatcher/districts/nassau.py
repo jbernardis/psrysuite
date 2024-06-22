@@ -221,9 +221,17 @@ class Nassau (District):
 			
 	def DoBlockAction(self, blk, blockend, state):
 		District.DoBlockAction(self, blk, blockend, state)
-		if blk.GetName() == "N21":
+		bn = blk.GetName()
+		if bn == "N21":
 			self.CheckBlockSignals("N21", "N21W", False)
-			
+		elif bn == "NWOSCY" and not blk.GetEast() and state == EMPTY:
+			"""
+			if the OS empties and we are westbound into coach yard, force the coach yard to cleared since there is no
+			detection on those tracks.  Otherwise, they will stay green
+			"""
+			updBlk = self.blocks["N60"]
+			updBlk.SetCleared(False, False)
+
 	def DoSignalAction(self, sig, aspect, frozenaspect=None, callon=False):
 		District.DoSignalAction(self, sig, aspect, frozenaspect=frozenaspect, callon=callon)
 		signame = sig.GetName()
