@@ -18,3 +18,6 @@ cliff fleeting - physical lever controls martinsville, cliveden and green mounta
 when the cliff control is set to all, cliff controls everything.
 When it is set to dispatch all, the dispatcher controls everything
 When set to dispatcher controls bank/cliveden, cliff only controls sheffield, green mountain, and cliveden.  Dispatcher controls single track and martinsville/bank
+
+
+train routing - give a warning if a train enters a block that is not in its route - and a way to acknowledge and therefore ignore future such warnings

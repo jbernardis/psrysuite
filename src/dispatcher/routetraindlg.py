@@ -199,7 +199,7 @@ class RouteTrainDlg(wx.Dialog):
 		sigst.SetFont(self.font)
 			
 		if osname is None or rtname is None:
-			rtest = wx.StaticText(self, wx.ID_ANY, "", size=(	COLOS, -1))
+			rtest = wx.StaticText(self, wx.ID_ANY, "", size=(COLOS, -1))
 		else:
 			try:
 				rn = rtname.split("Rt")[1]

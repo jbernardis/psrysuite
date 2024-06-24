@@ -206,7 +206,7 @@ class Script (wx.Frame):
 					return
 			
 			else:
-				logging.error("Unknown command in simulator script: (%s) - ignoring" % cmd)
+				logging.error("Unknown command in trafficgen script: (%s) - ignoring" % cmd)
 
 	def AddToOccupiedBlocks(self, bn):
 		self.occupiedBlocks.append(bn)

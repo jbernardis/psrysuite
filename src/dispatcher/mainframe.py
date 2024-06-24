@@ -96,7 +96,6 @@ class MainFrame(wx.Frame):
 		self.AREnabled = False
 		self.pidATC	= None
 		self.procATC = None
-		self.pidAdvisor = None
 		self.OSSLocks = True
 		self.sidingsUnlocked = False
 		self.CTCManager = None
@@ -329,10 +328,7 @@ class MainFrame(wx.Frame):
 			self.cbATC = wx.CheckBox(self, wx.ID_ANY, "Automatic Train Control", pos=(self.centerOffset+670, 50))
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBATC, self.cbATC)
 			self.cbATC.Enable(False)
-			self.cbAdvisor = wx.CheckBox(self, wx.ID_ANY, "Advisor", pos=(self.centerOffset+670, 75))
-			self.Bind(wx.EVT_CHECKBOX, self.OnCBAdvisor, self.cbAdvisor)
-			self.cbAdvisor.Enable(False)
-			
+
 			self.bSnapshot = wx.Button(self, wx.ID_ANY, "Snapshot", pos=(self.centerOffset+2100, 75), size=BTNDIM)
 			self.bSnapshot.Enable(False)
 			self.Bind(wx.EVT_BUTTON, self.OnBSnapshot, self.bSnapshot)
@@ -992,14 +988,6 @@ class MainFrame(wx.Frame):
 					
 			self.Request({'handswitch': {'name': sw+'.hand', 'status': 1 if self.sidingsUnlocked else 0}})
 			
-	def OnCBAdvisor(self, evt):
-		self.AdvisorEnabled = self.cbAdvisor.IsChecked()
-		if self.AdvisorEnabled:
-			rqStatus = "on"
-		else:
-			rqStatus = "off"
-		self.Request({"advisor": { "status": rqStatus}})
-		
 	def sendPendingATCShow(self):
 		self.Request(self.pendingATCShowCmd)
 		
@@ -2327,7 +2315,6 @@ class MainFrame(wx.Frame):
 				self.bSaveLocos.Enable(False)
 				self.cbAutoRouter.Enable(False)
 				self.cbATC.Enable(False)
-				self.cbAdvisor.Enable(False)
 				self.cbOSSLocks.Enable(False)
 				self.cbSidingsUnlocked.Enable(False)
 			else:
@@ -2358,7 +2345,6 @@ class MainFrame(wx.Frame):
 				self.bClearTrains.Enable(True)
 				self.cbAutoRouter.Enable(True)
 				self.cbATC.Enable(True)
-				self.cbAdvisor.Enable(True)
 				self.cbOSSLocks.Enable(True)
 				self.cbSidingsUnlocked.Enable(True)
 				
@@ -2600,6 +2586,10 @@ class MainFrame(wx.Frame):
 					if self.IsDispatcher():
 						self.CheckTrainsInBlock(block, None)
 						if tr is not None and not blk.IsOccupied():
+							"""
+							a block has been emptied - re-evaluate the front block of the train to determine its
+							governing signal
+							"""
 							tr.RemoveFromBlock(blk)
 							trblk = tr.FrontBlock()
 							if trblk is not None:
@@ -3295,7 +3285,6 @@ class MainFrame(wx.Frame):
 		if self.IsDispatcher():
 			self.cbAutoRouter.Enable(False)
 			self.cbATC.Enable(False)
-			self.cbAdvisor.Enable(False)
 			self.cbOSSLocks.Enable(False)
 			self.cbSidingsUnlocked.Enable(False)
 		logging.info("Server socket closed")

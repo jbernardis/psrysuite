@@ -68,6 +68,7 @@ from rrserver.dccserver import DCCHTTPServer
 
 from dispatcher.constants import RegAspects
 
+
 class ServerMain:
 	def __init__(self):
 		self.socketServer = None
@@ -332,13 +333,10 @@ class ServerMain:
 			"autorouter":	self.DoAutorouter,
 			"ar":			self.DoAR,
 			"arrequest":	self.DoARRequest,
-			"advisor":		self.DoAdvisor,
 			"atc":			self.DoATC,
 			"atcrequest":	self.DoATCRequest,
 			"atcstatus":	self.DoATCStatus,
 
-			"ctccmd":		self.DoCTCCmd,
-			
 			"debug":		self.DoDebug,
 			"simulate": 	self.DoSimulate,
 			"dumptrains":	self.DoDumpTrains,
@@ -351,8 +349,7 @@ class ServerMain:
 			"reopen":		self.DoReopen
 		}
 
-
-	def ProcessCommand(self, cmd):			
+	def ProcessCommand(self, cmd):
 		verb = cmd["cmd"][0]
 		if verb == "failedstart":
 			logging.info("received failed start command")
@@ -522,14 +519,14 @@ class ServerMain:
 		resp = {"clock": [{ "value": value, "status": status}]}
 		self.timeValue = value
 		self.clockStatus = status
-		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)
 			
 	def DoDCCSpeed(self, cmd):
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"dccspeed": [p]}
-		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("TRACKER") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("TRACKER")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)
 			
@@ -607,7 +604,7 @@ class ServerMain:
 			self.CrossoverPoints.append(b.split(":"))
 			
 	def DoGenLayout(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		if len(addrList) == 0:
 			logging.error("Cannot generate layout information until dispatcher has connected")
 		else:
@@ -635,7 +632,7 @@ class ServerMain:
 		self.rr.SetControlOption(name, value)
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"control": [p]}
-		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)
 		
@@ -693,7 +690,7 @@ class ServerMain:
 			self.sendSubBlocks(addr, skt)
 			
 	def DoTrainTimesRequest(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"traintimesrequest": {}})
 			
@@ -792,7 +789,7 @@ class ServerMain:
 		self.socketServer.sendToAll(resp)
 		
 	def GetTrainList(self):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"dumptrains": ""})
 		return self.trainList.GetTrainList()
@@ -824,7 +821,7 @@ class ServerMain:
 				self.socketServer.sendToAll(cmd)
 
 	def DoCheckTrains(self, cnd):				
-		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"checktrains": {}})
 		
@@ -838,12 +835,12 @@ class ServerMain:
 		self.socketServer.sendToAll(resp)
 	
 	def DoAdvice(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"advice": cmd})
 	
 	def DoAlert(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"alert": cmd})
 				
@@ -883,38 +880,19 @@ class ServerMain:
 		addrList = self.clientList.GetFunctionAddress("AR") + self.clientList.GetFunctionAddress("DISPLAY")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"ar": cmd})
-			
-						
-	def DoAdvisor(self, cmd):
-		stat = cmd["status"][0]
-		if stat == "on":
-			if not self.clientList.HasFunction("ADVISOR"):
-				advExec = os.path.join(os.getcwd(), "advisor", "main.py")
-				self.pidADV = Popen([sys.executable, advExec]).pid
-				logging.debug("advisor started as PID %d" % self.pidADV)
-		else:
-			self.deleteClients(["ADVISOR"])
-			self.pidADV = None
-
-	def DoCTCCmd(self, cmd):
-		addrList =  self.clientList.GetFunctionAddress("CTCPANEL")
-		for addr, skt in addrList:
-			self.socketServer.sendToOne(skt, addr, {"ctccmd": cmd})
 
 	def DoATC(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atc": cmd})
 
-
 	def DoATCRequest(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress(
-			"SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atcrequest": cmd})
 
 	def DoARRequest(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("CTCPANEL")
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"arrequest": cmd})
 					

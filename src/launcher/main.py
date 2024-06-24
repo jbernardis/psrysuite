@@ -68,9 +68,9 @@ elif mode == "simulation":
     svrProc = Popen([interpfg, svrExec, "--sim"], startupinfo=infoMinimize)
     print("server started as PID %d" % svrProc.pid)
     
-    simExec = os.path.join(os.getcwd(), "simulator", "main.py")
+    simExec = os.path.join(os.getcwd(), "trafficgen", "main.py")
     simProc = Popen([interpreter, simExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
-    print("simulator started as PID %d" % simProc.pid)
+    print("trafficgen started as PID %d" % simProc.pid)
     
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
     dispProc = Popen([interpreter, dispExec, "--dispatch"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)

@@ -43,7 +43,6 @@ from atc.ticker import Ticker
 class MainFrame(wx.Frame):
 	def __init__(self):
 		wx.Frame.__init__(self, None, size=(900, 800), style=wx.STAY_ON_TOP | wx.CAPTION | wx.RESIZE_BORDER)
-		#wx.Frame.__init__(self, None, size=(900, 800), style=(wx.STAY_ON_TOP | wx.CAPTION) & ~(wx.MINIMIZE_BOX|wx.RESIZE_BORDER|wx.MAXIMIZE_BOX))
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.Bind(wx.EVT_SIZE, self.OnResize)
 		self.Bind(wx.EVT_IDLE,self.OnIdle)
@@ -55,6 +54,8 @@ class MainFrame(wx.Frame):
 		
 		self.posx = 0
 		self.posy = 0
+		self.resetx = 0
+		self.resety = 0
 
 		self.blocks = {}
 		self.turnouts = {}
@@ -156,6 +157,9 @@ class MainFrame(wx.Frame):
 		
 	def SetPos(self):
 		self.SetPosition((self.posx, self.posy))
+
+	def GetPos(self):
+		self.posx, self.posy = self.GetPosition()
 
 	def Initialize(self):
 		logging.info("enter initialize")
@@ -561,13 +565,12 @@ class MainFrame(wx.Frame):
 					self.atcList.RefreshTrain(dccl)
 					
 				elif action == "hide":
+					self.GetPos()
 					self.Hide()
 				
 				elif action == "reset":
-					if "x" in parms:
-						self.posx = int(parms["x"][0])
-					if "y" in parms:
-						self.posy = int(parms["y"][0])
+					self.posx = self.resetx
+					self.posy = self.resety
 					self.SetPos()
 					self.Show()
 				
@@ -575,8 +578,10 @@ class MainFrame(wx.Frame):
 					if "x" in parms or "y" in parms:
 						if "x" in parms:
 							self.posx = int(parms["x"][0])
+							self.resetx = self.posx
 						if "y" in parms:
 							self.posy = int(parms["y"][0])
+							self.resety = self.posy
 						self.SetPos()
 
 					self.Show()

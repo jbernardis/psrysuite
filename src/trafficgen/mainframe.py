@@ -8,13 +8,13 @@ import logging
 from dispatcher.settings import Settings
 
 
-from simulator.listener import Listener
-from simulator.rrserver import RRServer
-from simulator.script import Script
-from simulator.scrlist import ScriptListCtrl
-from simulator.trainparmdlg import TrainParmDlg
+from trafficgen.listener import Listener
+from trafficgen.rrserver import RRServer
+from trafficgen.script import Script
+from trafficgen.scrlist import ScriptListCtrl
+from trafficgen.trainparmdlg import TrainParmDlg
 
-from simulator.train import Trains
+from trafficgen.train import Trains
 
 from traineditor.layoutdata import LayoutData
 from traineditor.generators import GenerateSim
@@ -43,10 +43,10 @@ class MainFrame(wx.Frame):
 		self.stoppable = []
 
 		icon = wx.Icon()
-		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "simulator.ico"), wx.BITMAP_TYPE_ANY))
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(), "icons", "trafficgen.ico"), wx.BITMAP_TYPE_ANY))
 		self.SetIcon(icon)
 
-		self.title = "PSRY Simulator"
+		self.title = "PSRY Traffic Generator"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
@@ -87,7 +87,7 @@ class MainFrame(wx.Frame):
 		vsz.Add(hsz)
 		vsz.AddSpacer(20)
 
-		self.scriptList = ScriptListCtrl(self, os.path.join(cmdFolder, "simulator"))
+		self.scriptList = ScriptListCtrl(self, os.path.join(cmdFolder, "trafficgen"))
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20)
 		btnsz = wx.BoxSizer(wx.VERTICAL)
@@ -371,7 +371,7 @@ class MainFrame(wx.Frame):
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)
 				self.ShowTitle()
-				self.Request({"identify": {"SID": self.sessionid, "function": "SIM"}})
+				self.Request({"identify": {"SID": self.sessionid, "function": "TRAFFICGEN"}})
 				self.Request({"refresh": {"SID": self.sessionid}})
 
 			elif cmd == "end":
