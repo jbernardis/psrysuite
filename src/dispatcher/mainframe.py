@@ -65,7 +65,7 @@ MENU_TRAIN_ROUTE = 910
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
-allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest", "traintimesrequest", "trainblockorder", "trainsignal" ]
+allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest", "traintimesrequest", "trainblockorder", "trainsignal", "blockdir" ]
 disallowedSatelliteCommands = [ "relay" ]
 
 wildcardTrain = "train files (*.trn)|*.trn|"	 \
@@ -1763,8 +1763,7 @@ class MainFrame(wx.Frame):
 				newTr.AddToBlock(b)
 				b.SetTrain(newTr)
 				b.SetEast(east)
-				if self.IsDispatcher():
-					self.CheckTrainsInBlock(b.GetName(), None)
+				self.CheckTrainsInBlock(b.GetName(), None)
 
 			self.Request({"settrain": { "blocks": blist}})
 			self.Request({"settrain": { "blocks": blist, "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
@@ -1822,8 +1821,7 @@ class MainFrame(wx.Frame):
 				tr.AddToBlock(blk)
 				blk.SetTrain(tr)
 				blk.SetEast(east)
-				if self.IsDispatcher():
-					self.CheckTrainsInBlock(blk.GetName(), None)
+				self.CheckTrainsInBlock(blk.GetName(), None)
 
 			self.Request({"settrain": { "blocks": blist}})
 			self.Request({"settrain": { "blocks": blist, "name": oldName, "loco": oldLoco, "east": "1" if east else "0"}})
@@ -1841,10 +1839,9 @@ class MainFrame(wx.Frame):
 			tr.SetEast(nd)
 			tr.SetBlocksDirection()
 			tr.ReverseBlockOrder()
-			if self.IsDispatcher():
-				blk = tr.FrontBlock()
-				if blk is not None:
-					self.CheckTrainsInBlock(blk.GetName(), None)
+			blk = tr.FrontBlock()
+			if blk is not None:
+				self.CheckTrainsInBlock(blk.GetName(), None)
 
 			self.activeTrains.RefreshTrain(tr.GetName())
 			self.SendTrainBlockOrder(tr)
@@ -1870,10 +1867,9 @@ class MainFrame(wx.Frame):
 				return
 
 			tr.SetBlockOrder(neworder)
-			if self.IsDispatcher():
-				blk = tr.FrontBlock()
-				if blk is not None:
-					self.CheckTrainsInBlock(blk.GetName(), None)
+			blk = tr.FrontBlock()
+			if blk is not None:
+				self.CheckTrainsInBlock(blk.GetName(), None)
 
 			self.activeTrains.RefreshTrain(tr.GetName())
 			self.SendTrainBlockOrder(tr)
@@ -1929,8 +1925,7 @@ class MainFrame(wx.Frame):
 			newTr.AddToBlock(b)
 			b.SetTrain(newTr)
 			b.SetEast(east)
-			if self.IsDispatcher():
-				self.CheckTrainsInBlock(b.GetName(), None)
+			self.CheckTrainsInBlock(b.GetName(), None)
 
 		self.Request({"settrain": {"blocks": blockList}})
 		self.Request(

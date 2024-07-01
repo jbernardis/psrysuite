@@ -709,6 +709,8 @@ class ServerMain:
 		if trid is not None and blocks is not None:
 			if east is not None:
 				self.trainList.SetEast(trid, east)
+
+			print("calling update BO(%s, %s)" % (trid, str(blocks)))
 			self.trainList.UpdateTrainBlockOrder(trid, blocks)
 
 			p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}

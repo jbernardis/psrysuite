@@ -90,8 +90,10 @@ class Signal:
 	def GetAspectType(self):
 		return self.aspectType
 	
-	def GetAspectName(self):
-		return "%s (%s)" % (aspectname(self.aspect, self.aspectType), aspecttype(self.aspectType))
+	def GetAspectName(self, aspect=None):
+		if aspect is None:
+			aspect = self.aspect
+		return "%s (%s)" % (aspectname(aspect, self.aspectType), aspecttype(self.aspectType))
 	
 	def SetTrain(self, tr):
 		self.train = tr
@@ -379,7 +381,7 @@ class MainFrame(wx.Frame):
 			sigName = sig["name"]
 			aspect = sig["aspect"]
 			try:
-				frozenAspect = sig["frozenAspect"]
+				frozenAspect = sig["frozenaspect"]
 			except KeyError:
 				frozenAspect = None
 			try:
@@ -564,7 +566,7 @@ class MainFrame(wx.Frame):
 
 			tr.AddToBlock(blk, action)
 			if action == "replace":
-				tr.SetBlockOrder(reversed(blocks))
+				tr.SetBlockOrder(blocks)
 
 			blk.SetTrain(tr)
 

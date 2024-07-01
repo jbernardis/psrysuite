@@ -79,8 +79,6 @@ class ActiveTrainList:
 		self.EnableTrainListPanel(False)
 		return self.panelTrainList
 				
-
-	
 	def EnableTrainListPanel(self, flag=True):
 		if self.panelTrainList is not None:
 			self.panelTrainList.Enable(flag)

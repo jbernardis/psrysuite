@@ -24,6 +24,10 @@ class TrainList:
 				for b in blocks:
 					if b in self.trains[tr]["blocks"]:
 						self.trains[tr]["blocks"].remove(b)
+						try:
+							self.trains[tr]["blockorder"].remove(b)
+						except:
+							pass
 						if len(self.trains[tr]["blocks"]) == 0:
 							dellist.append(tr)
 
@@ -34,13 +38,16 @@ class TrainList:
 			if train in self.trains:
 				if action == "replace":
 					self.trains[train]["blocks"] = [b for b in blocks]
+					self.trains[train]["blockorder"] = [b for b in blocks]
 				else:
 					for b in blocks:
 						if b not in self.trains[train]["blocks"]:
 							if action == "front":
 								self.trains[train]["blocks"].append(b)
+								self.trains[train]["blockorder"].append(b)
 							else:
 								self.trains[train]["blocks"] = [b] + self.trains[train]["blocks"]
+								self.trains[train]["blockorder"] = [b] + self.trains[train]["blockorder"]
 				if loco:
 					self.trains[train]["loco"] = loco
 				self.trains[train]["east"] = east

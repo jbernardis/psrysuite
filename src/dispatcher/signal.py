@@ -1,5 +1,6 @@
 from dispatcher.constants import STOP, aspectname, aspecttype, aspectprofileindex
 
+
 class Signal:
 	def __init__(self, district, screen, frame, name, aspecttype, east, pos, tiles):
 		self.district = district
@@ -64,8 +65,11 @@ class Signal:
 	def GetAspectType(self):
 		return self.aspectType
 	
-	def GetAspectName(self):
-		return "%s (%s)" % (aspectname(self.aspect, self.aspectType), aspecttype(self.aspectType))
+	def GetAspectName(self, aspect=None):
+		if aspect is None:
+			aspect = self.aspect
+
+		return "%s (%s)" % (aspectname(aspect, self.aspectType), aspecttype(self.aspectType))
 	
 	def GetAspectProfileIndex(self, aspect=None):
 		asp = self.aspect if aspect is None else aspect
@@ -149,7 +153,7 @@ class Signal:
 		
 	def SetFrozenAspect(self, fa):
 		self.frozenAspect = fa
-		
+
 	def GetFrozenAspect(self):
 		return self.frozenAspect
 

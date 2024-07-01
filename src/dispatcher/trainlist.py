@@ -561,12 +561,15 @@ class TrainListCtrl(wx.ListCtrl):
 			return u"\u2713" if tr.GetSBActive() else " "
 		
 		elif col == 7:
-			sig, aspect, _ = tr.GetSignal()
+			sig, aspect, frozenAspect = tr.GetSignal()
 			if sig is None:
 				return ""
 			resp = sig.GetName()
+			if frozenAspect is not None:
+				aspect = frozenAspect
+
 			if aspect is not None:
-				resp += ":%s" % sig.GetAspectName()
+				resp += ":%s" % sig.GetAspectName(aspect=aspect)
 			return resp 
 		
 		elif col == 8:

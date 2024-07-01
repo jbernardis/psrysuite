@@ -1185,7 +1185,7 @@ class OverSwitch (Block):
 				# turn the signal we just passed red, but hold onto the lock to be cleared when we exit the block
 				# also retain the old aspect, used to govern train speed
 				self.entrySignal.SetFrozenAspect(aspect)
-				self.frame.Request({"signal": { "name": signm, "aspect": STOP, "aspecttype": atype, "frozenAspect": aspect}})
+				self.frame.Request({"signal": { "name": signm, "aspect": STOP, "aspecttype": atype, "frozenaspect": aspect}})
 				tr = self.GetTrain()
 				if tr is not None:
 					self.frame.activeTrains.UpdateTrain(tr.GetName())
