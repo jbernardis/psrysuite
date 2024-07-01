@@ -161,8 +161,31 @@ class Train:
 
 		return bnl
 
+	def GetDesignatorMap(self):
+		dmap = {}
+		for bn in self.blockOrder:
+			blk = self.blocks[bn]
+			if blk.IsOS():
+				dmap[blk.GetRouteDesignator()] = bn
+		return dmap
+
 	def GetBlockList(self):
 		return self.blocks
+
+	def ReverseBlockOrder(self):
+		self.blockOrder = list(reversed(self.blockOrder))
+
+	def GetBlockOrderList(self):
+		return self.blockOrder
+
+	def GetBlockOrder(self):
+		return { "name": self.name,
+			"east": self.east,
+			"blocks": self.blockOrder }
+
+	def SetBlockOrder(self, order):
+		self.blockOrder = [b for b in order if b in self.blocks]
+		logging.debug("Setting block order of train %s = %s" % (self.name, str(self.blockOrder)))
 
 	def GetBlockCount(self):
 		return len(self.blocks)
@@ -181,22 +204,25 @@ class Train:
 			blk.DrawTrain()
 
 	def SetBlocksDirection(self):
-		for blk in self.blocks.values():
-			blk.SetEast(self.east)
+		lastBlock = self.blockOrder[-1]
+		effectiveDirection = self.east
+		for bn in reversed(self.blockOrder): # move from the front of the train to the rear
+			blk = self.blocks[bn]
+			blk.SetEast(effectiveDirection)
 			blk.Draw()
 
-	def AddToBlock(self, blk, rear=False):
+	def AddToBlock(self, blk, action):
 		bn = blk.GetName()
 		if bn in self.blocks:
 			return
 
 		self.blocks[bn] = blk
 		blk.SetTrain(self)
-		if rear:
+		if action == "rear":
 			self.blockOrder.insert(0, bn)
 		else:
 			self.blockOrder.append(bn)
-		logging.debug("Added block %s to %s of train %s, new block list = %s" % ("rear" if rear else "front", bn, self.name, str(self.blockOrder)))
+		logging.debug("Added block %s to %s of train %s, new block list = %s" % (action, bn, self.name, str(self.blockOrder)))
 
 	def RemoveFromBlock(self, blk):
 		bn = blk.GetName()
@@ -261,13 +287,13 @@ class Train:
 		if len(self.blockOrder) == 0:
 			return False
 		return bn == self.blockOrder[-1]
-			
+
 	def FrontBlock(self):
 		if len(self.blockOrder) == 0:
 			return None
 		bn = self.blockOrder[-1]
 		return self.blocks[bn]
-			
+
 	def IsInBlock(self, blk):
 		bn = blk.GetName()
 		return bn in self.blocks

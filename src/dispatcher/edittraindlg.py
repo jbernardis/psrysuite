@@ -4,7 +4,7 @@ import logging
 from dispatcher.losttrains import LostTrainsDlg
 
 MAXSTEPS = 9
-BUTTONSIZE = (90, 30)
+BUTTONSIZE = (120, 40)
 
 class EditTrainDlg(wx.Dialog):
 	def __init__(self, parent, train, block, locos, trains, engineers, existingTrains, atcFlag, arFlag, lostTrains, dx, dy):
@@ -159,8 +159,6 @@ class EditTrainDlg(wx.Dialog):
 			
 		vsz.AddSpacer(30)
 
-		bsz = wx.BoxSizer(wx.HORIZONTAL)
-
 		self.bOK = wx.Button(self, wx.ID_ANY, "OK", size=BUTTONSIZE)
 		self.bOK.SetDefault()
 		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BUTTONSIZE)
@@ -170,23 +168,33 @@ class EditTrainDlg(wx.Dialog):
 		self.bMerge.SetToolTip("Merge this train with another")
 		self.bReverse = wx.Button(self, wx.ID_ANY, "Reverse", size=BUTTONSIZE)
 		self.bReverse.SetToolTip("Reverse Direction on this train")
+		self.bSort = wx.Button(self, wx.ID_ANY, "Reorder Blocks", size=BUTTONSIZE)
+		self.bSort.SetToolTip("Rearracge the order of blocks occupied by this train")
 
+		bsz = wx.BoxSizer(wx.HORIZONTAL)
 		bsz.Add(self.bOK)
 		bsz.AddSpacer(30)
 		bsz.Add(self.bCancel)
-		bsz.AddSpacer(30)
+
+		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
+		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
+		vsz.Add(bsz, 0, wx.ALIGN_CENTER)
+
+		vsz.AddSpacer(20)
+
+		bsz = wx.BoxSizer(wx.HORIZONTAL)
 		bsz.Add(self.bSever)
 		bsz.AddSpacer(30)
 		bsz.Add(self.bMerge)
 		bsz.AddSpacer(30)
 		bsz.Add(self.bReverse)
+		bsz.AddSpacer(30)
+		bsz.Add(self.bSort)
 
-		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
-		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
 		self.Bind(wx.EVT_BUTTON, self.onSever, self.bSever)
 		self.Bind(wx.EVT_BUTTON, self.onMerge, self.bMerge)
 		self.Bind(wx.EVT_BUTTON, self.onReverse, self.bReverse)
-
+		self.Bind(wx.EVT_BUTTON, self.onSort, self.bSort)
 		vsz.Add(bsz, 0, wx.ALIGN_CENTER)
 
 		vsz.AddSpacer(20)
@@ -354,6 +362,9 @@ class EditTrainDlg(wx.Dialog):
 	def onReverse(self, _):
 		self.EndModal(wx.ID_BACKWARD)
 
+	def onSort(self, _):
+		self.EndModal(wx.ID_SORT_ASCENDING)
+
 	def GetResults(self):
 		t = self.chosenTrain
 		l = self.chosenLoco
@@ -365,3 +376,144 @@ class EditTrainDlg(wx.Dialog):
 		ar = False if not self.arFlag else self.cbAR.GetValue()
 
 		return t, l, e, atc, ar, self.startingEast
+
+
+class SortTrainBlocksDlg(wx.Dialog):
+	def __init__(self, parent, tr):
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
+		self.parent = parent
+		self.Bind(wx.EVT_CLOSE, self.onCancel)
+
+		self.modified = False
+		self.titleText = "Reorder Train Blocks"
+		self.SetTitleText()
+
+		textFont = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial"))
+		stFont = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+
+		self.blocks = [t for t in reversed(tr.GetBlockNameList())]
+		self.dmap = tr.GetDesignatorMap()
+
+		self.lbBlocks = wx.ListBox(self, wx.ID_ANY, choices=self.blocks, size=(160, 200))
+		self.lbBlocks.SetFont(textFont)
+		self.Bind(wx.EVT_LISTBOX, self.onLbBlocksSelect, self.lbBlocks)
+		self.lbBlocks.SetSelection(0)
+		self.sx = 0
+
+		self.bUp = wx.Button(self, wx.ID_ANY, "Up", size=BUTTONSIZE)
+		self.Bind(wx.EVT_BUTTON, self.onBUp, self.bUp)
+		self.bUp.Enable(False)
+		self.bDown = wx.Button(self, wx.ID_ANY, "Down", size=BUTTONSIZE)
+		self.Bind(wx.EVT_BUTTON, self.onBDown, self.bDown)
+		self.bDown.Enable(True)
+
+		vsz = wx.BoxSizer(wx.VERTICAL)
+
+		vsz.AddSpacer(20)
+
+		st = wx.StaticText(self, wx.ID_ANY, "Front of Train")
+		st.SetFont(stFont)
+		vsz.Add(st, 0, wx.LEFT, 20)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(self.lbBlocks)
+		hsz.AddSpacer(20)
+
+		btnsz = wx.BoxSizer(wx.VERTICAL)
+		btnsz.AddSpacer(20)
+		btnsz.Add(self.bUp)
+		btnsz.AddSpacer(30)
+		btnsz.Add(self.bDown)
+		btnsz.AddSpacer(20)
+
+		hsz.Add(btnsz, 0, wx.ALIGN_CENTER_VERTICAL)
+
+		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		st = wx.StaticText(self, wx.ID_ANY, "Rear of Train")
+		st.SetFont(stFont)
+		vsz.Add(st, 0, wx.LEFT, 20)
+
+		vsz.AddSpacer(20)
+
+		btnsz = wx.BoxSizer(wx.HORIZONTAL)
+
+		self.bOK = wx.Button(self, wx.ID_ANY, "OK", size=BUTTONSIZE)
+		self.Bind(wx.EVT_BUTTON, self.onBOK, self.bOK)
+
+		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BUTTONSIZE)
+		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
+
+		btnsz.Add(self.bOK)
+		btnsz.AddSpacer(30)
+		btnsz.Add(self.bCancel)
+
+		vsz.Add(btnsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		vsz.AddSpacer(20)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(20)
+		hsz.Add(vsz)
+		hsz.AddSpacer(20)
+
+		self.SetSizer(hsz)
+		self.Layout()
+		self.Fit()
+
+	def SetTitleText(self):
+		title = self.titleText + (" * " if self.modified else "")
+		self.SetTitle(title)
+
+	def SetModified(self, flag=True):
+		if flag != self.modified:
+			self.modified = flag
+			self.SetTitleText()
+
+	def onLbBlocksSelect(self, _):
+		self.sx = self.lbBlocks.GetSelection()
+		self.EnableButtons()
+
+	def EnableButtons(self):
+		self.bUp.Enable(self.sx > 0)
+		self.bDown.Enable(self.sx < (len(self.blocks)-1))
+
+	def onBUp(self, _):
+		s1 = self.sx
+		s0 = s1 - 1
+
+		self.blocks[s0], self.blocks[s1] = self.blocks[s1], self.blocks[s0]
+		self.lbBlocks.SetItems(self.blocks)
+		self.sx = s0
+		self.lbBlocks.SetSelection(s0)
+		self.EnableButtons()
+		self.SetModified()
+
+	def onBDown(self, _):
+		s0 = self.sx
+		s1 = s0 + 1
+
+		self.blocks[s0], self.blocks[s1] = self.blocks[s1], self.blocks[s0]
+		self.lbBlocks.SetItems(self.blocks)
+		self.sx = s1
+		self.lbBlocks.SetSelection(s1)
+		self.EnableButtons()
+		self.SetModified()
+
+	def onBOK(self, _):
+		self.EndModal(wx.ID_OK if self.modified else wx.ID_EXIT)
+
+	def onCancel(self, _):
+		if self.modified:
+			dlg = wx.MessageDialog(self, "All pending changes will be list if you cancel.  Press Yes to proceed",
+				"Changes Pending", wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
+
+			rc = dlg.ShowModal()
+			dlg.Destroy()
+
+			if rc != wx.ID_YES:
+				return
+
+		self.EndModal(wx.ID_CANCEL)
+
+	def GetResults(self):
+		rv = [self.dmap.get(b, b) for b in reversed(self.blocks)]
+		return rv

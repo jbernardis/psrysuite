@@ -21,3 +21,9 @@ When set to dispatcher controls bank/cliveden, cliff only controls sheffield, gr
 
 
 train routing - give a warning if a train enters a block that is not in its route - and a way to acknowledge and therefore ignore future such warnings
+
+finish up train block order:
+    active trains, display, satellite impact (display mostly done)
+    test thoroughly
+
+restructure settrain command to imply block order with blocks

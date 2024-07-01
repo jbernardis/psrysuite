@@ -305,7 +305,8 @@ class ServerMain:
 			"trainsignal":	self.DoTrainSignal,
 			"movetrain":	self.DoMoveTrain,
 			"removetrain":	self.DoRemoveTrain,
-			"traincomplete":self.DoTrainComplete,
+			"traincomplete":		self.DoTrainComplete,
+			"trainblockorder":		self.DoTrainBlockOrder,
 			"assigntrain":  self.DoAssignTrain,
 			"checktrains":  self.DoCheckTrains,
 			
@@ -689,15 +690,40 @@ class ServerMain:
 		elif reftype == "subblocks":
 			self.sendSubBlocks(addr, skt)
 			
+	def DoTrainBlockOrder(self, cmd):
+		try:
+			trid = cmd["name"][0]
+		except KeyError:
+			trid = None
+
+		try:
+			blocks = cmd["blocks"]
+		except KeyError:
+			blocks = None
+
+		try:
+			east = cmd["east"][0].startswith("T")
+		except (IndexError, KeyError):
+			east = None
+
+		if trid is not None and blocks is not None:
+			if east is not None:
+				self.trainList.SetEast(trid, east)
+			self.trainList.UpdateTrainBlockOrder(trid, blocks)
+
+			p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
+			p["blocks"] = [b for b in blocks]
+			resp = {"trainblockorder": [p]}
+			self.socketServer.sendToAll(resp)
+
 	def DoTrainTimesRequest(self, cmd):
 		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"traintimesrequest": {}})
-			
+
 	def DoTrainTimesReport(self, cmd):
 		addrList = self.clientList.GetFunctionAddress("DISPLAY")
 		for addr, skt in addrList:
-			#self.socketServer.sendToOne(skt, addr, {"traintimesreport": {"trains": cmd["trains"], "times": cmd["times"]}})
 			self.socketServer.sendToOne(skt, addr, {"traintimesreport": cmd})
 
 	def DoSetTrain(self, cmd):
@@ -714,14 +740,14 @@ class ServerMain:
 		except (IndexError, KeyError):
 			east = True
 		try:
-			rear = True if cmd["rear"][0] == "1" else False
+			action = cmd["action"][0]
 		except (IndexError, KeyError):
-			rear = False
-		block = cmd["block"][0]
+			action = "replace"
+		blocks = cmd["blocks"]
 
 		if trn and trn.startswith("??"):
 			# this is an unknown train - see if we have a known train in the same block
-			ntrn, nloco = self.trainList.FindTrainInBlock(block)
+			ntrn, nloco = self.trainList.FindTrainInBlock(blocks[0])
 			if ntrn:
 				trn = ntrn
 				trinfo = self.trainList.GetTrainInfo(trn)
@@ -733,7 +759,7 @@ class ServerMain:
 		elif trn:
 			# this is a known train - see if we have an existing train (known or unknown)
 			# in the block, and just replace it
-			etrn, eloco = self.trainList.FindTrainInBlock(block)
+			etrn, eloco = self.trainList.FindTrainInBlock(blocks[0])
 			if etrn:
 				if self.trainList.RenameTrain(etrn, trn, eloco, loco, east):
 					for cmd in self.trainList.GetSetTrainCmds(trn):
@@ -749,10 +775,10 @@ class ServerMain:
 		#self.rr.OccupyBlock(block, 0 if trn is None else 1)
 		
 		# train information is always echoed back to all listeners
-		resp = {"settrain": [{"name": trn, "loco": loco, "block": block, "east": east, "rear": rear}]}
+		resp = {"settrain": {"name": trn, "loco": loco, "blocks": blocks, "east": east, "action": action}}
 		self.socketServer.sendToAll(resp)
 
-		self.trainList.Update(trn, loco, block, east)
+		self.trainList.Update(trn, loco, blocks, east, action)
 		
 	def DoMoveTrain(self, cmd): #"movetrain":
 		try:

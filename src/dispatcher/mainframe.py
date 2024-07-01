@@ -13,7 +13,7 @@ from subprocess import Popen
 from dispatcher.constants import BLOCK
 
 from dispatcher.bitmaps import BitMaps
-from dispatcher.district import Districts
+from dispatcher.district import Districts, CrossingEastWestBoundary
 from dispatcher.trackdiagram import TrackDiagram
 from dispatcher.tile import loadTiles
 from dispatcher.train import Train
@@ -45,7 +45,7 @@ from dispatcher.constants import HyYdPt, LaKr, NaCl, screensList, EMPTY, OCCUPIE
 from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
 
-from dispatcher.edittraindlg import EditTrainDlg
+from dispatcher.edittraindlg import EditTrainDlg, SortTrainBlocksDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
 
 from ctcmanager.ctcmanager import CTCManager
@@ -65,7 +65,7 @@ MENU_TRAIN_ROUTE = 910
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
-allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest", "traintimesrequest" ]
+allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest", "traintimesrequest", "trainblockorder", "trainsignal" ]
 disallowedSatelliteCommands = [ "relay" ]
 
 wildcardTrain = "train files (*.trn)|*.trn|"	 \
@@ -83,6 +83,7 @@ class Node:
 
 BTNDIM = (80, 23) if sys.platform.lower() == "win32" else (100, 23)
 WIDTHADJUST = 0 if sys.platform.lower() == "win32" else 56
+
 
 class MainFrame(wx.Frame):
 	def __init__(self, settings):
@@ -1727,7 +1728,7 @@ class MainFrame(wx.Frame):
 
 		dlg.Destroy()
 		
-		if rc == wx.ID_CUT:	
+		if rc == wx.ID_CUT:	 # split train in 2
 			bname = blk.GetName()	
 			blockDict = tr.GetBlockList()					
 			blockList = [b for b in blockDict.keys()]   # if b != bname]
@@ -1738,12 +1739,12 @@ class MainFrame(wx.Frame):
 				return 
 			
 			dlg = ChooseBlocksDlg(self, oldName, blockList)
-			rc = dlg.ShowModal()
-			if rc == wx.ID_OK:
+			lrc = dlg.ShowModal()
+			if lrc == wx.ID_OK:
 				blist = dlg.GetResults()
 			dlg.Destroy()
 			
-			if rc != wx.ID_OK:
+			if lrc != wx.ID_OK:
 				return	
 			
 			logging.info("Splitting following blocks from train %s: %s" % (oldName, str(blist)))			
@@ -1762,13 +1763,17 @@ class MainFrame(wx.Frame):
 				newTr.AddToBlock(b)
 				b.SetTrain(newTr)
 				b.SetEast(east)
-				self.Request({"settrain": { "block": b.GetName()}})
-				self.Request({"settrain": { "block": b.GetName(), "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
 				if self.IsDispatcher():
 					self.CheckTrainsInBlock(b.GetName(), None)
-			
+
+			self.Request({"settrain": { "blocks": blist}})
+			self.Request({"settrain": { "blocks": blist, "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
+
 			self.trains[newName] = newTr
-			
+
+			self.SendTrainBlockOrder(tr)
+			self.SendTrainBlockOrder(newTr)
+
 			self.activeTrains.AddTrain(newTr)
 			self.activeTrains.UpdateTrain(oldName)
 			
@@ -1786,7 +1791,7 @@ class MainFrame(wx.Frame):
 			newTr.Draw()
 			return 
 		
-		if rc == wx.ID_PASTE:
+		if rc == wx.ID_PASTE: # merge trains together
 			trList = [t for t in self.trains.keys() if t != oldName]
 			if len(trList) == 0:
 				dlg = wx.MessageDialog(self, "No other trains to merge with", "Unable to merge train", wx.OK | wx.ICON_INFORMATION)
@@ -1795,11 +1800,11 @@ class MainFrame(wx.Frame):
 				return
 			
 			dlg = ChooseTrainDlg(self, oldName, trList)
-			rc = dlg.ShowModal()
-			if rc == wx.ID_OK:
+			lrc = dlg.ShowModal()
+			if lrc == wx.ID_OK:
 				trxid = dlg.GetResults()
 			dlg.Destroy()
-			if rc != wx.ID_OK:
+			if lrc != wx.ID_OK:
 				return 
 			
 			if trxid is None:
@@ -1809,33 +1814,70 @@ class MainFrame(wx.Frame):
 			trx = self.trains[trxid]
 			
 			east = tr.GetEast()  # assume the direction of the surviving train
-			
-			for blkNm in [x for x in trx.GetBlockList()]:
+
+			blist = [x for x in trx.GetBlockList()]
+			for blkNm in blist:
 				blk = self.blocks[blkNm]
 				trx.RemoveFromBlock(blk)
 				tr.AddToBlock(blk)
 				blk.SetTrain(tr)
 				blk.SetEast(east)
-				self.Request({"settrain": { "block": blkNm}})
-				self.Request({"settrain": { "block": blkNm, "name": oldName, "loco": oldLoco, "east": "1" if east else "0"}})
 				if self.IsDispatcher():
 					self.CheckTrainsInBlock(blk.GetName(), None)
-					
+
+			self.Request({"settrain": { "blocks": blist}})
+			self.Request({"settrain": { "blocks": blist, "name": oldName, "loco": oldLoco, "east": "1" if east else "0"}})
+
 			del(self.trains[trxid])
-			
+			self.SendTrainBlockOrder(tr)
+			self.SendTrainBlockOrder(trx)
+			self.activeTrains.UpdateTrain(oldName)
+
 			self.activeTrains.RemoveTrain(trxid)
 			return
 		
 		if rc == wx.ID_BACKWARD:
 			nd = not tr.GetEast()
 			tr.SetEast(nd)
-			self.activeTrains.RefreshTrain(tr.GetName())
 			tr.SetBlocksDirection()
-			req = {"renametrain": { "oldname": tr.GetName(), "newname": tr.GetName(), "east": "1" if nd else "0", "context": "reverse"}}
-			self.Request(req)
+			tr.ReverseBlockOrder()
+			if self.IsDispatcher():
+				blk = tr.FrontBlock()
+				if blk is not None:
+					self.CheckTrainsInBlock(blk.GetName(), None)
+
+			self.activeTrains.RefreshTrain(tr.GetName())
+			self.SendTrainBlockOrder(tr)
+			#req = {"renametrain": { "oldname": tr.GetName(), "newname": tr.GetName(), "east": "1" if nd else "0", "context": "reverse"}}
+			#self.Request(req)
 
 			return
-		
+
+		if rc == wx.ID_SORT_ASCENDING:
+			if len(tr.GetBlockOrderList()) <= 1:
+				dlg = wx.MessageDialog(self, "Train occupies < 2 blocks", "Unable to reorder blocks", wx.OK | wx.ICON_INFORMATION)
+				dlg.ShowModal()
+				dlg.Destroy()
+				return
+
+			dlg = SortTrainBlocksDlg(self, tr)
+			lrc = dlg.ShowModal()
+			if lrc == wx.ID_OK:
+				neworder = dlg.GetResults()
+
+			dlg.Destroy()
+			if lrc != wx.ID_OK:
+				return
+
+			tr.SetBlockOrder(neworder)
+			if self.IsDispatcher():
+				blk = tr.FrontBlock()
+				if blk is not None:
+					self.CheckTrainsInBlock(blk.GetName(), None)
+
+			self.activeTrains.RefreshTrain(tr.GetName())
+			self.SendTrainBlockOrder(tr)
+
 		if rc != wx.ID_OK:
 			return
 		
@@ -1865,6 +1907,9 @@ class MainFrame(wx.Frame):
 
 		tr.Draw()
 
+	def SendTrainBlockOrder(self, tr):
+		self.Request({"trainblockorder": tr.GetBlockOrder()})
+
 	def StealTrainID(self, trid):
 		logging.info("Removing train ID %s" % trid)
 		tr = self.trains[trid]
@@ -1884,13 +1929,16 @@ class MainFrame(wx.Frame):
 			newTr.AddToBlock(b)
 			b.SetTrain(newTr)
 			b.SetEast(east)
-			self.Request({"settrain": {"block": b.GetName()}})
-			self.Request(
-				{"settrain": {"block": b.GetName(), "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
 			if self.IsDispatcher():
 				self.CheckTrainsInBlock(b.GetName(), None)
 
+		self.Request({"settrain": {"blocks": blockList}})
+		self.Request(
+			{"settrain": {"blocks": blockList, "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
+
 		self.trains[newName] = newTr
+		self.SendTrainBlockOrder(newTr)
+		self.SendTrainBlockOrder(tr)
 
 		self.activeTrains.AddTrain(newTr)
 
@@ -2039,21 +2087,31 @@ class MainFrame(wx.Frame):
 		if blk is None:
 			logging.info("Bad block name: %s" % blkNm)
 			return 
-		
-		if blk.GetBlockType() != BLOCK:
-			# skip OS and stopping sections
-			return 
-		
-		if sig is None:
-			sigNm = blk.GetDirectionSignal()
-			if sigNm is None:
-				# no signal at the end of this block
-				return 
-			sig = self.GetSignalByName(sigNm)
-			if sig is None:
-				return
 
-		# check for trains in the entry block.  If it is the front of the train, then this signal change applies to that train.
+		btype = blk.GetBlockType()
+		if btype == BLOCK:
+			if sig is None:
+				# identify the signal for this block that matches the block's direction
+				sigNm = blk.GetDirectionSignal()
+				if sigNm is None:
+					# no signal at the end of this block
+					return
+				sig = self.GetSignalByName(sigNm)
+				if sig is None:
+					return
+
+		elif btype == OVERSWITCH:
+			if sig is None:
+				# get the entry signal for this OS block
+				sig = blk.GetEntrySignal()
+				if sig is None:
+					return
+
+		else:
+			# for all other block types
+			return
+
+		# check for trains in the block.  If it is the front of the train, then this signal change applies to that train.
 		for trid, tr in self.trains.items():
 			if tr.FrontInBlock(blkNm):
 				# we found a train
@@ -2230,8 +2288,10 @@ class MainFrame(wx.Frame):
 			foundTrains = {}
 				
 			for trid, trinfo in trjson.items():
+				blist = []
 				for b in trinfo["blocks"]:
 					if b in blkNames:
+						blist.append(b)
 						# first remove the block from the old train
 						blk = self.blocks[b]
 						otr = blk.GetTrain()
@@ -2239,6 +2299,7 @@ class MainFrame(wx.Frame):
 							self.PopupEvent("Unable to find train %s in block %s" % blk.GetName())
 						else:
 							otr.RemoveFromBlock(blk)
+							self.SendTrainBlockOrder(otr)
 							
 							if otr.IsInNoBlocks():
 								otrid = otr.GetName()
@@ -2265,13 +2326,17 @@ class MainFrame(wx.Frame):
 						foundTrains[trid] = 1
 						ntr.SetEast(trinfo["east"])
 						blk.SetEast(trinfo["east"])
-						self.Request({"settrain": { "block": blk.GetName()}})
-						self.Request({"settrain": { "block": blk.GetName(), "name": trid, "loco": trinfo["loco"], "east": "1" if trinfo["east"] else "0"}})
 						ntr.Draw()
 						blk.Draw()
 
 					else:
 						self.PopupEvent("Block %s/Train %s in snapshot - not occupied" % (b, trid))
+
+				self.Request({"settrain": { "blocks": blist}})
+				self.Request({"settrain": { "blocks": blist, "name": trid, "loco": trinfo["loco"], "east": "1" if trinfo["east"] else "0"}})
+
+				ntr = self.trains[trid]
+				self.SendTrainBlockOrder(ntr)
 						
 			unknownBlocks = [b for b in blkNames if b not in foundTrainBlocks]
 			if len(unknownBlocks) > 0:
@@ -2430,7 +2495,6 @@ class MainFrame(wx.Frame):
 		evt = DeliveryEvent(data=jdata)
 		wx.QueueEvent(self, evt)
 
-		
 	def CreateDispatchTable(self):					
 		self.dispatch = {
 			"turnout":			self.DoCmdTurnout,
@@ -2468,6 +2532,7 @@ class MainFrame(wx.Frame):
 			"signallock":		self.DoCmdSignalLock,
 			"traintimesrequest":	self.DoCmdTrainTimesRequest,
 			"traintimesreport":		self.DoCmdTrainTimesReport,
+			"trainblockorder":	self.DoCmdTrainBlockOrder,
 		}
 		
 	def DoCmdNOOP(self, _):
@@ -2591,6 +2656,7 @@ class MainFrame(wx.Frame):
 							governing signal
 							"""
 							tr.RemoveFromBlock(blk)
+							self.SendTrainBlockOrder(tr)
 							trblk = tr.FrontBlock()
 							if trblk is not None:
 								nm = trblk.GetName()
@@ -2772,154 +2838,185 @@ class MainFrame(wx.Frame):
 			self.activeTrains.UpdateTrain(trid)
 
 	def DoCmdSetTrain(self, parms):
-		for p in parms:
-			block = p["block"]
-			name = p["name"]
-			loco = p["loco"]
-			try:
-				east = p["east"]
-			except KeyError:
-				east = None
+		blocks = parms["blocks"]
+		name = parms["name"]
+		loco = parms["loco"]
+		try:
+			east = parms["east"]
+		except KeyError:
+			east = None
 
-			try:
-				rear = p["rear"]
-			except KeyError:
-				rear = False
+		try:
+			action = parms["action"]
+		except KeyError:
+			action = "replace"
 
-			try:
-				nameonly = p["nameonly"]
-			except KeyError:
-				nameonly = False
+		try:
+			nameonly = parms["nameonly"]
+		except KeyError:
+			nameonly = False
 
-			try:
-				blk = self.blocks[block]
-			except:
-				logging.warning("unable to identify block (%s)" % block)
-				blk = None
-
-			if blk:
-				tr = blk.GetTrain()
-				if name is None:
-					if tr:
-						tr.RemoveFromBlock(blk)
-						trid = tr.GetName()
-						self.activeTrains.UpdateTrain(trid)
-						self.UpdateRouteDialogs(trid)
-						if tr.IsInNoBlocks():
-							if not tr.IsBeingEdited():
-								self.PopupEvent("Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
-								self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block)
-							else:
-								tr.SetBeingEdited(False)
-							try:
-								self.activeTrains.RemoveTrain(trid)
-								del(self.trains[trid])
-							except:
-								logging.warning("can't delete train %s from train list" % trid)
-
-
-					delList = []
-					for trid, tr in self.trains.items():
-						if tr.IsInBlock(blk):
-							tr.RemoveFromBlock(blk)
-							self.activeTrains.UpdateTrain(tr.GetName())
-							if tr.IsInNoBlocks():
-								delList.append([trid, tr])
-
-					for trid, tr in delList:
+		blkorderMap = {}
+		for block in blocks:
+			blk = self.blocks[block]
+			tr = blk.GetTrain()
+			if name is None: # the block is to be dis-associated with any train
+				if tr:
+					tr.RemoveFromBlock(blk)
+					if self.IsDispatcher():
+						self.SendTrainBlockOrder(tr)
+					trid = tr.GetName()
+					self.activeTrains.UpdateTrain(trid)
+					self.UpdateRouteDialogs(trid)
+					if tr.IsInNoBlocks():
 						if not tr.IsBeingEdited():
 							self.PopupEvent("Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
 							self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block)
+						else:
+							tr.SetBeingEdited(False)
 						try:
 							self.activeTrains.RemoveTrain(trid)
 							del(self.trains[trid])
 						except:
 							logging.warning("can't delete train %s from train list" % trid)
-						
 
-					continue
+				delList = []
+				for trid, tr in self.trains.items():
+					if tr.IsInBlock(blk):
+						tr.RemoveFromBlock(blk)
+						if self.IsDispatcher():
+							blkorderMap[trid] = tr
+						self.activeTrains.UpdateTrain(tr.GetName())
+						if tr.IsInNoBlocks():
+							delList.append([trid, tr])
 
-				if not blk.IsOccupied():
-					logging.warning("Set train for block %s, but that block is unoccupied" % block)
-					continue
+				for trid, tr in delList:
+					if not tr.IsBeingEdited():
+						self.PopupEvent("Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
+						self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block)
+					try:
+						self.activeTrains.RemoveTrain(trid)
+						del(self.trains[trid])
+					except:
+						logging.warning("can't delete train %s from train list" % trid)
 
-				oldName = None
-				if tr:
-					oldName = tr.GetName()
-					if oldName and oldName != name:
-						if name in self.trains:
-							# merge the two trains under the new "name"
-							if not oldName.startswith("??"):
-								self.PopupEvent("Merging train %s => %s block %s" % (oldName, name, blk.GetName))
+				continue
 
-							try:
-								bl = self.trains[oldName].GetBlockList()
-							except:
-								bl = {}
-							for blk in bl.values():
-								self.trains[name].AddToBlock(blk)
-							self.activeTrains.UpdateTrain(name)
+			if not blk.IsOccupied():
+				logging.warning("Set train for block %s, but that block is unoccupied" % block)
+				continue
 
-						else:
-							tr.SetName(name)
-							if name in self.trainList:
-								if east is None:
-									tr.SetEast(self.trainList[name]["eastbound"])
-								else:
-									tr.SetEast(east)
-							
-							self.trains[name] = tr
-							self.activeTrains.RenameTrain(oldName, name)
-							self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0", "context": "settrainmerge"}})
-
-						try:
-							self.activeTrains.RemoveTrain(oldName)
-						except:
-							logging.warning("can't delete train %s from train list" % oldName)
+			oldName = None
+			if tr:
+				oldName = tr.GetName()
+				if oldName and oldName != name:
+					if name in self.trains:
+						ntr = self.trains[name]
+						# merge the two trains under the new "name"
+						if not oldName.startswith("??"):
+							self.PopupEvent("Merging train %s => %s block %s" % (oldName, name, blk.GetName))
 
 						try:
-							del(self.trains[oldName])
+							bl = self.trains[oldName].GetBlockList()
 						except:
-							logging.warning("can't delete train %s from train list" % oldName)
-				
-				try:
-					# trying to find train in existing list
-					tr = self.trains[name]
-					if oldName and oldName == name:
-						if east is not None:
-							tr.SetEast(east)
-							blk.SetEast(east)
+							bl = {}
+						for blk in bl.values():
+							ntr.AddToBlock(blk, action)
+						if self.IsDispatcher():
+							blkorderMap[name] = ntr
+						self.activeTrains.UpdateTrain(name)
+
 					else:
-						e = tr.GetEast()
-						blk.SetEast(e) # block takes on direction of the train if known
-				except KeyError:
-					# not there - create a new one")
-					tr = Train(name)
-					self.trains[name] = tr
-					self.activeTrains.AddTrain(tr)
-					# new train takes on direction from the settrain command
-					tr.SetEast(east)
-					# and block is set to the same thing
-					blk.SetEast(east)
-					
-				tr.AddToBlock(blk, rear=rear)
-				blk.SetTrain(tr)
+						tr.SetName(name)
+						if name in self.trainList:
+							if east is None:
+								tr.SetEast(self.trainList[name]["eastbound"])
+							else:
+								tr.SetEast(east)
 
-				if self.IsDispatcher() and not nameonly:
-					self.CheckTrainsInBlock(block, None)
-				
-				if loco:
-					self.activeTrains.SetLoco(tr, loco)
-	
-				tid = tr.GetName()			
-				self.activeTrains.UpdateTrain(tid)
-				self.UpdateRouteDialogs(tid)
-				self.lostTrains.Remove(tid)
+						self.trains[name] = tr
+						self.activeTrains.RenameTrain(oldName, name)
+						self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0", "context": "settrainmerge"}})
+						if self.IsDispatcher():
+							blkorderMap[name] = tr
 
-				blk.EvaluateStoppingSections()
-				blk.Draw()   # this will redraw the train in this block only
-				tr.Draw() # necessary if this train appears in other blocks too
-		
+					try:
+						self.activeTrains.RemoveTrain(oldName)
+					except:
+						logging.warning("can't delete train %s from train list" % oldName)
+
+					try:
+						del(self.trains[oldName])
+					except:
+						logging.warning("can't delete train %s from train list" % oldName)
+
+			try:
+				# trying to find train in existing list
+				tr = self.trains[name]
+				if oldName and oldName == name:
+					if east is not None:
+						tr.SetEast(east)
+						blk.SetEast(east)
+				else:
+					e = tr.GetEast()
+					blk.SetEast(e) # block takes on direction of the train if known
+
+			except KeyError:
+				# not there - create a new one")
+				tr = Train(name)
+				self.trains[name] = tr
+				self.activeTrains.AddTrain(tr)
+				# new train takes on direction from the settrain command
+				tr.SetEast(east)
+				# and block is set to the same thing
+				blk.SetEast(east)
+
+			tr.AddToBlock(blk, action)
+			if action == "replace":
+				tr.SetBlockOrder(blocks)
+
+			blk.SetTrain(tr)
+			if self.IsDispatcher():
+				blkorderMap[name] = tr
+
+			if self.IsDispatcher() and not nameonly:
+				self.CheckTrainsInBlock(block, None)
+
+			if loco:
+				self.activeTrains.SetLoco(tr, loco)
+
+			tid = tr.GetName()
+			self.activeTrains.UpdateTrain(tid)
+			self.UpdateRouteDialogs(tid)
+			self.lostTrains.Remove(tid)
+
+			blk.EvaluateStoppingSections()
+			blk.Draw()   # this will redraw the train in this block only
+			tr.Draw() # necessary if this train appears in other blocks too
+
+		for trid, tr in blkorderMap.items():
+			if trid in self.trains:
+				self.AssertBlockDirections(tr)
+				self.SendTrainBlockOrder(tr)
+				self.activeTrains.UpdateTrain(trid)
+
+	def AssertBlockDirections(self, tr):
+		order = list(reversed(tr.GetBlockOrderList()))
+		if len(order) <= 1:
+			return
+
+		lastBlock = order[0]
+		lastBlk = self.blocks[lastBlock]
+		direction = tr.GetEast()
+		for block in order[1:]:
+			blk = self.blocks[block]
+			if CrossingEastWestBoundary(blk, lastBlk):
+				direction = not direction
+			blk.SetEast(direction)
+
+			lastBlock = block
+			lastBlk = blk
+
 	def DoCmdTrainComplete(self, parms):					
 		for p in parms:
 			train = p["train"]
@@ -3043,7 +3140,26 @@ class MainFrame(wx.Frame):
 		elif parms["type"] == "trains":
 			if not self.IsDispatcher():
 				self.Request({"traintimesrequest": {}})
-				
+
+	def DoCmdTrainBlockOrder(self, parms):
+		for p in parms:
+			trid = p["name"]
+			blocks = p["blocks"]
+			try:
+				east = p["east"].startswith("T")
+			except (IndexError, KeyError):
+				east = None
+
+			try:
+				tr = self.trains[trid]
+			except:
+				tr = None
+
+			if tr is not None:
+				tr.SetEast(east)
+				tr.SetBlockOrder(blocks)
+				self.activeTrains.UpdateTrain(trid)
+
 	def DoCmdTrainTimesRequest(self, parms):
 		trains, times = self.activeTrains.GetTrainTimes()
 		resp = {"traintimesreport": {"trains": trains, "times": times}}

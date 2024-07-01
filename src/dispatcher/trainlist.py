@@ -596,7 +596,7 @@ class TrainListCtrl(wx.ListCtrl):
 			return "%s - %d" % (throttle, limit)
 		
 		elif col == 9:
-			return ", ".join(tr.GetBlockNameList())
+			return ", ".join(reversed(tr.GetBlockNameList()))
 		
 		elif col == 10:
 			t = tr.GetTime()

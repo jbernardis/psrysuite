@@ -17,6 +17,14 @@ EWCrossoverPoints = [
 ]
 
 
+def CrossingEastWestBoundary(osblk, blk):
+	if osblk is None or blk is None:
+		return False
+	blkNm = blk.GetName()
+	osNm = osblk.GetName()
+	return [osNm, blkNm] in EWCrossoverPoints or [blkNm, osNm] in EWCrossoverPoints
+
+
 class District:
 	def __init__(self, name, frame, screen):
 		self.sigLeverMap = None
@@ -306,7 +314,7 @@ class District:
 			logging.debug("Unable to calculate aspect: Block %s is busy" % exitBlkNm)
 			return None
 
-		if self.CrossingEastWestBoundary(osblk, exitBlk):
+		if CrossingEastWestBoundary(osblk, exitBlk):
 			currentDirection = not currentDirection
 	
 		if exitBlk.IsCleared():
@@ -325,7 +333,7 @@ class District:
 		nb = exitBlk.NextBlock(reverse = currentDirection!=exitBlk.GetEast())
 		if nb:
 			nbName = nb.GetName()
-			if self.CrossingEastWestBoundary(nb, exitBlk):
+			if CrossingEastWestBoundary(nb, exitBlk):
 				currentDirection = not currentDirection
 			
 			nbStatus = nb.GetStatus()
@@ -342,7 +350,7 @@ class District:
 				except:
 					nxb = None
 				if nxb:
-					if self.CrossingEastWestBoundary(nb, nxb):
+					if CrossingEastWestBoundary(nb, nxb):
 						currentDirection = not currentDirection
 					nnb = nxb.NextBlock(reverse = currentDirection!=nxb.GetEast())
 				else:
@@ -715,9 +723,8 @@ class District:
 		if osblock.IsBusy() and aspect == STOP:
 			return
 
-
 		if aspect != 0:
-			if self.CrossingEastWestBoundary(osblock, exitBlk):
+			if CrossingEastWestBoundary(osblock, exitBlk):
 				nd = not sig.GetEast()
 			else:
 				nd = sig.GetEast()
@@ -763,7 +770,7 @@ class District:
 		if self.dbg.showaspectcalculation:
 			self.frame.DebugMessage("Now looking at previous block %s" % exitBlkNm)
 
-		if self.CrossingEastWestBoundary(osblk, exitBlk):
+		if CrossingEastWestBoundary(osblk, exitBlk):
 			currentDirection = not currentDirection
 			if self.dbg.showaspectcalculation:
 				self.frame.DebugMessage("Changing direction %s because of E/W boundary" % ("east" if currentDirection else "west"))
@@ -786,7 +793,7 @@ class District:
 				self.frame.DebugMessage("OS block %s does not have a route - returning" % nbName)
 			return
 		
-		if self.CrossingEastWestBoundary(nb, exitBlk):
+		if CrossingEastWestBoundary(nb, exitBlk):
 			currentDirection = not currentDirection
 			if self.dbg.showaspectcalculation:
 				self.frame.DebugMessage("Changing direction %s because of E/W boundary" % ("east" if currentDirection else "west"))
@@ -947,13 +954,6 @@ class District:
 
 	def DoIndicatorAction(self, ind, value):
 		pass
-
-	def CrossingEastWestBoundary(self, osblk, blk):
-		if osblk is None or blk is None:
-			return False
-		blkNm = blk.GetName()
-		osNm = osblk.GetName()
-		return [osNm, blkNm] in EWCrossoverPoints
 
 	def DefineBlocks(self):
 		self.blocks = {}

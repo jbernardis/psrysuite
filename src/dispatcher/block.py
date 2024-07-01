@@ -1,7 +1,7 @@
 import logging
 
 from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, BLOCK, OVERSWITCH, STOPPINGBLOCK, MAIN, STOP
-from pickle import TRUE
+from dispatcher.district import CrossingEastWestBoundary
 
 
 class Route:
@@ -441,8 +441,8 @@ class Block:
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
-				req = {"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": "1" if east else "0",
-									"rear": "1" if rear else "0"}}
+				req = {"settrain": { "blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0",
+									"action": "rear" if rear else "front"}}
 				self.frame.Request(req)
 			if refresh:
 				self.Draw()
@@ -476,8 +476,8 @@ class Block:
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
-				req = {"settrain": { "block": self.GetName(), "name": trn, "loco": loco, "east": "1" if east else "0",
-									"rear": "1" if rear else "0"}}
+				req = {"settrain": { "blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0",
+									"action": "eear" if rear else "front"}}
 				self.frame.Request(req)
 		else:
 			for b in [self.sbEast, self.sbWest]:
@@ -502,7 +502,7 @@ class Block:
 			return
 		# all unoccupied - clean up
 		if self.frame.IsDispatcher():
-			self.frame.Request({"settrain": { "block": self.GetName(), "name": None, "loco": None}})
+			self.frame.Request({"settrain": { "blocks": [self.GetName()], "name": None, "loco": None}})
 
 		self.train = None
 		self.EvaluateStoppingSections()
@@ -702,9 +702,9 @@ class Block:
 		
 	def CheckEWCross(self, tr, blk):
 		if self.type == OVERSWITCH:
-			rc = self.district.CrossingEastWestBoundary(self, blk)
+			rc = CrossingEastWestBoundary(self, blk)
 		else:
-			rc = self.district.CrossingEastWestBoundary(blk, self)
+			rc = CrossingEastWestBoundary(blk, self)
 		if rc:
 			if self.dbg.identifytrain:
 				self.frame.DebugMessage("Train %s crossed an E/W boundary - reversing train direction" % tr.GetName())
@@ -1047,26 +1047,26 @@ class OverSwitch (Block):
 			
 		if self.east:
 			if entryBlk:
-				if self.district.CrossingEastWestBoundary(self, entryBlk):
+				if CrossingEastWestBoundary(self, entryBlk):
 					entryBlk.SetNextBlockWest(self)
 				else:
 					entryBlk.SetNextBlockEast(self)
 			self.SetNextBlockWest(entryBlk)
 			if exitBlk:
-				if self.district.CrossingEastWestBoundary(self, exitBlk):
+				if CrossingEastWestBoundary(self, exitBlk):
 					exitBlk.SetNextBlockEast(self)
 				else:
 					exitBlk.SetNextBlockWest(self)
 			self.SetNextBlockEast(exitBlk)
 		else:
 			if entryBlk:
-				if self.district.CrossingEastWestBoundary(self, entryBlk):
+				if CrossingEastWestBoundary(self, entryBlk):
 					entryBlk.SetNextBlockEast(self)
 				else:
 					entryBlk.SetNextBlockWest(self)
 			self.SetNextBlockEast(entryBlk)
 			if exitBlk:
-				if self.district.CrossingEastWestBoundary(self, exitBlk):
+				if CrossingEastWestBoundary(self, exitBlk):
 					exitBlk.SetNextBlockWest(self)
 				else:
 					exitBlk.SetNextBlockEast(self)
@@ -1223,8 +1223,6 @@ class OverSwitch (Block):
 			if draw:
 				t.SetContainingBlock(self)
 				t.Draw(stat, self.east)
-			#else:
-				#t.SetContainingBlock(None)
 
 		self.district.DrawOthers(self)
 		self.DrawTrain()

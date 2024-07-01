@@ -353,6 +353,7 @@ class MainFrame(wx.Frame):
 			"sessionID":		self.DoCmdSessionID,
 			"end":				self.DoCmdEnd,
 			"traintimesreport":	self.DoCmdTrainTimesReport,
+			"trainblockorder":	self.DoCmdTrainBlockOrder,
 		}
 
 	def onDeliveryEvent(self, evt):
@@ -421,6 +422,26 @@ class MainFrame(wx.Frame):
 			tr.SetSignal(None)
 			self.activeTrains.UpdateTrain(trid)
 
+	def DoCmdTrainBlockOrder(self, parms):
+		for p in parms:
+			trid = p["name"]
+			blocks = p["blocks"]
+			try:
+				east = p["east"].startswith("T")
+			except (IndexError, KeyError):
+				east = None
+
+			try:
+				tr = self.trains[trid]
+			except:
+				tr = None
+
+			if tr is not None:
+				tr.SetEast(east)
+				tr.SetBlockOrder(blocks)
+				self.activeTrains.UpdateTrain(trid)
+
+
 	def DoCmdSetRoute(self, parms):
 		for p in parms:
 			blknm = p["block"]
@@ -436,116 +457,121 @@ class MainFrame(wx.Frame):
 				block.SetRoute(rtnm)
 
 	def DoCmdSetTrain(self, parms):
-		for p in parms:
-			block = p["block"]
-			name = p["name"]
-			loco = p["loco"]
-			try:
-				east = p["east"]
-			except KeyError:
-				east = None
+		blocks = parms["blocks"]
+		name = parms["name"]
+		loco = parms["loco"]
+		try:
+			east = parms["east"]
+		except KeyError:
+			east = None
 
-			try:
-				blk = self.blocks[block]
-			except:
-				logging.warning("unable to identify block (%s)" % block)
-				blk = None
+		try:
+			action = parms["action"]
+		except KeyError:
+			action = "replace"
 
-			if blk:
-				tr = blk.GetTrain()
-				if name is None:
-					if tr:
-						tr.RemoveFromBlock(blk)
-						self.activeTrains.UpdateTrain(tr.GetName())
-						if tr.IsInNoBlocks():
-							trid = tr.GetName()
-							try:
-								self.activeTrains.RemoveTrain(trid)
-								del(self.trains[trid])
-							except:
-								logging.warning("can't delete train %s from train list" % trid)
+		try:
+			nameonly = parms["nameonly"]
+		except KeyError:
+			nameonly = False
 
-
-					delList = []
-					for trid, tr in self.trains.items():
-						if tr.IsInBlock(blk):
-							tr.RemoveFromBlock(blk)
-							self.activeTrains.UpdateTrain(tr.GetName())
-							if tr.IsInNoBlocks():
-								delList.append([trid, tr])
-
-					for trid, tr in delList:
+		for block in blocks:
+			blk = self.blocks[block]
+			tr = blk.GetTrain()
+			if name is None:
+				if tr:
+					tr.RemoveFromBlock(blk)
+					self.activeTrains.UpdateTrain(tr.GetName())
+					if tr.IsInNoBlocks():
+						trid = tr.GetName()
 						try:
 							self.activeTrains.RemoveTrain(trid)
 							del(self.trains[trid])
 						except:
 							logging.warning("can't delete train %s from train list" % trid)
-						
 
-					continue
+				delList = []
+				for trid, tr in self.trains.items():
+					if tr.IsInBlock(blk):
+						tr.RemoveFromBlock(blk)
+						self.activeTrains.UpdateTrain(tr.GetName())
+						if tr.IsInNoBlocks():
+							delList.append([trid, tr])
 
-				oldName = None
-				if tr:
-					oldName = tr.GetName()
-					if oldName and oldName != name:
-						if name in self.trains:
-							# merge the two trains under the new "name"
-							if not oldName.startswith("??"):
-								pass
+				for trid, tr in delList:
+					try:
+						self.activeTrains.RemoveTrain(trid)
+						del(self.trains[trid])
+					except:
+						logging.warning("can't delete train %s from train list" % trid)
 
-							try:
-								bl = self.trains[oldName].GetBlockList()
-							except:
-								bl = {}
-							for blk in bl.values():
-								self.trains[name].AddToBlock(blk)
-							self.activeTrains.UpdateTrain(name)
-						else:
-							tr.SetName(name)
-							if name in self.trainList:
-								tr.SetEast(self.trainList[name]["eastbound"])
-							
-							self.trains[name] = tr
-							self.activeTrains.RenameTrain(oldName, name)
-							self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0"}})
+				continue
+
+			oldName = None
+			if tr:
+				oldName = tr.GetName()
+				if oldName and oldName != name:
+					if name in self.trains:
+						# merge the two trains under the new "name"
+						if not oldName.startswith("??"):
+							pass
 
 						try:
-							self.activeTrains.RemoveTrain(oldName)
+							bl = self.trains[oldName].GetBlockList()
 						except:
-							logging.warning("can't delete train %s from train list" % oldName)
-
-						try:
-							del(self.trains[oldName])
-						except:
-							logging.warning("can't delete train %s from train list" % oldName)
-				
-				try:
-					# trying to find train in existing list
-					tr = self.trains[name]
-					if oldName and oldName == name:
-						if east is not None:
-							tr.SetEast(east)
-							blk.SetEast(east)
+							bl = {}
+						for blk in bl.values():
+							self.trains[name].AddToBlock(blk, action)
+						self.activeTrains.UpdateTrain(name)
 					else:
-						e = tr.GetEast()
-						blk.SetEast(e) # block takes on direction of the train if known
-				except KeyError:
-					# not there - create a new one")
-					tr = Train(name)
-					self.trains[name] = tr
-					self.activeTrains.AddTrain(tr)
-					# new train takes on direction from the settrain command
-					tr.SetEast(east)
-					# and block is set to the same thing
-					blk.SetEast(east)
-					
-				tr.AddToBlock(blk)
-				blk.SetTrain(tr)
-				
-				if loco:
-					self.activeTrains.SetLoco(tr, loco)
-				
-				self.activeTrains.UpdateTrain(tr.GetName())
+						tr.SetName(name)
+						if name in self.trainList:
+							tr.SetEast(self.trainList[name]["eastbound"])
+
+						self.trains[name] = tr
+						self.activeTrains.RenameTrain(oldName, name)
+						#self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0"}})
+
+					try:
+						self.activeTrains.RemoveTrain(oldName)
+					except:
+						logging.warning("can't delete train %s from train list" % oldName)
+
+					try:
+						del(self.trains[oldName])
+					except:
+						logging.warning("can't delete train %s from train list" % oldName)
+
+			try:
+				# trying to find train in existing list
+				tr = self.trains[name]
+				if oldName and oldName == name:
+					if east is not None:
+						tr.SetEast(east)
+						blk.SetEast(east)
+				else:
+					e = tr.GetEast()
+					blk.SetEast(e) # block takes on direction of the train if known
+			except KeyError:
+				# not there - create a new one")
+				tr = Train(name)
+				self.trains[name] = tr
+				self.activeTrains.AddTrain(tr)
+				# new train takes on direction from the settrain command
+				tr.SetEast(east)
+				# and block is set to the same thing
+				blk.SetEast(east)
+
+			tr.AddToBlock(blk, action)
+			if action == "replace":
+				tr.SetBlockOrder(reversed(blocks))
+
+			blk.SetTrain(tr)
+
+			if loco:
+				self.activeTrains.SetLoco(tr, loco)
+
+			self.activeTrains.UpdateTrain(tr.GetName())
 						
 	def DoCmdAssignTrain(self, parms):	
 		for p in parms:

@@ -13,32 +13,40 @@ class TrainList:
 		
 		self.trains[train]["atc"] = atcflag
 
-	def Update(self, train, loco, block, east):
-		if block is None:
+	def Update(self, train, loco, blocks, east, action):
+		if len(blocks) == 0:
 			return
 
 		if train is None:
 			# search for and remove the block from the table
 			dellist = []
 			for tr in self.trains:
-				if block in self.trains[tr]["blocks"]:
-					self.trains[tr]["blocks"].remove(block)
-					if len(self.trains[tr]["blocks"]) == 0:
-						dellist.append(tr)
+				for b in blocks:
+					if b in self.trains[tr]["blocks"]:
+						self.trains[tr]["blocks"].remove(b)
+						if len(self.trains[tr]["blocks"]) == 0:
+							dellist.append(tr)
 
 			for tr in dellist:
 				del(self.trains[tr])
 
 		else:
 			if train in self.trains:
-				if block not in self.trains[train]["blocks"]:
-					self.trains[train]["blocks"].append(block)
+				if action == "replace":
+					self.trains[train]["blocks"] = [b for b in blocks]
+				else:
+					for b in blocks:
+						if b not in self.trains[train]["blocks"]:
+							if action == "front":
+								self.trains[train]["blocks"].append(b)
+							else:
+								self.trains[train]["blocks"] = [b] + self.trains[train]["blocks"]
 				if loco:
 					self.trains[train]["loco"] = loco
 				self.trains[train]["east"] = east
 			else:
-				self.trains[train] = {"blocks": [block], "loco": loco, "atc": False, "signal": None, "aspect": 0, "east": east}
-				
+				self.trains[train] = {"blocks": [b for b in blocks], "blockorder": [b for b in blocks], "loco": loco, "atc": False, "signal": None, "aspect": 0, "east": east}
+
 	def Dump(self):
 		print("==========================start of trains dump")
 		for trid in self.trains:
@@ -57,7 +65,12 @@ class TrainList:
 			return 
 		
 		self.trains[train]["engineer"] = engineer
-		
+
+	def UpdateTrainBlockOrder(self, train, blocks):
+		if train not in self.trains:
+			return
+
+		self.trains[train]["blockorder"] = [b for b in blocks]
 
 	def FindTrainInBlock(self, block):
 		for tr, trinfo in self.trains.items():
@@ -109,6 +122,10 @@ class TrainList:
 			self.trains[nname]["east"] = east
 
 		return True
+
+	def SetEast(self, name,east):
+		if east is not None:
+			self.trains[name]["east"] = east
 	
 	def GetTrainList(self):
 		return self.trains
@@ -118,7 +135,7 @@ class TrainList:
 		for tr, trinfo in self.trains.items():
 			if train is None or train == tr:
 				loco = trinfo["loco"]
-				blocks = trinfo["blocks"]
+				blocks = trinfo["blockorder"]
 				if len(blocks) == 0:
 					frontblock = None
 				else:
@@ -126,14 +143,10 @@ class TrainList:
 				atc = trinfo["atc"]
 				signal = trinfo["signal"]
 				aspect = "%d" % trinfo["aspect"]
-				#east = None if nameonly else trinfo["east"]
 				east = trinfo["east"]
-				clist = []
-				for b in blocks:
-					clist.append({"block": b, "name": tr, "loco": loco, "atc": atc, "east": east, "nameonly": nameflag})
-				yield({"settrain": clist})
+				yield ({"settrain": {"blocks": blocks, "name": tr, "loco": loco, "atc": atc, "east": east, "nameonly": nameflag}})
 				yield({"trainsignal": {"train": tr, "block": frontblock, "signal": signal, "aspect": aspect}})
-				
+
 				try:
 					eng = trinfo["engineer"]
 				except KeyError:

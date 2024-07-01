@@ -96,7 +96,7 @@ class ManageEngineersDlg(wx.Dialog):
 		
 		self.SetSizer(vsz)
 		self.Layout()
-		self.Fit();
+		self.Fit()
 
 		self.setTitle()
 
