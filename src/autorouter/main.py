@@ -174,34 +174,32 @@ class MainUnit:
 						self.osList[blknm].SetActiveRoute(rtnm)
 	
 				elif cmd == "settrain":
-					for p in parms:
-						logging.debug("inbound settrain: %s" % str(p))
-						block = p["block"]
-						name = p["name"]
-						loco = p["loco"]
-						try:
-							nameonly = p["nameonly"] == "1"
-						except KeyError:
-							nameonly = False
-							
-						try:
-							east = p["east"]
-						except KeyError:
-							east = True
-	
-						if name is None:
-							self.blocks[block].SetTrain(None, None)
-						else:
-							if name not in self.trains:
-								self.trains[name] = Train(self, name, loco)
-	
-							self.trains[name].SetEast(east)
-							self.blocks[block].SetEast(east)
-							
-							if not nameonly: # this prevents us from setting up a route request for changes to name/direction only
-								self.trains[name].AddBlock(block)	
-								self.blocks[block].SetTrain(name, loco)
-	
+					block = parms["blocks"][0]
+					name = parms["name"]
+					loco = parms["loco"]
+					try:
+						nameonly = parms["nameonly"] == "1"
+					except KeyError:
+						nameonly = False
+
+					try:
+						east = parms["east"]
+					except KeyError:
+						east = True
+
+					if name is None:
+						self.blocks[block].SetTrain(None, None)
+					else:
+						if name not in self.trains:
+							self.trains[name] = Train(self, name, loco)
+
+						self.trains[name].SetEast(east)
+						self.blocks[block].SetEast(east)
+
+						if not nameonly: # this prevents us from setting up a route request for changes to name/direction only
+							self.trains[name].AddBlock(block)
+							self.blocks[block].SetTrain(name, loco)
+
 				elif cmd == "ar":
 					action = parms["action"][0]
 					trnm = parms["train"][0]

@@ -567,9 +567,12 @@ class TrainListCtrl(wx.ListCtrl):
 			resp = sig.GetName()
 			if frozenAspect is not None:
 				aspect = frozenAspect
+				flag = "*"
+			else:
+				flag = ""
 
 			if aspect is not None:
-				resp += ":%s" % sig.GetAspectName(aspect=aspect)
+				resp += ":%s%s" % (flag, sig.GetAspectName(aspect=aspect))
 			return resp 
 		
 		elif col == 8:

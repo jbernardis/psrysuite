@@ -359,14 +359,13 @@ class MainFrame(wx.Frame):
 					val = p["value"]
 
 			elif cmd == "settrain":
-				for p in parms:
-					block = p["block"]
-					name = p["name"]
-					loco = p["loco"]
-					try:
-						east = p["east"]
-					except KeyError:
-						east = True
+				blocks = parms["blocks"]
+				name = parms["name"]
+				loco = parms["loco"]
+				try:
+					east = parms["east"]
+				except KeyError:
+					east = True
 
 			elif cmd == "sessionID":
 				self.sessionid = int(parms)

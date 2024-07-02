@@ -164,7 +164,7 @@ class Script (wx.Frame):
 				req = {"movetrain": {"block": subblock}}
 				self.parent.Request(req)
 				
-				req = {"settrain": {"block": block, "name": name, "loco": loco, "east": "1" if direction else "0"}}
+				req = {"settrain": {"blocks": [block], "name": name, "loco": loco, "east": "1" if direction else "0"}}
 				self.parent.Request(req)
 				self.ticker.StartOnce(duration * self.tm)
 
