@@ -1739,6 +1739,7 @@ class MainFrame(wx.Frame):
 				return 
 			
 			dlg = ChooseBlocksDlg(self, oldName, blockList)
+			dlg.CenterOnScreen()
 			lrc = dlg.ShowModal()
 			if lrc == wx.ID_OK:
 				blist = dlg.GetResults()
@@ -1760,7 +1761,7 @@ class MainFrame(wx.Frame):
 			for bn in blist:
 				b = blockDict[bn]							
 				tr.RemoveFromBlock(b)
-				newTr.AddToBlock(b)
+				newTr.AddToBlock(b, 'front')
 				b.SetTrain(newTr)
 				b.SetEast(east)
 				self.CheckTrainsInBlock(b.GetName(), None)
@@ -1799,6 +1800,7 @@ class MainFrame(wx.Frame):
 				return
 			
 			dlg = ChooseTrainDlg(self, oldName, trList)
+			dlg.CenterOnScreen()
 			lrc = dlg.ShowModal()
 			if lrc == wx.ID_OK:
 				trxid = dlg.GetResults()
@@ -1818,7 +1820,7 @@ class MainFrame(wx.Frame):
 			for blkNm in blist:
 				blk = self.blocks[blkNm]
 				trx.RemoveFromBlock(blk)
-				tr.AddToBlock(blk)
+				tr.AddToBlock(blk, 'front')
 				blk.SetTrain(tr)
 				blk.SetEast(east)
 				self.CheckTrainsInBlock(blk.GetName(), None)
@@ -1858,6 +1860,7 @@ class MainFrame(wx.Frame):
 				return
 
 			dlg = SortTrainBlocksDlg(self, tr)
+			dlg.CenterOnScreen()
 			lrc = dlg.ShowModal()
 			if lrc == wx.ID_OK:
 				neworder = dlg.GetResults()
@@ -1922,7 +1925,7 @@ class MainFrame(wx.Frame):
 		for bn in blockList:
 			b = blockDict[bn]
 			tr.RemoveFromBlock(b)
-			newTr.AddToBlock(b)
+			newTr.AddToBlock(b, 'front')
 			b.SetTrain(newTr)
 			b.SetEast(east)
 			self.CheckTrainsInBlock(b.GetName(), None)
@@ -2237,6 +2240,7 @@ class MainFrame(wx.Frame):
 	def OnBEventsLog(self, _):
 		if self.dlgEvents is None:
 			self.dlgEvents = ListDlg(self, "Events List", self.eventsList, self.DlgEventsExit, self.DlgEventsClear)
+			self.dlgEvents.CenterOnScreen()
 			self.dlgEvents.Show()
 			
 	def DlgEventsClear(self):
@@ -2256,6 +2260,7 @@ class MainFrame(wx.Frame):
 	def OnBAdviceLog(self, _):
 		if self.dlgAdvice is None:
 			self.dlgAdvice = ListDlg(self, "Advice List", self.adviceList, self.DlgAdviceExit, self.DlgAdviceClear)
+			self.dlgAdvice.CenterOnScreen()
 			self.dlgAdvice.Show()
 			
 	def DlgAdviceClear(self):
@@ -2278,6 +2283,11 @@ class MainFrame(wx.Frame):
 			blkNames = [b.GetName() for b in blks]
 
 			trjson = self.Get("getsnapshot", {})
+			if trjson is None:
+				dlg = wx.MessageDialog(self, "Snapshot does not exist", "File Not Found", wx.OK | wx.ICON_WARNING)
+				dlg.ShowModal()
+				dlg.Destroy()
+				return
 				
 			foundTrainBlocks = []
 			foundTrains = {}
@@ -2316,7 +2326,7 @@ class MainFrame(wx.Frame):
 							ntr = self.trains[trid]
 							
 						# now add the block to the new train
-						ntr.AddToBlock(blk)
+						ntr.AddToBlock(blk, 'front')
 						foundTrainBlocks.append(b)
 						foundTrains[trid] = 1
 						ntr.SetEast(trinfo["east"])
@@ -2650,12 +2660,27 @@ class MainFrame(wx.Frame):
 							a block has been emptied - re-evaluate the front block of the train to determine its
 							governing signal
 							"""
+							trid = tr.GetName()
 							tr.RemoveFromBlock(blk)
 							self.SendTrainBlockOrder(tr)
-							trblk = tr.FrontBlock()
-							if trblk is not None:
-								nm = trblk.GetName()
-								self.CheckTrainsInBlock(nm, None)
+							if tr.IsInNoBlocks():
+								if not tr.IsBeingEdited():
+									self.PopupEvent(
+										"Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
+									self.lostTrains.Add(trid, tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block)
+								else:
+									tr.SetBeingEdited(False)
+								try:
+									self.activeTrains.RemoveTrain(trid)
+									del (self.trains[trid])
+								except:
+									logging.warning("can't delete train %s from train list" % trid)
+
+							else:
+								trblk = tr.FrontBlock()
+								if trblk is not None:
+									nm = trblk.GetName()
+									self.CheckTrainsInBlock(nm, None)
 
 			else:
 				logging.info("Ignoring block command for unknown block: %s" % block)
@@ -2967,6 +2992,20 @@ class MainFrame(wx.Frame):
 				blk.SetEast(east)
 
 			tr.AddToBlock(blk, action)
+			if self.IsDispatcher() and self.settings.display.notifyoninvalidblocks and not name.startswith("??"):
+				try:
+					seq = self.trainList[name]["sequence"]
+					sb =  self.trainList[name]["startblock"]
+				except:
+					seq = None
+					sb = None
+
+				if seq is not None:
+					blist = [sb] + [s["block"] for s in seq] + ["{"+s["route"][3:]+"}" for s in seq]
+					bdesig = blk.GetRouteDesignator()
+					if bdesig not in blist:
+						self.PopupEvent("Train %s not expected in  block %s" % (name, bdesig))
+
 			if action == "replace":
 				tr.SetBlockOrder(blocks)
 
@@ -3442,6 +3481,7 @@ class MainFrame(wx.Frame):
 			return 
 		
 		dlg = ChooseItemDlg(self, True, True, self.rrServer)
+		dlg.CenterOnScreen()
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			file, directory = dlg.GetFile()
@@ -3467,6 +3507,7 @@ class MainFrame(wx.Frame):
 
 	def OnBLoadTrains(self, _):
 		dlg = ChooseItemDlg(self, True, False, self.rrServer)
+		dlg.CenterOnScreen()
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			file, directory = dlg.GetFile()
@@ -3577,6 +3618,7 @@ class MainFrame(wx.Frame):
 			return 
 		
 		dlg = ChooseItemDlg(self, False, True, self.rrServer)
+		dlg.CenterOnScreen()
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			file, directory = dlg.GetFile()
@@ -3604,6 +3646,7 @@ class MainFrame(wx.Frame):
 
 	def OnBLoadLocos(self, _):
 		dlg = ChooseItemDlg(self, False, False, self.rrServer)
+		dlg.CenterOnScreen()
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			file, directory = dlg.GetFile()

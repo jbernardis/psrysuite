@@ -1,13 +1,11 @@
 
-ar/atc/advisor - ??get rid of checkboxes and have always on???
+ar/atc - ??get rid of checkboxes and have always on???
 
-retire/get rid of advisor?????   tracker????
+retire/get rid of tracker????
 
 when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)
 
 change everywhere that shows an internal OS name to show the route name instead
-
-move all dialog boxes to center of screen (unless that are fixed elsewhere for another reason)
 
 automate management of single track if dispatcher all or dispatcher cliveden/martinsville:
     EB train entering B11 or B21 or leaves COSCLW
@@ -20,4 +18,4 @@ When it is set to dispatch all, the dispatcher controls everything
 When set to dispatcher controls bank/cliveden, cliff only controls sheffield, green mountain, and cliveden.  Dispatcher controls single track and martinsville/bank
 
 
-train routing - give a warning if a train enters a block that is not in its route - and a way to acknowledge and therefore ignore future such warnings
+modify notification of train routing into an invalid block to be settable on a train by train basis instead ob being global

@@ -183,6 +183,7 @@ class Settings:
 		self.display.allowatcrequests = True
 		self.display.showevents = False
 		self.display.showadvice = False
+		self.display.notifyoninvalidblocks = True
 		if self.cfg.has_section(section):
 			for opt, value in self.cfg.items(section):
 				if opt == 'pages':
@@ -205,9 +206,12 @@ class Settings:
 					
 				elif opt == 'showevents':
 					self.display.showevents = parseBoolean(value, False)
-					
+
 				elif opt == 'showadvice':
 					self.display.showadvice = parseBoolean(value, False)
+
+				elif opt == 'notifyoninvalidblocks':
+					self.display.notifyoninvalidblocks = parseBoolean(value, True)
 		else:
 			print("Missing %s section - assuming defaults" % section)
 
@@ -416,6 +420,7 @@ class Settings:
 		self.cfg.set(section, "allowatcrequests", "True" if self.display.allowatcrequests else "False")
 		self.cfg.set(section, "showevents", "True" if self.display.showevents else "False")
 		self.cfg.set(section, "showadvice", "True" if self.display.showadvice else "False")
+		self.cfg.set(section, "notifyoninvalidblocks", "True" if self.display.notifyoninvalidblocks else "False")
 
 		section = "activetrains" 
 		try:

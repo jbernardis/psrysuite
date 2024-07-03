@@ -167,7 +167,7 @@ class EditTrainDlg(wx.Dialog):
 		self.bMerge = wx.Button(self, wx.ID_ANY, "Merge", size=BUTTONSIZE)
 		self.bMerge.SetToolTip("Merge this train with another")
 		self.bReverse = wx.Button(self, wx.ID_ANY, "Reverse", size=BUTTONSIZE)
-		self.bReverse.SetToolTip("Reverse Direction on this train")
+		self.bReverse.SetToolTip("Reverse Direction on this train and reverse the order of its blocks")
 		self.bSort = wx.Button(self, wx.ID_ANY, "Reorder Blocks", size=BUTTONSIZE)
 		self.bSort.SetToolTip("Rearracge the order of blocks occupied by this train")
 
@@ -400,12 +400,22 @@ class SortTrainBlocksDlg(wx.Dialog):
 		self.lbBlocks.SetSelection(0)
 		self.sx = 0
 
-		self.bUp = wx.Button(self, wx.ID_ANY, "Up", size=BUTTONSIZE)
+		self.bUp = wx.Button(self, wx.ID_ANY, u'\u25b2' + " Up " + u'\u25b2', size=BUTTONSIZE)
+		self.bUp.SetFont(stFont)
 		self.Bind(wx.EVT_BUTTON, self.onBUp, self.bUp)
+		self.bUp.SetToolTip("Move selected block up towards the front of the train")
 		self.bUp.Enable(False)
-		self.bDown = wx.Button(self, wx.ID_ANY, "Down", size=BUTTONSIZE)
+
+		self.bDown = wx.Button(self, wx.ID_ANY, u'\u25bc' + " Down " + u'\u25bc', size=BUTTONSIZE)
+		self.bDown.SetFont(stFont)
 		self.Bind(wx.EVT_BUTTON, self.onBDown, self.bDown)
+		self.bDown.SetToolTip("Move selected block down towards the rear of the train")
 		self.bDown.Enable(True)
+
+		self.bReverse = wx.Button(self, wx.ID_ANY, "Reverse", size=BUTTONSIZE)
+		self.bReverse.SetFont(stFont)
+		self.Bind(wx.EVT_BUTTON, self.onBReverse, self.bReverse)
+		self.bReverse.SetToolTip("Reverse the block order without changing the train direction")
 
 		vsz = wx.BoxSizer(wx.VERTICAL)
 
@@ -422,6 +432,8 @@ class SortTrainBlocksDlg(wx.Dialog):
 		btnsz = wx.BoxSizer(wx.VERTICAL)
 		btnsz.AddSpacer(20)
 		btnsz.Add(self.bUp)
+		btnsz.AddSpacer(30)
+		btnsz.Add(self.bReverse)
 		btnsz.AddSpacer(30)
 		btnsz.Add(self.bDown)
 		btnsz.AddSpacer(20)
@@ -495,6 +507,14 @@ class SortTrainBlocksDlg(wx.Dialog):
 		self.lbBlocks.SetItems(self.blocks)
 		self.sx = s1
 		self.lbBlocks.SetSelection(s1)
+		self.EnableButtons()
+		self.SetModified()
+
+	def onBReverse(self, _):
+		self.blocks = list(reversed(self.blocks))
+		self.lbBlocks.SetItems(self.blocks)
+		self.lbBlocks.SetSelection(0)
+		self.sx = 0
 		self.EnableButtons()
 		self.SetModified()
 

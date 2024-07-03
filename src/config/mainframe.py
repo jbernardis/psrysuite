@@ -174,13 +174,19 @@ class MainFrame(wx.Frame):
 		self.cbShowEvents = wx.CheckBox(dispBox, wx.ID_ANY, "Show Events")
 		boxsizer.Add(self.cbShowEvents, 0, wx.LEFT, 40)
 		self.cbShowEvents.SetValue(self.settings.display.showevents)
-		
+
 		boxsizer.AddSpacer(10)
-		
+
 		self.cbShowAdvice = wx.CheckBox(dispBox, wx.ID_ANY, "Show Advice")
 		boxsizer.Add(self.cbShowAdvice, 0, wx.LEFT, 40)
 		self.cbShowAdvice.SetValue(self.settings.display.showadvice)
-		
+
+		boxsizer.AddSpacer(10)
+
+		self.cbNotifyInvalidBlock = wx.CheckBox(dispBox, wx.ID_ANY, "Notify entry into an invalid block")
+		boxsizer.Add(self.cbNotifyInvalidBlock, 0, wx.LEFT, 40)
+		self.cbNotifyInvalidBlock.SetValue(self.settings.display.notifyoninvalidblocks)
+
 		boxsizer.AddSpacer(10)
 		
 		dispBox.SetSizer(boxsizer)
@@ -478,6 +484,7 @@ class MainFrame(wx.Frame):
 		self.settings.display.allowatcrequests = self.cbAllowATCRequests.IsChecked()
 		self.settings.display.showevents = self.cbShowEvents.IsChecked()
 		self.settings.display.showadvice = self.cbShowAdvice.IsChecked()
+		self.settings.display.notifyoninvalidblocks = self.cbNotifyInvalidBlock.IsChecked()
 		
 		self.settings.activetrains.suppressyards = self.cbSuppressYards.IsChecked()		
 		ix = self.rbShowOnly.GetSelection()
