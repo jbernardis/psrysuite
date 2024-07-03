@@ -2849,15 +2849,15 @@ class MainFrame(wx.Frame):
 			tr.SetSignal(sig)
 			self.activeTrains.UpdateTrain(trid)
 
-	def CheckForIncorrectRoute(self, tr, sig):
+	def CheckForIncorrectRoute(self, tr, sig, ignoreunchangedsignal=False, silent=False):
 		if tr is None or sig is None:
-			return
+			return None, None
 
 		if not self.settings.dispatcher.notifyincorrectroute:
-			return
+			return None, None
 
 		if not self.IsDispatcherOrSatellite():
-			return
+			return None, None
 
 		trid = tr.GetName()
 		signm = sig.GetName()
@@ -2865,20 +2865,21 @@ class MainFrame(wx.Frame):
 		if fa is not None:
 			currentAspect = fa
 
-		if currentSig is None:
-			changedSignal = True
-		else:
-			changedSignal = currentSig.GetName() != signm or currentAspect != sig.GetAspect()
+		if not ignoreunchangedsignal:
+			if currentSig is None:
+				changedSignal = True
+			else:
+				changedSignal = currentSig.GetName() != signm or currentAspect != sig.GetAspect()
 
-		if not changedSignal:
-			return
+			if not changedSignal:
+				return None, None
 
 		if trid not in self.trainList:
-			return
+			return None, None
 
 		aspect = sig.GetAspect()
 		if aspect == 0:
-			return
+			return None, None
 
 		blk = tr.FrontBlock()
 		if blk is not None:
@@ -2890,17 +2891,17 @@ class MainFrame(wx.Frame):
 			nb = None
 
 		if nb is None:
-			return
+			return None, None
 
 		if nb.GetBlockType() != OVERSWITCH:
-			return
+			return None, None
 
 		if nb.GetRoute() is None:
-			return
+			return None, None
 
 		rtnm = nb.GetRouteName()
 		if rtnm is None:
-			return
+			return None, None
 
 		try:
 			seq = self.trainList[trid]["sequence"]
@@ -2908,17 +2909,23 @@ class MainFrame(wx.Frame):
 			seq = None
 
 		if seq is None:
-			return
+			return None, None
 
 		blist = [s["route"] for s in seq]
 		if rtnm not in blist:
-			self.PopupEvent("Train %s: incorrect route beyond signal %s: %s" %
-							(trid, signm, formatRouteDesignator(rtnm)))
+			incorrectRoute = formatRouteDesignator(rtnm)
+			if not silent:
+				self.PopupEvent("Train %s: incorrect route beyond signal %s: %s" % (trid, signm, incorrectRoute))
+			correctRoute = None
 			for s in seq:
 				if signm == s["signal"]:
-					self.PopupEvent(
-						"The correct route is %s" % formatRouteDesignator(s["route"]))
+					correctRoute = formatRouteDesignator(s["route"])
+					if not silent:
+						self.PopupEvent("The correct route is %s" % correctRoute)
 					break
+
+			return incorrectRoute, correctRoute
+		return None, None
 
 	def DoCmdSetTrain(self, parms):
 		blocks = parms["blocks"]
@@ -3609,7 +3616,9 @@ class MainFrame(wx.Frame):
 	def CheckTrains(self):
 		rc1 = self.CheckTrainsContiguous()
 		rc2 = self.CheckLocosUnique()
-		if rc1 and rc2:
+		rc3 = self.CheckBlocksExpected()
+		rc4 = self.CheckCorrectRoute()
+		if rc1 and rc2 and rc3 and rc4:
 			dlg = wx.MessageDialog(self, "All Trains are OK", "All Trains OK", wx.OK | wx.ICON_INFORMATION)
 			dlg.ShowModal()
 			dlg.Destroy()
@@ -3671,6 +3680,74 @@ class MainFrame(wx.Frame):
 		if query and rc == wx.ID_YES:
 			return True
 		
+		return False
+
+	def CheckBlocksExpected(self):
+		results = {}
+		for trid, tr in self.trains.items():
+			if trid in self.trainList:
+				try:
+					seq = self.trainList[trid]["sequence"]
+					sb =  self.trainList[trid]["startblock"]
+				except:
+					seq = None
+					sb = None
+
+				if seq is not None:
+					expectedlist = [sb] + [s["block"] for s in seq] + [formatRouteDesignator(s["route"]) for s in seq]
+					trList = [blk.GetRouteDesignator() for blk in tr.GetBlockList().values()]
+					unexpected = [bn for bn in trList if bn not in expectedlist]
+					if len(unexpected) != 0:
+						results[trid] = [b for b in unexpected]
+
+		n = len(results)
+		if n == 0:
+			return True
+
+		if n == 1:
+			plural = " is"
+		else:
+			plural = "s are"
+
+		resList = ["%s: %s" % (trid, ", ".join(results[trid])) for trid in results.keys()]
+		msg = ("The following train%s unexpectedly in the indicated block(s):\n\n" % plural) + "\n".join(resList)
+
+		dlg = wx.MessageDialog(self, msg, "Trains in unexpected blocks", style=wx.OK | wx.ICON_WARNING)
+		rc = dlg.ShowModal()
+		dlg.Destroy()
+
+		return False
+
+	def CheckCorrectRoute(self):
+		results = {}
+		for trid, tr in self.trains.items():
+			if trid not in self.trainList:
+				continue
+
+			sig, _, _ = tr.GetSignal()
+			if sig is None:
+				continue
+
+			corRt, incRt = self.CheckForIncorrectRoute(tr, sig, ignoreunchangedsignal=True, silent=True)
+			if corRt is not None:
+				results[trid] = [corRt, incRt]
+
+		n = len(results)
+		if n == 0:
+			return True
+
+		if n == 1:
+			plural = " is"
+		else:
+			plural = "s are"
+
+		resList = ["%s: %s should be %s" % (tr, results[tr][0], results[tr][1]) for tr in results]
+		msg = ("The following train%s routed incorrectly:\n\n" % plural) + "\n".join(resList)
+
+		dlg = wx.MessageDialog(self, msg, "Trains incorrecrtly routed", style=wx.OK | wx.ICON_WARNING)
+		rc = dlg.ShowModal()
+		dlg.Destroy()
+
 		return False
 
 	def OnBSaveLocos(self, _):
