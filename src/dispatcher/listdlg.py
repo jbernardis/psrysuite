@@ -20,7 +20,7 @@ class ListDlg(wx.Dialog):
 
         data = "\n".join(dataList)
         tcList = wx.TextCtrl(self, wx.ID_ANY, data,
-                size=(600, 460), style=wx.TE_MULTILINE)
+                size=(800, 460), style=wx.TE_MULTILINE)
         tcList.SetFont(font)
         tcList.ShowPosition(len(data))
         vsz.Add(tcList)

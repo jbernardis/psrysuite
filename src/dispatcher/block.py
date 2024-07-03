@@ -1,7 +1,11 @@
 import logging
 
-from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, BLOCK, OVERSWITCH, STOPPINGBLOCK, MAIN, STOP
+from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, BLOCK, OVERSWITCH, STOPPINGBLOCK, MAIN, STOP, FRONT, REAR
 from dispatcher.district import CrossingEastWestBoundary
+
+
+def formatRouteDesignator(rtName):
+	return "{%s}" % rtName[3:]
 
 
 class Route:
@@ -442,7 +446,7 @@ class Block:
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
 				req = {"settrain": { "blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0",
-									"action": "rear" if rear else "front"}}
+									"action": REAR if rear else FRONT}}
 				self.frame.Request(req)
 			if refresh:
 				self.Draw()
@@ -477,7 +481,7 @@ class Block:
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
 				req = {"settrain": { "blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0",
-									"action": "eear" if rear else "front"}}
+									"action": REAR if rear else FRONT}}
 				self.frame.Request(req)
 		else:
 			for b in [self.sbEast, self.sbWest]:
@@ -1110,7 +1114,7 @@ class OverSwitch (Block):
 		if self.route is None:
 			return self.GetName()
 		else:
-			return "{%s}" % self.GetRouteName()[3:]
+			return formatRouteDesignator(self.GetRouteName())
 
 	def GetRouteType(self, reverse=False):
 		if self.route is None:

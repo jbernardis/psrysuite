@@ -11,7 +11,8 @@ from dispatcher.train import Train
 from activetrains.trainlist import ActiveTrainList
 from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
-from dispatcher.constants import aspectname, aspecttype, aspectprofileindex, RegAspects
+from dispatcher.constants import aspectname, aspecttype, aspectprofileindex, RegAspects, REPLACE
+from dispatcher.block import formatRouteDesignator
 
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
@@ -54,7 +55,7 @@ class Block:
 		if self.route is None:
 			return None
 		else:
-			return "{%s}" % self.route[3:]
+			return formatRouteDesignator(self.route)
 
 		
 class Signal:
@@ -470,7 +471,7 @@ class MainFrame(wx.Frame):
 		try:
 			action = parms["action"]
 		except KeyError:
-			action = "replace"
+			action = REPLACE
 
 		try:
 			nameonly = parms["nameonly"]
@@ -565,7 +566,7 @@ class MainFrame(wx.Frame):
 				blk.SetEast(east)
 
 			tr.AddToBlock(blk, action)
-			if action == "replace":
+			if action == REPLACE:
 				tr.SetBlockOrder(blocks)
 
 			blk.SetTrain(tr)

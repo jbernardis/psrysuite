@@ -26,6 +26,11 @@ SLIPSWITCH = 31
 STOP = 0b000
 CLEAR= 0b011
 
+# where to add a list of blocks onto a train
+FRONT = "f"
+REAR = "r"
+REPLACE = "p"
+
 # route types
 MAIN = 40
 SLOW = 41

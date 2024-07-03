@@ -5,10 +5,10 @@ if cmdFolder not in sys.path:
 
 lfn = os.path.join(os.getcwd(), "logs", "rrserver.log")
 
-
 import logging
 import logging.handlers
 from dispatcher.settings import Settings
+from dispatcher.constants import REPLACE
 should_roll_over = os.path.isfile(lfn)
 
 settings = Settings()
@@ -744,7 +744,7 @@ class ServerMain:
 		try:
 			action = cmd["action"][0]
 		except (IndexError, KeyError):
-			action = "replace"
+			action = REPLACE
 		blocks = cmd["blocks"]
 
 		if trn and trn.startswith("??"):

@@ -28,6 +28,7 @@ from dispatcher.listdlg import ListDlg
 from dispatcher.delayedrequest import DelayedRequests
 from dispatcher.delayedsignal import DelayedSignals
 from dispatcher.trainqueue import TrainQueue
+from dispatcher.block import formatRouteDesignator
 
 from dispatcher.districts.yard import Yard
 from dispatcher.districts.hyde import Hyde
@@ -41,7 +42,8 @@ from dispatcher.districts.cliveden import Cliveden
 from dispatcher.districts.cliff import Cliff
 from dispatcher.districts.port import Port
 
-from dispatcher.constants import HyYdPt, LaKr, NaCl, screensList, EMPTY, OCCUPIED, NORMAL, REVERSE, OVERSWITCH, SLIPSWITCH, turnoutstate
+from dispatcher.constants import HyYdPt, LaKr, NaCl, screensList, EMPTY, OCCUPIED, NORMAL, REVERSE, \
+		OVERSWITCH, SLIPSWITCH, turnoutstate, REPLACE
 from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
 
@@ -532,19 +534,6 @@ class MainFrame(wx.Frame):
 			self.Request({"clock": { "value": self.timeValue, "status": self.clockStatus}})
 					
 	def OnThrottle(self, _):
-	#===========================================================================
-	# 	dlg = TestRoutesDlg(self)
-	# 	dlg.ShowModal()
-	# 	dlg.Destroy()
-	# 	
-	# def TestSetupRoute(self, rname):
-	# 	rt = self.routes[rname]
-	# 	osblk = rt.GetOS()
-	# 	district = osblk.GetDistrict()
-	# 	district.SetUpRoute(osblk, rt)
-	# 	
-	# def xxx(self, _):
-	#===========================================================================
 		throttleExec = os.path.join(os.getcwd(), "throttle", "main.py")
 		throttleProc = Popen([sys.executable, throttleExec])
 		logging.info("Throttle started as PID %d" % throttleProc.pid)
@@ -2113,6 +2102,7 @@ class MainFrame(wx.Frame):
 		for trid, tr in self.trains.items():
 			if tr.FrontInBlock(blkNm):
 				# we found a train
+				self.CheckForIncorrectRoute(tr, sig)
 				tr.SetSignal(sig)
 				self.activeTrains.UpdateTrain(trid)
 				req = {"trainsignal": { "train": trid, "block": blkNm, "signal": sig.GetName(), "aspect": sig.GetAspect()}}
@@ -2231,7 +2221,7 @@ class MainFrame(wx.Frame):
 		self.PopupEvent(message, force=True)
 
 	def PopupEvent(self, message, force=False):
-		if self.IsDispatcher() or self.settings.display.showevents or force:
+		if self.IsDispatcherOrSatellite() or self.settings.display.showevents or force:
 			self.events.Append(message)
 			self.eventsList.append(message)
 			if self.dlgEvents is not None:
@@ -2251,7 +2241,7 @@ class MainFrame(wx.Frame):
 		self.dlgEvents = None
 
 	def PopupAdvice(self, message, force=False):
-		if self.IsDispatcher() or self.settings.display.showadvice or force:
+		if self.IsDispatcherOrSatellite() or self.settings.display.showadvice or force:
 			self.advice.Append(message)
 			self.adviceList.append(message)
 			if self.dlgAdvice is not None:
@@ -2852,10 +2842,83 @@ class MainFrame(wx.Frame):
 			sig = self.signals[signm]
 		except:
 			sig  = None
-			
+
 		if tr is not None and sig is not None:
+			self.CheckForIncorrectRoute(tr, sig)
+
 			tr.SetSignal(sig)
 			self.activeTrains.UpdateTrain(trid)
+
+	def CheckForIncorrectRoute(self, tr, sig):
+		if tr is None or sig is None:
+			return
+
+		if not self.settings.dispatcher.notifyincorrectroute:
+			return
+
+		if not self.IsDispatcherOrSatellite():
+			return
+
+		trid = tr.GetName()
+		signm = sig.GetName()
+		currentSig, currentAspect, fa = tr.GetSignal()
+		if fa is not None:
+			currentAspect = fa
+
+		if currentSig is None:
+			changedSignal = True
+		else:
+			changedSignal = currentSig.GetName() != signm or currentAspect != sig.GetAspect()
+
+		if not changedSignal:
+			return
+
+		if trid not in self.trainList:
+			return
+
+		aspect = sig.GetAspect()
+		if aspect == 0:
+			return
+
+		blk = tr.FrontBlock()
+		if blk is not None:
+			if blk.GetEast():
+				nb = blk.GetAdjacentBlocks()[0]
+			else:
+				nb = blk.GetAdjacentBlocks()[1]
+		else:
+			nb = None
+
+		if nb is None:
+			return
+
+		if nb.GetBlockType() != OVERSWITCH:
+			return
+
+		if nb.GetRoute() is None:
+			return
+
+		rtnm = nb.GetRouteName()
+		if rtnm is None:
+			return
+
+		try:
+			seq = self.trainList[trid]["sequence"]
+		except:
+			seq = None
+
+		if seq is None:
+			return
+
+		blist = [s["route"] for s in seq]
+		if rtnm not in blist:
+			self.PopupEvent("Train %s: incorrect route beyond signal %s: %s" %
+							(trid, signm, formatRouteDesignator(rtnm)))
+			for s in seq:
+				if signm == s["signal"]:
+					self.PopupEvent(
+						"The correct route is %s" % formatRouteDesignator(s["route"]))
+					break
 
 	def DoCmdSetTrain(self, parms):
 		blocks = parms["blocks"]
@@ -2869,7 +2932,7 @@ class MainFrame(wx.Frame):
 		try:
 			action = parms["action"]
 		except KeyError:
-			action = "replace"
+			action = REPLACE
 
 		try:
 			nameonly = parms["nameonly"]
@@ -2992,7 +3055,7 @@ class MainFrame(wx.Frame):
 				blk.SetEast(east)
 
 			tr.AddToBlock(blk, action)
-			if self.IsDispatcher() and self.settings.display.notifyoninvalidblocks and not name.startswith("??"):
+			if self.IsDispatcherOrSatellite() and self.settings.dispatcher.notifyinvalidblocks and not name.startswith("??"):
 				try:
 					seq = self.trainList[name]["sequence"]
 					sb =  self.trainList[name]["startblock"]
@@ -3001,12 +3064,12 @@ class MainFrame(wx.Frame):
 					sb = None
 
 				if seq is not None:
-					blist = [sb] + [s["block"] for s in seq] + ["{"+s["route"][3:]+"}" for s in seq]
+					blist = [sb] + [s["block"] for s in seq] + [formatRouteDesignator(s["route"]) for s in seq]
 					bdesig = blk.GetRouteDesignator()
 					if bdesig not in blist:
-						self.PopupEvent("Train %s not expected in  block %s" % (name, bdesig))
+						self.PopupEvent("Train %s not expected in block %s" % (name, bdesig))
 
-			if action == "replace":
+			if action == REPLACE:
 				tr.SetBlockOrder(blocks)
 
 			blk.SetTrain(tr)

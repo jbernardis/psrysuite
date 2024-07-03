@@ -125,7 +125,7 @@ class MainFrame(wx.Frame):
 
 
 
-		dispBox = wx.StaticBox(self, wx.ID_ANY, "Dispatcher/Display")
+		dispBox = wx.StaticBox(self, wx.ID_ANY, "Dispatcher/Display/Satellite")
 		topBorder = dispBox.GetBordersForSizer()[0]
 		boxsizer = wx.BoxSizer(wx.VERTICAL)
 		boxsizer.AddSpacer(topBorder+10)
@@ -135,10 +135,6 @@ class MainFrame(wx.Frame):
 		rbv = 0 if self.settings.dispatcher.dispatch else 1 if self.settings.dispatcher.satellite else 2
 		self.rbMode.SetSelection(rbv)
 
-		# self.cbDispatch = wx.CheckBox(dispBox, wx.ID_ANY, "Dispatcher Mode")
-		# boxsizer.Add(self.cbDispatch, 0, wx.LEFT, 40)
-		# self.cbDispatch.SetValue(self.settings.dispatcher.dispatch)
-		#
 		boxsizer.AddSpacer(10)
 
 		self.cbShowCameras = wx.CheckBox(dispBox, wx.ID_ANY, "Show Cameras")
@@ -150,9 +146,21 @@ class MainFrame(wx.Frame):
 		self.rbPages = wx.RadioBox(dispBox, wx.ID_ANY, "Pages", choices=["1", "3"])
 		boxsizer.Add(self.rbPages, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 		self.rbPages.SetSelection(0 if self.settings.display.pages == 1 else 1)
-		
+
 		boxsizer.AddSpacer(10)
-		
+
+		self.cbNotifyInvalidBlock = wx.CheckBox(dispBox, wx.ID_ANY, "Notify entry into an invalid block")
+		boxsizer.Add(self.cbNotifyInvalidBlock, 0, wx.LEFT, 40)
+		self.cbNotifyInvalidBlock.SetValue(self.settings.dispatcher.notifyinvalidblocks)
+
+		boxsizer.AddSpacer(10)
+
+		self.cbNotifyIncorrectRoute = wx.CheckBox(dispBox, wx.ID_ANY, "Notify signal cleared for incorrect route")
+		boxsizer.Add(self.cbNotifyIncorrectRoute, 0, wx.LEFT, 40)
+		self.cbNotifyIncorrectRoute.SetValue(self.settings.dispatcher.notifyincorrectroute)
+
+		boxsizer.AddSpacer(10)
+
 		dispBox.SetSizer(boxsizer)
 		
 		vszrl.Add(dispBox, 0, wx.EXPAND)
@@ -180,12 +188,6 @@ class MainFrame(wx.Frame):
 		self.cbShowAdvice = wx.CheckBox(dispBox, wx.ID_ANY, "Show Advice")
 		boxsizer.Add(self.cbShowAdvice, 0, wx.LEFT, 40)
 		self.cbShowAdvice.SetValue(self.settings.display.showadvice)
-
-		boxsizer.AddSpacer(10)
-
-		self.cbNotifyInvalidBlock = wx.CheckBox(dispBox, wx.ID_ANY, "Notify entry into an invalid block")
-		boxsizer.Add(self.cbNotifyInvalidBlock, 0, wx.LEFT, 40)
-		self.cbNotifyInvalidBlock.SetValue(self.settings.display.notifyoninvalidblocks)
 
 		boxsizer.AddSpacer(10)
 		
@@ -473,6 +475,8 @@ class MainFrame(wx.Frame):
 		rbv = self.rbMode.GetSelection()
 		self.settings.dispatcher.dispatch = rbv == 0
 		self.settings.dispatcher.satellite = rbv == 1
+		self.settings.dispatcher.notifyinvalidblocks = self.cbNotifyInvalidBlock.IsChecked()
+		self.settings.dispatcher.notifyincorrectroute = self.cbNotifyIncorrectRoute.IsChecked()
 
 		self.settings.rrserver.rrtty = self.teRRComPort.GetValue()
 		self.settings.rrserver.dcctty = self.teDCCComPort.GetValue()
@@ -484,8 +488,7 @@ class MainFrame(wx.Frame):
 		self.settings.display.allowatcrequests = self.cbAllowATCRequests.IsChecked()
 		self.settings.display.showevents = self.cbShowEvents.IsChecked()
 		self.settings.display.showadvice = self.cbShowAdvice.IsChecked()
-		self.settings.display.notifyoninvalidblocks = self.cbNotifyInvalidBlock.IsChecked()
-		
+
 		self.settings.activetrains.suppressyards = self.cbSuppressYards.IsChecked()		
 		ix = self.rbShowOnly.GetSelection()
 		self.settings.activetrains.suppressunknown = False

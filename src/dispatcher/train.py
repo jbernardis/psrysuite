@@ -1,12 +1,13 @@
 import logging
-import traceback
-	
+
 ST_FWD    = "f"
 ST_FWD128 = "F"
 ST_REV    = "r"
 ST_REV128 = "R"
 ST_STOP   = "s"
 ST_ESTOP  = "e"
+
+from dispatcher.constants import REAR
 
 
 def formatThrottle(speed, speedType):
@@ -218,7 +219,7 @@ class Train:
 
 		self.blocks[bn] = blk
 		blk.SetTrain(self)
-		if action == "rear":
+		if action == REAR:
 			self.blockOrder.insert(0, bn)
 		else:
 			self.blockOrder.append(bn)

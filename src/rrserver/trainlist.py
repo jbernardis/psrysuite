@@ -1,6 +1,6 @@
 import logging
 import json
-from tracker import engineers
+from dispatcher.constants import FRONT, REPLACE
 
 class TrainList:
 	def __init__(self, parent):
@@ -36,13 +36,13 @@ class TrainList:
 
 		else:
 			if train in self.trains:
-				if action == "replace":
+				if action == REPLACE:
 					self.trains[train]["blocks"] = [b for b in blocks]
 					self.trains[train]["blockorder"] = [b for b in blocks]
 				else:
 					for b in blocks:
 						if b not in self.trains[train]["blocks"]:
-							if action == "front":
+							if action == FRONT:
 								self.trains[train]["blocks"].append(b)
 								self.trains[train]["blockorder"].append(b)
 							else:
