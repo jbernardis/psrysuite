@@ -49,6 +49,12 @@ class InspectDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnBLevers, bLevers)
         btnszr.Add(bLevers)
 
+        btnszr.AddSpacer(20)
+
+        bHandSwitches = wx.Button(self, wx.ID_ANY, "Siding Locks", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnBHandSwitches, bHandSwitches)
+        btnszr.Add(bHandSwitches)
+
         btnszr.AddSpacer(10)
 
         bResetBlks = wx.Button(self, wx.ID_ANY, "Reset Blocks", size=BSIZE)
@@ -83,27 +89,34 @@ class InspectDlg(wx.Dialog):
 
     def OnBProxies(self, _):
         pi = self.parent.GetOSProxyInfo()
-        print(str(pi), flush=True)
-        dlg = OSProxyDlg(self, pi)
+        dlg = OSProxyDlg(self, pi, self.parent.GetOSProxyInfo)
         dlg.ShowModal()
         dlg.Destroy()
 
     def OnBRelays(self, _):
-        rl = self.parent.Get("stoprelays", {})
-        relayList = ["%-6.6s   %s" % (self.formatRelayName(rly), str(rl[rly])) for rly in sorted(rl.keys())]
-        dlg = ListDlg(self, "\n".join(relayList), (200, 200), "Stopping Relays")
+        rv = self.GetRelayValues()
+        dlg = ListDlg(self, rv, (200, 200), "Stopping Relays", self.GetRelayValues)
         dlg.ShowModal()
         dlg.Destroy()
+
+    def GetRelayValues(self):
+        rl = self.parent.Get("stoprelays", {})
+        relayList = ["%-6.6s   %s" % (self.formatRelayName(rly), str(rl[rly])) for rly in sorted(rl.keys())]
+        return "\n".join(relayList)
 
     def formatRelayName(self, rn):
         return rn.split(".")[0]
 
     def OnBLevers(self, _):
-        sl = self.parent.Get("signallevers", {})
-        leverList = ["%-6.6s   %s" % (lvr, self.formatSigLvr(sl[lvr])) for lvr in sorted(sl.keys())]
-        dlg = ListDlg(self, "\n".join(leverList), (200, 200), "Signal Levers")
+        slv = self.GetSignalLeverValues()
+        dlg = ListDlg(self, slv, (200, 200), "Signal Levers", self.GetSignalLeverValues)
         dlg.ShowModal()
         dlg.Destroy()
+
+    def GetSignalLeverValues(self):
+        sl = self.parent.Get("signallevers", {})
+        leverList = ["%-6.6s   %s" % (lvr, self.formatSigLvr(sl[lvr])) for lvr in sorted(sl.keys())]
+        return "\n".join(leverList)
 
     def formatSigLvr(self, data):
         dl = 0 if data[0] is None else data[0]
@@ -120,6 +133,17 @@ class InspectDlg(wx.Dialog):
             return " N " + callon
         else:
             return " ? " + callon
+
+    def OnBHandSwitches(self, _):
+        hsv = self.GetHandswitchValues()
+        dlg = ListDlg(self, hsv, (260, 200), "Siding Locks", self.GetHandswitchValues)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def GetHandswitchValues(self):
+        hsinfo = self.parent.GetHandswitchInfo()
+        hsList = ["%-9.9s   %s" % (hs, str(hsinfo[hs])) for hs in sorted(hsinfo.keys())]
+        return "\n".join(hsList)
 
     def OnBResetBlks(self, _):
         resetList = []
@@ -300,10 +324,11 @@ class LogLevelDlg(wx.Dialog):
 
 
 class ListDlg(wx.Dialog):
-    def __init__(self, parent, data, sz, title):
+    def __init__(self, parent, data, sz, title, cbRefresh=None):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, title)
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
         self.parent = parent
+        self.cbRefresh = cbRefresh
 
         vszr = wx.BoxSizer(wx.VERTICAL)
 
@@ -312,40 +337,71 @@ class ListDlg(wx.Dialog):
         lb = wx.TextCtrl(self, wx.ID_ANY, value=data, size=sz, style=wx.TE_READONLY + wx.TE_MULTILINE)
         lb.SetFont(font)
         vszr.Add(lb, 1, wx.ALL, 20)
+        self.lb = lb
+
+        if callable(cbRefresh):
+            vszr.AddSpacer(20)
+            b = wx.Button(self, wx.ID_ANY, "Refresh")
+            self.Bind(wx.EVT_BUTTON, self.onBRefresh, b)
+            vszr.Add(b, 0, wx.ALIGN_CENTER_HORIZONTAL)
+            vszr.AddSpacer(20)
 
         self.SetSizer(vszr)
         self.Layout()
         self.Fit();
         self.CenterOnScreen()
+
+    def onBRefresh(self, _):
+        r = self.cbRefresh()
+        if r is None:
+            return
+
+        self.lb.Clear()
+        self.lb.SetValue(r)
+
 
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)
 
 
 class OSProxyDlg(wx.Dialog):
-    def __init__(self, parent, data):
+    def __init__(self, parent, data, cbRefresh=None):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "OS Proxies")
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
         self.parent = parent
+        self.cbRefresh = cbRefresh
 
         vszr = wx.BoxSizer(wx.VERTICAL)
 
         lb = OSProxyListCtrl(self, data)
         vszr.Add(lb, 1, wx.ALL, 20)
+        self.lb = lb
+
+        if callable(self.cbRefresh):
+            vszr.AddSpacer(20)
+            b = wx.Button(self, wx.ID_ANY, "Refresh")
+            self.Bind(wx.EVT_BUTTON, self.onBRefresh, b)
+            vszr.Add(b, 0, wx.ALIGN_CENTER_HORIZONTAL)
+            vszr.AddSpacer(20)
 
         self.SetSizer(vszr)
         self.Layout()
         self.Fit();
         self.CenterOnScreen()
 
+    def onBRefresh(self, _):
+        ospdict = self.cbRefresh()
+        self.lb.SetData(ospdict)
+
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)
 
 
 class OSProxyListCtrl(wx.ListCtrl):
-    def __init__(self, parent, ospdict):
+    def __init__(self, parent, ospdict, cbRefresh=None):
         wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(700, 160), style=wx.LC_REPORT + wx.LC_VIRTUAL)
         self.parent = parent
+        self.cbRefresh=cbRefresh
         self.order = [rname for rname in sorted(ospdict.keys())]
         self.osp = ospdict
 
@@ -366,6 +422,12 @@ class OSProxyListCtrl(wx.ListCtrl):
         self.InsertColumn(3, "Segments")
         self.SetColumnWidth(3, 300)
 
+        self.SetItemCount(len(self.order))
+
+    def SetData(self, ospdict):
+        self.order = [rname for rname in sorted(ospdict.keys())]
+        self.osp = ospdict
+        self.SetItemCount(0)
         self.SetItemCount(len(self.order))
 
     def OnGetItemText(self, item, col):

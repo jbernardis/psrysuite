@@ -2177,6 +2177,10 @@ class MainFrame(wx.Frame):
 
 		return {rn: {"count": counts[rn], "os": osnames[rn], "segments": pnames[rn]} for rn in counts.keys()}
 
+	def GetHandswitchInfo(self):
+		hsinfo = {hsname.split(".")[0]: self.handswitches[hsname].GetValue() for hsname in self.handswitches}
+		return hsinfo
+
 	def GetBlockStatus(self, blknm):
 		try:
 			blk = self.blocks[blknm]

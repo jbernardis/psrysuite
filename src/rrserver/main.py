@@ -97,7 +97,6 @@ class ServerMain:
 
 		self.clients = {}
 
-		
 		if settings.ipaddr is not None:
 			if self.ip != settings.ipaddr:
 				logging.info("Using configured IP Address (%s) instead of retrieved IP Address: (%s)" % (settings.ipaddr, self.ip))
@@ -138,7 +137,6 @@ class ServerMain:
 		else:
 			self.queueCmd({"cmd": ["failedstart"]})
 
-		
 	def DelayedStartup(self, _):
 		if not settings.rrserver.simulation:
 			self.rrBus = Bus(settings.rrserver.rrtty)
@@ -241,7 +239,6 @@ class ServerMain:
 		layout = {"routes": routes, "blocks": blocks, "subblocks": subblocks, "crossover": self.CrossoverPoints}
 		with open(os.path.join(os.getcwd(), "data", "layout.json"), "w") as jfp:
 			json.dump(layout, jfp, sort_keys=True, indent=2)
-
 
 	def refreshClient(self, addr, skt):
 		if self.timeValue is not None:

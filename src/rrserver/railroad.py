@@ -30,16 +30,16 @@ class Railroad():
 
 		self.districtList = [
 			[ Yard, "Yard" ],
-   			[ Latham, "Latham" ],
-   			[ Dell, "Dell" ],
-   			[ Shore, "Shore" ],
-   			[ Krulish, "Krulish" ],
-   			[ Nassau, "Nassau" ],
-   			[ Bank, "Bank" ],
-   			[ Cliveden, "Cliveden" ],
-   			[ Cliff, "Cliff" ],
-   			[ Hyde, "Hyde" ],
-   			[ Port, "Port" ],
+			[ Latham, "Latham" ],
+			[ Dell, "Dell" ],
+			[ Shore, "Shore" ],
+			[ Krulish, "Krulish" ],
+			[ Nassau, "Nassau" ],
+			[ Bank, "Bank" ],
+			[ Cliveden, "Cliveden" ],
+			[ Cliff, "Cliff" ],
+			[ Hyde, "Hyde" ],
+			[ Port, "Port" ],
 		]
 		
 		self.controlOptions = {}
@@ -64,8 +64,7 @@ class Railroad():
 		self.topulsect = self.settings.rrserver.topulsect
 		self.nxbpulselen = self.settings.rrserver.nxbpulselen
 		self.nxbpulsect = self.settings.rrserver.nxbpulsect
-		
-		
+
 		self.fleetedSignals = {}
 		self.districtLock = {"NWSL": [0, 0, 0, 0], "NESL": [0, 0, 0]}
 		self.enableSendIO = True
@@ -99,7 +98,6 @@ class Railroad():
 				blks.append([blknm, 1 if blk.IsEast() else 0])
 		return sorted(blks)
 
-			
 	def dump(self):
 		logging.info("================================SIGNALS")
 		for s in self.signals.values():
@@ -139,8 +137,6 @@ class Railroad():
 		self.SetControlOption("valleyjct.fleet", 0)
 		self.SetControlOption("yard.fleet", 0)
 		self.SetControlOption("osslocks", 1)
-		
-		#self.dump()
 
 		return True
 			

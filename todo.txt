@@ -1,12 +1,18 @@
-
+Pondering/Future
+****************
 ar/atc - ??get rid of checkboxes and have always on???
 
 retire/get rid of tracker????
 
+modify notification of train routing into an invalid block to be settable on a train by train basis instead of being global
+
 when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)
 
-change everywhere that shows an internal OS name to show the route name instead
 
+
+
+To Be Tested
+************
 automate management of single track if dispatcher all or dispatcher cliveden/martinsville:
     EB train entering B11 or B21 or leaves COSCLW
     WB train entering C23, C12 or leaving BOSE
@@ -15,7 +21,26 @@ automate management of single track if dispatcher all or dispatcher cliveden/mar
 cliff fleeting - physical lever controls martinsville, cliveden and green mountain - NOT SHEFFIELD
 when the cliff control is set to all, cliff controls everything.
 When it is set to dispatch all, the dispatcher controls everything
-When set to dispatcher controls bank/cliveden, cliff only controls sheffield, green mountain, and cliveden.  Dispatcher controls single track and martinsville/bank
+When set to dispatcher controls bank/cliveden, cliff only controls sheffield, green mountain, and cliveden.  Dispatcher controls single track (and it's end OSes) and martinsville/bank
 
 
-modify notification of train routing into an invalid block to be settable on a train by train basis instead ob being global
+
+
+To Be designed/Implemented
+**************************
+
+revisit locale.  In ini file:
+    locale=...
+
+    Dispatcher and satellite see all without consideration of ini file entries
+
+    Displays only see if showevents or showadvice are set to true and the following:
+        if locale is specified, they only see messages marked with that locale
+        otherwise they see everything
+
+inspection interface
+     look into signal lever position.  For some locales, we should probably reverse L/R on this screen
+        cliff and yard seem to be ok, but nassau and port are reversed.  I think all of them are backwards, and the
+        cliff and yard should be reversed on the display.  I really need to verify actual operation with what I see in the software
+
+
