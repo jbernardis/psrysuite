@@ -1291,49 +1291,49 @@
       },
       {
         "block": "P41",
+        "signal": "PB2R",
         "os": "POSSJ1",
         "route": "PRtP30P41",
-        "signal": "PB4R",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "P42",
+        "signal": "PB12R",
         "os": "POSCJ2",
         "route": "PRtP41P42",
-        "signal": "PB12R",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "N25",
+        "signal": "S16R",
         "os": "SOSHJE",
         "route": "SRtP42N25",
-        "signal": "S16R",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "N21",
+        "signal": "K4R",
         "os": "KOSM",
         "route": "KRtN25N21",
-        "signal": "K4R",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "N41",
+        "signal": "N14R",
         "os": "NWOSE",
         "route": "NRtN21N41",
-        "signal": "N14R",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "R10",
+        "signal": "N24RB",
         "os": "NEOSRH",
         "route": "NRtR10N41",
-        "signal": "N24RB",
         "time": 5000,
         "trigger": "Front"
       }
@@ -1442,41 +1442,41 @@
       },
       {
         "block": "P30",
+        "signal": "PB4L",
         "os": "POSSJ1",
         "route": "PRtP30P41",
-        "signal": "PB2L",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "P50",
+        "signal": "PA32RB",
         "os": "POSPJ2",
         "route": "PRtP30P50",
-        "signal": "PA32RB",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "Y11",
+        "signal": "Y4RA",
         "os": "YOSCJW",
         "route": "YRtY11P50",
-        "signal": "Y4RA",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "Y10",
+        "signal": "Y8R",
         "os": "YOSEJW",
         "route": "YRtY10Y11",
-        "signal": "Y8R",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "Y60",
+        "signal": "Y22R",
         "os": "YOSKL3",
         "route": "YRtY10Y60",
-        "signal": "Y22R",
         "time": 5000,
         "trigger": "Front"
       }
@@ -1791,41 +1791,41 @@
       },
       {
         "block": "P41",
+        "signal": "PB2R",
         "os": "POSSJ1",
         "route": "PRtP30P41",
-        "signal": "PB4R",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "P42",
+        "signal": "PB12R",
         "os": "POSCJ2",
         "route": "PRtP41P42",
-        "signal": "PB12R",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "N25",
+        "signal": "S16R",
         "os": "SOSHJE",
         "route": "SRtP42N25",
-        "signal": "S16R",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "N21",
+        "signal": "K4R",
         "os": "KOSM",
         "route": "KRtN25N21",
-        "signal": "K4R",
         "time": 5000,
         "trigger": "Front"
       },
       {
         "block": "N31",
+        "signal": "N14R",
         "os": "NWOSE",
         "route": "NRtN21N31",
-        "signal": "N14R",
         "time": 5000,
         "trigger": "Front"
       }

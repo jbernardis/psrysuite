@@ -89,6 +89,8 @@ class InspectDlg(wx.Dialog):
 
     def OnBProxies(self, _):
         pi = self.parent.GetOSProxyInfo()
+        if pi is None:
+            pi = []
         dlg = OSProxyDlg(self, pi, self.parent.GetOSProxyInfo)
         dlg.ShowModal()
         dlg.Destroy()
@@ -101,8 +103,10 @@ class InspectDlg(wx.Dialog):
 
     def GetRelayValues(self):
         rl = self.parent.Get("stoprelays", {})
+        if rl is None:
+            return []
         relayList = ["%-6.6s   %s" % (self.formatRelayName(rly), str(rl[rly])) for rly in sorted(rl.keys())]
-        return "\n".join(relayList)
+        return relayList
 
     def formatRelayName(self, rn):
         return rn.split(".")[0]
@@ -115,8 +119,11 @@ class InspectDlg(wx.Dialog):
 
     def GetSignalLeverValues(self):
         sl = self.parent.Get("signallevers", {})
+        if sl is None:
+            return []
+
         leverList = ["%-6.6s   %s" % (lvr, self.formatSigLvr(sl[lvr])) for lvr in sorted(sl.keys())]
-        return "\n".join(leverList)
+        return leverList
 
     def formatSigLvr(self, data):
         dl = 0 if data[0] is None else data[0]
@@ -142,13 +149,15 @@ class InspectDlg(wx.Dialog):
 
     def GetHandswitchValues(self):
         hsinfo = self.parent.GetHandswitchInfo()
+        if hsinfo is None:
+            return []
         hsList = ["%-9.9s   %s" % (hs, str(hsinfo[hs])) for hs in sorted(hsinfo.keys())]
-        return "\n".join(hsList)
+        return hsList
 
     def OnBResetBlks(self, _):
         resetList = []
         blks = sorted([bn for bn, blk in self.parent.blocks.items() if (blk.IsCleared() and bn not in skipBlocks)])
-        dlg = CheckListDlg(self, blks, "Chooce Block(s) to reset")
+        dlg = CheckListDlg(self, blks, "Choose Block(s) to reset")
         rc = dlg.ShowModal()
         if rc == wx.ID_OK:
             resetList = dlg.GetCheckedItems()
@@ -334,7 +343,7 @@ class ListDlg(wx.Dialog):
 
         font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
 
-        lb = wx.TextCtrl(self, wx.ID_ANY, value=data, size=sz, style=wx.TE_READONLY + wx.TE_MULTILINE)
+        lb = wx.ListBox(self, wx.ID_ANY, choices=data, size=sz, style=wx.LC_REPORT)
         lb.SetFont(font)
         vszr.Add(lb, 1, wx.ALL, 20)
         self.lb = lb
@@ -352,13 +361,14 @@ class ListDlg(wx.Dialog):
         self.CenterOnScreen()
 
     def onBRefresh(self, _):
+        top = self.lb.GetTopItem()
         r = self.cbRefresh()
         if r is None:
             return
 
         self.lb.Clear()
-        self.lb.SetValue(r)
-
+        self.lb.SetItems(r)
+        self.lb.SetFirstItem(top)
 
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)

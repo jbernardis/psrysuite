@@ -181,7 +181,7 @@
       "sbwest": "D11.W"
     },
     "D20": {
-      "east": 0,
+      "east": 1,
       "sbeast": "D20.E",
       "sbwest": null
     },

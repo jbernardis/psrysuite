@@ -1,5 +1,6 @@
 import wx
 from dispatcher.constants import BlockName
+from dispatcher.block import formatRouteDesignator
 
 BUTTONSIZE = (90, 30)
 COLSIG = 100
@@ -12,6 +13,7 @@ class RouteTrainDlg(wx.Dialog):
 		self.parent = parent
 		self.train = train
 		self.trinfo = trinfo
+		self.isDispatcher = isDispatcher
 		self.sequence = trinfo["sequence"]
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		
@@ -22,6 +24,9 @@ class RouteTrainDlg(wx.Dialog):
 		self.bmpArrow = self.parent.bitmaps.arrow
 		self.bmpClear = self.parent.bitmaps.clear
 		self.lastStepx = None
+
+		self.goodBlocks = [step["block"] for step in self.sequence]
+		self.goodOSs = [formatRouteDesignator(step["route"]) for step in self.sequence]
 
 		vsz = wx.BoxSizer(wx.VERTICAL)
 
@@ -49,22 +54,28 @@ class RouteTrainDlg(wx.Dialog):
 			vsz.Add(self.AddLine(step["signal"], step["os"], step["route"], step["block"]))
 			
 		vsz.AddSpacer(20)
-		
-		if isDispatcher:
-			hsz = wx.BoxSizer(wx.HORIZONTAL)
-		
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+
+		if self.isDispatcher:
 			self.bRoute = wx.Button(self, wx.ID_ANY, "Set Route", size=BUTTONSIZE)
-			self.Bind(wx.EVT_BUTTON, self.OnBRoute, self.bRoute);
+			self.Bind(wx.EVT_BUTTON, self.OnBRoute, self.bRoute)
 			hsz.Add(self.bRoute)
 			
-			hsz.AddSpacer(50)
+			hsz.AddSpacer(30)
 			
 			self.bSignal = wx.Button(self, wx.ID_ANY, "Set Signal", size=BUTTONSIZE)
-			self.Bind(wx.EVT_BUTTON, self.OnBSignal, self.bSignal);
+			self.Bind(wx.EVT_BUTTON, self.OnBSignal, self.bSignal)
 			hsz.Add(self.bSignal)
-			
-			vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
-			vsz.AddSpacer(10)
+
+			hsz.AddSpacer(30)
+
+		self.bRefresh = wx.Button(self, wx.ID_ANY, "Refresh", size=BUTTONSIZE)
+		self.Bind(wx.EVT_BUTTON, self.OnBRefresh, self.bRefresh)
+		hsz.Add(self.bRefresh)
+
+		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		vsz.AddSpacer(10)
 		
 		self.msg = wx.StaticText(self, wx.ID_ANY, "                                      ")
 		self.msg.SetFont(self.font)
@@ -82,7 +93,6 @@ class RouteTrainDlg(wx.Dialog):
 		self.Layout()
 		self.Fit()
 		self.CenterOnScreen()
-
 
 	def OnBRoute(self, evt):
 		if self.lastStepx is None:
@@ -118,45 +128,46 @@ class RouteTrainDlg(wx.Dialog):
 		
 		if not rc or (rc and msg is not None):
 			self.parent.PopupEvent(msg)
+
+	def OnBRefresh(self, _):
+		self.DetermineTrainPosition()
 		
 	def UpdateTrainStatus(self):
 		self.DetermineTrainPosition()
 		
 	def DetermineTrainPosition(self):
-		'''
-		find the furthest forward block
-		'''
-		trainBlocks = self.train.GetBlockList()
-		stepx = 0
-		found = False
-		i = 1
-		for step in self.sequence:
-			if step["block"] in trainBlocks or step["os"] in trainBlocks:
-				stepx = i
-				found = True
-			elif found:
-				break
-			i += 1
-	
-		# if the train is in the last block, and if the last block is the same as the start block, and the train
-		# is not in the next to last block, then put the train in the first block
-		
-		if stepx == len(self.sequence) and self.trinfo["startblock"] == self.sequence[-1]["block"] and self.sequence[-2]["block"] not in trainBlocks:
-			stepx = 0
-			
-		if stepx == 0 and self.trinfo["startblock"] not in trainBlocks:
-			stepx = None
+		fb = self.train.FrontBlock()
+		if fb is None:
+			self.ClearArrow(self.lastStepx)
+			self.msg.SetLabel("")
+			return
+
+		fbn = fb.GetRouteDesignator()
+		try:
+			stepx = self.goodBlocks.index(fbn)+1
+		except ValueError:
+			try:
+				stepx = self.goodOSs.index(fbn)+1
+			except ValueError:
+				stepx = None
+
+		if self.lastStepx is not None:
+			self.ClearArrow(self.lastStepx)
+
+		if stepx is None:
 			self.msg.SetLabel("Train is in unexpected block")
+			if self.isDispatcher:
+				self.bRoute.Enable(False)
+				self.bSignal.Enable(False)
 		else:
 			self.msg.SetLabel("")
-			if stepx != self.lastStepx:
-				self.SetArrow(stepx)
-			
-		if stepx != self.lastStepx:
-			self.ClearArrow(self.lastStepx)
-			
+			self.SetArrow(stepx)
+			if self.isDispatcher:
+				self.bRoute.Enable(True)
+				self.bSignal.Enable(True)
+
 		self.lastStepx = stepx
-		
+
 	def SetArrow(self, sx):
 		if sx is None:
 			return

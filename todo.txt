@@ -28,16 +28,6 @@ When set to dispatcher controls bank/cliveden, cliff only controls sheffield, gr
 
 To Be designed/Implemented
 **************************
-
-revisit locale.  In ini file:
-    locale=...
-
-    Dispatcher and satellite see all without consideration of ini file entries
-
-    Displays only see if showevents or showadvice are set to true and the following:
-        if locale is specified, they only see messages marked with that locale
-        otherwise they see everything
-
 inspection interface
      look into signal lever position.  For some locales, we should probably reverse L/R on this screen
         cliff and yard seem to be ok, but nassau and port are reversed.  I think all of them are backwards, and the

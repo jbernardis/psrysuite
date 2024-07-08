@@ -2915,8 +2915,12 @@ class MainFrame(wx.Frame):
 		if seq is None:
 			return None, None
 
-		blist = [s["route"] for s in seq]
+		blist = [s["block"] for s in seq]
 		if rtnm not in blist:
+			return None, None
+
+		rlist = [s["route"] for s in seq]
+		if rtnm not in rlist:
 			incorrectRoute = formatRouteDesignator(rtnm)
 			if not silent:
 				self.PopupEvent("Train %s: incorrect route beyond signal %s: %s" % (trid, signm, incorrectRoute))
