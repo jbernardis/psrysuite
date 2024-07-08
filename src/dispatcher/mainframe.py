@@ -2865,21 +2865,24 @@ class MainFrame(wx.Frame):
 
 		trid = tr.GetName()
 		signm = sig.GetName()
+
+		if trid not in self.trainList:
+			return None, None
+
 		currentSig, currentAspect, fa = tr.GetSignal()
 		if fa is not None:
 			currentAspect = fa
+
+		if currentAspect is None:
+			return None, None
 
 		if not ignoreunchangedsignal:
 			if currentSig is None:
 				changedSignal = True
 			else:
 				changedSignal = currentSig.GetName() != signm or currentAspect != sig.GetAspect()
-
 			if not changedSignal:
 				return None, None
-
-		if trid not in self.trainList:
-			return None, None
 
 		aspect = sig.GetAspect()
 		if aspect == 0:
@@ -2887,11 +2890,13 @@ class MainFrame(wx.Frame):
 
 		blk = tr.FrontBlock()
 		if blk is not None:
+			blknm = blk.GetName()
 			if blk.GetEast():
 				nb = blk.GetAdjacentBlocks()[0]
 			else:
 				nb = blk.GetAdjacentBlocks()[1]
 		else:
+			blknm = None
 			nb = None
 
 		if nb is None:
@@ -2916,7 +2921,7 @@ class MainFrame(wx.Frame):
 			return None, None
 
 		blist = [s["block"] for s in seq]
-		if rtnm not in blist:
+		if blknm not in blist:
 			return None, None
 
 		rlist = [s["route"] for s in seq]

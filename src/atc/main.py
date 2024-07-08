@@ -460,26 +460,26 @@ class MainFrame(wx.Frame):
 					self.osList[blknm].SetActiveRoute(rtnm)
 
 			elif cmd == "settrain":
-				for p in parms:
-					block = p["block"]
-					name = p["name"]
-					loco = p["loco"]
-					try:
-						east = p["east"]
-					except KeyError:
-						east = True
+				blocks = parms["blocks"]
+				name = parms["name"]
+				loco = parms["loco"]
+				try:
+					east = parms["east"]
+				except KeyError:
+					east = True
 
-					if name is None:
-						self.blocks[block].SetTrain(None, None)
-					else:
-						if name not in self.trains:
-							self.trains[name] = Train(self, name, loco)
+				if name is None:
+					for b in blocks:
+						self.blocks[b].SetTrain(None, None)
+				else:
+					if name not in self.trains:
+						self.trains[name] = Train(self, name, loco)
 
-						self.trains[name].AddBlock(block)
-						self.trains[name].SetEast(east)
-						self.blocks[block].SetDirection(east)
-
-						self.blocks[block].SetTrain(name, loco)
+					self.trains[name].SetEast(east)
+					for b in blocks:
+						self.trains[name].AddBlock(b)
+						self.blocks[b].SetDirection(east)
+						self.blocks[b].SetTrain(name, loco)
 						
 			elif cmd == "trainsignal":
 				print("ATC TrainSignal command: %s" % str(parms), flush=True)
