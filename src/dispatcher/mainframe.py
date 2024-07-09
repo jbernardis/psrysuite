@@ -1718,9 +1718,10 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 		
 		if rc == wx.ID_CUT:	 # split train in 2
-			bname = blk.GetName()	
-			blockDict = tr.GetBlockList()					
-			blockList = [b for b in blockDict.keys()]   # if b != bname]
+			blockDict = tr.GetBlockList()
+			blockOrder = tr.GetBlockOrderList()
+			blockList = list(reversed([blockDict[b].GetRouteDesignator() for b in blockOrder]))
+			routeMap = {blockDict[b].GetRouteDesignator(): b for b in blockOrder}
 			if len(blockList) == 1:
 				dlg = wx.MessageDialog(self, "Train occupies only 1 block", "Unable to split train", wx.OK | wx.ICON_INFORMATION)
 				dlg.ShowModal()
@@ -1731,7 +1732,7 @@ class MainFrame(wx.Frame):
 			dlg.CenterOnScreen()
 			lrc = dlg.ShowModal()
 			if lrc == wx.ID_OK:
-				blist = dlg.GetResults()
+				blist = list(reversed(dlg.GetResults()))
 			dlg.Destroy()
 			
 			if lrc != wx.ID_OK:
@@ -1747,8 +1748,9 @@ class MainFrame(wx.Frame):
 			
 			newTr.SetBeingEdited(True)
 			
-			for bn in blist:
-				b = blockDict[bn]							
+			for rn in blist:
+				bn = routeMap[rn]
+				b = blockDict[bn]
 				tr.RemoveFromBlock(b)
 				newTr.AddToBlock(b, 'front')
 				b.SetTrain(newTr)

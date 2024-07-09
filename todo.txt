@@ -2,8 +2,6 @@ Pondering/Future
 ****************
 ar/atc - ??get rid of checkboxes and have always on???
 
-retire/get rid of tracker????
-
 modify notification of train routing into an invalid block to be settable on a train by train basis instead of being global
 
 when committing to python 3.12, make sure to update requirements.txt for correct version of wxPython(4.2.1 instead of 4.2.0)
