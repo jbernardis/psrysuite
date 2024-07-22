@@ -17,7 +17,7 @@ from dispatcher.district import Districts, CrossingEastWestBoundary
 from dispatcher.trackdiagram import TrackDiagram
 from dispatcher.tile import loadTiles
 from dispatcher.train import Train
-from dispatcher.trainlist import ActiveTrainList
+from dispatcher.trainlist import ActiveTrainList, YardBlocks
 from dispatcher.losttrains import LostTrains, LostTrainsRecoveryDlg
 from dispatcher.routetraindlg import RouteTrainDlg
 from dispatcher.inspectdlg import InspectDlg
@@ -2910,6 +2910,18 @@ class MainFrame(wx.Frame):
 		if nb.GetRoute() is None:
 			return None, None
 
+		rt = nb.GetRoute()
+		if rt is None:
+			return None, None
+
+		nextBlk = rt.GetExitBlock()
+		if nextBlk is not None and nextBlk in YardBlocks:
+			"""
+			possibility here - if we do not want to check for incorrect block entry when we are coming into a yerd
+			then we should return None, None here
+			"""
+			pass
+
 		rtnm = nb.GetRouteName()
 		if rtnm is None:
 			return None, None
@@ -3077,7 +3089,16 @@ class MainFrame(wx.Frame):
 				blk.SetEast(east)
 
 			tr.AddToBlock(blk, action)
-			if self.IsDispatcherOrSatellite() and self.settings.dispatcher.notifyinvalidblocks and not name.startswith("??"):
+			"""
+			check to see if the train is in an unexpected block unless:
+			- we are not the dispatcher or a satellite
+			- the option to do this check is turned off
+			- this is an unknown train, or
+			- this block is inside a yard - to allow the yard operator flexibility
+			
+			note that this check is bypassed later if the train, even though it's a known train, does not have a defined block sequence
+			"""
+			if self.IsDispatcherOrSatellite() and self.settings.dispatcher.notifyinvalidblocks and not name.startswith("??") and block not in YardBlocks:
 				try:
 					seq = self.trainList[name]["sequence"]
 					sb =  self.trainList[name]["startblock"]

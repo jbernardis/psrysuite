@@ -19,7 +19,7 @@ class Shore (District):
 			if not callon:
 				if signm in ["S12R", "S12LA", "S12LB", "S12LC", "S4R", "S4LA", "S4LB", "S4LC" ]:
 					if osblk.IsBusy():
-						self.ReportOSBusy(osblk.GetName())
+						self.ReportOSBusy(osblk.GetRouteDesignator())
 						return False
 			return District.PerformSignalAction(self, sig, callon=callon)
 
@@ -28,7 +28,7 @@ class Shore (District):
 		movement = aspect == 0  # do we want the signal to allow movement
 		if movement:
 			if osblk.IsBusy() or self.blocks["SOSW"].IsBusy() or self.blocks["SOSE"].IsBusy():
-				self.ReportOSBusy(osblk.GetName())
+				self.ReportOSBusy(osblk.GetRouteDesignator())
 				return False
 			aspect = RESTRICTING
 		else:  # stopping
@@ -81,13 +81,15 @@ class Shore (District):
 		if source == "ctc":
 			if signame == "S8.lvr":
 				for osname in ["SOSE", "SOSW"]:
-					if self.blocks[osname].IsBusy():
-						self.ReportOSBusy(osname)
+					osblk = self.blocks[osname]
+					if osblk.IsBusy():
+						self.ReportOSBusy(osblk.GetRouteDesignator())
 						return False
 
 			elif signame in ["S12.lvr", "S4.lvr"]:
-				if self.blocks["SOSHF"].IsBusy():
-					self.ReportOSBusy("SOSHF")
+				osblk = self.blocks["SOSHF"]
+				if osblk.IsBusy():
+					self.ReportOSBusy(osblk.GetRouteDesignator())
 					return False
 
 		return District.DoSignalLeverAction(self, signame, state, callon, silent, source)

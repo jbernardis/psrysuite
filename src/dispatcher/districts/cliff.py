@@ -106,7 +106,7 @@ class Cliff (District):
 		if osBlkNm:
 			osBlk = self.blocks[osBlkNm]
 			if osBlk.IsBusy():
-				self.ReportBlockBusy(osBlkNm)
+				self.ReportBlockBusy(osBlk.GetRouteDesignator())
 				return
 
 			btn.Press(refresh=True)

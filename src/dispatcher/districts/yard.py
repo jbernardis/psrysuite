@@ -124,7 +124,7 @@ class Yard (District):
 			osBlk = rte.GetOS()
 			osname = osBlk.GetName()
 			if osBlk.IsBusy():
-				self.ReportBlockBusy(osname)
+				self.ReportBlockBusy(osBlk.GetRouteDesignator())
 				return
 
 			btn.Press(refresh=True)

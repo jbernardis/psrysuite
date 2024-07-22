@@ -293,14 +293,14 @@ class District:
 		
 		if osblk.IsOccupied():
 			if not silent:
-				self.frame.PopupEvent("Block %s is busy" % osblk.GetName())
+				self.frame.PopupEvent("Block %s is busy" % osblk.GetRouteDesignator())
 			logging.debug("Unable to calculate aspect: OS Block is busy")
 			return None
 		
 		currentDirection = sig.GetEast()
 		if currentDirection != osblk.GetEast() and osblk.IsCleared():
 			if not silent:
-				self.frame.PopupEvent("Block %s is cleared in opposite direction" % osblk.GetName())
+				self.frame.PopupEvent("Block %s is cleared in opposite direction" % osblk.GetRouteDesignator())
 			logging.debug("Unable to calculate aspect: Block %s is cleared in opposite direction" % osblk.GetName())
 			return None
 		
@@ -310,7 +310,7 @@ class District:
 		exitBlk = self.frame.blocks[exitBlkNm]
 		if exitBlk.IsOccupied():
 			if not silent:
-				self.frame.PopupEvent("Block %s is busy" % exitBlk.GetName())
+				self.frame.PopupEvent("Block %s is busy" % exitBlk.GetRouteDesignator())
 			logging.debug("Unable to calculate aspect: Block %s is busy" % exitBlkNm)
 			return None
 
@@ -320,13 +320,13 @@ class District:
 		if exitBlk.IsCleared():
 			if exitBlk.GetEast() != currentDirection:
 				if not silent or True:
-					self.frame.PopupEvent("Block %s is cleared in opposite direction" % exitBlk.GetName())
+					self.frame.PopupEvent("Block %s is cleared in opposite direction" % exitBlk.GetRouteDesignator())
 				logging.debug("Unable to calculate aspect: Block %s cleared in opposite direction" % exitBlkNm)
 				return None
 
 		if exitBlk.AreHandSwitchesSet() and not self.frame.sidingsUnlocked:
 			if not silent:
-				self.frame.PopupEvent("Block %s is locked" % exitBlk.GetName())
+				self.frame.PopupEvent("Block %s is locked" % exitBlk.GetRouteDesignator())
 			logging.debug("Unable to calculate aspect: Block %s is locked" % exitBlkNm)
 			return None
 		
