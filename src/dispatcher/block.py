@@ -445,8 +445,11 @@ class Block:
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
-				req = {"settrain": { "blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0",
-									"action": REAR if rear else FRONT}}
+				stParams =  { "blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0", "action": REAR if rear else FRONT}
+				rt = tr.GetChosenRoute()
+				if rt is not None:
+					stParams["route"] = rt
+				req = {"settrain": stParams}
 				self.frame.Request(req)
 			if refresh:
 				self.Draw()
@@ -480,8 +483,11 @@ class Block:
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
-				req = {"settrain": { "blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0",
-									"action": REAR if rear else FRONT}}
+				stParams = { "blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0", "action": REAR if rear else FRONT}
+				rt = tr.GetChosenRoute()
+				if rt is not None:
+					stParams["route"] = rt
+				req = {"settrain": stParams}
 				self.frame.Request(req)
 		else:
 			for b in [self.sbEast, self.sbWest]:

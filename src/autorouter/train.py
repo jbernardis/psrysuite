@@ -5,6 +5,7 @@ class Train:
 		self.loco = loco
 		self.blocks = []
 		self.east = True
+		self.chosenRoute = None
 
 	def AddBlock(self, block):
 		if block in self.blocks:
@@ -40,3 +41,9 @@ class Train:
 			self.parent.TrainTailInBlock(self.name, self.blocks[0])
 
 		return len(self.blocks)
+
+	def SetChosenRoute(self, rtnm):
+		self.chosenRoute = rtnm
+
+	def GetChosenRoute(self):
+		return self.chosenRoute

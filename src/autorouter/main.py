@@ -187,6 +187,11 @@ class MainUnit:
 					except KeyError:
 						east = True
 
+					try:
+						route = parms["route"]
+					except KeyError:
+						route = None
+
 					if name is None:
 						self.blocks[block].SetTrain(None, None)
 					else:
@@ -194,6 +199,7 @@ class MainUnit:
 							self.trains[name] = Train(self, name, loco)
 
 						self.trains[name].SetEast(east)
+						self.trains[name].SetChosenRoute(route)
 						self.blocks[block].SetEast(east)
 
 						if not nameonly: # this prevents us from setting up a route request for changes to name/direction only
@@ -292,12 +298,13 @@ class MainUnit:
 			
 	def AddTrain(self, train):
 		if train not in self.trains:
+			logging.info("Train %s is not in our list" % train)
 			return  # unknown train - skip
 		
 		logging.info("Adding train %s to AR" % train)
 		if train not in self.ARTrains:
 			self.ARTrains.append(train)
-			self.triggers.AddTrain(train)
+			self.triggers.AddTrain(train, route=self.trains[train].GetChosenRoute())
 			
 		tr = self.trains[train]
 		block = tr.GetLatestBlock()

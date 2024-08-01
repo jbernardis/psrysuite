@@ -6,11 +6,11 @@ class LostTrains:
 	def __init__(self):
 		self.trains = {}
 		
-	def Add(self, train, loco, engineer, east, block):
+	def Add(self, train, loco, engineer, east, block, route):
 		if train.startswith("??"):
 			return False
 		
-		self.trains[train] = (loco, engineer, east, block)
+		self.trains[train] = (loco, engineer, east, block, route)
 		return True
 		
 	def Remove(self, train):
@@ -28,7 +28,7 @@ class LostTrains:
 		return self.trains[tid]
 	
 	def GetList(self):
-		return [(train, info[0], info[1], info[2], info[3]) for train, info in self.trains.items()]
+		return [(train, info[0], info[1], info[2], info[3], info[4]) for train, info in self.trains.items()]
 	
 	def Count(self):
 		return len(self.trains)
@@ -52,7 +52,7 @@ class LostTrainsDlg(wx.Dialog):
 		
 		vsz.AddSpacer(20)
 		
-		st = wx.StaticText(self, wx.ID_ANY, 'Train / Dir / Loco / Engineer / Block')
+		st = wx.StaticText(self, wx.ID_ANY, 'Train / Dir / Loco / Engineer / Block / Route')
 		vsz.Add(st, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
 		vsz.AddSpacer(10)
@@ -110,7 +110,7 @@ class LostTrainsDlg(wx.Dialog):
 		
 	def DetermineChoices(self):
 		self.trainNames =  [t[0] for t in self.lostTrains.GetList() if t[0] not in self.pendingDeletions]
-		return ["%s / %s / %s / %s / %s" % (t[0], "E" if t[3] else "W", t[1], t[2], t[4]) for t in self.lostTrains.GetList() if t[0] not in self.pendingDeletions]
+		return ["%s / %s / %s / %s / %s / %s" % (t[0], "E" if t[3] else "W", t[1], t[2], t[4], t[5]) for t in self.lostTrains.GetList() if t[0] not in self.pendingDeletions]
 	
 	def DoPendingRemoval(self):
 		for tname in self.pendingDeletions:
@@ -196,7 +196,7 @@ class LostTrainsRecoveryDlg(wx.Dialog):
 		vsz.AddSpacer(20)
 		
 		vszl = wx.BoxSizer(wx.VERTICAL)
-		st = wx.StaticText(self, wx.ID_ANY, 'Train / Dir / Loco / Engineer / Block')
+		st = wx.StaticText(self, wx.ID_ANY, 'Train / Dir / Loco / Engineer / Block / Route')
 		vszl.Add(st, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		
 		vszl.AddSpacer(10)
@@ -303,7 +303,7 @@ class LostTrainsRecoveryDlg(wx.Dialog):
 		
 	def DetermineChoices(self):
 		self.trainNames =  [t[0] for t in self.lostTrains]
-		return ["%s / %s / %s / %s / %s" % (t[0], "E" if t[3] else "W", t[1], t[2], t[4]) for t in self.lostTrains]
+		return ["%s / %s / %s / %s / %s / %s" % (t[0], "E" if t[3] else "W", t[1], t[2], t[4], t[5]) for t in self.lostTrains]
 	
 	def ApplyBlockFilter(self, blocks):
 		for idx in range(len(self.lostTrains)):

@@ -1,7 +1,7 @@
 import wx
 import os
 from glob import glob
-from tracker.schedule import Schedule
+from traineditor.trntracker.schedule import Schedule
 
 BTNSZ = (120, 46)
 wildcardJson = "JSON file (*.json)|*.json|"	 \

@@ -707,7 +707,6 @@ class ServerMain:
 			if east is not None:
 				self.trainList.SetEast(trid, east)
 
-			print("calling update BO(%s, %s)" % (trid, str(blocks)))
 			self.trainList.UpdateTrainBlockOrder(trid, blocks)
 
 			p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
@@ -742,6 +741,14 @@ class ServerMain:
 			action = cmd["action"][0]
 		except (IndexError, KeyError):
 			action = REPLACE
+		try:
+			route = cmd["route"][0]
+		except (IndexError, KeyError):
+			route = None
+		try:
+			silent = True if cmd["silent"][0] == "1" else False
+		except (IndexError, KeyError):
+			silent = True
 		blocks = cmd["blocks"]
 
 		if trn and trn.startswith("??"):
@@ -774,10 +781,13 @@ class ServerMain:
 		#self.rr.OccupyBlock(block, 0 if trn is None else 1)
 		
 		# train information is always echoed back to all listeners
-		resp = {"settrain": {"name": trn, "loco": loco, "blocks": blocks, "east": east, "action": action}}
+		stParams = {"name": trn, "loco": loco, "blocks": blocks, "east": east, "action": action, "silent": silent}
+		if route is not None:
+			stParams["route"] = route
+		resp = {"settrain": stParams}
 		self.socketServer.sendToAll(resp)
 
-		self.trainList.Update(trn, loco, blocks, east, action)
+		self.trainList.Update(trn, loco, blocks, east, action, route=route)
 		
 	def DoMoveTrain(self, cmd): #"movetrain":
 		try:
@@ -829,6 +839,10 @@ class ServerMain:
 		except (IndexError, KeyError):
 			oloco = None
 		try:
+			oroute = cmd["oldroute"][0]
+		except (IndexError, KeyError):
+			oroute = None
+		try:
 			nname = cmd["newname"][0]
 		except (IndexError, KeyError):
 			nname = None
@@ -837,11 +851,15 @@ class ServerMain:
 		except (IndexError, KeyError):
 			nloco = None
 		try:
+			nroute = cmd["newroute"][0]
+		except (IndexError, KeyError):
+			nroute = None
+		try:
 			east = cmd["east"][0] == "1"
 		except (IndexError, KeyError):
 			east = None
 
-		if self.trainList.RenameTrain(oname, nname, oloco, nloco, east):
+		if self.trainList.RenameTrain(oname, nname, oloco, nloco, oroute, nroute, east):
 			for cmd in self.trainList.GetSetTrainCmds(nname, nameonly=True):
 				self.socketServer.sendToAll(cmd)
 

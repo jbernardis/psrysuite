@@ -9,9 +9,10 @@ class Triggers:
 		self.trainSeq = trainSeq
 		self.triggerTable = {}
 			
-	def AddTrain(self, trid):
-		tr = self.trainSeq.GetTrainById(trid)
-		trid, script = GenerateAR(tr, None)
+	def AddTrain(self, trid, route=None):
+		rttr = trid if route is None else route
+		tr = self.trainSeq.GetTrainById(rttr)
+		_, script = GenerateAR(tr, None)
 		self.triggerTable[trid] = script
 		
 	def RemoveTrain(self, trid):

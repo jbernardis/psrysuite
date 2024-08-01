@@ -16,8 +16,6 @@ def GenerateAR(tr, blks):
 
 	return trainid, script
 
-
-
 		
 def GenerateSim(tr, layout):
 	locoid = 0

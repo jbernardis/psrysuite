@@ -46,6 +46,7 @@ class Train:
 		self.engineer = None
 		self.beingEdited = False
 		self.time = None
+		self.chosenRoute = None
 		
 	def SetTime(self, t):
 		self.time = t
@@ -72,6 +73,7 @@ class Train:
 		return { "name": self.name, 
 			"loco": self.loco,
 			"east": self.east,
+			"route": self.chosenRoute,
 			"blocks": self.blockOrder }
 		
 	def blockInfo(self):
@@ -135,6 +137,12 @@ class Train:
 	def GetName(self):
 		return self.name
 
+	def GetChosenRoute(self):
+		return self.chosenRoute
+
+	def SetChosenRoute(self, rt):
+		self.chosenRoute = rt
+
 	def GetLoco(self):
 		return self.loco
 	
@@ -161,6 +169,12 @@ class Train:
 				bnl.append(bn)
 
 		return bnl
+
+	def GetSetTrainCommand(self):
+		stParams = {"blocks": self.blockOrder, "name": self.name, "loco": self.loco, "atc": self.atc, "east": self.east}
+		if self.chosenRoute is not None:
+			stParams["route"] = self.chosenRoute
+		return {"settrain": stParams}
 
 	def GetDesignatorMap(self):
 		dmap = {}

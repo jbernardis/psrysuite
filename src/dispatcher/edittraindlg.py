@@ -26,7 +26,8 @@ class EditTrainDlg(wx.Dialog):
 		self.block = block
 		
 		self.startingEast = train.GetEast()
-		
+		self.chosenRoute = train.GetChosenRoute()
+
 		self.locos = locos
 		self.trains = trains
 		self.noEngineer = "<none>"
@@ -34,22 +35,39 @@ class EditTrainDlg(wx.Dialog):
 		self.lostTrains = lostTrains
 		
 		locoList  = sorted(list(locos.keys()), key=self.BuildLocoKey)
-		trainList = sorted(list(trains.keys()))
-			
+		self.trainList = sorted(list(trains.keys()))
+		self.trainsWithSeq = [k for k in self.trainList if "sequence" in self.trains[k] and len(self.trains[k]["sequence"]) > 0]
+
 		font = wx.Font(wx.Font(16, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
 
 		lblTrain = wx.StaticText(self, wx.ID_ANY, "Train:", size=(120, -1))
 		lblTrain.SetFont(font)
 		self.cbTrainID = wx.ComboBox(self, wx.ID_ANY, name,
-					choices=trainList,
+					choices=self.trainList,
 					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER, size=(120, -1))
 		self.cbTrainID.SetFont(font)
-		
+
+		self.cbAssignRoute = wx.CheckBox(self, wx.ID_ANY, "Choose route")
+		self.cbAssignRoute.SetFont(font)
+		self.cbAssignRoute.SetValue(self.chosenRoute is not None)
+
+		self.cbRoute = wx.ComboBox(self, wx.ID_ANY, name,
+					choices=self.trainsWithSeq,
+					style=wx.CB_DROPDOWN | wx.CB_READONLY, size=(120, -1))
+		self.cbRoute.SetFont(font)
+		try:
+			idx = self.trainsWithSeq.index(self.chosenRoute)
+		except ValueError:
+			idx = 0
+		self.cbRoute.SetSelection(idx)
+
 		self.chosenTrain = name
 		
 		self.Bind(wx.EVT_COMBOBOX, self.OnTrainChoice, self.cbTrainID)
 		self.Bind(wx.EVT_TEXT, self.OnTrainText, self.cbTrainID)
-		
+		self.Bind(wx.EVT_CHECKBOX, self.OnAssignRoute, self.cbAssignRoute)
+		self.Bind(wx.EVT_COMBOBOX, self.OnRouteChoice, self.cbRoute)
+
 		self.chosenLoco = loco
 		
 		lblLoco  = wx.StaticText(self, wx.ID_ANY, "Loco:", size=(120, -1))
@@ -91,6 +109,10 @@ class EditTrainDlg(wx.Dialog):
 		hsz.Add(lblTrain)
 		hsz.AddSpacer(10)
 		hsz.Add(self.cbTrainID)
+		hsz.AddSpacer(10)
+		hsz.Add(self.cbAssignRoute)
+		hsz.AddSpacer(5)
+		hsz.Add(self.cbRoute)
 		if lostCt > 0:
 			hsz.AddSpacer(20)
 			hsz.Add(self.bLostTrains)
@@ -231,7 +253,7 @@ class EditTrainDlg(wx.Dialog):
 			self.cbATC.Enable(self.chosenLoco != "??")
 		self.ShowTrainLocoDesc()
 		evt.Skip()
-		
+
 	def OnTrainChoice(self, evt):
 		self.chosenTrain = evt.GetString()
 		if self.chosenTrain in self.trains:
@@ -249,7 +271,20 @@ class EditTrainDlg(wx.Dialog):
 		self.chosenTrain = nm
 		self.ShowTrainLocoDesc()
 		evt.Skip()
-		
+
+	def OnAssignRoute(self, _):
+		if self.cbAssignRoute.IsChecked():
+			self.cbRoute.Enable(True)
+			self.chosenRoute = self.trainsWithSeq[0]
+			self.cbRoute.SetSelection(0)
+		else:
+			self.cbRoute.Enable(False)
+			self.chosenRoute = None
+
+	def OnRouteChoice(self, evt):
+		self.chosenRoute = evt.GetString()
+		self.ShowTrainLocoDesc()
+
 	def OnEngChoice(self, evt):
 		self.chosenEngineer = evt.GetString()
 
@@ -280,7 +315,7 @@ class EditTrainDlg(wx.Dialog):
 			self.parent.PopupEvent("Unable to identify lost train")
 			return
 
-		loco, engineer, east, _ = tr
+		loco, engineer, east, _, route = tr
 	
 		rc = wx.ID_YES		
 		if east != self.startingEast:
@@ -296,6 +331,17 @@ class EditTrainDlg(wx.Dialog):
 			self.cbTrainID.SetValue(trname)
 			self.cbLocoID.SetValue(loco)
 			self.cbEngineer.SetValue(self.noEngineer if engineer is None or engineer == "None" else engineer)
+			if route is None:
+				self.cbAssignRoute.SetValue(False)
+				self.cbRoute.SetSelection(0)
+			else:
+				self.cbAssignRoute.SetValue(True)
+				try:
+					idx = self.trainsWithSeq.index(route)
+				except ValueError:
+					idx = 0
+				self.chosenRoute = self.trainsWithSeq[idx]
+				self.cbRoute.SetSelection(idx)
 			dlg.Destroy()
 			return
 
@@ -306,23 +352,36 @@ class EditTrainDlg(wx.Dialog):
 			self.stDescr.SetLabel("")
 			
 		if self.chosenTrain in self.trains:
+			self.cbAssignRoute.Enable(False)
+			self.cbAssignRoute.SetValue(False)
+			self.cbRoute.Enable(False)
+			self.chosenRoute = None
 			tr = self.trains[self.chosenTrain]
-			track = tr["tracker"]
-			for lx in range(MAXSTEPS):
-				if lx >= len(track):
-					self.stTrainInfo[lx].SetLabel("")
-				else:
-					self.stTrainInfo[lx].SetLabel("%-12.12s  %-4.4s  %s" % (track[lx][0], "(%d)" % track[lx][2], track[lx][1]))
-					
+			self.ShowRouteDetails(tr["tracker"])
+
 			details = "Eastbound" if self.startingEast else "Westbound"
 			if tr["cutoff"]:
 				details += " via cutoff"
 			self.stFlags.SetLabel(details)
 			
 		else:
-			for st in self.stTrainInfo:
-				st.SetLabel("")
+			self.cbAssignRoute.Enable(True)
+			self.cbRoute.Enable(self.cbAssignRoute.IsChecked())
+			if self.chosenRoute is not None:
+				rtr = self.trains[self.chosenRoute]
+				self.ShowRouteDetails(rtr["tracker"])
+			else:
+				for st in self.stTrainInfo:
+					st.SetLabel("")
 			self.stFlags.SetLabel("")
+
+	def ShowRouteDetails(self, track):
+		for lx in range(MAXSTEPS):
+			if lx >= len(track):
+				self.stTrainInfo[lx].SetLabel("")
+			else:
+				self.stTrainInfo[lx].SetLabel(
+					"%-12.12s  %-4.4s  %s" % (track[lx][0], "(%d)" % track[lx][2], track[lx][1]))
 
 	def onCancel(self, _):
 		self.EndModal(wx.ID_CANCEL)
@@ -371,11 +430,15 @@ class EditTrainDlg(wx.Dialog):
 		e = self.chosenEngineer
 		if e == self.noEngineer:
 			e = None
+		if self.cbAssignRoute.IsChecked():
+			r = self.chosenRoute
+		else:
+			r = None
 			
 		atc = False if not self.atcFlag else self.cbATC.GetValue()
 		ar = False if not self.arFlag else self.cbAR.GetValue()
 
-		return t, l, e, atc, ar, self.startingEast
+		return t, l, e, atc, ar, self.startingEast, r
 
 
 class SortTrainBlocksDlg(wx.Dialog):

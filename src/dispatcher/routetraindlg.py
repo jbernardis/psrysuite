@@ -8,14 +8,18 @@ COLOS = 350
 COLBLK = 60
 
 class RouteTrainDlg(wx.Dialog):
-	def __init__(self, parent, train, trinfo, isDispatcher):
+	def __init__(self, parent, train, rtName, trinfo, isDispatcher):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.parent = parent
 		self.train = train
+		self.rtName = rtName
 		self.trinfo = trinfo
 		self.isDispatcher = isDispatcher
 		self.sequence = trinfo["sequence"]
 		self.Bind(wx.EVT_CLOSE, self.onClose)
+
+		self.colors = [ wx.Colour(225, 255, 240), wx.Colour(138, 255, 197) ]
+		self.line = 0
 		
 		self.SetTitle("Route Status")
 		
@@ -38,7 +42,10 @@ class RouteTrainDlg(wx.Dialog):
 		st.SetFont(self.font)
 		hsz.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
 		hsz.AddSpacer(10)
-		st = wx.StaticText(self, wx.ID_ANY, train.GetName())
+		trstr = train.GetName()
+		if rtName is not None:
+			trstr += " (%s)" % rtName
+		st = wx.StaticText(self, wx.ID_ANY, trstr)
 		st.SetFont(self.fontTrainID)
 		hsz.Add(st)
 		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
@@ -203,12 +210,14 @@ class RouteTrainDlg(wx.Dialog):
 		return hsz
 		
 	def AddLine(self, signame, osname, rtname, blkname):
+		color = self.colors[self.line % 2]
 		if signame is None:
 			sigst = wx.StaticText(self, wx.ID_ANY, "", size=(COLSIG, -1))
 		else:
 			sigst = wx.StaticText(self, wx.ID_ANY, signame, size=(COLSIG, -1))
 		sigst.SetFont(self.font)
-			
+		sigst.SetBackgroundColour(color)
+
 		if osname is None or rtname is None:
 			rtest = wx.StaticText(self, wx.ID_ANY, "", size=(COLOS, -1))
 		else:
@@ -218,10 +227,12 @@ class RouteTrainDlg(wx.Dialog):
 				rn = rtname
 			rtest = wx.StaticText(self, wx.ID_ANY, "%s(%s)" % (BlockName(osname), rn), size=(COLOS, -1))
 		rtest.SetFont(self.font)
+		rtest.SetBackgroundColour(color)
 			
 		blkst = wx.StaticText(self, wx.ID_ANY, blkname, size=(COLBLK, -1))
 		blkst.SetFont(self.font)
-		
+		blkst.SetBackgroundColour(color)
+
 		bmp = wx.StaticBitmap(self, wx.ID_ANY, self.bmpClear)
 		self.bmps.append(bmp)
 		
@@ -231,5 +242,7 @@ class RouteTrainDlg(wx.Dialog):
 		hsz.Add(sigst)
 		hsz.Add(rtest)
 		hsz.Add(blkst)
+
+		self.line += 1
 		
 		return hsz

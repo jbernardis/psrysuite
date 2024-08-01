@@ -13,7 +13,7 @@ class TrainList:
 		
 		self.trains[train]["atc"] = atcflag
 
-	def Update(self, train, loco, blocks, east, action):
+	def Update(self, train, loco, blocks, east, action, route=None):
 		if len(blocks) == 0:
 			return
 
@@ -51,8 +51,9 @@ class TrainList:
 				if loco:
 					self.trains[train]["loco"] = loco
 				self.trains[train]["east"] = east
+				self.trains[train]["route"] = route
 			else:
-				self.trains[train] = {"blocks": [b for b in blocks], "blockorder": [b for b in blocks], "loco": loco, "atc": False, "signal": None, "aspect": 0, "east": east}
+				self.trains[train] = {"blocks": [b for b in blocks], "blockorder": [b for b in blocks], "loco": loco, "atc": False, "signal": None, "aspect": 0, "east": east, "route": route}
 
 	def Dump(self):
 		print("==========================start of trains dump")
@@ -99,13 +100,22 @@ class TrainList:
 
 		return None
 
-	def RenameTrain(self, oname, nname, oloco, nloco, east):
+	def RenameTrain(self, oname, nname, oloco, nloco, oroute, nroute, east):
 		if oname == nname and oloco == nloco:
+			rc = False
+			try:
+				croute = self.trains[oname]["route"]
+			except KeyError:
+				croute = None
+			if nroute != croute:
+				self.trains[oname]["route"] = nroute
+				rc = True
+
 			if east is not None:
 				self.trains[oname]["east"] = east
 				return True
 			else:
-				return False
+				return rc
 			
 		if oname != nname:
 			if oname not in self.trains:
@@ -121,6 +131,8 @@ class TrainList:
 				self.trains[nname] = self.trains[oname]
 
 			del(self.trains[oname])
+
+		self.trains[nname]["route"] = nroute
 
 		if nloco is not None:
 			self.trains[nname]["loco"] = nloco
@@ -151,7 +163,10 @@ class TrainList:
 				signal = trinfo["signal"]
 				aspect = "%d" % trinfo["aspect"]
 				east = trinfo["east"]
-				yield ({"settrain": {"blocks": blocks, "name": tr, "loco": loco, "atc": atc, "east": east, "nameonly": nameflag}})
+				stParams = {"blocks": blocks, "name": tr, "loco": loco, "atc": atc, "east": east, "nameonly": nameflag}
+				if trinfo["route"] is not None:
+					stParams["route"] = trinfo["route"]
+				yield ({"settrain": stParams})
 				yield({"trainsignal": {"train": tr, "block": frontblock, "signal": signal, "aspect": aspect}})
 
 				try:
