@@ -47,7 +47,7 @@ class EditTrainDlg(wx.Dialog):
 					style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER, size=(120, -1))
 		self.cbTrainID.SetFont(font)
 
-		self.cbAssignRoute = wx.CheckBox(self, wx.ID_ANY, "Choose route")
+		self.cbAssignRoute = wx.CheckBox(self, wx.ID_ANY, "Route")
 		self.cbAssignRoute.SetFont(font)
 		self.cbAssignRoute.SetValue(self.chosenRoute is not None)
 
@@ -106,13 +106,13 @@ class EditTrainDlg(wx.Dialog):
 			self.Bind(wx.EVT_BUTTON, self.OnBLostTrains, self.bLostTrains)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
-		hsz.Add(lblTrain)
+		hsz.Add(lblTrain, 0, wx.TOP, 5)
 		hsz.AddSpacer(10)
-		hsz.Add(self.cbTrainID)
+		hsz.Add(self.cbTrainID, 0, wx.TOP, 5)
 		hsz.AddSpacer(10)
-		hsz.Add(self.cbAssignRoute)
+		hsz.Add(self.cbAssignRoute, 0, wx.TOP, 10)
 		hsz.AddSpacer(5)
-		hsz.Add(self.cbRoute)
+		hsz.Add(self.cbRoute, 0, wx.TOP, 5)
 		if lostCt > 0:
 			hsz.AddSpacer(20)
 			hsz.Add(self.bLostTrains)
