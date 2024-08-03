@@ -8642,5 +8642,146 @@
       ]
     ],
     "block": null
+  },
+  "PLW": {
+    "tracker": [
+      [
+        "Port",
+        "Cornell Jct",
+        7
+      ],
+      [
+        "Yard",
+        "East End Jct",
+        1
+      ],
+      [
+        "",
+        "Koehlstadt",
+        0
+      ],
+      [
+        "Latham",
+        "",
+        10
+      ],
+      [
+        "Dell",
+        "Loland",
+        25
+      ],
+      [
+        "Port",
+        "",
+        6
+      ]
+    ],
+    "block": null,
+    "cutoff": false,
+    "desc": "Port Loop West",
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "PT",
+      "track": "P50"
+    },
+    "terminus": {
+      "loc": "PT",
+      "track": "P32"
+    },
+    "eastbound": false,
+    "startblock": "P50",
+    "startsubblock": null,
+    "time": 5000,
+    "sequence": [
+      {
+        "block": "Y11",
+        "signal": "Y4RA",
+        "os": "YOSCJW",
+        "route": "YRtY11P50",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "Y30",
+        "signal": "Y8R",
+        "os": "YOSEJW",
+        "route": "YRtY30Y11",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "Y51",
+        "signal": "Y34L",
+        "os": "YOSKL4",
+        "route": "YRtY30Y51",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "Y20",
+        "signal": "Y26LB",
+        "os": "YOSKL1",
+        "route": "YRtY20Y51",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "Y21",
+        "signal": "Y10L",
+        "os": "YOSEJE",
+        "route": "YRtY20Y21",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "L20",
+        "signal": "Y4L",
+        "os": "YOSCJE",
+        "route": "YRtY21L20",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "L21",
+        "signal": "L6RA",
+        "os": "LOSLAM",
+        "route": "LRtL20L21",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "D20",
+        "signal": "L16R",
+        "os": "LOSCAM",
+        "route": "LRtL21D20",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "D21",
+        "signal": "D4RA",
+        "os": "DOSVJE",
+        "route": "DRtD20D21",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "S20",
+        "signal": "D10R",
+        "os": "DOSFOE",
+        "route": "DRtD21S20",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "P32",
+        "signal": "S4R",
+        "os": "SOSE",
+        "route": "SRtS20P32",
+        "time": 5000,
+        "trigger": "Front"
+      }
+    ]
   }
 }

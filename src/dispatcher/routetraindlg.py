@@ -31,6 +31,7 @@ class RouteTrainDlg(wx.Dialog):
 
 		self.goodBlocks = [step["block"] for step in self.sequence]
 		self.goodOSs = [formatRouteDesignator(step["route"]) for step in self.sequence]
+		self.startingBlock = trinfo["startblock"]
 
 		vsz = wx.BoxSizer(wx.VERTICAL)
 
@@ -156,7 +157,10 @@ class RouteTrainDlg(wx.Dialog):
 			try:
 				stepx = self.goodOSs.index(fbn)+1
 			except ValueError:
-				stepx = None
+				if fbn == self.startingBlock:
+					stepx = 0
+				else:
+					stepx = None
 
 		if self.lastStepx is not None:
 			self.ClearArrow(self.lastStepx)
@@ -166,6 +170,14 @@ class RouteTrainDlg(wx.Dialog):
 			if self.isDispatcher:
 				self.bRoute.Enable(False)
 				self.bSignal.Enable(False)
+
+		elif stepx == 0: # train is in starting block
+			self.msg.SetLabel("")
+			self.SetArrow(stepx)
+			if self.isDispatcher:
+				self.bRoute.Enable(True)
+				self.bSignal.Enable(True)
+
 		else:
 			self.msg.SetLabel("")
 			self.SetArrow(stepx)
