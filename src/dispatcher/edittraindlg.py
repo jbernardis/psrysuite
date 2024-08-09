@@ -408,7 +408,19 @@ class EditTrainDlg(wx.Dialog):
 					self.parent.StealTrainID(self.chosenTrain)
 				else:
 					return
-		
+
+		if self.cbAssignRoute.IsChecked():
+			if self.chosenRoute is not None:
+				if self.startingEast != self.trains[self.chosenRoute]["eastbound"]:
+					mdlg = wx.MessageDialog(self,  'Route is in the opposite direction from the train.\nPress "Yes" to proceed',
+									'Opposite Directions',
+									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
+									)
+					rc = mdlg.ShowModal()
+					mdlg.Destroy()
+					if rc != wx.ID_YES:
+						return
+
 		self.lostTrains.Remove(self.chosenTrain)
 		self.EndModal(wx.ID_OK)
 		

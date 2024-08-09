@@ -1884,6 +1884,20 @@ class MainFrame(wx.Frame):
 			return
 		oldChosenRoute = tr.GetChosenRoute()
 		if oldName != trainid or oldLoco != locoid or oldChosenRoute != chosenRoute:
+			if oldChosenRoute != chosenRoute and chosenRoute is not None:
+				trEast = tr.GetEast()
+				rteEast = self.trainList[chosenRoute]["eastbound"]
+				if trEast != rteEast:
+					east = rteEast
+					tr.SetEast(east)
+					tr.SetBlocksDirection()
+					tr.ReverseBlockOrder()
+					blk = tr.FrontBlock()
+					if blk is not None:
+						self.CheckTrainsInBlock(blk.GetName(), None)
+					self.activeTrains.RefreshTrain(tr.GetName())
+					self.SendTrainBlockOrder(tr)
+
 			self.Request({"renametrain": { "oldname": oldName, "newname": trainid, "oldloco": oldLoco, "newloco": locoid, "oldroute": oldChosenRoute, "newroute": chosenRoute, "east": "1" if east else "0", "context": "rename"}})
 			
 		if oldEngineer != engineer:
