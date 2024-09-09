@@ -2352,6 +2352,10 @@ class MainFrame(wx.Frame):
 					else:
 						self.PopupEvent("Block %s/Train %s in snapshot - not occupied" % (b, trid))
 
+				if len(blist) == 0:
+					self.PopupEvent("Train %s does not appear in any blocks - ignoring" % trid)
+					continue
+
 				# now if the new train does not yet exist - create it
 				if trid not in self.trains:
 					# we don't have a train of this name.  create one
