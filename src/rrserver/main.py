@@ -726,6 +726,12 @@ class ServerMain:
 
 	def DoSetTrain(self, cmd):
 		try:
+			blocks = cmd["blocks"]
+		except (IndexError, KeyError):
+			logging.error("Set train message is missing blocks - ignoring")
+			return
+
+		try:
 			trn = cmd["name"][0]
 		except (IndexError, KeyError):
 			trn = None
@@ -749,7 +755,6 @@ class ServerMain:
 			silent = True if cmd["silent"][0] == "1" else False
 		except (IndexError, KeyError):
 			silent = True
-		blocks = cmd["blocks"]
 
 		if trn and trn.startswith("??"):
 			# this is an unknown train - see if we have a known train in the same block

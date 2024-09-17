@@ -201,6 +201,7 @@ class MainFrame(wx.Frame):
 			for screen, fg, pos, bmp in self.CTCManager.GetBitmaps():
 				offset = self.diagrams[screen].offset
 				self.panels[screen].DrawCTCBitmap(fg, pos[0], pos[1], offset, bmp)
+				print("setting ctc bitmap at position %d %d" % (pos[0], pos[1]), flush=True)
 			for label, font, screen, lblx, lbly in self.CTCManager.GetLabels():
 				offset = self.diagrams[screen].offset
 				self.panels[screen].DrawCTCLabel(lblx, lbly, offset, font, label)

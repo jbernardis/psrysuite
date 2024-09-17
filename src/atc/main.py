@@ -308,7 +308,8 @@ class MainFrame(wx.Frame):
 			logging.info("in ticker loop for loco %s" % dccl.GetLoco())
 			gs, _ = dccl.GetGoverningSignal()
 			aspect = 0  # assume STOP
-			
+			aspectType = RegAspects
+
 			if dccl.HasCompleted():
 				logging.info("Train %s has completed" % dccl.GetTrain())
 				aspect = 0 # we've reached the terminus - we should stop
@@ -317,7 +318,6 @@ class MainFrame(wx.Frame):
 				logging.info("governing signal is None")
 				# we are moving into terminus block - move slowly
 				aspect = 4 # restricting
-				
 
 			elif "signal" in gs:
 				signame = gs["signal"]
