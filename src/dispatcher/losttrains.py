@@ -2,6 +2,7 @@ import wx
 
 BSIZE = (100, 26)
 
+
 class LostTrains:
 	def __init__(self):
 		self.trains = {}
@@ -172,7 +173,8 @@ class LostTrainsDlg(wx.Dialog):
 		
 	def GetResult(self):
 		return self.chosenTrain
-	
+
+
 class LostTrainsRecoveryDlg(wx.Dialog):
 	def __init__(self, parent, lostTrains):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")

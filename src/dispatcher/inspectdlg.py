@@ -25,13 +25,13 @@ class InspectDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnBLogLevel, bLogLevel)
         btnszr.Add(bLogLevel)
 
-        btnszr.AddSpacer(20)
+        btnszr.AddSpacer(10)
 
         bDebug = wx.Button(self, wx.ID_ANY, "Debugging Flags", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBDebug, bDebug)
         btnszr.Add(bDebug)
 
-        btnszr.AddSpacer(20)
+        btnszr.AddSpacer(10)
 
         bProxies = wx.Button(self, wx.ID_ANY, "OS Proxies", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBProxies, bProxies)
@@ -49,7 +49,13 @@ class InspectDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnBLevers, bLevers)
         btnszr.Add(bLevers)
 
-        btnszr.AddSpacer(20)
+        btnszr.AddSpacer(10)
+
+        bToLocks = wx.Button(self, wx.ID_ANY, "Turnout Locks", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnBTurnoutLocks, bToLocks)
+        btnszr.Add(bToLocks)
+
+        btnszr.AddSpacer(10)
 
         bHandSwitches = wx.Button(self, wx.ID_ANY, "Siding Locks", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBHandSwitches, bHandSwitches)
@@ -114,6 +120,45 @@ class InspectDlg(wx.Dialog):
     def OnBLevers(self, _):
         slv = self.GetSignalLeverValues()
         dlg = ListDlg(self, slv, (200, 200), "Signal Levers", self.GetSignalLeverValues)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def OnBTurnoutLocks(self, _):
+        lks = self.parent.GetTurnoutLocks()
+        toList = [x for x in lks if len(lks[x]) != 0]
+        if len(toList) == 0:
+            dlg = wx.MessageDialog(self, "No turnouts are presently locked",
+                "Turnout Locks",
+                wx.OK | wx.ICON_INFORMATION)
+            dlg.ShowModal()
+            dlg.Destroy()
+            return
+
+        dlg = wx.MultiChoiceDialog( self,
+            "Choose turnout(s) to unlock",
+            "Turnout Locks", toList)
+
+        rc = dlg.ShowModal()
+        if rc == wx.ID_OK:
+            selections = dlg.GetSelections()
+            toNames = [toList[x] for x in selections]
+        else:
+            toNames = []
+
+        dlg.Destroy()
+        if rc != wx.ID_OK:
+            return
+
+        if len(toNames) == 0:
+            return
+
+        for tonm in toNames:
+            self.parent.turnouts[tonm].ClearLocks()
+            self.parent.turnouts[tonm].Draw()
+
+        dlg = wx.MessageDialog(self, "Unlocked Turnouts:\n%s" % ", ".join(toNames),
+            "Turnout Locks",
+            wx.OK | wx.ICON_INFORMATION)
         dlg.ShowModal()
         dlg.Destroy()
 

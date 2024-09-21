@@ -1244,6 +1244,13 @@ class MainFrame(wx.Frame):
 
 		return self.signalLeverMap[slname]
 
+	def GetTurnoutLocks(self):
+		locks = {}
+		for tout in self.turnouts:
+			locks[tout] = self.turnouts[tout].GetLockedBy()
+
+		return locks
+
 	def IsDispatcher(self):
 		return self.settings.dispatcher.dispatch
 
@@ -2701,7 +2708,7 @@ class MainFrame(wx.Frame):
 					tr = blk.GetTrain()
 					district = blk.GetDistrict()
 					district.DoBlockAction(blk, blockend, stat)
-					if self.IsDispatcher():
+					if self.IsDispatcherOrSatellite():
 						self.CheckTrainsInBlock(block, None)
 						if tr is not None and not blk.IsOccupied():
 							"""

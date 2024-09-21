@@ -100,11 +100,14 @@ class TurnoutTile:
 				return bmps["red"]
 
 		if blkstat == CLEARED:
-			try:
-				return bmps["green-dis"]
-			except KeyError:
-				pass
-			return bmps["green"]
+			if disabled:
+				try:
+					return bmps["green-dis"]
+				except KeyError:
+					pass
+				return bmps["green"]
+			else:
+				return bmps["green"]
 
 		if disabled:
 			try:

@@ -59,6 +59,16 @@ class Turnout:
 		if refresh:
 			self.Draw()
 			
+	def ClearLock(self, locker, forward=True):
+		if locker not in self.lockedBy:
+			return False
+
+		self.lockedBy.remove(locker)
+		if self.locked and len(self.lockedBy) == 0:
+			self.locked = False
+			if forward:
+				self.frame.Request({"turnoutlock": { "name": self.name, "status": 0}})
+
 	def ClearLocks(self, forward=True):
 		self.lockedBy = []
 		if self.locked:
