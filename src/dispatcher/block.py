@@ -255,6 +255,12 @@ class Block:
 		if self.sbWest and self.sbWest.IsActive():
 			active = True
 		return active
+
+	def SetStoppingRelays(self, flag=False):
+		if self.sbEast and self.sbEast.IsActive():
+			self.sbEast.Activate(flag)
+		if self.sbWest and self.sbWest.IsActive():
+			self.sbWest.Activate(flag)
 	
 	def SetLastEntered(self, subblk):
 		self.lastSubBlockEntered = subblk

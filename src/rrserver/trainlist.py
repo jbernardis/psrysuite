@@ -30,6 +30,10 @@ class TrainList:
 							pass
 						if len(self.trains[tr]["blocks"]) == 0:
 							dellist.append(tr)
+				if len(self.trains[tr]["blocks"]) == 1:
+					bn = self.trains[tr]["blocks"][0]
+					if bn in [ "KOSN10S11", "KOSN20S21" ]:
+						dellist.append(tr)
 
 			for tr in dellist:
 				del(self.trains[tr])
@@ -93,6 +97,9 @@ class TrainList:
 		
 		return None
 
+	def HasTrain(self, trid):
+		return trid in self.trains
+
 	def GetLocoForTrain(self, trn):
 		for tr, trinfo in self.trains.items():
 			if tr == trn:
@@ -143,6 +150,9 @@ class TrainList:
 		return True
 
 	def SetEast(self, name,east):
+		if name not in self.trains:
+			return
+
 		if east is not None:
 			self.trains[name]["east"] = east
 	

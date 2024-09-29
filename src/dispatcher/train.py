@@ -314,4 +314,14 @@ class Train:
 		return bn in self.blocks
 
 	def IsInNoBlocks(self):
-		return len(self.blocks) == 0
+		l = len(self.blocks)
+		if l == 0:
+			return True
+
+		if l != 1:
+			return False
+
+		bn = list(self.blocks.keys())[0]
+		return bn in [ "KOSN10S11", "KOSN20S21" ]
+
+

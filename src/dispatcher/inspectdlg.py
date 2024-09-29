@@ -17,65 +17,74 @@ class InspectDlg(wx.Dialog):
 
         self.SetTitle("Inspection Dialog")
 
-        btnszr = wx.BoxSizer(wx.VERTICAL)
-
-        btnszr.AddSpacer(20)
+        btnszr1 = wx.BoxSizer(wx.VERTICAL)
+        btnszr1.AddSpacer(20)
 
         bLogLevel = wx.Button(self, wx.ID_ANY, "Logging Level", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBLogLevel, bLogLevel)
-        btnszr.Add(bLogLevel)
+        btnszr1.Add(bLogLevel)
 
-        btnszr.AddSpacer(10)
+        btnszr1.AddSpacer(10)
 
         bDebug = wx.Button(self, wx.ID_ANY, "Debugging Flags", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBDebug, bDebug)
-        btnszr.Add(bDebug)
+        btnszr1.Add(bDebug)
 
-        btnszr.AddSpacer(10)
+        btnszr1.AddSpacer(20)
+
+        btnszr2 = wx.BoxSizer(wx.VERTICAL)
+        btnszr2.AddSpacer(20)
 
         bProxies = wx.Button(self, wx.ID_ANY, "OS Proxies", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBProxies, bProxies)
-        btnszr.Add(bProxies)
+        btnszr2.Add(bProxies)
 
-        btnszr.AddSpacer(10)
+        btnszr2.AddSpacer(10)
 
         bRelays = wx.Button(self, wx.ID_ANY, "Stop Relays", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBRelays, bRelays)
-        btnszr.Add(bRelays)
+        btnszr2.Add(bRelays)
 
-        btnszr.AddSpacer(10)
+        btnszr2.AddSpacer(10)
 
         bLevers = wx.Button(self, wx.ID_ANY, "Signal Levers", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBLevers, bLevers)
-        btnszr.Add(bLevers)
+        btnszr2.Add(bLevers)
 
-        btnszr.AddSpacer(10)
+        btnszr2.AddSpacer(20)
+
+        btnszr3 = wx.BoxSizer(wx.VERTICAL)
+        btnszr3.AddSpacer(20)
 
         bToLocks = wx.Button(self, wx.ID_ANY, "Turnout Locks", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBTurnoutLocks, bToLocks)
-        btnszr.Add(bToLocks)
+        btnszr3.Add(bToLocks)
 
-        btnszr.AddSpacer(10)
+        btnszr3.AddSpacer(10)
 
         bHandSwitches = wx.Button(self, wx.ID_ANY, "Siding Locks", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBHandSwitches, bHandSwitches)
-        btnszr.Add(bHandSwitches)
+        btnszr3.Add(bHandSwitches)
 
-        btnszr.AddSpacer(10)
+        btnszr3.AddSpacer(10)
 
         bResetBlks = wx.Button(self, wx.ID_ANY, "Reset Blocks", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBResetBlks, bResetBlks)
-        btnszr.Add(bResetBlks)
+        btnszr3.Add(bResetBlks)
+
+        btnszr3.AddSpacer(20)
+
+        btnszr = wx.BoxSizer(wx.HORIZONTAL)
 
         btnszr.AddSpacer(20)
+        btnszr.Add(btnszr1)
+        btnszr.AddSpacer(10)
+        btnszr.Add(btnszr2)
+        btnszr.AddSpacer(10)
+        btnszr.Add(btnszr3)
+        btnszr.AddSpacer(20)
 
-        szr = wx.BoxSizer(wx.HORIZONTAL)
-        szr.AddSpacer(40)
-        szr.Add(btnszr)
-        
-        szr.AddSpacer(40)
-        
-        self.SetSizer(szr)
+        self.SetSizer(btnszr)
         self.Layout()
         self.Fit()
 
@@ -102,16 +111,47 @@ class InspectDlg(wx.Dialog):
         dlg.Destroy()
 
     def OnBRelays(self, _):
-        rv = self.GetRelayValues()
-        dlg = ListDlg(self, rv, (200, 200), "Stopping Relays", self.GetRelayValues)
+        rl = self.GetRelayList()
+        if len(rl) == 0:
+            dlg = wx.MessageDialog(self, "No stopping relays are presently activated",
+                "Stopping Relays",
+                wx.OK | wx.ICON_INFORMATION)
+            dlg.ShowModal()
+            dlg.Destroy()
+            return
+
+        dlg = wx.MultiChoiceDialog( self,
+            "Choose stopping relay(s) to unlock",
+            "Stopping Relays", rl)
+
+        rc = dlg.ShowModal()
+        if rc == wx.ID_OK:
+            selections = dlg.GetSelections()
+            rlNames = [rl[x] for x in selections]
+        else:
+            rlNames = []
+
+        dlg.Destroy()
+        if rc != wx.ID_OK:
+            return
+
+        if len(rlNames) == 0:
+            return
+
+        for bn in rlNames:
+            self.parent.SetStoppingRelays(bn, False)
+
+        dlg = wx.MessageDialog(self, "Deactivated Relays:\n%s" % ", ".join(rlNames),
+            "Stopping Relays",
+            wx.OK | wx.ICON_INFORMATION)
         dlg.ShowModal()
         dlg.Destroy()
 
-    def GetRelayValues(self):
+    def GetRelayList(self):
         rl = self.parent.Get("stoprelays", {})
         if rl is None:
             return []
-        relayList = ["%-6.6s   %s" % (self.formatRelayName(rly), str(rl[rly])) for rly in sorted(rl.keys())]
+        relayList = [self.formatRelayName(rly) for rly in sorted(rl.keys()) if rl[rly]]
         return relayList
 
     def formatRelayName(self, rn):

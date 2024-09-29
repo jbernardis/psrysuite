@@ -704,15 +704,18 @@ class ServerMain:
 			east = None
 
 		if trid is not None and blocks is not None:
-			if east is not None:
-				self.trainList.SetEast(trid, east)
+			if self.trainList.HasTrain(trid):
+				if east is not None:
+					self.trainList.SetEast(trid, east)
 
-			self.trainList.UpdateTrainBlockOrder(trid, blocks)
+				self.trainList.UpdateTrainBlockOrder(trid, blocks)
 
-			p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
-			p["blocks"] = [b for b in blocks]
-			resp = {"trainblockorder": [p]}
-			self.socketServer.sendToAll(resp)
+				p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
+				p["blocks"] = [b for b in blocks]
+				resp = {"trainblockorder": [p]}
+				self.socketServer.sendToAll(resp)
+			else:
+				logging.error("Received trainblock order for non existant train %s" % trid)
 
 	def DoTrainTimesRequest(self, cmd):
 		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")

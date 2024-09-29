@@ -389,25 +389,31 @@ class EditTrainDlg(wx.Dialog):
 	def onOK(self, _):
 		if self.chosenTrain != self.name and self.chosenTrain in self.existingTrains:
 			blist = self.existingTrains[self.chosenTrain].GetBlockNameList()
-			plural = "s\n" if len(blist) > 1 else " "
-			bstr = ", ".join(blist)
-			
-			adje, adjw = self.block.GetAdjacentBlocks()
-			adjacent = False
-			for adj in adje, adjw:
-				if adj is not  None and adj.GetName() in blist:
-					adjacent = True
-					break
+			if len(blist) > 0:
+				plural = "s\n" if len(blist) > 1 else " "
+				bstr = ", ".join(blist)
 
-			if not adjacent:
-				dlg = wx.MessageDialog(self, "Train %s already exists on the layout in block%s%s\n\nPress \"YES\" to acquire this train ID for THIS train" % (self.chosenTrain, plural, bstr),
-						'Duplicate Train', wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-				rc = dlg.ShowModal()
-				dlg.Destroy()
-				if rc == wx.ID_YES:
-					self.parent.StealTrainID(self.chosenTrain)
-				else:
-					return
+				adje, adjw = self.block.GetAdjacentBlocks()
+				adjacent = False
+				for adj in adje, adjw:
+					if adj is not None and adj.GetName() in blist:
+						adjacent = True
+						break
+
+				if not adjacent:
+					dlg = wx.MessageDialog(self, "Train %s already exists on the layout in block%s%s\n\nPress \"YES\" to acquire this train ID for THIS train" % (self.chosenTrain, plural, bstr),
+							'Duplicate Train', wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+					rc = dlg.ShowModal()
+					dlg.Destroy()
+					if rc == wx.ID_YES:
+						self.parent.StealTrainID(self.chosenTrain)
+					else:
+						return
+			else:
+				mdlg = wx.MessageDialog(self,
+							'Train does not exist in any blocks', 'No Blocks', wx.OK | wx.ICON_WARNING)
+				mdlg.ShowModal()
+				mdlg.Destroy()
 
 		if self.cbAssignRoute.IsChecked():
 			if self.chosenRoute is not None:

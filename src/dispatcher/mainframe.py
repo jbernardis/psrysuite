@@ -1,6 +1,7 @@
 import wx
 import wx.lib.newevent
 from wx.lib.gizmos.ledctrl import LEDNumberCtrl
+from subprocess import Popen, DEVNULL
 
 import os
 import sys
@@ -201,7 +202,6 @@ class MainFrame(wx.Frame):
 			for screen, fg, pos, bmp in self.CTCManager.GetBitmaps():
 				offset = self.diagrams[screen].offset
 				self.panels[screen].DrawCTCBitmap(fg, pos[0], pos[1], offset, bmp)
-				print("setting ctc bitmap at position %d %d" % (pos[0], pos[1]), flush=True)
 			for label, font, screen, lblx, lbly in self.CTCManager.GetLabels():
 				offset = self.diagrams[screen].offset
 				self.panels[screen].DrawCTCLabel(lblx, lbly, offset, font, label)
@@ -2537,6 +2537,17 @@ class MainFrame(wx.Frame):
 			
 		for s in self.signals.values():
 			s.ClearLocks(forward=False)
+
+	def SetStoppingRelays(self, bn, flag=False):
+		if bn not in self.blocks:
+			logging.error("trying to deactivate relays for unknown block: %s" % bn)
+			return
+
+		if not callable(self.blocks[bn].SetStoppingRelays):
+			logging.error("wrong block type trying to deactivate relays: %s" % bn)
+			return
+
+		self.blocks[bn].SetStoppingRelays(flag)
 	
 	def AllSignalsNeutral(self):
 		for s in self.signals.values():
@@ -3965,16 +3976,17 @@ class MainFrame(wx.Frame):
 		
 	def CloseProgram(self):
 		killServer = False
-		if self.IsDispatcher():
-			dlg = ExitDlg(self)
-			dlg.CenterOnScreen()
-			rc = dlg.ShowModal()
-			if rc == wx.ID_OK:
-				killServer = dlg.GetResults()
+		saveLogs = False
 
-			dlg.Destroy()
-			if rc != wx.ID_OK:
-				return	
+		dlg = ExitDlg(self, self.IsDispatcher())
+		dlg.CenterOnScreen()
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			killServer, saveLogs = dlg.GetResults()
+
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return
 			
 		self.events.Close()
 		self.advice.Close()
@@ -3992,16 +4004,22 @@ class MainFrame(wx.Frame):
 			
 		self.Destroy()
 		logging.info("%s process ending" % ("Dispatcher" if self.IsDispatcher() else "Satellite" if self.IsSatellite() else "Display"))
-		
+
+		if saveLogs:
+			logging.info("Saving log and output files")
+			interpreter = sys.executable.replace("python.exe", "pythonw.exe")
+			svExec = os.path.join(os.getcwd(), "savelogs", "main.py")
+			dispProc = Popen([interpreter, svExec], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
 
 	def GetDebugFlags(self):
 		return self.settings.debug
 
 
 class ExitDlg (wx.Dialog):
-	def __init__(self, parent):
-		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Save Trains/Locomotives")
+	def __init__(self, parent, isDispatcher):
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Exit Dialog")
 		self.parent = parent
+		self.isDispatcher = isDispatcher
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
 
 		dw, dh = wx.GetDisplaySize()
@@ -4013,21 +4031,32 @@ class ExitDlg (wx.Dialog):
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(20)
 
-		self.bTrains = wx.Button(self, wx.ID_ANY, "Save Trains")
-		self.bLocos  = wx.Button(self, wx.ID_ANY, "Save Locos")
-		self.bSnapshot  = wx.Button(self, wx.ID_ANY, "Take Snapshot")
+		if self.isDispatcher:
+			self.bTrains = wx.Button(self, wx.ID_ANY, "Save Trains")
+			self.bLocos  = wx.Button(self, wx.ID_ANY, "Save Locos")
+			self.bSnapshot  = wx.Button(self, wx.ID_ANY, "Take Snapshot")
+			self.Bind(wx.EVT_BUTTON, self.onSaveTrains, self.bTrains)
+			self.Bind(wx.EVT_BUTTON, self.onSaveLocos, self.bLocos)
+			self.Bind(wx.EVT_BUTTON, self.onSnapshot, self.bSnapshot)
 
-		vsz.Add(self.bTrains, 0, wx.ALIGN_CENTER)
-		vsz.AddSpacer(10)
-		vsz.Add(self.bLocos, 0, wx.ALIGN_CENTER)
-		vsz.AddSpacer(10)
-		vsz.Add(self.bSnapshot, 0, wx.ALIGN_CENTER)
-		vsz.AddSpacer(20)
-	
-		self.cbKillServer = wx.CheckBox(self, wx.ID_ANY, "Shutdown Server")
-		self.cbKillServer.SetValue(self.parent.settings.dispatcher.precheckshutdownserver)
+			vsz.Add(self.bTrains, 0, wx.ALIGN_CENTER)
+			vsz.AddSpacer(10)
+			vsz.Add(self.bLocos, 0, wx.ALIGN_CENTER)
+			vsz.AddSpacer(10)
+			vsz.Add(self.bSnapshot, 0, wx.ALIGN_CENTER)
+			vsz.AddSpacer(20)
 
-		vsz.Add(self.cbKillServer, 0, wx.ALIGN_CENTER)
+			self.cbKillServer = wx.CheckBox(self, wx.ID_ANY, "Shutdown Server")
+			self.cbKillServer.SetValue(self.parent.settings.dispatcher.precheckshutdownserver)
+
+			vsz.Add(self.cbKillServer, 0, wx.ALIGN_CENTER)
+
+			vsz.AddSpacer(10)
+
+		self.cbSaveLogs = wx.CheckBox(self, wx.ID_ANY, "Save log/output files")
+		self.cbSaveLogs.SetValue(False)
+
+		vsz.Add(self.cbSaveLogs, 0, wx.ALIGN_CENTER)
 
 		vsz.AddSpacer(20)
 
@@ -4041,11 +4070,8 @@ class ExitDlg (wx.Dialog):
 		bsz.AddSpacer(10)
 		bsz.Add(self.bCancel)
 
-		self.Bind(wx.EVT_BUTTON, self.onSaveTrains, self.bTrains)
-		self.Bind(wx.EVT_BUTTON, self.onSaveLocos, self.bLocos)
-		self.Bind(wx.EVT_BUTTON, self.onSnapshot, self.bSnapshot)
-		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
 		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
+		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
 
 		vsz.Add(bsz, 0, wx.ALIGN_CENTER)
 		
@@ -4071,7 +4097,10 @@ class ExitDlg (wx.Dialog):
 		self.parent.TakeSnapshot()
 		
 	def GetResults(self):
-		return self.cbKillServer.GetValue()
+		if self.isDispatcher:
+			return self.cbKillServer.GetValue(), self.cbSaveLogs.GetValue()
+		else:
+			return False, self.cbSaveLogs.GetValue()
 
 	def onCancel(self, _):
 		self.EndModal(wx.ID_CANCEL)
