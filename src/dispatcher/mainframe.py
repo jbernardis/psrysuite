@@ -419,18 +419,20 @@ class MainFrame(wx.Frame):
 				pnl.SetShift(False)
 
 		elif kcd == wx.WXK_F1:
-			if self.dlgInspect is None:
-				self.dlgInspect = InspectDlg(self, self.CloseInspect, self.settings)
-				self.dlgInspect.Show()
-			else:
-				self.dlgInspect.Raise()
+			if self.IsDispatcherOrSatellite():
+				if self.dlgInspect is None:
+					self.dlgInspect = InspectDlg(self, self.CloseInspect, self.settings)
+					self.dlgInspect.Show()
+				else:
+					self.dlgInspect.Raise()
 
 		elif kcd == wx.WXK_F2:
-			if self.CTCManager is not None:
-				self.CTCVisible = not self.CTCVisible
-				for dp in self.panels.values():
-					dp.ShowCTC(self.CTCVisible)
-				self.CTCManager.SetVisible(self.CTCVisible)
+			if self.IsDispatcherOrSatellite():
+				if self.CTCManager is not None:
+					self.CTCVisible = not self.CTCVisible
+					for dp in self.panels.values():
+						dp.ShowCTC(self.CTCVisible)
+					self.CTCManager.SetVisible(self.CTCVisible)
 
 		else:
 			#self.PopupEvent("Key Code: %d" % kcd)
@@ -2548,7 +2550,10 @@ class MainFrame(wx.Frame):
 			return
 
 		self.blocks[bn].SetStoppingRelays(flag)
-	
+
+	def SetIgnoredBlocks(self, igList):
+		self.Request({"ignore": {"blocks": igList}})
+
 	def AllSignalsNeutral(self):
 		for s in self.signals.values():
 			s.ForceNeutral()
@@ -2604,6 +2609,7 @@ class MainFrame(wx.Frame):
 			"traintimesrequest":	self.DoCmdTrainTimesRequest,
 			"traintimesreport":		self.DoCmdTrainTimesReport,
 			"trainblockorder":	self.DoCmdTrainBlockOrder,
+			"ignore":			self.DoCmdIgnore,
 		}
 		
 	def DoCmdNOOP(self, _):
@@ -2789,7 +2795,15 @@ class MainFrame(wx.Frame):
 
 	def DoCmdBlockClear(self, parms):
 		pass
-					
+
+	def DoCmdIgnore(self, parms):
+		try:
+			iglist = parms["blocks"]
+		except KeyError:
+			iglist = []
+		self.settings.rrserver.ignoredblocks = iglist
+		logging.info("setting ignored blocks list to: %s" % str(iglist))
+
 	def DoCmdSignal(self, parms):
 		for p in parms:
 			sigName = p["name"]
@@ -4054,7 +4068,7 @@ class ExitDlg (wx.Dialog):
 			vsz.AddSpacer(10)
 
 		self.cbSaveLogs = wx.CheckBox(self, wx.ID_ANY, "Save log/output files")
-		self.cbSaveLogs.SetValue(False)
+		self.cbSaveLogs.SetValue(self.parent.settings.dispatcher.prechecksavelogs)
 
 		vsz.Add(self.cbSaveLogs, 0, wx.ALIGN_CENTER)
 

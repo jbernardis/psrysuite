@@ -30,16 +30,16 @@ class InspectDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnBDebug, bDebug)
         btnszr1.Add(bDebug)
 
+        btnszr1.AddSpacer(10)
+
+        bProxies = wx.Button(self, wx.ID_ANY, "OS Proxies", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnBProxies, bProxies)
+        btnszr1.Add(bProxies)
+
         btnszr1.AddSpacer(20)
 
         btnszr2 = wx.BoxSizer(wx.VERTICAL)
         btnszr2.AddSpacer(20)
-
-        bProxies = wx.Button(self, wx.ID_ANY, "OS Proxies", size=BSIZE)
-        self.Bind(wx.EVT_BUTTON, self.OnBProxies, bProxies)
-        btnszr2.Add(bProxies)
-
-        btnszr2.AddSpacer(10)
 
         bRelays = wx.Button(self, wx.ID_ANY, "Stop Relays", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBRelays, bRelays)
@@ -51,16 +51,16 @@ class InspectDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnBLevers, bLevers)
         btnszr2.Add(bLevers)
 
+        btnszr2.AddSpacer(10)
+
+        bToLocks = wx.Button(self, wx.ID_ANY, "Turnout Locks", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnBTurnoutLocks, bToLocks)
+        btnszr2.Add(bToLocks)
+
         btnszr2.AddSpacer(20)
 
         btnszr3 = wx.BoxSizer(wx.VERTICAL)
         btnszr3.AddSpacer(20)
-
-        bToLocks = wx.Button(self, wx.ID_ANY, "Turnout Locks", size=BSIZE)
-        self.Bind(wx.EVT_BUTTON, self.OnBTurnoutLocks, bToLocks)
-        btnszr3.Add(bToLocks)
-
-        btnszr3.AddSpacer(10)
 
         bHandSwitches = wx.Button(self, wx.ID_ANY, "Siding Locks", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBHandSwitches, bHandSwitches)
@@ -71,6 +71,12 @@ class InspectDlg(wx.Dialog):
         bResetBlks = wx.Button(self, wx.ID_ANY, "Reset Blocks", size=BSIZE)
         self.Bind(wx.EVT_BUTTON, self.OnBResetBlks, bResetBlks)
         btnszr3.Add(bResetBlks)
+
+        btnszr3.AddSpacer(10)
+
+        bIgnoreBlks = wx.Button(self, wx.ID_ANY, "Ignore Blocks", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnBIgnoreBlks, bIgnoreBlks)
+        btnszr3.Add(bIgnoreBlks)
 
         btnszr3.AddSpacer(20)
 
@@ -254,6 +260,22 @@ class InspectDlg(wx.Dialog):
         for bn in resetList:
             blk = self.parent.blocks[bn]
             blk.RemoveClearStatus()
+
+    def OnBIgnoreBlks(self, _):
+        ignoreIndices = []
+        blks = sorted(list(self.parent.blocks.keys()))
+        dlg = CheckListDlg(self, blks, "Choose Block(s) to ignore", prechecked=self.settings.rrserver.ignoredblocks)
+        rc = dlg.ShowModal()
+        if rc == wx.ID_OK:
+            ignoreList = dlg.GetCheckedItems()
+
+        dlg.Destroy()
+        if rc != wx.ID_OK:
+            return
+
+        logging.info("New ignore list: %s" % str(ignoreList))
+        self.parent.SetIgnoredBlocks(ignoreList)
+        self.settings.rrserver.ignoredblocks = ignoreList
 
     def OnCancel(self, _):
         self.closer()
@@ -548,7 +570,7 @@ class OSProxyListCtrl(wx.ListCtrl):
 
 
 class CheckListDlg(wx.Dialog):
-    def __init__(self, parent, items, title):
+    def __init__(self, parent, items, title, prechecked=[]):
         self.choices = items
         wx.Dialog.__init__(self, parent, wx.ID_ANY, title)
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
@@ -558,6 +580,17 @@ class CheckListDlg(wx.Dialog):
 
         cb = wx.CheckListBox(self, wx.ID_ANY, size=(160, -1), choices=items)
         self.cbItems = cb
+        pcxl = []
+        for pc in prechecked:
+            try:
+                n = items.index(pc)
+            except ValueError:
+                n = None
+            if n is not None:
+                pcxl.append(n)
+
+        if len(pcxl) > 0:
+            self.cbItems.SetCheckedItems(pcxl)
         vszr.Add(cb, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
         vszr.AddSpacer(20)

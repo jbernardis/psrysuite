@@ -338,7 +338,8 @@ class ServerMain:
 			"debug":		self.DoDebug,
 			"simulate": 	self.DoSimulate,
 			"dumptrains":	self.DoDumpTrains,
-			
+			"ignore": 		self.DoIgnore,
+
 			"dccspeed":		self.DoDCCSpeed,
 			
 			"quit":			self.DoQuit,
@@ -909,6 +910,22 @@ class ServerMain:
 			
 	def DoDumpTrains(self, cmd):
 		self.trainList.Dump()
+
+	def DoIgnore(self, cmd):
+		try:
+			settings.rrserver.ignoredblocks = cmd["blocks"]
+		except KeyError:
+			settings.rrserver.ignoredblocks = []
+
+		logging.info("received ignore command: %s" % str(settings.rrserver.ignoredblocks))
+		settings.SaveAll()
+		self.rr.UpdateIgnoreList()
+
+		p = {tag: cmd[tag] for tag in cmd if tag != "cmd"}
+		resp = {"ignore": p}
+		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
+		for addr, skt in addrList:
+			self.socketServer.sendToOne(skt, addr, resp)
 
 	def DoClose(self, cmd):
 		function = cmd["function"][0]

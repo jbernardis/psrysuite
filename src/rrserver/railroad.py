@@ -41,6 +41,8 @@ class Railroad():
 			[ Hyde, "Hyde" ],
 			[ Port, "Port" ],
 		]
+
+		self.ignoredBlocks = self.settings.rrserver.ignoredblocks
 		
 		self.controlOptions = {}
 		self.signals = {}
@@ -1025,6 +1027,10 @@ class Railroad():
 			
 			if t.district.Name() == districtName:
 				t.UpdateLockBits(released)
+
+	def UpdateIgnoreList(self):
+		self.ignoredBlocks = self.settings.rrserver.ignoredblocks
+		logging.info("railroad ignore blocks list: %s" % str(self.ignoredBlocks))
 		
 	def ExamineInputs(self):
 		for addr, district, node in self.addrList:
@@ -1036,25 +1042,27 @@ class Railroad():
 				objName = obj.Name()
 
 				if objType == INPUT_BLOCK:
-					# if block has changed to occupied
-					if newval != 0:
-						# remove any pending detectio loss
-						self.pendingDetectionLoss.Remove(objName)
-						# and process the detection gain
-						if obj.SetOccupied(True):
-							self.RailroadEvent(obj.GetEventMessage())
-							obj.UpdateIndicators()
-					
-					# otherwise, this is a detection loss - add it to pending, but only if we are currently occupied
+					if objName.split(".")[0] in self.ignoredBlocks:
+						logging.info("Ignoring block %s as per ignore list" % objName)
 					else:
-						if obj.IsOccupied():
-							self.pendingDetectionLoss.Add(objName, obj)
-						else:
-							if obj.SetOccupied(False):
+						# if block has changed to occupied
+						if newval != 0:
+							# remove any pending detectio loss
+							self.pendingDetectionLoss.Remove(objName)
+							# and process the detection gain
+							if obj.SetOccupied(True):
 								self.RailroadEvent(obj.GetEventMessage())
 								obj.UpdateIndicators()
 
-			
+						# otherwise, this is a detection loss - add it to pending, but only if we are currently occupied
+						else:
+							if obj.IsOccupied():
+								self.pendingDetectionLoss.Add(objName, obj)
+							else:
+								if obj.SetOccupied(False):
+									self.RailroadEvent(obj.GetEventMessage())
+									obj.UpdateIndicators()
+
 				elif objType == INPUT_TURNOUTPOS:
 					pos = obj.Position()
 					if pos:

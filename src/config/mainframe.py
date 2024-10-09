@@ -130,7 +130,7 @@ class MainFrame(wx.Frame):
 		boxsizer = wx.BoxSizer(wx.VERTICAL)
 		boxsizer.AddSpacer(topBorder+10)
 
-		self.rbMode = wx.RadioBox(dispBox, wx.ID_ANY, "Pages", choices=["Dispatch", "Satellite", "Display"])
+		self.rbMode = wx.RadioBox(dispBox, wx.ID_ANY, "Function", choices=["Dispatch", "Satellite", "Display"])
 		boxsizer.Add(self.rbMode, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 		rbv = 0 if self.settings.dispatcher.dispatch else 1 if self.settings.dispatcher.satellite else 2
 		self.rbMode.SetSelection(rbv)
@@ -158,6 +158,18 @@ class MainFrame(wx.Frame):
 		self.cbNotifyIncorrectRoute = wx.CheckBox(dispBox, wx.ID_ANY, "Notify signal cleared for incorrect route")
 		boxsizer.Add(self.cbNotifyIncorrectRoute, 0, wx.LEFT, 40)
 		self.cbNotifyIncorrectRoute.SetValue(self.settings.dispatcher.notifyincorrectroute)
+
+		boxsizer.AddSpacer(10)
+
+		self.cbPrecheckShutdownServer = wx.CheckBox(dispBox, wx.ID_ANY, "Precheck \"Shutdown Server\" on exit")
+		boxsizer.Add(self.cbPrecheckShutdownServer, 0, wx.LEFT, 40)
+		self.cbPrecheckShutdownServer.SetValue(self.settings.dispatcher.precheckshutdownserver)
+
+		boxsizer.AddSpacer(10)
+
+		self.cbPrecheckSaveLogs = wx.CheckBox(dispBox, wx.ID_ANY, "Precheck \"Save Logs\" on exit")
+		boxsizer.Add(self.cbPrecheckSaveLogs, 0, wx.LEFT, 40)
+		self.cbPrecheckSaveLogs.SetValue(self.settings.dispatcher.prechecksavelogs)
 
 		boxsizer.AddSpacer(10)
 
@@ -477,6 +489,8 @@ class MainFrame(wx.Frame):
 		self.settings.dispatcher.satellite = rbv == 1
 		self.settings.dispatcher.notifyinvalidblocks = self.cbNotifyInvalidBlock.IsChecked()
 		self.settings.dispatcher.notifyincorrectroute = self.cbNotifyIncorrectRoute.IsChecked()
+		self.settings.dispatcher.precheckshutdownserver = self.cbPrecheckShutdownServer.IsChecked()
+		self.settings.dispatcher.prechecksavelogs = self.cbPrecheckSaveLogs.IsChecked()
 
 		self.settings.rrserver.rrtty = self.teRRComPort.GetValue()
 		self.settings.rrserver.dcctty = self.teDCCComPort.GetValue()

@@ -53,6 +53,7 @@ class Settings:
 		self.rrserver.nxbpulsect = 2
 		self.rrserver.ioerrorthreshold = 5
 		self.rrserver.pendingdetectionlosscycles = 2
+		self.rrserver.ignoredblocks = []
 		if self.cfg.has_section(section):
 			for opt, value in self.cfg.items(section):
 				if opt == 'simulation':
@@ -81,6 +82,9 @@ class Settings:
 
 				elif opt == "ioerrorthreshold":
 					self.rrserver.ioerrorthreshold = int(value)
+
+				elif opt == "ignoredblocks":
+					self.rrserver.ignoredblocks = x = [x.strip() for x in value.split(",")]
 
 				elif opt == "pendingdetectionlosscycles":
 					self.rrserver.pendingdetectionlosscycles = int(value)
@@ -140,6 +144,7 @@ class Settings:
 		self.dispatcher.dispatch = True
 		self.dispatcher.satellite = False
 		self.dispatcher.precheckshutdownserver = True
+		self.dispatcher.prechecksavelogs = True
 		self.dispatcher.clockstarttime = 355
 		self.dispatcher.matrixturnoutdelay = 2
 		self.dispatcher.notifyinvalidblocks = True
@@ -154,7 +159,10 @@ class Settings:
 
 				elif opt == 'precheckshutdownserver':
 					self.dispatcher.precheckshutdownserver = parseBoolean(value, True)
-					
+
+				elif opt == 'prechecksavelogs':
+					self.dispatcher.prechecksavelogs = parseBoolean(value, True)
+
 				elif opt == 'matrixturnoutdelay':
 					try:
 						s = int(value)
@@ -381,6 +389,7 @@ class Settings:
 		self.cfg.set(section, "nxbpulsect", "%d" % self.rrserver.nxbpulsect)
 		self.cfg.set(section, "ioerrorthreshold", "%d" % self.rrserver.ioerrorthreshold)
 		self.cfg.set(section, "pendingdetectionlosscycles", "%d" % self.rrserver.pendingdetectionlosscycles)
+		self.cfg.set(section, "ignoredblocks", ", ".join(self.rrserver.ignoredblocks))
 
 		section = "dccsniffer"
 		try:
@@ -411,6 +420,7 @@ class Settings:
 		self.cfg.set(section, "dispatch", "True" if self.dispatcher.dispatch else "False")
 		self.cfg.set(section, "satellite", "True" if self.dispatcher.satellite else "False")
 		self.cfg.set(section, "precheckshutdownserver", "True" if self.dispatcher.precheckshutdownserver else "False")
+		self.cfg.set(section, "prechecksavelogs", "True" if self.dispatcher.prechecksavelogs else "False")
 		self.cfg.set(section, "clockstarttime",   "%d" % self.dispatcher.clockstarttime)
 		self.cfg.set(section, "matrixturnoutdelay",   "%d" % self.dispatcher.matrixturnoutdelay)
 		self.cfg.set(section, "notifyinvalidblocks", "True" if self.dispatcher.notifyinvalidblocks else "False")
