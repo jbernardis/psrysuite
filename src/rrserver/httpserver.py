@@ -96,7 +96,11 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 		while self.haltServer == False:
 			r = select.select([self.socket], [], [], 0)[0]
 			if r and len(r) > 0:
-				self.handle_request()
+				try:
+					self.handle_request()
+				except ValueError:
+					logging.warning("Value error parsing HTTP message - ignoring")
+					pass
 			else:
 				pass #time.sleep(0.0001) # yield to other threads
 

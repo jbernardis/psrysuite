@@ -246,7 +246,10 @@ class Train:
 
 		blk.SetTrain(None)
 		del self.blocks[bn]
-		self.blockOrder.remove(bn)
+		try:
+			self.blockOrder.remove(bn)
+		except ValueError:
+			pass
 		logging.debug("Removed block %s from train %s, new block list = %s" % (bn, self.name, str(self.blockOrder)))
 		return True
 		

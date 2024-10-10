@@ -349,7 +349,15 @@ class ServerMain:
 		}
 
 	def ProcessCommand(self, cmd):
-		verb = cmd["cmd"][0]
+		try:
+			verb = cmd["cmd"][0]
+		except KeyError:
+			verb = None
+
+		if verb is None:
+			logging.error("Command without cmd parameter")
+			return
+
 		if verb == "failedstart":
 			logging.info("received failed start command")
 			self.forever = False
@@ -369,10 +377,12 @@ class ServerMain:
 			handler = self.dispatch[verb]
 		except KeyError:
 			logging.error("Unknown command: %s" % verb)
-		
 		else:
-			handler(cmd)
-			
+			try:
+				handler(cmd)
+			except Exception as e:
+				logging.error("Exception %s processing command %s" % (str(e), verb))
+
 	def DoInterval(self, _):
 		if self.pause > 0:
 			'''

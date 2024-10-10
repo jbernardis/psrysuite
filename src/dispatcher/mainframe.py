@@ -2626,7 +2626,10 @@ class MainFrame(wx.Frame):
 				self.PopupEvent("Unknown command: %s" % cmd)
 			
 			else:
-				handler(parms)
+				try:
+					handler(parms)
+				except Exception as e:
+					logging.error("Exception %s handlint command %s" % (str(e), cmd))
 			
 	def DoCmdTurnout(self, parms):
 		for p in parms:
