@@ -2630,13 +2630,23 @@ class MainFrame(wx.Frame):
 			
 	def DoCmdTurnout(self, parms):
 		for p in parms:
-			turnout = p["name"]
-			state = p["state"]
+			try:
+				turnout = p["name"]
+			except KeyError:
+				turnout = None
+			try:
+				state = p["state"]
+			except KeyError:
+				state = None
 			try:
 				force = p["force"]
 			except:
 				force = False
-				
+
+			if turnout is None or state is None:
+				logging.error("Turnout command missing turnout name and/or state")
+				return
+
 			try:
 				to = self.turnouts[turnout]
 			except KeyError:
@@ -2656,12 +2666,22 @@ class MainFrame(wx.Frame):
 
 	def DoCmdTurnoutLever(self, parms):
 		for p in parms:
-			turnout = p["name"]
-			state = p["state"]
+			try:
+				turnout = p["name"]
+			except KeyError:
+				turnout = None
+			try:
+				state = p["state"]
+			except KeyError:
+				state = None
 			try:
 				force = p["force"]
 			except:
 				force = False
+
+			if turnout is None or state is None:
+				logging.error("Turnout lever command missing turnout name and/or state")
+				return
 
 			try:
 				tout = self.turnouts[turnout]
@@ -2679,21 +2699,46 @@ class MainFrame(wx.Frame):
 
 	def DoCmdFleet(self, parms):
 		for p in parms:
-			signm = p["name"]
+			try:
+				signm = p["name"]
+			except KeyError:
+				signm = None
 			try:
 				value = int(p["value"])
 			except:
 				value = 0
 
-			sig = self.signals[signm]
+			if signm is None:
+				logging.error("fleet command without signal name parameter")
+				return
+
+			try:
+				sig = self.signals[signm]
+			except KeyError:
+				sig = None
+
+			if sig is None:
+				logging.error("fleet command with unknown signal name %s" % signm)
+				return
+
 			sig.EnableFleeting(value == 1)
 			self.FleetCheckBoxes(signm)
 			
 	def DoCmdBlock(self, parms):
 		for p in parms:
-			block = p["name"]
-			state = p["state"]
-			
+			try:
+				block = p["name"]
+			except KeyError:
+				block = None
+			try:
+				state = p["state"]
+			except KeyError:
+				state = None
+
+			if block is None or state is None:
+				logging.error("Block command without block and/or state parameter")
+				return
+
 			if block in self.osProxies:
 				district = self.osProxies[block].GetDistrict()
 				block = district.CheckOSProxies(block, state)
@@ -2759,7 +2804,11 @@ class MainFrame(wx.Frame):
 
 	def DoCmdBlockDir(self, parms):
 		for p in parms:
-			block = p["block"]
+			try:
+				block = p["block"]
+			except:
+				logging.error("Blockdir command without block parameter")
+				return
 			try:
 				direction = p["dir"] == 'E'
 			except KeyError:
@@ -2784,7 +2833,12 @@ class MainFrame(wx.Frame):
 
 	def DoCmdSetRoute(self, parms):
 		for p in parms:
-			rtnm = p["route"]
+			try:
+				rtnm = p["route"]
+			except KeyError:
+				logging.error("Setroute command without route parameter")
+				return
+
 			osnm, signm = self.delayedSignals.GetSignal(rtnm)
 
 			if osnm is not None and signm is not None:
@@ -2806,8 +2860,19 @@ class MainFrame(wx.Frame):
 
 	def DoCmdSignal(self, parms):
 		for p in parms:
-			sigName = p["name"]
-			aspect = p["aspect"]
+			try:
+				sigName = p["name"]
+			except KeyError:
+				sigName = None
+			try:
+				aspect = p["aspect"]
+			except KeyError:
+				aspect = None
+
+			if sigName is None or aspect is None:
+				logging.error("Signal command without signal and/or aspect command")
+				return
+
 			try:
 				frozenaspect = p["frozenaspect"]
 			except:
@@ -2834,8 +2899,19 @@ class MainFrame(wx.Frame):
 	def DoCmdSigLever(self, parms):
 		if self.IsDispatcher():
 			for p in parms:
-				signame = p["name"]
-				state = p["state"]
+				try:
+					signame = p["name"]
+				except KeyError:
+					signame = None
+				try:
+					state = p["state"]
+				except KeyError:
+					state = None
+
+				if signame is None or state is None:
+					logging.error("Signal lever command without signal and/or state command")
+					return
+
 				try:
 					callon = int(p["callon"])
 				except (KeyError, ValueError):
@@ -2860,7 +2936,11 @@ class MainFrame(wx.Frame):
 		if self.IsDispatcher():
 			return 
 		for p in parms:
-			signame = p["name"]
+			try:
+				signame = p["name"]
+			except KeyError:
+				signame = None
+
 			try:
 				state = int(p["state"])
 			except:
@@ -2871,28 +2951,54 @@ class MainFrame(wx.Frame):
 			except:
 				sig = None
 			if sig is None or state is None:
+				logging.error("signal lock command without signal name and/or state parameters")
 				return 
 			
 			sig.SetLock(None, state == 1)
 
 	def DoCmdHandSwitch(self, parms):				
 		for p in parms:
-			hsName = p["name"]
-			state = p["state"]
+			try:
+				hsName = p["name"]
+			except KeyError:
+				hsName = None
+
+			try:
+				state = p["state"]
+			except KeyError:
+				state = None
+
+			if hsName is None or state is None:
+				logging.error("Handswitch command without hsname and/or state parameters")
+				return
 			
 			try:
 				hs = self.handswitches[hsName]
 			except:
 				hs = None
 
-			if hs is not None and state != hs.GetValue():
+			if hs is None:
+				logging.error("Unknown handswitch name: %s" % hsName)
+				return
+
+			if state != hs.GetValue():
 				district = hs.GetDistrict()
 				district.DoHandSwitchAction(hs, state)
 						
 	def DoCmdIndicator(self, parms):
 		for p in parms:
-			iName = p["name"]
-			value = int(p["value"])
+			try:
+				iName = p["name"]
+			except KeyError:
+				iName = None
+			try:
+				value = int(p["value"])
+			except KeyError:
+				value = None
+
+			if iName is None or value is None:
+				logging.error("Indicator command without name and/or value parameters")
+				return
 			
 			try:
 				ind = self.indicators[iName]
@@ -2902,11 +3008,24 @@ class MainFrame(wx.Frame):
 			if ind is not None:
 				district = ind.GetDistrict()
 				district.DoIndicatorAction(ind, value)
+			else:
+				logging.error("Unknown indicator name: %s" % iName)
 
 	def DoCmdBreaker(self, parms):
 		for p in parms:
-			name = p["name"]
-			val = p["value"]
+			try:
+				name = p["name"]
+			except KeyError:
+				name = None
+			try:
+				val = p["value"]
+			except KeyError:
+				val = None
+
+			if name is None or val is None:
+				logging.error("Breaker command without name and/or value parameter")
+				return
+
 			if val == 0:
 				self.PopupEvent("Breaker: %s" % BreakerName(name))
 				self.breakerDisplay.AddBreaker(name)
@@ -2920,8 +3039,18 @@ class MainFrame(wx.Frame):
 					ind.SetValue(val, silent=True)
 
 	def DoCmdTrainSignal(self, parms):							
-		trid = parms["train"]			
-		signm = parms["signal"]
+		try:
+			trid = parms["train"]
+		except KeyError:
+			trid = None
+		try:
+			signm = parms["signal"]
+		except KeyError:
+			signm = None
+
+		if trid is None or signm is None:
+			logging.error("Train signal command without train and/or signal command")
+			return
 		
 		try:
 			tr = self.trains[trid]
@@ -2933,11 +3062,17 @@ class MainFrame(wx.Frame):
 		except:
 			sig  = None
 
-		if tr is not None and sig is not None:
-			self.CheckForIncorrectRoute(tr, sig)
+		if tr is None:
+			logging.error("Unknown train: %s" % trid)
+			return
 
-			tr.SetSignal(sig)
-			self.activeTrains.UpdateTrain(trid)
+		if sig is None:
+			logging.error("Unknown signal %s" % signm)
+			return
+
+		self.CheckForIncorrectRoute(tr, sig)
+		tr.SetSignal(sig)
+		self.activeTrains.UpdateTrain(trid)
 
 	def CheckForIncorrectRoute(self, tr, sig, ignoreunchangedsignal=False, silent=False):
 		if tr is None or sig is None:
@@ -3040,9 +3175,21 @@ class MainFrame(wx.Frame):
 		return None, None
 
 	def DoCmdSetTrain(self, parms):
-		blocks = parms["blocks"]
-		name = parms["name"]
-		loco = parms["loco"]
+		try:
+			blocks = parms["blocks"]
+		except KeyError:
+			blocks = []
+
+		try:
+			name = parms["name"]
+		except KeyError:
+			name = None
+
+		try:
+			loco = parms["loco"]
+		except KeyError:
+			loco = None
+
 		try:
 			east = parms["east"]
 		except KeyError:
@@ -3112,7 +3259,7 @@ class MainFrame(wx.Frame):
 					if not tr.IsBeingEdited():
 						if not silent:
 							self.PopupEvent("Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
-						self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block)
+						self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block, tr.GetChosenRoute())
 					try:
 						self.activeTrains.RemoveTrain(trid)
 						del(self.trains[trid])
@@ -3271,11 +3418,18 @@ class MainFrame(wx.Frame):
 
 	def DoCmdTrainComplete(self, parms):					
 		for p in parms:
-			train = p["train"]
+			try:
+				train = p["train"]
+			except KeyError:
+				train = None
+
+			if train is None:
+				logging.error("TrainComplete command without train parameter")
+				return
 
 			try:
 				tr = self.trains[train]
-			except:
+			except KeyError:
 				logging.error("Unknown train name (%s) in traincomplete message" % train)
 				return
 				
@@ -3298,7 +3452,11 @@ class MainFrame(wx.Frame):
 	
 	def DoCmdAssignTrain(self, parms):	
 		for p in parms:
-			train = p["train"]
+			try:
+				train = p["train"]
+			except KeyError:
+				train = None
+
 			try:
 				engineer = p["engineer"]
 			except KeyError:
@@ -3308,6 +3466,10 @@ class MainFrame(wx.Frame):
 				reassigned = p["reassign"] != "0"
 			except KeyError:
 				reassigned = False
+
+			if train is None:
+				logging.error("AssignTrain command without train parameter")
+				return
 				
 			try:
 				tr = self.trains[train]
@@ -3328,9 +3490,33 @@ class MainFrame(wx.Frame):
 	def DoCmdClock(self, parms):
 		if self.IsDispatcher():
 			return
-		
-		self.timeValue = int(parms[0]["value"])
-		status = int(parms[0]["status"])
+
+		try:
+			tv = parms[0]["value"]
+		except KeyError:
+			tv = None
+
+		try:
+			sv = parms[0]["status"]
+		except KeyError:
+			sv = None
+
+		error = False
+		try:
+			self.timeValue = int(tv)
+		except:
+			error = True
+
+		status = 0
+		try:
+			status = int(sv)
+		except:
+			error = True
+
+		if error:
+			logging.error("Invbalid parameters in clock command")
+			return
+
 		if status != self.clockStatus:
 			self.clockStatus = status
 			self.ShowClockStatus()
@@ -3354,6 +3540,7 @@ class MainFrame(wx.Frame):
 				speedtype = None
 				
 			if loco is None:
+				logging.error("DCCSpeed command without loco parameter")
 				return 
 			
 			tr = self.activeTrains.FindTrainByLoco(loco)
@@ -3363,8 +3550,19 @@ class MainFrame(wx.Frame):
 
 	def DoCmdControl(self, parms):
 		for p in parms:
-			name = p["name"]
-			value = int(p["value"])
+			try:
+				name = p["name"]
+			except KeyError:
+				name = None
+			try:
+				value = int(p["value"])
+			except KeyError:
+				value = None
+
+			if name is None or value is None:
+				logging.error("Control command without name and/or value parameter")
+				return
+
 			if self.IsDispatcher():
 				self.UpdateControlWidget(name, value)
 			else:
@@ -3379,7 +3577,16 @@ class MainFrame(wx.Frame):
 		self.ShowTitle()
 
 	def DoCmdEnd(self, parms):
-		if parms["type"] == "layout":
+		try:
+			ptype = parms["type"]
+		except KeyError:
+			ptype = None
+
+		if ptype is None:
+			logging.error("End command without type parameter")
+			return
+
+		if ptype == "layout":
 			if self.IsDispatcher():
 				self.SendBlockDirRequests()
 				self.SendOSRoutes()
@@ -3389,14 +3596,20 @@ class MainFrame(wx.Frame):
 			self.activeTrains.RemoveAllTrains()
 			self.Request({"refresh": {"SID": self.sessionid, "type": "trains"}})
 			
-		elif parms["type"] == "trains":
+		elif ptype == "trains":
 			if not self.IsDispatcher():
 				self.Request({"traintimesrequest": {}})
 
 	def DoCmdTrainBlockOrder(self, parms):
 		for p in parms:
-			trid = p["name"]
-			blocks = p["blocks"]
+			try:
+				trid = p["name"]
+			except KeyError:
+				trid = None
+			try:
+				blocks = p["blocks"]
+			except KeyError:
+				blocks = []
 			try:
 				east = p["east"].startswith("T")
 			except (IndexError, KeyError):
@@ -3422,6 +3635,7 @@ class MainFrame(wx.Frame):
 			trains = parms["trains"]
 			times = parms["times"]
 		except KeyError:
+			logging.error("train times report command without trains and/or times report")
 			return
 
 		for trid, tm in zip(trains, times):
@@ -3434,16 +3648,22 @@ class MainFrame(wx.Frame):
 				tr.SetTime(None if tm == -1 else tm)
 					
 	def DoCmdAdvice(self, parms):
-		if self.IsDispatcherOrSatellite() or self.settings.display.showadvice:
-			self.PopupAdvice(parms["msg"][0])
+		if "msg" in parms:
+			if self.IsDispatcherOrSatellite() or self.settings.display.showadvice:
+				self.PopupAdvice(parms["msg"][0])
 					
 	def DoCmdAlert(self, parms):
-		if self.IsDispatcherOrSatellite() or self.settings.display.showevents:
-			logging.info("ALERT: %s" % (str(parms)))
-			self.PopupEvent(parms["msg"][0])
+		if "msg" in parms:
+			if self.IsDispatcherOrSatellite() or self.settings.display.showevents:
+				logging.info("ALERT: %s" % (str(parms)))
+				self.PopupEvent(parms["msg"][0])
 				
 	def DoCmdAR(self, parms):
-		trnm = parms["train"][0]
+		try:
+			trnm = parms["train"][0]
+		except KeyError:
+			logging.warning("AR command without a train name")
+			return
 		try:
 			tr = self.trains[trnm]
 		except KeyError:
@@ -3456,7 +3676,11 @@ class MainFrame(wx.Frame):
 		tr.Draw()
 				
 	def DoCmdARRequest(self, parms):
-		trnm = parms["train"][0]
+		try:
+			trnm = parms["train"][0]
+		except KeyError:
+			logging.warning("ARRequest command without a train name")
+			return
 		if self.AREnabled:
 			try:
 				tr = self.trains[trnm]
@@ -3476,7 +3700,6 @@ class MainFrame(wx.Frame):
 		else:
 			self.PopupEvent("AR request for %s - not enabled" % trnm)
 
-		
 	def DoCmdATC(self, parms):
 		try:
 			trnm = parms["train"][0]
@@ -3496,7 +3719,11 @@ class MainFrame(wx.Frame):
 		tr.Draw()
 				
 	def DoCmdATCRequest(self, parms):
-		trnm = parms["train"][0]
+		try:
+			trnm = parms["train"][0]
+		except KeyError:
+			logging.warning("ATCRequest command without a train name")
+			return
 		if self.ATCEnabled:
 			try:
 				tr = self.trains[trnm]
@@ -3516,12 +3743,20 @@ class MainFrame(wx.Frame):
 		
 		else:
 			self.PopupEvent("ATC request for %s - not enabled" % trnm)
-
 					
 	def DoCmdATCStatus(self, parms):
-		action = parms["action"][0]
+		try:
+			action = parms["action"][0]
+		except KeyError:
+			logging.warning("ATC Status command without action")
+			return
+
 		if action == "reject":
-			trnm = parms["train"][0]
+			try:
+				trnm = parms["train"][0]
+			except KeyError:
+				logging.warning("ATC Status reject command without train name")
+				return
 			try:
 				tr = self.trains[trnm]
 			except KeyError:
@@ -3534,7 +3769,11 @@ class MainFrame(wx.Frame):
 			tr.Draw()
 			
 		elif action in [ "complete", "remove" ]:
-			trnm = parms["train"][0]
+			try:
+				trnm = parms["train"][0]
+			except KeyError:
+				logging.warning("ATC Status complete/remove command without train name")
+				return
 			try:
 				tr = self.trains[trnm]
 			except KeyError:
@@ -3609,7 +3848,6 @@ class MainFrame(wx.Frame):
 					
 	def Get(self, cmd, parms):
 		return self.rrServer.Get(cmd, parms)
-					
 
 	def SendBlockDirRequests(self):
 		bdirs = []
@@ -3636,7 +3874,6 @@ class MainFrame(wx.Frame):
 			self.Request({"routedefs": { "data": json.dumps(rds[rx:rx+step])}})
 			rx  += step
 
-			
 	def SendCrossoverPoints(self):
 		self.Request({"crossover": {"data": ["%s:%s" % (b[0], b[1]) for b in self.districts.GetCrossoverPoints()]}})
 

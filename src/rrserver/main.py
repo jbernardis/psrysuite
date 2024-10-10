@@ -389,7 +389,10 @@ class ServerMain:
 		self.socketServer.sendToAll(resp)
 
 	def DoSignal(self, cmd):
-		signame = cmd["name"][0]
+		try:
+			signame = cmd["name"][0]
+		except KeyError:
+			signame = None
 		try:
 			aspect = int(cmd["aspect"][0])
 		except KeyError:
@@ -407,6 +410,10 @@ class ServerMain:
 			frozenaspect = int(cmd["frozenaspect"][0])
 		except:
 			frozenaspect=None
+
+		if signame is None:
+			logging.error("Signal command without name parameter")
+			return
 	
 		if aspectType is not None:
 			self.rr.SetAspect(signame, aspect, frozenaspect, callon, aspectType=aspectType)
@@ -414,14 +421,36 @@ class ServerMain:
 			self.rr.SetAspect(signame, aspect, frozenaspect, callon)
 
 	def DoSignalLock(self, cmd):			
-		signame = cmd["name"][0]
-		status = int(cmd["status"][0])
+		try:
+			signame = cmd["name"][0]
+		except KeyError:
+			signame = None
+
+		try:
+			status = int(cmd["status"][0])
+		except KeyError:
+			status = None
+
+		if signame is None or status is None:
+			logging.error("signal lock command without name and/or status paremeter")
+			return
 		
 		self.rr.SetSignalLock(signame, status)
 				
 	def DoTurnout(self, cmd):
-		swname = cmd["name"][0]
-		status = cmd["status"][0]
+		try:
+			swname = cmd["name"][0]
+		except KeyError:
+			swname = None
+
+		try:
+			status = cmd["status"][0]
+		except KeyError:
+			status = None
+
+		if swname is None or status is None:
+			logging.error("turnout command without name and/or status paremeter")
+			return
 
 		self.rr.SetOutPulseTo(swname, status)
 
@@ -447,27 +476,59 @@ class ServerMain:
 		if bentry and bexit:
 			self.rr.SetOutPulseNXB(bentry)
 			self.rr.SetOutPulseNXB(bexit)
-		else:
+		elif button:
 			self.rr.SetOutPulseNXB(button)
+		else:
+			logging.error("NX button without entry&exit/button parameters")
 		
 	def DoTurnoutLock(self, cmd):
-		swname = cmd["name"][0]
-		status = int(cmd["status"][0])
+		try:
+			swname = cmd["name"][0]
+		except KeyError:
+			swname = None
+
+		try:
+			status = int(cmd["status"][0])
+		except KeyError:
+			status = None
+
+		if swname is None or status is None:
+			logging.error("turnout lock command without name and/or status paremeter")
+			return
 
 		self.rr.SetTurnoutLock(swname, status)
 			
 	def DoHandSwitch(self, cmd):
-		hsname = cmd["name"][0]
-		stat = int(cmd["status"][0])
+		try:
+			hsname = cmd["name"][0]
+		except KeyError:
+			hsname = None
+
+		try:
+			stat = int(cmd["status"][0])
+		except KeyError:
+			stat = None
+
+		if hsname is None or stat is None:
+			logging.error("handswitch without name and/or status paremeter")
+			return
 
 		self.rr.SetHandswitch(hsname, stat)
 
 	def DoSetRoute(self, cmd):
-		blknm = cmd["block"][0]
+		try:
+			blknm = cmd["block"][0]
+		except (IndexError, KeyError):
+			blknm = None
+
 		try:
 			route = cmd["route"][0]
 		except (IndexError, KeyError):
 			route = None
+
+		if blknm is None:
+			logging.error("Route command without block parameter")
+			return
 
 		if route is None:
 			ends = None
@@ -492,8 +553,19 @@ class ServerMain:
 		self.socketServer.sendToAll(resp)
 
 	def DoIndicator(self, cmd):
-		indname = cmd["name"][0]
-		value = int(cmd["value"][0])
+		try:
+			indname = cmd["name"][0]
+		except KeyError:
+			indname = None
+
+		try:
+			value = int(cmd["value"][0])
+		except KeyError:
+			value = None
+
+		if indname is None or value is None:
+			logging.error("indicator command without name and/or value paremeter")
+			return
 
 		self.rr.SetIndicator(indname, value == 1)
 		# indicator information is always echoed to all listeners
@@ -501,10 +573,21 @@ class ServerMain:
 		self.socketServer.sendToAll(resp)
 
 	def DoRelay(self, cmd):
-		block = cmd["block"][0]
+		try:
+			block = cmd["block"][0]
+		except KeyError:
+			block = None
+
+		try:
+			status = int(cmd["state"][0])
+		except KeyError:
+			status = None
+
+		if block is None or status is None:
+			logging.error("relay command without block and/or state paremeter")
+			return
+
 		relay = block + ".srel"
-		status = int(cmd["state"][0])
-		
 		resp = {"relay": [{ "name": relay, "state": status}]}
 		addrList = self.clientList.GetFunctionAddress("DISPLAY")
 		for addr, skt in addrList:
@@ -513,8 +596,20 @@ class ServerMain:
 		self.rr.SetRelay(relay, status)
 		
 	def DoClock(self, cmd):
-		value = cmd["value"][0]
-		status = cmd["status"][0]
+		try:
+			value = cmd["value"][0]
+		except KeyError:
+			value = None
+
+		try:
+			status = cmd["status"][0]
+		except KeyError:
+			status = None
+
+		if value is None or status is None:
+			logging.error("clock command without value and/or status paremeter")
+			return
+
 		resp = {"clock": [{ "value": value, "status": status}]}
 		self.timeValue = value
 		self.clockStatus = status
@@ -530,29 +625,87 @@ class ServerMain:
 			self.socketServer.sendToOne(skt, addr, resp)
 			
 	def DoSimulate(self, cmd):
-		action = cmd["action"][0]
-		if action == "occupy":
-			block = cmd["block"][0]
-			state = int(cmd["state"][0])
-			self.rr.OccupyBlock(block, state)
+		try:
+			action = cmd["action"][0]
+		except KeyError:
+			action = None
+
+		if action is None:
+			logging.error("Sinulate command without action parameter")
+
+		elif action == "occupy":
+			try:
+				block = cmd["block"][0]
+			except KeyError:
+				block = None
+			try:
+				state = int(cmd["state"][0])
+			except KeyError:
+				state = None
+
+			if block is None or state is None:
+				logging.error("simjulate occupy command without block and/or state parameter")
+			else:
+				self.rr.OccupyBlock(block, state)
 			
 		elif action == "breaker":
-			brkname = cmd["breaker"][0]
-			state = int(cmd["state"][0])
-			self.rr.SetBreaker(brkname, state)
+			try:
+				brkname = cmd["breaker"][0]
+			except KeyError:
+				brkname = None
+			try:
+				state = int(cmd["state"][0])
+			except KeyError:
+				state = None
+
+			if brkname is None or state is None:
+				logging.error("simulate breaker command without breaker and/or state parateter")
+			else:
+				self.rr.SetBreaker(brkname, state)
 			
 		elif action == "routein":
-			rtname = cmd["name"][0]
-			self.rr.SetRouteIn(rtname)
+			try:
+				rtname = cmd["name"][0]
+			except KeyError:
+				rtname = None
+
+			if rtname is None:
+				logging.error("simulate routeit command without name parameter")
+			else:
+				self.rr.SetRouteIn(rtname)
 			
 		elif action == "turnoutpos":
-			toname = cmd["turnout"][0]
-			normal = cmd["normal"][0] == "1"
-			self.rr.SetTurnoutPos(toname, normal)
+			try:
+				toname = cmd["turnout"][0]
+			except KeyError:
+				toname = None
+			try:
+				normal = cmd["normal"][0] == "1"
+			except KeyError:
+				normal = None
+
+			if toname is None or normal is None:
+				logging.error("simulate turnoutpos command without turnout and/or normal parameter")
+			else:
+				self.rr.SetTurnoutPos(toname, normal)
+
+		else:
+			logging.error("Simulate command - unknown action: %s" % action)
 			
 	def DoIdentify(self, cmd):
-		sid = int(cmd["SID"][0])
-		function = cmd["function"][0]
+		try:
+			sid = int(cmd["SID"][0])
+		except KeyError:
+			sid = None
+		try:
+			function = cmd["function"][0]
+		except KeyError:
+			function = None
+
+		if sid is None or function is None:
+			logging.error("Identify command without SID and/or function paremeter")
+			return
+
 		self.clientList.SetSessionFunction(sid, function)
 		if function == "DISPATCH":
 			self.deleteClients(["AR", "ADVISOR", "ATC"])
@@ -560,8 +713,14 @@ class ServerMain:
 			self.pidADV = None
 
 	def DoRouteDef(self, cmd):
-		name = cmd["name"][0]
-		osNm = cmd["os"][0]
+		try:
+			name = cmd["name"][0]
+		except KeyError:
+			name = None
+		try:
+			osNm = cmd["os"][0]
+		except KeyError:
+			osNm = None
 		try:
 			signals = cmd["signals"]
 		except KeyError:
@@ -575,13 +734,23 @@ class ServerMain:
 		except KeyError:
 			ends = [None, None]
 
+		if name is None or osNm is None:
+			logging.error("Routedef command without name and/or os parameter")
+			return
+
 		self.routeDefs[name] = (RouteDef(name, osNm, ends, signals, turnouts))
 
 	def DoRouteDefs(self, cmd):
 		data = json.loads(cmd["data"][0])
 		for r in data:
-			name = r["name"]
-			osNm = r["os"]
+			try:
+				name = r["name"]
+			except KeyError:
+				name = None
+			try:
+				osNm = r["os"]
+			except KeyError:
+				osNm = None
 			try:
 				signals = r["signals"]
 			except KeyError:
@@ -595,11 +764,24 @@ class ServerMain:
 			except KeyError:
 				ends = [None, None]
 
+			if name is None or osNm is None:
+				logging.error("Routedefs command without name and/or os parameter")
+				return
+
 			self.routeDefs[name] = (RouteDef(name, osNm, ends, signals, turnouts))
 
 	def DoCrossOver(self, cmd):
+		try:
+			colist = cmd["data"]
+		except KeyError:
+			colist = None
+
+		if colist is None:
+			logging.error("crossover command without data parameter")
+			return
+
 		self.CrossoverPoints = []
-		for b in cmd["data"]:
+		for b in colist:
 			self.CrossoverPoints.append(b.split(":"))
 			
 	def DoGenLayout(self, cmd):
@@ -611,22 +793,53 @@ class ServerMain:
 			logging.info("Layout file has been generated")
 					
 	def DoFleet(self, cmd):
-		signame = cmd["name"][0]
-		value = int(cmd["value"][0])
+		try:
+			signame = cmd["name"][0]
+		except KeyError:
+			signame = None
+		try:
+			value = int(cmd["value"][0])
+		except KeyError:
+			value = None
+
+		if signame is None or value is None:
+			logging.error("Fleet command without signame and/or value parameter")
+			return
+
 		self.rr.SetSignalFleet(signame, value)
 		resp = {"fleet": [{"name": signame, "value": value}]}
 		# fleeting changes are always echoed back to all listeners
 		self.socketServer.sendToAll(resp)
 		
 	def DoDistrictLock(self, cmd):
-		name = cmd["name"][0]
-		value = cmd["value"]
+		try:
+			name = cmd["name"][0]
+		except KeyError:
+			name = None
+		try:
+			value = cmd["value"]
+		except KeyError:
+			value = None
+
+		if name is None or value is None:
+			logging.error("DistrictLock command without name and/or value parameter")
+			return
 
 		self.rr.SetDistrictLock(name, [int(v) for v in value])
 			
 	def DoControl(self, cmd):
-		name = cmd["name"][0]
-		value = int(cmd["value"][0])
+		try:
+			name = cmd["name"][0]
+		except KeyError:
+			name = None
+		try:
+			value = int(cmd["value"][0])
+		except KeyError:
+			value = None
+
+		if name is None or value is None:
+			logging.error("Control command without name and/or value parameter")
+			return
 
 		self.rr.SetControlOption(name, value)
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
@@ -649,24 +862,73 @@ class ServerMain:
 		self.rrBus.reopen()
 
 	def DoBlockDir(self, cmd):
-		block = cmd["block"][0]
-		direction = cmd["dir"][0]
+		try:
+			block = cmd["block"][0]
+		except KeyError:
+			block = None
+		try:
+			direction = cmd["dir"][0]
+		except KeyError:
+			direction = None
+
+		if block is None or direction is None:
+			logging.error("Blockdir command without block and/or dir parameter")
+			return
+
 		self.rr.SetBlockDirection(block, direction)
 
 	def DoBlockDirs(self, cmd):
-		data = json.loads(cmd["data"][0])
+		try:
+			data = json.loads(cmd["data"][0])
+		except KeyError:
+			data = None
+
+		if data is None:
+			logging.error("Blockdirs command without data parameter")
+			return
+
 		for b in data:
-			block = b["block"]
-			direction = b["dir"]
+			try:
+				block = b["block"]
+			except KeyError:
+				block = None
+			try:
+				direction = b["dir"]
+			except KeyError:
+				direction = None
+
+			if block is None or direction is None:
+				logging.error("Blockdirs command without block and/or dir parameter")
+				return
+
 			self.rr.SetBlockDirection(block, direction)
 
 	def DoBlockClear(self, cmd):
-		block = cmd["block"][0]
-		clear = cmd["clear"][0]
+		try:
+			block = cmd["block"][0]
+		except KeyError:
+			block = None
+		try:
+			clear = cmd["clear"][0]
+		except KeyError:
+			clear = None
+
+		if block is None or clear is None:
+			logging.error("Blockclear command without block and/or clear parameter")
+			return
+
 		self.rr.SetBlockClear(block, clear == "1")
 		
 	def DoRefresh(self, cmd):
-		sid = int(cmd["SID"][0])
+		try:
+			sid = int(cmd["SID"][0])
+		except KeyError:
+			sid = None
+
+		if sid is None:
+			logging.error("Refresh command without SID parameter")
+			return
+
 		for addr, data in self.clients.items():
 			if data[1] == sid:
 				skt = data[0]
@@ -676,7 +938,7 @@ class ServerMain:
 
 		try:
 			reftype = cmd["type"][0]
-		except:
+		except KeyError:
 			reftype = None
 
 		if reftype is None:
@@ -687,6 +949,8 @@ class ServerMain:
 			self.sendRouteDefs(addr, skt)
 		elif reftype == "subblocks":
 			self.sendSubBlocks(addr, skt)
+		else:
+			logging.error("Invalid type: %s, for refresh command" % reftype)
 			
 	def DoTrainBlockOrder(self, cmd):
 		try:
@@ -697,7 +961,7 @@ class ServerMain:
 		try:
 			blocks = cmd["blocks"]
 		except KeyError:
-			blocks = None
+			blocks = []
 
 		try:
 			east = cmd["east"][0].startswith("T")
@@ -717,6 +981,8 @@ class ServerMain:
 				self.socketServer.sendToAll(resp)
 			else:
 				logging.error("Received trainblock order for non existant train %s" % trid)
+		else:
+			logging.error("Trainblockorder command without name and/or blocks parameter")
 
 	def DoTrainTimesRequest(self, cmd):
 		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
@@ -788,6 +1054,7 @@ class ServerMain:
 
 		# TODO - we need to set the occupancy bit (or clear it is trn is None)
 		#self.rr.OccupyBlock(block, 0 if trn is None else 1)
+		print("we got here, trn = %s, blocks = %s" % (str(trn), str(blocks)), flush=True)
 		
 		# train information is always echoed back to all listeners
 		stParams = {"name": trn, "loco": loco, "blocks": blocks, "east": east, "action": action, "silent": silent}
@@ -878,9 +1145,23 @@ class ServerMain:
 			self.socketServer.sendToOne(skt, addr, {"checktrains": {}})
 		
 	def DoTrainSignal(self, cmd):
-		trid = cmd["train"][0]
-		signal = cmd["signal"][0]
-		aspect = cmd["aspect"][0]
+		try:
+			trid = cmd["train"][0]
+		except KeyError:
+			trid = None
+		try:
+			signal = cmd["signal"][0]
+		except KeyError:
+			signal = None
+		try:
+			aspect = cmd["aspect"][0]
+		except KeyError:
+			aspect = None
+
+		if trid is None or signal is None or aspect is None:
+			logging.error("trainsignal command without train and/or signal and/op aspect parameter")
+			return
+
 		self.trainList.UpdateSignal(trid, signal, aspect)
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"trainsignal": p}
@@ -897,13 +1178,31 @@ class ServerMain:
 			self.socketServer.sendToOne(skt, addr, {"alert": cmd})
 				
 	def DoServer(self, cmd):
-		action = cmd["action"][0]
-		if action == "exit":
+		try:
+			action = cmd["action"][0]
+		except KeyError:
+			action = None
+
+		if action is None:
+			logging.error("server command without action parameter")
+
+		elif action == "exit":
 			logging.info("HTTP 'server:exit' command received - terminating")
 			self.Shutdown()
+
+		else:
+			logging.error("server command with unknown action: %s" % action)
 				
 	def DoDebug(self, cmd):
-		function = cmd["function"][0]
+		try:
+			function = cmd["function"][0]
+		except KeyError:
+			function = None
+
+		if function is None:
+			logging.error("debug command without function parameter")
+			return
+
 		addrList = self.clientList.GetFunctionAddress(function)
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"debug": cmd})
@@ -928,13 +1227,29 @@ class ServerMain:
 			self.socketServer.sendToOne(skt, addr, resp)
 
 	def DoClose(self, cmd):
-		function = cmd["function"][0]
+		try:
+			function = cmd["function"][0]
+		except KeyError:
+			function = None
+
+		if function is None:
+			logging.error("Close command without function parameter")
+			return
+
 		addrList = self.clientList.GetFunctionAddress(function)
 		for addr, _ in addrList:
 			self.socketServer.deleteSocket(addr)
 
 	def DoAutorouter(self, cmd): # start/kill autorouter process
-		stat = cmd["status"][0]
+		try:
+			stat = cmd["status"][0]
+		except KeyError:
+			stat = None
+
+		if stat is None:
+			logging.error("autorouter command without status parameter")
+			return
+
 		if stat == "on":
 			if not self.clientList.HasFunction("AR"):
 				arExec = os.path.join(os.getcwd(), "autorouter", "main.py")

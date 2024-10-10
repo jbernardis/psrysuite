@@ -139,6 +139,12 @@ class TrainList:
 
 			del(self.trains[oname])
 
+		else:
+			# the old name and the new name are the same - make sure the train exists
+			if nname not in self.trains:
+				logging.error("Trying to change parameters on a non-existant train: %s" % nname)
+				return False
+
 		self.trains[nname]["route"] = nroute
 
 		if nloco is not None:
