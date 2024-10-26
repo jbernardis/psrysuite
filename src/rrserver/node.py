@@ -69,7 +69,8 @@ class Node:
 		return rv
 	
 	def SetInputBit(self, vbyte, vbit, state):
-		self.inb[vbyte] = setBit(self.inb[vbyte], 7-vbit, state) 
+		old = self.inb[vbyte]
+		self.inb[vbyte] = setBit(self.inb[vbyte], 7-vbit, state)
 
 	def SetOutputBit(self, vbyte, vbit, state):
 		self.outb[vbyte] = setBit(self.outb[vbyte], vbit, state)	   

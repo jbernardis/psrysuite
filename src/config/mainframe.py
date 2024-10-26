@@ -103,18 +103,7 @@ class MainFrame(wx.Frame):
 		hsz.Add(self.teDCCComPort)
 		hsz.AddSpacer(20)
 		boxsizer.Add(hsz)
-		
-		boxsizer.AddSpacer(10)
 
-		hsz = wx.BoxSizer(wx.HORIZONTAL)
-		hsz.AddSpacer(20)
-		hsz.Add(wx.StaticText(commBox, wx.ID_ANY, "DCC Sniffer COM port: ", size=(130, -1)))		
-		self.teSnifferComPort = wx.TextCtrl(commBox, wx.ID_ANY, "", size=(100, -1))
-		self.teSnifferComPort.SetValue(self.settings.dccsniffer.tty)
-		hsz.Add(self.teSnifferComPort)
-		hsz.AddSpacer(20)
-		boxsizer.Add(hsz)
-		
 		boxsizer.AddSpacer(10)
 
 		commBox.SetSizer(boxsizer)
@@ -206,11 +195,49 @@ class MainFrame(wx.Frame):
 		dispBox.SetSizer(boxsizer)
 		
 		vszrl.Add(dispBox, 0, wx.EXPAND)
-		
 
 		vszrr = wx.BoxSizer(wx.VERTICAL)
 		vszrr.AddSpacer(20)
-			
+
+		snifferBox = wx.StaticBox(self, wx.ID_ANY, "DCC Sniffer")
+		topBorder = snifferBox.GetBordersForSizer()[0]
+		boxsizer = wx.BoxSizer(wx.VERTICAL)
+		boxsizer.AddSpacer(topBorder + 10)
+
+		boxsizer.AddSpacer(10)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(20)
+		hsz.Add(wx.StaticText(snifferBox, wx.ID_ANY, "DCC Sniffer COM port: ", size=(130, -1)))
+		self.teSnifferComPort = wx.TextCtrl(snifferBox, wx.ID_ANY, "", size=(100, -1))
+		self.teSnifferComPort.SetValue(self.settings.dccsniffer.tty)
+		hsz.Add(self.teSnifferComPort)
+		hsz.AddSpacer(20)
+		boxsizer.Add(hsz)
+
+		self.cbSnifferEnable = wx.CheckBox(snifferBox, wx.ID_ANY, "Enable")
+		boxsizer.Add(self.cbSnifferEnable, 0, wx.LEFT, 40)
+		self.cbSnifferEnable.SetValue(self.settings.dccsniffer.enable)
+
+		boxsizer.AddSpacer(10)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(20)
+		hsz.Add(wx.StaticText(snifferBox, wx.ID_ANY, "Interval (usec): ", size=(130, -1)))
+		self.teInterval = wx.TextCtrl(snifferBox, wx.ID_ANY, "", size=(100, -1))
+		self.teInterval.SetValue("%d" % self.settings.dccsniffer.interval)
+		hsz.Add(self.teInterval)
+		hsz.AddSpacer(20)
+		boxsizer.Add(hsz)
+
+		boxsizer.AddSpacer(10)
+
+		snifferBox.SetSizer(boxsizer)
+
+		vszrr.Add(snifferBox, 0, wx.EXPAND)
+
+		vszrr.AddSpacer(20)
+
 		atBox = wx.StaticBox(self, wx.ID_ANY, "Active Trains")
 		topBorder = atBox.GetBordersForSizer()[0]
 		boxsizer = wx.BoxSizer(wx.VERTICAL)
@@ -468,7 +495,7 @@ class MainFrame(wx.Frame):
 	def OnBGenerate(self, _):
 		dlg = GenerateDlg(self, self.GenShortcut)
 		dlg.ShowModal()
-		dlg.Destroy
+		dlg.Destroy()
 
 	def OnBBackup(self, _):
 		saveData(self, self.settings)
@@ -496,7 +523,8 @@ class MainFrame(wx.Frame):
 		self.settings.rrserver.dcctty = self.teDCCComPort.GetValue()
 		
 		self.settings.dccsniffer.tty = self.teSnifferComPort.GetValue()
-		
+		self.settings.dccsniffer.enable = self.cbSnifferEnable.IsChecked()
+
 		self.settings.display.showcameras = self.cbShowCameras.IsChecked()		
 		self.settings.display.pages = 1 if self.rbPages.GetSelection() == 0 else 3
 		self.settings.display.allowatcrequests = self.cbAllowATCRequests.IsChecked()

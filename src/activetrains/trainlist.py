@@ -107,6 +107,8 @@ class ActiveTrainsPanel(wx.Panel):
 		self.suppressNonATC =  self.settings.activetrains.onlyatc
 		self.suppressNonAssigned =  self.settings.activetrains.onlyassigned
 		self.suppressNonAssignedAndKnown = self.settings.activetrains.onlyassignedorunknown
+
+		self.dccSnifferEnabled = self.settings.dccsniffer.enable
 		
 		self.resized = False
 		self.Bind(wx.EVT_SIZE, self.OnResize)
@@ -161,7 +163,7 @@ class ActiveTrainsPanel(wx.Panel):
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20)
 
-		self.trCtl = TrainListCtrl(self, lines*32)
+		self.trCtl = TrainListCtrl(self, self.dccSnifferEnabled, lines*32)
 		hsz.Add(self.trCtl, 0, wx.EXPAND)
 		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.DoubleClickTrain, self.trCtl)
 

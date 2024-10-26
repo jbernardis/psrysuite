@@ -1,12 +1,17 @@
+import threading
 import serial
 import logging
+import time
 
-class Sniffer:
-	def __init__(self):
+
+class Sniffer(threading.Thread):
+	def __init__(self, parent):
+		threading.Thread.__init__(self)
 		self.tty = None
 		self.baud = None
 		self.port = None
-		self.isRunning = False
+		self._isRunning = False
+		self.parent = parent
 
 	def connect(self, tty):
 		self.tty = tty
@@ -20,19 +25,22 @@ class Sniffer:
 		return self.port is not None
 	
 	def kill(self):
-		self.isRunning = False
-		
-	def run(self, rrserver):
-		self.isRunning = True
-		while self.isRunning:
+		self._isRunning = False
+
+	def isRunning(self):
+		return self._isRunning
+
+	def run(self):
+		self._isRunning = True
+		while self._isRunning:
 			if self.port is None or not self.port.is_open:
-				self.isRunning = False
+				self._isRunning = False
 			else:
 				try:
 					c = self.port.read_until()
 				except serial.SerialException:
 					self.port = None
-					self.isRunning = True
+					self._isRunning = True
 				
 				if len(c) != 0:
 					try:
@@ -45,13 +53,15 @@ class Sniffer:
 							logging.warning("received unexpected DCC message: %s" % s)
 						else:
 							req = {
-								"dccspeed": {
-									"speedtype": p[0],
-									"loco": "%d" % int(p[1]), # strip off any leading zeroes
-									"speed": p[2]
-								}
+								"cmd": "dccspeed",
+								"loco": "%d" % int(p[1]), # strip off any leading zeroes
+								"speed": p[2],
+								"stype": p[0]
 							}
-							rrserver.SendRequest(req)
+
+							self.parent.raiseDCCEvent(req)
+				else:
+					time.sleep(0.0001)
 
 		try:
 			self.port.close()

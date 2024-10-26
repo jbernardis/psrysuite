@@ -329,7 +329,6 @@ class MainFrame(wx.Frame):
 		self.activeTrains.RemoveAllTrains()
 		self.trains = {}
 		self.Request({"refresh": {"SID": self.sessionid}})
-		
 
 	def raiseDeliveryEvent(self, data): # thread context
 		try:
@@ -346,10 +345,12 @@ class MainFrame(wx.Frame):
 			"signal":			self.DoCmdSignal,
 			"trainsignal":		self.DoCmdTrainSignal,
 			"settrain":			self.DoCmdSetTrain,
+			"deletetrain":		self.DoCmdDeleteTrain,
 			"setroute":			self.DoCmdSetRoute,
 			"assigntrain":		self.DoCmdAssignTrain,
 			"relay":			self.DoCmdRelay,
 			"dccspeed":			self.DoCmdDCCSpeed,
+			"dccspeeds":		self.DoCmdDCCSpeeds,
 			"atc":				self.DoCmdATC,
 			"atcstatus":		self.DoCmdATCStatus,
 			"ar":				self.DoCmdAR,
@@ -458,6 +459,24 @@ class MainFrame(wx.Frame):
 				logging.error("Unable to find block %s from setroute message" % blknm)
 			else:
 				block.SetRoute(rtnm)
+
+	def DoCmdDeleteTrain(self, parms):
+		try:
+			trid = parms["name"]
+		except KeyError:
+			trid = None
+
+		if trid is None:
+			return
+
+		try:
+			del (self.trains[trid])
+		except:
+			logging.warning("can't delete train %s from train list" % trid)
+		try:
+			self.activeTrains.RemoveTrain(trid)
+		except:
+			logging.warning("can't delete train %s from active train list" % trid)
 
 	def DoCmdSetTrain(self, parms):
 		blocks = parms["blocks"]
@@ -640,7 +659,14 @@ class MainFrame(wx.Frame):
 			if tr is not None:
 				tr.SetThrottle(speed, speedtype)
 				self.activeTrains.UpdateTrain(tr.GetName())
-				
+
+	def DoCmdDCCSpeeds(self, parms):
+		for loco, spinfo in parms.items():
+			tr = self.activeTrains.FindTrainByLoco(loco)
+			if tr is not None:
+				tr.SetThrottle(spinfo[0], spinfo[1])
+				self.activeTrains.UpdateTrain(tr.GetName())
+
 	def DoCmdATC(self, parms):
 		action = parms["action"][0]
 		if action not in [ "add", "remove" ]:

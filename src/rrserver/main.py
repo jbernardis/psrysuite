@@ -66,7 +66,7 @@ from rrserver.clientlist import ClientList
 from rrserver.trainlist import TrainList
 from rrserver.dccserver import DCCHTTPServer
 
-from dispatcher.constants import RegAspects
+#from dispatcher.constants import RegAspects
 
 
 class ServerMain:
@@ -82,8 +82,9 @@ class ServerMain:
 		self.pidAR = None
 		self.pidADV = None
 		self.DCCSniffer = None
-		self.pidDCCSniffer = None
 		self.timeValue = None
+		self.rrBus = None
+		self.DCCServer = None
 		self.clockStatus = 2
 		self.busInterval = settings.rrserver.businterval
 		
@@ -142,9 +143,12 @@ class ServerMain:
 			self.rrBus = Bus(settings.rrserver.rrtty)
 			self.rr.setBus(self.rrBus)
 			pname = os.path.join(os.getcwd(), "dccsniffer", "main.py")
-			self.DCCSniffer = Popen([sys.executable, pname])
-			pid = self.DCCSniffer.pid
-			logging.info("started DCC sniffer process as PID %d" % pid)
+			if settings.dccsniffer.enable:
+				self.DCCSniffer = Popen([sys.executable, pname])
+				pid = self.DCCSniffer.pid
+				logging.info("started DCC sniffer process as PID %d" % pid)
+			else:
+				logging.info("start DCC sniffer process skipped")
 
 	def StartDCCServer(self):
 		self.DCCServer = DCCHTTPServer(settings.ipaddr, settings.dccserverport, settings.rrserver.dcctty)
@@ -298,6 +302,7 @@ class ServerMain:
 			"control":		self.DoControl,
 			
 			"settrain":		self.DoSetTrain,
+			"deletetrain":	self.DoDeleteTrain,
 			"renametrain":	self.DoRenameTrain,
 			"trainsignal":	self.DoTrainSignal,
 			"movetrain":	self.DoMoveTrain,
@@ -341,7 +346,8 @@ class ServerMain:
 			"ignore": 		self.DoIgnore,
 
 			"dccspeed":		self.DoDCCSpeed,
-			
+			"dccspeeds": 	self.DoDCCSpeeds,
+
 			"quit":			self.DoQuit,
 			"delayedstartup":
 							self.DelayedStartup,
@@ -623,17 +629,26 @@ class ServerMain:
 		resp = {"clock": [{ "value": value, "status": status}]}
 		self.timeValue = value
 		self.clockStatus = status
-		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("TRACKER") + self.clientList.GetFunctionAddress("SATELLITE")
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)
-			
+
 	def DoDCCSpeed(self, cmd):
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"dccspeed": [p]}
-		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE") + self.clientList.GetFunctionAddress("TRACKER")
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress(
+			"DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, resp)
-			
+
+	def DoDCCSpeeds(self, cmd):
+		p = {tag: cmd[tag] for tag in cmd if tag != "cmd"}
+		resp = {"dccspeeds": p}
+		addrList = self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress(
+			"DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
+		for addr, skt in addrList:
+			self.socketServer.sendToOne(skt, addr, resp)
+
 	def DoSimulate(self, cmd):
 		try:
 			action = cmd["action"][0]
@@ -654,7 +669,7 @@ class ServerMain:
 				state = None
 
 			if block is None or state is None:
-				logging.error("simjulate occupy command without block and/or state parameter")
+				logging.error("simulate occupy command without block and/or state parameter")
 			else:
 				self.rr.OccupyBlock(block, state)
 			
@@ -1004,6 +1019,26 @@ class ServerMain:
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"traintimesreport": cmd})
 
+	def DoDeleteTrain(self, cmd):
+		try:
+			trn = cmd["name"][0]
+		except (IndexError, KeyError):
+			trn = None
+
+		if trn is None:
+			logging.info("skipping delete train command with no train name")
+			return
+
+		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
+		resp = {"deletetrain": p}
+		self.socketServer.sendToAll(resp)
+
+		if not self.trainList.HasTrain(trn):
+			logging.info("skipping delete of non existant train")
+			return
+
+		self.trainList.DeleteTrain(trn)
+
 	def DoSetTrain(self, cmd):
 		try:
 			blocks = cmd["blocks"]
@@ -1036,36 +1071,16 @@ class ServerMain:
 		except (IndexError, KeyError):
 			silent = True
 
-		if trn and trn.startswith("??"):
-			# this is an unknown train - see if we have a known train in the same block
-			ntrn, nloco = self.trainList.FindTrainInBlock(blocks[0])
-			if ntrn:
-				trn = ntrn
-				trinfo = self.trainList.GetTrainInfo(trn)
-				east = trinfo["east"]
-				
-			if nloco:
-				loco = nloco
-				
-		elif trn:
-			# this is a known train - see if we have an existing train (known or unknown)
-			# in the block, and just replace it
-			etrn, eloco = self.trainList.FindTrainInBlock(blocks[0])
-			if etrn:
-				if self.trainList.RenameTrain(etrn, trn, eloco, loco, east):
-					for cmd in self.trainList.GetSetTrainCmds(trn):
-						self.socketServer.sendToAll(cmd)
-				return
-			else: # see if we have it anywhere, and preserve the loco value if we do
-				eloco = self.trainList.GetLocoForTrain(trn)
-				if eloco is not None:
-					if eloco != loco:
-						loco = eloco
+		logging.info("set train: %s" % str(cmd))
 
-		# TODO - we need to set the occupancy bit (or clear it is trn is None)
+		for blknm in blocks:
+			ntrn, nloco = self.trainList.FindTrainInBlock(blknm)
+			if ntrn and ntrn != trn:
+				#remove the block from the old train
+				self.trainList.RemoveTrainFromBlock(ntrn, blknm)
+
 		#self.rr.OccupyBlock(block, 0 if trn is None else 1)
-		print("we got here, trn = %s, blocks = %s" % (str(trn), str(blocks)), flush=True)
-		
+
 		# train information is always echoed back to all listeners
 		stParams = {"name": trn, "loco": loco, "blocks": blocks, "east": east, "action": action, "silent": silent}
 		if route is not None:
@@ -1330,10 +1345,11 @@ class ServerMain:
 			logging.error("exception %s terminating socket server" % str(e))
 		
 		if not settings.rrserver.simulation:
-			try:
-				self.DCCSniffer.kill()
-			except Exception as e:
-				logging.error("exception %s terminating DCC Sniffer process" % str(e))
+			if self.DCCSniffer is not None:
+				try:
+					self.DCCSniffer.kill()
+				except Exception as e:
+					logging.error("exception %s terminating DCC Sniffer process" % str(e))
 				
 			try:
 				self.DCCServer.close()

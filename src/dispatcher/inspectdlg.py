@@ -57,6 +57,12 @@ class InspectDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnBTurnoutLocks, bToLocks)
         btnszr2.Add(bToLocks)
 
+        btnszr2.AddSpacer(10)
+
+        bAuditTrBlks = wx.Button(self, wx.ID_ANY, "Audit Trains\nin Blocks", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnBAuditTrainsInBlocks, bAuditTrBlks)
+        btnszr2.Add(bAuditTrBlks)
+
         btnszr2.AddSpacer(20)
 
         btnszr3 = wx.BoxSizer(wx.VERTICAL)
@@ -171,7 +177,7 @@ class InspectDlg(wx.Dialog):
 
     def OnBTurnoutLocks(self, _):
         lks = self.parent.GetTurnoutLocks()
-        toList = [x for x in lks if len(lks[x]) != 0]
+        toList = sorted([x for x in lks if len(lks[x]) != 0])
         if len(toList) == 0:
             dlg = wx.MessageDialog(self, "No turnouts are presently locked",
                 "Turnout Locks",
@@ -231,6 +237,114 @@ class InspectDlg(wx.Dialog):
             return " N " + callon
         else:
             return " ? " + callon
+
+    def OnBAuditTrainsInBlocks(self, _):
+        messages = []
+        blkTrainMap = {}
+        for bname, blk in self.parent.blocks.items():
+            if blk.IsOccupied():
+                # we should retain the block ID if it is occupied and there is no train identified.  In this case,
+                # the block should be set as unoccupied in a way that propagates to the server
+                blkTrainMap[bname] = blk.GetTrain()
+
+        if len(blkTrainMap) > 0:
+            messages.append("Occupied Blocks")
+            for bname, tr in blkTrainMap.items():
+                trnm = None if tr is None else tr.GetName()
+                blk = self.parent.blocks[bname]
+                rtname = blk.GetRouteDesignator()
+                messages.append("Block %s  occupied by %s" % (rtname, str(trnm)))
+            messages.append("---")
+
+        trlist = list(self.parent.trains.keys())
+        activetrains = self.parent.activeTrains.GetAllTrains()
+        atrlist = list(activetrains.keys())
+        alllist = list(set(trlist+atrlist))
+
+        trBlkMap = {}
+        messages.append("Train List")
+        for tname in alllist:
+            if tname in trlist:
+                tr = self.parent.trains[tname]
+                if tname in atrlist:
+                    tx = "AL"
+                else:
+                    tx = " L"
+            else:
+                tr = activetrains[tname]
+                if tname in trlist:
+                    tx = "AL"
+                else:
+                    tx = "A "
+
+            blist = tr.GetBlockList()
+            bnlist = reversed(tr.GetBlockNameList())
+            trBlkMap[tname] = [bn for bn in blist]
+            messages.append(("Train %s(%s) occupies blocks %s" % (tname, tx, ", ".join(bnlist))))
+
+        messages.append("---")
+
+        messages.append("Audit by Block")
+        errs = False
+        for bname, tr in blkTrainMap.items():
+            tname = None if tr is None else tr.GetName()
+            if tr is None:
+                messages.append("  Block %s: train is none" % bname)
+                errs = True
+            elif tname not in trBlkMap:
+                errs = True
+                messages.append("  Train %s referenced by block %s does not exist in the block's train list" % (tname, bname))
+            elif bname not in trBlkMap[tname]:
+                errs = True
+                messages.append("  Block %s referenced by train %s is not in that train's block list" % (bname, tname))
+            else:
+                #everything is OK - do nothing
+                pass
+
+        if not errs:
+            messages.append("  All OK")
+        messages.append("---")
+
+        errs = False
+        messages.append("Audit by Train")
+        for tname, bnlist in trBlkMap.items():
+            for bname in bnlist:
+                t = blkTrainMap[bname]
+                trname = None if t is None else t.GetName()
+                if bname not in blkTrainMap:
+                    errs = True
+                    messages.append("  Block %s referenced by train %s is not occupied" % (bname, tname))
+                elif trname is None:
+                    errs = True
+                    messages.append("  Block %s, train is None" % bname)
+                elif tname != trname:
+                    errs = True
+                    messages.append("  Train %s references block %s, but that block's occupant is %s" % (tname, bname, trname))
+                else:
+                    # everything is OK - do nothing
+                    pass
+
+        if not errs:
+            messages.append("  All OK")
+        messages.append("---")
+
+        messages.append("Audit Active Trains vs Train List")
+        tronly = [t for t in trlist if t not in atrlist]
+        atronly = [t for t in atrlist if t not in trlist]
+        if len(tronly) > 0:
+            messages.append("  Trains in main list but not in active list: %s" % ", ".join(tronly))
+        if len(atronly) > 0:
+            messages.append("  Trains in active list but not in main list: %s" % ", ".join(atronly))
+        if len(tronly) == 0 and len(atronly) == 0:
+            messages.append("  All OK")
+
+        messages.append("---")
+
+        dlg = wx.MessageDialog(self, "\n".join(messages),
+                               "Train/Block Audit",
+                               wx.OK | wx.ICON_INFORMATION)
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def OnBHandSwitches(self, _):
         hsv = self.GetHandswitchValues()

@@ -1,6 +1,5 @@
 import logging
 import re
-import sys
 
 from rrserver.districts.yard import Yard
 from rrserver.districts.latham import Latham
@@ -14,13 +13,14 @@ from rrserver.districts.cliff import Cliff
 from rrserver.districts.hyde import Hyde
 from rrserver.districts.port import Port
 
-from rrserver.constants import INPUT_BLOCK, INPUT_TURNOUTPOS, INPUT_BREAKER, INPUT_SIGNALLEVER,\
+from rrserver.constants import INPUT_BLOCK, INPUT_TURNOUTPOS, INPUT_BREAKER, INPUT_SIGNALLEVER, \
 	INPUT_HANDSWITCH, INPUT_ROUTEIN
 
-from rrserver.rrobjects import Block, StopRelay, Signal, SignalLever, RouteIn, Turnout,\
+from rrserver.rrobjects import Block, StopRelay, Signal, SignalLever, RouteIn, Turnout, \
 			OutNXButton, Handswitch, Breaker, Indicator, ODevice, Lock
 
-class Railroad():
+
+class Railroad:
 	def __init__(self, parent, cbEvent, settings):
 		self.parent = parent
 		self.cbEvent = cbEvent
@@ -155,10 +155,11 @@ class Railroad():
 				logging.warning("Ignoring occupy command - unknown block name: %s" % blknm)
 				return
 
+		newstate = 1 if state != 0 else 0
 		for blk in blist:
 			if len(blk.Bits()) > 0:
 				vbyte, vbit = blk.Bits()[0]
-				blk.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
+				blk.node.SetInputBit(vbyte, vbit, newstate)
 			else:
 				'''
 				block has sub blocks - occupy all of them as per state
@@ -167,7 +168,7 @@ class Railroad():
 				for sb in sbl:
 					if len(sb.Bits()) > 0:
 						vbyte, vbit = sb.Bits()[0]
-						sb.node.SetInputBit(vbyte, vbit, 1 if state != 0 else 0)
+						sb.node.SetInputBit(vbyte, vbit, newstate)
 		
 	def SetTurnoutPos(self, tonm, normal):
 		'''
@@ -527,11 +528,6 @@ class Railroad():
 		
 	def SetDistrictLock(self, name, value):
 		self.districtLock[name] = value
-		
-		
-		
-		
-		
 
 	def AddBlock(self, name, district, node, address, bits, east):
 		try:
@@ -907,20 +903,6 @@ class Railroad():
 		if blk.SetOccupied(False):
 			self.RailroadEvent(blk.GetEventMessage())
 
-
-
-
-
-
-
-
-
-	def GetSwitchLock(self, toname):  # only used by port - reserve judgement until then
-		if toname in self.switchLock:
-			return self.switchLock[toname]
-		else:
-			return False
-
 	def GetDistrictLock(self, name):  # only used in nassau - reserve judgement til then
 		if name in self.districtLock:
 			return self.districtLock[name]
@@ -1194,10 +1176,10 @@ class Railroad():
 						if obj.SetLeverState(rbit, cbit, lbit):
 							self.RailroadEvent(obj.GetEventMessage())
 							obj.UpdateLed()
-			
 
 	def RailroadEvent(self, event):
 		self.cbEvent(event)
+
 
 class PendingDetectionLoss:
 	def __init__(self, railroad):
@@ -1226,12 +1208,13 @@ class PendingDetectionLoss:
 				if obj.SetOccupied(False):
 					self.railroad.RailroadEvent(obj.GetEventMessage())
 					obj.UpdateIndicators()
-					
+
 				removeBlock.append(blkName)
 			
 		for blkName in removeBlock:
 			del(self.pendingDetectionLoss[blkName])
-		
+
+
 class PulseCounter:
 	def __init__(self, vbyte, vbit, pct, plen, node):
 		self.vbyte = vbyte

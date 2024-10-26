@@ -1,4 +1,3 @@
-
 import threading
 import socket
 import logging
@@ -98,5 +97,8 @@ class Listener(threading.Thread):
 						self.parent.raiseDeliveryEvent(msgBuf)
 	
 		self.endOfLife = True
-		self.join()
+		try:
+			self.join()
+		except RuntimeError:
+			pass
 		

@@ -169,6 +169,10 @@ class Block:
 	def AddTrainLoc(self, screen, loc, routes=None):
 		self.trainLoc.append([screen, loc, routes])
 
+	def IsInActiveRoute(self, col, row):
+		# not applicable to normal blocks
+		return True
+
 	def AddConditionalTrack(self, trk):
 		self.conditionalTrack = trk
 
@@ -1118,6 +1122,17 @@ class OverSwitch (Block):
 
 	def GetRoute(self):
 		return self.route
+
+	def IsInActiveRoute(self, col, row):
+		for _, loc, rte in self.trainLoc:
+			if rte is None:
+				# if the route list is NOne, it is an unconditional train location
+				return True
+
+			if loc[0] == col and loc[1] == row and self.rtName in rte:
+				return True
+
+		return False
 
 	def GetRouteName(self):
 		return self.rtName

@@ -1,5 +1,6 @@
 import wx
 import logging
+import time
 
 
 class Script (wx.Frame):
@@ -163,6 +164,8 @@ class Script (wx.Frame):
 					#self.parent.Request({"blockdir": { "block": block, "dir": direction}})
 				req = {"movetrain": {"block": subblock}}
 				self.parent.Request(req)
+
+				time.sleep(0.500)
 				
 				req = {"settrain": {"blocks": [block], "name": name, "loco": loco, "east": "1" if direction else "0"}}
 				self.parent.Request(req)

@@ -59,6 +59,12 @@ class TrainList:
 			else:
 				self.trains[train] = {"blocks": [b for b in blocks], "blockorder": [b for b in blocks], "loco": loco, "atc": False, "signal": None, "aspect": 0, "east": east, "route": route}
 
+	def DeleteTrain(self, trid):
+		try:
+			del self.trains[trid]
+		except KeyError:
+			pass
+
 	def Dump(self):
 		print("==========================start of trains dump")
 		for trid in self.trains:
@@ -90,12 +96,34 @@ class TrainList:
 				return tr, trinfo["loco"]
 
 		return None, None
+
+	def RemoveTrainFromBlock(self, trn, blk):
+		try:
+			trinfo = self.trains[trn]
+		except KeyError:
+			return False
+
+		try:
+			trinfo["blocks"].remove(blk)
+		except ValueError:
+			return False
+
+		if len(trinfo["blocks"]) == 0:
+			del self.trains[trn]
+
+		return True
 	
 	def GetTrainInfo(self, trid):
 		if trid in self.trains:
 			return self.trains[trid]
 		
 		return None
+
+	def GetTrainBlocks(self, trid):
+		try:
+			return self.trains[trid]["blocks"]
+		except KeyError:
+			return []
 
 	def HasTrain(self, trid):
 		return trid in self.trains

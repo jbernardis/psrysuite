@@ -1,14 +1,10 @@
 [
-	{"movetrain": {"block": ["D11"]}},
-	{"delay": {"ms": 1000}},
 	{"settrain": {"blocks": ["D11"], "name": "11", "loco": "64", "east": 0}},
-
 
 	{"movetrain": {"block": ["D11.E"]}},
 
-	{"movetrain": {"block": ["S10"]}},
-	{"delay": {"ms": 1000}},
 	{"settrain": {"blocks": ["S10"], "name": "17", "loco": "64", "east": 0}},
+
 	{"movetrain": {"block": ["S10.W"]}},
 	{"movetrain": {"block": ["DOSFOW"]}}
 ]

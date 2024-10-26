@@ -68,7 +68,7 @@ MENU_TRAIN_ROUTE = 910
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
-allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest", "traintimesrequest", "trainblockorder", "trainsignal", "blockdir" ]
+allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest", "traintimesrequest", "trainblockorder", "trainsignal", "blockdir", "deletetrain" ]
 disallowedSatelliteCommands = [ "relay" ]
 
 wildcardTrain = "train files (*.trn)|*.trn|"	 \
@@ -1313,20 +1313,16 @@ class MainFrame(wx.Frame):
 
 		sig, osblock, rtname = self.pendingFleets[bname]
 		del(self.pendingFleets[bname])
-
 		'''
 		the signal should be red, so if it's not, do nothing here
 		'''
 		if sig.GetAspect() != 0:
 			return
-		
-		
 		'''
 		calculate a new aspect for this signal, based on current conditions
 		'''
 		rt = osblock.GetRoute()
 		newAspect = sig.GetDistrict().CalculateAspect(sig, osblock, rt)
-		
 		'''
 		check if this signal is still in the selected route through this OS block
 		'''
@@ -1517,7 +1513,8 @@ class MainFrame(wx.Frame):
 			
 			for col, blk in ln:
 				if col <= pos[0] <= col+3:
-					break
+					if blk.IsInActiveRoute(col, pos[1]):
+						break
 			else:
 				blk = None
 
@@ -1732,7 +1729,7 @@ class MainFrame(wx.Frame):
 		oldAR = tr.IsOnAR() if self.IsDispatcher() else False
 		dlgx = self.centerw - 500 - self.centerOffset
 		dlgy = self.totalh - 660
-		dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.engineerList, self.trains, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, self.lostTrains, dlgx, dlgy)
+		dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.engineerList, self.trains, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, self.IsDispatcherOrSatellite(), self.lostTrains, dlgx, dlgy)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			trainid, locoid, engineer, atc, ar, east, chosenRoute = dlg.GetResults()
@@ -1794,10 +1791,13 @@ class MainFrame(wx.Frame):
 				trid = tr.GetName()
 				try:
 					self.activeTrains.RemoveTrain(trid)
-					del(self.trains[trid])
+				except:
+					logging.warning("can't delete train %s from active train list" % trid)
+				try:
+					del self.trains[trid]
 				except:
 					logging.warning("can't delete train %s from train list" % trid)
-			
+
 			else:
 				tr.Draw()
 				
@@ -1826,7 +1826,7 @@ class MainFrame(wx.Frame):
 				return 
 			
 			trx = self.trains[trxid]
-			
+
 			east = tr.GetEast()  # assume the direction of the surviving train
 
 			blist = [x for x in trx.GetBlockList()]
@@ -1837,16 +1837,18 @@ class MainFrame(wx.Frame):
 				blk.SetTrain(tr)
 				blk.SetEast(east)
 				self.CheckTrainsInBlock(blk.GetName(), None)
+			# self.Request({"settrain": { "blocks": blist}})
 
-			self.Request({"settrain": { "blocks": blist}})
+			# set the block list for the surviving train
+			blist = [x for x in tr.GetBlockList()]
 			self.Request({"settrain": { "blocks": blist, "name": oldName, "loco": oldLoco, "east": "1" if east else "0"}})
 
-			del(self.trains[trxid])
 			self.SendTrainBlockOrder(tr)
-			self.SendTrainBlockOrder(trx)
 			self.activeTrains.UpdateTrain(oldName)
 
-			self.activeTrains.RemoveTrain(trxid)
+			self.Request({"deletetrain": {"name": trxid}})
+
+			tr.Draw()
 			return
 		
 		if rc == wx.ID_BACKWARD:
@@ -1860,9 +1862,6 @@ class MainFrame(wx.Frame):
 
 			self.activeTrains.RefreshTrain(tr.GetName())
 			self.SendTrainBlockOrder(tr)
-			#req = {"renametrain": { "oldname": tr.GetName(), "newname": tr.GetName(), "east": "1" if nd else "0", "context": "reverse"}}
-			#self.Request(req)
-
 			return
 
 		if rc == wx.ID_SORT_ASCENDING:
@@ -2354,7 +2353,7 @@ class MainFrame(wx.Frame):
 								otrid = otr.GetName()
 								try:
 									self.activeTrains.RemoveTrain(otrid)
-									del(self.trains[otrid])
+									del self.trains[otrid]
 								except:
 									logging.warning("can't delete train %s from train list" % otrid)
 							else:
@@ -2587,10 +2586,12 @@ class MainFrame(wx.Frame):
 			"breaker":			self.DoCmdBreaker,
 			"trainsignal":		self.DoCmdTrainSignal,
 			"settrain":			self.DoCmdSetTrain,
+			"deletetrain":		self.DoCmdDeleteTrain,
 			"assigntrain":		self.DoCmdAssignTrain,
 			"traincomplete":	self.DoCmdTrainComplete,
 			"clock":			self.DoCmdClock,
 			"dccspeed":			self.DoCmdDCCSpeed,
+			"dccspeeds":		self.DoCmdDCCSpeeds,
 			"control":			self.DoCmdControl,
 			"sessionID":		self.DoCmdSessionID,
 			"end":				self.DoCmdEnd,
@@ -2742,7 +2743,7 @@ class MainFrame(wx.Frame):
 				logging.error("Block command without block and/or state parameter")
 				return
 
-			if block in self.osProxies:
+			if block is not None and block in self.osProxies:
 				district = self.osProxies[block].GetDistrict()
 				block = district.CheckOSProxies(block, state)
 				if block is None:
@@ -2761,49 +2762,50 @@ class MainFrame(wx.Frame):
 					except KeyError:
 						blk = None
 
-			if blk is not None:
-				if self.settings.debug.blockoccupancy:
-					msg = "Block %s%s occupancy %s" % (block, "" if blockend is None else ".%s" % blockend, state)
-					self.PopupEvent(msg)
-				stat = OCCUPIED if state == 1 else EMPTY
-				if state == 1:
-					blk.SetLastEntered(blockend)
-					
-				if blk.GetStatus(blockend) != stat:
-					tr = blk.GetTrain()
-					district = blk.GetDistrict()
-					district.DoBlockAction(blk, blockend, stat)
-					if self.IsDispatcherOrSatellite():
-						self.CheckTrainsInBlock(block, None)
-						if tr is not None and not blk.IsOccupied():
-							"""
-							a block has been emptied - re-evaluate the front block of the train to determine its
-							governing signal
-							"""
-							trid = tr.GetName()
-							tr.RemoveFromBlock(blk)
-							self.SendTrainBlockOrder(tr)
-							if tr.IsInNoBlocks():
-								if not tr.IsBeingEdited():
-									self.PopupEvent(
-										"Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
-									self.lostTrains.Add(trid, tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block, tr.GetChosenRoute())
-								else:
-									tr.SetBeingEdited(False)
-								try:
-									self.activeTrains.RemoveTrain(trid)
-									del (self.trains[trid])
-								except:
-									logging.warning("can't delete train %s from train list" % trid)
-
-							else:
-								trblk = tr.FrontBlock()
-								if trblk is not None:
-									nm = trblk.GetName()
-									self.CheckTrainsInBlock(nm, None)
-
-			else:
+			if blk is None:
 				logging.info("Ignoring block command for unknown block: %s" % block)
+				return
+
+			if self.settings.debug.blockoccupancy:
+				msg = "Block %s%s occupancy change: %s" % (block, "" if blockend is None else ".%s" % blockend, state)
+				self.PopupEvent(msg)
+
+			stat = OCCUPIED if state == 1 else EMPTY
+			if state == 1:
+				blk.SetLastEntered(blockend)
+
+			if blk.GetStatus(blockend) != stat:
+				tr = blk.GetTrain()
+				district = blk.GetDistrict()
+				district.DoBlockAction(blk, blockend, stat)
+				if self.IsDispatcherOrSatellite():
+					self.CheckTrainsInBlock(block, None)
+					if tr is not None and not blk.IsOccupied():
+						"""
+						a block has been emptied - re-evaluate the front block of the train to determine its
+						governing signal
+						"""
+						trid = tr.GetName()
+						tr.RemoveFromBlock(blk)
+						self.SendTrainBlockOrder(tr)
+						if tr.IsInNoBlocks():
+							if not tr.IsBeingEdited():
+								self.PopupEvent(
+									"Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
+								self.lostTrains.Add(trid, tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block, tr.GetChosenRoute())
+							else:
+								tr.SetBeingEdited(False)
+							try:
+								self.activeTrains.RemoveTrain(trid)
+								del self.trains[trid]
+							except:
+								logging.warning("can't delete train %s from train list" % trid)
+
+						else:
+							trblk = tr.FrontBlock()
+							if trblk is not None:
+								nm = trblk.GetName()
+								self.CheckTrainsInBlock(nm, None)
 
 	def DoCmdBlockDir(self, parms):
 		for p in parms:
@@ -3177,6 +3179,24 @@ class MainFrame(wx.Frame):
 			return incorrectRoute, correctRoute
 		return None, None
 
+	def DoCmdDeleteTrain(self, parms):
+		try:
+			trid = parms["name"]
+		except KeyError:
+			trid = None
+
+		if trid is None:
+			return
+
+		try:
+			del self.trains[trid]
+		except:
+			logging.warning("can't delete train %s from train list" % trid)
+		try:
+			self.activeTrains.RemoveTrain(trid)
+		except:
+			logging.warning("can't delete train %s from active train list" % trid)
+
 	def DoCmdSetTrain(self, parms):
 		try:
 			blocks = parms["blocks"]
@@ -3244,7 +3264,10 @@ class MainFrame(wx.Frame):
 							tr.SetBeingEdited(False)
 						try:
 							self.activeTrains.RemoveTrain(trid)
-							del(self.trains[trid])
+						except:
+							logging.warning("can't delete train %s from active train list" % trid)
+						try:
+							del self.trains[trid]
 						except:
 							logging.warning("can't delete train %s from train list" % trid)
 
@@ -3265,7 +3288,10 @@ class MainFrame(wx.Frame):
 						self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block, tr.GetChosenRoute())
 					try:
 						self.activeTrains.RemoveTrain(trid)
-						del(self.trains[trid])
+					except:
+						logging.warning("can't delete train %s from active train list" % trid)
+					try:
+						del self.trains[trid]
 					except:
 						logging.warning("can't delete train %s from train list" % trid)
 
@@ -3282,9 +3308,6 @@ class MainFrame(wx.Frame):
 					if name in self.trains:
 						ntr = self.trains[name]
 						# merge the two trains under the new "name"
-						if not oldName.startswith("??"):
-							self.PopupEvent("Merging train %s => %s block %s" % (oldName, name, blk.GetName))
-
 						try:
 							bl = self.trains[oldName].GetBlockList()
 						except:
@@ -3305,7 +3328,7 @@ class MainFrame(wx.Frame):
 
 						self.trains[name] = tr
 						self.activeTrains.RenameTrain(oldName, name)
-						self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0", "context": "settrainmerge"}})
+						#self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0", "context": "settrainmerge"}})
 						if self.IsDispatcher():
 							blkorderMap[name] = tr
 
@@ -3549,6 +3572,13 @@ class MainFrame(wx.Frame):
 			tr = self.activeTrains.FindTrainByLoco(loco)
 			if tr is not None:
 				tr.SetThrottle(speed, speedtype)
+				self.activeTrains.UpdateTrain(tr.GetName())
+
+	def DoCmdDCCSpeeds(self, parms):
+		for loco, spinfo in parms.items():
+			tr = self.activeTrains.FindTrainByLoco(loco)
+			if tr is not None:
+				tr.SetThrottle(spinfo[0], spinfo[1])
 				self.activeTrains.UpdateTrain(tr.GetName())
 
 	def DoCmdControl(self, parms):

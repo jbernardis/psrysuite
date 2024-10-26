@@ -2,12 +2,11 @@ import logging
 '''
 DISPATCH = 10
 DISPLAY  = 11
-TRACKER  = 20
 ATC      = 30
 AR       = 40
 '''
 
-functions = [ "DISPATCH", "DISPLAY", "TRACKER", "ATC", "AR" ]
+functions = [ "DISPATCH", "DISPLAY", "ATC", "AR" ]
 
 class ClientList:
 	def __init__(self, parent):

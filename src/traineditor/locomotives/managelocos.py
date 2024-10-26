@@ -128,7 +128,7 @@ class ManageLocosDlg(wx.Dialog):
 		
 		if rc != wx.ID_OK:
 			return
-		
+
 		if locoID in self.locoOrder:
 			dlg = wx.MessageDialog(self, "Loco ID \"%s\" is already in use" % locoID, 
 					"Duplicate Name", wx.OK | wx.ICON_WARNING)
@@ -171,8 +171,10 @@ class ManageLocosDlg(wx.Dialog):
 			self.ModifySelectedLoco()
 		
 	def ModifySelectedLoco(self):
-		dlg = ModifyLocoDlg(self, self.selectedLoco, self.locoList.getLocoInfo(self.selectedLoco))
+		sl = self.selectedLoco
+		dlg = ModifyLocoDlg(self, sl, self.locoList.getLocoInfo(sl))
 		rc = dlg.ShowModal()
+
 		if rc == wx.ID_OK:
 			loco = dlg.GetResults()
 			
@@ -180,7 +182,8 @@ class ManageLocosDlg(wx.Dialog):
 		if rc != wx.ID_OK:
 			return 
 
-		self.locoList.modify(self.selectedLoco, loco)
+		self.locoList.modify(sl, loco)
+		self.selectedLoco = sl
 		self.SetModified()	
 		
 	def SetModified(self, flag=True):

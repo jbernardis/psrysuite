@@ -77,6 +77,7 @@ class SktServer (threading.Thread):
 			readable, _, _ = select.select(slist, [], [], 0)
 			if readable and s in readable:
 				skt, addr = s.accept()
+				logging.info("Socket accepted from Address %s" % str(addr))
 				with self.socketLock:
 					self.sockets.append((skt, addr))
 					self.cbEvent({"cmd": ["newclient"], "socket": skt, "addr": addr, "SID": self.sessionID})

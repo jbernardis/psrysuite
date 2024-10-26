@@ -95,10 +95,16 @@ class Settings:
 		section = "dccsniffer"
 		self.dccsniffer = SNode()
 		self.dccsniffer.tty = "COM4"
+		self.dccsniffer.enable = True
+		self.dccsniffer.interval = 5000
 		if self.cfg.has_section(section):
 			for opt, value in self.cfg.items(section):
 				if opt == 'tty':
 					self.dccsniffer.tty = value
+				elif opt == 'enable':
+					self.dccsniffer.enable = parseBoolean(value, True)
+				elif opt == 'interval':
+					self.dccsniffer.interval = int(value)
 
 		else:
 			print("Missing dccsniffer section - assuming defaults")
@@ -398,6 +404,8 @@ class Settings:
 			pass
 		
 		self.cfg.set(section, "tty", self.dccsniffer.tty)
+		self.cfg.set(section, "enable", "True" if self.dccsniffer.enable else "False")
+		self.cfg.set(section, "interval", "%d" % self.dccsniffer.interval)
 
 		section = "control"
 		try:

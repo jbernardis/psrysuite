@@ -3,6 +3,7 @@ import logging
 from rrserver.constants import INPUT_BLOCK, INPUT_BREAKER, INPUT_SIGNALLEVER, INPUT_ROUTEIN, INPUT_HANDSWITCH, INPUT_TURNOUTPOS
 from dispatcher.constants import RegAspects
 
+
 class Block:
 	def __init__(self, name, district, node, address, east):
 		self.name = name
@@ -89,9 +90,27 @@ class Block:
 	def SetOccupied(self, flag):
 		if self.occupied == flag:
 			return False
-		
+
 		self.occupied = flag
+
+		if self.mainBlock is not None:
+			self.mainBlock.DeriveOccupancyFromSubs()
+
 		return True
+
+	def DeriveOccupancyFromSubs(self):
+		if len(self.subBlocks) > 0:
+			# this is the main block - get occupied status from subblocks
+			occ = False
+			for b in self.subBlocks:
+				occ = True if b.IsOccupied(recurse=False) else occ
+
+			rc = self.occupied != occ
+
+			self.occupied = occ
+			return rc
+		return False
+
 
 		
 	def IsOccupied(self, recurse=True):
@@ -101,11 +120,14 @@ class Block:
 		'''
 		for a block that is subdivided into subblocks, occupied reflects the status of all subblocks or'ed together
 		'''
-		occ = self.occupied
-		for b in self.subBlocks:
-			occ = True if b.IsOccupied(recurse=False) else occ
+		if len(self.subBlocks) == 0:
+			return self.occupied
+		else:
+			occ = False
+			for b in self.subBlocks:
+				occ = True if b.IsOccupied(recurse=False) else occ
 
-		return occ
+			return occ
 	
 	def SetCleared(self, flag):
 		if self.cleared == flag:
@@ -154,6 +176,9 @@ class Block:
 
 	def GetEventMessage(self, clear=False, direction=False):
 		bname = self.mainBlockName if self.mainBlockName is not None else self.name
+
+		for b in self.subBlocks:
+			logging.info("Block %s   occupied: %s" % (self.name, self.occupied))
 
 		if clear:
 			return {"blockclear": [{ "block": bname, "clear": self.IsCleared()}]}

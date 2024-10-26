@@ -60,6 +60,9 @@ class ActiveTrainList:
 		self.RegenerateLocoMap()
 		if self.dlgTrainList is not None:
 			self.dlgTrainList.RemoveAllTrains()
+
+	def GetAllTrains(self):
+		return self.trains
 			
 	def SetLoco(self, tr, loco):
 		tr.SetLoco(loco)
@@ -136,6 +139,8 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.suppressNonATC =  self.settings.activetrains.onlyatc
 		self.suppressNonAssigned =  self.settings.activetrains.onlyassigned
 		self.suppressNonAssignedAndKnown = self.settings.activetrains.onlyassignedorunknown
+
+		self.dccSnifferEnabled = self.settings.dccsniffer.enable
 		
 		self.resized = False
 
@@ -190,7 +195,7 @@ class ActiveTrainsDlg(wx.Dialog):
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20)
 
-		self.trCtl = TrainListCtrl(self)
+		self.trCtl = TrainListCtrl(self, self.dccSnifferEnabled)
 		hsz.Add(self.trCtl)
 		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.DoubleClickTrain, self.trCtl)
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ClickTrain, self.trCtl)
@@ -321,12 +326,13 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.dlgExit()
 		
 class TrainListCtrl(wx.ListCtrl):
-	def __init__(self, parent, height=160):
+	def __init__(self, parent, dccsnifferenabled, height=160):
 		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1366, height), style=wx.LC_REPORT + wx.LC_VIRTUAL)
 		self.parent = parent
 		self.trains = {}
 		self.order = []
 		self.filtered = []
+		self.dccsnifferenabled = dccsnifferenabled
 		
 		self.suppressYards = True
 		self.suppressUnknown = False
@@ -355,7 +361,7 @@ class TrainListCtrl(wx.ListCtrl):
 		self.SetColumnWidth(6, 50)
 		self.InsertColumn(7, "Signal")
 		self.SetColumnWidth(7, 300)
-		self.InsertColumn(8, "Throttle")
+		self.InsertColumn(8, "Throttle" if self.dccsnifferenabled else "Limit")
 		self.SetColumnWidth(8, 100)
 		self.InsertColumn(9, "Blocks")
 		self.SetColumnWidth(9, 400)
@@ -589,7 +595,7 @@ class TrainListCtrl(wx.ListCtrl):
 				throttlelimit = 0
 			else:
 				throttlelimit = sig.GetAspectProfileIndex(aspect)
-			loco =  tr.GetLoco()
+			loco = tr.GetLoco()
 			locoinfo = self.parent.GetLocoInfo(loco)
 			if locoinfo is None:
 				limit = 0
@@ -599,7 +605,7 @@ class TrainListCtrl(wx.ListCtrl):
 				except (IndexError, KeyError):
 					limit = 0
 
-			return "%s - %d" % (throttle, limit)
+			return "%s - %d" % (throttle, limit) if self.dccsnifferenabled else "%d" % limit
 		
 		elif col == 9:
 			return ", ".join(reversed(tr.GetBlockNameList()))

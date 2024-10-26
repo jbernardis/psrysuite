@@ -7,7 +7,7 @@ MAXSTEPS = 9
 BUTTONSIZE = (120, 40)
 
 class EditTrainDlg(wx.Dialog):
-	def __init__(self, parent, train, block, locos, trains, engineers, existingTrains, atcFlag, arFlag, lostTrains, dx, dy):
+	def __init__(self, parent, train, block, locos, trains, engineers, existingTrains, atcFlag, arFlag, dispatcherFlag, lostTrains, dx, dy):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details", pos=(dx, dy))
 		self.parent = parent
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
@@ -184,14 +184,15 @@ class EditTrainDlg(wx.Dialog):
 		self.bOK = wx.Button(self, wx.ID_ANY, "OK", size=BUTTONSIZE)
 		self.bOK.SetDefault()
 		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BUTTONSIZE)
-		self.bSever = wx.Button(self, wx.ID_ANY, "Split", size=BUTTONSIZE)
-		self.bSever.SetToolTip("Split this train into 2 sections")
-		self.bMerge = wx.Button(self, wx.ID_ANY, "Merge", size=BUTTONSIZE)
-		self.bMerge.SetToolTip("Merge this train with another")
-		self.bReverse = wx.Button(self, wx.ID_ANY, "Reverse", size=BUTTONSIZE)
-		self.bReverse.SetToolTip("Reverse Direction on this train and reverse the order of its blocks")
-		self.bSort = wx.Button(self, wx.ID_ANY, "Reorder Blocks", size=BUTTONSIZE)
-		self.bSort.SetToolTip("Rearracge the order of blocks occupied by this train")
+		if dispatcherFlag:
+			self.bSever = wx.Button(self, wx.ID_ANY, "Split", size=BUTTONSIZE)
+			self.bSever.SetToolTip("Split this train into 2 sections")
+			self.bMerge = wx.Button(self, wx.ID_ANY, "Merge", size=BUTTONSIZE)
+			self.bMerge.SetToolTip("Merge this train with another")
+			self.bReverse = wx.Button(self, wx.ID_ANY, "Reverse", size=BUTTONSIZE)
+			self.bReverse.SetToolTip("Reverse Direction on this train and reverse the order of its blocks")
+			self.bSort = wx.Button(self, wx.ID_ANY, "Reorder Blocks", size=BUTTONSIZE)
+			self.bSort.SetToolTip("Rearracge the order of blocks occupied by this train")
 
 		bsz = wx.BoxSizer(wx.HORIZONTAL)
 		bsz.Add(self.bOK)
@@ -204,22 +205,23 @@ class EditTrainDlg(wx.Dialog):
 
 		vsz.AddSpacer(20)
 
-		bsz = wx.BoxSizer(wx.HORIZONTAL)
-		bsz.Add(self.bSever)
-		bsz.AddSpacer(30)
-		bsz.Add(self.bMerge)
-		bsz.AddSpacer(30)
-		bsz.Add(self.bReverse)
-		bsz.AddSpacer(30)
-		bsz.Add(self.bSort)
+		if dispatcherFlag:
+			bsz = wx.BoxSizer(wx.HORIZONTAL)
+			bsz.Add(self.bSever)
+			bsz.AddSpacer(30)
+			bsz.Add(self.bMerge)
+			bsz.AddSpacer(30)
+			bsz.Add(self.bReverse)
+			bsz.AddSpacer(30)
+			bsz.Add(self.bSort)
 
-		self.Bind(wx.EVT_BUTTON, self.onSever, self.bSever)
-		self.Bind(wx.EVT_BUTTON, self.onMerge, self.bMerge)
-		self.Bind(wx.EVT_BUTTON, self.onReverse, self.bReverse)
-		self.Bind(wx.EVT_BUTTON, self.onSort, self.bSort)
-		vsz.Add(bsz, 0, wx.ALIGN_CENTER)
+			self.Bind(wx.EVT_BUTTON, self.onSever, self.bSever)
+			self.Bind(wx.EVT_BUTTON, self.onMerge, self.bMerge)
+			self.Bind(wx.EVT_BUTTON, self.onReverse, self.bReverse)
+			self.Bind(wx.EVT_BUTTON, self.onSort, self.bSort)
+			vsz.Add(bsz, 0, wx.ALIGN_CENTER)
 
-		vsz.AddSpacer(20)
+			vsz.AddSpacer(20)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20)
