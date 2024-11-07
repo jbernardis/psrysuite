@@ -5,8 +5,6 @@ import json
 import time
 import re
 
-import pprint
-
 from monitor.getbitsdlg import GetBitsDlg
 from monitor.setinputbitsdlg import SetInputBitsDlg
 from dispatcher.settings import Settings
@@ -419,9 +417,7 @@ class MainFrame(wx.Frame):
 			return 
 		
 		rinfo = self.routes[rtnm]
-		print("route %s" % rtnm)
-		pprint.pprint(rinfo)
-		
+
 	def OnMatrix(self, _):
 		chx = self.chMatrixArea.GetSelection()
 		if chx == wx.NOT_FOUND:

@@ -121,6 +121,9 @@ class TrackDiagram(wx.Panel):
 		self.text[(x*16+offset, y*16)] = text;
 		self.Refresh()
 
+	def DrawCustom(self):
+		self.Refresh()
+
 	def DrawFixedBitmap(self, x, y, offset, bmp):
 		self.bitmaps[x+offset, y] = bmp
 		self.Refresh()
@@ -209,4 +212,6 @@ class TrackDiagram(wx.Panel):
 				txt, fnt = lblinfo
 				dc.SetFont(fnt)
 				dc.DrawText(txt, bx[0], bx[1])
+
+		self.frame.drawCustom(dc)
 

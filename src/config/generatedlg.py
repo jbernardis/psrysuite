@@ -43,6 +43,10 @@ class GenerateDlg(wx.Dialog):
 		self.Bind(wx.EVT_BUTTON, self.OnBGenDisplay, self.bGenDisplay)
 		vsz.Add(self.bGenDisplay, 0, wx.ALL, 10)
 
+		self.bGenCliffDisplay = wx.Button(genBox, wx.ID_ANY, "Cliff Display", size=GENBTNSZ)
+		self.Bind(wx.EVT_BUTTON, self.OnBGenCliffDisplay, self.bGenCliffDisplay)
+		vsz.Add(self.bGenCliffDisplay, 0, wx.ALL, 10)
+
 		self.bGenSatellite = wx.Button(genBox, wx.ID_ANY, "Satellite", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenSatellite, self.bGenSatellite)
 		vsz.Add(self.bGenSatellite, 0, wx.ALL, 10)
@@ -179,18 +183,29 @@ class GenerateDlg(wx.Dialog):
 			"parameter": "simulation"
 		}
 		self.generator(module, self.cbStartMenu.IsChecked())
-		
+
 	def OnBGenDisplay(self, _):
 		module = {
 			"name": "PSRY Display",
-			"dir":  "launcher",
+			"dir": "launcher",
 			"main": "main.py",
 			"desc": "Launcher for Display",
 			"icon": "launcher.ico",
 			"parameter": "display"
 		}
 		self.generator(module, self.cbStartMenu.IsChecked())
-		
+
+	def OnBGenCliffDisplay(self, _):
+		module = {
+			"name": "PSRY Cliff Display",
+			"dir": "launcher",
+			"main": "main.py",
+			"desc": "Launcher for Cliff Display",
+			"icon": "launcher.ico",
+			"parameter": "cliffdisplay"
+		}
+		self.generator(module, self.cbStartMenu.IsChecked())
+
 	def OnBGenServerOnly(self, _):
 		module = {
 			"name": "PSRY Server Only",

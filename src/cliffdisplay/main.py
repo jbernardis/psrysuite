@@ -5,20 +5,13 @@ if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
 
 from dispatcher.settings import Settings
-from dispatcher.psryframe import PSRYFrame
+from cliffdisplay.cliffframe import CliffFrame
 
 settings = Settings()
-
-if settings.dispatcher.dispatch:
-	fn = "dispatch"
-elif settings.dispatcher.satellite:
-	fn = "satellite"
-else:
-	fn = "display"
+fn = "cliffdisplay"
 
 ofp = open(os.path.join(os.getcwd(), "output", "%s.out" % fn), "w")
 efp = open(os.path.join(os.getcwd(), "output", "%s.err" % fn), "w")
-
 sys.stdout = ofp
 sys.stderr = efp
 
@@ -46,7 +39,7 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 class App(wx.App):
 	def OnInit(self):
-		self.frame = PSRYFrame(settings)
+		self.frame = CliffFrame(settings)
 		self.frame.Show()
 		return True
 

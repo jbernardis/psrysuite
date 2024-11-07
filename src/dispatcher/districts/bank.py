@@ -302,6 +302,7 @@ class Bank (District):
 	
 	def DoBlockAction(self, blk, blockend, state):
 		blknm = blk.GetName()
+		dispatcher = self.frame.IsDispatcherOrSatellite()
 		controlOpt = self.frame.cliffControl
 		c13auto = self.frame.c13auto
 
@@ -312,7 +313,7 @@ class Bank (District):
 		District.DoBlockAction(self, blk, blockend, state)
 		blkEastAfter = blk.GetEast()
 
-		if controlOpt != 0 and c13auto:
+		if dispatcher and controlOpt != 0 and c13auto:
 			# we are in either dispatcher all or dispatcher bank/cliveden mode
 			if blkEastAfter and blknm in [ "B11", "B21" ] and blockend is None and state == OCCUPIED:
 				rtname = "BRt" + blknm + "C13"

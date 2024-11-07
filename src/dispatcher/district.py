@@ -51,7 +51,7 @@ class District:
 		self.westGroup = {}
 		self.eastButton = {}
 		self.westButton = {}
-		logging.info("Creating district %s" % name)
+		logging.info("Creating district %s" % str(self))
 		self.dbg = self.frame.GetDebugFlags()
 		self.matrixturnoutdelay = self.frame.settings.dispatcher.matrixturnoutdelay
 
@@ -62,6 +62,9 @@ class District:
 		self.sigtiles = sigtiles
 		self.misctiles = misctiles
 		self.btntiles = btntiles
+
+	def GetName(self):
+		return self.name
 
 	def Initialize(self):
 		blist = [self.frame.GetBlockByName(n) for n in self.osBlocks.keys()]
@@ -430,7 +433,6 @@ class District:
 
 		if sig.SetAspect(aspect, refresh = True, callon = False):
 			self.frame.Request({"signal": { "name": sigNm, "aspect": aspect, "aspecttype": atype }})
-
 
 	def CheckBlockSignalsAdv(self, blkNm, blkNxtNm, sigNm, blkEast):
 		blk = self.frame.blocks[blkNm]

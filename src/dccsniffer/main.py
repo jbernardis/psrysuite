@@ -113,7 +113,6 @@ class MainUnit:
 
 	def raiseDeliveryEvent(self, data):  # thread context
 		jdata = json.loads(data)
-		print("got delivery event: %s" % str(data))
 		for cmd, parms in jdata.items():
 			if cmd == "sessionID":
 				self.sessionid = int(parms)

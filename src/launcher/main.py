@@ -82,11 +82,18 @@ elif mode == "simulation":
 
 elif mode == "display":
     print("launch mode: display")
-   
+
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
     dispProc = Popen([interpreter, dispExec, "--display"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
-            
+
+elif mode == "cliffdisplay":
+    print("launch mode: cliff display")
+
+    dispExec = os.path.join(os.getcwd(), "cliffdisplay", "main.py")
+    dispProc = Popen([interpreter, dispExec, "--display"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
+    print("dispatcher started as PID %d" % dispProc.pid)
+
 elif mode == "dispatcheronly":
     print("launch mode: dispatcher only")
     
