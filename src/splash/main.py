@@ -4,6 +4,7 @@ import os
 
 versiondate = "7-November-2024"
 
+
 class MainFrame(wx.Frame):
 	def __init__(self):
 		wx.Frame.__init__(self, None, style=wx.DEFAULT_FRAME_STYLE)

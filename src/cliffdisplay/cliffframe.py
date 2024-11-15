@@ -59,8 +59,9 @@ c13control = "c13control"
 
 
 class NassauTrack:
-	def __init__(self, name, bmp, line):
+	def __init__(self, name, ebsig, bmp, line):
 		self.name = name
+		self.ebsig = ebsig
 		self.line = line
 		self.train = None
 		self.loco = None
@@ -117,12 +118,12 @@ class CliffFrame(MainFrame):
 		wx.CallAfter(self.CliffInitialize)
 
 		self.nassauTracks = {
-			"N32": NassauTrack("N32", self.bitmaps.misc.indicatorr, 500),
-			"N31": NassauTrack("N31", self.bitmaps.misc.indicatorr, 530),
-			"N12": NassauTrack("N12", self.bitmaps.misc.indicatorr, 560),
-			"N22": NassauTrack("N22", self.bitmaps.misc.indicatorr, 590),
-			"N41": NassauTrack("N41", self.bitmaps.misc.indicatorr, 620),
-			"N42": NassauTrack("N42", self.bitmaps.misc.indicatorr, 650)
+			"N32": NassauTrack("N32", "N26RA", self.bitmaps.misc.indicatorr, 500),
+			"N31": NassauTrack("N31", "N26RB", self.bitmaps.misc.indicatorr, 530),
+			"N12": NassauTrack("N12", "N26RC", self.bitmaps.misc.indicatorr, 560),
+			"N22": NassauTrack("N22", "N24RA", self.bitmaps.misc.indicatorr, 590),
+			"N41": NassauTrack("N41", "N24RB", self.bitmaps.misc.indicatorr, 620),
+			"N42": NassauTrack("N42", "N24RC", self.bitmaps.misc.indicatorr, 650)
 		}
 
 		self.nassauTracksBySignal = {
@@ -328,6 +329,8 @@ class CliffFrame(MainFrame):
 		for bn in [b for b in blocks if b in self.nassauTracks.keys()]:
 			self.nassauTracks[bn].SetTrain(name)
 			self.nassauTracks[bn].SetLoco(loco)
+			if name is None:
+				self.nassauTracks[bn].SetSignal(self.bitmaps.misc.indicatorr)
 
 		self.DrawCustom()
 
@@ -374,6 +377,13 @@ class CliffFrame(MainFrame):
 				aspect = p["aspect"]
 			except KeyError:
 				aspect = 0
+			try:
+				frozenaspect = p["frozenaspect"]
+			except KeyError:
+				frozenaspect = None
+
+			if frozenaspect is not None:
+				aspect = frozenaspect
 
 			if sigName is None:
 				continue
