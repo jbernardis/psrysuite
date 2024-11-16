@@ -94,6 +94,9 @@ class NassauTrack:
 
 		dc.DrawBitmap(self.signal, 300, self.line)
 
+		dc.SetTextForeground(wx.Colour(255, 255, 255))
+		dc.DrawText(self.ebsig, 325, self.line)
+
 
 class CliffFrame(MainFrame):
 	def __init__(self, settings):
@@ -118,21 +121,30 @@ class CliffFrame(MainFrame):
 		wx.CallAfter(self.CliffInitialize)
 
 		self.nassauTracks = {
-			"N32": NassauTrack("N32", "N26RA", self.bitmaps.misc.indicatorr, 500),
-			"N31": NassauTrack("N31", "N26RB", self.bitmaps.misc.indicatorr, 530),
-			"N12": NassauTrack("N12", "N26RC", self.bitmaps.misc.indicatorr, 560),
-			"N22": NassauTrack("N22", "N24RA", self.bitmaps.misc.indicatorr, 590),
-			"N41": NassauTrack("N41", "N24RB", self.bitmaps.misc.indicatorr, 620),
-			"N42": NassauTrack("N42", "N24RC", self.bitmaps.misc.indicatorr, 650)
+			"W11": NassauTrack("W11", "N28R",  self.bitmaps.misc.indicatorr, 500),
+			"N32": NassauTrack("N32", "N26RA", self.bitmaps.misc.indicatorr, 530),
+			"N31": NassauTrack("N31", "N26RB", self.bitmaps.misc.indicatorr, 560),
+			"N12": NassauTrack("N12", "N26RC", self.bitmaps.misc.indicatorr, 590),
+			"N22": NassauTrack("N22", "N24RA", self.bitmaps.misc.indicatorr, 620),
+			"N41": NassauTrack("N41", "N24RB", self.bitmaps.misc.indicatorr, 650),
+			"N42": NassauTrack("N42", "N24RC", self.bitmaps.misc.indicatorr, 680),
+			"W20": NassauTrack("W20", "N24RD", self.bitmaps.misc.indicatorr, 710)
 		}
 
 		self.nassauTracksBySignal = {
+			"N28R":  self.nassauTracks["W11"],
 			"N26RA": self.nassauTracks["N32"],
 			"N26RB": self.nassauTracks["N31"],
 			"N26RC": self.nassauTracks["N12"],
 			"N24RA": self.nassauTracks["N22"],
 			"N24RB": self.nassauTracks["N41"],
-			"N24RC": self.nassauTracks["N42"]
+			"N24RC": self.nassauTracks["N42"],
+			"N24RD": self.nassauTracks["W20"]
+		}
+
+		self.trackRoutedToBank = {
+			"B10": None,
+			"B20": None
 		}
 
 	def CliffInitialize(self):
@@ -334,6 +346,39 @@ class CliffFrame(MainFrame):
 
 		self.DrawCustom()
 
+	def DoCmdSetRoute(self, parms):
+		MainFrame.DoCmdSetRoute(self, parms)
+		try:
+			bn = parms[0]["block"]
+		except (IndexError, KeyError):
+			bn = None
+		try:
+			ends = parms[0]["ends"]
+		except (IndexError, KeyError):
+			ends = []
+		try:
+			route = parms[0]["route"]
+		except (IndexError, KeyError):
+			route = None
+
+		if bn is None:
+			return
+
+		if bn not in ["NEOSE", "NEOSW", "NEOSRH"]:
+			return
+
+		if route is None:
+			if bn == "NEOSE":
+				self.trackRoutedToBank["B20"] = None
+			elif bn == "NEOSW":
+				self.trackRoutedToBank["B10"] = None
+		else:
+			if "B10" in ends:
+				self.trackRoutedToBank["B10"] = ends[0] if ends[1] == "B10" else ends[1]
+
+			elif "B20" in ends:
+				self.trackRoutedToBank["B20"] = ends[0] if ends[1] == "B20" else ends[1]
+
 	def DoCmdBlockClear(self, parms):
 		MainFrame.DoCmdBlockClear(self, parms)
 		try:
@@ -391,12 +436,17 @@ class CliffFrame(MainFrame):
 			if sigName not in self.nassauTracksBySignal.keys():
 				continue
 
-			if aspect == 0:
-				bmp = self.bitmaps.misc.indicatorr
-			else:
-				bmp = self.bitmaps.misc.indicatorg
+			nassauTrack = self.nassauTracksBySignal[sigName]
 
-			self.nassauTracksBySignal[sigName].SetSignal(bmp)
+			if nassauTrack.name in self.trackRoutedToBank.values():
+				if aspect == 0:
+					bmp = self.bitmaps.misc.indicatorr
+				else:
+					bmp = self.bitmaps.misc.indicatorg
+			else:
+				bmp = self.bitmaps.misc.indicatorr
+
+			nassauTrack.SetSignal(bmp)
 			changes = True
 
 		if changes:
