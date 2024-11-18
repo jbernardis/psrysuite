@@ -64,11 +64,13 @@ class NassauTrack:
 		self.ebsig = ebsig
 		self.line = line
 		self.train = None
+		self.east = None
 		self.loco = None
 		self.signal = bmp
 
-	def SetTrain(self, trid):
+	def SetTrain(self, trid, east):
 		self.train = trid
+		self.east = east
 
 	def SetLoco(self, lid):
 		if lid is None:
@@ -88,9 +90,11 @@ class NassauTrack:
 			trloco = "" if self.train is None else self.train
 			trloco += "/"
 			trloco += "??" if self.loco is None else self.loco
+			if self.east is not None:
+				dc.DrawBitmap(self.east, 160, self.line)
 
 		dc.SetTextForeground(wx.Colour(255, 255, 0))
-		dc.DrawText(trloco, 160, self.line)
+		dc.DrawText(trloco, 178, self.line)
 
 		dc.DrawBitmap(self.signal, 300, self.line)
 
@@ -334,15 +338,44 @@ class CliffFrame(MainFrame):
 			name = None
 
 		try:
+			east = parms["east"]
+		except KeyError:
+			east = None
+
+		try:
 			loco = parms["loco"]
 		except KeyError:
 			loco = None
 
 		for bn in [b for b in blocks if b in self.nassauTracks.keys()]:
-			self.nassauTracks[bn].SetTrain(name)
+			self.nassauTracks[bn].SetTrain(name, self.bitmaps.misc.arroweast if east else self.bitmaps.misc.arrowwest)
 			self.nassauTracks[bn].SetLoco(loco)
 			if name is None:
 				self.nassauTracks[bn].SetSignal(self.bitmaps.misc.indicatorr)
+
+		self.DrawCustom()
+
+	def DoCmdTrainBlockOrder(self, parms):
+		MainFrame.DoCmdTrainBlockOrder(self, parms)
+		for p in parms:
+			try:
+				trid = p["name"]
+			except KeyError:
+				trid = None
+			try:
+				east = p["east"].startswith("T")
+			except (IndexError, KeyError):
+				east = True
+			try:
+				blocks = p["blocks"]
+			except KeyError:
+				blocks = []
+
+			if trid is None:
+				return
+
+			for bn in [b for b in blocks if b in self.nassauTracks.keys()]:
+				self.nassauTracks[bn].SetTrain(trid, self.bitmaps.misc.arroweast if east else self.bitmaps.misc.arrowwest)
 
 		self.DrawCustom()
 

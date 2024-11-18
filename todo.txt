@@ -23,6 +23,10 @@ When set to dispatcher controls bank/cliveden, cliff only controls sheffield, gr
 
 Need to verify block adjacency is defined properly.  Concerns about waterman and port
 
+better algorithm for DCC speeds.  Instead of a broadcase for every speed change for every loco, store/update the speeds in a local table, and
+send 1 message with all speeds every 5 or 10 seconds.
+
+
 
 
 
@@ -33,13 +37,10 @@ inspection interface
         cliff and yard seem to be ok, but nassau and port are reversed.  I think all of them are backwards, and the
         cliff and yard should be reversed on the display.  I really need to verify actual operation with what I see in the software
 
- better algorithm for DCC speeds.  Instead of a broadcase for every speed change for every loco, store/update the speeds in a local table, and
- send 1 message with all speeds every 5 or 10 seconds.
+make sure we have the proper initial value for fleet based on switch
 
-  make sure we have the proper initial value for fleet based on switch
+finish out train/block audit
 
-  finish out train/block audit
-
-  examine logs from shows for errors
+need to implement locales for alerts/events - all on, all off, or on only for matching locale(s)
 
 
