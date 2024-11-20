@@ -4049,7 +4049,7 @@ class ExitDlg (wx.Dialog):
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(20)
 
-		if self.parent.isDispatcherOrSatellite():
+		if self.parent.IsDispatcherOrSatellite():
 			self.bTrains = wx.Button(self, wx.ID_ANY, "Save Trains")
 			self.bLocos  = wx.Button(self, wx.ID_ANY, "Save Locos")
 			self.bSnapshot  = wx.Button(self, wx.ID_ANY, "Take Snapshot")
@@ -4064,12 +4064,12 @@ class ExitDlg (wx.Dialog):
 			vsz.Add(self.bSnapshot, 0, wx.ALIGN_CENTER)
 			vsz.AddSpacer(20)
 
-			self.cbKillServer = wx.CheckBox(self, wx.ID_ANY, "Shutdown Server")
-			self.cbKillServer.SetValue(self.parent.settings.dispatcher.precheckshutdownserver)
+			if self.parent.IsDispatcher():
+				self.cbKillServer = wx.CheckBox(self, wx.ID_ANY, "Shutdown Server")
+				self.cbKillServer.SetValue(self.parent.settings.dispatcher.precheckshutdownserver)
 
-			vsz.Add(self.cbKillServer, 0, wx.ALIGN_CENTER)
-
-			vsz.AddSpacer(10)
+				vsz.Add(self.cbKillServer, 0, wx.ALIGN_CENTER)
+				vsz.AddSpacer(10)
 
 		self.cbSaveLogs = wx.CheckBox(self, wx.ID_ANY, "Save log/output files")
 		self.cbSaveLogs.SetValue(self.parent.settings.dispatcher.prechecksavelogs)
