@@ -2157,16 +2157,17 @@ class MainFrame(wx.Frame):
 			self.bCheckTrains.Enable(False)
 
 			if self.IsDispatcherOrSatellite():
-				self.bSnapshot.Enable(False)
 				self.bLoadTrains.Enable(False)
 				self.bLoadLocos.Enable(False)
 				self.bSaveTrains.Enable(False)
 				self.bClearTrains.Enable(False)
 				self.bSaveLocos.Enable(False)
-				self.cbAutoRouter.Enable(False)
-				self.cbATC.Enable(False)
-				self.cbOSSLocks.Enable(False)
-				self.cbSidingsUnlocked.Enable(False)
+				self.bSnapshot.Enable(False)
+				if self.IsDispatcher():
+					self.cbAutoRouter.Enable(False)
+					self.cbATC.Enable(False)
+					self.cbOSSLocks.Enable(False)
+					self.cbSidingsUnlocked.Enable(False)
 			else:
 				self.ClearAllLocks()
 				self.AllSignalsNeutral()
@@ -2186,18 +2187,19 @@ class MainFrame(wx.Frame):
 			self.bActiveTrains.Enable(True)
 			self.bCheckTrains.Enable(True)
 			if self.IsDispatcherOrSatellite():
-				self.bSnapshot.Enable(True)
 				self.bLoadTrains.Enable(True)
 				self.bLoadLocos.Enable(True)
 				self.bLostTrains.Enable(True)
 				self.bSaveTrains.Enable(True)
 				self.bSaveLocos.Enable(True)
 				self.bClearTrains.Enable(True)
-				self.cbAutoRouter.Enable(True)
-				self.cbATC.Enable(True)
-				self.cbOSSLocks.Enable(True)
-				self.cbSidingsUnlocked.Enable(True)
-				
+				self.bSnapshot.Enable(True)
+				if self.IsDispatcher():
+					self.cbAutoRouter.Enable(True)
+					self.cbATC.Enable(True)
+					self.cbOSSLocks.Enable(True)
+					self.cbSidingsUnlocked.Enable(True)
+
 			self.RetrieveData()
 			#self.districts.Initialize()
 			if self.IsDispatcher():
@@ -4047,7 +4049,7 @@ class ExitDlg (wx.Dialog):
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(20)
 
-		if self.isDispatcher:
+		if self.parent.isDispatcherOrSatellite():
 			self.bTrains = wx.Button(self, wx.ID_ANY, "Save Trains")
 			self.bLocos  = wx.Button(self, wx.ID_ANY, "Save Locos")
 			self.bSnapshot  = wx.Button(self, wx.ID_ANY, "Take Snapshot")

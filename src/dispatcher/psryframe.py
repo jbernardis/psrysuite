@@ -270,15 +270,16 @@ class PSRYFrame(MainFrame):
 			self.Bind(wx.EVT_CHECKBOX, self.OnCBATC, self.cbATC)
 			self.cbATC.Enable(False)
 
+		if self.IsDispatcherOrSatellite():
 			self.bSnapshot = wx.Button(self, wx.ID_ANY, "Snapshot", pos=(self.centerOffset + 2100, 75), size=BTNDIM)
 			self.bSnapshot.Enable(False)
 			self.Bind(wx.EVT_BUTTON, self.OnBSnapshot, self.bSnapshot)
 
-		if self.IsDispatcher() or self.settings.display.showevents:
+		if self.IsDispatcherOrSatellite() or self.settings.display.showevents:
 			self.bEvents = wx.Button(self, wx.ID_ANY, "Events Log", pos=(self.centerOffset + 840, 25), size=BTNDIM)
 			self.Bind(wx.EVT_BUTTON, self.OnBEventsLog, self.bEvents)
 
-		if self.IsDispatcher() or self.settings.display.showadvice:
+		if self.IsDispatcherOrSatellite() or self.settings.display.showadvice:
 			self.bAdvice = wx.Button(self, wx.ID_ANY, "Advice Log", pos=(self.centerOffset + 840, 65), size=BTNDIM)
 			self.Bind(wx.EVT_BUTTON, self.OnBAdviceLog, self.bAdvice)
 
