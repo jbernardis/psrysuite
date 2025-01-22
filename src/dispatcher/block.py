@@ -260,10 +260,10 @@ class Block:
 			active = True
 		return active
 
-	def SetStoppingRelays(self, flag=False):
-		if self.sbEast and self.sbEast.IsActive():
+	def SetStoppingRelays(self, flag=False, force=False):
+		if self.sbEast and (self.sbEast.IsActive() or force):
 			self.sbEast.Activate(flag)
-		if self.sbWest and self.sbWest.IsActive():
+		if self.sbWest and (self.sbWest.IsActive() or force):
 			self.sbWest.Activate(flag)
 	
 	def SetLastEntered(self, subblk):

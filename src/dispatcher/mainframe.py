@@ -2265,7 +2265,7 @@ class MainFrame(wx.Frame):
 		for s in self.signals.values():
 			s.ClearLocks(forward=False)
 
-	def SetStoppingRelays(self, bn, flag=False):
+	def SetStoppingRelays(self, bn, flag=False, force=False):
 		if bn not in self.blocks:
 			logging.error("trying to deactivate relays for unknown block: %s" % bn)
 			return
@@ -2274,7 +2274,7 @@ class MainFrame(wx.Frame):
 			logging.error("wrong block type trying to deactivate relays: %s" % bn)
 			return
 
-		self.blocks[bn].SetStoppingRelays(flag)
+		self.blocks[bn].SetStoppingRelays(flag, force)
 
 	def SetIgnoredBlocks(self, igList):
 		self.Request({"ignore": {"blocks": igList}})

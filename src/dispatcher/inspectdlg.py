@@ -123,37 +123,34 @@ class InspectDlg(wx.Dialog):
         dlg.Destroy()
 
     def OnBRelays(self, _):
-        rl = self.GetRelayList()
-        if len(rl) == 0:
-            dlg = wx.MessageDialog(self, "No stopping relays are presently activated",
-                "Stopping Relays",
-                wx.OK | wx.ICON_INFORMATION)
-            dlg.ShowModal()
-            dlg.Destroy()
-            return
+        rlAct, rlInact = self.GetRelayList()
 
-        dlg = wx.MultiChoiceDialog( self,
-            "Choose stopping relay(s) to unlock",
-            "Stopping Relays", rl)
-
+        dlg = RelayDlg(self, rlAct, rlInact)
         rc = dlg.ShowModal()
         if rc == wx.ID_OK:
-            selections = dlg.GetSelections()
-            rlNames = [rl[x] for x in selections]
-        else:
-            rlNames = []
+            newRlAct, newRlInact = dlg.GetRelays()
 
         dlg.Destroy()
         if rc != wx.ID_OK:
             return
 
-        if len(rlNames) == 0:
+        tobeActivated = [r for r in newRlAct if r not in rlAct]
+        tobeDeactivated = [r for r in newRlInact if r not in rlInact]
+
+        if len(tobeActivated) == 0 and len(tobeDeactivated) == 0:
             return
 
-        for bn in rlNames:
-            self.parent.SetStoppingRelays(bn, False)
+        for bn in tobeActivated:
+            self.parent.SetStoppingRelays(bn, True, force=True)
+        for bn in tobeDeactivated:
+            self.parent.SetStoppingRelays(bn, False, force=True)
 
-        dlg = wx.MessageDialog(self, "Deactivated Relays:\n%s" % ", ".join(rlNames),
+        msg = []
+        if len(tobeActivated) != 0:
+            msg.append("  Activated: %s" % ", ".join(tobeActivated))
+        if len(tobeDeactivated) != 0:
+            msg.append("Deactivated: %s" % ", ".join(tobeDeactivated))
+        dlg = wx.MessageDialog(self, "\n".join(msg),
             "Stopping Relays",
             wx.OK | wx.ICON_INFORMATION)
         dlg.ShowModal()
@@ -161,10 +158,12 @@ class InspectDlg(wx.Dialog):
 
     def GetRelayList(self):
         rl = self.parent.Get("stoprelays", {})
+
         if rl is None:
             return []
-        relayList = [self.formatRelayName(rly) for rly in sorted(rl.keys()) if rl[rly]]
-        return relayList
+        relaysActive = [self.formatRelayName(rly) for rly in sorted(rl.keys()) if rl[rly]]
+        relaysInactive = [self.formatRelayName(rly) for rly in sorted(rl.keys()) if not rl[rly]]
+        return relaysActive, relaysInactive
 
     def formatRelayName(self, rn):
         return rn.split(".")[0]
@@ -393,6 +392,63 @@ class InspectDlg(wx.Dialog):
 
     def OnCancel(self, _):
         self.closer()
+
+
+class RelayDlg(wx.Dialog):
+    def __init__(self, parent, rlAct, rlInact):
+        wx.Dialog.__init__(self, parent, wx.ID_ANY, "Choose Relays")
+        self.Bind(wx.EVT_CLOSE, self.OnCancel)
+
+        vsz = wx.BoxSizer(wx.VERTICAL)
+        vsz.AddSpacer(20)
+
+        st = wx.StaticText(self, wx.ID_ANY, "Check/Uncheck to Activate/Deactivate")
+        vsz.Add(st)
+        vsz.AddSpacer(10)
+
+        self.AllRelays = sorted(rlAct+rlInact)
+
+        self.cblRelays = wx.CheckListBox(self, wx.ID_ANY, choices=self.AllRelays, size=(100, 200))
+        self.cblRelays.SetCheckedStrings(rlAct)
+        vsz.Add(self.cblRelays, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
+        vsz.AddSpacer(20)
+
+        h = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.bOK = wx.Button(self, wx.ID_ANY, "OK")
+        self.Bind(wx.EVT_BUTTON, self.OnBOk, self.bOK)
+        h.Add(self.bOK)
+
+        h.AddSpacer(20)
+
+        self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, self.bCancel)
+        h.Add(self.bCancel)
+
+        vsz.Add(h, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
+        vsz.AddSpacer(20)
+
+        hsz = wx.BoxSizer(wx.HORIZONTAL)
+        hsz.AddSpacer(20)
+        hsz.Add(vsz)
+        hsz.AddSpacer(20)
+
+        self.SetSizer(hsz)
+        self.Layout()
+        self.Fit()
+
+    def GetRelays(self):
+        rlAct = self.cblRelays.GetCheckedStrings()
+        rlInact = [r for r in self.AllRelays if r not in rlAct]
+        return rlAct, rlInact
+
+    def OnCancel(self, evt):
+        self.EndModal(wx.ID_CANCEL)
+
+    def OnBOk(self, evt):
+        self.EndModal(wx.ID_OK)
 
 
 class DebugFlagsDlg(wx.Dialog):
