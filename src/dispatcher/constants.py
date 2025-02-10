@@ -24,7 +24,7 @@ SLIPSWITCH = 31
 
 # basic signal aspects
 STOP = 0b000
-CLEAR= 0b011
+CLEAR = 0b011
 
 # where to add a list of blocks onto a train
 FRONT = "f"
@@ -43,6 +43,7 @@ RegSloAspects = 51
 AdvAspects = 52
 SloAspects = 53
 
+
 def turnoutstate(st, short=False):
 	if st == NORMAL:
 		return "Nml" if short else "Normal"
@@ -50,6 +51,7 @@ def turnoutstate(st, short=False):
 		return "Rev" if short else "Reverse"
 	
 	return "??"
+
 
 def statusname(status):
 	if status == EMPTY:
@@ -63,6 +65,7 @@ def statusname(status):
 	
 	else:
 		return "None"
+
 
 def aspectname(aspect, atype):
 	if atype == RegAspects:
@@ -150,6 +153,7 @@ def aspectname(aspect, atype):
 	else:
 		return "Stop"
 
+
 def aspectprofileindex(aspect, atype):
 	""" 
 	return the index used to determine maximum speed from a locomotive's profile
@@ -158,91 +162,93 @@ def aspectprofileindex(aspect, atype):
 	"""
 	if atype == RegAspects:
 		if aspect == 0b011:
-			return 3 # Clear
+			return 3  # Clear
 		
 		elif aspect == 0b010:
-			return 2 # Approach Medium
+			return 2  # Approach Medium
 		
 		elif aspect == 0b111:
-			return 2 # Medium Clear
+			return 2  # Medium Clear
 		
 		elif aspect == 0b110:
-			return 1 # Approach Slow
+			return 1  # Approach Slow
 		
 		elif aspect == 0b001:
-			return 2 # Approach
+			return 2  # Approach
 		
 		elif aspect == 0b101:
-			return 2 # Medium Approach
+			return 2  # Medium Approach
 		
 		elif aspect == 0b100:
-			return 1 # Restricting
+			return 1  # Restricting
 		
 		else:
-			return 0 # Stop
+			return 0  # Stop
 	
 	elif atype == RegSloAspects:
 		if aspect == 0b011:
-			return 3 # Clear
+			return 3  # Clear
 		
 		elif aspect == 0b111:
-			return 2 # Slow clear
+			return 2  # Slow clear
 		
 		elif aspect == 0b001:
-			return 2 # Approach
+			return 2  # Approach
 		
 		elif aspect == 0b101:
-			return 1 # Slow Approach
+			return 1  # Slow Approach
 		
 		elif aspect == 0b100:
-			return 1 # Restricting
+			return 1  # Restricting
 		
 		else:
-			return 0 # Stop
+			return 0  # Stop
 	
 	elif atype == AdvAspects:
 		if aspect == 0b011:
-			return 3 # Clear
+			return 3  # Clear
 		
 		elif aspect == 0b010:
-			return 2 # Approach Medium
+			return 2  # Approach Medium
 		
 		elif aspect == 0b111:
-			return 3 # Clear
+			return 3  # Clear
 		
 		elif aspect == 0b110:
-			return 2 # Advance Approach
+			return 2  # Advance Approach
 		
 		elif aspect == 0b001:
-			return 2 # Approach
+			return 2  # Approach
 		
 		elif aspect == 0b101:
-			return 2 # Medium Approach
+			return 2  # Medium Approach
 		
 		elif aspect == 0b100:
-			return 1 # Restricting
+			return 1  # Restricting
 		
 		else:
-			return 0 # Stop
+			return 0  # Stop
 	
 	elif atype == SloAspects:
 		if aspect == 0b01:
-			return 2 # Slow Clear
+			return 2  # Slow Clear
 		
 		elif aspect == 0b11:
-			return 1 # Slow Approach
+			return 1  # Slow Approach
 		
 		elif aspect == 0b10:
-			return 1 # Restricting
+			return 1  # Restricting
 		
 		else:
-			return 0 #cStop
+			return 0  # Stop
 	
 	else:
-		return 0 # Stop
-	
+		return 0  # Stop
+
+
 def restrictedaspect(atype):
 	return 0b10 if atype == SloAspects else 0b100
+
 
 def aspecttype(atype):
 	if atype == RegAspects:
@@ -265,12 +271,14 @@ def routetype(rtype):
 		return "SLOW"
 	if rtype == RESTRICTING:
 		return "RESTRICTING"
-	
+
+
 def statustype(stat):
 	if stat == CLEARED:
 		return "CLEARED"
 	else:
 		return "NOT CLEARED"
+
 
 osBlockNames = {
 	'BOSE': 'Bank East',
@@ -292,9 +300,9 @@ osBlockNames = {
 	'HOSWE': 'Hyde West EB', 
 	'HOSWW': 'Hyde West WB', 
 	'HOSWW2': 'Hyde West H30', 
-	'KOSE': 'Krulist EB', 
+	'KOSE': 'Krulish EB',
 	'KOSM': 'Krulish Mid', 
-	'KOSN10S11': 'Krulist Virtual WB', 
+	'KOSN10S11': 'Krulish Virtual WB',
 	'KOSN20S21': 'Krulish Virtual EB', 
 	'KOSW': 'Krulish WB', 
 	'LOSCAE': 'Carlton EB', 
@@ -339,6 +347,8 @@ osBlockNames = {
 	'YOSWYW': 'Waterman W'
 }
 
-BlockName = lambda bn: osBlockNames.get(bn, bn)	
+
+def BlockName(bn):
+	return osBlockNames.get(bn, bn)
 
 	

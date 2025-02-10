@@ -163,7 +163,10 @@ class ManageEngineersDlg(wx.Dialog):
 	def bSavePressed(self, _):
 		self.eng.save()
 		self.setModified(False)
-		
+		dlg = wx.MessageDialog(self, 'Engineer list has been saved', 'Data Saved', wx.OK | wx.ICON_INFORMATION)
+		dlg.ShowModal()
+		dlg.Destroy()
+
 	def bOKPressed(self, _):
 		if self.modified:
 			self.eng.save()

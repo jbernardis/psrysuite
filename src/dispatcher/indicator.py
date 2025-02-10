@@ -20,5 +20,4 @@ class Indicator:
 			return
 		self.value = val
 		if not silent:
-			self.frame.Request({"indicator": { "name": self.name, "value": self.value}})
-
+			self.frame.Request({"indicator": {"name": self.name, "value": self.value}})

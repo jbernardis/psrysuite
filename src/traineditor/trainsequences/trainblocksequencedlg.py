@@ -366,7 +366,10 @@ class TrainBlockSequencesDlg(wx.Dialog):
 	def OnBSave(self, _):
 		self.trains.Save()
 		self.SetModified(False)
-		
+		dlg = wx.MessageDialog(self, 'Train list has been saved', 'Data Saved', wx.OK | wx.ICON_INFORMATION)
+		dlg.ShowModal()
+		dlg.Destroy()
+
 	def OnBExit(self, _):
 		self.doExit()
 		

@@ -1,7 +1,7 @@
-
 import threading
 import socket
 import logging
+
 
 class Listener(threading.Thread):
 	def __init__(self, parent, ip, port):
@@ -17,7 +17,7 @@ class Listener(threading.Thread):
 	def connect(self):
 		try:
 			self.skt = socket.create_connection((self.ip, self.port))
-		except:
+		except (ConnectionRefusedError, TimeoutError, socket.gaierror):
 			self.skt = None
 			return False
 
@@ -60,14 +60,13 @@ class Listener(threading.Thread):
 				else:
 					szBuf += b
 					totalRead += len(b)
-		
-		
+
 			if not self.isRunning:
 				break
 
 			try:
 				msgSize = int.from_bytes(szBuf, "little")
-			except:
+			except (ValueError, OverflowError):
 				msgSize = None
 
 			if msgSize:		

@@ -1,6 +1,7 @@
 import wx  
 import os     
 
+
 class ChooseItemDlg(wx.Dialog):
     def __init__(self, parent, trains, allowentry, rrserver):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
@@ -8,6 +9,7 @@ class ChooseItemDlg(wx.Dialog):
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
         self.trains = trains
         self.allowentry = allowentry
+        self.files = []
         
         self.suffix = ".trn" if trains else ".loco"
         self.directory = os.path.join("data", "trains" if self.trains else "locos")
@@ -136,7 +138,7 @@ class ChooseItemDlg(wx.Dialog):
         
         self.SetSizer(hszr)
         self.Layout()
-        self.Fit();
+        self.Fit()
         
     def OnBAll(self, _):
         self.SetLocations(True)
@@ -183,7 +185,6 @@ class ChooseItemDlg(wx.Dialog):
             
         return locations, "CNHPY"
 
-        
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)
         
@@ -200,6 +201,7 @@ class ChooseItemDlg(wx.Dialog):
         self.EndModal(wx.ID_OK)
         
     def OnDelete(self, _):
+        l = None
         dlg = ChooseItemsDlg(self, self.files, self.trains)
         rc = dlg.ShowModal()
         if rc == wx.ID_OK:
@@ -221,6 +223,7 @@ class ChooseItemDlg(wx.Dialog):
             self.cbItems.SetSelection(0)
         else:
             self.cbItems.SetSelection(wx.NOT_FOUND)
+
 
 class ChooseItemsDlg(wx.Dialog):
     def __init__(self, parent, items, trains):
@@ -264,7 +267,7 @@ class ChooseItemsDlg(wx.Dialog):
         
         self.SetSizer(hszr)
         self.Layout()
-        self.Fit();
+        self.Fit()
             
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)
@@ -274,6 +277,7 @@ class ChooseItemsDlg(wx.Dialog):
         
     def GetFiles(self):
         return self.cbItems.GetCheckedStrings()
+
 
 class ChooseBlocksDlg(wx.Dialog):
     def __init__(self, parent, tid, blocklist):
@@ -318,7 +322,7 @@ class ChooseBlocksDlg(wx.Dialog):
         
         self.SetSizer(hszr)
         self.Layout()
-        self.Fit();
+        self.Fit()
         
     def GetResults(self):
         return list(self.cbItems.GetCheckedStrings())
@@ -373,7 +377,7 @@ class ChooseTrainDlg(wx.Dialog):
         
         self.SetSizer(hszr)
         self.Layout()
-        self.Fit();
+        self.Fit()
         
     def GetResults(self):
         idx = self.cbItems.GetSelection()
@@ -387,9 +391,11 @@ class ChooseTrainDlg(wx.Dialog):
         
     def OnBOK(self, _):
         self.EndModal(wx.ID_OK)
-        
+
+
 BTNDIM = (80, 40)
-   
+
+
 class ChooseSnapshotActionDlg(wx.Dialog):
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "Choose snapshot sction")
@@ -425,7 +431,7 @@ class ChooseSnapshotActionDlg(wx.Dialog):
        
         self.SetSizer(vszr)
         self.Layout()
-        self.Fit();
+        self.Fit()
         self.CenterOnScreen()
         
     def OnBSave(self, _):

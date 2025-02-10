@@ -136,6 +136,7 @@ class Block:
 		self.sbSigEast = None
 		self.sigWest = None
 		self.sigEast = None
+		self.route = None
 		self.determineStatus()
 		self.entrySignal = None
 		self.entryAspect = 0
@@ -240,7 +241,7 @@ class Block:
 			anyOccupied = True
 
 		for screen, loc, routes in self.trainLoc:
-			drawTrain = True # assume that we draw the train here
+			drawTrain = True  # assume that we draw the train here
 			if routes and self.IsOS():
 				if self.route is None:
 					drawTrain = False  # this OS has no route - do not show a train
@@ -295,10 +296,11 @@ class Block:
 	def determineStatus(self):
 		self.status = OCCUPIED if self.occupied else CLEARED if self.cleared else EMPTY
 		if self.occupied:
-			try:
-				self.unknownTrain = self.train.GetName().startswith("??")
-			except:
+			tn = self.train.GetName()
+			if tn is None:
 				self.unknownTrain = False
+			else:
+				self.unknownTrain = tn.startswith("??")
 
 	def NextBlock(self, reverse=False):
 		if self.east:
@@ -349,10 +351,10 @@ class Block:
 		self.east = east
 		self.Draw()
 		if broadcast:
-			self.frame.Request({"blockdir": { "block": self.GetName(), "dir": "E" if east else "W"}})
+			self.frame.Request({"blockdir": {"block": self.GetName(), "dir": "E" if east else "W"}})
 			for b in [self.sbEast, self.sbWest]:
 				if b is not None:
-					self.frame.Request({"blockdir": { "block": b.GetName(), "dir": "E" if east else "W"}})
+					self.frame.Request({"blockdir": {"block": b.GetName(), "dir": "E" if east else "W"}})
 
 	def IsReversed(self):
 		return self.east != self.defaultEast
@@ -437,7 +439,6 @@ class Block:
 			if b is None:
 				logging.warning("Stopping block %s not defined for block %s" % (blockend, self.GetName()))
 				return
-			tr = self.GetTrain()
 			b.SetOccupied(occupied, refresh)
 			if occupied and self.train is None and self.frame.IsDispatcher():
 				tr, rear = self.IdentifyTrain(b.IsCleared())
@@ -455,7 +456,7 @@ class Block:
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
-				stParams =  { "blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0", "action": REAR if rear else FRONT}
+				stParams = {"blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0", "action": REAR if rear else FRONT}
 				rt = tr.GetChosenRoute()
 				if rt is not None:
 					stParams["route"] = rt
@@ -475,7 +476,7 @@ class Block:
 		if self.occupied:
 			previouslyCleared = self.cleared
 			self.cleared = False
-			self.frame.Request({"blockclear": { "block": self.GetName(), "clear": 0}})
+			self.frame.Request({"blockclear": {"block": self.GetName(), "clear": 0}})
 
 			if self.train is None and self.frame.IsDispatcher():
 				tr, rear = self.IdentifyTrain(previouslyCleared)
@@ -493,7 +494,7 @@ class Block:
 
 				trn, loco = tr.GetNameAndLoco()
 				self.SetTrain(tr)
-				stParams = { "blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0", "action": REAR if rear else FRONT}
+				stParams = {"blocks": [self.GetName()], "name": trn, "loco": loco, "east": "1" if east else "0", "action": REAR if rear else FRONT}
 				rt = tr.GetChosenRoute()
 				if rt is not None:
 					stParams["route"] = rt
@@ -522,14 +523,14 @@ class Block:
 			return
 		# all unoccupied - clean up
 		if self.frame.IsDispatcher():
-			self.frame.Request({"settrain": { "blocks": [self.GetName()], "name": None, "loco": None}})
+			self.frame.Request({"settrain": {"blocks": [self.GetName()], "name": None, "loco": None}})
 
 		self.train = None
 		self.EvaluateStoppingSections()
 		if self.type == OVERSWITCH and self.entrySignal is not None:
 			signm = self.entrySignal.GetName()
 			atype = self.entrySignal.GetAspectType()
-			self.frame.Request({"signal": { "name": signm, "aspect": STOP, "aspecttype": atype}})
+			self.frame.Request({"signal": {"name": signm, "aspect": STOP, "aspecttype": atype}})
 			self.entrySignal.SetLock(self.GetName(), 0)
 
 		self.frame.DoFleetPending(self)
@@ -551,14 +552,14 @@ class Block:
 		if self.dbg.identifytrain:
 			self.frame.DebugMessage("========New Train Identification========")
 			self.frame.DebugMessage("Attempting to identify train in block %s" % self.GetName())
-		#=======================================================================
+		# =======================================================================
 		# uncomment the following code to not identify trains that cross into a block against the signal
 		#
 		# if self.type == OVERSWITCH:
 		# 	if not cleared:
 		# 		# should not be entering an OS block without clearance
 		# 		return None, False
-		#=======================================================================
+		# =======================================================================
 			
 		if self.east:
 			'''
@@ -729,7 +730,7 @@ class Block:
 			if self.dbg.identifytrain:
 				self.frame.DebugMessage("Train %s crossed an E/W boundary - reversing train direction" % tr.GetName())
 			tr.SetEast(not tr.GetEast())
-			self.frame.Request({"renametrain": { "oldname": tr.GetName(), "newname": tr.GetName(), "east": "1" if tr.GetEast() else "0"}})	
+			self.frame.Request({"renametrain": {"oldname": tr.GetName(), "newname": tr.GetName(), "east": "1" if tr.GetEast() else "0"}})
 
 	def SetCleared(self, cleared=True, refresh=False):
 		if cleared and self.occupied:
@@ -744,7 +745,7 @@ class Block:
 		self.determineStatus()
 		if self.status == EMPTY:
 			self.Reset()
-		self.frame.Request({"blockclear": { "block": self.GetName(), "clear": 1 if cleared else 0}})
+		self.frame.Request({"blockclear": {"block": self.GetName(), "clear": 1 if cleared else 0}})
 
 		if refresh:
 			self.Draw()
@@ -754,8 +755,8 @@ class Block:
 				b.SetCleared(cleared, refresh)
 				
 	def RemoveClearStatus(self):
-		#if self.name == "C13":
-			#return  # do not do this on single track
+		# if self.name == "C13":
+		# 	return  # do not do this on single track
 		self.cleared = False
 		self.determineStatus()
 		for b in [self.sbEast, self.sbWest]:
@@ -769,13 +770,15 @@ class Block:
 							"sbwest": None if self.sbWest is None else self.sbWest.GetName()}}
 
 
-class StoppingBlock (Block):
+class StoppingBlock:  # (Block):
 	def __init__(self, block, tiles, eastend):
 		self.block = block
+		self.east = False
 		self.tiles = tiles
 		self.eastend = eastend
 		self.type = STOPPINGBLOCK
 		self.frame = self.block.frame
+		self.status = None
 		self.active = False
 		self.occupied = False
 		self.cleared = False
@@ -795,7 +798,7 @@ class StoppingBlock (Block):
 			return
 		
 		mainBlk = self.block
-		district = self.block.GetDistrict()
+		# district = self.block.GetDistrict()
 		bname = self.block.GetName()
 		direction = "East" if self.eastend else "West"
 
@@ -804,8 +807,7 @@ class StoppingBlock (Block):
 			logging.debug("no known exit block from %s" % mainBlk.GetName())
 			# we don't know the exit block - this means the OS is set to a different
 			# route and the signal should be red - assert that stopping block is active
-			logging.debug("===activating stopping relay for block %s %s because unable to identify next block" % (
-			bname, direction))
+			logging.debug("===activating stopping relay for block %s %s because unable to identify next block" % (bname, direction))
 			self.Activate(True)
 			return
 
@@ -871,7 +873,7 @@ class StoppingBlock (Block):
 		if flag:
 			self.frame.PopupEvent("Stop Relay: %s %s by %s" % (bname, direction, tname))
 
-		self.frame.Request({"relay": { "block": self.block.GetName(), "state": 1 if flag else 0}})
+		self.frame.Request({"relay": {"block": self.block.GetName(), "state": 1 if flag else 0}})
 
 		if tr is None:
 			self.block.DrawTrain()
@@ -913,7 +915,8 @@ class StoppingBlock (Block):
 	def IsBusy(self):
 		return self.cleared or self.occupied
 
-	def GetDistrict(self):
+	@staticmethod
+	def GetDistrict():
 		return None
 
 	def GetName(self):
@@ -928,12 +931,15 @@ class StoppingBlock (Block):
 			# already in the desired state
 			return
 
-		self.frame.Request({"blockclear": { "block": self.GetName(), "clear": 1 if cleared else 0}})
+		self.frame.Request({"blockclear": {"block": self.GetName(), "clear": 1 if cleared else 0}})
 		self.cleared = cleared
 		self.determineStatus()
 		if refresh:
 			self.Draw()
-			
+
+	def IsCleared(self):
+		return self.cleared
+
 	def RemoveClearStatus(self):
 		self.cleared = False
 		self.determineStatus()
@@ -949,7 +955,7 @@ class StoppingBlock (Block):
 
 		self.occupied = occupied
 		if self.occupied:
-			self.frame.Request({"blockclear": { "block": self.GetName(), "clear": 0}})
+			self.frame.Request({"blockclear": {"block": self.GetName(), "clear": 0}})
 			self.cleared = False
 			self.EvaluateStoppingSection()
 
@@ -1185,7 +1191,7 @@ class OverSwitch (Block):
 
 	def SetOccupied(self, occupied=True, blockend=None, refresh=False):
 		if occupied == self.IsOccupied():
-			return # we're already in the desired state
+			return  # we're already in the desired state
 		
 		Block.SetOccupied(self, occupied, blockend, refresh)
 		
@@ -1208,7 +1214,7 @@ class OverSwitch (Block):
 					
 					# lock the entry signal by the exitblock name
 
-					#self.entrySignal.SetLock(exitBlkName, 1)
+					# self.entrySignal.SetLock(exitBlkName, 1)
 					self.entrySignal.SetLock(self.name, 1)
 					self.entrySignal.SetFleetPending(self.entrySignal.GetAspect() != 0, self, rtName, exitBlk)
 				else:
@@ -1216,7 +1222,7 @@ class OverSwitch (Block):
 				# turn the signal we just passed red, but hold onto the lock to be cleared when we exit the block
 				# also retain the old aspect, used to govern train speed
 				self.entrySignal.SetFrozenAspect(aspect)
-				self.frame.Request({"signal": { "name": signm, "aspect": STOP, "aspecttype": atype, "frozenaspect": aspect}})
+				self.frame.Request({"signal": {"name": signm, "aspect": STOP, "aspecttype": atype, "frozenaspect": aspect}})
 				tr = self.GetTrain()
 				if tr is not None:
 					self.frame.activeTrains.UpdateTrain(tr.GetName())
@@ -1228,7 +1234,7 @@ class OverSwitch (Block):
 				atype = self.entrySignal.GetAspectType()
 				aspect = self.entrySignal.GetAspect()
 				self.entrySignal.SetFrozenAspect(None)
-				self.frame.Request({"signal": { "name": self.entrySignal.GetName(), "aspect": aspect, "aspecttype": atype, "frozenaspect": None}})
+				self.frame.Request({"signal": {"name": self.entrySignal.GetName(), "aspect": aspect, "aspecttype": atype, "frozenaspect": None}})
 				tr = self.GetTrain()
 				if tr is not None:
 					self.frame.activeTrains.UpdateTrain(tr.GetName())
@@ -1261,4 +1267,3 @@ class OverSwitch (Block):
 	def DrawTurnouts(self):
 		for t in self.turnouts:
 			t.Draw(EMPTY, self.east)
-

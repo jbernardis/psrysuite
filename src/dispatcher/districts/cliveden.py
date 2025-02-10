@@ -36,7 +36,7 @@ class Cliveden (District):
 
 		if controlOpt != 0 and c13auto:
 			# we are in either dispatcher all or dispatcher bank/cliveden mode
-			if not blkEastAfter and blknm in [ "C23", "C12" ] and blockend is None and state == OCCUPIED:
+			if not blkEastAfter and blknm in ["C23", "C12"] and blockend is None and state == OCCUPIED:
 				rtname = "CRtC13" + blknm
 				signm = "C14RA" if blknm == "C12" else "C14RB"
 				self.AutomatedBlockEnqueue(self.C13Queue, "COSCLW", rtname, "C13", signm)
@@ -68,7 +68,7 @@ class Cliveden (District):
 
 		District.PerformTurnoutAction(self, turnout, force=force)
 
-	def PerformSignalAction(self, sig, callon=False):
+	def PerformSignalAction(self, sig, callon=False, silent=False):
 		signame = sig.GetName()
 		controlOpt = self.frame.cliffControl
 		if (controlOpt == 1 and signame not in ["C14RA", "C14RB", "C14L"]) or controlOpt == 0:
@@ -110,8 +110,8 @@ class Cliveden (District):
 				(self.tiles["horiz"],   self.screen,      (79, 13), False),
 			], False)
 		self.blocks["C13"].AddStoppingBlock([
-				(self.tiles["horiznc"], self.screen,      (80, 13), False),
-				(self.tiles["eobright"],self.screen,      (81, 13), False),
+				(self.tiles["horiznc"],  self.screen,      (80, 13), False),
+				(self.tiles["eobright"], self.screen,      (81, 13), False),
 			], True)
 		self.blocks["C13"].AddStoppingBlock([
 				(self.tiles["eobleft"], self.screen,      (73, 13), False),
@@ -121,11 +121,11 @@ class Cliveden (District):
 
 		self.blocks["C23"] = Block(self, self.frame, "C23",
 			[
-				(self.tiles["horiz"],   self.screen,      (89, 13), False),
-				(self.tiles["horiznc"], self.screen,      (90, 13), False),
-				(self.tiles["horiz"],   self.screen,      (91, 13), False),
-				(self.tiles["horiz"],   self.screen,      (93, 13), False),
-				(self.tiles["eobright"],self.screen,      (94, 13), False),
+				(self.tiles["horiz"],    self.screen,      (89, 13), False),
+				(self.tiles["horiznc"],  self.screen,      (90, 13), False),
+				(self.tiles["horiz"],    self.screen,      (91, 13), False),
+				(self.tiles["horiz"],    self.screen,      (93, 13), False),
+				(self.tiles["eobright"], self.screen,      (94, 13), False),
 			], False)
 		self.blocks["C23"].AddStoppingBlock([
 				(self.tiles["eobleft"], self.screen,      (87, 13), False),
@@ -135,12 +135,12 @@ class Cliveden (District):
 
 		self.blocks["C12"] = Block(self, self.frame, "C12",
 			[
-				(self.tiles["horiz"],   self.screen,      (89, 15), False),
-				(self.tiles["horiznc"], self.screen,      (90, 15), False),
-				(self.tiles["horiz"],   self.screen,      (91, 15), False),
-				(self.tiles["horiznc"], self.screen,      (92, 15), False),
-				(self.tiles["horiz"],   self.screen,      (93, 15), False),
-				(self.tiles["eobright"],self.screen,      (94, 15), False),
+				(self.tiles["horiz"],    self.screen,      (89, 15), False),
+				(self.tiles["horiznc"],  self.screen,      (90, 15), False),
+				(self.tiles["horiz"],    self.screen,      (91, 15), False),
+				(self.tiles["horiznc"],  self.screen,      (92, 15), False),
+				(self.tiles["horiz"],    self.screen,      (93, 15), False),
+				(self.tiles["eobright"], self.screen,      (94, 15), False),
 			], True)
 		self.blocks["C12"].AddStoppingBlock([
 				(self.tiles["eobleft"], self.screen,      (87, 15), False),
@@ -150,12 +150,12 @@ class Cliveden (District):
 
 		self.blocks["C22"] = Block(self, self.frame, "C22",
 			[
-				(self.tiles["eobleft"], self.screen,      (100, 13), False),
-				(self.tiles["horiznc"], self.screen,      (101, 13), False),
-				(self.tiles["horiz"],   self.screen,      (102, 13), False),
-				(self.tiles["horiznc"], self.screen,      (103, 13), False),
-				(self.tiles["horiz"],   self.screen,      (104, 13), False),
-				(self.tiles["eobright"],self.screen,      (105, 13), False),
+				(self.tiles["eobleft"],  self.screen,      (100, 13), False),
+				(self.tiles["horiznc"],  self.screen,      (101, 13), False),
+				(self.tiles["horiz"],    self.screen,      (102, 13), False),
+				(self.tiles["horiznc"],  self.screen,      (103, 13), False),
+				(self.tiles["horiz"],    self.screen,      (104, 13), False),
+				(self.tiles["eobright"], self.screen,      (105, 13), False),
 			], False)
 		self.blocks["C22"].AddTrainLoc(self.screen, (102, 13))
 
@@ -172,58 +172,58 @@ class Cliveden (District):
 				(self.tiles["horiz"],   self.screen,      (108, 15), False),
 				(self.tiles["horiznc"], self.screen,      (109, 15), False),
 				(self.tiles["horiz"],   self.screen,      (110, 15), False),
-				(self.tiles["turnrightright"],self.screen,(111, 15), False),
-				(self.tiles["diagright"],self.screen,     (112, 16), False),
-				(self.tiles["diagright"],self.screen,     (113, 17), False),
-				(self.tiles["turnleftup"],self.screen,    (114, 18), False),
-				(self.tiles["verticalnc"],self.screen,    (114, 19), True),
-				(self.tiles["vertical"], self.screen,     (114, 20), True),
-				(self.tiles["verticalnc"],self.screen,    (114, 21), True),
-				(self.tiles["vertical"], self.screen,     (114, 22), True),
-				(self.tiles["verticalnc"],self.screen,    (114, 23), True),
-				(self.tiles["vertical"], self.screen,     (114, 24), True),
-				(self.tiles["verticalnc"],self.screen,    (114, 25), True),
-				(self.tiles["vertical"], self.screen,     (114, 26), True),
-				(self.tiles["turnleftdown"],self.screen,  (114, 27), False),
-				(self.tiles["diagright"],self.screen,     (115, 28), False),
-				(self.tiles["diagright"],self.screen,     (116, 29), False),
-				(self.tiles["turnrightleft"],self.screen, (117, 30), False),
-				(self.tiles["eobright"],self.screen,      (118, 30), False),
+				(self.tiles["turnrightright"], self.screen, (111, 15), False),
+				(self.tiles["diagright"],      self.screen, (112, 16), False),
+				(self.tiles["diagright"],      self.screen, (113, 17), False),
+				(self.tiles["turnleftup"],     self.screen, (114, 18), False),
+				(self.tiles["verticalnc"],     self.screen, (114, 19), True),
+				(self.tiles["vertical"],       self.screen, (114, 20), True),
+				(self.tiles["verticalnc"],     self.screen, (114, 21), True),
+				(self.tiles["vertical"],       self.screen, (114, 22), True),
+				(self.tiles["verticalnc"],     self.screen, (114, 23), True),
+				(self.tiles["vertical"],       self.screen, (114, 24), True),
+				(self.tiles["verticalnc"],     self.screen, (114, 25), True),
+				(self.tiles["vertical"],       self.screen, (114, 26), True),
+				(self.tiles["turnleftdown"],   self.screen, (114, 27), False),
+				(self.tiles["diagright"],      self.screen, (115, 28), False),
+				(self.tiles["diagright"],      self.screen, (116, 29), False),
+				(self.tiles["turnrightleft"],  self.screen, (117, 30), False),
+				(self.tiles["eobright"],       self.screen, (118, 30), False),
 			], True)
 		self.blocks["C11"].AddTrainLoc(self.screen, (102, 15))
 
 		self.blocks["COSCLW"] = OverSwitch(self, self.frame, "COSCLW",
 			[
-				(self.tiles["eobleft"], self.screen,      (82, 13), False),
-				(self.tiles["horiznc"], self.screen,      (84, 13), False),
-				(self.tiles["horiz"],   self.screen,      (85, 13), False),
-				(self.tiles["eobright"],self.screen,      (86, 13), False),
-				(self.tiles["diagright"],self.screen,     (84, 14), False),
-				(self.tiles["turnrightleft"],self.screen, (85, 15), False),
-				(self.tiles["eobright"],self.screen,      (86, 15), False),
+				(self.tiles["eobleft"],       self.screen, (82, 13), False),
+				(self.tiles["horiznc"],       self.screen, (84, 13), False),
+				(self.tiles["horiz"],         self.screen, (85, 13), False),
+				(self.tiles["eobright"],      self.screen, (86, 13), False),
+				(self.tiles["diagright"],     self.screen, (84, 14), False),
+				(self.tiles["turnrightleft"], self.screen, (85, 15), False),
+				(self.tiles["eobright"],      self.screen, (86, 15), False),
 			], False)
 
 		self.blocks["COSCLEW"] = OverSwitch(self, self.frame, "COSCLEW",
 			[
-				(self.tiles["eobleft"], self.screen,      (95, 13), False),
-				(self.tiles["horiznc"], self.screen,      (97, 13), False),
-				(self.tiles["horiz"],   self.screen,      (98, 13), False),
-				(self.tiles["eobright"],self.screen,      (99, 13), False),
+				(self.tiles["eobleft"],  self.screen,      (95, 13), False),
+				(self.tiles["horiznc"],  self.screen,      (97, 13), False),
+				(self.tiles["horiz"],    self.screen,      (98, 13), False),
+				(self.tiles["eobright"], self.screen,      (99, 13), False),
 			], False)
 
 		self.blocks["COSCLEE"] = OverSwitch(self, self.frame, "COSCLEE",
 			[
-				(self.tiles["eobleft"], self.screen,      (95, 15), False),
-				(self.tiles["horiz"],   self.screen,      (96, 15), False),
-				(self.tiles["horiznc"], self.screen,      (97, 15), False),
-				(self.tiles["eobright"],self.screen,      (99, 15), False),
-				(self.tiles["eobleft"], self.screen,      (95, 13), False),
-				(self.tiles["diagright"],self.screen,     (97, 14), False),
+				(self.tiles["eobleft"],   self.screen,      (95, 15), False),
+				(self.tiles["horiz"],     self.screen,      (96, 15), False),
+				(self.tiles["horiznc"],   self.screen,      (97, 15), False),
+				(self.tiles["eobright"],  self.screen,      (99, 15), False),
+				(self.tiles["eobleft"],   self.screen,      (95, 13), False),
+				(self.tiles["diagright"], self.screen,      (97, 14), False),
 			], True)
 
-		self.osBlocks["COSCLW"] = [ "C13", "C23", "C12" ]
-		self.osBlocks["COSCLEW"] = [ "C23", "C22" ]
-		self.osBlocks["COSCLEE"] = [ "C12", "C11", "C23" ]
+		self.osBlocks["COSCLW"] = ["C13", "C23", "C12"]
+		self.osBlocks["COSCLEW"] = ["C23", "C22"]
+		self.osBlocks["COSCLEE"] = ["C12", "C11", "C23"]
 
 		return self.blocks, self.osBlocks
 
@@ -231,14 +231,14 @@ class Cliveden (District):
 		self.turnouts = {}
 
 		toList = [
-			[ "CSw9",   "torightright",  ["COSCLEW", "COSCLEE"], (96, 13) ],
-			[ "CSw9b",  "torightleft",   ["COSCLEW", "COSCLEE"], (98, 15) ],
-			[ "CSw13" , "torightright",  ["COSCLW"], (83, 13) ],
+			["CSw9",   "torightright",  ["COSCLEW", "COSCLEE"], (96, 13)],
+			["CSw9b",  "torightleft",   ["COSCLEW", "COSCLEE"], (98, 15)],
+			["CSw13", "torightright",  ["COSCLW"], (83, 13)],
 		]
 		
 		hslist = [
-			[ "CSw11",  "toleftright",   "C23", (92, 13) ],
-			[ "CSw15",  "torightleft",   "C13", (78, 13) ],
+			["CSw11",  "toleftright",   "C23", (92, 13)],
+			["CSw15",  "torightleft",   "C13", (78, 13)],
 		]
 
 		for tonm, tileSet, blks, pos in toList:
@@ -268,15 +268,15 @@ class Cliveden (District):
 		self.osProxies = {}
 	
 		sigList = [
-			[ "C14L",   RegAspects, True,    "rightlong", (82, 14) ],
-			[ "C14RB",  RegAspects, False,   "leftlong", (86, 12) ],
-			[ "C14RA",  RegAspects, False,   "leftlong", (86, 14) ],
+			["C14L",   RegAspects, True,    "rightlong", (82, 14)],
+			["C14RB",  RegAspects, False,   "leftlong", (86, 12)],
+			["C14RA",  RegAspects, False,   "leftlong", (86, 14)],
 
-			[ "C12L",   RegAspects, True,    "rightlong", (95, 16) ],
-			[ "C12R",   RegAspects, False,   "leftlong", (99, 14) ],
+			["C12L",   RegAspects, True,    "rightlong", (95, 16)],
+			["C12R",   RegAspects, False,   "leftlong", (99, 14)],
 
-			[ "C10L",   RegAspects, True,    "rightlong", (95, 14) ],
-			[ "C10R",   RegAspects, False,   "leftlong", (99, 12) ],
+			["C10L",   RegAspects, True,    "rightlong", (95, 14)],
+			["C10R",   RegAspects, False,   "leftlong", (99, 12)],
 		]
 		for signm, atype, east, tileSet, pos in sigList:
 			self.signals[signm]  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
@@ -285,9 +285,9 @@ class Cliveden (District):
 		self.signals["C14RB"].SetMutexSignals(["C14RA"])
 
 		self.sigLeverMap = {
-			"C10.lvr": [ "COSCLEW", "COSCLEE" ],
-			"C12.lvr": [ "COSCLEE" ],
-			"C14.lvr": [ "COSCLW" ],
+			"C10.lvr": ["COSCLEW", "COSCLEE"],
+			"C12.lvr": ["COSCLEE"],
+			"C14.lvr": ["COSCLW"],
 		}
 
 		for sl in self.sigLeverMap:
@@ -319,30 +319,30 @@ class Cliveden (District):
 		self.osSignals = {}
 
 		block = self.blocks["COSCLW"]
-		self.routes["CRtC13C23"] = Route(self.screen, block, "CRtC13C23", "C23", [ (82, 13), (83, 13), (84, 13), (85, 13), (86, 13) ], "C13", [MAIN, MAIN], ["CSw13:N"], ["C14RB", "C14L"])
-		self.routes["CRtC13C12"] = Route(self.screen, block, "CRtC13C12", "C12", [ (82, 13), (83, 13), (84, 14), (85, 15), (86, 15) ], "C13", [DIVERGING, DIVERGING], ["CSw13:R"], ["C14RA", "C14L"])
+		self.routes["CRtC13C23"] = Route(self.screen, block, "CRtC13C23", "C23", [(82, 13), (83, 13), (84, 13), (85, 13), (86, 13)], "C13", [MAIN, MAIN], ["CSw13:N"], ["C14RB", "C14L"])
+		self.routes["CRtC13C12"] = Route(self.screen, block, "CRtC13C12", "C12", [(82, 13), (83, 13), (84, 14), (85, 15), (86, 15)], "C13", [DIVERGING, DIVERGING], ["CSw13:R"], ["C14RA", "C14L"])
 
-		block=self.blocks["COSCLEW"]
-		self.routes["CRtC23C22"] = Route(self.screen, block, "CRtC23C22", "C22", [ (95, 13), (96, 13), (97, 13), (98, 13), (99, 13) ], "C23", [MAIN, MAIN], ["CSw9:N"], ["C10R", "C10L"])
+		block = self.blocks["COSCLEW"]
+		self.routes["CRtC23C22"] = Route(self.screen, block, "CRtC23C22", "C22", [(95, 13), (96, 13), (97, 13), (98, 13), (99, 13)], "C23", [MAIN, MAIN], ["CSw9:N"], ["C10R", "C10L"])
 
-		block=self.blocks["COSCLEE"]
-		self.routes["CRtC12C11"] = Route(self.screen, block, "CRtC12C11", "C12", [ (95, 15), (96, 15), (97, 15), (98, 15), (99, 15) ], "C11", [MAIN, MAIN], ["CSw9:N"], ["C12L", "C12R"])
-		self.routes["CRtC23C11"] = Route(self.screen, block, "CRtC23C11", "C23", [ (95, 13), (96, 13), (97, 14), (98, 15), (99, 15) ], "C11", [DIVERGING, DIVERGING], ["CSw9:R"], ["C10L", "C12R"])
+		block = self.blocks["COSCLEE"]
+		self.routes["CRtC12C11"] = Route(self.screen, block, "CRtC12C11", "C12", [(95, 15), (96, 15), (97, 15), (98, 15), (99, 15)], "C11", [MAIN, MAIN], ["CSw9:N"], ["C12L", "C12R"])
+		self.routes["CRtC23C11"] = Route(self.screen, block, "CRtC23C11", "C23", [(95, 13), (96, 13), (97, 14), (98, 15), (99, 15)], "C11", [DIVERGING, DIVERGING], ["CSw9:R"], ["C10L", "C12R"])
 
-		self.signals["C14L"].AddPossibleRoutes("COSCLW", [ "CRtC13C23", "CRtC13C12" ])
-		self.signals["C14RA"].AddPossibleRoutes("COSCLW", [ "CRtC13C12" ])
-		self.signals["C14RB"].AddPossibleRoutes("COSCLW", [ "CRtC13C23" ])
+		self.signals["C14L"].AddPossibleRoutes("COSCLW", ["CRtC13C23", "CRtC13C12"])
+		self.signals["C14RA"].AddPossibleRoutes("COSCLW", ["CRtC13C12"])
+		self.signals["C14RB"].AddPossibleRoutes("COSCLW", ["CRtC13C23"])
 
-		self.signals["C12L"].AddPossibleRoutes("COSCLEE", [ "CRtC12C11" ])
-		self.signals["C12R"].AddPossibleRoutes("COSCLEE", [ "CRtC12C11", "CRtC23C11" ])
+		self.signals["C12L"].AddPossibleRoutes("COSCLEE", ["CRtC12C11"])
+		self.signals["C12R"].AddPossibleRoutes("COSCLEE", ["CRtC12C11", "CRtC23C11"])
 
-		self.signals["C10L"].AddPossibleRoutes("COSCLEW", [ "CRtC23C22" ])
-		self.signals["C10L"].AddPossibleRoutes("COSCLEE", [ "CRtC23C11" ])
-		self.signals["C10R"].AddPossibleRoutes("COSCLEW", [ "CRtC23C22" ])
+		self.signals["C10L"].AddPossibleRoutes("COSCLEW", ["CRtC23C22"])
+		self.signals["C10L"].AddPossibleRoutes("COSCLEE", ["CRtC23C11"])
+		self.signals["C10R"].AddPossibleRoutes("COSCLEW", ["CRtC23C22"])
 
-		self.osSignals["COSCLW"] =  [ "C14L", "C14RA", "C14RB" ]
-		self.osSignals["COSCLEW"] = [ "C10L", "C10R", "C12R" ]
-		self.osSignals["COSCLEE"] = [ "C12L", "C12R", "C10L" ]
+		self.osSignals["COSCLW"] = ["C14L", "C14RA", "C14RB"]
+		self.osSignals["COSCLEW"] = ["C10L", "C10R", "C12R"]
+		self.osSignals["COSCLEE"] = ["C12L", "C12R", "C10L"]
 
 		p = OSProxy(self, "COSCLEW")
 		self.osProxies["COSCLEW"] = p
@@ -368,4 +368,3 @@ class Cliveden (District):
 		self.handswitches["CSw15.hand"] = hs
 
 		return self.handswitches
-

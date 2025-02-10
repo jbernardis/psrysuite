@@ -1,36 +1,14 @@
 import wx
 import wx.lib.newevent
 from wx.lib.gizmos.ledctrl import LEDNumberCtrl
-# from subprocess import Popen, DEVNULL
 
 import os
-# import sys
-# import json
-# import re
-# import logging
-# import time
-# from subprocess import Popen
-#
-# from dispatcher.constants import BLOCK
 
-from dispatcher.mainframe import MainFrame, Node, BTNDIM, WIDTHADJUST
+from dispatcher.mainframe import MainFrame, Node, BTNDIM
 from dispatcher.bitmaps import BitMaps
-# from dispatcher.district import Districts, CrossingEastWestBoundary
 from dispatcher.trackdiagram import TrackDiagram
-# from dispatcher.tile import loadTiles
-# from dispatcher.train import Train
-# from dispatcher.trainlist import ActiveTrainList, YardBlocks
-# from dispatcher.losttrains import LostTrains, LostTrainsRecoveryDlg
-# from dispatcher.routetraindlg import RouteTrainDlg
-# from dispatcher.inspectdlg import InspectDlg
 
-from dispatcher.breaker import BreakerDisplay, BreakerName
-# from dispatcher.toaster import Toaster
-# from dispatcher.listdlg import ListDlg
-# from dispatcher.delayedrequest import DelayedRequests
-# from dispatcher.delayedsignal import DelayedSignals
-# from dispatcher.trainqueue import TrainQueue
-# from dispatcher.block import formatRouteDesignator
+from dispatcher.breaker import BreakerDisplay
 
 from cliffdisplay.districts.yard import Yard
 from cliffdisplay.districts.hyde import Hyde
@@ -43,16 +21,6 @@ from cliffdisplay.districts.bank import Bank
 from cliffdisplay.districts.cliveden import Cliveden
 from cliffdisplay.districts.cliff import Cliff
 from cliffdisplay.districts.port import Port
-
-# from dispatcher.constants import HyYdPt, LaKr, NaCl, EMPTY, OCCUPIED, NORMAL, REVERSE, \
-# 		OVERSWITCH, SLIPSWITCH, turnoutstate, REPLACE
-# from dispatcher.listener import Listener
-# from dispatcher.rrserver import RRServer
-#
-# from dispatcher.edittraindlg import EditTrainDlg, SortTrainBlocksDlg
-# from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
-#
-# from ctcmanager.ctcmanager import CTCManager
 
 cliff = "cliff"
 c13control = "c13control"
@@ -105,7 +73,6 @@ class NassauTrack:
 class CliffFrame(MainFrame):
 	def __init__(self, settings):
 		MainFrame.__init__(self, settings)
-		self.c13Control = 0
 
 		self.settings.dispatcher.dispatch = False
 		self.SetupScreen()
@@ -159,7 +126,7 @@ class CliffFrame(MainFrame):
 
 	def drawCustom(self, dc):
 		dc.SetTextBackground(wx.Colour(0, 0, 0))
-		dc.SetFont(wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")))
+		dc.SetFont(wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")))
 		for nt in self.nassauTracks.values():
 			nt.draw(dc)
 
@@ -208,7 +175,7 @@ class CliffFrame(MainFrame):
 		self.Bind(wx.EVT_BUTTON, self.OnThrottle, self.bThrottle)
 		self.bThrottle.SetToolTip("Open up a new throttle window - multiple allowed")
 
-		self.bEditTrains = wx.Button(self, wx.ID_ANY, "Edit Trains", pos=(self.centerOffset + 150, 45), size=BTNDIM)
+		self.bEditTrains = wx.Button(self, wx.ID_ANY, "Edit Data", pos=(self.centerOffset + 150, 45), size=BTNDIM)
 		self.Bind(wx.EVT_BUTTON, self.OnEditTrains, self.bEditTrains)
 		self.bEditTrains.SetToolTip("Open up the train editor window")
 
@@ -227,8 +194,7 @@ class CliffFrame(MainFrame):
 		self.Bind(wx.EVT_BUTTON, self.OnBSaveTrains, self.bSaveTrains)
 		self.bSaveTrains.SetToolTip("Save train IDs to a file")
 
-		self.bClearTrains = wx.Button(self, wx.ID_ANY, "Clear Train IDs", pos=(self.centerOffset + 2000, 75),
-									  size=BTNDIM)
+		self.bClearTrains = wx.Button(self, wx.ID_ANY, "Clear Train IDs", pos=(self.centerOffset + 2000, 75), size=BTNDIM)
 		self.bClearTrains.Enable(False)
 		self.Bind(wx.EVT_BUTTON, self.OnBClearTrains, self.bClearTrains)
 		self.bClearTrains.SetToolTip("Repolace train IDs from active trains with temporary names")

@@ -223,7 +223,10 @@ class ManageLocosDlg(wx.Dialog):
 			
 		self.RRServer.Post("locos.json", "data", locos)
 		self.SetModified(False)
-		
+		dlg = wx.MessageDialog(self, 'Locomotive data has been saved', 'Data Saved', wx.OK | wx.ICON_INFORMATION)
+		dlg.ShowModal()
+		dlg.Destroy()
+
 	def bRevertPressed(self, _):
 		self.LoadLocos()
 		

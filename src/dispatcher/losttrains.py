@@ -16,7 +16,7 @@ class LostTrains:
 		
 	def Remove(self, train):
 		try:
-			del(self.trains[train])
+			del self.trains[train]
 		except KeyError:
 			return False
 			
@@ -33,7 +33,8 @@ class LostTrains:
 	
 	def Count(self):
 		return len(self.trains)
-	
+
+
 class LostTrainsDlg(wx.Dialog):
 	def __init__(self, parent, lostTrains):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
@@ -42,15 +43,13 @@ class LostTrainsDlg(wx.Dialog):
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.pendingDeletions = []
 		self.chosenTrain = None
+		self.trainNames = []
 
 		self.choices = self.DetermineChoices()
 		
 		self.SetTitle("Lost Trains")
-		
 
 		vsz = wx.BoxSizer(wx.VERTICAL)
-
-		
 		vsz.AddSpacer(20)
 		
 		st = wx.StaticText(self, wx.ID_ANY, 'Train / Dir / Loco / Engineer / Block / Route')
@@ -110,7 +109,7 @@ class LostTrainsDlg(wx.Dialog):
 		self.CenterOnScreen()
 		
 	def DetermineChoices(self):
-		self.trainNames =  [t[0] for t in self.lostTrains.GetList() if t[0] not in self.pendingDeletions]
+		self.trainNames = [t[0] for t in self.lostTrains.GetList() if t[0] not in self.pendingDeletions]
 		return ["%s / %s / %s / %s / %s / %s" % (t[0], "E" if t[3] else "W", t[1], t[2], t[4], t[5]) for t in self.lostTrains.GetList() if t[0] not in self.pendingDeletions]
 	
 	def DoPendingRemoval(self):
@@ -123,7 +122,7 @@ class LostTrainsDlg(wx.Dialog):
 		self.chosenTrain = self.trainNames[tx]
 		self.EndModal(wx.ID_OK)
 
-	def OnCheck(self, event):
+	def OnCheck(self, _):
 		checkedItems = self.ch.GetCheckedItems()
 		n = len(checkedItems)
 		if n == 0:
@@ -136,14 +135,14 @@ class LostTrainsDlg(wx.Dialog):
 			self.bOK.Enable(False)
 			self.bRemove.Enable(True)
 		
-	def OnBRemove(self, evt):
+	def OnBRemove(self, _):
 		checkedItems = self.ch.GetCheckedItems()
 		self.pendingDeletions.extend([self.trainNames[i] for i in checkedItems])
 		self.ch.SetItems(self.DetermineChoices())
 		self.bOK.Enable(False)
 		self.bRemove.Enable(False)
 		
-	def OnBOK(self, evt):
+	def OnBOK(self, _):
 		# dopending removals and set up the selected train for retrieval
 		self.DoPendingRemoval()
 		checkedItems = self.ch.GetCheckedItems()
@@ -154,16 +153,16 @@ class LostTrainsDlg(wx.Dialog):
 		self.chosenTrain = self.trainNames[tx]
 		self.EndModal(wx.ID_OK)
 		
-	def OnBExit(self, evt):
+	def OnBExit(self, _):
 		# perform pendingg deletions and exit without selecting a lost train
 		self.DoPendingRemoval()
 		self.chosenTrain = None
 		self.EndModal(wx.ID_CANCEL)
 		
-	def OnBCancel(self, evt):
+	def OnBCancel(self, _):
 		self.DoCancel()
 		
-	def OnClose(self, evt):
+	def OnClose(self, _):
 		self.DoCancel()
 		
 	def DoCancel(self):
@@ -183,15 +182,13 @@ class LostTrainsRecoveryDlg(wx.Dialog):
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.pendingDeletions = []
 		self.chosenTrain = None
+		self.trainNames = []
 
 		self.choices = self.DetermineChoices()
 		
 		self.SetTitle("Recover Lost Trains")
 		
-
 		vsz = wx.BoxSizer(wx.VERTICAL)
-
-		
 		vsz.AddSpacer(20)
 		st = wx.StaticText(self, wx.ID_ANY, "Select train(s) to recover")
 		vsz.Add(st, 0, wx.ALIGN_CENTER_HORIZONTAL)
@@ -304,7 +301,7 @@ class LostTrainsRecoveryDlg(wx.Dialog):
 		self.CenterOnScreen()
 		
 	def DetermineChoices(self):
-		self.trainNames =  [t[0] for t in self.lostTrains]
+		self.trainNames = [t[0] for t in self.lostTrains]
 		return ["%s / %s / %s / %s / %s / %s" % (t[0], "E" if t[3] else "W", t[1], t[2], t[4], t[5]) for t in self.lostTrains]
 	
 	def ApplyBlockFilter(self, blocks):
@@ -313,7 +310,7 @@ class LostTrainsRecoveryDlg(wx.Dialog):
 			self.ch.Check(idx, check=lt[4] in blocks)
 		self.SetOKButton()
 
-	def OnCheck(self, event):
+	def OnCheck(self, _):
 		self.SetOKButton()
 		
 	def SetOKButton(self):
@@ -324,39 +321,39 @@ class LostTrainsRecoveryDlg(wx.Dialog):
 		else:
 			self.bOK.Enable(True)
 			
-	def OnBAll(self, evt):
+	def OnBAll(self, _):
 		self.ch.SetCheckedItems(range(len(self.choices)))
 		self.bOK.Enable(True)
 			
-	def OnBNone(self, evt):
+	def OnBNone(self, _):
 		self.ch.SetCheckedItems([])
 		self.bOK.Enable(False)
 		
-	def OnBSheffield(self, evt):
+	def OnBSheffield(self, _):
 		self.ApplyBlockFilter(["C21", "C40", "C41", "C42", "C43", "C44", "C50", "C51", "C52", "C53", "C54"])
 		
-	def OnBNassau(self, evt):
+	def OnBNassau(self, _):
 		self.ApplyBlockFilter(["N12", "N22", "N31", "N32", "N41", "N42"])
 		
-	def OnBHyde(self, evt):
+	def OnBHyde(self, _):
 		self.ApplyBlockFilter(["H12", "H22", "H30", "H31", "H32", "H33", "H34", "H40", "H41", "H42", "H43"])
 		
-	def OnBPort(self, evt):
+	def OnBPort(self, _):
 		self.ApplyBlockFilter(["P1", "P2", "P3", "P4", "P5", "P6", "P7"])
 		
-	def OnBYard(self, evt):
+	def OnBYard(self, _):
 		self.ApplyBlockFilter(["Y50", "Y51", "Y52", "Y53"])
 		
-	def OnBWaterman(self, evt):
+	def OnBWaterman(self, _):
 		self.ApplyBlockFilter(["Y81", "Y82", "Y83", "Y84"])
 		
-	def OnBOK(self, evt):
+	def OnBOK(self, _):
 		self.EndModal(wx.ID_OK)
 		
-	def OnBCancel(self, evt):
+	def OnBCancel(self, _):
 		self.DoCancel()
 		
-	def OnClose(self, evt):
+	def OnClose(self, _):
 		self.DoCancel()
 		
 	def DoCancel(self):

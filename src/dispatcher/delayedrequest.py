@@ -6,7 +6,7 @@ class DelayedRequests:
     def Append(self, evt):
         cmd = list(evt.keys())[0]
         delay = evt[cmd]["delay"]
-        del(evt[cmd]["delay"])
+        del evt[cmd]["delay"]
         self.events.append([delay, evt])
         
     def CheckForExpiry(self, cb):

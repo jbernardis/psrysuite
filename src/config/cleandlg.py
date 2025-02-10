@@ -1,5 +1,6 @@
 import wx
 
+
 class CleanDlg(wx.Dialog):
     def __init__(self, parent, choices, label):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "Clean up %s" % label)

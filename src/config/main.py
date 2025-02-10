@@ -25,13 +25,13 @@ efp = open(os.path.join(os.getcwd(), "output", "config.err"), "w")
 sys.stdout = ofp
 sys.stderr = efp
 
+
 class App(wx.App):
 	def OnInit(self):
-		self.frame = MainFrame()
-		self.frame.Show()
+		frame = MainFrame()
+		frame.Show()
 		return True
 
 
 app = App(False)
 app.MainLoop()
-

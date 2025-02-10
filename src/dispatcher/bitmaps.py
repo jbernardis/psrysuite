@@ -2,9 +2,11 @@ import wx
 import os
 import logging
 
+
 class Node:
 	def __init__(self):
 		pass
+
 
 class BitMaps:
 	def __init__(self, idir):
@@ -13,10 +15,10 @@ class BitMaps:
 		self.loadDir(idir, self)
 
 	def loadDir(self, idir, parent):
+		pdir = os.path.expandvars(idir)
 		try:
-			pdir = os.path.expandvars(idir)
 			l = os.listdir(pdir)
-		except:
+		except FileNotFoundError:
 			logging.error("Unable to get bitmap listing from directory: %s" % idir)
 			return
 

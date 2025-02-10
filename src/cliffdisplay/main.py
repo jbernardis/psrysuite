@@ -1,5 +1,6 @@
 import wx
-import os, sys 
+import os
+import sys
 cmdFolder = os.getcwd()
 if cmdFolder not in sys.path:
 	sys.path.insert(0, cmdFolder)
@@ -39,8 +40,8 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 class App(wx.App):
 	def OnInit(self):
-		self.frame = CliffFrame(settings)
-		self.frame.Show()
+		frame = CliffFrame(settings)
+		frame.Show()
 		return True
 
 

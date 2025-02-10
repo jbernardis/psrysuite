@@ -7,6 +7,7 @@ COLSIG = 100
 COLOS = 350
 COLBLK = 60
 
+
 class RouteTrainDlg(wx.Dialog):
 	def __init__(self, parent, train, rtName, trinfo, isDispatcher):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
@@ -18,13 +19,13 @@ class RouteTrainDlg(wx.Dialog):
 		self.sequence = trinfo["sequence"]
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 
-		self.colors = [ wx.Colour(225, 255, 240), wx.Colour(138, 255, 197) ]
+		self.colors = [wx.Colour(225, 255, 240), wx.Colour(138, 255, 197)]
 		self.line = 0
 		
 		self.SetTitle("Route Status")
 		
-		self.font = wx.Font(wx.Font(14, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
-		self.fontTrainID = wx.Font(wx.Font(22, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+		self.font = wx.Font(wx.Font(14, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+		self.fontTrainID = wx.Font(wx.Font(22, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
 		self.bmpArrow = self.parent.bitmaps.arrow
 		self.bmpClear = self.parent.bitmaps.clear
 		self.lastStepx = None
@@ -102,7 +103,7 @@ class RouteTrainDlg(wx.Dialog):
 		self.Fit()
 		self.CenterOnScreen()
 
-	def OnBRoute(self, evt):
+	def OnBRoute(self, _):
 		if self.lastStepx is None:
 			return
 		
@@ -127,7 +128,7 @@ class RouteTrainDlg(wx.Dialog):
 			else:
 				self.parent.DelaySignalRequest(self.sequence[sx]["signal"], self.sequence[sx]["os"], self.sequence[sx]["route"], 5)
 
-	def OnBSignal(self, evt):
+	def OnBSignal(self, _):
 		if self.lastStepx is None:
 			return
 
@@ -171,7 +172,7 @@ class RouteTrainDlg(wx.Dialog):
 				self.bRoute.Enable(False)
 				self.bSignal.Enable(False)
 
-		elif stepx == 0: # train is in starting block
+		elif stepx == 0:  # train is in starting block
 			self.msg.SetLabel("")
 			self.SetArrow(stepx)
 			if self.isDispatcher:
@@ -197,7 +198,7 @@ class RouteTrainDlg(wx.Dialog):
 			return
 		self.bmps[sx].SetBitmap(self.bmpClear)
 		
-	def onClose(self, evt):
+	def onClose(self, _):
 		self.parent.CloseRouteTrainDlg(self.name)
 		
 	def AddHeaders(self):

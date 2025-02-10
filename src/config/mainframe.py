@@ -2,18 +2,66 @@ import wx
 import os
 import sys
 import winshell
+import getopt
 
 from dispatcher.settings import Settings
 from config.generatedlg import GenerateDlg
 from utilities.backup import saveData, restoreData
 
-		
+
+def GenShortcut(module, forceStartMenu=False):
+	psrypath = os.getcwd()
+	python = sys.executable.replace("python.exe", "pythonw.exe")
+
+	paths = [os.path.join(winshell.desktop(), "%s.lnk" % module["name"])]
+
+	if forceStartMenu:
+		smdir = os.path.join(winshell.start_menu(), "Programs", "PSRY")
+		try:
+			os.mkdir(smdir)
+		except FileExistsError:
+			pass
+
+		paths.append(os.path.join(smdir, "%s.lnk" % module["name"]))
+
+	for link_path in paths:
+		if module["dir"] is None:
+			pyfile = os.path.join(psrypath, module["main"])
+		else:
+			pyfile = os.path.join(psrypath, module["dir"], module["main"])
+
+		with winshell.shortcut(link_path) as link:
+			link.path = python
+			if "parameter" in module:
+				link.arguments = "\"%s\" \"%s\"" % (pyfile, module["parameter"])
+			else:
+				link.arguments = "\"%s\"" % pyfile
+			link.working_directory = psrypath
+			link.description = module["desc"]
+			link.icon_location = (os.path.join(psrypath, "icons", module["icon"]), 0)
+
+
 class MainFrame(wx.Frame):
 	def __init__(self):
 		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE)
 		self.SetTitle("PSRY Configuration Utility")
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
-	
+
+		try:
+			opts, _ = getopt.getopt(sys.argv[1:], "",
+									["install"])
+		except getopt.GetoptError:
+			print('Invalid command line arguments - ignoring')
+			return
+
+		install = False
+		for opt, _ in opts:
+			print("command line option: %s" % opt, flush=True)
+			if opt == "--install":
+				install = True
+
+		print("install = %s" % str(install))
+
 		self.settings = Settings()
 		
 		icon = wx.Icon()
@@ -78,7 +126,6 @@ class MainFrame(wx.Frame):
 		
 		vszrl.AddSpacer(20)
 
-		
 		commBox = wx.StaticBox(self, wx.ID_ANY, "Server")
 		topBorder = commBox.GetBordersForSizer()[0]
 		boxsizer = wx.BoxSizer(wx.VERTICAL)
@@ -111,8 +158,6 @@ class MainFrame(wx.Frame):
 		vszrl.Add(commBox, 0, wx.EXPAND)
 		
 		vszrl.AddSpacer(20)
-
-
 
 		dispBox = wx.StaticBox(self, wx.ID_ANY, "Dispatcher/Display/Satellite")
 		topBorder = dispBox.GetBordersForSizer()[0]
@@ -168,7 +213,9 @@ class MainFrame(wx.Frame):
 		
 		vszrl.AddSpacer(20)
 
-		
+		vszrm = wx.BoxSizer(wx.VERTICAL)
+		vszrm.AddSpacer(20)
+
 		dispBox = wx.StaticBox(self, wx.ID_ANY, "Display")
 		topBorder = dispBox.GetBordersForSizer()[0]
 		boxsizer = wx.BoxSizer(wx.VERTICAL)
@@ -194,10 +241,7 @@ class MainFrame(wx.Frame):
 		
 		dispBox.SetSizer(boxsizer)
 		
-		vszrl.Add(dispBox, 0, wx.EXPAND)
-
-		vszrr = wx.BoxSizer(wx.VERTICAL)
-		vszrr.AddSpacer(20)
+		vszrm.Add(dispBox, 0, wx.EXPAND)
 
 		snifferBox = wx.StaticBox(self, wx.ID_ANY, "DCC Sniffer")
 		topBorder = snifferBox.GetBordersForSizer()[0]
@@ -234,9 +278,9 @@ class MainFrame(wx.Frame):
 
 		snifferBox.SetSizer(boxsizer)
 
-		vszrr.Add(snifferBox, 0, wx.EXPAND)
+		vszrm.Add(snifferBox, 0, wx.EXPAND)
 
-		vszrr.AddSpacer(20)
+		vszrm.AddSpacer(20)
 
 		atBox = wx.StaticBox(self, wx.ID_ANY, "Active Trains")
 		topBorder = atBox.GetBordersForSizer()[0]
@@ -279,11 +323,13 @@ class MainFrame(wx.Frame):
 		
 		atBox.SetSizer(boxsizer)
 		
-		vszrr.Add(atBox, 0, wx.EXPAND)
+		vszrm.Add(atBox, 0, wx.EXPAND)
 	
+		vszrm.AddSpacer(20)
+
+		vszrr = wx.BoxSizer(wx.VERTICAL)
 		vszrr.AddSpacer(20)
-		
-			
+
 		controlBox = wx.StaticBox(self, wx.ID_ANY, "Control")
 		topBorder = controlBox.GetBordersForSizer()[0]
 		boxsizer = wx.BoxSizer(wx.VERTICAL)
@@ -329,8 +375,10 @@ class MainFrame(wx.Frame):
 		hszr = wx.BoxSizer(wx.HORIZONTAL)
 		hszr.Add(vszrl, 1, wx.EXPAND)
 		hszr.AddSpacer(30)
+		hszr.Add(vszrm, 1, wx.EXPAND)
+		hszr.AddSpacer(30)
 		hszr.Add(vszrr, 1, wx.EXPAND)
-		
+
 		vszr.Add(hszr)
 		
 		vszrfile = wx.BoxSizer(wx.VERTICAL)
@@ -368,29 +416,31 @@ class MainFrame(wx.Frame):
 
 		vszr.AddSpacer(20)
 
+		btnszr = wx.BoxSizer(wx.HORIZONTAL)
+		btnszr2 = wx.BoxSizer(wx.HORIZONTAL)
+
 		self.bSave = wx.Button(self, wx.ID_ANY, "Save", size=(200, 60))
-		vszr.Add(self.bSave, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		btnszr.Add(self.bSave)
 		self.Bind(wx.EVT_BUTTON, self.OnBSave, self.bSave)
-		vszr.AddSpacer(20)
+		btnszr.AddSpacer(20)
 		
 		self.bGenerate = wx.Button(self, wx.ID_ANY, "Generate Shortcuts/Start Menu", size=(200, 60))
-		vszr.Add(self.bGenerate, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		btnszr.Add(self.bGenerate)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenerate, self.bGenerate)
-		vszr.AddSpacer(30)
 
-		hsz = wx.BoxSizer(wx.HORIZONTAL)
-				
-		self.bBackup = wx.Button(self, wx.ID_ANY, "Backup\nData Files", size=(100, 50))
-		hsz.Add(self.bBackup)		
-		hsz.AddSpacer(30)
+		self.bBackup = wx.Button(self, wx.ID_ANY, "Backup Data Files", size=(200, 60))
+		btnszr2.Add(self.bBackup)
+		btnszr2.AddSpacer(20)
 		self.Bind(wx.EVT_BUTTON, self.OnBBackup, self.bBackup)
-		self.bRestore = wx.Button(self, wx.ID_ANY, "Restore\nData Files", size=(100, 50))
-		hsz.Add(self.bRestore)
+		self.bRestore = wx.Button(self, wx.ID_ANY, "Restore Data Files", size=(200, 60))
+		btnszr2.Add(self.bRestore)
 		self.Bind(wx.EVT_BUTTON, self.OnBRestore, self.bRestore)
 		
-		vszr.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		vszr.Add(btnszr2, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		vszr.AddSpacer(30)
-		
+		vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		vszr.AddSpacer(30)
+
 		hszr = wx.BoxSizer(wx.HORIZONTAL)
 		hszr.AddSpacer(10)
 		hszr.Add(vszr)
@@ -400,9 +450,11 @@ class MainFrame(wx.Frame):
 		self.Fit()
 		self.Layout()
 		
-		self.GenConfigShortcut()
+		if install:
+			self.GenConfigShortcut()
 		
-	def GenConfigShortcut(self):
+	@staticmethod
+	def GenConfigShortcut():
 		module = {
 			"name": "PSRY Suite Configuration",
 			"dir":  "config",
@@ -410,7 +462,7 @@ class MainFrame(wx.Frame):
 			"desc": "Configuration Tool",
 			"icon": "config.ico",
 		}
-		self.GenShortcut(module, True)
+		GenShortcut(module, True)
 		module = {
 			"name": "PSRY Suite - save logs",
 			"dir":  "savelogs",
@@ -418,44 +470,13 @@ class MainFrame(wx.Frame):
 			"desc": "Save Logs and output for debugging",
 			"icon": "savelogs.ico",
 		}
-		self.GenShortcut(module, True)
-		
-	def GenShortcut(self, module, forceStartMenu=False):
-		psrypath = os.getcwd()
-		python = sys.executable.replace("python.exe", "pythonw.exe")
-
-		paths = []		
-		paths.append(os.path.join(winshell.desktop(), "%s.lnk" % module["name"]))
-		
-		if forceStartMenu:
-			smdir = os.path.join(winshell.start_menu(), "Programs", "PSRY")
-			try:
-				os.mkdir(smdir)
-			except FileExistsError:
-				pass
-			
-			paths.append(os.path.join(smdir, "%s.lnk" % module["name"]))
-		
-		for link_path in paths:
-			if module["dir"] is None:
-				pyfile = os.path.join(psrypath, module["main"])
-			else:
-				pyfile = os.path.join(psrypath, module["dir"], module["main"])
-		
-			with winshell.shortcut(link_path) as link:
-				link.path = python
-				if "parameter" in module:
-					link.arguments = "\"%s\" \"%s\"" % (pyfile, module["parameter"])
-				else:
-					link.arguments = "\"%s\"" % pyfile
-				link.working_directory = psrypath
-				link.description = module["desc"]
-				link.icon_location = (os.path.join(psrypath, "icons", module["icon"]), 0)
+		GenShortcut(module, True)
 
 	def OnBBackupDir(self, _):
 		startDir = self.teBackupDir.GetValue()
 		dlg = wx.DirDialog(self, "Choose a backup directory:", defaultPath=startDir, style=wx.DD_DEFAULT_STYLE)
 		rc = dlg.ShowModal()
+		path = None
 		if rc == wx.ID_OK:
 			path = dlg.GetPath()
 
@@ -480,9 +501,10 @@ class MainFrame(wx.Frame):
 			defaultDir=sdir,
 			defaultFile=sfile,
 			wildcard=wildcard,
-			style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST |wx.FD_PREVIEW)
+			style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_PREVIEW)
 
 		rc = dlg.ShowModal()
+		path = None
 		if rc == wx.ID_OK:
 			path = dlg.GetPath()
 
@@ -493,7 +515,7 @@ class MainFrame(wx.Frame):
 		self.teBrowser.SetValue(path)
 
 	def OnBGenerate(self, _):
-		dlg = GenerateDlg(self, self.GenShortcut)
+		dlg = GenerateDlg(self, GenShortcut)
 		dlg.ShowModal()
 		dlg.Destroy()
 
@@ -548,7 +570,7 @@ class MainFrame(wx.Frame):
 		cv = self.settings.activetrains.lines
 		try:
 			self.settings.activetrains.lines = int(self.teLines.GetValue())
-		except:
+		except ValueError:
 			self.settings.activetrains.lines = cv
 		
 		self.settings.control.cliff = self.rbCtlCliff.GetSelection()
@@ -566,4 +588,3 @@ class MainFrame(wx.Frame):
 
 	def OnClose(self, _):
 		self.Destroy()
-

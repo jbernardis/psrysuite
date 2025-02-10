@@ -1,10 +1,10 @@
 import wx
-import logging
 
 from dispatcher.losttrains import LostTrainsDlg
 
 MAXSTEPS = 9
 BUTTONSIZE = (120, 40)
+
 
 class EditTrainDlg(wx.Dialog):
 	def __init__(self, parent, train, block, locos, trains, engineers, existingTrains, atcFlag, arFlag, dispatcherFlag, lostTrains, dx, dy):
@@ -38,7 +38,7 @@ class EditTrainDlg(wx.Dialog):
 		self.trainList = sorted(list(trains.keys()))
 		self.trainsWithSeq = [k for k in self.trainList if "sequence" in self.trains[k] and len(self.trains[k]["sequence"]) > 0]
 
-		font = wx.Font(wx.Font(16, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+		font = wx.Font(wx.Font(16, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
 
 		lblTrain = wx.StaticText(self, wx.ID_ANY, "Train:", size=(120, -1))
 		lblTrain.SetFont(font)
@@ -235,7 +235,8 @@ class EditTrainDlg(wx.Dialog):
 		
 		self.ShowTrainLocoDesc()
 
-	def BuildLocoKey(self, lid):
+	@staticmethod
+	def BuildLocoKey(lid):
 		return int(lid)
 		
 	def OnLocoChoice(self, evt):
@@ -298,11 +299,12 @@ class EditTrainDlg(wx.Dialog):
 		self.chosenEngineer = nm
 		evt.Skip()
 		
-	def OnBClearEng(self, evt):
+	def OnBClearEng(self, _):
 		self.chosenEngineer = self.noEngineer
 		self.cbEngineer.SetValue(self.noEngineer)
 		
-	def OnBLostTrains(self, evt):
+	def OnBLostTrains(self, _):
+		trname = ""
 		dlg = LostTrainsDlg(self, self.lostTrains)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
@@ -323,8 +325,7 @@ class EditTrainDlg(wx.Dialog):
 		if east != self.startingEast:
 			mdlg = wx.MessageDialog(self,  'Trains are moving in opposite directions.\nPress "Yes" to proceed',
 									'Opposite Directions',
-									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
-									)
+									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
 			rc = mdlg.ShowModal()
 			mdlg.Destroy()
 
@@ -422,8 +423,7 @@ class EditTrainDlg(wx.Dialog):
 				if self.startingEast != self.trains[self.chosenRoute]["eastbound"]:
 					mdlg = wx.MessageDialog(self,  'Route is in the opposite direction from the train.\nPress "Yes" to proceed',
 									'Opposite Directions',
-									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
-									)
+									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
 					rc = mdlg.ShowModal()
 					mdlg.Destroy()
 					if rc != wx.ID_YES:

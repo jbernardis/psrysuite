@@ -1,10 +1,12 @@
 import requests
 import logging
+import json
+
 
 class RRServer(object):
 	def __init__(self):
 		self.ipAddr = None
-		#self.rrSession = requests.Session()
+		# self.rrSession = requests.Session()
 	
 	def SetServerAddress(self, ip, port):
 		self.ipAddr = "http://%s:%s" % (ip, port)
@@ -12,7 +14,7 @@ class RRServer(object):
 	def SendRequest(self, req):
 		for cmd, parms in req.items():
 			try:
-				#self.rrSession.get(self.ipAddr + "/" + cmd, params=parms, timeout=0.5)
+				# self.rrSession.get(self.ipAddr + "/" + cmd, params=parms, timeout=0.5)
 				requests.get(self.ipAddr + "/" + cmd, params=parms, timeout=0.7)
 			except requests.exceptions.ConnectionError:
 				logging.error("Unable to send request  is rr server running?")
@@ -30,13 +32,13 @@ class RRServer(object):
 		
 		try:
 			return r.json()
-		except:
+		except json.JSONDecodeError:
 			return r.text
 				
 	def Post(self, fn, directory,  data):
 		headers = {
-		    'Filename': fn,
-		    'Directory': directory
+			'Filename': fn,
+			'Directory': directory
 		}
 		try:
 			r = requests.post(self.ipAddr, headers=headers, json=data, timeout=4.0)
@@ -49,4 +51,3 @@ class RRServer(object):
 			return r.status_code
 		
 		return r.status_code
-

@@ -52,5 +52,3 @@ class HandSwitch:
 	def Draw(self):
 		bmp = self.tiles.getBmp("", "locked" if self.locked else "unlocked")
 		self.frame.DrawTile(self.screen, self.pos, bmp) 
-
-

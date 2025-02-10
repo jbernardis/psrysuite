@@ -644,7 +644,8 @@
       "fast": 80,
       "acc": 1,
       "dec": 1
-    }
+    },
+    "limit": 0
   },
   "1006": {
     "desc": null,
@@ -945,6 +946,17 @@
       "start": 10
     },
     "limit": 0
+  },
+  "3646": {
+    "desc": "description",
+    "prof": {
+      "start": 0,
+      "slow": 10,
+      "medium": 58,
+      "fast": 80,
+      "acc": 1,
+      "dec": 1
+    }
   },
   "3648": {
     "desc": "Penn / Bill Board Reefer",

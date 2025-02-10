@@ -84,7 +84,7 @@ class Settings:
 					self.rrserver.ioerrorthreshold = int(value)
 
 				elif opt == "ignoredblocks":
-					self.rrserver.ignoredblocks = x = [x.strip() for x in value.split(",")]
+					self.rrserver.ignoredblocks = [x.strip() for x in value.split(",")]
 
 				elif opt == "pendingdetectionlosscycles":
 					self.rrserver.pendingdetectionlosscycles = int(value)
@@ -342,9 +342,9 @@ class Settings:
 		process the command line next and override the settings file with the options seen there
 		"""
 		try:
-			opts, _ = getopt.getopt(sys.argv[1:],"",["dispatch","display", "simulate", "sim", "nosimulate", "nosim", "satellite"])
+			opts, _ = getopt.getopt(sys.argv[1:], "", ["dispatch", "display", "simulate", "sim", "nosimulate", "nosim", "satellite"])
 		except getopt.GetoptError:
-			print ('Invalid command line arguments - ignoring')
+			print('Invalid command line arguments - ignoring')
 			return 
 		
 		for opt, _ in opts:
@@ -364,11 +364,11 @@ class Settings:
 				self.dispatcher.satellite = True
 				print("Overriding dispatcher mode from command line: satellite")
 
-			elif opt in [ "--simulate", "--sim" ]:
+			elif opt in ["--simulate", "--sim"]:
 				self.rrserver.simulation = True
 				print("Overriding simulation flag from command line: True")
 				
-			elif opt in [ "--nosimulate", "--nosim" ]:
+			elif opt in ["--nosimulate", "--nosim"]:
 				self.rrserver.simulation = False
 				print("Overriding simulation flag from command line: False")
 		

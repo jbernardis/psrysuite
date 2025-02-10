@@ -911,7 +911,10 @@ class TrainTrackerDlg(wx.Dialog):
 				self.trains[tr].update(self.roster[tr])
 		
 			self.RRServer.Post("trains.json", "data", self.trains)
-				
+			dlg = wx.MessageDialog(self, 'Train list has been saved', 'Data Saved', wx.OK | wx.ICON_INFORMATION)
+			dlg.ShowModal()
+			dlg.Destroy()
+
 		self.setModified(False)
 		
 	def bPrintTrainCardsPressed(self, _):

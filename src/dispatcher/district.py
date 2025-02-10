@@ -2,7 +2,7 @@ import logging
 
 from dispatcher.constants import RegAspects, RegSloAspects, AdvAspects, SloAspects, \
 	MAIN, SLOW, DIVERGING, RESTRICTING, \
-	CLEARED, OCCUPIED, EMPTY, STOP, NORMAL, OVERSWITCH, \
+	CLEARED, OCCUPIED, STOP, NORMAL, OVERSWITCH, \
 	restrictedaspect, routetype, statusname, aspectname, aspecttype
 	
 EWCrossoverPoints = [
@@ -37,6 +37,8 @@ class District:
 		self.indicators = None
 		self.turnouts = None
 		self.osBlocks = None
+		self.blockSigs = None
+		self.osProxies = None
 		self.blocks = None
 		self.tiles = None
 		self.totiles = None
@@ -47,10 +49,14 @@ class District:
 		self.name = name
 		self.frame = frame
 		self.screen = screen
+		self.NXMap = {}
 		self.eastGroup = {}
 		self.westGroup = {}
 		self.eastButton = {}
 		self.westButton = {}
+		self.routeButtons = {}
+		self.buttonToRoute = {}
+
 		logging.info("Creating district %s" % str(self))
 		self.dbg = self.frame.GetDebugFlags()
 		self.matrixturnoutdelay = self.frame.settings.dispatcher.matrixturnoutdelay
@@ -100,7 +106,7 @@ class District:
 	def PerformButtonAction(self, btn):
 		pass
 
-	def DoEntryExitButtons(self, btn, groupName, sendButtons=False, interval = 0):
+	def DoEntryExitButtons(self, btn, groupName, sendButtons=False, interval=0):
 		bname = btn.GetName()
 		if self.westButton[groupName] and not self.westButton[groupName].IsPressed():
 			self.westButton[groupName] = None
@@ -143,9 +149,9 @@ class District:
 				wButton.Acknowledge(refresh=True)
 				eButton.Acknowledge(refresh=True)
 				if sendButtons:
-					self.frame.Request({"nxbutton": { "entry": wButton.GetName(),  "exit": eButton.GetName()}})
+					self.frame.Request({"nxbutton": {"entry": wButton.GetName(),  "exit": eButton.GetName()}})
 				else:
-					self.MatrixTurnoutRequest(toList, interval = interval)
+					self.MatrixTurnoutRequest(toList, interval=interval)
 
 			self.westButton[groupName] = None
 			self.eastButton[groupName] = None
@@ -169,7 +175,7 @@ class District:
 			if rte is not None:
 				self.blocks[osn].SetRoute(rte)
 
-	def MatrixTurnoutRequest(self, tolist, interval = 0):
+	def MatrixTurnoutRequest(self, tolist, interval=0):
 		first = True
 		delay = interval
 		for toname, state in tolist:
@@ -205,7 +211,7 @@ class District:
 			# print("block, sigs = %s %s" % (blknm, str(siglist)))
 			if signm in siglist:
 				osblk = self.frame.blocks[blknm]
-				#osblknm = blknm
+				# osblknm = blknm
 				rname = osblk.GetRouteName()
 				# print("os: %s route: %s" % (osblknm, str(rname)))
 				if osblk.route is None:
@@ -280,7 +286,8 @@ class District:
 			if rc:
 				trainqueue.Pop()
 
-	def AutomatedBlockEnqueue(self, trainqueue, osnm, rtnm, blknm, signm):
+	@staticmethod
+	def AutomatedBlockEnqueue(trainqueue, osnm, rtnm, blknm, signm):
 		trainqueue.Append(osnm, rtnm, signm, blknm)
 
 	def CalculateAspect(self, sig, osblk, rt, silent=False):
@@ -307,8 +314,8 @@ class District:
 			logging.debug("Unable to calculate aspect: Block %s is cleared in opposite direction" % osblk.GetName())
 			return None
 		
-		exitBlkNm = rt.GetExitBlock(reverse = currentDirection!=osblk.GetEast())
-		rType = rt.GetRouteType(reverse = currentDirection!=osblk.GetEast())
+		exitBlkNm = rt.GetExitBlock(reverse=currentDirection != osblk.GetEast())
+		rType = rt.GetRouteType(reverse=currentDirection != osblk.GetEast())
 
 		exitBlk = self.frame.blocks[exitBlkNm]
 		if exitBlk.IsOccupied():
@@ -333,29 +340,29 @@ class District:
 			logging.debug("Unable to calculate aspect: Block %s is locked" % exitBlkNm)
 			return None
 		
-		nb = exitBlk.NextBlock(reverse = currentDirection!=exitBlk.GetEast())
+		nb = exitBlk.NextBlock(reverse=currentDirection != exitBlk.GetEast())
 		if nb:
 			nbName = nb.GetName()
 			if CrossingEastWestBoundary(nb, exitBlk):
 				currentDirection = not currentDirection
 			
 			nbStatus = nb.GetStatus()
-			nbRType = nb.GetRouteType(reverse = currentDirection!=nb.GetEast())
+			nbRType = nb.GetRouteType(reverse=currentDirection != nb.GetEast())
 			nbRtName = nb.GetRouteName()
 			# try to go one more block, skipping past an OS block
 
-			nxbNm = nb.GetExitBlock(reverse = currentDirection!=nb.GetEast())
+			nxbNm = nb.GetExitBlock(reverse=currentDirection != nb.GetEast())
 			if nxbNm is None:
 				nnb = None
 			else:
 				try:
 					nxb = self.frame.blocks[nxbNm]
-				except:
+				except (KeyError, IndexError):
 					nxb = None
 				if nxb:
 					if CrossingEastWestBoundary(nb, nxb):
 						currentDirection = not currentDirection
-					nnb = nxb.NextBlock(reverse = currentDirection!=nxb.GetEast())
+					nnb = nxb.NextBlock(reverse=currentDirection != nxb.GetEast())
 				else:
 					nnb = None
 
@@ -390,7 +397,7 @@ class District:
 		logging.debug("Calculated aspect = %s   aspect type = %s route type = %s next block status = %s next block route type = %s next next block clear = %s" %
 					(aspectname(aspect, aType), aspecttype(aType), routetype(rType), statusname(nbStatus), routetype(nbRType), nnbClear))
 
-		#self.CheckBlockSignals(sig, aspect, exitBlk, doReverseExit, rType, nbStatus, nbRType, nnbClear)
+		# self.CheckBlockSignals(sig, aspect, exitBlk, doReverseExit, rType, nbStatus, nbRType, nnbClear)
 
 		return aspect
 
@@ -416,7 +423,7 @@ class District:
 			if rt is None:
 				nxtrte = None
 			else:
-				nxtrte = rt.rtype[0 if blkEast else 1] # get next route type
+				nxtrte = rt.rtype[0 if blkEast else 1]  # get next route type
 		
 		if east != blkEast:
 			aspect = 0	
@@ -431,12 +438,12 @@ class District:
 		else:
 			aspect = 0       # stop
 
-		if sig.SetAspect(aspect, refresh = True, callon = False):
-			self.frame.Request({"signal": { "name": sigNm, "aspect": aspect, "aspecttype": atype }})
+		if sig.SetAspect(aspect, refresh=True, callon=False):
+			self.frame.Request({"signal": {"name": sigNm, "aspect": aspect, "aspecttype": atype}})
 
 	def CheckBlockSignalsAdv(self, blkNm, blkNxtNm, sigNm, blkEast):
 		blk = self.frame.blocks[blkNm]
-		clear = blk.IsCleared() # is the first block cleared
+		clear = blk.IsCleared()  # is the first block cleared
 		sig = self.frame.signals[sigNm]
 		atype = sig.GetAspectType()
 					
@@ -458,7 +465,7 @@ class District:
 			if rt is None:
 				nxtrte = None
 			else:
-				nxtrte = rt.rtype[0 if blkEast else 1] # get next route type
+				nxtrte = rt.rtype[0 if blkEast else 1]  # get next route type
 
 		# now consider the block beyond the OS (as identified in a parameter) for clear and route type
 		try:
@@ -474,7 +481,7 @@ class District:
 				nxtclradv = blknxt.IsCleared()
 		
 		if east != blkEast or nxtEast != blkEast:
-			aspect = 0	# blocks going in opposite directions - just stop
+			aspect = 0  # blocks going in opposite directions - just stop
 		elif clear and nxtclr and (nxtrte == MAIN) and nxtclradv:
 			aspect = 0b011  # clear
 		elif clear and nxtclr and (nxtrte == MAIN) and (not nxtclradv):
@@ -486,8 +493,8 @@ class District:
 		else:
 			aspect = 0       # stop
 		
-		if sig.SetAspect(aspect, refresh=True, callon = False):
-			self.frame.Request({"signal": { "name": sigNm, "aspect": aspect, "aspecttype": atype }})
+		if sig.SetAspect(aspect, refresh=True, callon=False):
+			self.frame.Request({"signal": {"name": sigNm, "aspect": aspect, "aspecttype": atype}})
 
 	def anyTurnoutLocked(self, toList):
 		rv = False
@@ -499,9 +506,10 @@ class District:
 
 		return rv
 
-	def GetAspect(self, atype, rtype, nbstatus, nbrtype, nnbclear):
-		#print("Get aspect.  Aspect type = %s, route type %s nextblockstatus %s next block route type %s nextnextclear %s" %
-		#	(aspecttype(atype), routetype(rtype), statustype(nbstatus), routetype(nbrtype), str(nnbclear)))
+	@staticmethod
+	def GetAspect(atype, rtype, nbstatus, nbrtype, nnbclear):
+		# print("Get aspect.  Aspect type = %s, route type %s nextblockstatus %s next block route type %s nextnextclear %s" %
+		# (aspecttype(atype), routetype(rtype), statustype(nbstatus), routetype(nbrtype), str(nnbclear)))
 		if atype == RegAspects:
 			if rtype == MAIN and nbstatus == CLEARED and nbrtype == MAIN:
 				return 0b011  # Clear
@@ -587,7 +595,8 @@ class District:
 		else:
 			return 0
 
-	def GetBlockAspect(self, atype, rtype, nbstatus, nbrtype, nnbclear):
+	@staticmethod
+	def GetBlockAspect(atype, _, nbstatus, nbrtype, nnbclear):
 		if atype == RegAspects:
 			if nbstatus == CLEARED and nbrtype == MAIN:
 				return 0b011  # clear
@@ -670,6 +679,7 @@ class District:
 			return
 
 		osblock = None
+		rname = None
 		for blknm, siglist in self.frame.ossignals.items():
 			if signm in siglist:
 				osblock = self.frame.blocks[blknm]
@@ -689,7 +699,11 @@ class District:
 			return
 
 		if aspect < 0:
-			aspect = self.CalculateAspect(sig, osblock, self.frame.routes[rname], silent=True)
+			if rname is None:
+				aspect = None
+			else:
+				aspect = self.CalculateAspect(sig, osblock, self.frame.routes[rname], silent=True)
+
 			#  report calculated aspect back to the server
 			if aspect is None:
 				aspect = sig.GetAspect()
@@ -709,7 +723,7 @@ class District:
 		exitBlkNm = osblock.GetExitBlock()
 		entryBlkNm = osblock.GetEntryBlock()
 		exitBlk  = self.frame.GetBlockByName(exitBlkNm)
-		entryBlk = self.frame.GetBlockByName(entryBlkNm)
+		#  entryBlk = self.frame.GetBlockByName(entryBlkNm)
 
 		if aspect != 0:
 			osblock.SetEntrySignal(sig)
@@ -762,7 +776,7 @@ class District:
 		currentDirection = not sig.GetEast()
 		if self.dbg.showaspectcalculation:
 			self.frame.DebugMessage("Starting in direction %s" % ("east" if currentDirection else "west"))
-		exitBlkNm = rt.GetExitBlock(reverse = currentDirection!=osblk.GetEast())
+		exitBlkNm = rt.GetExitBlock(reverse=currentDirection != osblk.GetEast())
 
 		try:
 			exitBlk = self.frame.blocks[exitBlkNm]
@@ -777,7 +791,7 @@ class District:
 			if self.dbg.showaspectcalculation:
 				self.frame.DebugMessage("Changing direction %s because of E/W boundary" % ("east" if currentDirection else "west"))
 
-		nb = exitBlk.NextBlock(reverse = currentDirection!=exitBlk.GetEast())
+		nb = exitBlk.NextBlock(reverse=currentDirection != exitBlk.GetEast())
 		if nb is None:
 			if self.dbg.showaspectcalculation:
 				self.frame.DebugMessage("No next OS block identified")
@@ -815,6 +829,9 @@ class District:
 			sigNm = sigs[1]
 		elif exitBlkNm == ep[1]:
 			sigNm = sigs[0]
+		else:
+			self.frame.DebugMessage("Unable to identify signal for block %s" % exitBlkNm)
+			return
 
 		if self.dbg.showaspectcalculation:
 			self.frame.DebugMessage("Considering signal %s" % sigNm)
@@ -933,7 +950,6 @@ class District:
 							break
 		return signm, movement, osblk, route
 
-
 	def LockTurnoutsForSignal(self, osblknm, sig, flag):
 		signm = sig.GetName()
 		if osblknm in sig.possibleRoutes:
@@ -951,7 +967,8 @@ class District:
 			if tp:
 				tp.SetLock(locker, flag, refresh=True)
 
-	def DoHandSwitchAction(self, hs, stat):
+	@staticmethod
+	def DoHandSwitchAction(hs, stat):
 		hs.SetValue(stat != 0, refresh=True)
 
 	def DoIndicatorAction(self, ind, value):
@@ -1020,7 +1037,7 @@ class District:
 
 		for rn in preCounts:
 			# there SHOULD only be a single route, MAX, that changes
-			if postCounts[rn] > preCounts[rn] and preCounts[rn] == 0:
+			if postCounts[rn] > preCounts[rn]  == 0:
 				if self.dbg.blockoccupancy:
 					self.frame.DebugMessage("%s is the first OS section to be occupied for route %s-%s" %
 										(block, self.routes[rn].GetOSName(), rn))
@@ -1039,8 +1056,7 @@ class District:
 		
 		# no differences - just absorb the block command
 		return None
-			
-			
+
 	def GetOSProxyCounts(self):
 		counts = {}
 		for pn, prx in self.osProxies.items():
@@ -1142,6 +1158,6 @@ class Districts:
 	def GetRouteDefinitions(self):
 		return [r.GetDefinition() for r in self.frame.routes.values()]
 
-	def GetCrossoverPoints(self):
+	@staticmethod
+	def GetCrossoverPoints():
 		return EWCrossoverPoints
-

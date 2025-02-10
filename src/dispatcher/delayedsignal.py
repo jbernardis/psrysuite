@@ -4,7 +4,7 @@ class DelayedSignals:
         self.signals = {}
         
     def Append(self, signm, osnm, rtnm, maxtime):
-         self.signals[rtnm] = [osnm, signm, maxtime]
+        self.signals[rtnm] = [osnm, signm, maxtime]
 
     def CheckForExpiry(self):
         delList = []

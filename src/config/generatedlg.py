@@ -1,12 +1,12 @@
 import wx
 import os
 import winshell
-import sys
 import glob
 
 from config.cleandlg import CleanDlg
 
 GENBTNSZ = (170, 40)
+
 
 class GenerateDlg(wx.Dialog):
 	def __init__(self, parent, generator):
@@ -333,6 +333,7 @@ class GenerateDlg(wx.Dialog):
 		
 		dlg = CleanDlg(self, scList, "shortcuts")
 		rc = dlg.ShowModal()
+		rv = []
 		if rc == wx.ID_OK:
 			rv = dlg.GetResults()
 
@@ -356,6 +357,7 @@ class GenerateDlg(wx.Dialog):
 		
 		dlg = CleanDlg(self, scList, "start menu")
 		rc = dlg.ShowModal()
+		rv = []
 		if rc == wx.ID_OK:
 			rv = dlg.GetResults()
 

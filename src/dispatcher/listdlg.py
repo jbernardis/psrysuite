@@ -1,6 +1,7 @@
 import wx
 import os
 
+
 class ListDlg(wx.Dialog):
     def __init__(self, parent, title, dataList, dlgexit, dataclear):
         wx.Dialog.__init__(self, parent, style=wx.DEFAULT_FRAME_STYLE)
@@ -13,7 +14,7 @@ class ListDlg(wx.Dialog):
         self.title = title
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         
-        font = wx.Font(wx.Font(18, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial"))
+        font = wx.Font(wx.Font(18, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
 
         vsz = wx.BoxSizer(wx.VERTICAL)
         vsz.AddSpacer(20)
@@ -107,4 +108,3 @@ class ListDlg(wx.Dialog):
         
     def DoClose(self):
         self.dlgexit()
-

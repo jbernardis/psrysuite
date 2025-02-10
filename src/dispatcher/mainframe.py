@@ -1,7 +1,6 @@
 import wx
 import wx.lib.newevent
-#from wx.lib.gizmos.ledctrl import LEDNumberCtrl
-from subprocess import Popen, DEVNULL
+from subprocess import DEVNULL
 
 import os
 import sys
@@ -76,6 +75,56 @@ WIDTHADJUST = 0 if sys.platform.lower() == "win32" else 56
 class MainFrame(wx.Frame):
 	def __init__(self, settings):
 		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE)
+		self.title = None
+		self.bitmaps = None
+		self.bmpw = self.bmph = None
+		self.diagrams = {}
+		self.diagramWidth = 0
+		self.panels = None
+		self.bScreenHyYdPt = self.bScreenLaKr = self.bScreenNaCl = None
+		self.centerOffset = 0
+		self.widgetMap = None
+		self.currentScreen = None
+		self.stCliffControl = None
+		self.stC13Control = None
+		self.showSplash = None
+		self.centerh = None
+		self.centerw = None
+		self.totalh = None
+		self.totalw = None
+		self.bAdvice = None
+		self.bEvents = None
+		self.timeDisplay = None
+		self.breakerDisplay = None
+		self.bResetScreen = None
+		self.ypos = None
+		self.xpos = None
+		self.scrn = None
+		self.bLostTrains = None
+		self.bActiveTrains = None
+		self.bSaveLocos = None
+		self.bLoadLocos = None
+		self.bClearTrains = None
+		self.bSaveTrains = None
+		self.bLoadTrains = None
+		self.bCheckTrains = None
+		self.bEditTrains = None
+		self.bThrottle = None
+		self.bRefresh = None
+		self.bSubscribe = None
+		self.bStartClock = None
+		self.bResetClock = None
+		self.c13Control = 0
+		self.stNassauControl = None
+		self.stYardControl = None
+		self.bSnapshot = None
+
+		self.cbToD = None
+		self.cbAutoRouter = None
+		self.cbATC = None
+		self.cbOSSLocks = None
+		self.cbSidingsUnlocked = None
+
 		self.events = None
 		self.advice = None
 		self.listener = None
@@ -213,6 +262,25 @@ class MainFrame(wx.Frame):
 					for dp in self.panels.values():
 						dp.ShowCTC(self.CTCVisible)
 					self.CTCManager.SetVisible(self.CTCVisible)
+
+		elif kcd == wx.WXK_F3:
+			if self.IsDispatcherOrSatellite():
+				dlg = wx.MultiChoiceDialog(self,
+						"Items to reload",
+						"Reload Data", ["trains", "locomotives", "engineers"])
+
+				rc = dlg.ShowModal()
+				if rc == wx.ID_OK:
+					selections = dlg.GetSelections()
+				else:
+					selections = []
+
+				dlg.Destroy()
+				if rc != wx.ID_OK:
+					return
+
+				dataFlags = [True if i in selections else False for i in range(3)]
+				self.RetrieveData(report=True, trains=dataFlags[0], locos=dataFlags[1], engineers=dataFlags[2])
 
 		else:
 			#self.PopupEvent("Key Code: %d" % kcd)
@@ -884,7 +952,7 @@ class MainFrame(wx.Frame):
 	def ShowTitle(self):
 		titleString = self.title
 		if self.subscribed and self.sessionid is not None:
-			titleString += ("  -  Session ID %d" % self.sessionid)
+			titleString += ("  -  Session ID %s" % str(self.sessionid))
 		self.SetTitle(titleString)
 
 	def Initialize(self, districtMap):
@@ -1002,7 +1070,7 @@ class MainFrame(wx.Frame):
 					sgEast = None
 			bk.SetSBSignals((sgWest, sgEast))
 
-		# invert osBlocks so the we can easily map a block into the OS's it interconnects
+		# invert osBlocks so that we can easily map a block into the OS's it interconnects
 		self.blockOSMap = {}
 		for osblknm, blklist in self.osBlocks.items():
 			for blknm in blklist:
@@ -1071,7 +1139,7 @@ class MainFrame(wx.Frame):
 	def onTicker(self, _):
 		self.tickerFlag = not self.tickerFlag
 		if self.tickerFlag:
-			# call 1sec every other time to simulate a 1 second timer
+			# call 1sec every other time to simulate a 1-second timer
 			self.onTicker1Sec()
 			
 		self.tickerCount += 1
@@ -1298,6 +1366,7 @@ class MainFrame(wx.Frame):
 								addedMenuItem = True
 
 						trid = self.menuTrain.GetName()
+						# noinspection PyTypeChecker
 						hasSequence = ((trid in self.trainList and len(self.trainList[trid]["sequence"]) > 0)
 									or (self.menuTrain.GetChosenRoute() is not None))
 
@@ -1353,6 +1422,7 @@ class MainFrame(wx.Frame):
 				rtName = tr.GetChosenRoute()
 				trinfo = self.trainList[rtName]
 
+			# noinspection PyTypeChecker
 			if "sequence" not in trinfo or len(trinfo["sequence"]) == 0:
 				dlg = wx.MessageDialog(self, "Train does not have a block sequence defined",
 						"No Sequence Defined", wx.OK | wx.ICON_INFORMATION)
@@ -1670,7 +1740,7 @@ class MainFrame(wx.Frame):
 		newLoco = tr.GetLoco()
 
 		blockDict = tr.GetBlockList()
-		blockList = [b for b in blockDict.keys()]  # if b != bname]
+		blockList = [b for b in blockDict.keys()]  # if b != bname
 
 		for bn in blockList:
 			b = blockDict[bn]
@@ -2209,28 +2279,37 @@ class MainFrame(wx.Frame):
 		self.breakerDisplay.UpdateDisplay()
 		self.ShowTitle()
 
-	def RetrieveData(self):
-		locos = self.Get("getlocos", {})
-		if locos is None:
-			logging.error("Unable to retrieve locos")
-			locos = {}
-			
-		self.locoList = locos
+	def RetrieveData(self, report=False, locos=True, trains=True, engineers=True):
+		if locos:
+			l = self.Get("getlocos", {})
+			if l is None:
+				logging.error("Unable to retrieve locos")
+				l = {}
 
-		trains = self.Get("gettrains", {})
-		if trains is None:
-			logging.error("Unable to retrieve trains")
-			trains = {}
-			
-		self.trainList = trains
+			self.locoList = l
+			if report:
+				self.PopupEvent("Locomotives reloaded")
 
-		engineers = self.Get("getengineers", {})
-		if engineers is None:
-			logging.error("Unable to retrieve engineers")
-			engineers = []
-			
-		self.engineerList = engineers
-		
+		if trains:
+			t = self.Get("gettrains", {})
+			if t is None:
+				logging.error("Unable to retrieve trains")
+				t = {}
+
+			self.trainList = t
+			if report:
+				self.PopupEvent("Train roster reloaded")
+
+		if engineers:
+			e = self.Get("getengineers", {})
+			if e is None:
+				logging.error("Unable to retrieve engineers")
+				e = []
+
+			self.engineerList = e
+			if report:
+				self.PopupEvent("Engineers reloaded")
+
 	def GetLocoInfo(self, loco):
 		try:
 			return self.locoList[loco]
@@ -2239,7 +2318,7 @@ class MainFrame(wx.Frame):
 		
 	def SendSignals(self):
 		"""
-		Tell server about all signal aspect types.  Do not send aspect as this will defeat any initialization done inside of rrserver
+		Tell server about all signal aspect types.  Do not send aspect as this will defeat any initialization done inside rrserver
 		"""
 		for signm, sig in self.signals.items():
 			self.Request({"signal": {"name": signm, "aspect": None, "aspecttype": sig.GetAspectType(), "callon": 0}})
@@ -3087,7 +3166,7 @@ class MainFrame(wx.Frame):
 					blk.SetEast(e) # block takes on direction of the train if known
 
 			except KeyError:
-				# not there - create a new one")
+				# not there - create a new one
 				tr = Train(name)
 				self.trains[name] = tr
 				self.activeTrains.AddTrain(tr)
