@@ -10,6 +10,7 @@ BTNSZSMALL = (80, 30)
 
 locs = ["<none>", "CA", "CF", "DE", "GM", "HF", "HY", "JY", "KR", "LA", "LV", "NA", "PT", "SH", "WC", "YD" ]
 
+
 def formatLocation(info, tp):
 	if info[tp]["loc"] is None:
 		return ""
@@ -18,6 +19,7 @@ def formatLocation(info, tp):
 		return info[tp]["loc"]
 
 	return ("%s / %s" % (info[tp]["loc"], info[tp]["track"]))
+
 
 class TrainTrackerDlg(wx.Dialog):
 	def __init__(self, parent, rrserver, browser):
@@ -42,10 +44,10 @@ class TrainTrackerDlg(wx.Dialog):
 
 		self.setRoster()
 			
-		btnFont = wx.Font(wx.Font(10, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial"))
-		textFont = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.NORMAL, faceName="Arial"))
-		textFontBold = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial"))
-		labelFontBold = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+		btnFont = wx.Font(wx.Font(10, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+		textFont = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial"))
+		textFontBold = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+		labelFontBold = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
 		
 		hsizer = wx.BoxSizer(wx.HORIZONTAL)
 		hsizer.AddSpacer(20)

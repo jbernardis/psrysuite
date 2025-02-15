@@ -26,7 +26,7 @@ class ManageLocosDlg(wx.Dialog):
 	
 		self.LoadLocos()
 			
-		textFont = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.NORMAL, faceName="Arial"))
+		textFont = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial"))
 		
 		hsizer=wx.BoxSizer(wx.HORIZONTAL)
 		vsizer = wx.BoxSizer(wx.VERTICAL)

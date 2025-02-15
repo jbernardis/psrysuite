@@ -1,13 +1,15 @@
 import wx
 
 from dispatcher.losttrains import LostTrainsDlg
+from dispatcher.trainhistory import TrainHistoryDlg
+from dispatcher.preload import PreloadedTrainsDlg
 
 MAXSTEPS = 9
 BUTTONSIZE = (120, 40)
 
 
 class EditTrainDlg(wx.Dialog):
-	def __init__(self, parent, train, block, locos, trains, engineers, existingTrains, atcFlag, arFlag, dispatcherFlag, lostTrains, dx, dy):
+	def __init__(self, parent, train, block, locos, trains, engineers, existingTrains, atcFlag, arFlag, dispatcherFlag, lostTrains, trainHistory, preloadedTrains, dx, dy):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Edit Train Details", pos=(dx, dy))
 		self.parent = parent
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
@@ -33,6 +35,8 @@ class EditTrainDlg(wx.Dialog):
 		self.noEngineer = "<none>"
 		self.engineers = [self.noEngineer] + sorted(engineers)
 		self.lostTrains = lostTrains
+		self.trainHistory = trainHistory
+		self.preloadedTrains = preloadedTrains
 		
 		locoList  = sorted(list(locos.keys()), key=self.BuildLocoKey)
 		self.trainList = sorted(list(trains.keys()))
@@ -101,10 +105,18 @@ class EditTrainDlg(wx.Dialog):
 		self.Bind(wx.EVT_BUTTON, self.OnBClearEng, self.bClearEng)
 
 		lostCt = self.lostTrains.Count()
-		if lostCt > 0:		
+		if lostCt > 0:
 			self.bLostTrains = wx.Button(self, wx.ID_ANY, "Lost Trains", size=BUTTONSIZE)
 			self.Bind(wx.EVT_BUTTON, self.OnBLostTrains, self.bLostTrains)
 
+		self.bTrainHistory = wx.Button(self, wx.ID_ANY, "History", size=BUTTONSIZE)
+		self.Bind(wx.EVT_BUTTON, self.OnBTrainHistory, self.bTrainHistory)
+
+		if len(self.preloadedTrains) > 0:
+			self.bPreloadedTrains = wx.Button(self, wx.ID_ANY, "Preloaded", size=BUTTONSIZE)
+			self.Bind(wx.EVT_BUTTON, self.OnBPreloadedTrains, self.bPreloadedTrains)
+
+		vszl = wx.BoxSizer(wx.VERTICAL)
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.Add(lblTrain, 0, wx.TOP, 5)
 		hsz.AddSpacer(10)
@@ -113,28 +125,45 @@ class EditTrainDlg(wx.Dialog):
 		hsz.Add(self.cbAssignRoute, 0, wx.TOP, 10)
 		hsz.AddSpacer(5)
 		hsz.Add(self.cbRoute, 0, wx.TOP, 5)
-		if lostCt > 0:
-			hsz.AddSpacer(20)
-			hsz.Add(self.bLostTrains)
+
+		vszl.Add(hsz)
 		
-		vsz.Add(hsz)
-		
-		vsz.AddSpacer(10)
+		vszl.AddSpacer(10)
 		
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.Add(lblLoco)
 		hsz.AddSpacer(10)
 		hsz.Add(self.cbLocoID)
-		vsz.Add(hsz)
+
+		vszl.Add(hsz)
 		
-		vsz.AddSpacer(10)
+		vszl.AddSpacer(10)
 		
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
-		hsz.Add(lblEngineer)
+		hsz.Add(lblEngineer, 0, wx.TOP, 5)
 		hsz.AddSpacer(10)
-		hsz.Add(self.cbEngineer)
+		hsz.Add(self.cbEngineer, 0, wx.TOP, 5)
 		hsz.AddSpacer(20)
 		hsz.Add(self.bClearEng)
+		vszl.Add(hsz)
+
+		vszr = wx.BoxSizer(wx.VERTICAL)
+
+		if lostCt > 0:
+			vszr.Add(self.bLostTrains)
+			vszr.AddSpacer(20)
+
+		vszr.Add(self.bTrainHistory)
+
+		if len(self.preloadedTrains) > 0:
+			vszr.AddSpacer(20)
+			vszr.Add(self.bPreloadedTrains)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.Add(vszl)
+		hsz.AddSpacer(20)
+		hsz.Add(vszr)
+
 		vsz.Add(hsz)
 
 		vsz.AddSpacer(20)
@@ -302,14 +331,14 @@ class EditTrainDlg(wx.Dialog):
 	def OnBClearEng(self, _):
 		self.chosenEngineer = self.noEngineer
 		self.cbEngineer.SetValue(self.noEngineer)
-		
+
 	def OnBLostTrains(self, _):
 		trname = ""
 		dlg = LostTrainsDlg(self, self.lostTrains)
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
 			trname = dlg.GetResult()
-			
+
 		dlg.Destroy()
 		if rc != wx.ID_OK:
 			return
@@ -320,10 +349,10 @@ class EditTrainDlg(wx.Dialog):
 			return
 
 		loco, engineer, east, _, route = tr
-	
-		rc = wx.ID_YES		
+
+		rc = wx.ID_YES
 		if east != self.startingEast:
-			mdlg = wx.MessageDialog(self,  'Trains are moving in opposite directions.\nPress "Yes" to proceed',
+			mdlg = wx.MessageDialog(self, 'Trains are moving in opposite directions.\nPress "Yes" to proceed',
 									'Opposite Directions',
 									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
 			rc = mdlg.ShowModal()
@@ -337,6 +366,8 @@ class EditTrainDlg(wx.Dialog):
 			if route is None:
 				self.cbAssignRoute.SetValue(False)
 				self.cbRoute.SetSelection(0)
+				self.cbAssignRoute.Enable(False)
+				self.cbRoute.Enable(False)
 			else:
 				self.cbAssignRoute.SetValue(True)
 				try:
@@ -345,8 +376,105 @@ class EditTrainDlg(wx.Dialog):
 					idx = 0
 				self.chosenRoute = self.trainsWithSeq[idx]
 				self.cbRoute.SetSelection(idx)
-			dlg.Destroy()
+				self.cbAssignRoute.Enable(True)
+				self.cbRoute.Enable(True)
+
+			self.ShowTrainLocoDesc()
+
+	def OnBTrainHistory(self, _):
+		trname = ""
+		dlg = TrainHistoryDlg(self, self.trainHistory)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			trname = dlg.GetResult()
+
+		dlg.Destroy()
+		if rc != wx.ID_OK:
 			return
+
+		tr = self.trainHistory.GetTrain(trname)
+		if tr is None:
+			self.parent.PopupEvent("Unable to identify lost train")
+			return
+
+		loco = tr["loco"]
+		engineer = tr["engineer"]
+		east = tr["east"]
+		route = tr["route"]
+
+		rc = wx.ID_YES
+		if east != self.startingEast:
+			mdlg = wx.MessageDialog(self, 'Trains are moving in opposite directions.\nPress "Yes" to proceed',
+									'Opposite Directions',
+									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
+			rc = mdlg.ShowModal()
+			mdlg.Destroy()
+
+		if rc == wx.ID_YES:
+			self.startingEast = east
+			self.cbTrainID.SetValue(trname)
+			self.cbLocoID.SetValue(loco)
+			self.cbEngineer.SetValue(self.noEngineer if engineer is None or engineer == "None" else engineer)
+			if route is None:
+				self.cbAssignRoute.SetValue(False)
+				self.cbRoute.SetSelection(0)
+				self.cbAssignRoute.Enable(False)
+				self.cbRoute.Enable(False)
+			else:
+				self.cbAssignRoute.SetValue(True)
+				try:
+					idx = self.trainsWithSeq.index(route)
+				except ValueError:
+					idx = 0
+				self.chosenRoute = self.trainsWithSeq[idx]
+				self.cbRoute.SetSelection(idx)
+				self.cbAssignRoute.Enable(True)
+				self.cbRoute.Enable(True)
+
+			self.ShowTrainLocoDesc()
+
+	def OnBPreloadedTrains(self, _):
+		tr = None
+		dlg = PreloadedTrainsDlg(self, self.preloadedTrains)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			tr = dlg.GetResult()
+
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return
+
+		east = tr["east"]
+		rc = wx.ID_YES
+		if east != self.startingEast:
+			mdlg = wx.MessageDialog(self, 'Trains are moving in opposite directions.\nPress "Yes" to proceed',
+									'Opposite Directions',
+									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
+			rc = mdlg.ShowModal()
+			mdlg.Destroy()
+
+		if rc == wx.ID_YES:
+			self.startingEast = east
+			self.cbTrainID.SetValue(tr["name"])
+			self.cbLocoID.SetValue(tr["loco"])
+			route = tr["route"]
+			if route is None:
+				self.cbAssignRoute.SetValue(False)
+				self.cbRoute.SetSelection(0)
+				self.cbAssignRoute.Enable(False)
+				self.cbRoute.Enable(False)
+			else:
+				self.cbAssignRoute.SetValue(True)
+				try:
+					idx = self.trainsWithSeq.index(route)
+				except ValueError:
+					idx = 0
+				self.chosenRoute = self.trainsWithSeq[idx]
+				self.cbRoute.SetSelection(idx)
+				self.cbAssignRoute.Enable(True)
+				self.cbRoute.Enable(True)
+
+			self.ShowTrainLocoDesc()
 
 	def ShowTrainLocoDesc(self):
 		if self.chosenLoco in self.locos and self.locos[self.chosenLoco]["desc"] is not None:
@@ -373,10 +501,14 @@ class EditTrainDlg(wx.Dialog):
 			if self.chosenRoute is not None:
 				rtr = self.trains[self.chosenRoute]
 				self.ShowRouteDetails(rtr["tracker"])
+				details = "Eastbound" if self.startingEast else "Westbound"
+				if rtr["cutoff"]:
+					details += " via cutoff"
+				self.stFlags.SetLabel(details)
 			else:
 				for st in self.stTrainInfo:
 					st.SetLabel("")
-			self.stFlags.SetLabel("")
+				self.stFlags.SetLabel("")
 
 	def ShowRouteDetails(self, track):
 		for lx in range(MAXSTEPS):

@@ -62,7 +62,11 @@ class ActiveTrainList:
 			self.dlgTrainList.RemoveAllTrains()
 
 	def GetAllTrains(self):
-		return self.trains
+		if self.dlgTrainList is None:
+			dlgTrains= {}
+		else:
+			dlgTrains = self.dlgTrainList.GetTrainListControl()
+		return self.trains, dlgTrains
 			
 	def SetLoco(self, tr, loco):
 		tr.SetLoco(loco)
@@ -221,6 +225,9 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.Layout()
 		self.Fit()
 		self.CenterOnScreen()
+
+	def GetTrainListControl(self):
+		return self.trCtl.GetTrainListControl()
 		
 	def ClickLeft(self, evt):
 		self.clickLeft = True
@@ -324,7 +331,8 @@ class ActiveTrainsDlg(wx.Dialog):
 
 	def OnClose(self, _):
 		self.dlgExit()
-		
+
+
 class TrainListCtrl(wx.ListCtrl):
 	def __init__(self, parent, dccsnifferenabled, height=160):
 		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1366, height), style=wx.LC_REPORT + wx.LC_VIRTUAL)
@@ -338,7 +346,7 @@ class TrainListCtrl(wx.ListCtrl):
 		self.suppressUnknown = False
 		self.suppressNonATC = False
 		self.suppressNonAssigned = False		
-		self.SetFont(wx.Font(wx.Font(16, wx.FONTFAMILY_ROMAN, wx.BOLD, wx.NORMAL, faceName="Arial")))
+		self.SetFont(wx.Font(wx.Font(16, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")))
 		
 		self.normalA = wx.ItemAttr()
 		self.normalB = wx.ItemAttr()
@@ -385,6 +393,18 @@ class TrainListCtrl(wx.ListCtrl):
 		self.filterTrains()	
 		self.SetItemCount(len(self.filtered))	
 		self.RefreshItems(0, len(self.filtered)-1)
+
+	def GetTrainListControl(self):
+		return {
+			"trains": list(self.trains.keys()),
+			"trainct": len(self.trains),
+
+			"order": self.order.copy(),
+			"orderct": len(self.order),
+
+			"filter": self.filtered.copy(),
+			"filterct": len(self.filtered)
+		}
 		
 	def RenameTrain(self, oldName, newName):
 		try:

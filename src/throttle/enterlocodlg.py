@@ -11,7 +11,7 @@ class EnterLocoDlg(wx.Dialog):
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(20)
 
-		font = wx.Font(wx.Font(16, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+		font = wx.Font(wx.Font(16, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
 		lblLoco  = wx.StaticText(self, wx.ID_ANY, "Loco ID:")
 		lblLoco.SetFont(font)
 		self.cbLocoID = wx.ComboBox(self, wx.ID_ANY, "",

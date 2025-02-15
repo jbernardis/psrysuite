@@ -256,7 +256,7 @@ class InspectDlg(wx.Dialog):
             messages.append("---")
 
         trlist = list(self.parent.trains.keys())
-        activetrains = self.parent.activeTrains.GetAllTrains()
+        activetrains, ctltrains = self.parent.activeTrains.GetAllTrains()
         atrlist = list(activetrains.keys())
         alllist = list(set(trlist+atrlist))
 
@@ -266,18 +266,23 @@ class InspectDlg(wx.Dialog):
             if tname in trlist:
                 tr = self.parent.trains[tname]
                 if tname in atrlist:
-                    tx = "AL"
+                    tx = "All,Act"
                 else:
-                    tx = " L"
-            else:
+                    tx = "All"
+            elif tname in atrlist:
                 tr = activetrains[tname]
-                if tname in trlist:
-                    tx = "AL"
-                else:
-                    tx = "A "
+                tx = "Act"
+            else:
+                tr = None
+                tx = "None"
 
-            blist = tr.GetBlockList()
-            bnlist = reversed(tr.GetBlockNameList())
+            if tr:
+                blist = tr.GetBlockList()
+                bnlist = reversed(tr.GetBlockNameList())
+            else:
+                blist = []
+                bnlist = []
+
             trBlkMap[tname] = [bn for bn in blist]
             messages.append(("Train %s(%s) occupies blocks %s" % (tname, tx, ", ".join(bnlist))))
 
@@ -338,6 +343,22 @@ class InspectDlg(wx.Dialog):
             messages.append("  All OK")
 
         messages.append("---")
+
+        if len(ctltrains) == 0:
+            messages.append("Active Train List control is not instantiated")
+        else:
+            messages.append("Active Trains Control:")
+            messages.append("All trains: %s (%d)" % (", ".join(ctltrains["trains"]), ctltrains["trainct"]))
+            messages.append("Ordered trains: %s (%d)" % (", ".join(ctltrains["order"]), ctltrains["orderct"]))
+            messages.append("Filtered trains: %s (%d)" % (", ".join(ctltrains["filter"]), ctltrains["filterct"]))
+
+        messages.append("---")
+
+        logging.debug("********** Train/Block Audit Start **********")
+        for ml in messages:
+            logging.debug(ml)
+
+        logging.debug("********** Train/Block Audit End ************")
 
         dlg = wx.MessageDialog(self, "\n".join(messages),
                                "Train/Block Audit",

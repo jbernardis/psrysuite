@@ -1,4 +1,5 @@
 import wx
+import os
 
 BSIZE = (100, 26)
 
@@ -39,63 +40,59 @@ class LostTrainsDlg(wx.Dialog):
 	def __init__(self, parent, lostTrains):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.parent = parent
-		self.lostTrains = lostTrains
+		self.lt = lostTrains
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.pendingDeletions = []
+		self.trainOrder = []
+		self.trainMap = {}
+		self.trainList = self.lt.GetList()
+		self.SetArrays()
 		self.chosenTrain = None
-		self.trainNames = []
 
-		self.choices = self.DetermineChoices()
-		
 		self.SetTitle("Lost Trains")
 
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(20)
-		
-		st = wx.StaticText(self, wx.ID_ANY, 'Train / Dir / Loco / Engineer / Block / Route')
-		vsz.Add(st, 0, wx.ALIGN_CENTER_HORIZONTAL)
-		
-		vsz.AddSpacer(10)
 
-		self.ch = wx.CheckListBox(self, wx.ID_ANY, choices=self.choices)
+		self.ch = LostTrainsCtrl(self)
+		self.ch.SetData(self.trainOrder, self.trainList, self.trainMap)
 		vsz.Add(self.ch, 0, wx.ALIGN_CENTER_HORIZONTAL)
-		self.Bind(wx.EVT_CHECKLISTBOX, self.OnCheck, self.ch)
-		self.Bind(wx.EVT_LISTBOX_DCLICK, self.OnDClick, self.ch)
-	
+
 		vsz.AddSpacer(20)
-		
+
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
-		
+
 		self.bOK = wx.Button(self, wx.ID_ANY, "Select", size=BSIZE)
 		self.bOK.SetToolTip("Perform pending removals and return with the checked train as the selection")
-		self.Bind(wx.EVT_BUTTON, self.OnBOK, self.bOK)		
+		self.Bind(wx.EVT_BUTTON, self.OnBOK, self.bOK)
 		hsz.Add(self.bOK)
 		self.bOK.Enable(False)
-		
+
 		hsz.AddSpacer(20)
-		
+
 		self.bRemove = wx.Button(self, wx.ID_ANY, "Remove", size=BSIZE)
-		self.bRemove.SetToolTip("Mark the checked trains for removal.  Removal is pending until the dialog box is exited")
-		self.Bind(wx.EVT_BUTTON, self.OnBRemove, self.bRemove)		
+		self.bRemove.SetToolTip(
+			"Mark the checked trains for removal.  Removal is pending until the dialog box is exited")
+		self.Bind(wx.EVT_BUTTON, self.OnBRemove, self.bRemove)
 		hsz.Add(self.bRemove)
 		self.bRemove.Enable(False)
-		
+
 		hsz.AddSpacer(20)
-		
+
 		self.bExit = wx.Button(self, wx.ID_ANY, "Exit", size=BSIZE)
 		self.bExit.SetToolTip("Perform pending removals and exit the dialog box without selecting a train")
-		self.Bind(wx.EVT_BUTTON, self.OnBExit, self.bExit)		
+		self.Bind(wx.EVT_BUTTON, self.OnBExit, self.bExit)
 		hsz.Add(self.bExit)
-		
+
 		hsz.AddSpacer(20)
-		
+
 		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BSIZE)
 		self.bCancel.SetToolTip("Exit the dialog box without doing pending removals and without selecting a train")
-		self.Bind(wx.EVT_BUTTON, self.OnBCancel, self.bCancel)		
+		self.Bind(wx.EVT_BUTTON, self.OnBCancel, self.bCancel)
 		hsz.Add(self.bCancel)
-		
+
 		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
-		
+
 		vsz.AddSpacer(20)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
@@ -107,71 +104,232 @@ class LostTrainsDlg(wx.Dialog):
 		self.Layout()
 		self.Fit()
 		self.CenterOnScreen()
-		
-	def DetermineChoices(self):
-		self.trainNames = [t[0] for t in self.lostTrains.GetList() if t[0] not in self.pendingDeletions]
-		return ["%s / %s / %s / %s / %s / %s" % (t[0], "E" if t[3] else "W", t[1], t[2], t[4], t[5]) for t in self.lostTrains.GetList() if t[0] not in self.pendingDeletions]
-	
+
+	def SetArrays(self):
+		self.trainOrder = sorted([t[0] for t in self.trainList if t[0] not in self.pendingDeletions])
+		self.trainMap = {t[0]: t for t in self.trainList if t[0] not in self.pendingDeletions}
+
 	def DoPendingRemoval(self):
 		for tname in self.pendingDeletions:
-			self.lostTrains.Remove(tname)
-		
-	def OnDClick(self, evt):
-		# perform pending deletions and return the current item
-		tx = evt.GetSelection()
-		self.chosenTrain = self.trainNames[tx]
-		self.EndModal(wx.ID_OK)
+			self.lt.Remove(tname)
+		self.pendingDeletions = []
 
-	def OnCheck(self, _):
-		checkedItems = self.ch.GetCheckedItems()
-		n = len(checkedItems)
-		if n == 0:
+	def reportSelection(self, tx, doubleclick=False):
+		if tx is None or tx == wx.NOT_FOUND:
+			return
+
+		checked = self.ch.GetChecked()
+		if len(checked) > 1:
+			self.bRemove.Enable(True)
 			self.bOK.Enable(False)
-			self.bRemove.Enable(False)
-		elif n == 1:
+		elif len(checked) == 1:
+			self.bRemove.Enable(True)
 			self.bOK.Enable(True)
-			self.bRemove.Enable(True)
 		else:
+			self.bRemove.Enable(False)
 			self.bOK.Enable(False)
-			self.bRemove.Enable(True)
-		
+
 	def OnBRemove(self, _):
-		checkedItems = self.ch.GetCheckedItems()
-		self.pendingDeletions.extend([self.trainNames[i] for i in checkedItems])
-		self.ch.SetItems(self.DetermineChoices())
+		checked = self.ch.GetChecked()
+		self.pendingDeletions.extend([self.trainOrder[i] for i in checked])
+		self.SetArrays()
+		self.ch.SetData(self.trainOrder, self.trainList, self.trainMap)
 		self.bOK.Enable(False)
 		self.bRemove.Enable(False)
-		
+
 	def OnBOK(self, _):
-		# dopending removals and set up the selected train for retrieval
 		self.DoPendingRemoval()
-		checkedItems = self.ch.GetCheckedItems()
-		if len(checkedItems) == 0:
-			return 
-		
-		tx = checkedItems[0]
-		self.chosenTrain = self.trainNames[tx]
+		checked = self.ch.GetChecked()
+		tx = checked[0]
+		self.chosenTrain = self.trainOrder[tx]
 		self.EndModal(wx.ID_OK)
-		
+
 	def OnBExit(self, _):
 		# perform pendingg deletions and exit without selecting a lost train
 		self.DoPendingRemoval()
 		self.chosenTrain = None
 		self.EndModal(wx.ID_CANCEL)
-		
+
 	def OnBCancel(self, _):
+		if len(self.pendingDeletions) > 0:
+			dlg = wx.MessageDialog(self, "Pending removals will be lost if you continue\nPress Yes to continue or No to return", "Pending Deletions",
+				wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
+			rc = dlg.ShowModal()
+			dlg.Destroy()
+
+			if rc != wx.ID_YES:
+				return
+
 		self.DoCancel()
-		
+
 	def OnClose(self, _):
 		self.DoCancel()
-		
+
 	def DoCancel(self):
 		# exit without doing anything
 		self.chosenTrain = None
 		self.EndModal(wx.ID_CANCEL)
-		
+
 	def GetResult(self):
 		return self.chosenTrain
+
+
+class LostTrainsCtrl(wx.ListCtrl):
+	def __init__(self, parent):
+		self.parent = parent
+		self.trains = []
+		self.trainOrder = []
+		self.trainMap = {}
+		self.checked = []
+
+		wx.ListCtrl.__init__(
+			self, parent, wx.ID_ANY, size=(520, 240),
+			style=wx.LC_REPORT | wx.LC_VIRTUAL | wx.LC_VRULES | wx.LC_SINGLE_SEL
+		)
+		self.SetFont(wx.Font(wx.Font(14, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")))
+
+		bmpCheck, bmpEmpty = self.makeBmps()
+		self.il = wx.ImageList(16, 16)
+		self.idxCheck = self.il.Add(bmpCheck)
+		self.idxEmpty = self.il.Add(bmpEmpty)
+		self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+
+		self.InsertColumn(0, "Train")
+		self.InsertColumn(1, "Dir")
+		self.InsertColumn(2, "Loco")
+		self.InsertColumn(3, "Engineer")
+		self.InsertColumn(4, "Block")
+		self.InsertColumn(5, "Route")
+		self.SetColumnWidth(0, 100)
+		self.SetColumnWidth(1, 80)
+		self.SetColumnWidth(2, 80)
+		self.SetColumnWidth(3, 80)
+		self.SetColumnWidth(4, 80)
+		self.SetColumnWidth(5, 80)
+
+		self.SetItemCount(0)
+		self.selected = None
+
+		self.attr1 = wx.ItemAttr()
+		self.attr2 = wx.ItemAttr()
+		self.attr1.SetBackgroundColour(wx.Colour(225, 255, 240))
+		self.attr2.SetBackgroundColour(wx.Colour(138, 255, 197))
+
+		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected)
+		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated)
+		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnItemDeselected)
+		self.Bind(wx.EVT_LIST_CACHE_HINT, self.OnItemHint)
+
+	@staticmethod
+	def makeBmps():
+		bmpEmpty = wx.Bitmap(16, 16, 32)
+		dc = wx.MemoryDC(bmpEmpty)
+		dc.SetBackground(wx.Brush((0, 0, 0, 0)))
+		dc.Clear()
+		del dc
+		bmpEmpty.SetMaskColour((0, 0, 0))
+
+		fp = os.path.join(os.getcwd(), "images", "check.png")
+		bmpCheck = wx.Image(fp, wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+
+		return bmpCheck, bmpEmpty
+
+	def SetData(self, trainOrder, trainList, trainMap):
+		self.trains = trainList
+		self.trainMap = trainMap
+
+		self.trainOrder = trainOrder
+
+		self.checked = []
+		lx = len(self.trainOrder)
+		self.SetItemCount(lx)
+		if lx != 0:
+			self.RefreshItems(0, lx)
+
+	def getSelection(self):
+		if self.selected is None:
+			return None
+
+		if self.selected < 0 or self.selected >= self.GetItemCount():
+			return None
+
+		return self.trainOrder[self.selected]
+
+	def GetChecked(self):
+		return self.checked
+
+	def getTrainOrder(self):
+		return [l for l in self.trainOrder]
+
+	def getTrainInfo(self, trid):
+		try:
+			return self.trains[trid]
+		except KeyError:
+			return None
+
+	def setSelection(self, tx, doubleclick=False):
+		self.selected = tx
+		if tx is not None:
+			if tx in self.checked:
+				self.checked.remove(tx)
+			else:
+				self.checked.append(tx)
+			self.Select(tx)
+			self.RefreshItem(tx)
+
+		self.parent.reportSelection(tx, doubleclick=doubleclick)
+
+	def OnItemSelected(self, event):
+		self.setSelection(event.Index)
+		event.Skip()
+
+	def OnItemActivated(self, event):
+		self.setSelection(event.Index, doubleclick=True)
+		event.Skip()
+
+	def OnItemDeselected(self, event):
+		self.setSelection(None)
+		event.Skip()
+
+	def OnItemHint(self, evt):
+		if self.GetFirstSelected() == -1:
+			self.setSelection(None)
+
+	def OnGetItemImage(self, item):
+		if item in self.checked:
+			return self.idxCheck
+		else:
+			return self.idxEmpty
+
+	def OnGetItemText(self, item, col):
+		if item < 0 or item >= len(self.trainOrder):
+			return None
+
+		trid = self.trainOrder[item]
+		tr = self.trainMap[trid]
+		if col == 0:
+			return trid
+
+		elif col == 1:
+			return "E" if tr[3] else "W"
+
+		elif col == 2:
+			return "" if tr[1] is None else tr[1]
+
+		elif col == 3:
+			return "" if tr[2] is None else tr[2]
+
+		elif col == 4:
+			return "" if tr[4] is None else tr[4]
+
+		elif col == 5:
+			return "" if tr[5] is None else tr[5]
+
+	def OnGetItemAttr(self, item):
+		if item % 2 == 1:
+			return self.attr2
+		else:
+			return self.attr1
 
 
 class LostTrainsRecoveryDlg(wx.Dialog):

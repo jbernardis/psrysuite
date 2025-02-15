@@ -7,6 +7,7 @@ import json
 import os
 import logging
 
+
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		app = self.server.getApp()

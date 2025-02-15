@@ -1,3 +1,4 @@
+
 Pondering/Future
 ****************
 ar/atc - ??get rid of checkboxes and have always on???

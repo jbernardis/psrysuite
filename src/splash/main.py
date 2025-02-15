@@ -2,7 +2,7 @@ import wx
 import os
 
 
-versiondate = "9-February-2025"
+versiondate = "15-February-2025"
 
 
 class MainFrame(wx.Frame):
@@ -11,15 +11,15 @@ class MainFrame(wx.Frame):
 		self.SetTitle("PSRY Suite")
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		
-		textFont = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.NORMAL, faceName="Arial"))
-		textFontBold = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial"))
-		largeFontBold = wx.Font(wx.Font(18, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial"))
+		textFont = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial"))
+		textFontBold = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+		largeFontBold = wx.Font(wx.Font(18, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
 
 		self.pngPSRY = wx.Image(os.path.join(os.getcwd(), "images", "PSLogo_large.png"), wx.BITMAP_TYPE_PNG).ConvertToBitmap()
 		mask = wx.Mask(self.pngPSRY, wx.BLUE)
 		self.pngPSRY.SetMask(mask)
 		
-		vsizer=wx.BoxSizer(wx.VERTICAL)
+		vsizer = wx.BoxSizer(wx.VERTICAL)
 		vsizer.AddSpacer(20)
 		
 		st = wx.StaticText(self, wx.ID_ANY, "PSRY SUITE")
@@ -103,10 +103,11 @@ class MainFrame(wx.Frame):
 
 class App(wx.App):
 	def OnInit(self):
-		self.frame = MainFrame()
-		self.frame.CenterOnScreen()
-		self.frame.Show()
+		frame = MainFrame()
+		frame.CenterOnScreen()
+		frame.Show()
 		return True
+
 
 app = App(False)
 app.MainLoop()

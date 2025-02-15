@@ -66,7 +66,7 @@ class MyFrame(wx.Frame):
         
         self.address = node["address"]
          
-        font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+        font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
         sz = wx.BoxSizer(wx.VERTICAL)
         sz.AddSpacer(20)
         

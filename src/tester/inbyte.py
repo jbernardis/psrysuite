@@ -35,13 +35,12 @@ class InByte(wx.StaticBox):
             
         boxSizer.AddSpacer(10)
         
-        font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+        font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
         self.stByteValue = wx.StaticText(self, wx.ID_ANY, "00000000") 
         self.stByteValue.SetFont(font)
         boxSizer.Add(self.stByteValue, 0, wx.ALIGN_CENTER_HORIZONTAL)
-           
 
-        boxSizer.AddSpacer(10)            
+        boxSizer.AddSpacer(10)
         self.SetSizer(boxSizer)
         
     def cbIgnore(self, evt):

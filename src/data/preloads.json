@@ -1,0 +1,16 @@
+[
+  {
+    "name": "17A",
+    "loco": "12",
+    "east": false,
+    "block": "F11",
+    "route": "17"
+  },
+  {
+    "name": "HEX",
+    "loco": "198",
+    "east": true,
+    "block": "H32",
+    "route": null
+  }
+]

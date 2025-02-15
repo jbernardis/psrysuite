@@ -794,7 +794,7 @@ class DescriptionDlg(wx.Dialog):
 		self.parent = parent
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		
-		font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+		font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
 		
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(20)

@@ -162,7 +162,7 @@ class TrackDiagram(wx.Panel):
 		dc.SetTextForeground(wx.Colour(255, 0, 0))
 		dc.SetTextBackground(wx.Colour(255, 255, 255))
 		dc.SetBackgroundMode(wx.BRUSHSTYLE_SOLID)
-		dc.SetFont(wx.Font(wx.Font(10, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")))
+		dc.SetFont(wx.Font(wx.Font(10, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")))
 		self.DrawBackground(dc)
 		for bx, bmp in self.tiles.items():
 			dc.DrawBitmap(bmp, bx[0], bx[1])

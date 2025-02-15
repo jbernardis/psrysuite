@@ -16,7 +16,7 @@ class GetBitsDlg(wx.Dialog):
        
         hsz = wx.BoxSizer(wx.HORIZONTAL)
         
-        font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+        font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
 
         stO = wx.StaticText(self, wx.ID_ANY, "OUTPUTS:", size=(100, -1))
         stO.SetFont(font)

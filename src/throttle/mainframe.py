@@ -29,7 +29,7 @@ class MainFrame(wx.Frame):
 		self.loadImages(os.path.join(os.getcwd(), "images"))
 		self.settings = Settings()
 
-		font = wx.Font(wx.Font(24, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+		font = wx.Font(wx.Font(24, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
 		
 		self.stLoco = wx.StaticText(self, wx.ID_ANY, "0000")
 		self.stLoco.SetFont(font)

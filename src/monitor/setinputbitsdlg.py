@@ -11,7 +11,7 @@ class SetInputBitsDlg(wx.Dialog):
         self.parent = parent    
         vsz.AddSpacer(20)
         
-        font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+        font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
 
         hsz = wx.BoxSizer(wx.HORIZONTAL)
         hsz.AddSpacer(20)

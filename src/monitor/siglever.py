@@ -74,7 +74,7 @@ class SigLeverShowDlg(wx.Dialog):
 		self.closer = closer
 		self.parent = parent
 
-		font = wx.Font(wx.Font(12, wx.FONTFAMILY_TELETYPE, wx.NORMAL, wx.BOLD, faceName="Monospace"))
+		font = wx.Font(wx.Font(12, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
 		
 		vsz = wx.BoxSizer(wx.VERTICAL)	   
 		vsz.AddSpacer(20)

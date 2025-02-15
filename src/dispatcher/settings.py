@@ -483,7 +483,7 @@ class Settings:
 
 		try:
 			cfp = open(self.inifile, 'w')
-		except:
+		except Exception:
 			print("Unable to open settings file %s for writing" % self.inifile)
 			return False
 		

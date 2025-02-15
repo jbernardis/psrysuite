@@ -17,6 +17,8 @@ from dispatcher.tile import loadTiles
 from dispatcher.train import Train
 from dispatcher.trainlist import ActiveTrainList, YardBlocks
 from dispatcher.losttrains import LostTrains, LostTrainsRecoveryDlg
+from dispatcher.trainhistory import TrainHistory
+from dispatcher.preload import PreLoadedTrains
 from dispatcher.routetraindlg import RouteTrainDlg
 from dispatcher.inspectdlg import InspectDlg
 
@@ -159,7 +161,9 @@ class MainFrame(wx.Frame):
 		self.trainList = []
 		self.activeTrains = ActiveTrainList()
 		self.lostTrains = LostTrains()
-			
+		self.trainHistory = TrainHistory(self)
+		self.preloadedTrains = None
+
 		self.settings = settings
 			
 		logging.info("%s process starting" % "dispatcher" if self.IsDispatcher() else "satellite" if self.IsSatellite() else "display")
@@ -249,11 +253,14 @@ class MainFrame(wx.Frame):
 
 		elif kcd == wx.WXK_F1:
 			if self.IsDispatcherOrSatellite():
-				if self.dlgInspect is None:
-					self.dlgInspect = InspectDlg(self, self.CloseInspect, self.settings)
-					self.dlgInspect.Show()
+				if not self.subscribed:
+					self.PopupEvent("Not connected to server")
 				else:
-					self.dlgInspect.Raise()
+					if self.dlgInspect is None:
+						self.dlgInspect = InspectDlg(self, self.CloseInspect, self.settings)
+						self.dlgInspect.Show()
+					else:
+						self.dlgInspect.Raise()
 
 		elif kcd == wx.WXK_F2:
 			if self.IsDispatcherOrSatellite():
@@ -265,22 +272,30 @@ class MainFrame(wx.Frame):
 
 		elif kcd == wx.WXK_F3:
 			if self.IsDispatcherOrSatellite():
-				dlg = wx.MultiChoiceDialog(self,
-						"Items to reload",
-						"Reload Data", ["trains", "locomotives", "engineers"])
-
-				rc = dlg.ShowModal()
-				if rc == wx.ID_OK:
-					selections = dlg.GetSelections()
+				if not self.subscribed:
+					self.PopupEvent("Not connected to server")
 				else:
-					selections = []
+					dlg = wx.MultiChoiceDialog(self,
+							"Items to reload",
+							"Reload Data", ["trains", "preloaded trains", "locomotives", "engineers"])
 
-				dlg.Destroy()
-				if rc != wx.ID_OK:
-					return
+					rc = dlg.ShowModal()
+					if rc == wx.ID_OK:
+						selections = dlg.GetSelections()
+					else:
+						selections = []
 
-				dataFlags = [True if i in selections else False for i in range(3)]
-				self.RetrieveData(report=True, trains=dataFlags[0], locos=dataFlags[1], engineers=dataFlags[2])
+					dlg.Destroy()
+					if rc != wx.ID_OK:
+						return
+
+					dataFlags = [True if i in selections else False for i in range(4)]
+					if dataFlags[0] or dataFlags[2] or dataFlags[3]:
+						self.RetrieveData(report=True, trains=dataFlags[0], locos=dataFlags[2], engineers=dataFlags[3])
+
+					if dataFlags[1]:
+						self.preloadedTrains.Reload()
+						self.PopupEvent("Preloaded trains reloaded")
 
 		else:
 			#self.PopupEvent("Key Code: %d" % kcd)
@@ -1523,8 +1538,13 @@ class MainFrame(wx.Frame):
 		oldAR = tr.IsOnAR() if self.IsDispatcher() else False
 		dlgx = self.centerw - 500 - self.centerOffset
 		dlgy = self.totalh - 660
-		dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.engineerList, self.trains, self.IsDispatcher() and self.ATCEnabled, self.IsDispatcher() and self.AREnabled, self.IsDispatcherOrSatellite(), self.lostTrains, dlgx, dlgy)
+		dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.engineerList, self.trains,
+						   self.IsDispatcher() and self.ATCEnabled,
+						   self.IsDispatcher() and self.AREnabled,
+						   self.IsDispatcherOrSatellite(),
+						   self.lostTrains, self.trainHistory, self.preloadedTrains, dlgx, dlgy)
 		rc = dlg.ShowModal()
+		east = tr.GetEast()
 		if rc == wx.ID_OK:
 			trainid, locoid, engineer, atc, ar, east, chosenRoute = dlg.GetResults()
 
@@ -1685,7 +1705,9 @@ class MainFrame(wx.Frame):
 
 		if rc != wx.ID_OK:
 			return
+
 		oldChosenRoute = tr.GetChosenRoute()
+		tr.SetEast(east)  # take on the direction returned by edit dlg
 		if oldName != trainid or oldLoco != locoid or oldChosenRoute != chosenRoute:
 			if oldChosenRoute != chosenRoute and chosenRoute is not None:
 				trEast = tr.GetEast()
@@ -2054,13 +2076,13 @@ class MainFrame(wx.Frame):
 	def ToasterSetup(self):
 		self.events = Toaster()
 		self.events.SetOffsets(0, 150)
-		self.events.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
+		self.events.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")))
 		self.events.SetBackgroundColour(wx.Colour(255, 179, 154))
 		self.events.SetTextColour(wx.Colour(0, 0, 0))
 		
 		self.advice = Toaster()
 		self.advice.SetOffsets(0, 150)
-		self.advice.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.NORMAL, wx.BOLD, faceName="Arial")))
+		self.advice.SetFont(wx.Font(wx.Font(20, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")))
 		self.advice.SetBackgroundColour(wx.Colour(120, 255, 154))
 		self.advice.SetTextColour(wx.Colour(0, 0, 0))
 
@@ -2271,6 +2293,8 @@ class MainFrame(wx.Frame):
 					self.cbSidingsUnlocked.Enable(True)
 
 			self.RetrieveData()
+			self.preloadedTrains = PreLoadedTrains(self)
+
 			#self.districts.Initialize()
 			if self.IsDispatcher():
 				#self.SendControlValues()
@@ -3141,7 +3165,7 @@ class MainFrame(wx.Frame):
 
 						self.trains[name] = tr
 						self.activeTrains.RenameTrain(oldName, name)
-						#self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0", "context": "settrainmerge"}})
+						# self.Request({"renametrain": { "oldname": oldName, "newname": name, "east": "1" if tr.GetEast() else "0", "context": "settrainmerge"}})
 						if self.IsDispatcher():
 							blkorderMap[name] = tr
 					try:
@@ -3227,6 +3251,8 @@ class MainFrame(wx.Frame):
 			self.activeTrains.UpdateTrain(tid)
 			self.UpdateRouteDialogs(tid)
 			self.lostTrains.Remove(tid)
+
+			self.trainHistory.Update(tr)
 
 			blk.EvaluateStoppingSections()
 			blk.Draw()   # this will redraw the train in this block only
@@ -3318,6 +3344,7 @@ class MainFrame(wx.Frame):
 				
 			tr.SetEngineer(engineer)
 			self.activeTrains.UpdateTrain(train)
+			self.trainHistory.UpdateEngineer(train, engineer)
 			#
 			# if reassigned:
 			# 	self.PopupAdvice("Train %s has been reassigned to %s" % (train, engineer))
