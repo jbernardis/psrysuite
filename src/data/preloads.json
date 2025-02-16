@@ -12,5 +12,12 @@
     "east": true,
     "block": "H32",
     "route": null
+  },
+  {
+    "name": "17B",
+    "loco": "1956",
+    "east": false,
+    "block": "F11",
+    "route": "17A"
   }
 ]

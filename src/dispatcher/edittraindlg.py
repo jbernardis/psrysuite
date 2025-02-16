@@ -349,37 +349,7 @@ class EditTrainDlg(wx.Dialog):
 			return
 
 		loco, engineer, east, _, route = tr
-
-		rc = wx.ID_YES
-		if east != self.startingEast:
-			mdlg = wx.MessageDialog(self, 'Trains are moving in opposite directions.\nPress "Yes" to proceed',
-									'Opposite Directions',
-									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
-			rc = mdlg.ShowModal()
-			mdlg.Destroy()
-
-		if rc == wx.ID_YES:
-			self.startingEast = east
-			self.cbTrainID.SetValue(trname)
-			self.cbLocoID.SetValue(loco)
-			self.cbEngineer.SetValue(self.noEngineer if engineer is None or engineer == "None" else engineer)
-			if route is None:
-				self.cbAssignRoute.SetValue(False)
-				self.cbRoute.SetSelection(0)
-				self.cbAssignRoute.Enable(False)
-				self.cbRoute.Enable(False)
-			else:
-				self.cbAssignRoute.SetValue(True)
-				try:
-					idx = self.trainsWithSeq.index(route)
-				except ValueError:
-					idx = 0
-				self.chosenRoute = self.trainsWithSeq[idx]
-				self.cbRoute.SetSelection(idx)
-				self.cbAssignRoute.Enable(True)
-				self.cbRoute.Enable(True)
-
-			self.ShowTrainLocoDesc()
+		self.FillInTrainFields(trname, loco, engineer, east, route)
 
 	def OnBTrainHistory(self, _):
 		trname = ""
@@ -401,7 +371,22 @@ class EditTrainDlg(wx.Dialog):
 		engineer = tr["engineer"]
 		east = tr["east"]
 		route = tr["route"]
+		self.FillInTrainFields(trname, loco, engineer, east, route)
 
+	def OnBPreloadedTrains(self, _):
+		tr = None
+		dlg = PreloadedTrainsDlg(self, self.preloadedTrains)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			tr = dlg.GetResult()
+
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return
+
+		self.FillInTrainFields(tr["name"], tr["loco"], None, tr["east"], tr["route"])
+
+	def FillInTrainFields(self, trname, loco, engineer, east, route):
 		rc = wx.ID_YES
 		if east != self.startingEast:
 			mdlg = wx.MessageDialog(self, 'Trains are moving in opposite directions.\nPress "Yes" to proceed',
@@ -415,64 +400,44 @@ class EditTrainDlg(wx.Dialog):
 			self.cbTrainID.SetValue(trname)
 			self.cbLocoID.SetValue(loco)
 			self.cbEngineer.SetValue(self.noEngineer if engineer is None or engineer == "None" else engineer)
+
 			if route is None:
 				self.cbAssignRoute.SetValue(False)
 				self.cbRoute.SetSelection(0)
-				self.cbAssignRoute.Enable(False)
-				self.cbRoute.Enable(False)
+				self.cbAssignRoute.Enable(trname not in self.trains)
+				self.cbRoute.Enable(trname not in self.trains)
 			else:
-				self.cbAssignRoute.SetValue(True)
-				try:
-					idx = self.trainsWithSeq.index(route)
-				except ValueError:
-					idx = 0
-				self.chosenRoute = self.trainsWithSeq[idx]
-				self.cbRoute.SetSelection(idx)
-				self.cbAssignRoute.Enable(True)
-				self.cbRoute.Enable(True)
+				if trname in self.trains:
+					mdlg = wx.MessageDialog(self, "Route cannot be set for a known train: %s\nIgnoring" % trname,
+											'Known Train', wx.OK | wx.ICON_ERROR)
+					mdlg.ShowModal()
+					mdlg.Destroy()
 
-			self.ShowTrainLocoDesc()
+					self.cbAssignRoute.SetValue(False)
+					self.cbRoute.SetSelection(0)
+					self.cbAssignRoute.Enable(False)
+					self.cbRoute.Enable(False)
 
-	def OnBPreloadedTrains(self, _):
-		tr = None
-		dlg = PreloadedTrainsDlg(self, self.preloadedTrains)
-		rc = dlg.ShowModal()
-		if rc == wx.ID_OK:
-			tr = dlg.GetResult()
+				else:
+					self.cbAssignRoute.Enable(True)
+					self.cbRoute.Enable(True)
 
-		dlg.Destroy()
-		if rc != wx.ID_OK:
-			return
+					try:
+						idx = self.trainsWithSeq.index(route)
+					except ValueError:
+						mdlg = wx.MessageDialog(self, "Route is set to unknown train: %s\nIgnoring" % route, 'Unknown Route Train', wx.OK | wx.ICON_ERROR)
+						mdlg.ShowModal()
+						mdlg.Destroy()
+						idx = -1
 
-		east = tr["east"]
-		rc = wx.ID_YES
-		if east != self.startingEast:
-			mdlg = wx.MessageDialog(self, 'Trains are moving in opposite directions.\nPress "Yes" to proceed',
-									'Opposite Directions',
-									wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
-			rc = mdlg.ShowModal()
-			mdlg.Destroy()
-
-		if rc == wx.ID_YES:
-			self.startingEast = east
-			self.cbTrainID.SetValue(tr["name"])
-			self.cbLocoID.SetValue(tr["loco"])
-			route = tr["route"]
-			if route is None:
-				self.cbAssignRoute.SetValue(False)
-				self.cbRoute.SetSelection(0)
-				self.cbAssignRoute.Enable(False)
-				self.cbRoute.Enable(False)
-			else:
-				self.cbAssignRoute.SetValue(True)
-				try:
-					idx = self.trainsWithSeq.index(route)
-				except ValueError:
-					idx = 0
-				self.chosenRoute = self.trainsWithSeq[idx]
-				self.cbRoute.SetSelection(idx)
-				self.cbAssignRoute.Enable(True)
-				self.cbRoute.Enable(True)
+					if idx >= 0:
+						self.cbAssignRoute.SetValue(True)
+						self.chosenRoute = self.trainsWithSeq[idx]
+						self.cbRoute.SetSelection(idx)
+					else:
+						self.cbAssignRoute.SetValue(False)
+						self.chosenRoute = None
+						self.cbRoute.SetSelection(0)
 
 			self.ShowTrainLocoDesc()
 
