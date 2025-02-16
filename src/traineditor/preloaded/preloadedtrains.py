@@ -7,6 +7,8 @@ class PreLoadedTrains:
 		self.trainMap = {}
 		self.RRServer = rrserver
 		self.preloadedTrains = rrserver.Get("getfile", {"file": PRELOADFILE})
+		if self.preloadedTrains is None:
+			self.preloadedTrains = []
 		self.setArrays()
 
 	def setArrays(self):
