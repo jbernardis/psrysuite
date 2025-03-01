@@ -10,6 +10,7 @@ YardBlocks = [
 
 profileIndex = ["stop", "slow", "medium", "fast"]
 
+
 class ActiveTrainList:
 	def __init__(self):
 		self.trains = {}
@@ -131,7 +132,7 @@ class ActiveTrainList:
 
 class ActiveTrainsDlg(wx.Dialog):
 	def __init__(self, parent, dlgExit):
-		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Active Trains", size=(1000, 500), style=wx.RESIZE_BORDER|wx.CAPTION|wx.CLOSE_BOX)
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Active Trains", size=(1500, 1000), style=wx.RESIZE_BORDER|wx.CAPTION|wx.CLOSE_BOX)
 		self.parent = parent
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.Bind(wx.EVT_SIZE, self.OnResize)
@@ -184,18 +185,24 @@ class ActiveTrainsDlg(wx.Dialog):
 		hsz.Add(self.cbAssignedOnly)
 
 		hsz.AddSpacer(30)
-		
+
 		self.cbATCOnly = wx.CheckBox(self, wx.ID_ANY, "Show only ATC Trains")
 		self.cbATCOnly.SetValue(self.suppressNonATC)
 		self.Bind(wx.EVT_CHECKBOX, self.OnSuppressNonATC, self.cbATCOnly)
 		hsz.Add(self.cbATCOnly)
 
+		hsz.AddSpacer(60)
+
+		self.bRebuild = wx.Button(self, wx.ID_ANY, "Rebuild")
+		self.Bind(wx.EVT_BUTTON, self.onBRebuild, self.bRebuild)
+		hsz.Add(self.bRebuild)
+
 		hsz.AddSpacer(30)
 
 		vsz.Add(hsz)
-				
+
 		vsz.AddSpacer(10)
-	
+
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20)
 
@@ -297,7 +304,10 @@ class ActiveTrainsDlg(wx.Dialog):
 			self.cbUnknown.SetValue(False)
 			self.cbATCOnly.SetValue(False)
 		self.trCtl.SetSuppressNonAssigned(flag)
-				
+
+	def onBRebuild(self, _):
+		self.parent.RebuildActiveTrainList()
+
 	def AddTrain(self, tr):
 		self.trCtl.AddTrain(tr)
 		

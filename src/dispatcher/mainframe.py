@@ -3781,7 +3781,12 @@ class MainFrame(wx.Frame):
 		
 	def OnBCheckTrains(self, _):
 		self.CheckTrains()
-		
+
+	def RebuildActiveTrainList(self):
+		self.activeTrains.RemoveAllTrains()
+		for tr in self.trains.values():
+			self.activeTrains.AddTrain(tr)
+
 	def OnBClearTrains(self, _):
 		dlg = wx.MessageDialog(self, 'This clears all train IDs.  Are you sure you want to continue?\nPress "Yes" to confirm,\nor "No" to cancel.',
 				'Clear Train IDs', wx.YES_NO | wx.ICON_WARNING)
