@@ -218,7 +218,7 @@ class Block:
 	def HasUnknownTrain(self):
 		return self.unknownTrain
 
-	def DrawTrain(self):
+	def DrawTrain(self, hilite=False):
 		if len(self.trainLoc) == 0:
 			return
 
@@ -249,7 +249,7 @@ class Block:
 					drawTrain = False  # the current route through this OS is not in the list
 					
 			if anyOccupied and drawTrain:
-				self.frame.DrawTrain(screen, loc, trainID, locoID, sbActive, atc, ar)
+				self.frame.DrawTrain(screen, loc, trainID, locoID, sbActive, atc, ar, hilite)
 			elif drawTrain:  # don't clear trains from alternate routes that are not surrently set
 				self.frame.ClearTrain(screen, loc)
 

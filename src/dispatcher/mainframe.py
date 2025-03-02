@@ -159,6 +159,7 @@ class MainFrame(wx.Frame):
 
 		self.locoList = []
 		self.trainList = []
+		self.hilitedTrains = []
 		self.activeTrains = ActiveTrainList()
 		self.lostTrains = LostTrains()
 		self.trainHistory = TrainHistory(self)
@@ -244,7 +245,7 @@ class MainFrame(wx.Frame):
 			self.SetShift(True)
 			for pnl in self.panels.values():
 				pnl.SetShift(True)
-			
+
 		elif kcd == wx.WXK_ESCAPE and self.shift:
 			self.CloseProgram()
 			self.SetShift(False)
@@ -318,8 +319,8 @@ class MainFrame(wx.Frame):
 		self.shift = flag
 		if propagate:
 			for pnl in self.panels.values():
-				pnl.SetShift(False)
-		
+				pnl.SetShift(flag)
+
 	def OnResetScreen(self, _):
 		self.ResetScreen()
 		
@@ -1151,6 +1152,9 @@ class MainFrame(wx.Frame):
 
 		return blkMap
 
+	def AddHilitedTrain(self, tr):
+		self.hilitedTrains.append([tr, 8])
+
 	def onTicker(self, _):
 		self.tickerFlag = not self.tickerFlag
 		if self.tickerFlag:
@@ -1161,6 +1165,17 @@ class MainFrame(wx.Frame):
 		if self.tickerCount == 120:
 			self.tickerCount = 0
 			self.onTicker1Min()
+
+		nh = []
+		for tx in range(len(self.hilitedTrains)):
+			tr, ticks = self.hilitedTrains[tx]
+			ticks -= 1
+			if ticks <= 0:
+				tr.SetHilite(False)
+			else:
+				tr.SetHilite(True if ticks % 2 == 0 else False)
+				nh.append([tr, ticks])
+		self.hilitedTrains = nh
 			
 		self.delayedRequests.CheckForExpiry(self.Request)
 		self.delayedSignals.CheckForExpiry()
@@ -1925,9 +1940,9 @@ class MainFrame(wx.Frame):
 		offset = self.diagrams[screen].offset
 		self.panels[screen].ClearText(pos[0], pos[1], offset)
 
-	def DrawTrain(self, screen, pos, trainID, locoID, stopRelay, atc, ar):
+	def DrawTrain(self, screen, pos, trainID, locoID, stopRelay, atc, ar, hilite):
 		offset = self.diagrams[screen].offset
-		self.panels[screen].DrawTrain(pos[0], pos[1], offset, trainID, locoID, stopRelay, atc, ar)
+		self.panels[screen].DrawTrain(pos[0], pos[1], offset, trainID, locoID, stopRelay, atc, ar, hilite)
 
 	def ClearTrain(self, screen, pos):
 		offset = self.diagrams[screen].offset

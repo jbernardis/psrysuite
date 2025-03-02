@@ -78,7 +78,7 @@ class ActiveTrainList:
 			return self.locoMap[loco]
 		except:
 			return None
-			
+
 	def ShowTrainList(self, parent):
 		if self.dlgTrainList is None:
 			self.dlgTrainList = ActiveTrainsDlg(parent, self.HideTrainList)
@@ -148,6 +148,8 @@ class ActiveTrainsDlg(wx.Dialog):
 		self.dccSnifferEnabled = self.settings.dccsniffer.enable
 		
 		self.resized = False
+		self.shiftKey = False
+		self.clickLeft = False
 
 		self.dlgExit = dlgExit
 
@@ -245,17 +247,29 @@ class ActiveTrainsDlg(wx.Dialog):
 		evt.Skip()
 		
 	def ClickTrain(self, evt):
+		idx = evt.Index
 		if self.clickLeft:
-			self.EditTrain(evt.Index)
+			self.EditTrain(idx)
+		else:
+			if wx.GetKeyState(wx.WXK_SHIFT):
+				self.LocateTrain(evt.Index)
+			else:
+				self.RouteTrain(idx)
+
+	def RClickTrain(self, evt):
+		if wx.GetKeyState(wx.WXK_SHIFT):
+			self.LocateTrain(evt.Index)
 		else:
 			self.RouteTrain(evt.Index)
-		
-	def RClickTrain(self, evt):
-		self.RouteTrain(evt.Index)
-		
+
+	def LocateTrain(self, idx):
+		tr = self.trCtl.GetActiveTrain(idx)
+		if tr.SetHilite(True):
+			self.parent.AddHilitedTrain(tr)
+
 	def DoubleClickTrain(self, evt):
 		self.EditTrain(evt.Index)
-		
+
 	def EditTrain(self, idx):
 		tr = self.trCtl.GetActiveTrain(idx)
 		blk = tr.FrontBlock()
@@ -345,7 +359,7 @@ class ActiveTrainsDlg(wx.Dialog):
 
 class TrainListCtrl(wx.ListCtrl):
 	def __init__(self, parent, dccsnifferenabled, height=160):
-		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1366, height), style=wx.LC_REPORT + wx.LC_VIRTUAL)
+		wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(1366, height), style=wx.LC_REPORT + wx.LC_VIRTUAL + wx.LC_SINGLE_SEL)
 		self.parent = parent
 		self.trains = {}
 		self.order = []
@@ -356,6 +370,7 @@ class TrainListCtrl(wx.ListCtrl):
 		self.suppressUnknown = False
 		self.suppressNonATC = False
 		self.suppressNonAssigned = False		
+		self.suppressNonAssignedAndKnown = False
 		self.SetFont(wx.Font(wx.Font(16, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")))
 		
 		self.normalA = wx.ItemAttr()

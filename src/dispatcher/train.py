@@ -47,6 +47,7 @@ class Train:
 		self.beingEdited = False
 		self.time = None
 		self.chosenRoute = None
+		self.hilite = False
 		
 	def SetTime(self, t):
 		self.time = t
@@ -214,9 +215,16 @@ class Train:
 	def GetSBActive(self):
 		return self.sbActive
 
+	def SetHilite(self, flag=True):
+		if self.hilite == flag:
+			return False
+		self.hilite = flag
+		self.Draw()
+		return True
+
 	def Draw(self):
 		for blk in self.blocks.values():
-			blk.DrawTrain()
+			blk.DrawTrain(hilite=self.hilite)
 
 	def SetBlocksDirection(self):
 		lastBlock = self.blockOrder[-1]

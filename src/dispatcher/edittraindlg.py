@@ -14,6 +14,7 @@ class EditTrainDlg(wx.Dialog):
 		self.parent = parent
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
 
+		self.train = train
 		self.existingTrains = existingTrains		
 		self.atcFlag = atcFlag
 		self.arFlag = arFlag
@@ -213,6 +214,7 @@ class EditTrainDlg(wx.Dialog):
 		self.bOK = wx.Button(self, wx.ID_ANY, "OK", size=BUTTONSIZE)
 		self.bOK.SetDefault()
 		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BUTTONSIZE)
+		self.bLocate = wx.Button(self, wx.ID_ANY, "Locate", size=BUTTONSIZE)
 		if dispatcherFlag:
 			self.bSever = wx.Button(self, wx.ID_ANY, "Split", size=BUTTONSIZE)
 			self.bSever.SetToolTip("Split this train into 2 sections")
@@ -227,6 +229,8 @@ class EditTrainDlg(wx.Dialog):
 		bsz.Add(self.bOK)
 		bsz.AddSpacer(30)
 		bsz.Add(self.bCancel)
+		if not dispatcherFlag:
+			bsz.Add(self.bLocate)
 
 		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
 		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
@@ -243,6 +247,8 @@ class EditTrainDlg(wx.Dialog):
 			bsz.Add(self.bReverse)
 			bsz.AddSpacer(30)
 			bsz.Add(self.bSort)
+			bsz.AddSpacer(30)
+			bsz.Add(self.bLocate)
 
 			self.Bind(wx.EVT_BUTTON, self.onSever, self.bSever)
 			self.Bind(wx.EVT_BUTTON, self.onMerge, self.bMerge)
@@ -251,6 +257,8 @@ class EditTrainDlg(wx.Dialog):
 			vsz.Add(bsz, 0, wx.ALIGN_CENTER)
 
 			vsz.AddSpacer(20)
+
+		self.Bind(wx.EVT_BUTTON, self.onLocate, self.bLocate)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20)
@@ -482,6 +490,10 @@ class EditTrainDlg(wx.Dialog):
 			else:
 				self.stTrainInfo[lx].SetLabel(
 					"%-12.12s  %-4.4s  %s" % (track[lx][0], "(%d)" % track[lx][2], track[lx][1]))
+
+	def onLocate(self, _):
+		if self.train.SetHilite(True):
+			self.parent.AddHilitedTrain(self.train)
 
 	def onCancel(self, _):
 		self.EndModal(wx.ID_CANCEL)

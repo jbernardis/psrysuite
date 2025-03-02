@@ -146,8 +146,8 @@ class TrackDiagram(wx.Panel):
 		del(self.text[textKey])
 		self.Refresh()
 
-	def DrawTrain(self, x, y, offset, trainID, locoID, stopRelay, atc, ar):
-		self.trains[(x*16+offset, y*16)] = [trainID, locoID, stopRelay, atc, ar];
+	def DrawTrain(self, x, y, offset, trainID, locoID, stopRelay, atc, ar, hilite):
+		self.trains[(x*16+offset, y*16)] = [trainID, locoID, stopRelay, atc, ar, hilite]
 		self.Refresh()
 
 	def ClearTrain(self, x, y, offset):
@@ -173,6 +173,7 @@ class TrackDiagram(wx.Panel):
 		for bx, tinfo in self.trains.items():
 			x = bx[0]
 			y = bx[1]
+			hilite = tinfo[5]
 			if tinfo[2]:
 				dc.SetTextForeground(wx.Colour(255, 255, 255))
 				dc.SetTextBackground(wx.Colour(255, 0, 0))
@@ -192,13 +193,13 @@ class TrackDiagram(wx.Panel):
 				dc.DrawText(txt, x, y)
 				x += dc.GetTextExtent(txt)[0]
 
-			dc.SetTextForeground(wx.Colour(255, 0, 0))
-			dc.SetTextBackground(wx.Colour(255, 255, 255))
+			dc.SetTextForeground(wx.Colour(255, 255, 255) if hilite else wx.Colour(255, 0, 0))
+			dc.SetTextBackground(wx.Colour(255, 0, 0) if hilite else wx.Colour(255, 255, 255))
 			dc.DrawText(tinfo[0]+" ", x, y)
 			x += dc.GetTextExtent(tinfo[0])[0]+2
 
-			dc.SetTextForeground(wx.Colour(255, 255, 255))
-			dc.SetTextBackground(wx.Colour(255, 0, 0))
+			dc.SetTextForeground(wx.Colour(255, 0, 0) if hilite else wx.Colour(255, 255, 255))
+			dc.SetTextBackground(wx.Colour(255, 255, 255) if hilite else wx.Colour(255, 0, 0))
 			dc.DrawText(tinfo[1], x, y)
 
 		if self.showCTC:
