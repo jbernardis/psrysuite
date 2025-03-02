@@ -230,6 +230,7 @@ class EditTrainDlg(wx.Dialog):
 		bsz.AddSpacer(30)
 		bsz.Add(self.bCancel)
 		if not dispatcherFlag:
+			bsz.AddSpacer(30)
 			bsz.Add(self.bLocate)
 
 		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
