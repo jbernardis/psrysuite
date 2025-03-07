@@ -37,6 +37,7 @@ from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg, SortTrainBlocksDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
+from traineditor.preloaded.managepreloaded import ManagePreloadedDlg
 
 MENU_ATC_REMOVE  = 900
 MENU_ATC_STOP    = 901
@@ -120,6 +121,7 @@ class MainFrame(wx.Frame):
 		self.stNassauControl = None
 		self.stYardControl = None
 		self.bSnapshot = None
+		self.bPreloaded = None
 
 		self.cbToD = None
 		self.cbAutoRouter = None
@@ -2144,6 +2146,14 @@ class MainFrame(wx.Frame):
 		self.dlgAdvice.Destroy()
 		self.dlgAdvice = None
 
+	def OnBPreloaded(self, _):
+		dlg = ManagePreloadedDlg(self, self.rrServer)
+		rc = dlg.ShowModal()
+		dlg.Destroy()
+		if rc == wx.ID_OK:
+			self.preloadedTrains.Reload()
+			self.PopupEvent("Preloaded trains reloaded")
+
 	def OnBSnapshot(self, _):
 		dlg = ChooseSnapshotActionDlg(self)	
 		rc = dlg.ShowModal()
@@ -2270,6 +2280,7 @@ class MainFrame(wx.Frame):
 				self.bClearTrains.Enable(False)
 				self.bSaveLocos.Enable(False)
 				self.bSnapshot.Enable(False)
+				self.bPreloaded.Enable(False)
 				if self.IsDispatcher():
 					self.cbAutoRouter.Enable(False)
 					self.cbATC.Enable(False)
@@ -2301,6 +2312,7 @@ class MainFrame(wx.Frame):
 				self.bSaveLocos.Enable(True)
 				self.bClearTrains.Enable(True)
 				self.bSnapshot.Enable(True)
+				self.bPreloaded.Enable(True)
 				if self.IsDispatcher():
 					self.cbAutoRouter.Enable(True)
 					self.cbATC.Enable(True)
