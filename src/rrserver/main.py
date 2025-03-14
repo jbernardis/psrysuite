@@ -508,11 +508,16 @@ class ServerMain:
 		except KeyError:
 			status = None
 
+		try:
+			locker = cmd["locker"][0]
+		except KeyError:
+			locker = None
+
 		if swname is None or status is None:
 			logging.error("turnout lock command without name and/or status paremeter")
 			return
 
-		self.rr.SetTurnoutLock(swname, status)
+		self.rr.SetTurnoutLock(swname, status, locker)
 			
 	def DoHandSwitch(self, cmd):
 		try:

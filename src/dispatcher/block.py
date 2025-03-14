@@ -296,11 +296,14 @@ class Block:
 	def determineStatus(self):
 		self.status = OCCUPIED if self.occupied else CLEARED if self.cleared else EMPTY
 		if self.occupied:
-			tn = self.train.GetName()
-			if tn is None:
+			if self.train is None:
 				self.unknownTrain = False
 			else:
-				self.unknownTrain = tn.startswith("??")
+				tn = self.train.GetName()
+				if tn is None:
+					self.unknownTrain = False
+				else:
+					self.unknownTrain = tn.startswith("??")
 
 	def NextBlock(self, reverse=False):
 		if self.east:

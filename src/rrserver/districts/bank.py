@@ -4,6 +4,7 @@ from rrserver.district import District
 from rrserver.constants import BANK
 from rrserver.node import Node
 
+
 class Bank(District):
 	def __init__(self, rr, name, settings):
 		District.__init__(self, rr, name, settings)
@@ -32,6 +33,7 @@ class Bank(District):
 			self.rr.AddHandswitchInd("CSw19",   self, n, addr, [(2, 4)], inverted=True)
 
 			self.rr.AddTurnout("CSw23", self, n, addr, [(2, 5), (2, 6)])
+			self.rr.AddTurnoutPair("CSw23", "CSw23b")
 			self.rr.AddTurnout("CSw17", self, n, addr, [(2, 7), (3, 0)])
 
 			self.rr.AddStopRelay("B20.srel", self, n, addr, [(3, 1)])

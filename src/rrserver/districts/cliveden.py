@@ -30,6 +30,7 @@ class Cliveden(District):
 			
 			self.rr.AddTurnout("CSw13", self, n, addr, [(2, 7), (3, 0)])
 			self.rr.AddTurnout("CSw9",  self, n, addr, [(3, 1), (3, 6)]) # bit 3:2 is bad
+			self.rr.AddTurnoutPair("CSw9", "CSw9b")
 			
 			self.rr.AddStopRelay("C13.srel", self, n, addr, [(3, 3)])
 			self.rr.AddStopRelay("C23.srel", self, n, addr, [(3, 4)])

@@ -39,42 +39,50 @@ class Turnout:
 	def GetContainingBlock(self):
 		return self.containingBlock
 
-	def SetLock(self, signame, flag=True, refresh=False):
+	def SetLock(self, signame, flag=True, refresh=False, forward=True):
 		if flag:
 			self.locked = True
 			if signame in self.lockedBy:
 				# already locked by this signal
 				return
 			self.lockedBy.append(signame)
-			if len(self.lockedBy) == 1:
-				self.frame.Request({"turnoutlock": { "name": self.name, "status": 1}})
+			if len(self.lockedBy) == 1 or forward:
+				self.frame.Request({"turnoutlock": { "name": self.name, "status": 1, "locker": signame}})
 		else:
-			if signame not in self.lockedBy:
-				# this signal hasn't locked the turnout, so it can't unlock it
-				return
-			self.lockedBy.remove(signame)
+			try:
+				self.lockedBy.remove(signame)
+			except ValueError:
+				if len(self.lockedBy) > 0:
+					# this signal hasn't locked the turnout, so it can't unlock it
+					return
+
 			if len(self.lockedBy) == 0:
 				self.locked = False
-				self.frame.Request({"turnoutlock": { "name": self.name, "status": 0}})
+			if forward:
+				self.frame.Request({"turnoutlock": { "name": self.name, "status": 0, "locker": signame}})
 		if refresh:
 			self.Draw()
-			
-	def ClearLock(self, locker, forward=True):
+
+	def ClearLock(self, locker, refresh=False, forward=True):
 		if locker not in self.lockedBy:
 			return False
 
 		self.lockedBy.remove(locker)
 		if self.locked and len(self.lockedBy) == 0:
 			self.locked = False
-			if forward:
-				self.frame.Request({"turnoutlock": { "name": self.name, "status": 0}})
+		if forward:
+			self.frame.Request({"turnoutlock": { "name": self.name, "status": 0, "locker": locker}})
+		if refresh:
+			self.Draw()
 
-	def ClearLocks(self, forward=True):
+	def ClearLocks(self, refresh=False, forward=True):
 		self.lockedBy = []
 		if self.locked:
 			self.locked = False
-			if forward:
-				self.frame.Request({"turnoutlock": { "name": self.name, "status": 0}})
+		if forward:
+			self.frame.Request({"turnoutlock": { "name": self.name, "status": 0}})
+		if refresh:
+			self.Draw()
 
 	def GetType(self):
 		return self.ttype

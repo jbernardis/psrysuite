@@ -54,7 +54,9 @@ class Nassau(District):
 			
 			self.rr.AddTurnout("KSw1", self, n, addr, [(5, 0), (5, 1)])
 			self.rr.AddTurnout("KSw3", self, n, addr, [(5, 2), (5, 3)])
+			self.rr.AddTurnoutPair("KSw3", "KSw3b")
 			self.rr.AddTurnout("KSw5", self, n, addr, [(5, 4), (5, 5)])
+			self.rr.AddTurnoutPair("KSw5", "KSw5b")
 			self.rr.AddTurnout("KSw7", self, n, addr, [(5, 6), (5, 7)])
 
 			self.rr.AddBreakerInd("CBKrulish", self, n, addr, [(6, 0)])
@@ -76,10 +78,12 @@ class Nassau(District):
 			self.rr.AddSignal("N24RD", self, n, addr, [(7, 5)])
 
 			# virtual turnouts - no output bits
-			self.rr.AddTurnout("NSw19", self, n, addr, [])	
+			self.rr.AddTurnout("NSw19", self, n, addr, [])
+			self.rr.AddTurnoutPair("NSw19", "NSw19b")
 			self.rr.AddTurnout("NSw21", self, n, addr, [])	
 			self.rr.AddTurnout("NSw23", self, n, addr, [])	
-			self.rr.AddTurnout("NSw25", self, n, addr, [])	
+			self.rr.AddTurnout("NSw25", self, n, addr, [])
+			self.rr.AddTurnoutPair("NSw25", "NSw25b")
 			self.rr.AddTurnout("NSw27", self, n, addr, [])	
 			self.rr.AddTurnout("NSw29", self, n, addr, [])	
 			self.rr.AddTurnout("NSw31", self, n, addr, [])	
@@ -172,7 +176,9 @@ class Nassau(District):
 			self.rr.AddTurnout("NSw51", self, n, addr, [])	
 			self.rr.AddTurnout("NSw53", self, n, addr, [])	
 			self.rr.AddTurnout("NSw55", self, n, addr, [])	
-			self.rr.AddTurnout("NSw57", self, n, addr, [])	
+			self.rr.AddTurnoutPair("NSw55", "NSw55b")
+			self.rr.AddTurnout("NSw57", self, n, addr, [])
+			self.rr.AddTurnoutPair("NSw57", "NSw57b")
 
 			# inputs
 			self.rr.AddTurnoutPosition("NSw41", self, n, addr, [(0, 0), (3, 2)]) # bit 0,1 is bad

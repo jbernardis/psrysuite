@@ -86,11 +86,13 @@ class Port(District):
 			self.rr.AddTurnout("PASw5",  self, n, addr, [])
 			self.rr.AddTurnout("PASw7",  self, n, addr, [])
 			self.rr.AddTurnout("PASw9",  self, n, addr, [])
+			self.rr.AddTurnoutPair("PASw9", "PASw9b")
 			self.rr.AddTurnout("PASw11", self, n, addr, [])
 			self.rr.AddTurnout("PASw13", self, n, addr, [])
 			self.rr.AddTurnout("PASw15", self, n, addr, [])
 			self.rr.AddTurnout("PASw17", self, n, addr, [])
 			self.rr.AddTurnout("PASw19", self, n, addr, [])
+			self.rr.AddTurnoutPair("PASw19", "PASw19b")
 			self.rr.AddTurnout("PASw21", self, n, addr, [])
 			self.rr.AddTurnout("PASw23", self, n, addr, [])
 			
@@ -255,9 +257,13 @@ class Port(District):
 	
 			# virtual turnouts - we do not control these, so no output bits
 			self.rr.AddTurnout("PBSw1",  self, n, addr, [])
+			self.rr.AddTurnoutPair("PBSw1", "PBSw1b")
 			self.rr.AddTurnout("PBSw3",  self, n, addr, [])
+			self.rr.AddTurnoutPair("PBSw3", "PBSw3b")
 			self.rr.AddTurnout("PBSw11", self, n, addr, [])
+			self.rr.AddTurnoutPair("PBSw11", "PBSw11b")
 			self.rr.AddTurnout("PBSw13", self, n, addr, [])
+			self.rr.AddTurnoutPair("PBSw13", "PBSw13b")
 
 			# Inputs
 			self.rr.AddTurnoutPosition("PBSw1",  self, n, addr, [(0, 0), (0, 1)])

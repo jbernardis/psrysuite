@@ -56,7 +56,9 @@ class Shore(District):
 			self.rr.AddHandswitchInd("SSw1", self, n, SHORE, [(4, 0)])
 			
 			self.rr.AddTurnout("SSw3",  self, n, SHORE, [(4, 1), (4, 2)])
+			self.rr.AddTurnoutPair("SSw3", "SSw3b")
 			self.rr.AddTurnout("SSw5",  self, n, SHORE, [(4, 3), (4, 4)])
+			self.rr.AddTurnoutPair("SSw5", "SSw5b")
 			self.rr.AddTurnout("SSw7",  self, n, SHORE, [(4, 5), (4, 6)])
 			self.rr.AddTurnout("SSw9",  self, n, SHORE, [(4, 7), (5, 0)])
 			self.rr.AddTurnout("SSw11", self, n, SHORE, [(5, 1), (5, 2)])
@@ -142,8 +144,10 @@ class Shore(District):
 			self.rr.AddSignal("S20L",  self, n, HYDEJCT, [(1, 4), (1, 5), (1, 6)])
 			
 			self.rr.AddTurnout("SSw15", self, n, HYDEJCT, [(1, 7), (2, 0)])
+			self.rr.AddTurnoutPair("SSw15", "SSw15b")
 			self.rr.AddTurnout("SSw17", self, n, HYDEJCT, [(2, 1), (2, 2)])
 			self.rr.AddTurnout("SSw19", self, n, HYDEJCT, [(2, 3), (2, 4)])
+			self.rr.AddTurnoutPair("SSw19", "SSw19b")
 
 			self.rr.AddStopRelay("H20.srel", self, n, HYDEJCT, [(2, 5)])
 			self.rr.AddStopRelay("P42.srel", self, n, HYDEJCT, [(2, 6)])

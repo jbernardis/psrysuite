@@ -2486,7 +2486,7 @@ class MainFrame(wx.Frame):
 				try:
 					handler(parms)
 				except Exception as e:
-					logging.error("Exception %s handlint command %s" % (str(e), cmd))
+					logging.error("Exception %s handling command %s" % (str(e), cmd))
 			
 	def DoCmdTurnout(self, parms):
 		for p in parms:
@@ -2523,6 +2523,28 @@ class MainFrame(wx.Frame):
 	def DoCmdTurnoutLock(self, parms):
 		if self.CTCManager is not None:
 			self.CTCManager.DoCmdTurnoutLock(parms)
+		for p in parms:
+			tonm = p["name"]
+			try:
+				state = int(p["state"])
+			except (KeyError, ValueError):
+				state = 0
+			state = True if state != 0 else False
+			try:
+				locker = p["locker"]
+			except KeyError:
+				locker = None
+
+			try:
+				tout = self.turnouts[tonm]
+			except KeyError:
+				logging.error("turnoutlock: Unable to find turnout %s" % tonm)
+				return
+
+			if locker is None:
+				tout.ClearLocks(forward=False, refresh=True)
+			else:
+				tout.SetLock(locker, flag=state, forward=False, refresh=True)
 
 	def DoCmdTurnoutLever(self, parms):
 		for p in parms:

@@ -648,7 +648,7 @@ class District:
 			# self.frame.PopupEvent("Ignoring Block command for OS %s: route not set" % bname)
 			logging.info("Ignoring Block command for OS %s: route not set" % bname)
 			return 
-		
+
 		blk.SetOccupied(occupied=state == OCCUPIED, blockend=blockend, refresh=True)
 
 		osList = self.frame.GetOSForBlock(bname)
@@ -962,10 +962,10 @@ class District:
 	def LockTurnouts(self, locker, tolist, flag):
 		for t in tolist:
 			to = self.frame.turnouts[t]
-			to.SetLock(locker, flag, refresh=True)
+			to.SetLock(locker, flag, refresh=True, forward=True)
 			tp = to.GetPaired()
 			if tp:
-				tp.SetLock(locker, flag, refresh=True)
+				tp.SetLock(locker, flag, refresh=True, forward=True)
 
 	@staticmethod
 	def DoHandSwitchAction(hs, stat):

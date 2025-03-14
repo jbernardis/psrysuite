@@ -5,6 +5,7 @@ from rrserver.constants import  DELL, FOSS
 from rrserver.node import Node
 from dispatcher.constants import SloAspects
 
+
 class Dell(District):
 	def __init__(self, rr, name, settings):
 		District.__init__(self, rr, name, settings)
@@ -40,7 +41,9 @@ class Dell(District):
 			self.rr.AddTurnout("DSw5", self, n, DELL, [(2, 7), (3, 0)])
 
 			self.rr.AddTurnout("DSw7",  self, n, DELL, [(3, 1), (3, 2)])
+			self.rr.AddTurnoutPair("DSw7", "DSw7b")
 			self.rr.AddTurnout("DSw11", self, n, DELL, [(3, 3), (3, 4)])
+			self.rr.AddTurnoutPair("DSw11", "DSw11b")
 			self.rr.AddStopRelay("D20.srel", self, n, DELL, [(3, 5)])
 			self.rr.AddStopRelay("H23.srel", self, n, DELL, [(3, 6)])
 			self.rr.AddStopRelay("D11.srel", self, n, DELL, [(3, 7)])

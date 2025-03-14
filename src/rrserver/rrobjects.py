@@ -716,10 +716,13 @@ class Turnout:
 	def GetEventMessages(self):
 		return [self.GetEventMessage(), self.GetEventMessage(lock=True)]
 		
-	def GetEventMessage(self, lock=False, force=False):
+	def GetEventMessage(self, lock=False, locker=None, force=False):
 		self.force = force
 		if lock:
-			return {"turnoutlock": [{ "name": self.name, "state": 1 if self.locked else 0}]}
+			p = {"name": self.name, "state": 1 if self.locked else 0}
+			if locker is not None:
+				p["locker"] = locker
+			return {"turnoutlock": [p]}
 		else:
 			return {"turnout": [{ "name": self.name, "state": "N" if self.normal else "R", "force": self.force}]}
 

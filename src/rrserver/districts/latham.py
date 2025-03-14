@@ -19,11 +19,15 @@ class Latham(District):
 		with self.nodes[addr] as n:
 			# outputs
 			self.rr.AddTurnout("LSw1", self, n, addr, [(0, 0), (0, 1)])
-			self.rr.AddTurnout("LSw3", self, n, addr, [(2, 2), (0, 3)]) #output bit 0:2 is bad - using 2:2 
+			self.rr.AddTurnout("LSw3", self, n, addr, [(2, 2), (0, 3)]) #output bit 0:2 is bad - using 2:2
+			self.rr.AddTurnoutPair("LSw3", "LSw3b")
 			self.rr.AddTurnout("LSw5", self, n, addr, [(0, 4), (0, 5)])
+			self.rr.AddTurnoutPair("LSw5", "LSw5b")
 			self.rr.AddTurnout("LSw7", self, n, addr, [(0, 7), (0, 6)]) #yes - these bits are intentionally reversed
+			self.rr.AddTurnoutPair("LSw7", "LSw7b")
 			self.rr.AddTurnout("LSw9", self, n, addr, [(1, 0), (1, 1)])
-			
+			self.rr.AddTurnoutPair("LSw9", "LSw9b")
+
 			self.rr.AddSignal("L4R",  self, n, addr, [(1, 2), (1, 3), (1, 4)])
 			self.rr.AddSignal("L6RB", self, n, addr, [(1, 5)])
 			self.rr.AddSignal("L6RA", self, n, addr, [(1, 6), (1, 7), (2, 0)])
@@ -94,6 +98,7 @@ class Latham(District):
 			self.rr.AddHandswitchInd("LSw13", self, n, addr, [(1, 4)])
 
 			self.rr.AddTurnout("LSw15", self, n, addr, [(1, 5), (1, 6)])
+			self.rr.AddTurnoutPair("LSw15", "LSw15b")
 			self.rr.AddTurnout("LSw17", self, n, addr, [(1, 7), (2, 0)])
 			
 			self.rr.AddStopRelay("L31.srel", self, n, addr, [(2, 1)])

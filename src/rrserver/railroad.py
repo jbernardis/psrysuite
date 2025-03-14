@@ -49,6 +49,7 @@ class Railroad:
 		self.signalLevers = {}
 		self.blocks = {}
 		self.turnouts = {}
+		self.turnoutPairs = {}
 		self.handswitches = {}
 		self.breakers = {}
 		self.stopRelays = {}
@@ -380,19 +381,31 @@ class Railroad:
 			
 		return False
 
-	def SetTurnoutLock(self, toname, state):
+	def SetTurnoutLock(self, toname, state, locker=None):
+		aturnout = True
 		try:
 			tout = self.turnouts[toname]
 		except KeyError:
-			# logging.warning("Attempt to change lock state on unknown turnout: %s" % toname)
-			# this is normal for the B half of all crossover pairings
-			return
+			aturnout = False
+			try:
+				tout = self.turnoutPairs[toname]
+			except KeyError:
+				logging.warning("Attempt to change lock state on unknown turnout: %s" % toname)
+				return
 
-		release = tout.district.Released(tout)			
-		if tout.Lock(state == 1):
-			tout.UpdateLockBits(release=release)
-			self.RailroadEvent(tout.GetEventMessage(lock=True))
-		
+		if aturnout:
+			release = tout.district.Released(tout)
+			if tout.Lock(state == 1):
+				tout.UpdateLockBits(release=release)
+
+		msg = tout.GetEventMessage(lock=True, locker=locker)
+
+		if not aturnout:
+			msg["turnoutlock"][0]["name"] = toname
+			logging.warning(str(msg))
+
+		self.RailroadEvent(msg)
+
 	def SetAspect(self, signame, aspect, frozenaspect=None, callon=False, aspectType=None):
 		try:
 			sig = self.signals[signame]
@@ -687,6 +700,16 @@ class Railroad:
 		t.SetBits(bits)
 		self.turnouts[name] = t
 		return t
+
+	def AddTurnoutPair(self, aname, bname):
+		try:
+			ta = self.turnouts[aname]
+		except KeyError:
+			logging.warning("Invalid turnout pair %s:%s - turnout %s does not exist" % (aname, bname, aname))
+			return
+
+		logging.debug("added turnout pain %s => %s" % (bname, aname))
+		self.turnoutPairs[bname] = ta
 
 	def AddTurnoutPosition(self, name, district, node, address, bits):
 		try:

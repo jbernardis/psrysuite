@@ -106,9 +106,12 @@ class Hyde(District):
 			# outputs
 			self.rr.AddTurnout("HSw1",  self, n, addr, [(0, 0), (0, 1)])
 			self.rr.AddTurnout("HSw3",  self, n, addr, [(0, 2), (0, 3)])
+			self.rr.AddTurnoutPair("HSw3", "HSw5")
 			self.rr.AddTurnout("HSw7",  self, n, addr, [(0, 4), (0, 5)])
+			self.rr.AddTurnoutPair("HSw7", "HSw7b")
 			self.rr.AddTurnout("HSw9",  self, n, addr, [(0, 6), (0, 7)])
 			self.rr.AddTurnout("HSw11", self, n, addr, [(1, 0), (1, 1)])
+			self.rr.AddTurnoutPair("HSw11", "HSw13")
 			self.rr.AddTurnout("HSw23", self, n, addr, [(1, 2), (1, 3)])
 			self.rr.AddTurnout("HSw25", self, n, addr, [(1, 4), (1, 5)])
 			self.rr.AddTurnout("HSw27", self, n, addr, [(1, 6), (1, 7)])
