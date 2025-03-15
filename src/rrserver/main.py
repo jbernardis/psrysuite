@@ -608,11 +608,19 @@ class ServerMain:
 			logging.error("relay command without block and/or state paremeter")
 			return
 
+		try:
+			direction = cmd["direction"][0]
+		except KeyError:
+			direction = "unknown"
+
+		try:
+			train = int(cmd["train"][0])
+		except KeyError:
+			train = "??"
+
 		relay = block + ".srel"
-		resp = {"relay": [{ "name": relay, "state": status}]}
-		addrList = self.clientList.GetFunctionAddress("DISPLAY")
-		for addr, skt in addrList:
-			self.socketServer.sendToOne(skt, addr, resp)
+		resp = {"relay": [{ "name": relay, "state": status, "direction": direction, "train": train}]}
+		self.socketServer.sendToAll(resp)
 
 		self.rr.SetRelay(relay, status)
 		

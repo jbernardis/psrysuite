@@ -216,7 +216,7 @@
       "sbwest": null
     },
     "F11": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": "F11.W"
     },

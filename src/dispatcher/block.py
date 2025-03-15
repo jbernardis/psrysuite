@@ -860,7 +860,7 @@ class StoppingBlock:  # (Block):
 	def Activate(self, flag=True):
 		if flag == self.active:
 			return
-		
+
 		tr = self.block.GetTrain()
 		if tr is None:
 			tname = "??"
@@ -869,14 +869,11 @@ class StoppingBlock:  # (Block):
 			tr.SetSBActive(flag)
 			self.frame.activeTrains.UpdateTrain(tname)
 			
-		bname = self.block.GetName()
 		direction = "East" if self.eastend else "West"
 
 		self.active = flag
-		if flag:
-			self.frame.PopupEvent("Stop Relay: %s %s by %s" % (bname, direction, tname))
 
-		self.frame.Request({"relay": {"block": self.block.GetName(), "state": 1 if flag else 0}})
+		self.frame.Request({"relay": {"block": self.block.GetName(), "state": 1 if flag else 0, "direction": direction, "train": tname}})
 
 		if tr is None:
 			self.block.DrawTrain()

@@ -2460,7 +2460,7 @@ class MainFrame(wx.Frame):
 			"atcstatus":		self.DoCmdATCStatus,
 			"checktrains":		self.DoCmdCheckTrains,
 			"dumptrains":		self.DoCmdDumpTrains,
-			"relay":			self.DoCmdNOOP,
+			"relay":			self.DoCmdRelay,
 			"setroute":			self.DoCmdSetRoute,
 			"signallock":		self.DoCmdSignalLock,
 			"traintimesrequest":	self.DoCmdTrainTimesRequest,
@@ -2519,6 +2519,27 @@ class MainFrame(wx.Frame):
 
 		if self.CTCManager is not None:
 			self.CTCManager.DoCmdTurnout(parms)
+
+	def DoCmdRelay(self, parms):
+		for p in parms:
+			rname = p["name"]
+			try:
+				direction = p["direction"]
+			except KeyError:
+				direction = "unknown"
+			try:
+				train = p["train"]
+			except KeyError:
+				train = "??"
+			try:
+				state = int(p["state"])
+			except (KeyError, ValueError):
+				state = 0
+			state = True if state != 0 else False
+			if state:
+				if rname.endswith(".srel"):
+					rname = rname[:-5]
+				self.PopupEvent("Stop Relay: %s %s by %s" % (rname, direction, train))
 
 	def DoCmdTurnoutLock(self, parms):
 		if self.CTCManager is not None:
