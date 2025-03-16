@@ -220,13 +220,7 @@ class MainFrame(wx.Frame):
 		topBorder = dispBox.GetBordersForSizer()[0]
 		boxsizer = wx.BoxSizer(wx.VERTICAL)
 		boxsizer.AddSpacer(topBorder+10)
-		
-		self.cbAllowATCRequests = wx.CheckBox(dispBox, wx.ID_ANY, "Allow ATC Requests")
-		boxsizer.Add(self.cbAllowATCRequests, 0, wx.LEFT, 40)
-		self.cbAllowATCRequests.SetValue(self.settings.display.allowatcrequests)
-		
-		boxsizer.AddSpacer(10)
-		
+
 		self.cbShowEvents = wx.CheckBox(dispBox, wx.ID_ANY, "Show Events")
 		boxsizer.Add(self.cbShowEvents, 0, wx.LEFT, 40)
 		self.cbShowEvents.SetValue(self.settings.display.showevents)
@@ -242,6 +236,7 @@ class MainFrame(wx.Frame):
 		dispBox.SetSizer(boxsizer)
 		
 		vszrm.Add(dispBox, 0, wx.EXPAND)
+		vszrm.AddSpacer(20)
 
 		snifferBox = wx.StaticBox(self, wx.ID_ANY, "DCC Sniffer")
 		topBorder = snifferBox.GetBordersForSizer()[0]
@@ -549,7 +544,6 @@ class MainFrame(wx.Frame):
 
 		self.settings.display.showcameras = self.cbShowCameras.IsChecked()		
 		self.settings.display.pages = 1 if self.rbPages.GetSelection() == 0 else 3
-		self.settings.display.allowatcrequests = self.cbAllowATCRequests.IsChecked()
 		self.settings.display.showevents = self.cbShowEvents.IsChecked()
 		self.settings.display.showadvice = self.cbShowAdvice.IsChecked()
 

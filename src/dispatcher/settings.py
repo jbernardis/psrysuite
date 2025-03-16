@@ -202,7 +202,6 @@ class Settings:
 		self.display = SNode()
 		self.display.pages = 3
 		self.display.showcameras = False
-		self.display.allowatcrequests = True
 		self.display.showevents = False
 		self.display.showadvice = False
 		if self.cfg.has_section(section):
@@ -221,10 +220,7 @@ class Settings:
 
 				elif opt == 'showcameras':
 					self.display.showcameras = parseBoolean(value, False)
-					
-				elif opt == 'allowatcrequests':
-					self.display.allowatcrequests = parseBoolean(value, False)
-					
+
 				elif opt == 'showevents':
 					self.display.showevents = parseBoolean(value, False)
 
@@ -442,7 +438,6 @@ class Settings:
 
 		self.cfg.set(section, "pages",   "%d" % self.display.pages)
 		self.cfg.set(section, "showcameras", "True" if self.display.showcameras else "False")
-		self.cfg.set(section, "allowatcrequests", "True" if self.display.allowatcrequests else "False")
 		self.cfg.set(section, "showevents", "True" if self.display.showevents else "False")
 		self.cfg.set(section, "showadvice", "True" if self.display.showadvice else "False")
 

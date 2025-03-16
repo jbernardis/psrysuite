@@ -335,9 +335,7 @@ class ServerMain:
 			
 			"autorouter":	self.DoAutorouter,
 			"ar":			self.DoAR,
-			"arrequest":	self.DoARRequest,
 			"atc":			self.DoATC,
-			"atcrequest":	self.DoATCRequest,
 			"atcstatus":	self.DoATCStatus,
 
 			"debug":		self.DoDebug,
@@ -1298,25 +1296,15 @@ class ServerMain:
 			self.pidAR = None
 			
 	def DoAR(self, cmd): # forward autorouter messages to all AR cliebts
-		addrList = self.clientList.GetFunctionAddress("AR") + self.clientList.GetFunctionAddress("DISPLAY")
+		addrList = self.clientList.GetFunctionAddress("AR") + self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"ar": cmd})
 
 	def DoATC(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
+		addrList = self.clientList.GetFunctionAddress("ATC") + self.clientList.GetFunctionAddress("DISPLAY") + self.clientList.GetFunctionAddress("SATELLITE")
 		for addr, skt in addrList:
 			self.socketServer.sendToOne(skt, addr, {"atc": cmd})
 
-	def DoATCRequest(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
-		for addr, skt in addrList:
-			self.socketServer.sendToOne(skt, addr, {"atcrequest": cmd})
-
-	def DoARRequest(self, cmd):
-		addrList = self.clientList.GetFunctionAddress("DISPATCH") + self.clientList.GetFunctionAddress("SATELLITE")
-		for addr, skt in addrList:
-			self.socketServer.sendToOne(skt, addr, {"arrequest": cmd})
-					
 	def DoATCStatus(self, cmd):
 		self.socketServer.sendToAll({"atcstatus": cmd})
 

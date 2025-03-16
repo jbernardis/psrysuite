@@ -44,16 +44,12 @@ MENU_ATC_STOP    = 901
 MENU_ATC_ADD     = 902
 MENU_AR_ADD      = 903
 MENU_AR_REMOVE   = 904
-MENU_ATC_REM_REQ = 905
-MENU_ATC_ADD_REQ = 906
-MENU_AR_REM_REQ  = 907
-MENU_AR_ADD_REQ  = 908
 MENU_TRAIN_ROUTE = 910
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
 
-allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "atcrequest", "arrequest", "traintimesrequest", "trainblockorder", "trainsignal", "blockdir", "deletetrain" ]
+allowedCommands = [ "settrain", "renametrain", "assigntrain", "identify", "refresh", "traintimesrequest", "trainblockorder", "trainsignal", "blockdir", "deletetrain" ]
 disallowedSatelliteCommands = [ "relay" ]
 
 wildcardTrain = "train files (*.trn)|*.trn|"	 \
@@ -128,6 +124,7 @@ class MainFrame(wx.Frame):
 		self.cbATC = None
 		self.cbOSSLocks = None
 		self.cbSidingsUnlocked = None
+		self.menuTrain = None
 
 		self.events = None
 		self.advice = None
@@ -1357,23 +1354,7 @@ class MainFrame(wx.Frame):
 						self.menuTrain = tr
 						
 						self.Bind(wx.EVT_MENU, self.OnTrainRouting, id=MENU_TRAIN_ROUTE)
-						if not self.IsDispatcher():
-							if self.settings.display.allowatcrequests:
-								if tr.IsOnATC():
-									menu.Append( MENU_ATC_REM_REQ, "Request: ATC Remove" )
-									self.Bind(wx.EVT_MENU, self.OnATCRemReq, id=MENU_ATC_REM_REQ)
-								else:
-									menu.Append( MENU_ATC_ADD_REQ, "Request: ATC Add" )
-									self.Bind(wx.EVT_MENU, self.OnATCAddReq, id=MENU_ATC_ADD_REQ)
-								if tr.IsOnAR():
-									menu.Append( MENU_AR_REM_REQ, "Request: AR Remove" )
-									self.Bind(wx.EVT_MENU, self.OnARRemReq, id=MENU_AR_REM_REQ)
-								else:
-									menu.Append( MENU_AR_ADD_REQ, "Request: AR Add" )
-									self.Bind(wx.EVT_MENU, self.OnARAddReq, id=MENU_AR_ADD_REQ)
-								addedMenuItem = True
-						
-						else: # IS Dispatcher								
+						if self.IsDispatcher():
 							if self.ATCEnabled:
 								if tr.IsOnATC():
 									menu.Append( MENU_ATC_REMOVE, "Remove from ATC" )
@@ -1881,11 +1862,6 @@ class MainFrame(wx.Frame):
 			self.Request({"atc": {"action": "add", "train": trainid, "loco": locoid}})
 			self.menuTrain.Draw()
 
-	def OnATCAddReq(self, evt):
-		trainid, locoid = self.menuTrain.GetNameAndLoco()
-		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
-			self.Request({"atcrequest": {"action": "add", "train": trainid, "loco": locoid}})
-							
 	def OnATCRemove(self, evt):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
 		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
@@ -1893,12 +1869,7 @@ class MainFrame(wx.Frame):
 			self.activeTrains.UpdateTrain(trainid)
 			self.Request({"atc": {"action": "remove", "train": trainid, "loco": locoid}})
 			self.menuTrain.Draw()
-							
-	def OnATCRemReq(self, evt):
-		trainid, locoid = self.menuTrain.GetNameAndLoco()
-		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
-			self.Request({"atcrequest": {"action": "remove", "train": trainid, "loco": locoid}})
-		
+
 	def OnATCStop(self, evt):
 		trainid, locoid = self.menuTrain.GetNameAndLoco()
 		if self.VerifyTrainID(trainid) and self.VerifyLocoID(locoid):
@@ -1912,11 +1883,6 @@ class MainFrame(wx.Frame):
 			self.Request({"ar": {"action": "add", "train": trainid}})
 			self.menuTrain.Draw()
 
-	def OnARAddReq(self, evt):
-		trainid = self.menuTrain.GetName()
-		if self.VerifyTrainRoute(trainid):
-			self.Request({"arrequest": {"action": "add", "train": trainid}})
-		
 	def OnARRemove(self, evt):
 		trainid = self.menuTrain.GetName()
 		if self.VerifyTrainRoute(trainid):
@@ -1925,11 +1891,6 @@ class MainFrame(wx.Frame):
 			self.Request({"ar": {"action": "remove", "train": trainid}})
 			self.menuTrain.Draw()
 							
-	def OnARRemReq(self, evt):
-		trainid = self.menuTrain.GetName()
-		if self.VerifyTrainRoute(trainid):
-			self.Request({"arrequest": {"action": "remove", "train": trainid}})
-
 	def DrawTile(self, screen, pos, bmp):
 		offset = self.diagrams[screen].offset
 		self.panels[screen].DrawTile(pos[0], pos[1], offset, bmp)
@@ -2454,9 +2415,7 @@ class MainFrame(wx.Frame):
 			"advice":			self.DoCmdAdvice,
 			"alert":			self.DoCmdAlert,
 			"ar":				self.DoCmdAR,
-			"arrequest":		self.DoCmdARRequest,
 			"atc":				self.DoCmdATC,
-			"atcrequest":		self.DoCmdATCRequest,
 			"atcstatus":		self.DoCmdATCStatus,
 			"checktrains":		self.DoCmdCheckTrains,
 			"dumptrains":		self.DoCmdDumpTrains,
@@ -3617,31 +3576,6 @@ class MainFrame(wx.Frame):
 		tr.SetAR(action == "add")
 		self.activeTrains.UpdateTrain(trnm)
 		tr.Draw()
-				
-	def DoCmdARRequest(self, parms):
-		try:
-			trnm = parms["train"][0]
-		except KeyError:
-			logging.warning("ARRequest command without a train name")
-			return
-		if self.AREnabled:
-			try:
-				tr = self.trains[trnm]
-			except KeyError:
-				logging.warning("AR train %s does not exist" % trnm)
-				return
-			
-			action = parms["action"][0]
-			
-			tr.SetAR(action == "add")
-			self.activeTrains.UpdateTrain(trnm)
-			tr.Draw()
-			
-			self.Request({"ar": {"action": action, "train": trnm}})
-			tr.Draw()
-		
-		else:
-			self.PopupEvent("AR request for %s - not enabled" % trnm)
 
 	def DoCmdATC(self, parms):
 		try:
@@ -3660,33 +3594,7 @@ class MainFrame(wx.Frame):
 		tr.SetATC(action == "add")
 		self.activeTrains.UpdateTrain(trnm)
 		tr.Draw()
-				
-	def DoCmdATCRequest(self, parms):
-		try:
-			trnm = parms["train"][0]
-		except KeyError:
-			logging.warning("ATCRequest command without a train name")
-			return
-		if self.ATCEnabled:
-			try:
-				tr = self.trains[trnm]
-			except KeyError:
-				logging.warning("ATC train %s does not exist" % trnm)
-				return
-			
-			action = parms["action"][0]
-			
-			tr.SetATC(action == "add")
-			self.activeTrains.UpdateTrain(trnm)
-			tr.Draw()
-			
-			trainid, locoid = tr.GetNameAndLoco()
-			self.Request({"atc": {"action": action, "train": trainid, "loco": locoid}})
-			self.menuTrain.Draw()
-		
-		else:
-			self.PopupEvent("ATC request for %s - not enabled" % trnm)
-					
+
 	def DoCmdATCStatus(self, parms):
 		try:
 			action = parms["action"][0]
