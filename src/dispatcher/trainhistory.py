@@ -43,6 +43,7 @@ class TrainHistoryDlg(wx.Dialog):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.parent = parent
 		self.trainHistory = trainHistory
+		self.showUnknown = True
 
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.chosenTrain = None
@@ -52,7 +53,7 @@ class TrainHistoryDlg(wx.Dialog):
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(10)
 
-		self.ch = TrainHistoryCtrl(self, self.trainHistory)
+		self.ch = TrainHistoryCtrl(self, self.trainHistory, self.showUnknown)
 		vsz.Add(self.ch, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnClick, self.ch)
@@ -62,6 +63,13 @@ class TrainHistoryDlg(wx.Dialog):
 		vsz.AddSpacer(20)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
+
+		self.cbUnknown = wx.CheckBox(self, wx.ID_ANY, "Include Unknown Trains")
+		hsz.Add(self.cbUnknown, 0, wx.TOP, 10)
+		self.Bind(wx.EVT_CHECKBOX, self.OnCbUnknown, self.cbUnknown)
+		self.cbUnknown.SetValue(self.showUnknown)
+
+		hsz.AddSpacer(20)
 
 		self.bOK = wx.Button(self, wx.ID_ANY, "Select", size=BSIZE)
 		self.bOK.SetToolTip("Return with the selected train as the selection")
@@ -114,6 +122,11 @@ class TrainHistoryDlg(wx.Dialog):
 
 		self.bOK.Enable(self.chosenTrain is not None)
 
+	def OnCbUnknown(self, evt):
+		self.showUnknown = self.cbUnknown.GetValue()
+		logging.debug("cbUnknown value: %s" % str(self.showUnknown))
+		self.ch.SetShowUnknown(self.showUnknown)
+
 	def OnBOK(self, _):
 		if self.chosenTrain is None:
 			self.EndModal(wx.ID_CANCEL)
@@ -136,7 +149,7 @@ class TrainHistoryDlg(wx.Dialog):
 
 
 class TrainHistoryCtrl(wx.ListCtrl):
-	def __init__(self, parent, trainHistory):
+	def __init__(self, parent, trainHistory, showUnknown):
 		#  calculate control height by the size of history
 		n = len(trainHistory)
 		if n < 6:
@@ -150,9 +163,9 @@ class TrainHistoryCtrl(wx.ListCtrl):
 		self.trains = self.trainHistory.GetTrains()
 		self.sortColumn = 0
 		self.sortReverse = False
+		self.showUnknown = showUnknown
 		self.trainOrder = []
 		self.sortTrainOrder()
-		self.trainOrder = sorted(self.trains.keys(), key=self.BuildTrainKey, reverse=self.sortReverse)
 
 		self.SetFont(wx.Font(wx.Font(14, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial")))
 
@@ -181,8 +194,20 @@ class TrainHistoryCtrl(wx.ListCtrl):
 		except (KeyError, IndexError):
 			return None
 
+	def SetShowUnknown(self, flag):
+		self.showUnknown = flag
+		self.sortTrainOrder()
+		self.SetItemCount(0)
+		n = len(self.trainOrder)
+		self.SetItemCount(n)
+		self.RefreshItems(0, n-1)
+
 	def sortTrainOrder(self):
-		self.trainOrder = sorted(self.trains.keys(), key=self.BuildTrainKey, reverse=self.sortReverse)
+		if self.showUnknown:
+			k = self.trains.keys()
+		else:
+			k = [kk for kk in self.trains.keys() if not kk.startswith("??")]
+		self.trainOrder = sorted(k, key=self.BuildTrainKey, reverse=self.sortReverse)
 
 	def BuildTrainKey(self, trid):
 		if self.sortColumn == 0:
