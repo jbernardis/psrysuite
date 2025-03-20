@@ -232,6 +232,12 @@ class MainFrame(wx.Frame):
 		self.cbShowAdvice.SetValue(self.settings.display.showadvice)
 
 		boxsizer.AddSpacer(10)
+
+		self.cbShowUnknown = wx.CheckBox(dispBox, wx.ID_ANY, "Show Unknown Train History")
+		boxsizer.Add(self.cbShowUnknown, 0, wx.LEFT, 40)
+		self.cbShowUnknown.SetValue(self.settings.display.showunknownhistory)
+
+		boxsizer.AddSpacer(10)
 		
 		dispBox.SetSizer(boxsizer)
 		
@@ -546,6 +552,7 @@ class MainFrame(wx.Frame):
 		self.settings.display.pages = 1 if self.rbPages.GetSelection() == 0 else 3
 		self.settings.display.showevents = self.cbShowEvents.IsChecked()
 		self.settings.display.showadvice = self.cbShowAdvice.IsChecked()
+		self.settings.display.showunknownhistory = self.cbShowUnknown.IsChecked()
 
 		self.settings.activetrains.suppressyards = self.cbSuppressYards.IsChecked()		
 		ix = self.rbShowOnly.GetSelection()

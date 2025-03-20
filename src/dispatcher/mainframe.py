@@ -74,6 +74,8 @@ WIDTHADJUST = 0 if sys.platform.lower() == "win32" else 56
 class MainFrame(wx.Frame):
 	def __init__(self, settings):
 		wx.Frame.__init__(self, None, size=(900, 800), style=wx.DEFAULT_FRAME_STYLE)
+		self.settings = settings
+
 		self.title = None
 		self.bitmaps = None
 		self.bmpw = self.bmph = None
@@ -161,11 +163,9 @@ class MainFrame(wx.Frame):
 		self.hilitedTrains = []
 		self.activeTrains = ActiveTrainList()
 		self.lostTrains = LostTrains()
-		self.trainHistory = TrainHistory(self)
+		self.trainHistory = TrainHistory(self, self.settings)
 		self.preloadedTrains = None
 
-		self.settings = settings
-			
 		logging.info("%s process starting" % "dispatcher" if self.IsDispatcher() else "satellite" if self.IsSatellite() else "display")
 
 		icon = wx.Icon()

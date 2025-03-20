@@ -6,10 +6,18 @@ BSIZE = (100, 26)
 
 
 class TrainHistory:
-	def __init__(self, parent):
+	def __init__(self, parent, settings):
 		self.parent = parent
+		self.settings = settings
 		self.history = {}
 		self.trainIds = []
+
+	def ShowUnknown(self, flag=None):
+		if flag is not None:
+			self.settings.display.showunknownhistory = flag
+			self.settings.SaveAll()
+
+		return self.settings.display.showunknownhistory
 
 	def Update(self, tr):
 		trid = tr.GetName()
@@ -43,7 +51,7 @@ class TrainHistoryDlg(wx.Dialog):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.parent = parent
 		self.trainHistory = trainHistory
-		self.showUnknown = True
+		self.showUnknown = self.trainHistory.ShowUnknown()
 
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.chosenTrain = None
@@ -124,7 +132,7 @@ class TrainHistoryDlg(wx.Dialog):
 
 	def OnCbUnknown(self, evt):
 		self.showUnknown = self.cbUnknown.GetValue()
-		logging.debug("cbUnknown value: %s" % str(self.showUnknown))
+		self.trainHistory.ShowUnknown(flag=self.showUnknown)
 		self.ch.SetShowUnknown(self.showUnknown)
 
 	def OnBOK(self, _):

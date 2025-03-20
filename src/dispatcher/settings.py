@@ -204,6 +204,7 @@ class Settings:
 		self.display.showcameras = False
 		self.display.showevents = False
 		self.display.showadvice = False
+		self.display.showunknownhistory = True
 		if self.cfg.has_section(section):
 			for opt, value in self.cfg.items(section):
 				if opt == 'pages':
@@ -226,6 +227,9 @@ class Settings:
 
 				elif opt == 'showadvice':
 					self.display.showadvice = parseBoolean(value, False)
+
+				elif opt == 'showunknownhistory':
+					self.display.showunknownhistory = parseBoolean(value, True)
 
 		else:
 			print("Missing %s section - assuming defaults" % section)
@@ -440,6 +444,7 @@ class Settings:
 		self.cfg.set(section, "showcameras", "True" if self.display.showcameras else "False")
 		self.cfg.set(section, "showevents", "True" if self.display.showevents else "False")
 		self.cfg.set(section, "showadvice", "True" if self.display.showadvice else "False")
+		self.cfg.set(section, "showunknownhistory", "True" if self.display.showunknownhistory else "False")
 
 		section = "activetrains" 
 		try:

@@ -193,14 +193,19 @@ class TrackDiagram(wx.Panel):
 				dc.DrawText(txt, x, y)
 				x += dc.GetTextExtent(txt)[0]
 
-			dc.SetTextForeground(wx.Colour(255, 255, 255) if hilite else wx.Colour(255, 0, 0))
-			dc.SetTextBackground(wx.Colour(255, 0, 0) if hilite else wx.Colour(255, 255, 255))
+			dc.SetTextForeground(wx.Colour(255, 0, 0))
+			dc.SetTextBackground(wx.Colour(255, 255, 255))
 			dc.DrawText(tinfo[0]+" ", x, y)
 			x += dc.GetTextExtent(tinfo[0])[0]+2
 
-			dc.SetTextForeground(wx.Colour(255, 0, 0) if hilite else wx.Colour(255, 255, 255))
-			dc.SetTextBackground(wx.Colour(255, 255, 255) if hilite else wx.Colour(255, 0, 0))
+			dc.SetTextForeground(wx.Colour(255, 255, 255))
+			dc.SetTextBackground(wx.Colour(255, 0, 0))
 			dc.DrawText(tinfo[1], x, y)
+
+			if hilite:
+				dc.SetPen(wx.Pen(wx.GREEN, width=10, style=wx.PENSTYLE_SOLID))
+				dc.SetBrush(wx.Brush(wx.GREEN, wx.TRANSPARENT))
+				dc.DrawCircle(x, y, 50)
 
 		if self.showCTC:
 			for bx, bmp in self.ctcbgbitmaps.items():
