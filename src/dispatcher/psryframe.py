@@ -68,7 +68,7 @@ class PSRYFrame(MainFrame):
 
 		if self.settings.display.pages == 1:  # set up a single ultra-wide display accross 3 monitors
 			dp = TrackDiagram(self, [self.diagrams[sn] for sn in screensList], ht)
-			dp.SetPosition((8, 120))
+			dp.SetPosition((0, 120))
 			_, diagramh = dp.GetSize()
 			self.panels = {self.diagrams[sn].screen: dp for sn in screensList}  # all 3 screens just point to the same diagram
 			totalw = self.diagramWidth * 3
@@ -81,7 +81,7 @@ class PSRYFrame(MainFrame):
 				dp = TrackDiagram(self, [d], ht)
 				_, diagramh = dp.GetSize()
 				dp.Hide()
-				dp.SetPosition((8, 120))
+				dp.SetPosition((0, 120))
 				self.panels[d.screen] = dp
 
 			# add buttons to switch from screen to screen

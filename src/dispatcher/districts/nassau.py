@@ -561,6 +561,7 @@ class Nassau (District):
 				(self.tiles["horiz"],     self.screen, (18, 5), False),
 			], 
 			False)
+		self.blocks["NWOSTY"].AddTrainLoc(self.screen, (9, 25))
 
 		self.blocks["NWOSCY"] = OverSwitch(self, self.frame, "NWOSCY", 
 			[
@@ -599,6 +600,7 @@ class Nassau (District):
 				(self.tiles["horiz"],     self.screen, (19, 17), False),
 			], 
 			False)
+		self.blocks["NWOSCY"].AddTrainLoc(self.screen, (9, 27))
 
 		self.blocks["NWOSW"] = OverSwitch(self, self.frame, "NWOSW", 
 			[
@@ -635,6 +637,7 @@ class Nassau (District):
 				(self.tiles["horiz"],     self.screen, (19, 17), False),
 			], 
 			False)
+		self.blocks["NWOSW"].AddTrainLoc(self.screen, (9, 29))
 
 		self.blocks["NWOSE"] = OverSwitch(self, self.frame, "NWOSE", 
 			[
@@ -673,6 +676,7 @@ class Nassau (District):
 				(self.tiles["horiz"],     self.screen, (19, 17), False),
 			], 
 			True)
+		self.blocks["NWOSE"].AddTrainLoc(self.screen, (9, 31))
 
 		self.blocks["NEOSRH"] = OverSwitch(self, self.frame, "NEOSRH", 
 			[
@@ -725,6 +729,7 @@ class Nassau (District):
 				(self.tiles["turnleftright"],  self.screen, (32, 19), False),
 			],
 			False)
+		self.blocks["NEOSRH"].AddTrainLoc(self.screen, (39, 23))
 
 		self.blocks["NEOSW"] = OverSwitch(self, self.frame, "NEOSW", 
 			[
@@ -774,6 +779,7 @@ class Nassau (District):
 				(self.tiles["turnleftright"],  self.screen, (32, 19), False),
 			],
 			False)
+		self.blocks["NEOSW"].AddTrainLoc(self.screen, (39, 25))
 
 		self.blocks["NEOSE"] = OverSwitch(self, self.frame, "NEOSE", 
 			[
@@ -825,6 +831,7 @@ class Nassau (District):
 				(self.tiles["turnleftright"],  self.screen, (32, 19), False),
 			],
 			True)
+		self.blocks["NEOSE"].AddTrainLoc(self.screen, (39, 27))
 
 		self.osBlocks["NWOSTY"] = ["T12", "W10"]
 		self.osBlocks["NWOSCY"] = ["N60", "W10", "N32", "N31", "N12", "N22", "N41", "N42", "W20"]

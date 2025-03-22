@@ -178,6 +178,7 @@ class Latham (District):
 				(self.tiles["eobright"],  self.screen, (20, 15), False),
 			],
 			False)
+		self.blocks["LOSLAW"].AddTrainLoc(self.screen, (13, 18))
 
 		self.blocks["LOSLAM"] = OverSwitch(self, self.frame, "LOSLAM", 
 			[
@@ -199,6 +200,7 @@ class Latham (District):
 				(self.tiles["diagleft"],   self.screen, (10, 14), False),
 			],
 			True)
+		self.blocks["LOSLAM"].AddTrainLoc(self.screen, (13, 20))
 
 		self.blocks["LOSLAE"] = OverSwitch(self, self.frame, "LOSLAE", 
 			[
@@ -224,6 +226,7 @@ class Latham (District):
 				(self.tiles["eobright"],  self.screen, (20, 15), False),
 			],
 			True)
+		self.blocks["LOSLAE"].AddTrainLoc(self.screen, (13, 22))
 
 		self.blocks["LOSCAW"] = OverSwitch(self, self.frame, "LOSCAW", 
 			[
@@ -234,6 +237,7 @@ class Latham (District):
 				(self.tiles["eobright"],  self.screen, (35, 11), False),
 			], 
 			False)
+		self.blocks["LOSCAW"].AddTrainLoc(self.screen, (31, 18))
 
 		self.blocks["LOSCAM"] = OverSwitch(self, self.frame, "LOSCAM", 
 			[
@@ -246,6 +250,7 @@ class Latham (District):
 				(self.tiles["eobright"],  self.screen, (35, 11), False),
 			], 
 			True)
+		self.blocks["LOSCAM"].AddTrainLoc(self.screen, (31, 20))
 
 		self.blocks["LOSCAE"] = OverSwitch(self, self.frame, "LOSCAE", 
 			[
@@ -256,6 +261,7 @@ class Latham (District):
 				(self.tiles["eobright"],  self.screen, (35, 13), False),
 			], 
 			True)
+		self.blocks["LOSCAE"].AddTrainLoc(self.screen, (31, 22))
 
 		self.osBlocks["LOSLAW"] = ["L10", "L11", "L21", "L31"]
 		self.osBlocks["LOSLAM"] = ["L20", "P11", "L11", "L21", "L31"]

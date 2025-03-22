@@ -133,6 +133,7 @@ class Dell (District):
 				(self.tiles["eobright"],       self.screen, (55, 11), False),
 			],
 			False)
+		self.blocks["DOSVJW"].AddTrainLoc(self.screen, (49, 18))
 
 		self.blocks["DOSVJE"] = OverSwitch(self, self.frame, "DOSVJE", 
 			[
@@ -158,6 +159,7 @@ class Dell (District):
 				(self.tiles["eobright"],       self.screen, (55, 13), False),
 			],
 			True)
+		self.blocks["DOSVJE"].AddTrainLoc(self.screen, (49, 20))
 
 		self.blocks["DOSFOE"] = OverSwitch(self, self.frame, "DOSFOE", 
 			[
@@ -169,6 +171,7 @@ class Dell (District):
 				(self.tiles["eobright"],       self.screen, (70, 11), False),
 			],
 			True)
+		self.blocks["DOSFOE"].AddTrainLoc(self.screen, (66, 20))
 
 		self.blocks["DOSFOW"] = OverSwitch(self, self.frame, "DOSFOW", 
 			[
@@ -180,6 +183,7 @@ class Dell (District):
 				(self.tiles["eobright"],       self.screen, (70, 11), False),
 			],
 			False)
+		self.blocks["DOSFOW"].AddTrainLoc(self.screen, (66, 18))
 
 		self.osBlocks["DOSVJE"] = ["H13", "H23", "D10", "D20", "D21"]
 		self.osBlocks["DOSVJW"] = ["H13", "H23", "D10", "D20", "D11"]

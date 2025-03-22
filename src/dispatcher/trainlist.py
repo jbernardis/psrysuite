@@ -209,6 +209,9 @@ class ActiveTrainsDlg(wx.Dialog):
 		hsz.AddSpacer(20)
 
 		self.trCtl = TrainListCtrl(self, self.dccSnifferEnabled)
+		self.trCtl.SetToolTipString("Click/D-Click  to Edit,\nR-Click  to Route,\nShift-R-Click  to Locate")
+		tip = self.trCtl.GetToolTip()
+		tip.SetAutoPop(10000)
 		hsz.Add(self.trCtl)
 		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.DoubleClickTrain, self.trCtl)
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ClickTrain, self.trCtl)
