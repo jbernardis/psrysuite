@@ -916,12 +916,12 @@
       "sbwest": null
     },
     "YOSWYE": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     },
     "YOSWYW": {
-      "east": 0,
+      "east": 1,
       "sbeast": null,
       "sbwest": null
     }
@@ -956,7 +956,7 @@
       "Y30"
     ],
     [
-      "YOSWYE",
+      "YOSWYW",
       "Y87"
     ]
   ],
@@ -7433,10 +7433,10 @@
     },
     "YRtY70Y81": {
       "ends": [
-        "Y70",
-        "Y81"
+        "Y81",
+        "Y70"
       ],
-      "os": "YOSWYW",
+      "os": "YOSWYE",
       "signals": [
         "Y40L",
         "Y40RA"
@@ -7454,10 +7454,10 @@
     },
     "YRtY70Y82": {
       "ends": [
-        "Y70",
-        "Y82"
+        "Y82",
+        "Y70"
       ],
-      "os": "YOSWYW",
+      "os": "YOSWYE",
       "signals": [
         "Y40L",
         "Y40RB"
@@ -7479,10 +7479,10 @@
     },
     "YRtY70Y83": {
       "ends": [
-        "Y70",
-        "Y83"
+        "Y83",
+        "Y70"
       ],
-      "os": "YOSWYW",
+      "os": "YOSWYE",
       "signals": [
         "Y40L",
         "Y40RC"
@@ -7504,10 +7504,10 @@
     },
     "YRtY70Y84": {
       "ends": [
-        "Y70",
-        "Y84"
+        "Y84",
+        "Y70"
       ],
-      "os": "YOSWYW",
+      "os": "YOSWYE",
       "signals": [
         "Y40L",
         "Y40RD"
@@ -7571,10 +7571,10 @@
     },
     "YRtY87Y81": {
       "ends": [
-        "Y81",
-        "Y87"
+        "Y87",
+        "Y81"
       ],
-      "os": "YOSWYE",
+      "os": "YOSWYW",
       "signals": [
         "Y42LA",
         "Y42R"
@@ -7592,10 +7592,10 @@
     },
     "YRtY87Y82": {
       "ends": [
-        "Y82",
-        "Y87"
+        "Y87",
+        "Y82"
       ],
-      "os": "YOSWYE",
+      "os": "YOSWYW",
       "signals": [
         "Y42LB",
         "Y42R"
@@ -7617,10 +7617,10 @@
     },
     "YRtY87Y83": {
       "ends": [
-        "Y83",
-        "Y87"
+        "Y87",
+        "Y83"
       ],
-      "os": "YOSWYE",
+      "os": "YOSWYW",
       "signals": [
         "Y42LC",
         "Y42R"
@@ -7642,10 +7642,10 @@
     },
     "YRtY87Y84": {
       "ends": [
-        "Y84",
-        "Y87"
+        "Y87",
+        "Y84"
       ],
-      "os": "YOSWYE",
+      "os": "YOSWYW",
       "signals": [
         "Y42LD",
         "Y42R"

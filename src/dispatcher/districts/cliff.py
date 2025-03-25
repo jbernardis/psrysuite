@@ -208,6 +208,7 @@ class Cliff (District):
 				(self.tiles["diagright"], self.screen, (124, 33), False),
 				(self.tiles["turnrightleft"], self.screen, (125, 34), False),
 			], True)
+		self.blocks["COSGMW"].AddTrainLoc(self.screen, (119, 37))
 
 		self.osBlocks["COSGMW"] = ["C11", "G21", "C10", "C30", "C31"]
 
@@ -278,6 +279,7 @@ class Cliff (District):
 				(self.tiles["turnleftright"],  self.screen, (147, 32), False),
 				(self.tiles["diagleft"],       self.screen, (148, 31), False),
 			], True)
+		self.blocks["COSGME"].AddTrainLoc(self.screen, (145, 37))
 
 		self.osBlocks["COSGME"] = ["C10", "C30", "G12", "G10", "C20"]
 
@@ -588,6 +590,7 @@ class Cliff (District):
 				(self.tiles["turnleftright"],  self.screen, (133, 23), False),
 				(self.tiles["diagleft"],       self.screen, (134, 22), False),
 			], False)
+		self.blocks["COSSHE"].AddTrainLoc(self.screen, (146, 15))
 
 		self.osBlocks["COSSHE"] = ["C44", "C43", "C42", "C41", "C40", "C21", "C50", "C51", "C52", "C53", "C54", "C20"]
 
@@ -659,6 +662,7 @@ class Cliff (District):
 				(self.tiles["diagright"],      self.screen, (122, 22), False),
 				(self.tiles["turnrightleft"],  self.screen, (123, 23), False),
 			], False)
+		self.blocks["COSSHW"].AddTrainLoc(self.screen, (107, 4))
 
 		self.osBlocks["COSSHW"] = ["C22", "C44", "C43", "C42", "C41", "C40", "C21", "C50", "C51", "C52", "C53", "C54"]
 

@@ -3025,15 +3025,16 @@ class MainFrame(wx.Frame):
 		rlist = [s["route"] for s in seq]
 		if rtnm not in rlist:
 			incorrectRoute = formatRouteDesignator(rtnm)
-			if not silent:
-				self.PopupEvent("Train %s: incorrect route beyond signal %s: %s" % (trid, signm, incorrectRoute))
 			correctRoute = None
 			for s in seq:
 				if signm == s["signal"]:
 					correctRoute = formatRouteDesignator(s["route"])
-					if not silent:
-						self.PopupEvent("The correct route is %s" % correctRoute)
 					break
+
+			# if there is no correct route, then most likely we are beyond the end of the train route - do nothing
+			if not silent and correctRoute is not None:
+				self.PopupEvent("Train %s: incorrect route beyond signal %s: %s" % (trid, signm, incorrectRoute))
+				self.PopupEvent("The correct route is %s" % correctRoute)
 
 			return incorrectRoute, correctRoute
 		return None, None

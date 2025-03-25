@@ -235,6 +235,7 @@ class Hyde (District):
 				(self.tiles["horiznc"], self.screen, (31, 13), False),
 			], 
 			False)
+		self.blocks["HOSWW"].AddTrainLoc(self.screen, (16, 6))
 
 		self.blocks["HOSWW2"] = OverSwitch(self, self.frame, "HOSWW2", 
 			[
@@ -243,6 +244,7 @@ class Hyde (District):
 				(self.tiles["horiznc"], self.screen, (29, 5), False),
 			], 
 			False)
+		self.blocks["HOSWW2"].AddTrainLoc(self.screen, (16, 4))
 
 		self.osBlocks["HOSWW"] = ["H11", "H12", "H31", "H32", "H33", "H34"]
 		self.osBlocks["HOSWW2"] = ["H30", "H31"]
@@ -397,6 +399,7 @@ class Hyde (District):
 				(self.tiles["horiz"],   self.screen, (31, 21), False),
 
 			], True)
+		self.blocks["HOSWE"].AddTrainLoc(self.screen, (16, 22))
 
 		self.osBlocks["HOSWE"] = ["H21", "H22", "H41", "H42", "H43"]
 
@@ -473,6 +476,7 @@ class Hyde (District):
 
 			], 
 			False)
+		self.blocks["HOSEW"].AddTrainLoc(self.screen, (51, 4))
 
 		self.osBlocks["HOSEW"] = ["H13"]
 
@@ -546,6 +550,7 @@ class Hyde (District):
 				(self.tiles["diagleft"], self.screen, (51, 17), False),
 				(self.tiles["diagleft"], self.screen, (52, 16), False),
 			], True)
+		self.blocks["HOSEE"].AddTrainLoc(self.screen, (51, 22))
 
 		self.osBlocks["HOSEE"] = ["H23"]
 
@@ -906,13 +911,13 @@ class Hyde (District):
 
 		self.osButtons["HOSEE"] = ["HEEB1", "HEEB2", "HEEB3", "HEEB4", "HEEB5"]
 
-		b = Button(self, self.screen, self.frame, "HydeEastPower", (11, 4), self.btntiles)
+		b = Button(self, self.screen, self.frame, "HydeEastPower", (9, 4), self.btntiles)
 		self.buttons["HydeEastPower"] = b
 
-		b = Button(self, self.screen, self.frame, "HydeWestPower", (11, 6), self.btntiles)
+		b = Button(self, self.screen, self.frame, "HydeWestPower", (9, 6), self.btntiles)
 		self.buttons["HydeWestPower"] = b
 
-		b = Button(self, self.screen, self.frame, "H30Power", (11, 8), self.btntiles)
+		b = Button(self, self.screen, self.frame, "H30Power", (9, 8), self.btntiles)
 		self.buttons["H30Power"] = b
 
 		return self.buttons

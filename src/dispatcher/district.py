@@ -13,7 +13,7 @@ EWCrossoverPoints = [
 	["SOSE",   "P32"],
 	["SOSW",   "P32"],
 	["YOSKL4", "Y30"],
-	["YOSWYE", "Y87"],
+	["YOSWYW", "Y87"],
 ]
 
 

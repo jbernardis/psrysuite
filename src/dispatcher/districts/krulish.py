@@ -205,6 +205,7 @@ class Krulish (District):
 				(self.tiles["eobright"],     self.screen, (149, 13), False),
 			], 
 			False)
+		self.blocks["KOSW"].AddTrainLoc(self.screen, (143, 18))
 
 		self.blocks["KOSM"] = OverSwitch(self, self.frame, "KOSM", 
 			[
@@ -223,6 +224,7 @@ class Krulish (District):
 				(self.tiles["eobright"],     self.screen, (149, 9), False),
 			], 
 			False)
+		self.blocks["KOSM"].AddTrainLoc(self.screen, (143, 20))
 
 		self.blocks["KOSE"] = OverSwitch(self, self.frame, "KOSE", 
 			[
@@ -235,6 +237,7 @@ class Krulish (District):
 				(self.tiles["eobright"],      self.screen, (149, 13), False),
 			],
 			True)
+		self.blocks["KOSE"].AddTrainLoc(self.screen, (143, 22))
 
 		self.blocks["KOSN10S11"] = OverSwitch(self, self.frame, "KOSN10S11", [], False)
 		self.blocks["KOSN20S21"] = OverSwitch(self, self.frame, "KOSN20S21", [], True)

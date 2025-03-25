@@ -174,12 +174,12 @@ class Yard(District):
 			self.rr.AddRouteIn("Y84E",  self, n, addr, [(4, 2)])
 			
 			self.rr.AddBlock("Y70",    self, n, addr, [(4, 3)], True)  # waterman detectiuon
-			self.rr.AddBlock("YOSWYW", self, n, addr, [(4, 4)], False) #  WOS1
+			self.rr.AddBlock("YOSWYE", self, n, addr, [(4, 4)], True) #  WOS1
 			# bit 5 is bad
 			self.rr.AddBlock("Y82",    self, n, addr, [(4, 6)], True)
 			self.rr.AddBlock("Y83",    self, n, addr, [(4, 7)], True)
 			self.rr.AddBlock("Y84",    self, n, addr, [(5, 0)], True)
-			self.rr.AddBlock("YOSWYE", self, n, addr, [(5, 1)], False) #  WOS2
+			self.rr.AddBlock("YOSWYW", self, n, addr, [(5, 1)], True) #  WOS2
 			self.rr.AddBlock("Y87",    self, n, addr, [(5, 2)], False)
 			self.rr.AddBlock("Y81",    self, n, addr, [(5, 3)], True)
 			

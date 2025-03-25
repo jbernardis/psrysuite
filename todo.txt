@@ -1,6 +1,9 @@
 immediate to do
 ***************
 
+finish OSS reporting - still need to do port and yard main
+remove cameras and their associated setting
+
 
 
 

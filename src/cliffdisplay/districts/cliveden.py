@@ -129,6 +129,7 @@ class Cliveden (District):
 				(self.tiles["turnrightleft"], self.screen, (42, 15), False),
 				(self.tiles["eobright"], self.screen,      (43, 15), False),
 			], False)
+		self.blocks["COSCLW"].AddTrainLoc(self.screen, (39, 19))
 
 		self.blocks["COSCLEW"] = OverSwitch(self, self.frame, "COSCLEW",
 			[
@@ -137,6 +138,7 @@ class Cliveden (District):
 				(self.tiles["horiz"],   self.screen,      (55, 13), False),
 				(self.tiles["eobright"], self.screen,      (56, 13), False),
 			], False)
+		self.blocks["COSCLEW"].AddTrainLoc(self.screen, (52, 19))
 
 		self.blocks["COSCLEE"] = OverSwitch(self, self.frame, "COSCLEE",
 			[
@@ -147,6 +149,7 @@ class Cliveden (District):
 				(self.tiles["eobleft"], self.screen,      (52, 13), False),
 				(self.tiles["diagright"], self.screen,     (54, 14), False),
 			], True)
+		self.blocks["COSCLEE"].AddTrainLoc(self.screen, (52, 21))
 
 		self.osBlocks["COSCLW"] = ["C13", "C23", "C12"]
 		self.osBlocks["COSCLEW"] = ["C23", "C22"]
