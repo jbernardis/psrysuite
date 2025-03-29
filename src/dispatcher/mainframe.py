@@ -2496,9 +2496,26 @@ class MainFrame(wx.Frame):
 				state = 0
 			state = True if state != 0 else False
 			if state:
+				sigmessage = ""
 				if rname.endswith(".srel"):
 					rname = rname[:-5]
-				self.PopupEvent("Stop Relay: %s %s by %s" % (rname, direction, train))
+
+				try:
+					blk = self.blocks[rname]
+				except KeyError:
+					blk = None
+
+				if blk is not None:
+					signm = blk.GetDirectionSignal()
+					try:
+						sig = self.signals[signm]
+					except KeyError:
+						sig = None
+					if sig is not None:
+						sigmessage = " Signal %s" % sig.GetName()
+					else:
+						sigmessage = ""
+				self.PopupEvent("Stop Relay: Block %s %s%s Train %s" % (rname, direction, sigmessage, train))
 
 	def DoCmdTurnoutLock(self, parms):
 		if self.CTCManager is not None:
@@ -2601,7 +2618,7 @@ class MainFrame(wx.Frame):
 				logging.error("Block command without block and/or state parameter")
 				return
 
-			if block is not None and block in self.osProxies:
+			if block in self.osProxies:
 				district = self.osProxies[block].GetDistrict()
 				block = district.CheckOSProxies(block, state)
 				if block is None:
@@ -2623,6 +2640,13 @@ class MainFrame(wx.Frame):
 			if blk is None:
 				logging.info("Ignoring block command for unknown block: %s" % block)
 				return
+
+			if blk.GetBlockType() == OVERSWITCH:
+				if blk.GetRoute() is None:
+					logging.info("Ignoring block command for OS that does not have a route set")
+					msg = "Occupancy for OS %s ignored - no route set" % block
+					self.PopupEvent(msg)
+					return
 
 			if self.settings.debug.blockoccupancy:
 				msg = "Block %s%s occupancy change: %s" % (block, "" if blockend is None else ".%s" % blockend, state)
@@ -3033,8 +3057,8 @@ class MainFrame(wx.Frame):
 
 			# if there is no correct route, then most likely we are beyond the end of the train route - do nothing
 			if not silent and correctRoute is not None:
-				self.PopupEvent("Train %s: incorrect route beyond signal %s: %s" % (trid, signm, incorrectRoute))
-				self.PopupEvent("The correct route is %s" % correctRoute)
+				self.PopupAdvice("Train %s: incorrect route beyond signal %s: %s" % (trid, signm, incorrectRoute))
+				self.PopupAdvice("The correct route is %s" % correctRoute)
 
 			return incorrectRoute, correctRoute
 		return None, None

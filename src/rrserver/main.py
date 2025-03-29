@@ -612,7 +612,7 @@ class ServerMain:
 			direction = "unknown"
 
 		try:
-			train = int(cmd["train"][0])
+			train = cmd["train"][0]
 		except KeyError:
 			train = "??"
 

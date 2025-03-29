@@ -1026,23 +1026,27 @@ class District:
 	def CheckOSProxies(self, block, state):
 		if block not in self.osProxies:
 			return block
-		
+
 		if state == self.osProxies[block].IsOccupied():
 			return None
 		
 		preCounts = self.GetOSProxyCounts()
-		
+		if self.dbg.blockoccupancy:
+			self.frame.DebugMessage("PreCounts for %s: %s" % (block, str(preCounts)))
+
 		self.osProxies[block].SetOccupied(state)
 		postCounts = self.GetOSProxyCounts()
+		if self.dbg.blockoccupancy:
+			self.frame.DebugMessage("PostCounts for %s: %s" % (block, str(postCounts)))
 
 		for rn in preCounts:
 			# there SHOULD only be a single route, MAX, that changes
-			if postCounts[rn] > preCounts[rn]  == 0:
+			if postCounts[rn] > preCounts[rn] == 0:
 				if self.dbg.blockoccupancy:
 					self.frame.DebugMessage("%s is the first OS section to be occupied for route %s-%s" %
 										(block, self.routes[rn].GetOSName(), rn))
 				return self.routes[rn].GetOSName()
-			
+
 			elif postCounts[rn] == 0 and preCounts[rn] > 0:
 				if self.dbg.blockoccupancy:
 					self.frame.DebugMessage("%s is the last OS section to be unoccupied for route %s-%s" %
@@ -1053,7 +1057,7 @@ class District:
 				if self.dbg.blockoccupancy:
 					self.frame.DebugMessage("%s: count changed from %d to %d for route %s-%s" %
 										(block, preCounts[rn], postCounts[rn], self.routes[rn].GetOSName(), rn))
-		
+
 		# no differences - just absorb the block command
 		return None
 
@@ -1065,7 +1069,7 @@ class District:
 				if rte is not None:
 					if prx.HasRoute(rte.GetName()):
 						counts[rte.GetName()] = counts.get(rte.GetName(), 0) + (1 if prx.IsOccupied() else 0)
-				
+
 		return counts
 
 

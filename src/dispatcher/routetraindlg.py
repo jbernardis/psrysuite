@@ -126,7 +126,7 @@ class RouteTrainDlg(wx.Dialog):
 		rc, alreadyset, msg = self.parent.SetRouteThruOS(self.sequence[sx]["os"], self.sequence[sx]["route"], self.sequence[sx]["block"], self.sequence[sx]["signal"])
 		
 		if not rc or (rc and msg is not None):
-			self.parent.PopupEvent(msg)
+			self.parent.PopupAdvice(msg)
 
 		if rc:
 			if alreadyset:

@@ -981,6 +981,9 @@ class OSProxy:
 		
 	def GetDistrict(self):
 		return self.district
+
+	def GetName(self):
+		return self.name
 		
 	def SetOccupied(self, flag=True):
 		self.occupied = flag

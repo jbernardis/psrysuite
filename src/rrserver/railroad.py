@@ -708,7 +708,7 @@ class Railroad:
 			logging.warning("Invalid turnout pair %s:%s - turnout %s does not exist" % (aname, bname, aname))
 			return
 
-		logging.debug("added turnout pain %s => %s" % (bname, aname))
+		logging.debug("added turnout pair %s:%s" % (bname, aname))
 		self.turnoutPairs[bname] = ta
 
 	def AddTurnoutPosition(self, name, district, node, address, bits):

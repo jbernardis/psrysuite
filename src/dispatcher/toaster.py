@@ -4,7 +4,8 @@ TB_DEFAULT_STYLE = 0x2008002
 TB_CAPTION = 0x22009806
 
 ht = 36
-SIZE = 800
+SIZE = 1000
+
 
 class Toaster(wx.Frame):
 	def __init__(self, title="", size=(SIZE, ht), pos=(100,100), style=TB_DEFAULT_STYLE):
