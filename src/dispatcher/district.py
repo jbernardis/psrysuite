@@ -1029,7 +1029,7 @@ class District:
 
 		if state == self.osProxies[block].IsOccupied():
 			return None
-		
+
 		preCounts = self.GetOSProxyCounts()
 		if self.dbg.blockoccupancy:
 			self.frame.DebugMessage("PreCounts for %s: %s" % (block, str(preCounts)))
@@ -1067,10 +1067,19 @@ class District:
 			for osb in prx.osList:
 				rte = osb.GetRoute()
 				if rte is not None:
-					if prx.HasRoute(rte.GetName()):
+					if prx.HasRoute(rte.GetName()) and self.IsAligned(rte):
 						counts[rte.GetName()] = counts.get(rte.GetName(), 0) + (1 if prx.IsOccupied() else 0)
 
 		return counts
+
+	def IsAligned(self, rte):
+		toList = rte.GetSetTurnouts()
+		for to, pos in toList:
+			tout = self.turnouts[to]
+			if pos == 'N' and not tout.IsNormal():
+				return False
+
+		return True
 
 
 class Districts:

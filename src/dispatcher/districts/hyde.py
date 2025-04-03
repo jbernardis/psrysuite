@@ -1,6 +1,6 @@
 from dispatcher.district import District
 
-from dispatcher.block import Block, OverSwitch, Route
+from dispatcher.block import Block, OverSwitch, Route, OSProxy
 from dispatcher.turnout import Turnout
 from dispatcher.signal import Signal
 from dispatcher.button import Button
@@ -741,6 +741,22 @@ class Hyde (District):
 		block = self.blocks["HOSWW2"]			
 		self.routes["HRtH30H31"] = Route(self.screen, block, "HRtH30H31", "H31", [(28, 5), (29, 5), (30, 5), (31, 5)], "H30", [RESTRICTING, MAIN], ["HSw7:N"], ["H8L", "H8R"])
 		self.buttonToRoute["HWWB1"] = "HRtH30H31"
+
+		# ===============================================================================
+		# OS Proxies are only needed here because of common track between HOSWW and HOSWW2
+		p = OSProxy(self, "HOSWW")
+		self.osProxies["HOSWW"] = p
+		p.AddRoute(self.routes["HRtH11H12"])
+		p.AddRoute(self.routes["HRtH11H31"])
+		p.AddRoute(self.routes["HRtH11H32"])
+		p.AddRoute(self.routes["HRtH11H33"])
+		p.AddRoute(self.routes["HRtH11H34"])
+
+		p = OSProxy(self, "HOSWW2")
+		self.osProxies["HOSWW2"] = p
+		p.AddRoute(self.routes["HRtH11H31"])
+		p.AddRoute(self.routes["HRtH30H31"])
+		# ===============================================================================
 
 		block = self.blocks["HOSWE"]
 		self.routes["HRtH21H22"] = Route(self.screen, block, "HRtH21H22", "H21", [(21, 15), (22, 15), (23, 15), (24, 15), (25, 15), (26, 15), (27, 15), (28, 15), (29, 15), (30, 15), (31, 15)], "H22", [MAIN, RESTRICTING], ["HSw9:N", "HSw11:N"], ["H4R", "H4LA"])

@@ -39,7 +39,6 @@ class TrainsDlg(wx.Dialog):
     def OnClose(self, _):
         self.dlgExit()
     
-        
 
 class TrainsListCtrl(wx.ListCtrl):
     def __init__(self, parent, rrServer):
