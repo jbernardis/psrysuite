@@ -475,8 +475,9 @@ class MainFrame(wx.Frame):
 		tr = self.trains[self.trainNames[tx]]
 		order = self.ExpandTrainBlockList(tr)
 		if order is None:
-			dlg = wx.MessageDialog(self, "Train occupies no blocks",
-				"Train %s does not occupy any blocks" % self.trainNames[tx], wx.OK | wx.ICON_INFORMATION)
+			dlg = wx.MessageDialog(self,
+					"Train %s does not occupy any blocks" % self.trainNames[tx],
+					"Train occupies no blocks", wx.OK | wx.ICON_INFORMATION)
 			dlg.ShowModal()
 			dlg.Destroy()
 			return
@@ -538,7 +539,7 @@ class MainFrame(wx.Frame):
 
 		availableBlocks = self.GetAvailableBlocks(startBlock, moveEast)
 		routes = self.rrServer.Get("getroutes", {})
-		if len(availableBlocks) == 0:
+		if len(availableBlocks) == 0:  # This is an OS we are looking at
 			try:
 				rt = routes[startBlock]
 			except KeyError:
@@ -550,11 +551,14 @@ class MainFrame(wx.Frame):
 					for b in blocks:
 						if end in b:
 							discarded.append(end)
-				ends = [e for e in ends if e not in discarded]
-				if len(ends) != 1:
-					return None, None
+				nends = [e for e in ends if e not in discarded]
+				if len(nends) == 0:
+					return None, None, "All possible endpoints eliminated for block %s: %s" % (startBlock, str(ends))
+				if len(nends) > 1:
+					return None, None, "Multiple endpoints remain for block %s: %s" % (startBlock, str(nends))
 
-				nb = ends[0]
+				nb = nends[0]
+
 				sbe, sbw = self.layout.GetStopBlocks(nb)
 				if moveEast and sbw:
 					nb = sbw
@@ -566,6 +570,17 @@ class MainFrame(wx.Frame):
 		for ab, sig, osb, rte in availableBlocks:
 			r = routes[osb][0]
 			if r == rte:
+				if osb == "KOSN10S11":
+					if moveEast:
+						osb = "N10.W"
+					else:
+						osb = "S11.E"
+				elif osb == "KOSN20S21":
+					if moveEast:
+						osb = "N20.W"
+					else:
+						osb = "S21.E"
+
 				bl.append(osb)
 
 		if len(bl) == 0:
