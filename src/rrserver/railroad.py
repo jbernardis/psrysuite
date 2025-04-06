@@ -504,6 +504,9 @@ class Railroad:
 
 	def SetOSRoute(self, blknm, rtname, ends, signals):
 		self.osRoutes[blknm] = [rtname, ends, signals]
+
+	def GetOSRoutes(self):
+		return self.osRoutes
 		
 	def SetControlOption(self, name, value):
 		self.controlOptions[name] = value
@@ -931,6 +934,9 @@ class Railroad:
 			return self.districtLock[name]
 
 		return None
+
+	def GetBlocks(self):
+		return {bn: self.blocks[bn].toJson() for bn in self.blocks}
 
 	def GetBlock(self, blknm):
 		try:

@@ -320,7 +320,7 @@ class HTTPServer:
 			except Exception as e:
 				logging.info("Unknown error: %s" % str(e))
 				return 400, str(e)
-				
+
 		elif verb == "activetrains":
 			tl = self.main.GetTrainList()
 			if tl is None:
@@ -328,6 +328,26 @@ class HTTPServer:
 				return 400, "Unable to retrieve train list"
 			else:
 				jstr = json.dumps(tl)
+				return 200, jstr
+
+		elif verb == "getroutes":
+			rt = self.rr.GetOSRoutes()
+			if rt is None:
+				logging.info("Unknown error")
+				return 400, "Unable to retrieve route list"
+			else:
+				jstr = json.dumps(rt)
+				return 200, jstr
+
+		elif verb == "getblocks":
+			logging.debug("getblocks command")
+			rt = self.rr.GetBlocks()
+			logging.debug("blocks returned: %s" % str(rt))
+			if rt is None:
+				logging.info("Unknown error")
+				return 400, "Unable to retrieve block list"
+			else:
+				jstr = json.dumps(rt)
 				return 200, jstr
 
 		elif verb == "signallevers":
@@ -356,7 +376,26 @@ class HTTPServer:
 			else:
 				jstr = json.dumps(tl)
 				return 200, jstr
-		
+
+		elif verb == "blockosmap":
+			fn = os.path.join(os.getcwd(), "data", "blockosmap.json")
+			logging.info("Retrieving block os map from file (%s)" % fn)
+			try:
+				with open(fn, "r") as jfp:
+					j = json.load(jfp)
+			except FileNotFoundError:
+				logging.info("File not found")
+				return 400, "File Not Found"
+
+			except Exception as e:
+				logging.info("Unknown error: %s" % str(e))
+				return 400, "Unknown error encountered"
+
+			jstr = json.dumps(j)
+			logging.info("Returning %d bytes" % len(jstr))
+			return 200, jstr
+
+
 		else:
 			self.cbCommand(cmd)
 		

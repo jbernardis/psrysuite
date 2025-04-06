@@ -478,7 +478,7 @@ class Hyde (District):
 			False)
 		self.blocks["HOSEW"].AddTrainLoc(self.screen, (51, 4))
 
-		self.osBlocks["HOSEW"] = ["H13"]
+		self.osBlocks["HOSEW"] = ["H13", "H12", "H31", "H32", "H33", "H34"]
 
 		self.blocks["H23"] = Block(self, self.frame, "H23",
 			[
@@ -552,7 +552,7 @@ class Hyde (District):
 			], True)
 		self.blocks["HOSEE"].AddTrainLoc(self.screen, (51, 22))
 
-		self.osBlocks["HOSEE"] = ["H23"]
+		self.osBlocks["HOSEE"] = ["H23", "H22", "H40", "H41", "H42", "H43"]
 
 		# Blocks H10 and H20 are managed by shore district
 		self.blocks["H10"] = Block(self, self.frame, "H10",

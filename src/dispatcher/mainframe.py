@@ -1087,12 +1087,19 @@ class MainFrame(wx.Frame):
 
 		# invert osBlocks so that we can easily map a block into the OS's it interconnects
 		self.blockOSMap = {}
+		nameMap = {}
 		for osblknm, blklist in self.osBlocks.items():
 			for blknm in blklist:
 				if blknm in self.blockOSMap:
 					self.blockOSMap[blknm].append(self.blocks[osblknm])
+					nameMap[blknm].append(osblknm)
 				else:
-					self.blockOSMap[blknm] = [ self.blocks[osblknm] ]
+					self.blockOSMap[blknm] = [self.blocks[osblknm]]
+					nameMap[blknm] = [osblknm]
+
+		# jfn = os.path.join(os.getcwd(), "data", "blockosmap.json")
+		# with open(jfn, "w") as jfp:
+		# 	json.dump(nameMap, jfp, indent=2)
 
 	def GetOSForBlock(self, blknm):
 		if blknm not in self.blockOSMap:

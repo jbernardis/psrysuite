@@ -21,6 +21,9 @@ class Block:
 		self.stoppingBlocks = []
 		self.stoppedBlock = None
 
+	def toJson(self):
+		return {"name": self.name, "east": 1 if self.east else 0, "cleared": 1 if self.cleared else 0, "occupied": 1 if self.occupied else 0}
+
 	def Name(self):
 		return self.name
 		
@@ -110,8 +113,6 @@ class Block:
 			self.occupied = occ
 			return rc
 		return False
-
-
 		
 	def IsOccupied(self, recurse=True):
 		if recurse and self.mainBlock is not None:

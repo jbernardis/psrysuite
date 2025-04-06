@@ -2,7 +2,8 @@ immediate to do
 ***************
 
 finish OSS reporting - still need to do port and yard main
-remove cameras and their associated setting
+
+modify dispatcher to generate blockOSMap.json file on every run
 
 
 
