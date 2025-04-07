@@ -89,6 +89,7 @@ class TrainList:
 			return
 
 		self.trains[train]["blockorder"] = [b for b in blocks]
+		logging.debug("updating train block order to %s" % str(blocks))
 
 	def FindTrainInBlock(self, block):
 		for tr, trinfo in self.trains.items():

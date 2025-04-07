@@ -501,16 +501,21 @@ class MainFrame(wx.Frame):
 
 	def IdentifyNextBlock(self, tr):
 		self.layout = LayoutData(self.rrServer)
+		print("identify next block for train %s east %s" % (str(tr), tr["east"]))
 		blocks = list(reversed(tr["blockorder"]))
+		print("initial list of blocks: %s" % str(blocks))
 		if len(blocks) == 0:
 			return None, None, "Train does not occupy any blocks"
 
 		east = tr["east"]
 		moveEast = east	if self.cbForward.IsChecked() else not east
+		print("moving east: %s" % str(moveEast))
 
 		order = self.ExpandTrainBlockList(tr)
 		if order is None:
 			return None, None, "Train does not occupy any blocks"
+
+		print("expanded list of blocks: %s" % str(order))
 
 		if moveEast:
 			startBlock = order[0 if east else -1]
@@ -518,6 +523,8 @@ class MainFrame(wx.Frame):
 		else:
 			startBlock = order[-1 if east else 0]
 			endBlock = order[0 if east else -1]
+
+		print("start block %s end block %s" % (startBlock, endBlock))
 
 		if startBlock.endswith(".W") and moveEast:
 			return startBlock[:-2], endBlock, ""
@@ -538,8 +545,11 @@ class MainFrame(wx.Frame):
 					return sbw, endBlock, ""
 
 		availableBlocks = self.GetAvailableBlocks(startBlock, moveEast)
+		print("available blocks returned: %s" % str(availableBlocks))
 		routes = self.rrServer.Get("getroutes", {})
+		print("routes: %s" % str(routes))
 		if len(availableBlocks) == 0:  # This is an OS we are looking at
+			print("we are inside an OS looking for the next block")
 			try:
 				rt = routes[startBlock]
 			except KeyError:
@@ -566,9 +576,11 @@ class MainFrame(wx.Frame):
 					nb = sbe
 				return nb, endBlock, ""
 
+		print("we are past all of the OS logic")
 		bl = []
 		for ab, sig, osb, rte in availableBlocks:
 			r = routes[osb][0]
+			print("looking for a match for os %s route %s <=> %s" % (osb, rte, r))
 			if r == rte:
 				if osb == "KOSN10S11":
 					if moveEast:
@@ -581,8 +593,10 @@ class MainFrame(wx.Frame):
 					else:
 						osb = "S21.E"
 
+				print("adding %s to prospects" % osb)
 				bl.append(osb)
 
+		print("final list of blocks: %s" % str(bl))
 		if len(bl) == 0:
 			return None, None, "Unable to identify next block"
 

@@ -584,7 +584,9 @@ class Block:
 							self.CheckEWCross(tr, blkWest)
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Returning train %s" % tr.GetName())
-							return tr, False
+							# so we found a train coming from the west - so it is moving east
+							# so if it is an eastbound train we are adding to the front - else to the rear
+							return tr, not tr.GetEast()
 						else:
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Block %s did not have a train to consider" % blkWest.GetName())
@@ -599,7 +601,9 @@ class Block:
 						self.CheckEWCross(tr, self.blkWest)
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Returning train %s" % tr.GetName())
-						return tr, False
+						# so we found a train coming from the west - so it is moving east
+						# so if it is an eastbound train we are adding to the front - else to the rear
+						return tr, not tr.GetEast()
 					else:
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkWest.GetName())
@@ -620,7 +624,9 @@ class Block:
 							self.CheckEWCross(tr, blkEast)
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Returning train %s rear" % tr.GetName())
-							return tr, True
+							# so we found a train coming from the east - so it is moving west
+							# so if it is a westbound train we are adding to the front - else to the rear
+							return tr, tr.GetEast()
 						else:
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Block %s did not have a train to consider" % blkEast.GetName())
@@ -636,7 +642,9 @@ class Block:
 						self.CheckEWCross(tr, self.blkEast)
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Returning train %s rear" % tr.GetName())
-						return tr, True
+						# so we found a train coming from the east - so it is moving west
+						# so if it is a westbound train we are adding to the front - else to the rear
+						return tr, tr.GetEast()
 					else:
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkEast.GetName())
@@ -661,7 +669,9 @@ class Block:
 							self.CheckEWCross(tr, blkEast)
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Returning train %s" % tr.GetName())
-							return tr, False
+							# so we found a train coming from the east - so it is moving west
+							# so if it is a westbound train we are adding to the front - else to the rear
+							return tr, tr.GetEast()
 						else:
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Block %s did not have a train to consider" % blkEast.GetName())
@@ -677,7 +687,9 @@ class Block:
 						self.CheckEWCross(tr, self.blkEast)
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Returning train %s" % tr.GetName())
-						return tr, False
+						# so we found a train coming from the east - so it is moving west
+						# so if it is a westbound train we are adding to the front - else to the rear
+						return tr, tr.GetEast()
 					else:
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkEast.GetName())
@@ -698,7 +710,9 @@ class Block:
 							self.CheckEWCross(tr, blkWest)
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Returning train %s rear" % tr.GetName())
-							return tr, True
+							# so we found a train coming from the west - so it is moving east
+							# so if it is an eastbound train we are adding to the front - else to the rear
+							return tr, not tr.GetEast()
 						else:
 							if self.dbg.identifytrain:
 								self.frame.DebugMessage("Block %s did not have a train to consider" % blkWest.GetName())
@@ -714,7 +728,9 @@ class Block:
 						self.CheckEWCross(tr, self.blkWest)
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Returning train %s rear" % tr.GetName())
-						return tr, True
+						# so we found a train coming from the west - so it is moving east
+						# so if it is an eastbound train we are adding to the front - else to the rear
+						return tr, not tr.GetEast()
 					else:
 						if self.dbg.identifytrain:
 							self.frame.DebugMessage("Block %s did not have a train to consider" % self.blkWest.GetName())
