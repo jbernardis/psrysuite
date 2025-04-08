@@ -393,12 +393,12 @@
     ["HOSEE"]
   ],
   "P31": [
-    ["POSCJ1"],
-    ["POSSJ1", "POSSJ2"]
+    ["POSSJ1", "POSSJ2"],
+    ["POSCJ1"]
   ],
   "P41": [
-    ["POSCJ2"],
-    ["POSSJ1", "POSSJ2"]
+    ["POSSJ1", "POSSJ2"],
+    ["POSCJ2"]
   ],
   "P30": [
     ["POSSJ1"],

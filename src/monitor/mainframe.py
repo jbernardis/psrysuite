@@ -14,7 +14,7 @@ from monitor.siglever import SigLever, SigLeverShowDlg
 from monitor.buttonchoicedlg import ButtonChoiceDlg
 from dispatcher.delayedrequest import DelayedRequests
 from traineditor.layoutdata import LayoutData
-from monitor.blockosmap import BlockOSMap
+from monitor.blockosmap import BlockOSMap, CrossingEastWestBoundary
 
 Nodes = [
 	["Yard", 0x11],
@@ -570,12 +570,16 @@ class MainFrame(wx.Frame):
 					return None, None, "Multiple endpoints remain for block %s: %s" % (startBlock, str(nends))
 
 				nb = nends[0]
+				if CrossingEastWestBoundary(startBlock, nb):
+					moveEast = not moveEast
+					tr["east"] = not tr["east"]
 
 				sbe, sbw = self.layout.GetStopBlocks(nb)
 				if moveEast and sbw:
 					nb = sbw
 				elif not moveEast and sbe:
 					nb = sbe
+				print("returning blocks start: %s   end: %s" % (nb, endBlock))
 				return nb, endBlock, ""
 
 		print("we are past all of the OS logic")
@@ -605,6 +609,7 @@ class MainFrame(wx.Frame):
 		if len(bl) > 1:
 			return None, None, "Multiple next blocks to choose from: %s" % ", ".join(bl)
 
+		print("returning blocks start: %s  end: %s" % (bl[0], endBlock))
 		return bl[0], endBlock, ""
 
 	def ExpandTrainBlockList(self, tr):
