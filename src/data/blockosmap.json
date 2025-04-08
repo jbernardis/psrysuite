@@ -289,12 +289,12 @@
     []
   ],
   "C10": [
-    ["COSGME"],
-    ["COSGMW"]
+    ["COSGMW"],
+    ["COSGME"]
   ],
   "C30": [
-    ["COSGME"],
-    ["COSGMW"]
+    ["COSGMW"],
+    ["COSGME"]
   ],
   "C31": [
     ["COSGMW"],
@@ -313,48 +313,48 @@
     ["COSSHE"]
   ],
   "C44": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "C43": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "C42": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "C41": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "C40": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "C21": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "C50": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "C51": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "C52": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "C53": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "C54": [
-    ["COSSHE"],
-    ["COSSHW"]
+    ["COSSHW"],
+    ["COSSHE"]
   ],
   "H12": [
     ["HOSWW"],

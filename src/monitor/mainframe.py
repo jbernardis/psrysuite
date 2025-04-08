@@ -131,13 +131,7 @@ class MainFrame(wx.Frame):
 		self.bConnect = wx.Button(self, wx.ID_ANY, "Connect", size=(100, 46))
 		self.Bind(wx.EVT_BUTTON, self.OnConnect, self.bConnect)
 		bsz.Add(self.bConnect)
-		
-		bsz.AddSpacer(20)
-		
-		self.bReopen = wx.Button(self, wx.ID_ANY, "Reopen port", size=(100, 46))
-		self.Bind(wx.EVT_BUTTON, self.OnReopen, self.bReopen)
-		bsz.Add(self.bReopen)
-		
+
 		bsz.AddSpacer(20)
 		
 		self.bQuit = wx.Button(self, wx.ID_ANY, "Shutdown\nServer", size=(100, 46))
@@ -436,6 +430,7 @@ class MainFrame(wx.Frame):
 		self.blockOccupied[bname] = state == 1
 
 	def OnMove(self, _):
+		print("===========================================Move========================")
 		tx = self.chTrain.GetSelection()
 		if tx == wx.NOT_FOUND:
 			dlg = wx.MessageDialog(self, "Choose a train",
@@ -554,13 +549,20 @@ class MainFrame(wx.Frame):
 				rt = routes[startBlock]
 			except KeyError:
 				rt = None
+
+			print("current route through OS = %s" % rt)
+
+			# this is the list of blocks in the direction we are headed
+			dirBlocks = self.blockOsMap.GetBlockList(startBlock, moveEast)
+			print("dirblocks from %s = %s" % (startBlock, str(dirBlocks)))
 			if rt:
 				discarded = []
 				ends = rt[1]
 				for end in ends:
-					for b in blocks:
-						if end in b:
-							discarded.append(end)
+					print("look to see if %s is in (%s)" % (end, str(dirBlocks)))
+					if end not in dirBlocks:
+						print("discarding %s" % end)
+						discarded.append(end)
 				nends = [e for e in ends if e not in discarded]
 				if len(nends) == 0:
 					return None, None, "All possible endpoints eliminated for block %s: %s" % (startBlock, str(ends))
@@ -854,8 +856,6 @@ class MainFrame(wx.Frame):
 						if bname is not None:
 							self.blockOccupied[bname] = bstate == 1
 
-
-
 	def OnSetInputBit(self, _):
 		dlg = SetInputBitsDlg(self, Nodes)
 		dlg.Show()
@@ -877,10 +877,7 @@ class MainFrame(wx.Frame):
 	def DlgSessionsExit(self):
 		self.dlgSessions.Destroy()
 		self.dlgSessions = None
-		
-	def OnReopen(self, _):
-		self.rrServer.SendRequest({"reopen": {}})
-		
+
 	def OnQuit(self, _):
 		self.rrServer.SendRequest({"quit": {}})
 		self.connected = False
