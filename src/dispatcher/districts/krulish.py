@@ -379,8 +379,8 @@ class Krulish (District):
 		
 		p = OSProxy(self, "KOSM")
 		self.osProxies["KOSM"] = p
-		p.AddRoute(self.routes["KRtN10K10"])
-		p.AddRoute(self.routes["KRtN10N11"])
+		#p.AddRoute(self.routes["KRtN10K10"])
+		#p.AddRoute(self.routes["KRtN10N11"])
 		p.AddRoute(self.routes["KRtN25K10"])
 		p.AddRoute(self.routes["KRtN25N21"])
 		p.AddRoute(self.routes["KRtN25N11"])

@@ -17,7 +17,6 @@ class BlockOSMap:
 				if o not in self.osblockmap:
 					self.osblockmap[o] = [[], []]
 				if CrossingEastWestBoundary(o, blk):
-					print("OS %s and block %s is an east/west boundary" % (o, blk))
 					self.osblockmap[o][0].append(blk)
 				else:
 					self.osblockmap[o][1].append(blk)
@@ -26,12 +25,9 @@ class BlockOSMap:
 					self.osblockmap[o] = [[], []]
 
 				if CrossingEastWestBoundary(o, blk):
-					print("OS %s and block %s is an east/west boundary" % (o, blk))
 					self.osblockmap[o][1].append(blk)
 				else:
 					self.osblockmap[o][0].append(blk)
-		print("MAP FOR YOSCJE: %s" % str(self.osblockmap["YOSCJE"]))
-		print("MAP FOR YOSCJW: %s" % str(self.osblockmap["YOSCJW"]))
 
 	def GetEastOSList(self, bname):
 		try:

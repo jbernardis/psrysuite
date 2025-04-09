@@ -410,7 +410,6 @@ class MainFrame(wx.Frame):
 			self.bBreaker.Enable(flag)
 			self.bClearAll.Enable(flag)
 			self.bQuit.Enable(flag)
-			self.bReopen.Enable(flag)
 			self.bTurnoutPos.Enable(flag)
 			self.bSetInputBit.Enable(flag)
 			self.bMatrix.Enable(flag)	
@@ -601,6 +600,8 @@ class MainFrame(wx.Frame):
 
 				print("adding %s to prospects" % osb)
 				bl.append(osb)
+			else:
+				print("skipping os %s because of route %s != %s" % (osb, r, rte))
 
 		print("final list of blocks: %s" % str(bl))
 		if len(bl) == 0:
