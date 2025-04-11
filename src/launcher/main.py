@@ -100,16 +100,23 @@ elif mode == "dispatcheronly":
     dispExec = os.path.join(os.getcwd(), "dispatcher", "main.py")
     dispProc = Popen([interpreter, dispExec, "--dispatch"], stdout=DEVNULL, stderr=DEVNULL, close_fds=True)
     print("dispatcher started as PID %d" % dispProc.pid)
-             
+
 elif mode == "serveronly":
     print("launch mode: server only")
-    
+
     svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
     svrProc = Popen([interpfg, svrExec, "--nosim"], startupinfo=infoMinimize)
     print("server started as PID %d" % svrProc.pid)
-            
+
+elif mode == "serveronlysim":
+    print("launch mode: server only - simulation mode")
+
+    svrExec = os.path.join(os.getcwd(), "rrserver", "main.py")
+    svrProc = Popen([interpfg, svrExec, "--sim"], startupinfo=infoMinimize)
+    print("server started as PID %d" % svrProc.pid)
+
 else:
-    print("Unknown mode.  Must specify either 'dispatcher', 'remote dispatch', 'simulation', 'display', 'dispatcheronly', 'serveronly")
+    print("Unknown mode.  Must specify either 'dispatcher', 'remote dispatch', 'simulation', 'display', 'dispatcheronly', 'serveronly', or 'serveronlysim'")
     
 print("launcher exiting")  
 

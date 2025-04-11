@@ -82,7 +82,11 @@ class GenerateDlg(wx.Dialog):
 		self.bGenServerOnly = wx.Button(genBox, wx.ID_ANY, "Server Only", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenServerOnly, self.bGenServerOnly)
 		vsz.Add(self.bGenServerOnly, 0, wx.ALL, 10)
-					
+
+		self.bGenServerOnlySim = wx.Button(genBox, wx.ID_ANY, "Server Only\n(simulated)", size=GENBTNSZ)
+		self.Bind(wx.EVT_BUTTON, self.OnBGenServerOnlySim, self.bGenServerOnlySim)
+		vsz.Add(self.bGenServerOnlySim, 0, wx.ALL, 10)
+
 		self.bGenDispatcherOnly = wx.Button(genBox, wx.ID_ANY, "Dispatcher Only", size=GENBTNSZ)
 		self.Bind(wx.EVT_BUTTON, self.OnBGenDispatcherOnly, self.bGenDispatcherOnly)
 		vsz.Add(self.bGenDispatcherOnly, 0, wx.ALL, 10)
@@ -216,7 +220,18 @@ class GenerateDlg(wx.Dialog):
 			"parameter": "serveronly"
 		}	
 		self.generator(module, self.cbStartMenu.IsChecked())
-		
+
+	def OnBGenServerOnlySim(self, _):
+		module = {
+			"name": "PSRY Server Only (simulated)",
+			"dir":  "launcher",
+			"main": "main.py",
+			"desc": "Railroad Server",
+			"icon": "launcher.ico",
+			"parameter": "serveronlysim"
+		}
+		self.generator(module, self.cbStartMenu.IsChecked())
+
 	def OnBGenDispatcherOnly(self, _):
 		module = {
 			"name": "PSRY Dispatcher Only",

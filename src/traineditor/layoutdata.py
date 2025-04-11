@@ -3,6 +3,11 @@ import json
 class LayoutData:
 	def __init__(self, rrserver):
 		self.layout = rrserver.Get("getlayout", {})
+		if self.layout is None:
+			self.RRConnected = False
+			return
+
+		self.RRConnected = True
 
 		self.routes = self.layout["routes"]
 		self.subblocks = self.layout["subblocks"]
@@ -32,6 +37,9 @@ class LayoutData:
 
 		self.osblocks = sorted(self.osblocks)
 		self.blocks = sorted([x for x in self.blocks if x not in self.osblocks])
+
+	def IsConnected(self):
+		return self.RRConnected
 		
 	def IsCrossoverPt(self, osBlk, blk):
 		return [osBlk, blk] in self.crossovers

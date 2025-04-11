@@ -313,8 +313,9 @@ class Shore (District):
 				(self.tiles["eobright"],  self.screen, (109, 19), False),
 			],
 			False)
-		self.blocks["SOSW"].AddTrainLoc(self.screen, (94, 11), ["SRtS10S11", "SRtS10H30", "SRtS10H10"])
-		self.blocks["SOSW"].AddTrainLoc(self.screen, (94, 13), ["SRtS10H20", "SRtS10S21", "SRtS10P32"])
+		# self.blocks["SOSW"].AddTrainLoc(self.screen, (94, 11), ["SRtS10S11", "SRtS10H30", "SRtS10H10"])
+		# self.blocks["SOSW"].AddTrainLoc(self.screen, (94, 13), ["SRtS10H20", "SRtS10S21", "SRtS10P32"])
+		self.blocks["SOSW"].AddTrainLoc(self.screen, (84, 18))
 
 		self.blocks["SOSE"] = OverSwitch(self, self.frame, "SOSE", 
 			[
@@ -383,8 +384,9 @@ class Shore (District):
 				(self.tiles["eobright"],  self.screen, (109, 19), False),
 			],
 			True)
-		self.blocks["SOSE"].AddTrainLoc(self.screen, (94, 11), ["SRtS20S11", "SRtS20H30", "SRtS20H10"])
-		self.blocks["SOSE"].AddTrainLoc(self.screen, (94, 13), ["SRtS20H20", "SRtS20S21", "SRtS20P32"])
+		# self.blocks["SOSE"].AddTrainLoc(self.screen, (94, 11), ["SRtS20S11", "SRtS20H30", "SRtS20H10"])
+		# self.blocks["SOSE"].AddTrainLoc(self.screen, (94, 13), ["SRtS20H20", "SRtS20S21", "SRtS20P32"])
+		self.blocks["SOSE"].AddTrainLoc(self.screen, (84, 20))
 
 		self.blocks["F10"] = Block(self, self.frame, "F10",
 			[

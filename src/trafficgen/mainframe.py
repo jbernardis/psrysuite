@@ -4,6 +4,7 @@ import wx.lib.newevent
 import os
 import json
 import logging
+import time
 
 from dispatcher.settings import Settings
 
@@ -132,9 +133,21 @@ class MainFrame(wx.Frame):
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
 		self.layout = LayoutData(self.rrServer)
 
+		retries = 0
+		while not self.layout.IsConnected() and retries < 5:
+			retries += 1
+			logging.debug("Failed connection with server - retrying after %d second delay" % retries)
+			print("Failed connection with server - retrying after %d second delay" % retries)
+			time.sleep(retries)
+			self.layout = LayoutData(self.rrServer)
+
+		if not self.layout.IsConnected():
+			logging.error("Unable to connect with railroad server")
+		elif retries > 0:
+			logging.debug("Successfully connected with railroad server after %d retries" % retries)
+
 		self.ClearDataStructures()
 
-			
 		self.trains = Trains(self.rrServer)
 			
 		for tr in self.trains:
