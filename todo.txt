@@ -3,7 +3,7 @@ immediate to do
 
 finish OSS reporting - still need to do port and yard main
 
-modify dispatcher to generate blockOSMap.json file on every run
+script editing
 
 
 

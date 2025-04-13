@@ -917,7 +917,6 @@ class Railroad:
 		if blk.SetOccupied(True):
 			self.RailroadEvent(blk.GetEventMessage())
 
-
 	def RemoveTrain(self, blknm):
 		try:
 			blk = self.blocks[blknm]
@@ -948,6 +947,19 @@ class Railroad:
 			return self.stopRelays[blknm]
 		except KeyError:
 			return None
+
+	def GetSignals(self):
+		result = {}
+		for sn, s in self.signals.items():
+			result[s.Name()] = {"aspect": s.Aspect(), "aspecttype": s.AspectType()}
+		return result
+
+	def GetTurnoutPositions(self):
+		result = []
+		for trnm, trn in self.turnouts.items():
+			result.append({trnm: {"state": ("1" if trn.normal else "0"), "position": ("1" if trn.Position() is not None else "0")}})
+
+		return result
 
 	def GetTurnout(self, tonm):
 		try:
@@ -998,9 +1010,8 @@ class Railroad:
 		return 0, [], []
 
 	def SetInputBitByAddr(self, addr, vbytes, vbits, vals):
-		'''
-		this routine handles the setinbit command from HTTP server
-		'''
+		# this routine handles the setinbit command from HTTP server
+		logging.debug("setinputbit addr %s bytes %s  bits %s vals %s" % (addr, str(vbytes), str(vbits), str(vals)))
 		for dnodes in self.nodes.values():
 			if addr in dnodes:
 				for i in range(len(vbytes)):

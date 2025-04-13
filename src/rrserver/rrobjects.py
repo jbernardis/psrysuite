@@ -414,6 +414,9 @@ class Signal:
 		
 	def GetAspectType(self):
 		return self.aspectType
+
+	def AspectType(self):
+		return self.GetAspectType()
 		
 	def Aspect(self):
 		return self.aspect

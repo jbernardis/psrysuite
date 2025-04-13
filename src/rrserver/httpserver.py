@@ -330,6 +330,15 @@ class HTTPServer:
 				jstr = json.dumps(tl)
 				return 200, jstr
 
+		elif verb == "getsignals":
+			rt = self.rr.GetSignals()
+			if rt is None:
+				logging.info("Unknown error")
+				return 400, "Unable to retrieve signal list"
+			else:
+				jstr = json.dumps(rt)
+				return 200, jstr
+
 		elif verb == "getroutes":
 			rt = self.rr.GetOSRoutes()
 			if rt is None:
@@ -337,6 +346,15 @@ class HTTPServer:
 				return 400, "Unable to retrieve route list"
 			else:
 				jstr = json.dumps(rt)
+				return 200, jstr
+
+		elif verb == "getturnouts":
+			trn = self.rr.GetTurnoutPositions()
+			if trn is None:
+				logging.info("Unknown error")
+				return 400, "Unable to retrieve turnout positionlist"
+			else:
+				jstr = json.dumps(trn)
 				return 200, jstr
 
 		elif verb == "getblocks":

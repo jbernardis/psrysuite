@@ -2,7 +2,7 @@ import os
 import wx
 import requests
 import json
-import time
+
 import re
 
 from monitor.getbitsdlg import GetBitsDlg
@@ -110,6 +110,22 @@ class MainFrame(wx.Frame):
 		self.trains = {}
 		self.trainNames = []
 		self.blockOsMap = None
+		self.matrixMap = {}
+		self.gmMap = {}
+		self.hydeMap = {}
+
+		self.rrServer = None
+		self.delayedRequests = None
+		self.ticker = None
+		self.tickerCounter = 0
+
+		self.script = []
+		self.scriptLines = 0
+		self.scriptLine = -1
+		self.scriptPause = -1
+
+		self.recording = False
+		self.recordedCommands = []
 
 		self.settings = Settings()
 		if self.settings.rrserver.simulation:		
@@ -197,6 +213,12 @@ class MainFrame(wx.Frame):
 			self.cbOccupy = wx.CheckBox(self, wx.ID_ANY, "Occupy")
 			self.cbOccupy.SetValue(True)
 			hsz.Add(self.cbOccupy, 0, wx.TOP, 15)
+
+			hsz.AddSpacer(20)
+
+			self.bOccupyNone = wx.Button(self, wx.ID_ANY, "Clear All", size=(100, 46))
+			self.Bind(wx.EVT_BUTTON, self.OnOccupyNone, self.bOccupyNone)
+			hsz.Add(self.bOccupyNone)
 
 			hsz.AddSpacer(20)
 			vsz.Add(hsz)
@@ -367,6 +389,23 @@ class MainFrame(wx.Frame):
 			self.bScript = wx.Button(self, wx.ID_ANY, "Script", size=(100, 46))
 			self.Bind(wx.EVT_BUTTON, self.OnScript, self.bScript)
 			hsz.Add(self.bScript)
+			hsz.AddSpacer(20)
+
+			self.bSnapshot = wx.Button(self, wx.ID_ANY, "Snapshot", size=(100, 46))
+			self.Bind(wx.EVT_BUTTON, self.OnSnapshot, self.bSnapshot)
+			hsz.Add(self.bSnapshot)
+
+			hsz.AddSpacer(20)
+
+			self.bRecord = wx.Button(self, wx.ID_ANY, "Record", size=(100, 46))
+			self.Bind(wx.EVT_BUTTON, self.OnRecord, self.bRecord)
+			hsz.Add(self.bRecord)
+
+			hsz.AddSpacer(20)
+
+			self.lStatus = wx.StaticText(self, wx.ID_ANY, "", size=(200, -1))
+			self.lStatus.SetFont(wx.Font(16, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+			hsz.Add(self.lStatus, 0, wx.TOP, 15)
 
 			vsz.Add(hsz)
 			
@@ -395,7 +434,82 @@ class MainFrame(wx.Frame):
 				"buttons": ["C21E", "C40E", "C41E", "C42E", "C43E", "C44E", "C21W", "C40W", "C41W", "C42W", "C43W", "C44W"],
 				"bits"   : [[0, 0], [0, 1], [0, 5], [0, 4], [0, 3], [0, 2], [1, 0], [1, 1], [0, 6], [0, 7], [1, 3], [1, 2]]
 			}
-		}		
+		}
+
+		self.sheffieldRoutesMap = {
+			"CRtC20C44": ["C44E", "Cliff"],
+			"CRtC20C43": ["C43E", "Cliff"],
+			"CRtC20C42": ["C42E", "Cliff"],
+			"CRtC20C41": ["C41E", "Cliff"],
+			"CRtC20C40": ["C40E", "Cliff"],
+			"CRtC20C21": ["C21E", "Cliff"],
+
+			"CRtC44C22": ["C44W", "Cliff"],
+			"CRtC43C22": ["C43W", "Cliff"],
+			"CRtC42C22": ["C42W", "Cliff"],
+			"CRtC41C22": ["C41W", "Cliff"],
+			"CRtC40C22": ["C40W", "Cliff"],
+			"CRtC21C22": ["C21W", "Cliff"],
+
+			"CRtC50C22": ["C50W", "Sheffield"],
+			"CRtC51C22": ["C51W", "Sheffield"],
+			"CRtC52C22": ["C52W", "Sheffield"],
+			"CRtC53C22": ["C53W", "Sheffield"],
+			"CRtC54C22": ["C54W", "Sheffield"],
+
+			"CRtC20C50": ["C50E", "Sheffield"],
+			"CRtC20C51": ["C51E", "Sheffield"],
+			"CRtC20C52": ["C52E", "Sheffield"],
+			"CRtC20C53": ["C53E", "Sheffield"],
+			"CRtC20C54": ["C54E", "Sheffield"],
+		}
+
+		self.gmMap = {
+			"CRtC11G21": [0, 7],
+			"CRtC11C10": [0, 6],
+			"CRtC11C30": [0, 5],
+			"CRtC11C31": [0, 4],
+
+			"CRtG12C20": [0, 3],
+			"CRtG10C20": [0, 2],
+			"CRtC10C20": [0, 1],
+			"CRtC30C20": [0, 0]
+		}
+
+		self.hydeMap = {
+			"HRtH11H12": [0, 0],
+			"HRtH11H31": [0, 4],
+			"HRtH11H32": [0, 5],
+			"HRtH11H33": [0, 2],
+			"HRtH11H34": [0, 1],
+
+			"HRtH30H31": [0, 3],
+
+			"HRtH21H22": [0, 6],
+			"HRtH21H41": [1, 1],
+			"HRtH21H42": [1, 0],
+			"HRtH21H43": [0, 7],
+
+			"HRtH13H31": [2, 3],
+			"HRtH13H32": [2, 2],
+			"HRtH13H33": [2, 1],
+			"HRtH13H34": [2, 0],
+			"HRtH12H13": [1, 7],
+
+			"HRtH22H23": [1, 5],
+			"HRtH23H40": [1, 6],
+			"HRtH23H43": [1, 4],
+			"HRtH23H42": [1, 3],
+			"HRtH23H41": [1, 2]
+		}
+
+		self.hydeGroups = {
+			"HOSWW":  ["HRtH22H12", "HRtH11H31", "HRtH11H32", "HRtH11H33", "HRtH11H34"],
+			"HOSWW2": ["HRtH30H31"],
+			"HOSWE":  ["HRtH21H22", "HRtH21H41", "HRtH21H42", "HRtH21H43"],
+			"HOSEW":  ["HRtH13H31", "HRtH13H32", "HRtH13H33", "HRtH13H34", "HRtH12H13"],
+			"HOSEE":  ["HRtH22H23", "HRtH23H40", "HRtH23H43", "HRtH23H42", "HRtH23H41"]
+		}
 
 	def EnableButtons(self, flag=True):
 		self.bSessions.Enable(flag)
@@ -404,6 +518,7 @@ class MainFrame(wx.Frame):
 		self.bSigLvrShow.Enable(flag)	
 		if self.settings.rrserver.simulation:
 			self.bOccupy.Enable(flag)
+			self.bOccupyNone.Enable(flag)
 			self.bMove.Enable(flag)
 			self.bRear.Enable(flag)
 			self.bRefreshTrains.Enable(flag)
@@ -415,7 +530,9 @@ class MainFrame(wx.Frame):
 			self.bMatrix.Enable(flag)	
 			self.bSigLvr.Enable(flag)
 			self.bScript.Enable(flag)
-			
+			self.bSnapshot.Enable(flag)
+			self.bRecord.Enable(flag)
+
 	def OnConnect(self, _):
 		self.ConnectToServer()
 			
@@ -428,8 +545,12 @@ class MainFrame(wx.Frame):
 		self.Request({"simulate": {"action": "occupy", "block": bname, "state": state}})
 		self.blockOccupied[bname] = state == 1
 
+	def OnOccupyNone(self, _):
+		for bname in self.blockList:
+			self.Request({"simulate": {"action": "occupy", "block": bname, "state": 0}})
+			self.blockOccupied[bname] = False
+
 	def OnMove(self, _):
-		print("===========================================Move========================")
 		tx = self.chTrain.GetSelection()
 		if tx == wx.NOT_FOUND:
 			dlg = wx.MessageDialog(self, "Choose a train",
@@ -702,15 +823,11 @@ class MainFrame(wx.Frame):
 		
 		try:
 			blist1 = self.matrixMap[area]["entry"]
-			bits1  = self.matrixMap[area]["entrybits"]
 			blist2 = self.matrixMap[area]["exit"]
-			bits2  = self.matrixMap[area]["exitbits"]
 		except KeyError:
 			try:
 				blist1 = self.matrixMap[area]["buttons"]
-				bits1  = self.matrixMap[area]["bits"]
 				blist2 = None
-				bits2  = None
 			except KeyError:
 				# error
 				return
@@ -722,8 +839,24 @@ class MainFrame(wx.Frame):
 			
 		dlg.Destroy()
 		if rc != wx.ID_OK:
-			return 
-		
+			return
+
+		reqList = self.SendButtons(area, buttons)
+		for req in reqList:
+			self.Request(req)
+
+	def SendButtons(self, area, buttons):
+		try:
+			bits1  = self.matrixMap[area]["entrybits"]
+			bits2  = self.matrixMap[area]["exitbits"]
+		except KeyError:
+			try:
+				bits1  = self.matrixMap[area]["bits"]
+				bits2  = None
+			except KeyError:
+				# error
+				return []
+
 		vbytes = []
 		vbits = []
 		vals1 = []
@@ -740,11 +873,12 @@ class MainFrame(wx.Frame):
 			vals0.append(0)
 
 		addr = getNodeAddress(self.matrixMap[area]["node"])
+		reqlist = []
 		if addr is not None:		
-			req = {"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals1}}
-			self.Request(req)
-			req = {"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals0, "delay": 10}}
-			self.Request(req)
+			reqlist.append({"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals1}})
+			reqlist.append({"delay": {"ms": 500}}) # we must pause here to let button press register before release
+			reqlist.append({"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals0}})
+		return reqlist
 		
 	def OnSigLvr(self, _):
 		chx = self.chSigLvr.GetSelection()
@@ -775,7 +909,7 @@ class MainFrame(wx.Frame):
 		addr = getNodeAddress(info["node"])
 		if addr is not None:		
 			req = {"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals}}
-			self.rrServer.SendRequest(req)
+			self.Request(req)
 		
 	def OnSigLvrShow(self, _):	
 		if self.dlgSigLvrs is None:
@@ -809,58 +943,338 @@ class MainFrame(wx.Frame):
 		
 		with open(path, "r") as jfp:
 			try:
-				script = json.load(jfp)
+				self.script = json.load(jfp)
 			except json.JSONDecodeError as e:
 				dlg = wx.MessageDialog(self, str(e), 'JSON Decode Error', wx.OK | wx.ICON_ERROR)
 				dlg.ShowModal()
 				dlg.Destroy()
-				script = []
+				self.script = []
+
+		self.scriptLines = len(self.script)
+		if self.scriptLines == 0:
+			return
+
+		self.scriptLine = 0
+		self.EnableScriptingButtons(False)
+
+	def EnableScriptingButtons(self, flag=True):
+		self.bScript.Enable(flag)
+		self.bSnapshot.Enable(flag)
+		self.bRecord.Enable(flag or self.recording)
+		if self.recording:
+			self.bRecord.SetLabel("Stop")
+		else:
+			self.bRecord.SetLabel("Record")
+
+	def ExecuteScriptLine(self):
+		self.lStatus.SetLabel("%d/%d" % (self.scriptLine+1, self.scriptLines))
+		c = self.script[self.scriptLine]
+		self.scriptLine += 1
+		if self.scriptLine >= self.scriptLines:
+			self.scriptLine = -1
+			self.EnableScriptingButtons(True)
 			
-		for c in script:
-			cmd = list(c.keys())[0]
-			parms = c[cmd]
-			if cmd == "delay":
+		cmd = list(c.keys())[0]
+		if self.scriptLine == -1:
+			self.lStatus.SetLabel("")
+
+		parms = c[cmd]
+		if cmd == "delay":
+			try:
+				secs = parms["sec"]
+			except KeyError:
+				secs = None
+			try:
+				msecs = parms["ms"]
+			except KeyError:
+				msecs = None
+
+			if secs is None:
+				if msecs is None:
+					secs = 1
+				else:
+					secs = msecs / 1000.0
+
+			# pause the ticker from starting the next line until the timer has expired
+			# time.sleep(secs)
+			print("delay for %f seconds" % secs)
+			self.scriptPause = int(secs * 10.0)
+			print("setting scriptPause to %d" % self.scriptPause)
+		else:
+			self.Request(c)
+			if cmd == "movetrain":
 				try:
-					secs = parms["sec"]
+					bname = parms["block"][0]
+					self.blockOccupied[bname] = True
 				except KeyError:
-					secs = None
+					pass
+			elif cmd == "simulate":
 				try:
-					msecs = parms["ms"]
+					action = parms["action"][0]
 				except KeyError:
-					msecs = None
-					
-				if secs is None:
-					if msecs is None:
-						secs = 1
-					else:
-						secs = msecs / 1000.0
-				
-				time.sleep(secs)
-			else:
-				self.rrServer.SendRequest(c)
-				if cmd == "movetrain":
+					action = None
+
+				if action in ["occupy"]:
 					try:
 						bname = parms["block"][0]
-						self.blockOccupied[bname] = True
 					except KeyError:
-						pass
-				elif cmd == "simulate":
+						bname = None
 					try:
-						action = parms["action"][0]
+						bstate = parms["state"][0]
 					except KeyError:
-						action = None
+						bstate = 1
+					if bname is not None:
+						self.blockOccupied[bname] = bstate == 1
 
-					if action is not None:
-						try:
-							bname = parms["block"][0]
-						except KeyError:
-							bname = None
-						try:
-							bstate = parms["state"][0]
-						except KeyError:
-							bstate = 1
-						if bname is not None:
-							self.blockOccupied[bname] = bstate == 1
+	def OnRecord(self, _):
+		if self.recording:
+			self.recording = False
+			self.EnableScriptingButtons(True)
+			self.SaveScript(self.recordedCommands)
+		else:
+			self.recording = True
+			self.recordedCommands = []
+			self.EnableScriptingButtons(False)
+
+	def OnSnapshot(self, _):
+		self.layout = LayoutData(self.rrServer)
+
+		script = self.SnapshotSignals(clearall=True)
+
+		script.append({"delay": {"ms": 500}})
+
+		script.extend(self.SnapshotTurnouts())
+
+		script.extend(self.SnapshotSignals(skipred=True))
+
+		script.extend(self.SnapshotTrains())
+
+		self.SaveScript(script)
+
+	def SaveScript(self, script):
+		fdir = os.path.join(os.getcwd(), "monitor", "scripts")
+		wildcard = "script files (*.scr)|*.scr"
+		jfn = None
+		dlg = wx.FileDialog(
+			self, message="Save snapshor script as ...", defaultDir=fdir,
+			defaultFile="", wildcard=wildcard, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
+		)
+		rc = dlg.ShowModal()
+		if rc == wx.ID_OK:
+			jfn = dlg.GetPath().lower()
+			if not jfn.endswith(".scr"):
+				jfn += ".scr"
+
+		dlg.Destroy()
+		if rc != wx.ID_OK:
+			return
+
+		first = True
+		with open(jfn, "w") as jfp:
+			jfp.write("[\n")
+			for s in script:
+				if first:
+					first = False
+				else:
+					jfp.write(",\n")
+				jfp.write("  %s" % json.dumps(s))
+			jfp.write("\n]\n")
+
+	def SnapshotTrains(self):
+		result = []
+		trainlist = self.rrServer.Get("activetrains", {})
+
+		for tname, trn in trainlist.items():
+			fullorder = self.ExpandTrainBlockList(trn)
+
+			print("%s: %s" % (tname, str(trn)))
+
+			first = not tname.startswith("??")
+			for bname in reversed(fullorder):
+				result.append({"simulate": {"action": "occupy", "block": bname, "state": 1}})
+
+				if first:
+					first = False
+					east = 1 if trn["east"] else 0
+					result.append({"delay": {"ms": 1000}})
+					result.append({"settrain": {"blocks": [bname], "name": tname, "loco": trn["loco"], "east": east}})
+				else:
+					result.append({"delay": {"ms": 400}})
+
+		return result
+
+	def SnapshotSignals(self, clearall=False, skipred=False):
+		# {"signal": {"name": ["PB2L"], "aspect": ["1"], "aspecttype": ["50"], "callon": ["0"]}}
+		sigs = self.rrServer.Get("getsignals", {})
+
+		result = []
+		for s, sv in sigs.items():
+			if clearall:
+				result.append({"signal": {"name": [s], "aspect": ["0"], "aspecttype": ["%d" % sv["aspecttype"]], "callon": ["0"]}})
+			else:
+				aspect = "%d" % sv["aspect"]
+				if aspect != "0" or not skipred:
+					result.append({"signal": {"name": [s], "aspect": [aspect], "aspecttype": ["%d" % sv["aspecttype"]], "callon": ["0"]}})
+
+		return result
+
+
+	def SnapshotTurnouts(self):
+		r = self.rrServer.Get("getturnouts", {})
+		tnMap = {}
+		for t in r:
+			tnMap.update(t)
+
+		tnlist = [tn for tn in tnMap.keys() if tnMap[tn]["position"] == "1"]
+
+		script = []
+		for tn in tnlist:
+			script.append({"simulate": {"action": "turnoutpos", "turnout": tn, "normal": tnMap[tn]["state"]}})
+
+		routes = self.rrServer.Get("getroutes", {})
+
+		# Handle Waterman Yard
+		rtw = routes["YOSWYW"][0]
+		rte = routes["YOSWYE"][0]
+		script.extend(self.sendRteButton(rte, "Waterman Yard", 0))
+		script.extend(self.sendRteButton(rtw, "Waterman Yard", 4))
+
+		# Hyde
+		sbits = [[bt, 0] for bt in self.hydeMap.values()]
+		for osn in self.hydeGroups.keys():
+			try:
+				rn = routes[osn][0]
+			except (KeyError, IndexError):
+				rn = None
+
+			if rn is not None:
+				sbits.append([self.hydeMap[rn], 1])
+
+		addr = getNodeAddress("Hyde")
+		vbytes = []
+		vbits = []
+		vals = []
+		for bb, v in sbits:
+			vbytes.append(bb[0])
+			vbits.append(bb[1])
+			vals.append(v)
+
+		if addr is not None:
+			script.append({"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals}})
+
+		# Green Mountain
+		sbits = [[bt, 0] for bt in self.gmMap.values()]
+		try:
+			rte = routes["COSGME"][0]
+		except (KeyError, IndexError):
+			rte = None
+		if rte is not None:
+			sbits.append([self.gmMap[rte], 1])
+		try:
+			rtw = routes["COSGMW"][0]
+		except (KeyError, IndexError):
+			rtw = None
+		if rtw is not None:
+			sbits.append([self.gmMap[rtw], 1])
+
+		addr = getNodeAddress("Green Mtn")
+		vbytes = []
+		vbits = []
+		vals = []
+		for bb, v in sbits:
+			vbytes.append(bb[0])
+			vbits.append(bb[1])
+			vals.append(v)
+
+		if addr is not None:
+			script.append({"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals}})
+
+		# Sheffield
+		sbits = [[bt, 0] for bt in self.matrixMap["Cliff A"]["bits"]]
+		try:
+			rte = routes["COSSHE"][0]
+		except (KeyError, IndexError):
+			rte = None
+		try:
+			rtw = routes["COSSHW"][0]
+		except (KeyError, IndexError):
+			rtw = None
+
+		for rt in [rte, rtw]:
+			if rt is not None:
+				try:
+					btn, node = self.sheffieldRoutesMap[rt]
+				except KeyError:
+					btn = None
+				if btn is not None:
+					try:
+						bx = self.matrixMap["Cliff A"]["buttons"].index(btn)
+					except ValueError:
+						bx = None
+					if bx is not None:
+						sbits.append([self.matrixMap["Cliff A"]["bits"][bx], 1])
+
+		addr = getNodeAddress("Sheffield")
+		vbytes = []
+		vbits = []
+		vals = []
+		for bb, v in sbits:
+			vbytes.append(bb[0])
+			vbits.append(bb[1])
+			vals.append(v)
+
+		if addr is not None:
+			script.append({"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals}})
+
+		# Cliff
+		sbits = [[bt, 0] for bt in self.matrixMap["Cliff B"]["bits"]]
+		try:
+			rte = routes["COSSHE"][0]
+		except (KeyError, IndexError):
+			rte = None
+		try:
+			rtw = routes["COSSHW"][0]
+		except (KeyError, IndexError):
+			rtw = None
+
+		for rt in [rte, rtw]:
+			if rt is not None:
+				try:
+					btn, node = self.sheffieldRoutesMap[rt]
+				except KeyError:
+					btn = None
+				if btn is not None:
+					try:
+						bx = self.matrixMap["Cliff B"]["buttons"].index(btn)
+					except ValueError:
+						bx = None
+					if bx is not None:
+						sbits.append([self.matrixMap["Cliff B"]["bits"][bx], 1])
+
+		addr = getNodeAddress("Cliff")
+		vbytes = []
+		vbits = []
+		vals = []
+		for bb, v in sbits:
+			vbytes.append(bb[0])
+			vbits.append(bb[1])
+			vals.append(v)
+
+		if addr is not None:
+			script.append({"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals}})
+
+		return script
+
+	def sendRteButton(self, route, area, offset):
+		bx = 0
+		if "Y84" in route:
+			bx = 3
+		elif "Y83" in route:
+			bx = 2
+		elif "Y82" in route:
+			bx = 1
+
+		return self.SendButtons(area, [bx+offset])
 
 	def OnSetInputBit(self, _):
 		dlg = SetInputBitsDlg(self, Nodes)
@@ -897,10 +1311,19 @@ class MainFrame(wx.Frame):
 		self.delayedRequests = DelayedRequests()				
 		self.Bind(wx.EVT_TIMER, self.OnTicker)
 		self.ticker = wx.Timer(self)
-		self.ticker.Start(400)
+		self.tickerCounter = 0
+		self.ticker.Start(100)
 		
 	def OnTicker(self, _):
-		self.delayedRequests.CheckForExpiry(self.Request)
+		self.tickerCounter = (self.tickerCounter + 1) % 4
+		if self.tickerCounter == 0:
+			self.delayedRequests.CheckForExpiry(self.Request)
+
+		if self.scriptLine >= 0:
+			if self.scriptPause > 0:
+				self.scriptPause -= 1
+			else:
+				self.ExecuteScriptLine()
 
 	def ConnectToServer(self):
 		layout = self.rrServer.Get("getlayout", {})
@@ -1002,13 +1425,34 @@ class MainFrame(wx.Frame):
 			if "delay" in req[command] and req[command]["delay"] > 0:
 				self.delayedRequests.Append(req)
 			else:
+				if self.recording:
+					self.recordedCommands.append(req)
+					d = self.GetNeededDelay(req)
+					if d > 0:
+						self.recordedCommands.append({"delay": {"ms": d}})
 				self.rrServer.SendRequest(req)
 		else:
 			dlg = wx.MessageDialog(self, "No connection with server",
 					"Not Connected", wx.OK | wx.ICON_WARNING)
 			dlg.ShowModal()
 			dlg.Destroy()
-			
+
+	def GetNeededDelay(self, req):
+		try:
+			action = req["simulate"]["action"]
+		except KeyError:
+			action = None
+		if action is not None:
+			return 400
+
+		try:
+			s = req["setinbit"]
+		except KeyError:
+			s = None
+		if s is not None:
+			return 500
+
+		return 0
 
 	def OnClose(self, evt):
 		try:
@@ -1028,9 +1472,10 @@ class RRServer(object):
 
 	def SendRequest(self, req):
 		for cmd, parms in req.items():
+			#print("send Request: %s: %s" % (cmd, str(parms)))
 			try:
 				requests.get(self.ipAddr + "/" + cmd, params=parms, timeout=0.5)
-			except requests.exceptions.ConnectionError:
+			except requests.exceptions.ConnectionError as e:
 				return None
 			
 		return True

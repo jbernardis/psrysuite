@@ -1,10 +1,16 @@
 [
-	{"settrain": {"blocks": ["D11"], "name": "11", "loco": "64", "east": 0}},
-
-	{"movetrain": {"block": ["D11.E"]}},
-
-	{"settrain": {"blocks": ["S10"], "name": "17", "loco": "64", "east": 0}},
-
-	{"movetrain": {"block": ["S10.W"]}},
-	{"movetrain": {"block": ["DOSFOW"]}}
+  {"simulate": {"action": "occupy", "block": "D21", "state": 1}},
+  {"delay": {"ms": 400}},
+  {"simulate": {"action": "occupy", "block": "D21.E", "state": 1}},
+  {"delay": {"ms": 400}},
+  {"simulate": {"action": "occupy", "block": "D21", "state": 0}},
+  {"delay": {"ms": 400}},
+  {"simulate": {"action": "occupy", "block": "DOSFOE", "state": 1}},
+  {"delay": {"ms": 400}},
+  {"simulate": {"action": "occupy", "block": "D21.E", "state": 0}},
+  {"delay": {"ms": 400}},
+  {"simulate": {"action": "occupy", "block": "S20.W", "state": 1}},
+  {"delay": {"ms": 400}},
+  {"simulate": {"action": "occupy", "block": "DOSFOE", "state": 0}},
+  {"delay": {"ms": 400}}
 ]
