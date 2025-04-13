@@ -5,6 +5,10 @@ finish OSS reporting - still need to do port and yard main
 
 script editing
 
+when generating snapshot script, ask for signals/turnouts/trains and if clear is needed or only sets - need to resurrect re code for signal groups
+
+add clear all signals to monitor/sim
+
 
 
 

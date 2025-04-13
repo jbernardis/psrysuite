@@ -359,13 +359,19 @@ class MainFrame(wx.Frame):
 			hsz.Add(self.cbRight, 0, wx.TOP, 15)
 			
 			hsz.AddSpacer(20)
-			
+
 			self.bSigLvrShow = wx.Button(self, wx.ID_ANY, "Show", size=(100, 46))
 			self.Bind(wx.EVT_BUTTON, self.OnSigLvrShow, self.bSigLvrShow)
 			hsz.Add(self.bSigLvrShow)
-			
+
 			hsz.AddSpacer(20)
-			
+
+			self.bSigNeutral = wx.Button(self, wx.ID_ANY, "Neutralize\nAll Signals", size=(100, 46))
+			self.Bind(wx.EVT_BUTTON, self.OnSigNeutral, self.bSigNeutral)
+			hsz.Add(self.bSigNeutral)
+
+			hsz.AddSpacer(20)
+
 			vsz.Add(hsz)
 			
 			vsz.AddSpacer(20)
@@ -529,6 +535,7 @@ class MainFrame(wx.Frame):
 			self.bSetInputBit.Enable(flag)
 			self.bMatrix.Enable(flag)	
 			self.bSigLvr.Enable(flag)
+			self.bSigNeutral.Enable(flag)
 			self.bScript.Enable(flag)
 			self.bSnapshot.Enable(flag)
 			self.bRecord.Enable(flag)
@@ -546,9 +553,10 @@ class MainFrame(wx.Frame):
 		self.blockOccupied[bname] = state == 1
 
 	def OnOccupyNone(self, _):
+		script = []
 		for bname in self.blockList:
-			self.Request({"simulate": {"action": "occupy", "block": bname, "state": 0}})
-			self.blockOccupied[bname] = False
+			script.append({"simulate": {"action": "occupy", "block": bname, "state": 0}})
+		self.ExecuteScript(script)
 
 	def OnMove(self, _):
 		tx = self.chTrain.GetSelection()
@@ -842,8 +850,7 @@ class MainFrame(wx.Frame):
 			return
 
 		reqList = self.SendButtons(area, buttons)
-		for req in reqList:
-			self.Request(req)
+		self.ExecuteScript(reqList)
 
 	def SendButtons(self, area, buttons):
 		try:
@@ -943,19 +950,24 @@ class MainFrame(wx.Frame):
 		
 		with open(path, "r") as jfp:
 			try:
-				self.script = json.load(jfp)
+				script = json.load(jfp)
 			except json.JSONDecodeError as e:
 				dlg = wx.MessageDialog(self, str(e), 'JSON Decode Error', wx.OK | wx.ICON_ERROR)
 				dlg.ShowModal()
 				dlg.Destroy()
-				self.script = []
+				script = []
 
+		self.ExecuteScript(script)
+
+	def ExecuteScript(self, script):
+		self.script = [c for c in script]
 		self.scriptLines = len(self.script)
 		if self.scriptLines == 0:
 			return
 
 		self.scriptLine = 0
 		self.EnableScriptingButtons(False)
+		self.EnableButtons(False)
 
 	def EnableScriptingButtons(self, flag=True):
 		self.bScript.Enable(flag)
@@ -973,7 +985,8 @@ class MainFrame(wx.Frame):
 		if self.scriptLine >= self.scriptLines:
 			self.scriptLine = -1
 			self.EnableScriptingButtons(True)
-			
+			self.EnableButtons(True)
+
 		cmd = list(c.keys())[0]
 		if self.scriptLine == -1:
 			self.lStatus.SetLabel("")
@@ -1039,9 +1052,11 @@ class MainFrame(wx.Frame):
 	def OnSnapshot(self, _):
 		self.layout = LayoutData(self.rrServer)
 
-		script = self.SnapshotSignals(clearall=True)
+		script = []
 
-		script.append({"delay": {"ms": 500}})
+		#script.extend(self.SnapshotSignals(clearall=True))
+
+		#script.append({"delay": {"ms": 500}})
 
 		script.extend(self.SnapshotTurnouts())
 
@@ -1103,6 +1118,35 @@ class MainFrame(wx.Frame):
 
 		return result
 
+	def OnSigNeutral(self, _):
+		script = self.SnapshotSignals(clearall=True)
+
+		for lvr in self.sigLevers:
+			info = self.sigLevers[lvr].GetData()
+			if info is None:
+				return
+
+			if info["left"] is None:
+				vbytes = [info["right"][0]]
+				vbits = [info["right"][1]]
+				vals = [0]
+			elif info["right"] is None:
+				vbytes = [info["left"][0]]
+				vbits = [info["left"][1]]
+				vals = [0]
+			else:
+				vbytes = [info["left"][0], info["right"][0]]
+				vbits = [info["left"][1], info["right"][1]]
+				vals = [0, 0]
+
+			addr = getNodeAddress(info["node"])
+			if addr is not None:
+				req = {"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals}}
+				print("Lever: %s: %s" % (lvr, str(req)))
+				script.append(req)
+
+		self.ExecuteScript(script)
+
 	def SnapshotSignals(self, clearall=False, skipred=False):
 		# {"signal": {"name": ["PB2L"], "aspect": ["1"], "aspecttype": ["50"], "callon": ["0"]}}
 		sigs = self.rrServer.Get("getsignals", {})
@@ -1117,7 +1161,6 @@ class MainFrame(wx.Frame):
 					result.append({"signal": {"name": [s], "aspect": [aspect], "aspecttype": ["%d" % sv["aspecttype"]], "callon": ["0"]}})
 
 		return result
-
 
 	def SnapshotTurnouts(self):
 		r = self.rrServer.Get("getturnouts", {})

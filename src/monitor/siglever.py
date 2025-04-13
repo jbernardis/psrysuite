@@ -85,7 +85,7 @@ class SigLeverShowDlg(wx.Dialog):
 		
 		vsz.AddSpacer(20)
 		
-		self.Refresh()
+		self.RefreshLvrs()
 	
 		self.SetSizer(vsz)
 		self.Layout()
@@ -115,8 +115,7 @@ class SigLeverShowDlg(wx.Dialog):
 		nm, nbr = z.groups()
 		return "%s%03d" % (nm, int(nbr))
 
-		
-	def Refresh(self):
+	def RefreshLvrs(self):
 		sl = self.parent.rrServer.Get("signallevers", {})
 		
 		slnms = sorted(list(sl.keys()), key=self.BuildLeverKey)
