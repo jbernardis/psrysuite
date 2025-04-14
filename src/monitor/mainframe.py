@@ -933,9 +933,13 @@ class MainFrame(wx.Frame):
 		self.dlgSigLvrs = None
 		
 	def OnScript(self, _):
+		fdir = os.path.join(os.getcwd(), "data", "scripts")
+		if not os.path.exists(fdir):
+			os.makedirs(fdir)
+
 		dlg = wx.FileDialog(
-			self, message="Select script file file",
-			defaultDir=os.path.join(os.getcwd(), "monitor", "scripts"),
+			self, message="Select script file",
+			defaultDir=fdir,
 			defaultFile="",
 			wildcard="Monitor Script File (*.scr)|*.scr",
 			style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_PREVIEW)
@@ -1067,11 +1071,15 @@ class MainFrame(wx.Frame):
 		self.SaveScript(script)
 
 	def SaveScript(self, script):
-		fdir = os.path.join(os.getcwd(), "monitor", "scripts")
+		fdir = os.path.join(os.getcwd(), "data", "scripts")
+		if not os.path.exists(fdir):
+			os.makedirs(fdir)
+
 		wildcard = "script files (*.scr)|*.scr"
+
 		jfn = None
 		dlg = wx.FileDialog(
-			self, message="Save snapshor script as ...", defaultDir=fdir,
+			self, message="Save snapshot script as ...", defaultDir=fdir,
 			defaultFile="", wildcard=wildcard, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
 		)
 		rc = dlg.ShowModal()
