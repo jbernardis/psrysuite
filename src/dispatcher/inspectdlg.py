@@ -36,6 +36,12 @@ class InspectDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnBProxies, bProxies)
         btnszr1.Add(bProxies)
 
+        btnszr1.AddSpacer(10)
+
+        bNodes = wx.Button(self, wx.ID_ANY, "Node Status", size=BSIZE)
+        self.Bind(wx.EVT_BUTTON, self.OnBNodes, bNodes)
+        btnszr1.Add(bNodes)
+
         btnszr1.AddSpacer(20)
 
         btnszr2 = wx.BoxSizer(wx.VERTICAL)
@@ -378,6 +384,15 @@ class InspectDlg(wx.Dialog):
             return []
         hsList = ["%-9.9s   %s" % (hs, str(hsinfo[hs])) for hs in sorted(hsinfo.keys())]
         return hsList
+
+    def OnBNodes(self, _):
+        nodeList = self.parent.GetNodes()
+        dlg = NodeStatusDlg(self, nodeList, self.parent.GetNodes)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def ReEnableNodes(self, dislist):
+        self.parent.ReEnableNodes(dislist)
 
     def OnBResetBlks(self, _):
         resetList = []
@@ -752,6 +767,116 @@ class OSProxyListCtrl(wx.ListCtrl):
 
         elif col == 3:
             return ", ".join(self.osp[rte]["segments"])
+
+    def OnGetItemAttr(self, item):
+        if item % 2 == 1:
+            return self.normalB
+        else:
+            return self.normalA
+
+
+class NodeStatusDlg(wx.Dialog):
+    def __init__(self, parent, data, cbRefresh=None):
+        wx.Dialog.__init__(self, parent, wx.ID_ANY, "Node Status")
+        self.Bind(wx.EVT_CLOSE, self.OnCancel)
+        self.parent = parent
+        self.cbRefresh = cbRefresh
+
+        vszr = wx.BoxSizer(wx.VERTICAL)
+
+        lb = NodeStatusListCtrl(self, data)
+        vszr.Add(lb, 1, wx.ALL, 20)
+        self.lb = lb
+
+        hszr = wx.BoxSizer(wx.HORIZONTAL)
+
+        if callable(self.cbRefresh):
+            hszr.AddSpacer(20)
+            b = wx.Button(self, wx.ID_ANY, "Refresh")
+            self.Bind(wx.EVT_BUTTON, self.onBRefresh, b)
+            hszr.Add(b)
+
+        hszr.AddSpacer(20)
+        b = wx.Button(self, wx.ID_ANY, "Re-Enable")
+        self.Bind(wx.EVT_BUTTON, self.onBReEnable, b)
+        hszr.Add(b)
+        self.bReEnable = b
+        hszr.AddSpacer(20)
+
+        vszr.AddSpacer(20)
+        vszr.Add(hszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        vszr.AddSpacer(20)
+
+        self.SetSizer(vszr)
+        self.Layout()
+        self.Fit();
+        self.CenterOnScreen()
+
+        dislist = self.lb.GetDisabled()
+        self.bReEnable.Enable(len(dislist) > 0)
+
+    def onBReEnable(self, _):
+        disList = self.lb.GetDisabled()
+        self.parent.ReEnableNodes(disList)
+
+    def onBRefresh(self, _):
+        nlist = self.cbRefresh()
+        self.lb.SetData(nlist)
+        dislist = self.lb.GetDisabled()
+        self.bReEnable.Enable(len(dislist) > 0)
+
+    def OnCancel(self, _):
+        self.EndModal(wx.ID_CANCEL)
+
+
+class NodeStatusListCtrl(wx.ListCtrl):
+    def __init__(self, parent, nlist, cbRefresh=None):
+        wx.ListCtrl.__init__(self, parent, wx.ID_ANY, size=(420, 680), style=wx.LC_REPORT + wx.LC_VIRTUAL)
+        self.parent = parent
+        self.cbRefresh=cbRefresh
+        self.nodeinfo = sorted(nlist, key=lambda x: x[1])
+
+        font = wx.Font(wx.Font(14, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
+        self.SetFont(font)
+
+        self.normalA = wx.ItemAttr()
+        self.normalB = wx.ItemAttr()
+        self.normalA.SetBackgroundColour(wx.Colour(225, 255, 240))
+        self.normalB.SetBackgroundColour(wx.Colour(138, 255, 197))
+
+        self.InsertColumn(0, "Name")
+        self.SetColumnWidth(0, 160)
+        self.InsertColumn(1, "Address")
+        self.SetColumnWidth(1, 160)
+        self.InsertColumn(2, "Enabled")
+        self.SetColumnWidth(2, 100)
+
+        self.SetItemCount(len(self.nodeinfo))
+
+    def SetData(self, nlist):
+        self.nodeinfo = sorted(nlist, key=lambda x: x[1])
+        self.SetItemCount(0)
+        self.SetItemCount(len(self.nodeinfo))
+
+    def GetDisabled(self):
+        rv = []
+        for ni in self.nodeinfo:
+            if not ni[2]:
+                rv.append([ni[0], ni[1]])
+
+        return rv
+
+    def OnGetItemText(self, item, col):
+        ni = self.nodeinfo[item]
+
+        if col == 0:
+            return ni[0]
+
+        elif col == 1:
+            return "0x%02x" % ni[1]
+
+        elif col == 2:
+            return "%s" % ni[2]
 
     def OnGetItemAttr(self, item):
         if item % 2 == 1:

@@ -29,6 +29,7 @@ from dispatcher.delayedrequest import DelayedRequests
 from dispatcher.delayedsignal import DelayedSignals
 from dispatcher.trainqueue import TrainQueue
 from dispatcher.block import formatRouteDesignator
+from dispatcher.node import Node
 
 from dispatcher.constants import HyYdPt, LaKr, NaCl, EMPTY, OCCUPIED, NORMAL, REVERSE, \
 		OVERSWITCH, SLIPSWITCH, turnoutstate, REPLACE
@@ -60,7 +61,7 @@ wildcardLoco = "locomotive files (*.loco)|*.loco|"	 \
 SidingSwitches = [ "LSw11", "LSw13", "DSw9", "SSw1", "CSw3", "CSw11", "CSw15", "CSw19", "Csw21a", "CSw21b" ]
 
 
-class Node:
+class ScreenDiagram:
 	def __init__(self, screen, bitmapName, offset):
 		self.screen = screen
 		self.bitmap = bitmapName
@@ -165,6 +166,8 @@ class MainFrame(wx.Frame):
 		self.lostTrains = LostTrains()
 		self.trainHistory = TrainHistory(self, self.settings)
 		self.preloadedTrains = None
+
+		self.nodes = {}
 
 		logging.info("%s process starting" % "dispatcher" if self.IsDispatcher() else "satellite" if self.IsSatellite() else "display")
 
@@ -2031,6 +2034,10 @@ class MainFrame(wx.Frame):
 		hsinfo = {hsname.split(".")[0]: self.handswitches[hsname].GetValue() for hsname in self.handswitches}
 		return hsinfo
 
+	def GetNodes(self):
+		nv = [[n.Name(), n.Address(), n.IsEnabled()] for n in self.nodes.values()]
+		return nv
+
 	def GetBlockStatus(self, blknm):
 		try:
 			blk = self.blocks[blknm]
@@ -2432,6 +2439,7 @@ class MainFrame(wx.Frame):
 			"traintimesrequest":	self.DoCmdTrainTimesRequest,
 			"traintimesreport":		self.DoCmdTrainTimesReport,
 			"trainblockorder":	self.DoCmdTrainBlockOrder,
+			"nodestatus":		self.DoCmdNodeStatus,
 			"ignore":			self.DoCmdIgnore,
 		}
 		
@@ -3585,7 +3593,41 @@ class MainFrame(wx.Frame):
 		if "msg" in parms:
 			if self.IsDispatcherOrSatellite() or self.settings.display.showadvice:
 				self.PopupAdvice(parms["msg"][0])
-					
+
+	def DoCmdNodeStatus(self, parms):
+		logging.debug("nodestatus %s" % str(parms))
+		try:
+			status = parms["enabled"]
+		except KeyError:
+			status = 1
+		try:
+			name = parms["name"]
+		except KeyError:
+			name = None
+		try:
+			addr = parms["address"]
+		except KeyError:
+			addr = None
+
+		if addr is None or name is None:
+			return
+
+		if addr in self.nodes:
+			self.nodes[addr].SetStatus(status)
+		else:
+			self.nodes[addr] = Node(name, addr, status)
+
+		if status == 0:
+			msg = "Node %s(0x%x) disabled" % (name, addr)
+			self.PopupEvent(msg)
+
+	def EnableNode(self, name, addr, flag):
+		self.Request({"enablenode": { "name": name, "address": addr, "enable": "1" if flag else "0"}})
+
+	def ReEnableNodes(self, disList):
+		for n in disList:
+			self.Request({"enablenode": {"name": n[0], "address": n[1], "enable": "1"}})
+
 	def DoCmdAlert(self, parms):
 		if "msg" in parms:
 			if self.IsDispatcherOrSatellite() or self.settings.display.showevents:

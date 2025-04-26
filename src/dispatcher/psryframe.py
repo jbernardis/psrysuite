@@ -3,7 +3,7 @@ import wx.lib.newevent
 from wx.lib.gizmos.ledctrl import LEDNumberCtrl
 
 import os
-from dispatcher.mainframe import MainFrame, Node, BTNDIM
+from dispatcher.mainframe import MainFrame, ScreenDiagram, BTNDIM
 from dispatcher.bitmaps import BitMaps
 from dispatcher.trackdiagram import TrackDiagram
 
@@ -57,9 +57,9 @@ class PSRYFrame(MainFrame):
 		singlePage = self.settings.display.pages == 1
 		self.bmpw, self.bmph = self.bitmaps.diagrams.HydeYardPort.GetSize()
 		self.diagrams = {
-			HyYdPt: Node(HyYdPt, self.bitmaps.diagrams.HydeYardPort, 0),
-			LaKr: Node(LaKr, self.bitmaps.diagrams.LathamKrulish, self.bmpw if singlePage else 0),
-			NaCl: Node(NaCl, self.bitmaps.diagrams.NassauCliff, self.bmpw * 2 if singlePage else 0)
+			HyYdPt: ScreenDiagram(HyYdPt, self.bitmaps.diagrams.HydeYardPort, 0),
+			LaKr: ScreenDiagram(LaKr, self.bitmaps.diagrams.LathamKrulish, self.bmpw if singlePage else 0),
+			NaCl: ScreenDiagram(NaCl, self.bitmaps.diagrams.NassauCliff, self.bmpw * 2 if singlePage else 0)
 		}
 		topSpace = 120
 

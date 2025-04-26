@@ -77,7 +77,7 @@ class Node:
 		
 	def setBus(self, bus):
 		self.rrBus = bus
-		
+
 	def GetAddress(self):
 		return self.address
 		
@@ -107,15 +107,27 @@ class Node:
 				
 			if self.errorCount >= MAX_ERRORCOUNT:
 				self.disabled = True
-				self.rr.RailroadEvent({"alert": { "msg": ["Node %s(0x%2x) disabled" % (nodeNames[self.address], self.address)] } })
-				
+				self.rr.RailroadEvent({"nodestatus": {"name":  nodeNames[self.address], "address": self.address, "enabled": 0 } })
+
 	def ReEnable(self):
 		msg = "Re-Enabling node %s(0x%2x)" % (nodeNames[self.address], self.address)
 		logging.info(msg)
 		self.goodCount = 0
 		self.errorCount = 0
 		self.disabled = False
-					
+
+	def IsEnabled(self):
+		return not self.disabled
+
+	def Enable(self, flag=True):
+		msg = "Node %s(0x%2x) set enable to %s" % (nodeNames[self.address], self.address, flag)
+		logging.debug(msg)
+		if self.disabled != flag:
+			return
+
+		self.disabled = not flag
+		self.rr.RailroadEvent({"nodestatus": {"name": nodeNames[self.address], "address": self.address, "enabled": 1 if flag else 0}})
+
 	def GetChangedInputs(self):
 		results = []
 		for b in range(self.incount):
@@ -125,7 +137,6 @@ class Node:
 				mask = 0b11111111
 			else:
 				mask = new ^ old
-  
 			if mask != 0:
 				for i in range(8):
 					if mask & (1 << (7-i)) != 0:

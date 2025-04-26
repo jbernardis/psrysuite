@@ -15,6 +15,7 @@ from monitor.buttonchoicedlg import ButtonChoiceDlg
 from dispatcher.delayedrequest import DelayedRequests
 from traineditor.layoutdata import LayoutData
 from monitor.blockosmap import BlockOSMap, CrossingEastWestBoundary
+from monitor.snapshotdlg import SnapshotDlg
 
 Nodes = [
 	["Yard", 0x11],
@@ -555,8 +556,15 @@ class MainFrame(wx.Frame):
 	def OnOccupyNone(self, _):
 		script = []
 		for bname in self.blockList:
-			script.append({"simulate": {"action": "occupy", "block": bname, "state": 0}})
-		self.ExecuteScript(script)
+			if bname in self.blockOccupied and self.blockOccupied[bname]:
+				script.append({"simulate": {"action": "occupy", "block": bname, "state": 0}})
+
+		if len(script) > 0:
+			self.ExecuteScript(script)
+		else:
+			dlg = wx.MessageDialog(self, "No blocks are currently occupied", "No blocks occupied", wx.OK | wx.ICON_INFORMATION)
+			dlg.ShowModal()
+			dlg.Destroy()
 
 	def OnMove(self, _):
 		tx = self.chTrain.GetSelection()
@@ -951,16 +959,10 @@ class MainFrame(wx.Frame):
 		dlg.Destroy()
 		if rc != wx.ID_OK:
 			return
-		
-		with open(path, "r") as jfp:
-			try:
-				script = json.load(jfp)
-			except json.JSONDecodeError as e:
-				dlg = wx.MessageDialog(self, str(e), 'JSON Decode Error', wx.OK | wx.ICON_ERROR)
-				dlg.ShowModal()
-				dlg.Destroy()
-				script = []
 
+		with open(path, "r") as jfp:
+			sl = jfp.readlines()
+		script = [json.loads(s) for s in sl]
 		self.ExecuteScript(script)
 
 	def ExecuteScript(self, script):
@@ -990,6 +992,11 @@ class MainFrame(wx.Frame):
 			self.scriptLine = -1
 			self.EnableScriptingButtons(True)
 			self.EnableButtons(True)
+			dlg = wx.MessageDialog(self, "Script execution completed", "Script execution completed",
+					wx.OK | wx.ICON_INFORMATION)
+
+			dlg.ShowModal()
+			dlg.Destroy()
 
 		cmd = list(c.keys())[0]
 		if self.scriptLine == -1:
@@ -1054,21 +1061,37 @@ class MainFrame(wx.Frame):
 			self.EnableScriptingButtons(False)
 
 	def OnSnapshot(self, _):
+		dlg = SnapshotDlg(self)
+		rc = dlg.ShowModal()
+
+		if rc != wx.ID_OK:
+			dlg.Destroy()
+			return
+
+		rTurnouts, rSignals, rSkipNeutral, rTrains = dlg.GetResults()
+		dlg.Destroy()
+
 		self.layout = LayoutData(self.rrServer)
 
 		script = []
 
 		#script.extend(self.SnapshotSignals(clearall=True))
 
-		#script.append({"delay": {"ms": 500}})
+		if rTurnouts:
+			script.extend(self.SnapshotTurnouts())
 
-		script.extend(self.SnapshotTurnouts())
+		if rSignals:
+			script.extend(self.SnapshotSignals(skipred=rSkipNeutral))
 
-		script.extend(self.SnapshotSignals(skipred=True))
+		if rTrains:
+			script.extend(self.SnapshotTrains())
 
-		script.extend(self.SnapshotTrains())
-
-		self.SaveScript(script)
+		if len(script) > 0:
+			self.SaveScript(script)
+		else:
+			dlg = wx.MessageDialog(self, "No script was generated", "No script generated", wx.OK | wx.ICON_INFORMATION)
+			dlg.ShowModal()
+			dlg.Destroy()
 
 	def SaveScript(self, script):
 		fdir = os.path.join(os.getcwd(), "data", "scripts")
@@ -1092,16 +1115,9 @@ class MainFrame(wx.Frame):
 		if rc != wx.ID_OK:
 			return
 
-		first = True
 		with open(jfn, "w") as jfp:
-			jfp.write("[\n")
 			for s in script:
-				if first:
-					first = False
-				else:
-					jfp.write(",\n")
-				jfp.write("  %s" % json.dumps(s))
-			jfp.write("\n]\n")
+				jfp.write("%s\n" % json.dumps(s))
 
 	def SnapshotTrains(self):
 		result = []
@@ -1127,12 +1143,21 @@ class MainFrame(wx.Frame):
 		return result
 
 	def OnSigNeutral(self, _):
-		script = self.SnapshotSignals(clearall=True)
+		script = self.SnapshotSignals(clearall=True, skipred=True)
+
+		slState = self.rrServer.Get("signallevers", {})
 
 		for lvr in self.sigLevers:
 			info = self.sigLevers[lvr].GetData()
 			if info is None:
-				return
+				continue
+
+			print(str(info))
+			if lvr in slState:
+				print("Lever %s state = %s" % (lvr, slState[lvr]))
+				state = slState[lvr]
+				if state[0] == 0 and state[2] == 0:  # if the lever is not thrown either way, skip
+					continue
 
 			if info["left"] is None:
 				vbytes = [info["right"][0]]
@@ -1150,7 +1175,6 @@ class MainFrame(wx.Frame):
 			addr = getNodeAddress(info["node"])
 			if addr is not None:
 				req = {"setinbit": {"address": "0x%x" % addr, "byte": vbytes, "bit": vbits, "value": vals}}
-				print("Lever: %s: %s" % (lvr, str(req)))
 				script.append(req)
 
 		self.ExecuteScript(script)
@@ -1162,7 +1186,9 @@ class MainFrame(wx.Frame):
 		result = []
 		for s, sv in sigs.items():
 			if clearall:
-				result.append({"signal": {"name": [s], "aspect": ["0"], "aspecttype": ["%d" % sv["aspecttype"]], "callon": ["0"]}})
+				aspect = "%d" % sv["aspect"]
+				if aspect != "0" or not skipred:
+					result.append({"signal": {"name": [s], "aspect": ["0"], "aspecttype": ["%d" % sv["aspecttype"]], "callon": ["0"]}})
 			else:
 				aspect = "%d" % sv["aspect"]
 				if aspect != "0" or not skipred:

@@ -4,7 +4,7 @@ from wx.lib.gizmos.ledctrl import LEDNumberCtrl
 
 import os
 
-from dispatcher.mainframe import MainFrame, Node, BTNDIM
+from dispatcher.mainframe import MainFrame, ScreenDiagram, BTNDIM
 from dispatcher.bitmaps import BitMaps
 from dispatcher.trackdiagram import TrackDiagram
 
@@ -136,7 +136,7 @@ class CliffFrame(MainFrame):
 		self.bitmaps = BitMaps(os.path.join(os.getcwd(), "images", "bitmaps"))
 		self.bmpw, self.bmph = self.bitmaps.diagrams.Cliff.GetSize()
 		self.diagrams = {
-			cliff: Node(cliff, self.bitmaps.diagrams.Cliff, 0)
+			cliff: ScreenDiagram(cliff, self.bitmaps.diagrams.Cliff, 0)
 		}
 		topSpace = 120
 

@@ -255,7 +255,12 @@ class ServerMain:
 		for opt, val in self.rr.GetControlOptions().items():
 			m = {"control": [{"name": opt, "value": val}]}
 			self.socketServer.sendToOne(skt, addr, m)
-			
+
+		nv = self.rr.GetNodeStatuses()
+		for addr, name, stat in nv:
+			m = {"nodestatus":{"address": addr, "name": name, "enabled": stat}}
+			self.socketServer.sendToOne(skt, addr, m)
+
 		self.socketServer.sendToOne(skt, addr, {"end": {"type": "layout"}})
 
 	def sendTrainInfo(self, addr, skt):
@@ -349,7 +354,8 @@ class ServerMain:
 			"quit":			self.DoQuit,
 			"delayedstartup":
 							self.DelayedStartup,
-			"reopen":		self.DoReopen
+			"reopen":		self.DoReopen,
+			"enablenode":	self.DoEnableNode
 		}
 
 	def ProcessCommand(self, cmd):
@@ -896,6 +902,31 @@ class ServerMain:
 
 		self.pause = 12 # pause I/O for 12 (~5 seconds) cycles while port is re-opened		
 		self.rrBus.reopen()
+
+	def DoEnableNode(self, cmd):
+		logging.debug("enable node %s" % str(cmd))
+		try:
+			addr = int(cmd["address"][0])
+		except (KeyError, ValueError):
+			logging.debug("addr none")
+			addr = None
+		try:
+			name = cmd["name"][0]
+		except KeyError:
+			logging.debug("name none")
+			name = None
+		try:
+			enable = int(cmd["enable"][0])
+		except (KeyError, ValueError):
+			logging.debug("enable one")
+			enable = 1
+
+		if addr is None or name is None:
+			return
+
+		logging.debug("enable %s 0x%x %s" % (name, addr, enable))
+
+		self.rr.EnableNode(name, addr, enable == 1)
 
 	def DoBlockDir(self, cmd):
 		try:

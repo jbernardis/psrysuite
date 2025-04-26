@@ -14,7 +14,7 @@ from rrserver.districts.hyde import Hyde
 from rrserver.districts.port import Port
 
 from rrserver.constants import INPUT_BLOCK, INPUT_TURNOUTPOS, INPUT_BREAKER, INPUT_SIGNALLEVER, \
-	INPUT_HANDSWITCH, INPUT_ROUTEIN
+	INPUT_HANDSWITCH, INPUT_ROUTEIN, nodeNames
 
 from rrserver.rrobjects import Block, StopRelay, Signal, SignalLever, RouteIn, Turnout, \
 			OutNXButton, Handswitch, Breaker, Indicator, ODevice, Lock
@@ -90,6 +90,20 @@ class Railroad:
 			self.districts[name] = dclass(self, name, self.settings)
 			self.nodes[name] = self.districts[name].GetNodes()
 			self.addrList.extend([[addr, self.districts[name], node] for addr, node, in self.districts[name].GetNodes().items()])
+
+	def GetNodeStatuses(self):
+		retval = []
+		for addr, dist, node in self.addrList:
+			retval.append([addr, nodeNames[addr], 1 if node.IsEnabled() else 0])
+		return retval
+
+	def EnableNode(self, name, addr, enable):
+		for a, _, nd in self.addrList:
+			if addr == a:
+				logging.debug("found node to enable %s" % str(enable))
+				nd.Enable(enable)
+				return
+		logging.error("unable to find node %s(0x%2x) to set enabled to %s" % (name, addr, enable))
 			
 	def GetSubBlockInfo(self):
 		return self.subBlocks
