@@ -29,7 +29,7 @@ class SnapshotDlg(wx.Dialog):
 
 		hsz.AddSpacer(20)
 
-		self.cbSkipNeutral = wx.CheckBox(self, wx.ID_ANY, "Exclude non-neutral signals")
+		self.cbSkipNeutral = wx.CheckBox(self, wx.ID_ANY, "Exclude neutral signals")
 		self.cbSkipNeutral.SetValue(False)
 		hsz.Add(self.cbSkipNeutral)
 
