@@ -14,17 +14,24 @@ zfdir = newdir
 
 for zi in zlist:
 	if not zi.filename.startswith("psrysuite-master/src"):
+		print("skipping %s" % zi.filename)
 		continue
 
 	if zi.filename.endswith(".gitignore"):
+		print("skipping gitignore")
 		continue
 
 	if zi.is_dir():
-		print("Processing directory %s" % zi.filename)
 		zfdir = os.path.join(newdir, zi.filename[21:])
+		print("Processing directory %s => %s" % (zi.filename, zfdir))
+		os.mkdir(zfdir)
 	else:
-		print("    %s => %s" % (zi.filename, "path=%s" % zfdir))
-		zf.extract(zi, path=zfdir)
+		dn, bn = os.path.split(zi.filename[21:])
+		zdata = zf.read(zi)
+		ozfn = os.path.join(newdir, dn, bn)
+		print("       cp %s ==> = %s" % (zi.filename, ozfn))
+		with open(ozfn, "wb") as ozfp:
+			ozfp.write(zdata)
 
 print("renaming data directory to data-dist")
 os.rename(os.path.join(newdir, "data"), os.path.join(newdir, "data.dist"))

@@ -186,6 +186,15 @@ class Block:
 	def GetTiles(self):
 		return self.tiles
 
+	def GetSBTiles(self):
+		retval = []
+		if self.sbEast:
+			retval.extend(self.sbEast.GetTiles())
+		if self.sbWest:
+			retval.extend(self.sbWest.GetTiles())
+
+		return retval
+
 	def SetSignals(self, sigs):
 		self.sigWest = sigs[0]
 		self.sigEast = sigs[1]
@@ -423,6 +432,12 @@ class Block:
 
 	def AddTurnout(self, turnout):
 		self.turnouts.append(turnout)
+
+	def GetTurnoutLocations(self):
+		retval = []
+		for t in self.turnouts:
+			retval.append(t.GetScreenPos())
+		return retval
 
 	def EvaluateTurnout(self, toinfo):
 		toName, toStatus = toinfo
@@ -915,6 +930,9 @@ class StoppingBlock:  # (Block):
 
 	def GetRouteType(self):
 		return self.block.GetRouteType()
+
+	def GetTiles(self):
+		return self.tiles
 
 	def Reset(self):
 		pass

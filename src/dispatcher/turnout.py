@@ -203,6 +203,9 @@ class Turnout:
 	def GetPos(self):
 		return self.pos
 
+	def GetScreenPos(self):
+		return self.screen, self.pos
+
 
 class SlipSwitch(Turnout):
 	def __init__(self, district, frame, name, screen, tiles, pos):

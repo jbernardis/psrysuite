@@ -151,6 +151,8 @@ class MainFrame(wx.Frame):
 		self.timeValue = self.GetToD()
 		self.clockRunning = False # only applies to non-TOD clock
 		self.clockStatus = 3 # default = ToD
+
+		self.hiliteRouteTicker = 0
 		
 		self.eventsList = []
 		self.adviceList = []
@@ -1185,6 +1187,12 @@ class MainFrame(wx.Frame):
 				tr.SetHilite(True if ticks % 2 == 0 else False)
 				nh.append([tr, ticks])
 		self.hilitedTrains = nh
+
+		if self.hiliteRouteTicker > 0:
+			self.hiliteRouteTicker -= 1
+			if self.hiliteRouteTicker == 0:
+				self.ClearHighlitedRoute()
+
 			
 		self.delayedRequests.CheckForExpiry(self.Request)
 		self.delayedSignals.CheckForExpiry()
@@ -1464,7 +1472,45 @@ class MainFrame(wx.Frame):
 			return
 		
 		dlg.UpdateTrainStatus()
-		
+
+	def EnumerateBlockTiles(self, blkname):
+		try:
+			blk = self.blocks[blkname]
+		except KeyError:
+			return []
+
+		tl = blk.GetTiles() + blk.GetSBTiles()
+		tol = blk.GetTurnoutLocations()
+
+		tloc = [[t[1], t[2]] for t in tl] + tol
+
+		return tloc
+
+	def EnumerateOSTiles(self, osname, rtname):
+		try:
+			desiredRoute = self.routes[rtname]
+		except KeyError:
+			return []
+
+		scr, pos = desiredRoute.GetPositions()
+		return [[scr, p] for p in pos]
+
+	def SetHighlitedRoute(self, routeTiles):
+		tiles = {}
+		for scr, pos in routeTiles:
+			offset = self.diagrams[scr].offset
+			if scr not in tiles:
+				tiles[scr] = []
+			tiles[scr].append([pos[0]*16+offset, pos[1]*16])
+
+		for scr in tiles:
+			self.panels[scr].SetHighlitedRoute(tiles)
+		self.hiliteRouteTicker = 10
+
+	def ClearHighlitedRoute(self):
+		for p in self.panels.values():
+			p.ClearHighlitedRoute()
+
 	def SetRouteThruOS(self, osname, rtname, blkname, signame):
 		osblk = self.blocks[osname]
 		OSClear = osblk.IsCleared()	
@@ -1994,6 +2040,7 @@ class MainFrame(wx.Frame):
 				else:
 					w.Hide()
 
+		# self.panels[screen].Refresh()
 		return True
 
 	def PlaceWidgets(self):

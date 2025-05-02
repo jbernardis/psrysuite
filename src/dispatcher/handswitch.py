@@ -41,6 +41,9 @@ class HandSwitch:
 	def GetPos(self):
 		return self.pos
 
+	def GetTiles(self):
+		return self.tiles
+
 	def GetValue(self):
 		return self.locked
 

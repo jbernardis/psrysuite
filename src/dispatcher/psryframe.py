@@ -47,6 +47,10 @@ class PSRYFrame(MainFrame):
 	def PSRYInitialize(self):
 		self.Initialize(self.districtMap)
 
+		bmpHilite = self.misctiles["hilite"]
+		for p in self.panels.values():
+			p.SetHiliteBmp(bmpHilite)
+
 	def drawCustom(self, dc):
 		pass
 

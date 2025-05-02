@@ -89,7 +89,15 @@ class RouteTrainDlg(wx.Dialog):
 		self.Bind(wx.EVT_BUTTON, self.OnBLocate, self.bLocate)
 		hsz.Add(self.bLocate)
 
+		if self.isDispatcher:
+			hsz.AddSpacer(30)
+
+			self.bHilite = wx.Button(self, wx.ID_ANY, "HiLite", size=BUTTONSIZE)
+			self.Bind(wx.EVT_BUTTON, self.OnBHiLite, self.bHilite)
+			hsz.Add(self.bHilite)
+
 		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
 		vsz.AddSpacer(10)
 
 		self.msg = wx.StaticText(self, wx.ID_ANY, "                                      ")
@@ -147,6 +155,14 @@ class RouteTrainDlg(wx.Dialog):
 	def OnBLocate(self, _):
 		if self.train.SetHilite(True):
 			self.parent.AddHilitedTrain(self.train)
+
+	def OnBHiLite(self, _):
+		routeTiles = self.parent.EnumerateBlockTiles(self.startingBlock)
+		for step in self.sequence:
+			routeTiles.extend(self.parent.EnumerateOSTiles(step["os"], step["route"]))
+			routeTiles.extend(self.parent.EnumerateBlockTiles(step["block"]))
+
+		self.parent.SetHighlitedRoute(routeTiles)
 
 	def OnBRefresh(self, _):
 		self.DetermineTrainPosition()

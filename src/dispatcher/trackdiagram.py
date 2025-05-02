@@ -1,15 +1,17 @@
 import wx
 
+
 class TrackDiagram(wx.Panel):
-	def __init__(self, frame, dlist, ht=None): #screen, id, diagramBmp, offset):
+	def __init__(self, frame, dlist, ht=None): # dlist = screen, id, diagramBmp, offset):
 		wx.Panel.__init__(self, frame, size=(100, 100), pos=(0,0), style=0)
 		self.frame = frame
 		self.screens = [d.screen for d in dlist]
 		self.bgbmps =  [d.bitmap for d in dlist]
 		self.offsets = [d.offset for d in dlist]
 		self.xoffset = [int(o/16) for o in self.offsets]
-		self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
 		self.xoffset.append(9999)
+		self.offsetMap = {d.screen: d.offset for d in dlist}
+		self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
 
 		self.showPosition = True
 		self.showCTC = False
@@ -25,6 +27,8 @@ class TrackDiagram(wx.Panel):
 		self.ty = 0
 		self.scr = -1
 		self.shift_down = False
+		self.highlitedRoute = []
+		self.hilitebmp = None
 
 		self.SetCursor(wx.Cursor(wx.CURSOR_ARROW))
 
@@ -48,6 +52,9 @@ class TrackDiagram(wx.Panel):
 		self.Bind(wx.EVT_CHAR_HOOK, self.OnKeyDown)
 		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 		self.Bind(wx.EVT_ENTER_WINDOW, lambda event: self.SetFocus())
+
+	def SetHiliteBmp(self, bmp):
+		self.hilitebmp = bmp
 
 	def ShowCTC(self, flag=True):
 		if flag == self.showCTC:
@@ -150,6 +157,17 @@ class TrackDiagram(wx.Panel):
 		self.trains[(x*16+offset, y*16)] = [trainID, locoID, stopRelay, atc, ar, hilite]
 		self.Refresh()
 
+	def SetHighlitedRoute(self, tiles):
+		self.highlitedRoute = []
+		for s in self.screens:
+			if s in tiles:
+				self.highlitedRoute.extend(tiles[s])
+		self.Refresh()
+
+	def ClearHighlitedRoute(self):
+		self.highlitedRoute = []
+		self.Refresh()
+
 	def ClearTrain(self, x, y, offset):
 		textKey = (x*16+offset, y*16)
 		if textKey not in self.trains:
@@ -206,6 +224,10 @@ class TrackDiagram(wx.Panel):
 				dc.SetPen(wx.Pen(wx.GREEN, width=10, style=wx.PENSTYLE_SOLID))
 				dc.SetBrush(wx.Brush(wx.GREEN, wx.TRANSPARENT))
 				dc.DrawCircle(x, y, 50)
+
+		if len(self.highlitedRoute) > 0 and self.hilitebmp is not None:
+			for hx, hy in self.highlitedRoute:
+				dc.DrawBitmap(self.hilitebmp, hx, hy)
 
 		if self.showCTC:
 			for bx, bmp in self.ctcbgbitmaps.items():

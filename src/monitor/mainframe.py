@@ -576,6 +576,7 @@ class MainFrame(wx.Frame):
 			return
 
 		self.trains = self.rrServer.Get("activetrains", {})
+		self.UpdateBlocks()
 		nb, eb, msg = self.IdentifyNextBlock(self.trains[self.trainNames[tx]])
 		rear = self.cbRear.IsChecked()
 
@@ -592,6 +593,11 @@ class MainFrame(wx.Frame):
 			if rear:
 				self.Request({"simulate": {"action": "occupy", "block": eb, "state": 0}})
 				self.blockOccupied[eb] = False
+
+	def UpdateBlocks(self):
+		blocks = self.rrServer.Get("getblocks", {})
+		for bname, binfo in blocks.items():
+			self.blockOccupied[bname] = binfo.get("occupied", 0) == 1
 
 	def OnRear(self, _):
 		tx = self.chTrain.GetSelection()
@@ -758,20 +764,29 @@ class MainFrame(wx.Frame):
 		order = []
 		east = tr["east"]
 
+		print("starting expansion, east = %s" % str(east))
+
 		for b in blocks:
+			print("in loop for block %s" % b)
 			sbe, sbw = self.layout.GetStopBlocks(b)
 			if east:
+				print("East, sbe sbw %s %s" % (str(sbe), str(sbw)))
 				if sbe and self.BlockOccupied(sbe):
 					order.append(sbe)
 				if self.BlockOccupied(b):
 					order.append(b)
+				else:
+					print("block %s is not occupied" % b)
 				if sbw and self.BlockOccupied(sbw):
 					order.append(sbw)
 			else:
+				print("West, sbe sbw %s %s" % (str(sbe), str(sbw)))
 				if sbw and self.BlockOccupied(sbw):
 					order.append(sbw)
 				if self.BlockOccupied(b):
 					order.append(b)
+				else:
+					print("block %s is not occupied" % b)
 				if sbe and self.BlockOccupied(sbe):
 					order.append(sbe)
 

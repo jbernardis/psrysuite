@@ -1,4 +1,3 @@
-
 from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, NORMAL, REVERSE, STOP, CLEAR, RegAspects, RegSloAspects, AdvAspects, SloAspects
 
 class Tile:
@@ -789,6 +788,7 @@ def loadTiles(bitmaps):
 			"red": bmisc.indicatorr,
 			"out": bmisc.indicatorout,
 		})
+	misctiles["hilite"] = bmisc.hilite
 
 	b = bitmaps.signals
 	signals = {}
