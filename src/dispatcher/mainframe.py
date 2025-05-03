@@ -153,7 +153,8 @@ class MainFrame(wx.Frame):
 		self.clockStatus = 3 # default = ToD
 
 		self.hiliteRouteTicker = 0
-		
+		self.hilitedRoute = None
+
 		self.eventsList = []
 		self.adviceList = []
 		self.dlgEvents = None
@@ -1495,7 +1496,12 @@ class MainFrame(wx.Frame):
 		scr, pos = desiredRoute.GetPositions()
 		return [[scr, p] for p in pos]
 
-	def SetHighlitedRoute(self, routeTiles):
+	def SetHighlitedRoute(self, name, routeTiles):
+		for tid in self.routeTrainDlgs:
+			if tid != name:
+				self.routeTrainDlgs[tid].ClearHiliteFlag()
+
+		self.hilitedRoute = name
 		tiles = {}
 		for scr, pos in routeTiles:
 			offset = self.diagrams[scr].offset
@@ -1505,11 +1511,13 @@ class MainFrame(wx.Frame):
 
 		for scr in tiles:
 			self.panels[scr].SetHighlitedRoute(tiles)
-		self.hiliteRouteTicker = 10
+		self.hiliteRouteTicker = 0 #  10
 
-	def ClearHighlitedRoute(self):
-		for p in self.panels.values():
-			p.ClearHighlitedRoute()
+	def ClearHighlitedRoute(self, name):
+		if name == self.hilitedRoute:
+			self.hilitedRoute = None
+			for p in self.panels.values():
+				p.ClearHighlitedRoute()
 
 	def SetRouteThruOS(self, osname, rtname, blkname, signame):
 		osblk = self.blocks[osname]
@@ -1584,6 +1592,8 @@ class MainFrame(wx.Frame):
 		if trainid in self.routeTrainDlgs:
 			self.routeTrainDlgs[trainid].Destroy()
 			del(self.routeTrainDlgs[trainid])
+		if trainid == self.hilitedRoute:
+			self.ClearHighlitedRoute(trainid)
 						
 	def EditTrain(self, tr, blk):
 		oldName, oldLoco = tr.GetNameAndLoco()

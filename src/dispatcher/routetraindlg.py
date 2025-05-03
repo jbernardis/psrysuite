@@ -7,6 +7,9 @@ COLSIG = 100
 COLOS = 350
 COLBLK = 60
 
+HILITEON = "Hilite ON"
+HILITEOFF = "Hilite OFF"
+
 
 class RouteTrainDlg(wx.Dialog):
 	def __init__(self, parent, train, rtName, trinfo, isDispatcher):
@@ -18,6 +21,7 @@ class RouteTrainDlg(wx.Dialog):
 		self.isDispatcher = isDispatcher
 		self.sequence = trinfo["sequence"]
 		self.Bind(wx.EVT_CLOSE, self.onClose)
+		self.hilited = False
 
 		self.colors = [wx.Colour(225, 255, 240), wx.Colour(138, 255, 197)]
 		self.line = 0
@@ -92,7 +96,7 @@ class RouteTrainDlg(wx.Dialog):
 		if self.isDispatcher:
 			hsz.AddSpacer(30)
 
-			self.bHilite = wx.Button(self, wx.ID_ANY, "HiLite", size=BUTTONSIZE)
+			self.bHilite = wx.Button(self, wx.ID_ANY, HILITEON, size=BUTTONSIZE)
 			self.Bind(wx.EVT_BUTTON, self.OnBHiLite, self.bHilite)
 			hsz.Add(self.bHilite)
 
@@ -157,12 +161,23 @@ class RouteTrainDlg(wx.Dialog):
 			self.parent.AddHilitedTrain(self.train)
 
 	def OnBHiLite(self, _):
-		routeTiles = self.parent.EnumerateBlockTiles(self.startingBlock)
-		for step in self.sequence:
-			routeTiles.extend(self.parent.EnumerateOSTiles(step["os"], step["route"]))
-			routeTiles.extend(self.parent.EnumerateBlockTiles(step["block"]))
+		if self.hilited:
+			self.parent.ClearHighlitedRoute(self.name)
+			self.hilited = False
+			self.bHilite.SetLabel(HILITEON)
+		else:
+			routeTiles = self.parent.EnumerateBlockTiles(self.startingBlock)
+			for step in self.sequence:
+				routeTiles.extend(self.parent.EnumerateOSTiles(step["os"], step["route"]))
+				routeTiles.extend(self.parent.EnumerateBlockTiles(step["block"]))
 
-		self.parent.SetHighlitedRoute(routeTiles)
+			self.hilited = True
+			self.bHilite.SetLabel(HILITEOFF)
+			self.parent.SetHighlitedRoute(self.name, routeTiles)
+
+	def ClearHiliteFlag(self):
+		self.hilited = False
+		self.bHilite.SetLabel(HILITEON)
 
 	def OnBRefresh(self, _):
 		self.DetermineTrainPosition()
