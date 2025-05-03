@@ -12,7 +12,9 @@ TYPE_LOCO = "loco"
 root = "<root>"
 BTNSZ = (120, 46)
 
+
 def saveData(parent, settings):
+	zf = None
 	dlg = ChooseItemDlg(parent, True, settings)
 	rc = dlg.ShowModal()
 	if rc == wx.ID_OK:
@@ -24,11 +26,17 @@ def saveData(parent, settings):
 	if zf is None:
 		return
 
+	dname = os.path.split(zf)[0]
+	if not os.path.exists(dname):
+		os.makedirs(dname)
+
 	dirs = {
 		root: os.path.join(os.getcwd(), "data"),
 		"locos": os.path.join(os.getcwd(), "data", "locos"),
 		"trains": os.path.join(os.getcwd(), "data", "trains"),
-		"schedules": os.path.join(os.getcwd(), "data", "schedules")
+		"schedules": os.path.join(os.getcwd(), "data", "schedules"),
+		"scripts": os.path.join(os.getcwd(), "data", "scripts"),
+		"trackersnapshots": os.path.join(os.getcwd(), "data", "trackersnapshots")
 	}
 
 	fc = 0
@@ -56,9 +64,11 @@ def saveData(parent, settings):
 	dlg.ShowModal()
 	dlg.Destroy()
 
+
 def fileExists(fn):
 	fqfn = formFileName(fn)
 	return os.path.isfile(fqfn)
+
 
 def formFileName(fn):
 	return os.path.join(os.getcwd(), fn)
@@ -160,13 +170,15 @@ def restoreData(parent, settings):
 	dlg = wx.MessageDialog(parent, msg1 + msg2, 'Data restore successful', wx.OK | wx.ICON_INFORMATION)
 	dlg.ShowModal()
 	dlg.Destroy()
-	
+
+
 class ChooseItemDlg(wx.Dialog):
 	def __init__(self, parent, allowentry, settings):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
 		self.settings = settings
 		self.Bind(wx.EVT_CLOSE, self.OnCancel)
 		self.allowentry = allowentry
+		self.files = []
 		if allowentry:
 			self.SetTitle("Choose/Enter zip file")
 		else:
@@ -274,6 +286,7 @@ class ChooseItemDlg(wx.Dialog):
 		else:
 			self.cbItems.SetSelection(wx.NOT_FOUND)
 
+
 class ChooseItemsDlg(wx.Dialog):
 	def __init__(self, parent, items):
 		wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
@@ -323,6 +336,7 @@ class ChooseItemsDlg(wx.Dialog):
 		
 	def OnBOK(self, _):
 		self.EndModal(wx.ID_OK)
+
 
 class ChooseRestoreFiles(wx.Dialog):
 	def __init__(self, parent, files):
@@ -434,8 +448,7 @@ class ChooseRestoreFiles(wx.Dialog):
 
 	def getValues(self):
 		return [self.clbFiles.IsChecked(i) for i in range(len(self.fchoices))]
-		
-		
+
 
 class ChooseOverwriteFiles(wx.Dialog):
 	def __init__(self, parent, files):

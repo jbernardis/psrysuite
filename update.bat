@@ -14,13 +14,8 @@ rename src current
 mkdir current\logs
 mkdir current\output
 
-echo Creating python virtual environment
-python -m venv ./venv
-.\venv\Scripts\python -m pip install wheel
-.\venv\Scripts\python -m pip install -r requirements.txt
-
 echo Loading configuration editor for the first time
 cd current
 ..\venv\Scripts\python config\main.py --install
 
-echo Installation complete
+echo Update complete
