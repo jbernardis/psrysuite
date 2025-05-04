@@ -14,8 +14,11 @@ rename src current
 mkdir current\logs
 mkdir current\output
 
-echo Loading configuration editor for the first time
+echo Copying data directory from an old directory
+venv\Scripts\python copydata.py
+
+echo Loading configuration editor
 cd current
-..\venv\Scripts\python config\main.py --install
+..\venv\Scripts\python config\main.py
 
 echo Update complete
