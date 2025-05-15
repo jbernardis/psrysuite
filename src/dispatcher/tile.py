@@ -1,4 +1,7 @@
+import logging
+
 from dispatcher.constants import EMPTY, OCCUPIED, CLEARED, NORMAL, REVERSE, STOP, CLEAR, RegAspects, RegSloAspects, AdvAspects, SloAspects
+
 
 class Tile:
 	def __init__(self, name, bmps):
@@ -41,6 +44,7 @@ class Tile:
 			return bmp
 
 		return self.bmps["white"]
+
 
 class MiscTile:
 	def __init__(self, name, bmps):
@@ -115,6 +119,7 @@ class TurnoutTile:
 				pass
 		return bmps["white"]
 
+
 class SlipSwitchTile:
 	def __init__(self, name, nnbmps, nrbmps, rnbmps, rrbmps):
 		self.name = name
@@ -122,7 +127,6 @@ class SlipSwitchTile:
 		self.nrbmps = nrbmps
 		self.rnbmps = rnbmps
 		self.rrbmps = rrbmps
-
 
 	def getBmp(self, tostat, blkstat, disabled, unknownTrain=False):
 		if tostat == [NORMAL, NORMAL]:
@@ -177,24 +181,80 @@ class SignalTile:
 
 	def getBmp(self, sig):
 		if sig.aspectType == SloAspects:
-			clearValues = [ 0b01 ]
+			if sig.aspect == 0b01:
+				tag = "clear"
+			elif sig.aspect == 0b11:
+				tag = "approach"
+			elif sig.aspect == 0b10:
+				tag = "restricting"
+			else:
+				tag = "stop"
+
 		elif sig.aspectType == AdvAspects:
-			clearValues = [ 0b011, 0b111 ]
+			if sig.aspect == 0b011:
+				tag = "clear"
+			elif sig.aspect == 0b010:
+				tag = "approach-medium"
+			elif sig.aspect == 0b111:
+				tag = "clear"
+			elif sig.aspect == 0b110:
+				tag = "advance-approach"
+				logging.debug("advance approach for signal %s" % sig.GetName())
+			elif sig.aspect == 0b001:
+				tag = "approach"
+			elif sig.aspect == 0b101:
+				tag = "medium-approach"
+			elif sig.aspect == 0b100:
+				tag = "restricting"
+			else:
+				tag = "stop"
+
 		elif sig.aspectType == RegSloAspects:
-			clearValues = [ 0b011, 0b111 ]
+			if sig.aspect == 0b011:
+				tag = "clear"
+			elif sig.aspect == 0b111:
+				tag = "slow-clear"
+			elif sig.aspect == 0b001:
+				tag = "approach"
+			elif sig.aspect == 0b101:
+				tag = "slow-approach"
+			elif sig.aspect == 0b100:
+				tag = "restricting"
+			else:
+				tag = "stop"
+
 		else: # assume RegAspects
-			clearValues = [ CLEAR ]
+			if sig.aspect == 0b011:
+				tag = "clear"
+			elif sig.aspect == 0b010:
+				tag = "approach-medium"
+			elif sig.aspect == 0b111:
+				tag = "medium-clear"
+			elif sig.aspect == 0b110:
+				tag = "approach-slow"
+			elif sig.aspect == 0b001:
+				tag = "approach"
+			elif sig.aspect == 0b101:
+				tag = "medium-approach"
+			elif sig.aspect == 0b100:
+				tag = "restricting"
+			else:
+				tag = "stop"
 			
-		if sig.aspect == STOP:
-			return self.bmps["red-fleet"] if sig.fleetEnabled else self.bmps["red"]
-		elif sig.aspect not in clearValues:
-			try:
-				bmp =  self.bmps["restr-fleet"] if sig.fleetEnabled else self.bmps["restr"]
-			except:
-				bmp =  self.bmps["green-fleet"] if sig.fleetEnabled else self.bmps["green"]
-			return bmp
-		else:
-			return self.bmps["green-fleet"] if sig.fleetEnabled else self.bmps["green"]
+		if sig.fleetEnabled:
+			tag += "-fleet"
+
+		try:
+			return self.bmps[tag]
+		except KeyError:
+			logging.error("No tile defined for aspect tag %s" % tag)
+			if sig.aspect == STOP:
+				tag = "stop"
+			else:
+				tag = "restricting"
+			if sig.fleetEnabled:
+				tag += "-fleet"
+			return self.bmps[tag]
 
 
 def loadTiles(bitmaps):
@@ -794,39 +854,115 @@ def loadTiles(bitmaps):
 	signals = {}
 	signals["left"] = SignalTile("left", 
 		{
-			"green": b.left.green,
-			"red": b.left.red,
-			"restr": b.left.yellow,
-			"green-fleet": b.left.greenfleet,
-			"red-fleet": b.left.redfleet,
-			"restr-fleet": b.left.yellowfleet,
+			"clear": b.left.green,
+			"clear-fleet": b.left.greenfleet,
+			"slow-clear": b.left.green,
+			"slow-clear-fleet": b.left.greenfleet,
+			"medium-clear": b.left.green,
+			"medium-clear-fleet": b.left.greenfleet,
+
+			"stop": b.left.red,
+			"stop-fleet": b.left.redfleet,
+
+			"approach": b.left.flashyellow,
+			"approach-fleet": b.left.flashyellowfleet,
+			"approach-slow": b.left.flashyellow,
+			"approach-slow-fleet": b.left.flashyellowfleet,
+			"approach-medium": b.left.flashyellow,
+			"approach-medium-fleet": b.left.flashyellowfleet,
+			"advance-approach": b.left.flashyellow,
+			"advance-approach-fleet": b.left.flashyellowfleet,
+			"medium-approach": b.left.flashyellow,
+			"medium-approach-fleet": b.left.flashyellowfleet,
+			"slow-approach": b.left.flashyellow,
+			"slow-approach-fleet": b.left.flashyellowfleet,
+
+			"restricting": b.left.yellow,
+			"restricting-fleet": b.left.yellowfleet,
 		})
 	signals["leftlong"] = SignalTile("leftlong", 
 		{
-			"green": b.leftlong.green,
-			"red": b.leftlong.red,
-			"restr": b.leftlong.restr,
-			"green-fleet": b.leftlong.greenfleet,
-			"red-fleet": b.leftlong.redfleet,
-			"restr-fleet": b.leftlong.restrfleet,
+			"clear": b.leftlong.greenred,
+			"clear-fleet": b.leftlong.greenredfleet,
+			"slow-clear": b.leftlong.redgreen,
+			"slow-clear-fleet": b.leftlong.redgreenfleet,
+			"medium-clear": b.leftlong.redgreen,
+			"medium-clear-fleet": b.leftlong.redgreenfleet,
+
+			"stop": b.leftlong.red,
+			"stop-fleet": b.leftlong.redfleet,
+
+			"approach": b.leftlong.yellowred,
+			"approach-fleet": b.leftlong.yellowredfleet,
+			"approach-slow": b.leftlong.yellowyellow,
+			"approach-slow-fleet": b.leftlong.yellowyellowfleet,
+			"approach-medium": b.leftlong.yellowgreen,
+			"approach-medium-fleet": b.leftlong.yellowgreenfleet,
+			"advance-approach": b.leftlong.yellowred,
+			"advance-approach-fleet": b.leftlong.yellowredfleet,
+			"medium-approach": b.leftlong.redflashyellow,
+			"medium-approach-fleet": b.leftlong.redflashyellowfleet,
+			"slow-approach": b.leftlong.redflashyellow,
+			"slow-approach-fleet": b.leftlong.redflashyellowfleet,
+
+			"restricting": b.leftlong.redyellow,
+			"restricting-fleet": b.leftlong.redyellowfleet,
 		})
 	signals["right"] = SignalTile("right", 
 		{
-			"green": b.right.green,
-			"red": b.right.red,
-			"restr": b.right.yellow,
-			"green-fleet": b.right.greenfleet,
-			"red-fleet": b.right.redfleet,
-			"restr-fleet": b.right.yellowfleet,
+			"clear": b.right.green,
+			"clear-fleet": b.right.greenfleet,
+			"slow-clear": b.right.green,
+			"slow-clear-fleet": b.right.greenfleet,
+			"medium-clear": b.right.green,
+			"medium-clear-fleet": b.right.greenfleet,
+
+			"stop": b.right.red,
+			"stop-fleet": b.right.redfleet,
+
+			"approach": b.right.flashyellow,
+			"approach-fleet": b.right.flashyellowfleet,
+			"approach-slow": b.right.flashyellow,
+			"approach-slow-fleet": b.right.flashyellowfleet,
+			"approach-medium": b.right.flashyellow,
+			"approach-medium-fleet": b.right.flashyellowfleet,
+			"advance-approach": b.right.flashyellow,
+			"advance-approach-fleet": b.right.flashyellowfleet,
+			"medium-approach": b.right.flashyellow,
+			"medium-approach-fleet": b.right.flashyellowfleet,
+			"slow-approach": b.right.flashyellow,
+			"slow-approach-fleet": b.right.flashyellowfleet,
+
+			"restricting": b.right.yellow,
+			"restricting-fleet": b.right.yellowfleet,
 		})
 	signals["rightlong"] = SignalTile("rightlong", 
 		{
-			"green": b.rightlong.green,
-			"red": b.rightlong.red,
-			"restr": b.rightlong.restr,
-			"green-fleet": b.rightlong.greenfleet,
-			"red-fleet": b.rightlong.redfleet,
-			"restr-fleet": b.rightlong.restrfleet,
+			"clear": b.rightlong.greenred,
+			"clear-fleet": b.rightlong.greenredfleet,
+			"slow-clear": b.rightlong.redgreen,
+			"slow-clear-fleet": b.rightlong.redgreenfleet,
+			"medium-clear": b.rightlong.redgreen,
+			"medium-clear-fleet": b.rightlong.redgreenfleet,
+
+			"stop": b.rightlong.red,
+			"stop-fleet": b.rightlong.redfleet,
+
+			"approach": b.rightlong.yellowred,
+			"approach-fleet": b.rightlong.yellowredfleet,
+			"approach-slow": b.rightlong.yellowyellow,
+			"approach-slow-fleet": b.rightlong.yellowyellowfleet,
+			"approach-medium": b.rightlong.yellowgreen,
+			"approach-medium-fleet": b.rightlong.yellowgreenfleet,
+			"advance-approach": b.rightlong.yellowred,
+			"advance-approach-fleet": b.rightlong.yellowredfleet,
+			"medium-approach": b.rightlong.redflashyellow,
+			"medium-approach-fleet": b.rightlong.redflashyellowfleet,
+			"slow-approach": b.rightlong.redflashyellow,
+			"slow-approach-fleet": b.rightlong.redflashyellowfleet,
+
+			"restricting": b.rightlong.redyellow,
+			"restricting-fleet": b.rightlong.redyellowfleet,
 		})
 
 	return tiles, turnouts, slipswitches, signals, misctiles

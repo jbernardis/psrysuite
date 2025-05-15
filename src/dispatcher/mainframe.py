@@ -1466,7 +1466,7 @@ class MainFrame(wx.Frame):
 				self.routeTrainDlgs[trainid] = dlg
 				dlg.UpdateTrainStatus()
 			
-	def UpdateRouteDialogs(self, tid):
+	def UpdateRouteDialog(self, tid):
 		try:
 			dlg = self.routeTrainDlgs[tid]
 		except KeyError:
@@ -2191,6 +2191,14 @@ class MainFrame(wx.Frame):
 		rc = dlg.ShowModal()
 		dlg.Destroy()
 		if rc == wx.ID_SAVE:
+			trjson = self.Get("getsnapshot", {})
+			if trjson is not None:
+				dlg = wx.MessageDialog(self, "Snapshot already exists.\nDo you with to over-write?", "Over-write confirmation", wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
+				rc = dlg.ShowModal()
+				dlg.Destroy()
+				if rc == wx.ID_NO:
+					return
+
 			self.TakeSnapshot()
 							
 		elif rc == wx.ID_OPEN: #restore from snapshot
@@ -3217,7 +3225,7 @@ class MainFrame(wx.Frame):
 						self.SendTrainBlockOrder(tr)
 					trid = tr.GetName()
 					self.activeTrains.UpdateTrain(trid)
-					self.UpdateRouteDialogs(trid)
+					self.UpdateRouteDialog(trid)
 					if tr.IsInNoBlocks():
 						if not tr.IsBeingEdited():
 							if not silent:
@@ -3375,7 +3383,7 @@ class MainFrame(wx.Frame):
 
 			tid = tr.GetName()
 			self.activeTrains.UpdateTrain(tid)
-			self.UpdateRouteDialogs(tid)
+			self.UpdateRouteDialog(tid)
 			self.lostTrains.Remove(tid)
 
 			self.trainHistory.Update(tr)

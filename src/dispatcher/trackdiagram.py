@@ -6,7 +6,7 @@ class TrackDiagram(wx.Panel):
 		wx.Panel.__init__(self, frame, size=(100, 100), pos=(0,0), style=0)
 		self.frame = frame
 		self.screens = [d.screen for d in dlist]
-		self.bgbmps =  [d.bitmap for d in dlist]
+		self.bgbmps  = [d.bitmap for d in dlist]
 		self.offsets = [d.offset for d in dlist]
 		self.xoffset = [int(o/16) for o in self.offsets]
 		self.xoffset.append(9999)
@@ -222,7 +222,7 @@ class TrackDiagram(wx.Panel):
 
 			if hilite:
 				dc.SetPen(wx.Pen(wx.GREEN, width=10, style=wx.PENSTYLE_SOLID))
-				dc.SetBrush(wx.Brush(wx.GREEN, wx.TRANSPARENT))
+				dc.SetBrush(wx.Brush(wx.GREEN, wx.TRANSPARENT_BRUSH))
 				dc.DrawCircle(x, y, 50)
 
 		if len(self.highlitedRoute) > 0 and self.hilitebmp is not None:

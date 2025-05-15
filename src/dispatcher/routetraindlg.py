@@ -56,6 +56,19 @@ class RouteTrainDlg(wx.Dialog):
 		hsz.Add(st)
 		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		st = wx.StaticText(self, wx.ID_ANY, "Engineer:")
+		st.SetFont(self.font)
+		hsz.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
+		hsz.AddSpacer(10)
+		engineer = train.GetEngineer()
+		if engineer is None:
+			engineer = "(None)"
+		st = wx.StaticText(self, wx.ID_ANY, engineer)
+		st.SetFont(self.font)
+		hsz.Add(st)
+		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
 		vsz.AddSpacer(20)
 		vsz.Add(self.AddHeaders())
 		vsz.AddSpacer(10)

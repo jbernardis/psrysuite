@@ -341,7 +341,7 @@ class Latham (District):
 			["L16R", RegAspects, True,    "rightlong", (30, 14)],
 			["L14R", RegAspects, True,    "rightlong", (30, 16)],
 
-			["L18L", AdvAspects, False,   "left",  (35, 10)],
+			["L18L", AdvAspects, False,   "leftlong",  (35, 10)],
 			["L14L", RegAspects, False,   "left",  (35, 12)]
 		]
 		for signm, atype, east, tileSet, pos in sigList:
