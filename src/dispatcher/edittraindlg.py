@@ -302,6 +302,7 @@ class EditTrainDlg(wx.Dialog):
 			self.startingEast = tr["eastbound"]
 		else:
 			self.startingEast = None
+
 		self.ShowTrainLocoDesc()
 
 	def OnTrainText(self, evt):
@@ -457,11 +458,29 @@ class EditTrainDlg(wx.Dialog):
 			self.stDescr.SetLabel("")
 			
 		if self.chosenTrain in self.trains:
-			self.cbAssignRoute.Enable(False)
-			self.cbAssignRoute.SetValue(False)
-			self.cbRoute.Enable(False)
-			self.chosenRoute = None
 			tr = self.trains[self.chosenTrain]
+			try:
+				self.chosenRoute = tr["route"]
+			except KeyError:
+				self.chosenRoute = None
+
+			try:
+				idx = self.trainsWithSeq.index(self.chosenRoute)
+			except ValueError:
+				idx = -1
+			self.cbRoute.SetSelection(min(idx, 0))
+
+			self.cbAssignRoute.Enable(False)
+			self.cbAssignRoute.SetValue(self.chosenRoute is not None)
+			self.cbRoute.Enable(False)
+			try:
+				tx = self.trainsWithSeq.index(self.chosenRoute)
+			except ValueError:
+				self.chosenRoute = None
+				tx = wx.NOT_FOUND
+
+			self.cbRoute.SetSelection(tx)
+
 			self.ShowRouteDetails(tr["tracker"])
 
 			details = "Eastbound" if self.startingEast else "Westbound"

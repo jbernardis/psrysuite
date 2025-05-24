@@ -5,7 +5,7 @@ from dispatcher.turnout import Turnout
 from dispatcher.signal import Signal
 from dispatcher.handswitch import HandSwitch
 
-from dispatcher.constants import RESTRICTING, MAIN, DIVERGING,  OCCUPIED, CLEARED, STOP, RegAspects
+from dispatcher.constants import RESTRICTING, MAIN, DIVERGING,  OCCUPIED, CLEARED, STOP, RegAspects, restrictedaspect
 
 
 class Shore (District):
@@ -30,7 +30,7 @@ class Shore (District):
 			if osblk.IsBusy() or self.blocks["SOSW"].IsBusy() or self.blocks["SOSE"].IsBusy():
 				self.ReportOSBusy(osblk.GetRouteDesignator())
 				return False
-			aspect = RESTRICTING
+			aspect = restrictedaspect(sig.GetAspectType())
 		else:  # stopping
 			esig = osblk.GetEntrySignal()	
 			if esig is not None and esig.GetName() != signm:

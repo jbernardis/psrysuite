@@ -199,7 +199,6 @@ class SignalTile:
 				tag = "clear"
 			elif sig.aspect == 0b110:
 				tag = "advance-approach"
-				logging.debug("advance approach for signal %s" % sig.GetName())
 			elif sig.aspect == 0b001:
 				tag = "approach"
 			elif sig.aspect == 0b101:

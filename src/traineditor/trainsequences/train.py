@@ -10,6 +10,7 @@ class Train:
 		self.startsubblock = None
 		self.startblocktime = 5000
 		self.normalLoco = None
+		self.route = None
 		
 	def SetDirection(self, direction):
 		self.east = direction
@@ -46,16 +47,23 @@ class Train:
 		
 	def GetStartSubBlock(self):
 		return self.startsubblock
-	
+
 	def SetNormalLoco(self, loco):
 		self.normalLoco = loco
-		
+
 	def GetNormalLoco(self):
 		return self.normalLoco
-	
+
+	def SetRoute(self, route):
+		self.route = route
+
+	def GetRoute(self):
+		return self.route
+
 	def ToJSON(self):
-		return {"eastbound": self.east, "startblock": self.startblock, "startsubblock": self.startsubblock, "time": self.startblocktime, "sequence": self.steps}
-	
+		return {"eastbound": self.east, "startblock": self.startblock, "startsubblock": self.startsubblock, "time": self.startblocktime, "sequence": self.steps, "route": self.route}
+
+
 class Trains:
 	def __init__(self, rrserver):
 		self.RRServer = rrserver
@@ -64,15 +72,20 @@ class Trains:
 		self.trainlist = []
 		self.trainmap = {}
 		for tid, trData in TrainsJson.items():
-			if len(trData["sequence"]) > 0:
-				tr = self.AddTrain(tid, trData["eastbound"])
-				tr.SetStartBlock(trData["startblock"])
-				tr.SetStartSubBlock(trData["startsubblock"])
-				tr.SetStartBlockTime(trData["time"])
-				tr.SetSteps(trData["sequence"])
-				
-				tr.SetNormalLoco(trData["normalloco"])
-				self.trainmap[tid] = tr
+			if "route" not in trData:
+				trData["route"] = None
+
+			tr = self.AddTrain(tid, trData["eastbound"])
+			tr.SetStartBlock(trData["startblock"])
+			tr.SetStartSubBlock(trData["startsubblock"])
+			tr.SetStartBlockTime(trData["time"])
+			tr.SetSteps(trData["sequence"])
+			tr.SetRoute(trData["route"])
+
+			tr.SetNormalLoco(trData["normalloco"])
+			self.trainmap[tid] = tr
+
+
 			
 	def __iter__(self):
 		self._nx_ = 0
@@ -110,11 +123,13 @@ class Trains:
 					"cutoff": False,
 					"desc": None,
 					"loco": None,
+					"route": None,
 					"normalloco": None,
 					"origin": { "loc": None, "track": None },
 					"terminus": { "loc": None, "track": None }
 					}
-				
+
+
 			TrainsJson[tid].update(tr.ToJSON())
 			
 		self.RRServer.Post("trains.json", "data", TrainsJson)

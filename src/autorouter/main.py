@@ -244,7 +244,6 @@ class MainUnit:
 		except:
 			pass
 
-
 	def requestRoutes(self):
 		if self.sessionid is not None:
 			self.Request({"refresh": {"SID": self.sessionid, "type": "routes"}})
@@ -489,7 +488,7 @@ class MainUnit:
 					cmd = {"signal": {"name": sigNm, "aspect": -1}}
 					self.ReqQueue.Append(cmd)
 					logging.info("command sent: %s" % str(cmd))
-			else:
+				else:
 					logging.info("skipping this signal since we do not control Port")
 
 	def EnqueueRouteRequest(self, rteRq):

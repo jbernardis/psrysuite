@@ -1450,6 +1450,9 @@ class MainFrame(wx.Frame):
 			try:
 				trinfo = self.trainList[trainid]
 				rtName = None
+				if "route" in trinfo and trinfo["route"] is not None and trinfo["route"] != "":
+					rtName = tr.GetChosenRoute()
+					trinfo = self.trainList[rtName]
 			except (IndexError, KeyError):
 				rtName = tr.GetChosenRoute()
 				trinfo = self.trainList[rtName]

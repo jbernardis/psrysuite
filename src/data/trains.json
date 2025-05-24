@@ -185,7 +185,8 @@
         "Koehlstadt / Y51 (X)",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "12": {
     "block": null,
@@ -397,7 +398,8 @@
         "Sheffield Yd (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "17": {
     "block": null,
@@ -593,7 +595,8 @@
         "Koehlstadt / Y30 & 51 (X)",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "18": {
     "block": null,
@@ -805,7 +808,8 @@
         "Sheffiled Yard (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "21": {
     "block": null,
@@ -916,7 +920,8 @@
         "Southport (X)",
         16
       ]
-    ]
+    ],
+    "route": null
   },
   "22": {
     "block": null,
@@ -1051,7 +1056,8 @@
         "(sig) Wilson City / Track N42 (X)",
         23
       ]
-    ]
+    ],
+    "route": null
   },
   "43": {
     "block": null,
@@ -1147,7 +1153,8 @@
         "(sig) Wilson City / N31-32 (X)",
         23
       ]
-    ]
+    ],
+    "route": null
   },
   "44": {
     "block": null,
@@ -1243,7 +1250,8 @@
         "Green Mountain / Track C31 (X)",
         15
       ]
-    ]
+    ],
+    "route": null
   },
   "56": {
     "block": null,
@@ -1386,7 +1394,8 @@
         "Beechview Station  / Track A",
         26
       ]
-    ]
+    ],
+    "route": null
   },
   "57": {
     "block": null,
@@ -1529,7 +1538,8 @@
         "Koehlstadt / Y70",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "61": {
     "block": null,
@@ -1627,7 +1637,8 @@
         "Southport (X)",
         16
       ]
-    ]
+    ],
+    "route": null
   },
   "62": {
     "block": null,
@@ -1680,7 +1691,8 @@
         "Move to NA W / Siding A",
         22
       ]
-    ]
+    ],
+    "route": null
   },
   "63": {
     "block": null,
@@ -1743,7 +1755,8 @@
         "Waterman / Track Y69",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "64": {
     "block": null,
@@ -1868,7 +1881,8 @@
         "(sig) Nassau W / Track C or D",
         22
       ]
-    ]
+    ],
+    "route": null
   },
   "65": {
     "block": null,
@@ -1916,7 +1930,8 @@
         "(sig) S10 > Siding (X)",
         3
       ]
-    ]
+    ],
+    "route": null
   },
   "66": {
     "block": null,
@@ -1959,7 +1974,8 @@
         "(sig) Station / Track P2",
         16
       ]
-    ]
+    ],
+    "route": null
   },
   "71": {
     "block": null,
@@ -2083,7 +2099,8 @@
         "Southport (X)",
         16
       ]
-    ]
+    ],
+    "route": null
   },
   "72": {
     "block": null,
@@ -2218,7 +2235,8 @@
         "Hidden / Track H43 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "73": {
     "block": null,
@@ -2319,7 +2337,8 @@
         "Hidden / H34 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "81": {
     "block": null,
@@ -2483,7 +2502,8 @@
         "Hidden / H12 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "82": {
     "block": null,
@@ -2663,7 +2683,8 @@
         "Sheffield Yd (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "84": {
     "block": null,
@@ -2764,7 +2785,8 @@
         "Hidden / Track H42 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "90": {
     "block": null,
@@ -2812,7 +2834,8 @@
         "Harpers Ferry / Track A",
         7
       ]
-    ]
+    ],
+    "route": null
   },
   "91": {
     "block": null,
@@ -2865,7 +2888,8 @@
         "(sig) Wilson City / Track WC-E",
         24
       ]
-    ]
+    ],
+    "route": null
   },
   "92": {
     "block": null,
@@ -2923,7 +2947,8 @@
         "Store on Track B",
         7
       ]
-    ]
+    ],
+    "route": null
   },
   "93": {
     "block": null,
@@ -2991,7 +3016,8 @@
         "Station / Track P1",
         16
       ]
-    ]
+    ],
+    "route": null
   },
   "94": {
     "block": null,
@@ -3044,7 +3070,8 @@
         "(sig) Wilson City / Track D-E ",
         24
       ]
-    ]
+    ],
+    "route": null
   },
   "95": {
     "block": null,
@@ -3092,7 +3119,8 @@
         "HF / Track B (X)",
         6
       ]
-    ]
+    ],
+    "route": null
   },
   "96": {
     "block": null,
@@ -3241,7 +3269,8 @@
         "Harpers Ferry / Track F33",
         7
       ]
-    ]
+    ],
+    "route": null
   },
   "97": {
     "block": null,
@@ -3309,7 +3338,8 @@
         "(sig) Koehlstadt / Track Y53",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "9999": {
     "block": null,
@@ -3383,7 +3413,8 @@
         "Koehlstadt / Y51 (X)",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "CAJY": {
     "block": null,
@@ -3446,7 +3477,8 @@
         "28th Street / Track C or D",
         26
       ]
-    ]
+    ],
+    "route": null
   },
   "CF1": {
     "block": null,
@@ -3630,7 +3662,8 @@
         "Waterman / Track Y87",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "CF2": {
     "block": null,
@@ -3814,7 +3847,8 @@
         "Waterman / Track Y87",
         8
       ]
-    ]
+    ],
+    "route": null
   },
   "CF3": {
     "block": null,
@@ -3998,7 +4032,8 @@
         "Waterman / Track Y87",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "CFHY": {
     "block": null,
@@ -4162,7 +4197,8 @@
         "Hidden Trk / H33 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "CLYD": {
     "block": null,
@@ -4342,7 +4378,8 @@
         "Waterman Yd / Track Y87",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "CP1": {
     "block": null,
@@ -4526,7 +4563,8 @@
         "Station / Track Y30",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "CP2": {
     "block": null,
@@ -4710,7 +4748,8 @@
         "Station / Track Y30",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "CP3": {
     "block": null,
@@ -4894,7 +4933,8 @@
         "Station / Track Y30",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "HE22": {
     "block": null,
@@ -4996,7 +5036,8 @@
         "Track 22 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "HE41": {
     "block": null,
@@ -5098,7 +5139,8 @@
         "Track 41 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "HE42": {
     "block": null,
@@ -5200,7 +5242,8 @@
         "Track 42 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "HE43": {
     "block": null,
@@ -5307,7 +5350,8 @@
         "Hyde Jct / Track H34",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "HEX": {
     "block": null,
@@ -5400,7 +5444,8 @@
         "Hidden / Track H40 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "HW12": {
     "block": null,
@@ -5502,7 +5547,8 @@
         "Track 12 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "HW33": {
     "block": null,
@@ -5604,7 +5650,8 @@
         "Track 33 X",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "HW34": {
     "block": null,
@@ -5706,7 +5753,8 @@
         "Track 34 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "HWX": {
     "block": null,
@@ -5799,7 +5847,8 @@
         "Hidden / Track H32 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "HYCF": {
     "block": null,
@@ -5979,7 +6028,8 @@
         "Sheffield Yd (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "HYJY": {
     "block": null,
@@ -6047,7 +6097,8 @@
         "Track B",
         25
       ]
-    ]
+    ],
+    "route": null
   },
   "HYYD": {
     "block": null,
@@ -6187,7 +6238,8 @@
         "(sig) Waterman Yard (X)",
         1
       ]
-    ]
+    ],
+    "route": null
   },
   "JYHY": {
     "block": null,
@@ -6255,7 +6307,8 @@
         "Hyde / Track H41 (Hold)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "MAIL E": {
     "block": null,
@@ -6323,7 +6376,8 @@
         "(S6) Pick & Drop / C30>",
         15
       ]
-    ]
+    ],
+    "route": null
   },
   "MAIL W": {
     "block": null,
@@ -6391,7 +6445,8 @@
         "(sig) Station / P60-61",
         9
       ]
-    ]
+    ],
+    "route": null
   },
   "PBCX": {
     "block": null,
@@ -6492,7 +6547,8 @@
         "Hidden / Track H32 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "YDCF": {
     "block": null,
@@ -6704,7 +6760,8 @@
         "Sheffield Yd / C41-C44",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "YDCL": {
     "block": null,
@@ -6924,7 +6981,8 @@
         "Sheffield Yd / Track C41-C44",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "YDHY": {
     "block": null,
@@ -7072,7 +7130,8 @@
         "Hidden / Track H22 (X)",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "YF1": {
     "block": null,
@@ -7238,7 +7297,8 @@
       "track": null
     },
     "time": 5000,
-    "tracker": []
+    "tracker": [],
+    "route": null
   },
   "YF2": {
     "block": null,
@@ -7404,7 +7464,8 @@
       "track": null
     },
     "time": 5000,
-    "tracker": []
+    "tracker": [],
+    "route": null
   },
   "YF3": {
     "block": null,
@@ -7617,7 +7678,8 @@
         "Sheffield Yard",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "YP1": {
     "block": null,
@@ -7822,7 +7884,8 @@
         "Sheffield Yard",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "YP2": {
     "block": null,
@@ -8027,7 +8090,8 @@
         "Sheffield Yard",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "YP3": {
     "block": null,
@@ -8232,7 +8296,8 @@
         "Sheffield Yd",
         11
       ]
-    ]
+    ],
+    "route": null
   },
   "CF4": {
     "sequence": [],
@@ -8254,7 +8319,8 @@
     },
     "tracker": [],
     "block": null,
-    "eastbound": false
+    "eastbound": false,
+    "route": null
   },
   "CP4": {
     "sequence": [],
@@ -8316,7 +8382,8 @@
         1
       ]
     ],
-    "block": null
+    "block": null,
+    "route": null
   },
   "CP5": {
     "sequence": [],
@@ -8378,7 +8445,8 @@
         1
       ]
     ],
-    "block": null
+    "block": null,
+    "route": null
   },
   "CP6": {
     "sequence": [],
@@ -8440,7 +8508,8 @@
         1
       ]
     ],
-    "block": null
+    "block": null,
+    "route": null
   },
   "GMYD": {
     "sequence": [],
@@ -8507,7 +8576,8 @@
         1
       ]
     ],
-    "block": null
+    "block": null,
+    "route": null
   },
   "YDGM": {
     "sequence": [],
@@ -8574,7 +8644,8 @@
         11
       ]
     ],
-    "block": null
+    "block": null,
+    "route": null
   },
   "99999": {
     "sequence": [],
@@ -8641,7 +8712,8 @@
         1
       ]
     ],
-    "block": null
+    "block": null,
+    "route": null
   },
   "PLW": {
     "tracker": [
@@ -8782,6 +8854,51 @@
         "time": 5000,
         "trigger": "Front"
       }
-    ]
+    ],
+    "route": null
+  },
+  "CLYD1": {
+    "tracker": [],
+    "block": null,
+    "cutoff": false,
+    "desc": null,
+    "loco": null,
+    "route": "CLYD",
+    "normalloco": null,
+    "origin": {
+      "loc": null,
+      "track": null
+    },
+    "terminus": {
+      "loc": null,
+      "track": null
+    },
+    "eastbound": false,
+    "startblock": null,
+    "startsubblock": null,
+    "time": 5000,
+    "sequence": []
+  },
+  "CLYD2": {
+    "tracker": [],
+    "block": null,
+    "cutoff": false,
+    "desc": null,
+    "loco": null,
+    "route": "CLYD",
+    "normalloco": null,
+    "origin": {
+      "loc": null,
+      "track": null
+    },
+    "terminus": {
+      "loc": null,
+      "track": null
+    },
+    "eastbound": false,
+    "startblock": null,
+    "startsubblock": null,
+    "time": 5000,
+    "sequence": []
   }
 }

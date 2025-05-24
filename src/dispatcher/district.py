@@ -707,6 +707,7 @@ class District:
 			#  report calculated aspect back to the server
 			if aspect is None:
 				aspect = sig.GetAspect()
+				logging.debug("Calculated aspect of None whan given aspect -1.  signal/aspect = {%s/%s" % (sig.GetName(), aspect))
 				
 			self.frame.Request({"signal": {"name": signm, "aspect": aspect, "aspecttype": atype}})
 

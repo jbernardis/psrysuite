@@ -20,10 +20,14 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		self.title = "PSRY Train Block Sequence Editor"
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.RRServer = rrserver
-		
+
+		self.selectedTrain = None
+		self.selectedRoute = None
+		self.modified = False
+
 		self.cbTrain = wx.ComboBox(self, wx.ID_ANY, "", size=(100, -1),
 			 choices=[],
-			 style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER | wx.CB_SORT)
+			 style=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER) #  | wx.CB_SORT)
 		self.Bind(wx.EVT_COMBOBOX, self.OnCbTrain, self.cbTrain)
 		self.Bind(wx.EVT_TEXT_ENTER, self.OnCbTrainTextEnter, self.cbTrain)
 				
@@ -57,8 +61,19 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		self.Bind(wx.EVT_BUTTON, self.OnBExit, self.bExit)
 		self.bRevert = wx.Button(self, wx.ID_ANY, "Revert", size=(80, 50))
 		self.Bind(wx.EVT_BUTTON, self.OnBRevert, self.bRevert)
-		
+
+		self.cbUseRoute = wx.CheckBox(self, wx.ID_ANY, "Use route of train:")
+		self.Bind(wx.EVT_CHECKBOX, self.OnChbUseRoute, self.cbUseRoute)
+		self.chRoute = wx.Choice(self, wx.ID_ANY, choices=[])
+		self.Bind(wx.EVT_CHOICE, self.OnChRoute, self.chRoute)
+
+		routesz = wx.BoxSizer(wx.HORIZONTAL)
+		routesz.Add(self.cbUseRoute)
+		routesz.AddSpacer(5)
+		routesz.Add(self.chRoute)
+
 		buttonsz = wx.BoxSizer(wx.HORIZONTAL)
+
 		buttonsz.AddSpacer(10)
 		buttonsz.Add(self.bValCurrent)
 		buttonsz.AddSpacer(20)
@@ -111,6 +126,8 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.Add(hsz)
 		vsz.AddSpacer(20)
+		vsz.Add(routesz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		vsz.AddSpacer(20)
 		vsz.Add(buttonsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
 		vsz.AddSpacer(20)
 
@@ -122,42 +139,85 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		wx.CallAfter(self.Initialize)
 		
 	def Initialize(self):
-		self.selectedTrain = None
-		self.modified = False
 		self.ShowTitle()
-		self.EnableButtons(False)
+		self.bEditSteps.Enable(False)
+		self.bValCurrent.Enable(False)
+
 		self.loadTrains()
+		self.SetRouteChoices(self.trains.GetTrainList())
 		self.SetTrainChoices(self.trains.GetTrainList())
-		
-	def EnableButtons(self, flag=True):
-		self.bEditSteps.Enable(flag)
-		self.bValCurrent.Enable(flag)
-		
+
 	def loadTrains(self):
 		self.trains = Trains(self.RRServer)
-		
+
 	def SetTrainChoices(self, trlist=None):
 		if trlist is not None:
 			self.trainChoices = sorted([x for x in trlist])
-			
+
 		self.cbTrain.SetItems(self.trainChoices)
 		if self.selectedTrain is not None:
 			try:
 				tx = self.trainChoices.index(self.selectedTrain)
 			except ValueError:
 				self.selectedTrain = None
-				
+				tx = 0
+
 		if self.selectedTrain is None and len(self.trainChoices) > 0:
 			tx = 0
 			self.UpdateTrainSelection(self.trainChoices[0])
 		elif self.selectedTrain is None:
 			self.UpdateTrainSelection(None)
-				
+
 		if self.selectedTrain is not None:
 			self.cbTrain.SetSelection(tx)
-			
+			tr = self.trains.GetTrainById(self.selectedTrain)
+			self.selectedRoute = tr.GetRoute()
+			if self.selectedRoute is None:
+				self.cbUseRoute.SetValue(False)
+				self.chRoute.SetSelection(wx.NOT_FOUND)
+			else:
+				self.cbUseRoute.SetValue(True)
+				try:
+					tx = self.routeChoices.index(self.selectedRoute)
+				except ValueError:
+					tx = wx.NOT_FOUND
+				self.chRoute.SetSelection(tx)
+
+			nsteps = tr.GetNSteps()
+			self.cbUseRoute.Enable(nsteps == 0)
+			self.chRoute.Enable(nsteps == 0)
+		else:
+			self.cbTrain.SetSelection(wx.NOT_FOUND)
+			self.cbUseRoute.Enable(False)
+			self.chRoute.Enable(False)
+
 		self.bDelTrain.Enable(self.selectedTrain is not None)
-				
+
+	def SetRouteChoices(self, trlist=None):
+		if trlist is not None:
+			self.routeChoices = []
+			for trid in trlist:
+				tr = self.trains.GetTrainById(trid)
+				if tr is None:
+					continue
+
+				if tr.GetNSteps() > 0:
+					self.routeChoices.append(trid)
+		else:
+			self.routeChoices = []
+
+		self.chRoute.SetItems(self.routeChoices)
+		if self.selectedRoute is not None:
+			try:
+				tx = self.routeChoices.index(self.selectedRoute)
+			except ValueError:
+				self.selectedRoute = None
+				tx = wx.NOT_FOUND
+
+			self.chRoute.SetSelection(tx)
+		else:
+			self.chRoute.SetSelection(wx.NOT_FOUND)
+
 	def AddTrainChoice(self, newtid):
 		if newtid in self.trainChoices:
 			return False
@@ -194,21 +254,59 @@ class TrainBlockSequencesDlg(wx.Dialog):
 			tid = self.cbTrain.GetString(tx)
 
 		self.UpdateTrainSelection(tid)
-	
+
+	def OnChbUseRoute(self, evt):
+		flag = self.cbUseRoute.GetValue()
+		if flag:
+			try:
+				rt = self.routeChoices[0]
+			except (KeyError, IndexError):
+				rt = None
+
+			self.chRoute.SetSelection(wx.NOT_FOUND if rt is None else 0)
+			tr = self.trains.GetTrainById(self.selectedTrain)
+			tr.SetRoute(rt)
+			self.SetModified()
+			self.bEditSteps.Enable(False)
+
+		else:
+			tr = self.trains.GetTrainById(self.selectedTrain)
+			otid = tr.GetRoute()
+			tr.SetRoute(None)
+			self.SetModified(otid is not None)
+			self.chRoute.SetSelection(wx.NOT_FOUND)
+			self.bEditSteps.Enable(True)
+
+	def OnChRoute(self, evt):
+		tx = self.chRoute.GetSelection()
+		if tx is None or tx == wx.NOT_FOUND:
+			tid = None
+		else:
+			tid = self.chRoute.GetString(tx)
+
+		tr = self.trains.GetTrainById(self.selectedTrain)
+		otid = tr.GetRoute()
+		if otid != tid:
+			tr.SetRoute(tid)
+			self.SetModified()
+			self.SetModified()
+
 	def OnCbTrainTextEnter(self, evt):
 		tid = evt.GetString()
 		self.UpdateTrainSelection(tid)
 		
 	def UpdateTrainSelection(self, tid):
 		if tid is None:
-			self.EnableButtons(False)
+			self.bEditSteps.Enable(False)
+			self.bValCurrent.Enable(False)
 			self.currentTrain = None
 			self.blockSeq.SetItems([])
 			return
 		if tid not in self.trainChoices:
 			if not self.AddTrainChoice(tid):
 				if self.currentTrain is None:
-					self.EnableButtons(False)
+					self.bEditSteps.Enable(False)
+					self.bValCurrent.Enable(False)
 					self.currentTrain = None
 					self.blockSeq.SetItems([])
 					return
@@ -218,21 +316,45 @@ class TrainBlockSequencesDlg(wx.Dialog):
 				self.selectedTrain = tid
 		else:
 			self.selectedTrain = tid
-			
-		self.EnableButtons(True)
 
 		tr = self.trains.GetTrainById(self.selectedTrain)
 		self.currentTrain = tr
-		
-		self.chbEast.SetValue(tr.IsEast())
-		
-		self.blockSeq.SetItems(self.currentTrain.GetSteps())
-		self.startBlock = self.currentTrain.GetStartBlock()
-		self.startSubBlock = self.currentTrain.GetStartSubBlock()
-		self.startBlockTime = self.currentTrain.GetStartBlockTime()
+		if self.currentTrain.GetNSteps() > 0:  # train with steps defined
+			self.chbEast.SetValue(tr.IsEast())
+			self.blockSeq.SetItems(self.currentTrain.GetSteps())
+			self.startBlock = self.currentTrain.GetStartBlock()
+			self.startSubBlock = self.currentTrain.GetStartSubBlock()
+			self.startBlockTime = self.currentTrain.GetStartBlockTime()
+			self.ShowStartBlock()
+			self.cbUseRoute.Enable(False)
+			self.cbUseRoute.SetValue(False)
+			self.chRoute.SetSelection(wx.NOT_FOUND)
+			self.chRoute.Enable(False)
+			self.bEditSteps.Enable(True)
 
-		self.ShowStartBlock()
-		
+		elif tr.GetRoute() is not None:  # train that is based on another train
+			print("route for train %s is %s" % (self.selectedTrain, tr.GetRoute()))
+			self.selectedRoute = tr.GetRoute()
+			self.blockSeq.SetItems([])
+			self.cbUseRoute.Enable(True)
+			self.cbUseRoute.SetValue(True)
+			try:
+				tx = self.routeChoices.index(self.selectedRoute)
+			except ValueError:
+				tx = wx.NOT_FOUND
+			self.chRoute.SetSelection(tx)
+			self.chRoute.Enable(True)
+			self.bEditSteps.Enable(False)
+
+		else:  #  train that hasn't specified yet
+			self.selectedRoute = None
+			self.blockSeq.SetItems([])
+			self.cbUseRoute.Enable(True)
+			self.cbUseRoute.SetValue(False)
+			self.chRoute.SetSelection(wx.NOT_FOUND)
+			self.chRoute.Enable(True)
+			self.bEditSteps.Enable(True)
+
 	def ShowStartBlock(self):		
 		if self.startBlock is not None:
 			if self.startSubBlock is None:
@@ -243,8 +365,11 @@ class TrainBlockSequencesDlg(wx.Dialog):
 			self.teStartBlock.SetValue(sbString)
 		else:
 			self.teStartBlock.SetValue("")
-		self.teStartBlockTime.SetValue("%d" % self.startBlockTime)
-			
+		if self.startBlockTime is None:
+			self.teStartBlockTime.SetValue("")
+		else:
+			self.teStartBlockTime.SetValue("%d" % self.startBlockTime)
+
 	def OnChbEastbound(self, evt):
 		self.currentTrain.SetDirection(self.chbEast.IsChecked())
 		self.SetModified()
@@ -270,6 +395,14 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		self.startBlockTime = self.currentTrain.GetStartBlockTime()
 		self.ShowStartBlock()
 		self.SetModified()
+
+		l = len(results["steps"])
+		if l > 0:
+			self.currentTrain.SetRoute(None)
+			self.cbUseRoute.SetValue(False)
+			self.chRoute.SetSelection(wx.NOT_FOUND)
+		self.chRoute.Enable(l == 0)
+		self.cbUseRoute.Enable(l == 0)
 		
 	def validateSequence(self, blk, steps):
 		badTransitions = []
