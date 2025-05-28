@@ -106,12 +106,11 @@ class RouteTrainDlg(wx.Dialog):
 		self.Bind(wx.EVT_BUTTON, self.OnBLocate, self.bLocate)
 		hsz.Add(self.bLocate)
 
-		if self.isDispatcher:
-			hsz.AddSpacer(30)
+		hsz.AddSpacer(30)
 
-			self.bHilite = wx.Button(self, wx.ID_ANY, HILITEON, size=BUTTONSIZE)
-			self.Bind(wx.EVT_BUTTON, self.OnBHiLite, self.bHilite)
-			hsz.Add(self.bHilite)
+		self.bHilite = wx.Button(self, wx.ID_ANY, HILITEON, size=BUTTONSIZE)
+		self.Bind(wx.EVT_BUTTON, self.OnBHiLite, self.bHilite)
+		hsz.Add(self.bHilite)
 
 		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
