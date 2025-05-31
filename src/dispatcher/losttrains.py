@@ -1,5 +1,6 @@
 import wx
 import os
+import logging
 
 BSIZE = (100, 26)
 
@@ -7,15 +8,42 @@ BSIZE = (100, 26)
 class LostTrains:
 	def __init__(self):
 		self.trains = {}
+		self.branchLineW = None
+		self.branchLineE = None
 		
 	def Add(self, train, loco, engineer, east, block, route):
 		if train.startswith("??"):
 			return False
-		
+
+		if block == "F10" and not east:
+			self.branchLineW = (train, loco, engineer, east, block, route)
+		elif block == "R10" and east:
+			self.branchLineE = (train, loco, engineer, east, block, route)
+
 		self.trains[train] = (loco, engineer, east, block, route)
 		return True
-		
+
+	def GetBranchLineTrain(self, east):
+		return self.branchLineE if east else self.branchLineW
+
+	def ClearBranchLine(self, east):
+		if east:
+			if self.branchLineE is not None:
+				trid = self.branchLineE[0]
+				self.branchLineE = None
+				self.Remove(trid)
+		else:
+			if self.branchLineW is not None:
+				trid = self.branchLineW[0]
+				self.branchLineW = None
+				self.Remove(trid)
+
 	def Remove(self, train):
+		if self.branchLineE is not None and self.branchLineE[0] == train:
+			self.branchLineE = None
+		if self.branchLineW is not None and self.branchLineW[0] == train:
+			self.branchLineW = None
+
 		try:
 			del self.trains[train]
 		except KeyError:

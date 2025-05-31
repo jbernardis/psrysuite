@@ -4,7 +4,8 @@ from wx.lib.intctrl import IntCtrl
 from traineditor.trainsequences.nextblocklist import NextBlockListCtrl
 from traineditor.trainsequences.blocksequence import BlockSequenceListCtrl
 from traineditor.trainsequences.editblockdlg import EditBlockDlg
-		
+
+
 class TrainDlg(wx.Dialog):
 	def __init__(self, parent, train, layout):
 		self.parent = parent

@@ -1192,9 +1192,8 @@ class MainFrame(wx.Frame):
 		if self.hiliteRouteTicker > 0:
 			self.hiliteRouteTicker -= 1
 			if self.hiliteRouteTicker == 0:
-				self.ClearHighlitedRoute()
+				self.ClearHighlitedRoute(None)
 
-			
 		self.delayedRequests.CheckForExpiry(self.Request)
 		self.delayedSignals.CheckForExpiry()
 
@@ -1516,7 +1515,13 @@ class MainFrame(wx.Frame):
 			self.panels[scr].SetHighlitedRoute(tiles)
 		self.hiliteRouteTicker = 0 #  10
 
-	def ClearHighlitedRoute(self, name):
+	def ClearHighlitedRoute(self, name=None):
+		if name is None:
+			name = self.hilitedRoute
+
+		if name is None:
+			return
+
 		if name == self.hilitedRoute:
 			self.hilitedRoute = None
 			for p in self.panels.values():
@@ -1603,19 +1608,41 @@ class MainFrame(wx.Frame):
 		oldEngineer = tr.GetEngineer()
 		oldATC = tr.IsOnATC() if self.IsDispatcher() else False
 		oldAR = tr.IsOnAR() if self.IsDispatcher() else False
-		dlgx = self.centerw - 500 - self.centerOffset
-		dlgy = self.totalh - 660
-		dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.engineerList, self.trains,
-						   self.IsDispatcher() and self.ATCEnabled,
-						   self.IsDispatcher() and self.AREnabled,
-						   self.IsDispatcherOrSatellite(),
-						   self.lostTrains, self.trainHistory, self.preloadedTrains, dlgx, dlgy)
-		rc = dlg.ShowModal()
-		east = tr.GetEast()
-		if rc == wx.ID_OK:
-			trainid, locoid, engineer, atc, ar, east, chosenRoute = dlg.GetResults()
 
-		dlg.Destroy()
+		blknm = blk.GetName()
+		if blknm in ["R10", "F10"] and oldName.startswith("??"):
+			bl = self.lostTrains.GetBranchLineTrain(tr.GetEast())
+		else:
+			bl = None
+
+		rc = wx.ID_NO
+		if bl is not None:
+			loc = "Harper's Ferry/James Island" if not bl[3] else "Wilson City"
+			dlg = ConfirmBranchLineTrainDlg(self, bl[0], bl[1], bl[2], loc)
+			rc = dlg.ShowModal()
+			dlg.Destroy()
+
+		if rc == wx.ID_YES:
+			trainid, locoid, engineer, east, _, chosenRoute = bl
+			self.lostTrains.ClearBranchLine(east)
+			rc = wx.ID_OK
+			atc = False
+			ar = False
+
+		else:
+			dlgx = self.centerw - 500 - self.centerOffset
+			dlgy = self.totalh - 660
+			dlg = EditTrainDlg(self, tr, blk, self.locoList, self.trainList, self.engineerList, self.trains,
+							   self.IsDispatcher() and self.ATCEnabled,
+							   self.IsDispatcher() and self.AREnabled,
+							   self.IsDispatcherOrSatellite(),
+							   self.lostTrains, self.trainHistory, self.preloadedTrains, dlgx, dlgy)
+			rc = dlg.ShowModal()
+			east = tr.GetEast()
+			if rc == wx.ID_OK:
+				trainid, locoid, engineer, atc, ar, east, chosenRoute = dlg.GetResults()
+
+			dlg.Destroy()
 		
 		if rc == wx.ID_CUT:	 # split train in 2
 			blockDict = tr.GetBlockList()
@@ -1698,6 +1725,8 @@ class MainFrame(wx.Frame):
 			lrc = dlg.ShowModal()
 			if lrc == wx.ID_OK:
 				trxid = dlg.GetResults()
+			else:
+				trxid = None
 			dlg.Destroy()
 			if lrc != wx.ID_OK:
 				return 
@@ -3351,7 +3380,7 @@ class MainFrame(wx.Frame):
 			if self.IsDispatcherOrSatellite() and self.settings.dispatcher.notifyinvalidblocks and block not in YardBlocks:
 				try:
 					seq = self.trainList[name]["sequence"]
-					sb =  self.trainList[name]["startblock"]
+					sb = self.trainList[name]["startblock"]
 					if len(seq) == 0:
 						seq = None
 				except (IndexError, KeyError):
@@ -3359,7 +3388,7 @@ class MainFrame(wx.Frame):
 						rtnm = tr.GetChosenRoute()
 						seq = self.trainList[rtnm]["sequence"]
 						sb = self.trainList[rtnm]["startblock"]
-						if seq == 0:
+						if len(seq) == 0:
 							seq = None
 					except (IndexError, KeyError):
 						seq = None
@@ -4262,6 +4291,93 @@ class MainFrame(wx.Frame):
 
 	def GetDebugFlags(self):
 		return self.settings.debug
+
+
+class ConfirmBranchLineTrainDlg(wx.Dialog):
+	def __init__(self, parent, trid, lid, eng, loc):
+		wx.Dialog.__init__(self, parent, wx.ID_ANY, "Confirm Branch Line Train")
+		self.Bind(wx.EVT_CLOSE, self.AnswerNo)
+		btnsz = (120, 46)
+		font = wx.Font(wx.Font(16, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial"))
+		fontBold = wx.Font(wx.Font(16, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+
+		vsz = wx.BoxSizer(wx.VERTICAL)
+		vsz.AddSpacer(20)
+
+		st = wx.StaticText(self, wx.ID_ANY, "Confirm Branch Line Train:")
+		st.SetFont(font)
+		vsz.Add(st, 0, wx.LEFT, 10)
+		vsz.AddSpacer(20)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(40)
+		st = wx.StaticText(self, wx.ID_ANY, "Train:", size=(140, -1))
+		st.SetFont(font)
+		hsz.Add(st)
+		st = wx.StaticText(self, wx.ID_ANY, trid)
+		st.SetFont(fontBold)
+		hsz.Add(st)
+		vsz.Add(hsz)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(40)
+		st = wx.StaticText(self, wx.ID_ANY, "Locomotive:", size=(140, -1))
+		st.SetFont(font)
+		hsz.Add(st)
+		st = wx.StaticText(self, wx.ID_ANY, lid)
+		st.SetFont(fontBold)
+		hsz.Add(st)
+		vsz.Add(hsz)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(40)
+		st = wx.StaticText(self, wx.ID_ANY, "Engineer:", size=(140, -1))
+		st.SetFont(font)
+		hsz.Add(st)
+		st = wx.StaticText(self, wx.ID_ANY, eng)
+		st.SetFont(fontBold)
+		hsz.Add(st)
+		vsz.Add(hsz)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(40)
+		st = wx.StaticText(self, wx.ID_ANY, "From:", size=(140, -1))
+		st.SetFont(font)
+		hsz.Add(st)
+		st = wx.StaticText(self, wx.ID_ANY, loc)
+		st.SetFont(fontBold)
+		hsz.Add(st)
+		vsz.Add(hsz)
+
+		vsz.AddSpacer(30)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL);
+		byes = wx.Button(self, wx.ID_ANY, "Yes", size=btnsz)
+		self.Bind(wx.EVT_BUTTON, self.AnswerYes, byes)
+		bno = wx.Button(self, wx.ID_ANY, "No", size=btnsz)
+		self.Bind(wx.EVT_BUTTON, self.AnswerNo, bno)
+
+		hsz.Add(byes)
+		hsz.AddSpacer(30)
+		hsz.Add(bno)
+
+		vsz.Add(hsz, 0, wx.ALIGN_CENTER_HORIZONTAL)
+		vsz.AddSpacer(20)
+
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(20)
+		hsz.Add(vsz)
+		hsz.AddSpacer(20)
+
+		self.SetSizer(hsz)
+		self.Layout()
+		self.Fit()
+
+	def AnswerNo(self, _):
+		self.EndModal(wx.ID_NO)
+
+	def AnswerYes(self, _):
+		self.EndModal(wx.ID_YES)
 
 
 class ExitDlg (wx.Dialog):
