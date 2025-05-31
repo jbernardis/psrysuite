@@ -25,6 +25,12 @@ class ActiveTrainList:
 		self.RegenerateLocoMap()
 		if self.dlgTrainList is not None:
 			self.dlgTrainList.AddTrain(tr)
+
+	def GetTrain(self, trid):
+		try:
+			return self.trains[trid]
+		except KeyError:
+			return None
 			
 	def UpdateTrain(self, trid):
 		if self.dlgTrainList is not None:

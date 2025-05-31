@@ -5,7 +5,7 @@ from dispatcher.district import CrossingEastWestBoundary
 
 
 def formatRouteDesignator(rtName):
-	return "{%s}" % rtName[3:]
+	return "" if rtName is None else "{%s}" % rtName[3:]
 
 
 class Route:

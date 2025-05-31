@@ -323,7 +323,11 @@ class TrainDlg(wx.Dialog):
 				self.availableBlocks.append([e[1], s[0], os, r])
 			elif e[1] == blk:
 				self.availableBlocks.append([e[0], s[1], os, r])
-				
+		if blk == "F10":
+			self.availableBlocks.append(["R10", None, None, None])
+		elif blk == "R10":
+			self.availableBlocks.append(["F10", None, None, None])
+
 	def GetResults(self):
 		return {"startblock": self.startBlock, "startsubblock": self.startSubBlock, "time": self.tcStartBlockTime.GetValue(), "steps": self.blockSequence.GetBlocks()}
 

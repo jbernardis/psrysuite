@@ -10,6 +10,8 @@ from traineditor.layoutdata import LayoutData
 SIMSCRIPTFN = "simscripts.json"
 ARSCRIPTFN =  "arscripts.json"
 
+BRANCHENDS = ["F10", "R10"]
+
 def StoppingSection(blk):
 	return blk.endswith(".W") or blk.endswith(".E")
 		
@@ -408,20 +410,24 @@ class TrainBlockSequencesDlg(wx.Dialog):
 		badTransitions = []
 		for step in steps:
 			stepList = [step["block"], step["signal"], step["os"], step["route"]]
-			availableBlocks = []
-			rteList = self.layout.GetRoutesForBlock(blk)
-			for r in rteList:
-				e = self.layout.GetRouteEnds(r)
-				s = self.layout.GetRouteSignals(r)
-				os = self.layout.GetRouteOS(r)
-				if e[0] == blk:
-					availableBlocks.append([e[1], s[0], os, r])
-				elif e[1] == blk:
-					availableBlocks.append([e[0], s[1], os, r])
-					
-			if stepList not in availableBlocks:
-				badTransitions.append("Block %s  ==>  Block %s via signal %s OS %s Route %s" % (blk, stepList[0], stepList[1], stepList[2], stepList[3]))
-				
+			if blk in BRANCHENDS and step["block"] in BRANCHENDS and blk != step["block"]:
+				# opposite ends of the branch line are considered adjacent
+				pass
+			else:
+				availableBlocks = []
+				rteList = self.layout.GetRoutesForBlock(blk)
+				for r in rteList:
+					e = self.layout.GetRouteEnds(r)
+					s = self.layout.GetRouteSignals(r)
+					os = self.layout.GetRouteOS(r)
+					if e[0] == blk:
+						availableBlocks.append([e[1], s[0], os, r])
+					elif e[1] == blk:
+						availableBlocks.append([e[0], s[1], os, r])
+
+				if stepList not in availableBlocks:
+					badTransitions.append("Block %s  ==>  Block %s via signal %s OS %s Route %s" % (blk, stepList[0], stepList[1], stepList[2], stepList[3]))
+
 			blk = step["block"] # move on to the next block
 		
 		return badTransitions

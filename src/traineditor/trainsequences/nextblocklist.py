@@ -61,7 +61,7 @@ class NextBlockListCtrl(wx.ListCtrl):
 		self.setSelection(event.Index, activate=True)
 
 	def OnGetItemText(self, item, col):
-		return self.blocks[item][col]
+		return "" if self.blocks[item][col] is None else self.blocks[item][col]
 
 	def OnGetItemAttr(self, item):
 		if item % 2 == 1:

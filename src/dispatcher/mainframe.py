@@ -1476,6 +1476,9 @@ class MainFrame(wx.Frame):
 		
 		dlg.UpdateTrainStatus()
 
+	def GetTrainObject(self, trid):
+		return self.activeTrains.GetTrain(trid)
+
 	def EnumerateBlockTiles(self, blkname):
 		try:
 			blk = self.blocks[blkname]
@@ -1619,6 +1622,7 @@ class MainFrame(wx.Frame):
 		if bl is not None:
 			loc = "Harper's Ferry/James Island" if not bl[3] else "Wilson City"
 			dlg = ConfirmBranchLineTrainDlg(self, bl[0], bl[1], bl[2], loc)
+			dlg.CenterOnScreen()
 			rc = dlg.ShowModal()
 			dlg.Destroy()
 
@@ -4334,7 +4338,7 @@ class ConfirmBranchLineTrainDlg(wx.Dialog):
 		st = wx.StaticText(self, wx.ID_ANY, "Engineer:", size=(140, -1))
 		st.SetFont(font)
 		hsz.Add(st)
-		st = wx.StaticText(self, wx.ID_ANY, eng)
+		st = wx.StaticText(self, wx.ID_ANY, "" if eng is None else eng)
 		st.SetFont(fontBold)
 		hsz.Add(st)
 		vsz.Add(hsz)

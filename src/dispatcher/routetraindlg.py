@@ -17,6 +17,7 @@ class RouteTrainDlg(wx.Dialog):
 		self.parent = parent
 		self.train = train
 		self.rtName = rtName
+		self.trainName = train.GetName()
 		self.trinfo = trinfo
 		self.isDispatcher = isDispatcher
 		self.sequence = trinfo["sequence"]
@@ -146,7 +147,10 @@ class RouteTrainDlg(wx.Dialog):
 		if self.lastStepx >= len(self.sequence):
 			return
 
-		sx = self.lastStepx				
+		sx = self.lastStepx
+		if self.sequence[sx]["os"] is None or self.sequence[sx]["os"] == "":
+			return
+
 		rc, alreadyset, msg = self.parent.SetRouteThruOS(self.sequence[sx]["os"], self.sequence[sx]["route"], self.sequence[sx]["block"], self.sequence[sx]["signal"])
 		
 		if not rc or (rc and msg is not None):
@@ -163,6 +167,9 @@ class RouteTrainDlg(wx.Dialog):
 			return
 
 		sx = self.lastStepx				
+		if self.sequence[sx]["signal"] is None or self.sequence[sx]["signal"] == "":
+			return
+
 		rc, msg = self.parent.SetRouteSignal(self.sequence[sx]["os"], self.sequence[sx]["route"], self.sequence[sx]["block"], self.sequence[sx]["signal"])
 		
 		if not rc or (rc and msg is not None):
@@ -198,7 +205,17 @@ class RouteTrainDlg(wx.Dialog):
 		self.DetermineTrainPosition()
 		
 	def DetermineTrainPosition(self):
+		newTr = self.parent.GetTrainObject(self.trainName)
+		if newTr is None:
+			self.ClearArrow(self.lastStepx)
+			self.msg.SetLabel("")
+			return
+
+		if self.train != newTr:
+			self.train = newTr
+
 		fb = self.train.FrontBlock()
+
 		if fb is None:
 			self.ClearArrow(self.lastStepx)
 			self.msg.SetLabel("")
