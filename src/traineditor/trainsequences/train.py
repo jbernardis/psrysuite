@@ -1,6 +1,8 @@
 import json
 import os
 
+from dispatcher.train import CopyTrainReferences
+
 class Train:
 	def __init__(self, tid):
 		self.tid = tid
@@ -65,9 +67,11 @@ class Train:
 
 
 class Trains:
-	def __init__(self, rrserver):
+	def __init__(self, rrserver, copyrefs=False):
 		self.RRServer = rrserver
 		TrainsJson = rrserver.Get("gettrains", {})
+		if copyrefs:
+			CopyTrainReferences(TrainsJson)
 
 		self.trainlist = []
 		self.trainmap = {}
@@ -84,8 +88,6 @@ class Trains:
 
 			tr.SetNormalLoco(trData["normalloco"])
 			self.trainmap[tid] = tr
-
-
 			
 	def __iter__(self):
 		self._nx_ = 0

@@ -7,7 +7,7 @@ import json
 import logging
 from subprocess import Popen
 
-from dispatcher.train import Train
+from dispatcher.train import Train, CopyTrainReferences
 from activetrains.trainlist import ActiveTrainList
 from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
@@ -313,6 +313,7 @@ class MainFrame(wx.Frame):
 			logging.error("Unable to retrieve trains")
 			trains = {}
 			
+		CopyTrainReferences(trains)
 		self.trainList = trains
 
 		engineers = self.Get("getengineers", {})

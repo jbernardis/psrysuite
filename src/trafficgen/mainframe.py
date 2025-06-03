@@ -155,7 +155,9 @@ class MainFrame(wx.Frame):
 
 			s = Script(self, script, trid, self.cbComplete)
 			self.scripts[trid] = s
-			self.scriptList.AddScript(s)
+
+		for trid in sorted(self.scripts.keys()):
+			self.scriptList.AddScript(self.scripts[trid])
 
 	def reportSelection(self):
 		selectedScripts = self.scriptList.GetChecked()
@@ -268,16 +270,21 @@ class MainFrame(wx.Frame):
 	def CheckResumeScripts(self):
 		delList = []
 		resumeList = []
+		logging.debug("check for which scripts to resume.  %d paused" % len(self.pausedScripts))
 		for i in range(len(self.pausedScripts)):
+			logging.debug("Script at index %d" % i)
 			scr = self.pausedScripts[i]
 			if not scr.CheckPause():
+				logging.debug("deleting from paused list and adding to resume list")
 				delList.append(i)
 				resumeList.append(scr)
 
 		for i in delList:
+			logging.debug("actually deleting script %d from paused list" % i)
 			del(self.pausedScripts[i])
 
 		for scr in resumeList:
+			logging.debug("resuming script %s" % str(scr.GetName()))
 			scr.Resume()
 
 	def SignalAspect(self, signal):
@@ -398,6 +405,7 @@ class MainFrame(wx.Frame):
 
 	def Request(self, req):
 		if self.subscribed:
+			logging.debug("sending command: %s" % str(req))
 			self.rrServer.SendRequest(req)
 
 	def onDisconnectEvent(self, _):

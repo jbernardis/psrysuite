@@ -19,6 +19,7 @@ import json
 
 from dispatcher.constants import RegAspects
 from dispatcher.settings import Settings
+from dispatcher.train import CopyTrainReferences
 
 from atc.turnout import Turnout
 from atc.signal import Signal
@@ -220,6 +221,8 @@ class MainFrame(wx.Frame):
 		if trains is None:
 			logging.error("Unable to retrieve trains information")
 			return False
+
+		CopyTrainReferences(trains)
 		
 		logging.info("Trains: %s" % json.dumps(trains))
 

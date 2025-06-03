@@ -3293,7 +3293,7 @@
       "track": "F33"
     },
     "sequence": [
-     {
+      {
         "block": "R10",
         "signal": null,
         "os": null,
@@ -8999,6 +8999,28 @@
     "desc": null,
     "loco": null,
     "route": "CLYD",
+    "normalloco": null,
+    "origin": {
+      "loc": null,
+      "track": null
+    },
+    "terminus": {
+      "loc": null,
+      "track": null
+    },
+    "eastbound": false,
+    "startblock": null,
+    "startsubblock": null,
+    "time": 5000,
+    "sequence": []
+  },
+  "11A": {
+    "tracker": [],
+    "block": null,
+    "cutoff": false,
+    "desc": null,
+    "loco": null,
+    "route": "11",
     "normalloco": null,
     "origin": {
       "loc": null,

@@ -227,6 +227,7 @@ class Script (wx.Frame):
 
 
 	def Resume(self):
+		logging.debug("resumption of script %s" % self.GetName())
 		self.run()
 
 	def onTicker(self, _):

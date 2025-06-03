@@ -14,7 +14,7 @@ from dispatcher.constants import BLOCK
 
 from dispatcher.district import Districts, CrossingEastWestBoundary
 from dispatcher.tile import loadTiles
-from dispatcher.train import Train
+from dispatcher.train import Train, CopyTrainReferences
 from dispatcher.trainlist import ActiveTrainList, YardBlocks
 from dispatcher.losttrains import LostTrains, LostTrainsRecoveryDlg
 from dispatcher.trainhistory import TrainHistory
@@ -2423,6 +2423,7 @@ class MainFrame(wx.Frame):
 				logging.error("Unable to retrieve trains")
 				t = {}
 
+			CopyTrainReferences(t)
 			self.trainList = t
 			if report:
 				self.PopupEvent("Train roster reloaded")

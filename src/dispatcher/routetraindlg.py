@@ -1,6 +1,7 @@
 import wx
 from dispatcher.constants import BlockName
 from dispatcher.block import formatRouteDesignator
+from dispatcher.trainlist import YardBlocks
 
 BUTTONSIZE = (90, 30)
 COLSIG = 100
@@ -237,7 +238,9 @@ class RouteTrainDlg(wx.Dialog):
 			self.ClearArrow(self.lastStepx)
 
 		if stepx is None:
-			self.msg.SetLabel("Train is in unexpected block")
+			if fb.GetName() not in YardBlocks:
+				self.msg.SetLabel("Train is in unexpected block")
+
 			if self.isDispatcher:
 				self.bRoute.Enable(False)
 				self.bSignal.Enable(False)

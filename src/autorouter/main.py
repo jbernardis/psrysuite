@@ -36,6 +36,7 @@ from traineditor.trainsequences.train import Trains
 from autorouter.listener import Listener
 from autorouter.rrserver import RRServer
 
+
 class MainUnit:
 	def __init__(self):
 		logging.info("PSRY AutoRouter starting...")
@@ -44,7 +45,7 @@ class MainUnit:
 		self.rrServer = RRServer()
 		self.rrServer.SetServerAddress(self.settings.ipaddr, self.settings.serverport)
 
-		self.trainSeq = Trains(self.rrServer)
+		self.trainSeq = Trains(self.rrServer, copyrefs=True)
 		self.triggers = Triggers(self.trainSeq)
 
 		self.blocks = {}
@@ -69,7 +70,6 @@ class MainUnit:
 		
 		self.blocks["KOSN10S11"] = Block(self, "KOSN10S11", 0, 'W', True)
 		self.blocks["KOSN20S21"] = Block(self, "KOSN20S21", 0, 'E', True)
-		
 
 		logging.info("finished initialize")
 
@@ -538,6 +538,7 @@ class MainUnit:
 	def Request(self, req):
 		logging.info("Outgoing request: %s" % json.dumps(req))
 		self.rrServer.SendRequest(req)
+
 
 main = MainUnit()
 main.run()

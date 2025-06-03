@@ -1,4 +1,5 @@
 import logging
+import copy
 
 ST_FWD    = "f"
 ST_FWD128 = "F"
@@ -23,6 +24,23 @@ def formatThrottle(speed, speedType):
 		return "(%s/28)" % speedStr
 	else:
 		return speedStr
+
+
+def CopyTrainReferences(tl):
+	copylist = []
+	for trid, trinfo in tl.items():
+		try:
+			route = trinfo["route"]
+		except KeyError:
+			route = None
+
+		if route is not None:
+			logging.debug("Train %s references route %s" % (trid, route))
+			copylist.append([trid, route])
+
+	for trid, route in copylist:
+		tl[trid] = copy.deepcopy(tl[route])
+		tl[trid]["route"] = route
 
 
 class Train:
