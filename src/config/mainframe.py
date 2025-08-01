@@ -218,6 +218,12 @@ class MainFrame(wx.Frame):
 
 		boxsizer.AddSpacer(10)
 
+		self.cbAutoLoadSnap = wx.CheckBox(dispBox, wx.ID_ANY, "Autoload latest snapshot")
+		boxsizer.Add(self.cbAutoLoadSnap, 0, wx.LEFT, 40)
+		self.cbAutoLoadSnap.SetValue(self.settings.dispatcher.autoloadsnapshot)
+
+		boxsizer.AddSpacer(10)
+
 		dispBox.SetSizer(boxsizer)
 		
 		vszrl.Add(dispBox, 0, wx.EXPAND)
@@ -552,6 +558,7 @@ class MainFrame(wx.Frame):
 		self.settings.dispatcher.notifyincorrectroute = self.cbNotifyIncorrectRoute.IsChecked()
 		self.settings.dispatcher.precheckshutdownserver = self.cbPrecheckShutdownServer.IsChecked()
 		self.settings.dispatcher.prechecksavelogs = self.cbPrecheckSaveLogs.IsChecked()
+		self.settings.dispatcher.autoloadsnapshot = self.cbAutoLoadSnap.IsChecked()
 
 		self.settings.rrserver.rrtty = self.teRRComPort.GetValue()
 		self.settings.rrserver.dcctty = self.teDCCComPort.GetValue()

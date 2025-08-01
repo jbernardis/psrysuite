@@ -121,6 +121,8 @@ class MainFrame(wx.Frame):
 		self.stYardControl = None
 		self.bSnapshot = None
 		self.bPreloaded = None
+		self.initializing = True
+
 
 		self.cbToD = None
 		self.cbAutoRouter = None
@@ -2225,114 +2227,116 @@ class MainFrame(wx.Frame):
 	def OnBSnapshot(self, _):
 		dlg = ChooseSnapshotActionDlg(self)	
 		rc = dlg.ShowModal()
-		specifyVersion = dlg.GetValues()
 		dlg.Destroy()
 		if rc == wx.ID_SAVE:
 			self.TakeSnapshot()
 							
-		elif rc == wx.ID_OPEN: # restore from snapshot
-			snapList = self.Get("snaplist", {})
-			if len(snapList) == 0:
-				dlg = wx.MessageDialog(self, "No Snapshots exist", "File Not Found", wx.OK | wx.ICON_WARNING)
-				dlg.ShowModal()
-				dlg.Destroy()
+		elif rc in [wx.ID_OPEN, wx.ID_SELECTALL]: # restore from snapshot
+			self.LoadSnapshot(rc)
+
+	def LoadSnapshot(self, ldType):
+		snapList = self.Get("snaplist", {})
+		if len(snapList) == 0:
+			dlg = wx.MessageDialog(self, "No Snapshots exist", "File Not Found", wx.OK | wx.ICON_WARNING)
+			dlg.ShowModal()
+			dlg.Destroy()
+			return
+
+		blks = [x for x in self.blocks.values() if x.IsOccupied()]
+		blkNames = [b.GetName() for b in blks]
+
+		if ldType == wx.ID_SELECTALL:
+			dlg = ChooseSnapshotDlg(self, snapList)
+			rc = dlg.ShowModal()
+			sf = dlg.GetResults()
+			dlg.Destroy()
+			if rc != wx.ID_OK:
 				return
+			snapFile = sf
+		else:
+			snapFile = snapList[-1]
 
-			blks = [x for x in self.blocks.values() if x.IsOccupied()]
-			blkNames = [b.GetName() for b in blks]
+		self.PopupEvent("Using snapshot: %s" % snapFile)
 
-			if specifyVersion:
-				dlg = ChooseSnapshotDlg(self, snapList)
-				rc = dlg.ShowModal()
-				sf = dlg.GetResults()
-				dlg.Destroy()
-				if rc != wx.ID_OK:
-					return
-				snapFile = sf
-			else:
-				snapFile = snapList[-1]
+		trjson = self.Get("getsnapshot", {"filename": snapFile})
+		if trjson is None:
+			dlg = wx.MessageDialog(self, "Snapshot %s does not exist" % snapFile, "File Not Found", wx.OK | wx.ICON_WARNING)
+			dlg.ShowModal()
+			dlg.Destroy()
+			return
 
-			self.PopupEvent("Using snapshot: %s" % snapFile)
+		foundTrainBlocks = []
+		foundTrains = {}
 
-			trjson = self.Get("getsnapshot", {"filename": snapFile})
-			if trjson is None:
-				dlg = wx.MessageDialog(self, "Snapshot %s does not exist" % snapFile, "File Not Found", wx.OK | wx.ICON_WARNING)
-				dlg.ShowModal()
-				dlg.Destroy()
-				return
-				
-			foundTrainBlocks = []
-			foundTrains = {}
-				
-			for trid, trinfo in trjson.items():
-				blist = []
-				for b in trinfo["blocks"]:
-					if b in blkNames:
-						blist.append(b)
-						# first remove the block from the old train
-						blk = self.blocks[b]
-						otr = blk.GetTrain()
-						if otr is None:
-							self.PopupEvent("Unable to find train %s in block %s" % blk.GetName())
-						else:
-							otr.RemoveFromBlock(blk)
-							self.SendTrainBlockOrder(otr)
-							
-							if otr.IsInNoBlocks():
-								otrid = otr.GetName()
-								try:
-									self.activeTrains.RemoveTrain(otrid)
-									del self.trains[otrid]
-								except:
-									logging.warning("can't delete train %s from train list" % otrid)
-							else:
-								otr.Draw()
-					else:
-						self.PopupEvent("Block %s/Train %s in snapshot - not occupied" % (b, trid))
-
-				if len(blist) == 0:
-					self.PopupEvent("Train %s does not appear in any blocks - ignoring" % trid)
-					continue
-
-				# now if the new train does not yet exist - create it
-				if trid not in self.trains:
-					# we don't have a train of this name.  create one
-					ntr = Train(trid)
-					self.trains[trid] = ntr
-					self.activeTrains.AddTrain(ntr)
-				else:
-					ntr = self.trains[trid]
-
-				try:
-					rte = trinfo["route"]
-				except KeyError:
-					rte = None
-
-				ntr.SetChosenRoute(rte)
-
-				# now add the block to the new train
-				ntr.SetEast(trinfo["east"])
-				for b in blist:
+		for trid, trinfo in trjson.items():
+			blist = []
+			for b in trinfo["blocks"]:
+				if b in blkNames:
+					blist.append(b)
+					# first remove the block from the old train
 					blk = self.blocks[b]
-					ntr.AddToBlock(blk, 'front')
-					blk.SetEast(trinfo["east"])
-					blk.Draw()
+					otr = blk.GetTrain()
+					if otr is None:
+						self.PopupEvent("Unable to find train %s in block %s" % blk.GetName())
+					else:
+						otr.RemoveFromBlock(blk)
+						self.SendTrainBlockOrder(otr)
 
-				foundTrainBlocks.extend(blist)
-				foundTrains[trid] = 1
-				ntr.Draw()
+						if otr.IsInNoBlocks():
+							otrid = otr.GetName()
+							try:
+								self.activeTrains.RemoveTrain(otrid)
+								del self.trains[otrid]
+							except:
+								logging.warning("can't delete train %s from train list" % otrid)
+						else:
+							otr.Draw()
+				else:
+					self.PopupEvent("Block %s/Train %s in snapshot - not occupied" % (b, trid))
 
-				self.Request({"settrain": { "blocks": blist, "silent": "1"}})
-				self.Request({"settrain": { "blocks": blist, "name": trid, "loco": trinfo["loco"], "east": "1" if trinfo["east"] else "0", "route": rte}})
+			if len(blist) == 0:
+				self.PopupEvent("Train %s does not appear in any blocks - ignoring" % trid)
+				continue
 
+			# now if the new train does not yet exist - create it
+			if trid not in self.trains:
+				# we don't have a train of this name.  create one
+				ntr = Train(trid)
+				self.trains[trid] = ntr
+				self.activeTrains.AddTrain(ntr)
+			else:
 				ntr = self.trains[trid]
-				self.SendTrainBlockOrder(ntr)
-						
-			unknownBlocks = [b for b in blkNames if b not in foundTrainBlocks]
-			if len(unknownBlocks) > 0:
-				self.PopupEvent("Occupied Blocks not in snapshot: %s" % ", ".join(unknownBlocks))
-				
-			self.PopupEvent("%d trains restored from Snapshot" % len(foundTrains))
+
+			try:
+				rte = trinfo["route"]
+			except KeyError:
+				rte = None
+
+			ntr.SetChosenRoute(rte)
+
+			# now add the block to the new train
+			ntr.SetEast(trinfo["east"])
+			for b in blist:
+				blk = self.blocks[b]
+				ntr.AddToBlock(blk, 'front')
+				blk.SetEast(trinfo["east"])
+				blk.Draw()
+
+			foundTrainBlocks.extend(blist)
+			foundTrains[trid] = 1
+			ntr.Draw()
+
+			self.Request({"settrain": { "blocks": blist, "silent": "1"}})
+			self.Request({"settrain": { "blocks": blist, "name": trid, "loco": trinfo["loco"], "east": "1" if trinfo["east"] else "0", "route": rte}})
+
+			ntr = self.trains[trid]
+			self.SendTrainBlockOrder(ntr)
+
+		unknownBlocks = [b for b in blkNames if b not in foundTrainBlocks]
+		if len(unknownBlocks) > 0:
+			self.PopupEvent("Occupied Blocks not in snapshot: %s" % ", ".join(unknownBlocks))
+
+		self.PopupEvent("%d trains restored from Snapshot" % len(foundTrains))
 
 	def TakeSnapshot(self):
 		trinfo = self.activeTrains.forSnapshot()
@@ -2469,13 +2473,14 @@ class MainFrame(wx.Frame):
 			self.AllSignalsNeutral()
 			self.AllBlocksNotClear()
 			
-		self.DoRefresh()
+		self.DoRefresh(False)
 		
-	def DoRefresh(self):
+	def DoRefresh(self, initializing):
 		if self.IsDispatcher():
 			self.Request({"clock": { "value": self.timeValue, "status": self.clockStatus}})
 
 		self.Request({"refresh": {"SID": self.sessionid}})
+		self.initializing = initializing
 		
 	def ClearAllLocks(self):
 		for t in self.turnouts.values():
@@ -3628,7 +3633,7 @@ class MainFrame(wx.Frame):
 		self.sessionid = int(parms)
 		logging.info("connected to railroad server with session ID %d" % self.sessionid)
 		self.Request({"identify": {"SID": self.sessionid, "function": "DISPATCH" if self.IsDispatcher() else "SATELLITE" if self.IsSatellite() else "DISPLAY"}})
-		self.DoRefresh()
+		self.DoRefresh(True)
 		self.districts.OnConnect()
 		self.ShowTitle()
 
@@ -3655,6 +3660,14 @@ class MainFrame(wx.Frame):
 		elif ptype == "trains":
 			if not self.IsDispatcher():
 				self.Request({"traintimesrequest": {}})
+			self.RefreshComplete()
+
+	def RefreshComplete(self):
+		# Done refreshing from  server - now load latest snapshot
+		if self.IsDispatcher() and self.settings.dispatcher.autoloadsnapshot and self.initializing:
+			self.LoadSnapshot(wx.ID_OPEN)
+
+		self.initializing = False
 
 	def DoCmdTrainBlockOrder(self, parms):
 		for p in parms:

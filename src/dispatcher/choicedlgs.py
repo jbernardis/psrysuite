@@ -394,7 +394,7 @@ class ChooseTrainDlg(wx.Dialog):
         self.EndModal(wx.ID_OK)
 
 
-BTNDIM = (80, 40)
+BTNDIM = (120, 40)
 
 
 class ChooseSnapshotActionDlg(wx.Dialog):
@@ -403,37 +403,37 @@ class ChooseSnapshotActionDlg(wx.Dialog):
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
         
         vszr = wx.BoxSizer(wx.VERTICAL)
-        
-        hszr = wx.BoxSizer(wx.HORIZONTAL)
-        
-        hszr.AddSpacer(20)
+
+        vszr.AddSpacer(20)
         
         bSave = wx.Button(self, wx.ID_ANY, "Save", size=BTNDIM)
         self.Bind(wx.EVT_BUTTON, self.OnBSave, bSave)
-        hszr.Add(bSave)
-        
-        hszr.AddSpacer(30)
-        
-        bRestore = wx.Button(self, wx.ID_ANY, "Restore", size=BTNDIM)
+        vszr.Add(bSave, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
+        vszr.AddSpacer(20)
+
+        bRestore = wx.Button(self, wx.ID_ANY, "Restore Latest", size=BTNDIM)
         self.Bind(wx.EVT_BUTTON, self.OnBRestore, bRestore)
-        hszr.Add(bRestore)
-        
-        hszr.AddSpacer(20)
-
-        vszr.AddSpacer(20)
-        vszr.Add(hszr)
+        vszr.Add(bRestore, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
         vszr.AddSpacer(20)
 
-        self.cbSpecifyVersion = wx.CheckBox(self, wx.ID_ANY, "Restore Specific Version")
-        self.cbSpecifyVersion.SetValue(False)
-        vszr.Add(self.cbSpecifyVersion, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        bSelect = wx.Button(self, wx.ID_ANY, "Restore Selected", size=BTNDIM)
+        self.Bind(wx.EVT_BUTTON, self.OnBSelect, bSelect)
+        vszr.Add(bSelect, 0, wx.ALIGN_CENTER_HORIZONTAL)
 
         vszr.AddSpacer(30)
+
+        hszr = wx.BoxSizer(wx.HORIZONTAL)
+        hszr.AddSpacer(30)
         
         bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BTNDIM)
         self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
-        vszr.Add(bCancel, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        hszr.Add(bCancel, 0)
+
+        hszr.AddSpacer(30)
+
+        vszr.Add(hszr)
         
         vszr.AddSpacer(20)
        
@@ -444,15 +444,15 @@ class ChooseSnapshotActionDlg(wx.Dialog):
         
     def OnBSave(self, _):
         self.EndModal(wx.ID_SAVE)
-        
+
     def OnBRestore(self, _):
         self.EndModal(wx.ID_OPEN)
-        
+
+    def OnBSelect(self, _):
+        self.EndModal(wx.ID_SELECTALL)
+
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)
-
-    def GetValues(self):
-        return self.cbSpecifyVersion.IsChecked()
 
 
 mname = {

@@ -159,6 +159,7 @@ class Settings:
 		self.dispatcher.matrixturnoutdelay = 2
 		self.dispatcher.notifyinvalidblocks = True
 		self.dispatcher.notifyincorrectroute = True
+		self.dispatcher.autoloadsnapshot = True
 		if self.cfg.has_section(section):
 			for opt, value in self.cfg.items(section):
 				if opt == 'dispatch':
@@ -194,6 +195,9 @@ class Settings:
 
 				elif opt == 'notifyincorrectroute':
 					self.dispatcher.notifyincorrectroute = parseBoolean(value, True)
+
+				elif opt == 'autoloadsnapshot':
+					self.dispatcher.autoloadsnapshot = parseBoolean(value, True)
 
 		else:
 			print("Missing %s section - assuming defaults" % section)
@@ -438,6 +442,7 @@ class Settings:
 		self.cfg.set(section, "matrixturnoutdelay",   "%d" % self.dispatcher.matrixturnoutdelay)
 		self.cfg.set(section, "notifyinvalidblocks", "True" if self.dispatcher.notifyinvalidblocks else "False")
 		self.cfg.set(section, "notifyincorrectroute", "True" if self.dispatcher.notifyincorrectroute else "False")
+		self.cfg.set(section, "autoloadsnapshot", "True" if self.dispatcher.autoloadsnapshot else "False")
 
 		section = "display"
 		try:
