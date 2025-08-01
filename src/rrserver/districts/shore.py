@@ -131,8 +131,6 @@ class Shore(District):
 
 			self.rr.AddHandswitch("CSw15", self, n, SHORE, [(4, 2), (4, 3)])
 
-			
-
 		with self.nodes[HYDEJCT] as n:
 			#outputs
 			self.rr.AddSignal("S16R",  self, n, HYDEJCT, [(0, 0), (0, 1), (0, 2)])
@@ -169,10 +167,7 @@ class Shore(District):
 			self.rr.AddBlock("SOSHJM", self, n, HYDEJCT, [(1, 4)], True) 
 			self.rr.AddBlock("SOSHJE", self, n, HYDEJCT, [(1, 5)], True) 
 			self.rr.AddBlock("H11.W",  self, n, HYDEJCT, [(1, 6)], False) 
-			self.rr.AddBlock("H11",    self, n, HYDEJCT, [(1, 7)], False) 
-			
-
-
+			self.rr.AddBlock("H11",    self, n, HYDEJCT, [(1, 7)], False)
 		
 	def OutIn(self):
 		# determine whether or not the bortell gate should be activated

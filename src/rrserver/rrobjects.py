@@ -454,9 +454,12 @@ class Signal:
 	
 	def GetEventMessage(self, lock=False, callon=False):
 		if lock:
-			return {"signallock": [{ "name": self.name, "state": 1 if self.locked else 0}]}
+			msg = {"signallock": [{ "name": self.name, "state": 1 if self.locked else 0}]}
 		else:
-			return {"signal": [{ "name": self.name, "aspect": self.aspect, "aspecttype": self.aspectType, "frozenaspect": self.frozenaspect, "callon": 1 if callon else 0}]}
+			msg = {"signal": [{ "name": self.name, "aspect": self.aspect, "aspecttype": self.aspectType, "frozenaspect": self.frozenaspect, "callon": 1 if callon else 0}]}
+			logging.debug("Signal command: %s" % str(msg))
+
+		return msg
 		
 	def dump(self):
 		addr = "None" if self.address is None else ("%x" % self.address)
@@ -464,6 +467,7 @@ class Signal:
 		logging.info("	 LED: %s   locked: %s/%s" % (str(self.led), str(self.locked), str(self.lockBits)))
 		if self.district is None:
 			logging.info("<===== NULL SIGNAL DEFINITION")
+
 
 '''
 signal lever is a separate class because there is only 1 signal lever for each grouping of Lx and Rx signals
@@ -519,6 +523,7 @@ class SignalLever:
 		return self.bits
 	
 	def SetLeverState(self, rbit, cbit, lbit):
+		logging.debug("setting signal lever state for %s to %s %s %s" % (self.name, rbit, cbit, lbit))
 		self.callon = cbit == 1
 		nstate = self.state
 		if lbit is not None and lbit != 0:

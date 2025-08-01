@@ -51,6 +51,7 @@ class Settings:
 		self.rrserver.topulsect = 3
 		self.rrserver.nxbpulselen = 4
 		self.rrserver.nxbpulsect = 2
+		self.rrserver.snapshotlimit = 5
 		self.rrserver.ioerrorthreshold = 5
 		self.rrserver.pendingdetectionlosscycles = 2
 		self.rrserver.ignoredblocks = []
@@ -82,6 +83,9 @@ class Settings:
 
 				elif opt == "ioerrorthreshold":
 					self.rrserver.ioerrorthreshold = int(value)
+
+				elif opt == "snapshotlimit":
+					self.rrserver.snapshotlimit = int(value)
 
 				elif opt == "ignoredblocks":
 					self.rrserver.ignoredblocks = [x.strip() for x in value.split(",")]
@@ -396,6 +400,7 @@ class Settings:
 		self.cfg.set(section, "ioerrorthreshold", "%d" % self.rrserver.ioerrorthreshold)
 		self.cfg.set(section, "pendingdetectionlosscycles", "%d" % self.rrserver.pendingdetectionlosscycles)
 		self.cfg.set(section, "ignoredblocks", ", ".join(self.rrserver.ignoredblocks))
+		self.cfg.set(section, "snapshotlimit", "%d" % self.rrserver.snapshotlimit)
 
 		section = "dccsniffer"
 		try:

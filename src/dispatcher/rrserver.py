@@ -44,10 +44,10 @@ class RRServer(object):
 			r = requests.post(self.ipAddr, headers=headers, json=data, timeout=4.0)
 		except requests.exceptions.ConnectionError:
 			logging.error("Unable to send post request is rr server running?")
-			return 400
+			return 400, None
 		
 		if r.status_code >= 400:
 			logging.error("HTTP Error %d" % r.status_code)
-			return r.status_code
-		
-		return r.status_code
+			return r.status_code, None
+
+		return r.status_code, r.text

@@ -153,6 +153,17 @@ class MainFrame(wx.Frame):
 
 		boxsizer.AddSpacer(10)
 
+		hsz = wx.BoxSizer(wx.HORIZONTAL)
+		hsz.AddSpacer(20)
+		hsz.Add(wx.StaticText(commBox, wx.ID_ANY, "Snapshot version limit: ", size=(130, -1)))
+		self.teSnapshotLimit = wx.TextCtrl(commBox, wx.ID_ANY, "", size=(100, -1))
+		self.teSnapshotLimit.SetValue("%d" % self.settings.rrserver.snapshotlimit)
+		hsz.Add(self.teSnapshotLimit)
+		hsz.AddSpacer(20)
+		boxsizer.Add(hsz)
+
+		boxsizer.AddSpacer(10)
+
 		commBox.SetSizer(boxsizer)
 		
 		vszrl.Add(commBox, 0, wx.EXPAND)
@@ -544,7 +555,8 @@ class MainFrame(wx.Frame):
 
 		self.settings.rrserver.rrtty = self.teRRComPort.GetValue()
 		self.settings.rrserver.dcctty = self.teDCCComPort.GetValue()
-		
+		self.settings.rrserver.snapshotlimit = int(self.teSnapshotLimit.GetValue())
+
 		self.settings.dccsniffer.tty = self.teSnifferComPort.GetValue()
 		self.settings.dccsniffer.enable = self.cbSnifferEnable.IsChecked()
 

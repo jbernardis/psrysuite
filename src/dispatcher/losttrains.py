@@ -6,43 +6,65 @@ BSIZE = (100, 26)
 
 
 class LostTrains:
-	def __init__(self):
+	def __init__(self, frame):
+		self.frame = frame
 		self.trains = {}
 		self.branchLineW = None
 		self.branchLineE = None
-		
+		self.dbg = self.frame.GetDebugFlags()
+
 	def Add(self, train, loco, engineer, east, block, route):
 		if train.startswith("??"):
 			return False
 
 		if block == "F10" and not east:
 			self.branchLineW = (train, loco, engineer, east, block, route)
+			if self.dbg.identifytrain:
+				self.frame.DebugMessage("Recording train %s as branch line west" % train)
 		elif block == "R10" and east:
 			self.branchLineE = (train, loco, engineer, east, block, route)
+			if self.dbg.identifytrain:
+				self.frame.DebugMessage("Recording train %s as branch line east" % train)
+		elif block == "F10" and self.dbg.identifytrain:
+			self.frame.DebugMessage("NOT recording train %s as branch line west because of opposite direction" % train)
+		elif block == "R10" and self.dbg.identifytrain:
+			self.frame.DebugMessage("NOT recording train %s as branch line east because of opposite direction" % train)
 
 		self.trains[train] = (loco, engineer, east, block, route)
 		return True
 
 	def GetBranchLineTrain(self, east):
-		return self.branchLineE if east else self.branchLineW
+		blt = self.branchLineE if east else self.branchLineW
+		if blt is not None and self.dbg.identifytrain:
+			self.frame.DebugMessage("Returning train %s as branch line east" % blt[0])
+
+		return blt
 
 	def ClearBranchLine(self, east):
 		if east:
 			if self.branchLineE is not None:
 				trid = self.branchLineE[0]
+				if self.dbg.identifytrain:
+					self.frame.DebugMessage("Clearing train %s as branch line east" % trid)
 				self.branchLineE = None
 				self.Remove(trid)
 		else:
 			if self.branchLineW is not None:
 				trid = self.branchLineW[0]
+				if self.dbg.identifytrain:
+					self.frame.DebugMessage("Clearing train %s as branch line west" % trid)
 				self.branchLineW = None
 				self.Remove(trid)
 
 	def Remove(self, train):
 		if self.branchLineE is not None and self.branchLineE[0] == train:
+			if self.dbg.identifytrain:
+				self.frame.DebugMessage("Removing train %s as branch line east" % train)
 			self.branchLineE = None
 		if self.branchLineW is not None and self.branchLineW[0] == train:
 			self.branchLineW = None
+			if self.dbg.identifytrain:
+				self.frame.DebugMessage("Removing train %s as branch line west" % train)
 
 		try:
 			del self.trains[train]

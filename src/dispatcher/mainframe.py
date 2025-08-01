@@ -37,7 +37,7 @@ from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
 
 from dispatcher.edittraindlg import EditTrainDlg, SortTrainBlocksDlg
-from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg
+from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg, ChooseSnapshotDlg
 from traineditor.preloaded.managepreloaded import ManagePreloadedDlg
 
 MENU_ATC_REMOVE  = 900
@@ -166,7 +166,7 @@ class MainFrame(wx.Frame):
 		self.trainList = []
 		self.hilitedTrains = []
 		self.activeTrains = ActiveTrainList()
-		self.lostTrains = LostTrains()
+		self.lostTrains = LostTrains(self)
 		self.trainHistory = TrainHistory(self, self.settings)
 		self.preloadedTrains = None
 
@@ -2225,26 +2225,38 @@ class MainFrame(wx.Frame):
 	def OnBSnapshot(self, _):
 		dlg = ChooseSnapshotActionDlg(self)	
 		rc = dlg.ShowModal()
+		specifyVersion = dlg.GetValues()
 		dlg.Destroy()
 		if rc == wx.ID_SAVE:
-			trjson = self.Get("getsnapshot", {})
-			if trjson is not None:
-				dlg = wx.MessageDialog(self, "Snapshot already exists.\nDo you with to over-write?", "Over-write confirmation", wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
-				rc = dlg.ShowModal()
-				dlg.Destroy()
-				if rc == wx.ID_NO:
-					return
-
 			self.TakeSnapshot()
 							
-		elif rc == wx.ID_OPEN: #restore from snapshot
-			blks = [x for x in self.blocks.values() if x.IsOccupied()]
+		elif rc == wx.ID_OPEN: # restore from snapshot
+			snapList = self.Get("snaplist", {})
+			if len(snapList) == 0:
+				dlg = wx.MessageDialog(self, "No Snapshots exist", "File Not Found", wx.OK | wx.ICON_WARNING)
+				dlg.ShowModal()
+				dlg.Destroy()
+				return
 
+			blks = [x for x in self.blocks.values() if x.IsOccupied()]
 			blkNames = [b.GetName() for b in blks]
 
-			trjson = self.Get("getsnapshot", {})
+			if specifyVersion:
+				dlg = ChooseSnapshotDlg(self, snapList)
+				rc = dlg.ShowModal()
+				sf = dlg.GetResults()
+				dlg.Destroy()
+				if rc != wx.ID_OK:
+					return
+				snapFile = sf
+			else:
+				snapFile = snapList[-1]
+
+			self.PopupEvent("Using snapshot: %s" % snapFile)
+
+			trjson = self.Get("getsnapshot", {"filename": snapFile})
 			if trjson is None:
-				dlg = wx.MessageDialog(self, "Snapshot does not exist", "File Not Found", wx.OK | wx.ICON_WARNING)
+				dlg = wx.MessageDialog(self, "Snapshot %s does not exist" % snapFile, "File Not Found", wx.OK | wx.ICON_WARNING)
 				dlg.ShowModal()
 				dlg.Destroy()
 				return
@@ -2329,11 +2341,11 @@ class MainFrame(wx.Frame):
 			self.PopupEvent("No trains to save")
 			return 
 		
-		rc = self.rrServer.Post("snapshot.json", "data", trinfo)
+		rc, fn = self.rrServer.Post("snapshot.json", "data", trinfo)
 		if rc >= 400:
 			self.PopupEvent("Error saving snapshot")
 		else:
-			self.PopupEvent("%d trains saved in Snapshot" % lenTrInfo)
+			self.PopupEvent("%d trains saved in Snapshot %s" % (lenTrInfo, fn))
 		
 	def OnSubscribe(self, _):
 		if self.subscribed:

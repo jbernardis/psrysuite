@@ -1,5 +1,6 @@
 import wx  
-import os     
+import os
+import re
 
 
 class ChooseItemDlg(wx.Dialog):
@@ -418,9 +419,16 @@ class ChooseSnapshotActionDlg(wx.Dialog):
         hszr.Add(bRestore)
         
         hszr.AddSpacer(20)
-        
+
         vszr.AddSpacer(20)
         vszr.Add(hszr)
+
+        vszr.AddSpacer(20)
+
+        self.cbSpecifyVersion = wx.CheckBox(self, wx.ID_ANY, "Restore Specific Version")
+        self.cbSpecifyVersion.SetValue(False)
+        vszr.Add(self.cbSpecifyVersion, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
         vszr.AddSpacer(30)
         
         bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BTNDIM)
@@ -442,3 +450,96 @@ class ChooseSnapshotActionDlg(wx.Dialog):
         
     def OnCancel(self, _):
         self.EndModal(wx.ID_CANCEL)
+
+    def GetValues(self):
+        return self.cbSpecifyVersion.IsChecked()
+
+
+mname = {
+    "01": "Jan",
+    "02": "Feb",
+    "03": "Mar",
+    "04": "Apr",
+    "05": "May",
+    "06": "Jun",
+    "07": "Jul",
+    "08": "Aug",
+    "09": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Dec"
+}
+
+
+class ChooseSnapshotDlg(wx.Dialog):
+    def __init__(self, parent, snaplist):
+        wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
+        self.Bind(wx.EVT_CLOSE, self.OnCancel)
+        self.SetTitle("Choose Snapshot to load")
+
+        self.font = wx.Font(wx.Font(14, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
+
+        self.rexp = r"snapshot(\d\d\d\d)(\d\d)(\d\d)-(\d\d)(\d\d)(\d\d)"
+
+        self.snapList = [s for s in snaplist]
+        timeList = [self.IsolateTimeStamp(x) for x in snaplist]
+
+        vszr = wx.BoxSizer(wx.VERTICAL)
+        vszr.AddSpacer(20)
+
+        rbStyle = wx.RB_GROUP
+        self.radios = []
+        for t in timeList:
+            rb = wx.RadioButton(self, wx.ID_ANY, t, style=rbStyle)
+            rb.SetFont(self.font)
+            self.radios.append(rb)
+            rbStyle = 0
+            vszr.Add(rb)
+            vszr.AddSpacer(10)
+
+        vszr.AddSpacer(20)
+        self.radios[-1].SetValue(True)
+
+        btnszr = wx.BoxSizer(wx.HORIZONTAL)
+
+        bOK = wx.Button(self, wx.ID_ANY, "OK")
+        self.Bind(wx.EVT_BUTTON, self.OnBOK, bOK)
+
+        bCancel = wx.Button(self, wx.ID_ANY, "Cancel")
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, bCancel)
+
+        btnszr.Add(bOK)
+        btnszr.AddSpacer(20)
+        btnszr.Add(bCancel)
+
+        vszr.Add(btnszr, 0, wx.ALIGN_CENTER_HORIZONTAL)
+
+        vszr.AddSpacer(20)
+
+        hszr = wx.BoxSizer(wx.HORIZONTAL)
+        hszr.AddSpacer(20)
+        hszr.Add(vszr)
+
+        hszr.AddSpacer(20)
+
+        self.SetSizer(hszr)
+        self.Layout()
+        self.Fit()
+
+    def IsolateTimeStamp(self, fn):
+        m = re.match(self.rexp, fn)
+        year, month, day, hour, minute, second = m.group(1, 2, 3, 4, 5, 6)
+        return year + "/" + mname[month] + "/" + ("%2d" % int(day)) + "-" + ("%02d" % int(hour)) + ":" + minute + ":" + second
+
+    def GetResults(self):
+        for i in range(len(self.radios)):
+            if self.radios[i].GetValue():
+                return self.snapList[i]
+        return self.snapList[0]
+
+    def OnCancel(self, _):
+        self.EndModal(wx.ID_CANCEL)
+
+    def OnBOK(self, _):
+        self.EndModal(wx.ID_OK)
+

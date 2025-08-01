@@ -1,3 +1,6 @@
+import re
+import logging
+
 from dispatcher.district import District
 
 from dispatcher.block import Block, OverSwitch, Route, OSProxy
@@ -1072,10 +1075,16 @@ class Port (District):
 			["PB12L",  RegAspects, True,    "rightlong", (135, 36)],
 			["PB12R",  RegAspects, False,   "leftlong",  (142, 34)],
 		]
+
+		pattern = r'(^[a-zA-Z]+\d+)'
 		for signm, atype, east, tileSet, pos in sigList:
 			sig  = Signal(self, self.screen, self.frame, signm, atype, east, pos, self.sigtiles[tileSet])
 			sig.SetDisabled(True)
 			self.signals[signm]  = sig
+			match = re.search(pattern, signm)
+			if match:
+				lvrname = match.group(0) + ".lvr"
+				sig.SetLever(lvrname)
 			
 		self.signals["PA12LA"].SetMutexSignals(["PA12LB", "PA12LC"])
 		self.signals["PA12LB"].SetMutexSignals(["PA12LA", "PA12LC"])

@@ -647,7 +647,7 @@ class Railroad:
 				s.SetSignalAddress(district, node, address)
 			else:
 				logging.warning("Potential duplicate signal: %s" % name)
-				
+
 		s.SetBits(bits)
 		self.signals[name] = s
 		return s

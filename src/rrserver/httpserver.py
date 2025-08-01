@@ -3,6 +3,10 @@ from threading import Thread
 from socketserver import ThreadingMixIn 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
+from datetime import datetime
+from os import listdir
+from os.path import isfile, join
+
 import json
 import os
 import logging
@@ -43,7 +47,11 @@ class Handler(BaseHTTPRequestHandler):
 				logging.warning("Connection Aborted Error writing 400 response back to requester - ignoring")
 
 	def do_POST(self):
+		app = self.server.getApp()
+		snapVersionLimit = app.GetSnapshotLimit()
 		err = False
+		content_length = None
+		filename = ""
 		try:
 			content_length = int(self.headers['Content-Length'])
 		except KeyError:
@@ -53,31 +61,50 @@ class Handler(BaseHTTPRequestHandler):
 		try:
 			filename = self.headers["Filename"]
 		except KeyError:
+			filename = ""
+
+		if filename == "":
 			logging.error("Received POST without file name - ignoring")
 			err = True
-			
+
 		try:
 			directory = self.headers["Directory"]
 		except KeyError:
 			logging.warning("Received POST without directory name - assuming \"data\"")
 			directory = "data"
 
-		if err:
-			pass
-		else:
-			trdata = json.loads(self.rfile.read(content_length))
-			
 		if not err:
-			folder = os.path.join(os.getcwd(), directory)
-			fn = os.path.join(folder, filename)
+			savingSnapshot = False
+			if filename == "snapshot.json":
+				savingSnapshot = True
+				folder = os.path.join(os.getcwd(), directory, "snapshots")
+				os.makedirs(folder, exist_ok=True)
+				n = datetime.now()
+				ts = "%4d%02d%02d-%02d%02d%02d" % (n.year, n.month, n.day, n.hour, n.minute, n.second)
+				filename = "snapshot" + ts + ".json"
+				fn = os.path.join(folder, filename)
+			else:
+				folder = os.path.join(os.getcwd(), directory)
+				fn = os.path.join(folder, filename)
+
+			trdata = json.loads(self.rfile.read(content_length))
 			with open(fn, "w") as jfp:
 				json.dump(trdata, jfp, indent=2)
-				
+
+			if savingSnapshot:
+				#  get rid of excess versions of the snapshot files
+				snapList = sorted([f for f in listdir(folder) if isfile(join(folder, f))])
+				if len(snapList) > snapVersionLimit:
+					dellist = snapList[:(len(snapList)-snapVersionLimit)]
+					for fn in dellist:
+						fqn = os.path.join(folder, fn)
+						os.unlink(fqn)
+
 			self.send_response(200)
 			self.send_header("Content-type", "text/plain")
 			self.end_headers()
 			try:
-				b = "File %s saved" % filename
+				b = "%s" % filename
 				self.wfile.write(b.encode())
 			except ConnectionAbortedError:
 				logging.warning("Connection Aborted Error writing 200 response back to requester - ignoring")
@@ -90,6 +117,7 @@ class Handler(BaseHTTPRequestHandler):
 				self.wfile.write(b.encode())
 			except ConnectionAbortedError:
 				logging.warning("Connection Aborted Error writing 400 response back to requester - ignoring")
+
 
 class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 	def serve_railroad(self):
@@ -123,12 +151,19 @@ class HTTPServer:
 		self.thread.start()
 		self.main = main
 		self.rr = railroad
+		self.snapShotLimit = 5
 
 	def getThread(self):
 		return self.thread
 
 	def getServer(self):
 		return self.server
+
+	def SetSnapshotLimit(self, limit):
+		self.snapShotLimit = limit
+
+	def GetSnapshotLimit(self):
+		return self.snapShotLimit
 
 	def dispatch(self, cmd):
 		verb = cmd["cmd"][0]
@@ -205,7 +240,8 @@ class HTTPServer:
 			return 200, jstr
 		
 		elif verb == "getsnapshot":
-			fn = os.path.join(os.getcwd(), "data", "snapshot.json")
+			filename = cmd["filename"][0]
+			fn = os.path.join(os.getcwd(), "data", "snapshots", filename)
 			logging.info("Retrieving snapshot information from file (%s)" % fn)
 			try:
 				with open(fn, "r") as jfp:
@@ -221,7 +257,13 @@ class HTTPServer:
 			jstr = json.dumps(j)
 			logging.info("Returning %d bytes" % len(jstr))
 			return 200, jstr
-		
+
+		elif verb == "snaplist":
+			folder = os.path.join(os.getcwd(), "data", "snapshots")
+			snapList = sorted([f for f in listdir(folder) if isfile(join(folder, f))])
+			jstr = json.dumps(snapList)
+			return 200, jstr
+
 		elif verb == "listdir":
 			try:
 				directory = cmd["dir"][0]

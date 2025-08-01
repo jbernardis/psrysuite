@@ -119,6 +119,7 @@ class ServerMain:
 			self.Shutdown()
 			
 		logging.info("HTTP Server created")
+		self.dispServer.SetSnapshotLimit(settings.rrserver.snapshotlimit)
 
 		logging.info("Starting Socket server at address: %s:%d" % (self.ip, settings.socketport))
 		self.socketServer = SktServer(self.ip, settings.socketport, self.socketEventReceipt)
@@ -320,6 +321,7 @@ class ServerMain:
 			"signal":   	self.DoSignal,
 			"signallock":	self.DoSignalLock,
 			"siglever":		self.DoSigLever,
+			"sigleverled":	self.DoSigLeverLED,
 			"turnout":  	self.DoTurnout,
 			"turnoutlock":	self.DoTurnoutLock,
 			"turnoutlever":	self.DoTurnoutLever,
@@ -407,6 +409,38 @@ class ServerMain:
 		p = {tag: cmd[tag][0] for tag in cmd if tag != "cmd"}
 		resp = {"siglever": [p]}
 		self.socketServer.sendToAll(resp)
+
+	def DoSigLeverLED(self, cmd):
+		try:
+			lvrname = cmd["name"][0]
+		except KeyError:
+			lvrname = None
+		try:
+			state = cmd["state"][0]
+		except KeyError:
+			state = None
+
+		if lvrname is None:
+			logging.error("SigLeverLED command without lever name - ignoring")
+			return
+
+		if lvrname.endswith(".lvr"):
+			lvrname = lvrname[:-4]
+
+		if state is None:
+			logging.info("SigLeverLED command without state - assuming neutral")
+			state = "N"
+
+		logging.debug("Set Signal Lever %s LED to state %s" % (lvrname, state))
+		try:
+			sl = self.rr.signalLevers[lvrname]
+		except KeyError:
+			logging.error("Unknown signal lever name: %s" % lvrname)
+			logging.debug("Known lever names: %s" % str(list(self.rr.signalLevers.keys())))
+			return
+
+		if sl.SetLeverState(1 if state == "R" else 0, 0, 1 if state == 'L' else 0):
+			sl.UpdateLed()
 
 	def DoSignal(self, cmd):
 		try:

@@ -56,6 +56,7 @@ class District:
 		self.westButton = {}
 		self.routeButtons = {}
 		self.buttonToRoute = {}
+		self.lockedList = []
 
 		logging.info("Creating district %s" % str(self))
 		self.dbg = self.frame.GetDebugFlags()
@@ -143,7 +144,7 @@ class District:
 			if toList is None or self.anyTurnoutLocked(toList):
 				wButton.Invalidate(refresh=True)
 				eButton.Invalidate(refresh=True)
-				self.frame.PopupEvent("No available route" if toList is None else "Route locked out")
+				self.frame.PopupEvent("No available route" if toList is None else ("Route locked out (%s)" % ", ".join(self.lockedList)))
 
 			else:
 				wButton.Acknowledge(refresh=True)
@@ -237,22 +238,26 @@ class District:
 		else:
 			if rt is None:
 				self.frame.PopupEvent("No available route")
+				self.NeutralizeLeverLED(sig.GetLever())
 				return False
 	
 			if osblk.AreHandSwitchesSet():
 				self.frame.PopupEvent("Block %s siding(s) unlocked" % osblk.GetName())
+				self.NeutralizeLeverLED(sig.GetLever())
 				return False
 	
 			# this is a valid signal for the current route	
 			if not currentMovement:  # we are trying to change the signal to allow movement
 				aspect = self.CalculateAspect(sig, osblk, rt, silent=silent)
 				if aspect is None:
+					self.NeutralizeLeverLED(sig.GetLever())
 					return False
 	
 			else:  # we are trying to change the signal to stop the train
 				esig = osblk.GetEntrySignal()
 				if esig is not None and esig.GetName() != signm:
 					self.frame.PopupEvent("Incorrect signal for current route  %s not = %s" % (esig.GetName(), signm))
+					self.NeutralizeLeverLED(sig.GetLever())
 					return False
 				aspect = 0
 
@@ -262,6 +267,12 @@ class District:
 			sig.SetLock(osblk.GetName(), 0 if aspect == 0 else 1)
 			
 		return True
+
+	def NeutralizeLeverLED(self, lvrName):
+		if lvrName is None:
+			return
+
+		self.frame.Request({"sigleverled": {"name": lvrName, "state": "N"}})
 
 	def AutomatedBlockProcess(self, trainqueue):
 		rv = trainqueue.Peek()
@@ -498,10 +509,12 @@ class District:
 
 	def anyTurnoutLocked(self, toList):
 		rv = False
+		self.lockedList = []
 		for toname, stat in toList:
 			turnout = self.turnouts[toname]
 			tostat = "N" if turnout.IsNormal() else "R"
 			if turnout.IsLocked() and tostat != stat:
+				self.lockedList.append(toname)
 				rv = True
 
 		return rv
@@ -879,12 +892,14 @@ class District:
 		if signm is None:
 			if silent == 0:
 				self.frame.PopupEvent("No Available Route")
+			self.NeutralizeLeverLED(signame)
 			return
 
 		sig = self.frame.signals[signm]
 		if not sig:
 			if silent == 0:
 				self.frame.PopupEvent("No Available S1gnal")
+			self.NeutralizeLeverLED(signame)
 			return
 		
 		aspectType = sig.GetAspectType()
@@ -895,6 +910,7 @@ class District:
 			else:
 				aspect = self.CalculateAspect(sig, osblk, route)
 				if aspect is None:
+					self.NeutralizeLeverLED(signame)
 					return
 		else:
 			aspect = 0

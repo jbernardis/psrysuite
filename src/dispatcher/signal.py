@@ -15,6 +15,7 @@ class Signal:
 		self.aspectType = aspecttype
 		self.east = east
 		self.possibleRoutes = {}
+		self.lvrName = None
 		self.guardBlock = None # block that the signal is guarding exit from
 		self.fleetEnabled = False
 		self.locked = False
@@ -43,6 +44,12 @@ class Signal:
 
 	def IsFleeted(self):
 		return self.fleetEnabled
+
+	def SetLever(self, lvrName):
+		self.lvrName = lvrName
+
+	def GetLever(self):
+		return self.lvrName
 
 	def AddPossibleRoutes(self, blk, rtList):
 		self.possibleRoutes[blk] = rtList
@@ -124,7 +131,7 @@ class Signal:
 			if forward:
 				self.frame.Request({"signallock": { "name": self.name, "status": 0}})
 
-	def SetAspect(self, aspect, refresh = False, callon = False):
+	def SetAspect(self, aspect, refresh=False, callon=False):
 		if self.aspect == aspect:
 			return False
 		
