@@ -2234,12 +2234,13 @@ class MainFrame(wx.Frame):
 		elif rc in [wx.ID_OPEN, wx.ID_SELECTALL]: # restore from snapshot
 			self.LoadSnapshot(rc)
 
-	def LoadSnapshot(self, ldType):
+	def LoadSnapshot(self, ldType, silent=False):
 		snapList = self.Get("snaplist", {})
 		if len(snapList) == 0:
-			dlg = wx.MessageDialog(self, "No Snapshots exist", "File Not Found", wx.OK | wx.ICON_WARNING)
-			dlg.ShowModal()
-			dlg.Destroy()
+			if not silent:
+				dlg = wx.MessageDialog(self, "No Snapshots exist", "File Not Found", wx.OK | wx.ICON_WARNING)
+				dlg.ShowModal()
+				dlg.Destroy()
 			return
 
 		blks = [x for x in self.blocks.values() if x.IsOccupied()]
@@ -3665,7 +3666,7 @@ class MainFrame(wx.Frame):
 	def RefreshComplete(self):
 		# Done refreshing from  server - now load latest snapshot
 		if self.IsDispatcher() and self.settings.dispatcher.autoloadsnapshot and self.initializing:
-			self.LoadSnapshot(wx.ID_OPEN)
+			self.LoadSnapshot(wx.ID_OPEN, silent=True)
 
 		self.initializing = False
 
