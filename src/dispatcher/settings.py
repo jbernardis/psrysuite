@@ -154,6 +154,7 @@ class Settings:
 		self.dispatcher.dispatch = True
 		self.dispatcher.satellite = False
 		self.dispatcher.precheckshutdownserver = True
+		self.dispatcher.prechecksnapshot = True
 		self.dispatcher.prechecksavelogs = True
 		self.dispatcher.clockstarttime = 355
 		self.dispatcher.matrixturnoutdelay = 2
@@ -170,6 +171,9 @@ class Settings:
 
 				elif opt == 'precheckshutdownserver':
 					self.dispatcher.precheckshutdownserver = parseBoolean(value, True)
+
+				elif opt == 'prechecksnapshot':
+					self.dispatcher.prechecksnapshot = parseBoolean(value, True)
 
 				elif opt == 'prechecksavelogs':
 					self.dispatcher.prechecksavelogs = parseBoolean(value, True)
@@ -437,6 +441,7 @@ class Settings:
 		self.cfg.set(section, "dispatch", "True" if self.dispatcher.dispatch else "False")
 		self.cfg.set(section, "satellite", "True" if self.dispatcher.satellite else "False")
 		self.cfg.set(section, "precheckshutdownserver", "True" if self.dispatcher.precheckshutdownserver else "False")
+		self.cfg.set(section, "prechecksnapshot", "True" if self.dispatcher.prechecksnapshot else "False")
 		self.cfg.set(section, "prechecksavelogs", "True" if self.dispatcher.prechecksavelogs else "False")
 		self.cfg.set(section, "clockstarttime",   "%d" % self.dispatcher.clockstarttime)
 		self.cfg.set(section, "matrixturnoutdelay",   "%d" % self.dispatcher.matrixturnoutdelay)

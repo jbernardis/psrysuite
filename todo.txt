@@ -1,14 +1,6 @@
 immediate to do
 ***************
 
-finish OSS reporting - still need to do port and yard main
-
-script editing
-
-when generating snapshot script, ask for signals/turnouts/trains and if clear is needed or only sets - need to resurrect re code for signal groups
-
-add clear all signals to monitor/sim
-
 
 
 
@@ -51,10 +43,13 @@ inspection interface
         cliff and yard seem to be ok, but nassau and port are reversed.  I think all of them are backwards, and the
         cliff and yard should be reversed on the display.  I really need to verify actual operation with what I see in the software
 
-make sure we have the proper initial value for fleet based on switch
-
-finish out train/block audit
-
 need to implement locales for alerts/events - all on, all off, or on only for matching locale(s)
+
+look into moving train identification from dispatcher/display/satellite and into server
+
+branch line disappearance logic should not consider train direction when chaeking fo match.  Only which end of the branch line
+
+work out issue with 2 bit slow aspect signals, particularly N26L in conjunction with N16L
+
 
 

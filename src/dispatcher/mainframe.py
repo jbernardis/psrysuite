@@ -1349,9 +1349,6 @@ class MainFrame(wx.Frame):
 			ln = None
 
 		if ln:
-			if shift:
-				return
-			
 			for col, blk in ln:
 				if col <= pos[0] <= col+3:
 					if blk.IsInActiveRoute(col, pos[1]):
@@ -1365,9 +1362,28 @@ class MainFrame(wx.Frame):
 					if tr is None:
 						logging.error("Block %s is occupied, but get train returned None" % blk.GetName())
 						#blk.SetOccupied(occupied=False, refresh=True)
-						return 
-					
-					if right:
+						return
+
+					if shift and not right:
+						trid = tr.GetName()
+						try:
+							hasSequence = ((trid in self.trainList and len(self.trainList[trid]["sequence"]) > 0)
+									or (tr.GetChosenRoute() is not None))
+						except:
+							hasSequence = False
+						if not hasSequence:
+							self.PopupEvent("Train %s has no block sequence defined"  % trid)
+						else:
+							self.ShowHilitedRoute(trid)
+
+					elif shift and right:
+						#self.PopupEvent("Right Shift on a train %s in %s" % (tr.GetName(), blk.GetName()))
+						pass
+
+					elif not right:
+						self.EditTrain(tr, blk)
+
+					else:
 						addedMenuItem = False
 						
 						menu = wx.Menu()
@@ -1416,13 +1432,24 @@ class MainFrame(wx.Frame):
 								self.RouteTrain(self.menuTrain)
 							else:
 								self.PopupEvent("Train %s has no block sequence defined" % trid)
-
-					else:
-						self.EditTrain(tr, blk)					
 				return
 
 		if self.CTCManager is not None:
 			self.CTCManager.CheckHotSpots(self.currentScreen, rawpos[0], rawpos[1])
+
+	def ShowHilitedRoute(self, trid):
+		try:
+			trinfo = self.trainList[trid]
+		except KeyError:
+			self.PopupEvent("Train %s has no block sequence defined" % trid)
+			return
+
+		routeTiles = self.EnumerateBlockTiles(trinfo["startblock"])
+		for step in trinfo["sequence"]:
+			routeTiles.extend(self.EnumerateOSTiles(step["os"], step["route"]))
+			routeTiles.extend(self.EnumerateBlockTiles(step["block"]))
+
+		self.SetHighlitedRoute("MAIN", routeTiles, ticker=14)
 
 	def formatSigLvr(self, data):
 		dl = 0 if data[0] is None else data[0]
@@ -1503,7 +1530,7 @@ class MainFrame(wx.Frame):
 		scr, pos = desiredRoute.GetPositions()
 		return [[scr, p] for p in pos]
 
-	def SetHighlitedRoute(self, name, routeTiles):
+	def SetHighlitedRoute(self, name, routeTiles, ticker=0):
 		for tid in self.routeTrainDlgs:
 			if tid != name:
 				self.routeTrainDlgs[tid].ClearHiliteFlag()
@@ -1518,7 +1545,7 @@ class MainFrame(wx.Frame):
 
 		for scr in tiles:
 			self.panels[scr].SetHighlitedRoute(tiles)
-		self.hiliteRouteTicker = 0 #  10
+		self.hiliteRouteTicker = ticker
 
 	def ClearHighlitedRoute(self, name=None):
 		if name is None:
@@ -1616,7 +1643,7 @@ class MainFrame(wx.Frame):
 
 		blknm = blk.GetName()
 		if blknm in ["R10", "F10"] and oldName.startswith("??"):
-			bl = self.lostTrains.GetBranchLineTrain(tr.GetEast())
+			bl = self.lostTrains.GetBranchLineTrain(blknm, tr.GetEast())
 		else:
 			bl = None
 
@@ -1630,7 +1657,7 @@ class MainFrame(wx.Frame):
 
 		if rc == wx.ID_YES:
 			trainid, locoid, engineer, east, _, chosenRoute = bl
-			self.lostTrains.ClearBranchLine(east)
+			self.lostTrains.ClearBranchLine(trainid)
 			rc = wx.ID_OK
 			atc = False
 			ar = False
@@ -3284,7 +3311,7 @@ class MainFrame(wx.Frame):
 					if tr.IsInNoBlocks():
 						if not tr.IsBeingEdited():
 							if not silent:
-								self.PopupEvent("Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
+								self.PopupEvent("Train %s - detection1 lost from block %s" % (trid, blk.GetRouteDesignator()))
 							self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block, tr.GetChosenRoute())
 						else:
 							tr.SetBeingEdited(False)
@@ -3310,7 +3337,7 @@ class MainFrame(wx.Frame):
 				for trid, tr in delList:
 					if not tr.IsBeingEdited():
 						if not silent:
-							self.PopupEvent("Train %s - detection lost from block %s" % (trid, blk.GetRouteDesignator()))
+							self.PopupEvent("Train %s - detection2 lost from block %s" % (trid, blk.GetRouteDesignator()))
 						self.lostTrains.Add(tr.GetName(), tr.GetLoco(), tr.GetEngineer(), tr.GetEast(), block, tr.GetChosenRoute())
 					try:
 						self.activeTrains.RemoveTrain(trid)
@@ -4286,16 +4313,20 @@ class MainFrame(wx.Frame):
 	def CloseProgram(self):
 		killServer = False
 		saveLogs = False
+		takeSnapshot = False
 
 		dlg = ExitDlg(self, self.IsDispatcher())
 		dlg.CenterOnScreen()
 		rc = dlg.ShowModal()
 		if rc == wx.ID_OK:
-			killServer, saveLogs = dlg.GetResults()
+			killServer, takeSnapshot, saveLogs = dlg.GetResults()
 
 		dlg.Destroy()
 		if rc != wx.ID_OK:
 			return
+
+		if takeSnapshot:
+			self.TakeSnapshot()
 			
 		self.events.Close()
 		self.advice.Close()
@@ -4427,20 +4458,24 @@ class ExitDlg (wx.Dialog):
 		vsz = wx.BoxSizer(wx.VERTICAL)
 		vsz.AddSpacer(20)
 
-		if self.parent.IsDispatcherOrSatellite():
-			self.bTrains = wx.Button(self, wx.ID_ANY, "Save Trains")
-			self.bLocos  = wx.Button(self, wx.ID_ANY, "Save Locos")
-			self.bSnapshot  = wx.Button(self, wx.ID_ANY, "Take Snapshot")
-			self.Bind(wx.EVT_BUTTON, self.onSaveTrains, self.bTrains)
-			self.Bind(wx.EVT_BUTTON, self.onSaveLocos, self.bLocos)
-			self.Bind(wx.EVT_BUTTON, self.onSnapshot, self.bSnapshot)
+		self.hasSnapshot = False
 
-			vsz.Add(self.bTrains, 0, wx.ALIGN_CENTER)
-			vsz.AddSpacer(10)
-			vsz.Add(self.bLocos, 0, wx.ALIGN_CENTER)
-			vsz.AddSpacer(10)
-			vsz.Add(self.bSnapshot, 0, wx.ALIGN_CENTER)
-			vsz.AddSpacer(20)
+		if self.parent.IsDispatcherOrSatellite():
+			if self.parent.subscribed:
+				self.bTrains = wx.Button(self, wx.ID_ANY, "Save Trains")
+				self.bLocos  = wx.Button(self, wx.ID_ANY, "Save Locos")
+				self.cbSnapshot  = wx.CheckBox(self, wx.ID_ANY, "Take Snapshot")
+				self.cbSnapshot.SetValue(self.parent.settings.dispatcher.prechecksnapshot)
+				self.Bind(wx.EVT_BUTTON, self.onSaveTrains, self.bTrains)
+				self.Bind(wx.EVT_BUTTON, self.onSaveLocos, self.bLocos)
+				self.hasSnapshot = True
+
+				vsz.Add(self.bTrains, 0, wx.ALIGN_CENTER)
+				vsz.AddSpacer(10)
+				vsz.Add(self.bLocos, 0, wx.ALIGN_CENTER)
+				vsz.AddSpacer(20)
+				vsz.Add(self.cbSnapshot, 0, wx.ALIGN_CENTER)
+				vsz.AddSpacer(10)
 
 			if self.parent.IsDispatcher():
 				self.cbKillServer = wx.CheckBox(self, wx.ID_ANY, "Shutdown Server")
@@ -4448,6 +4483,8 @@ class ExitDlg (wx.Dialog):
 
 				vsz.Add(self.cbKillServer, 0, wx.ALIGN_CENTER)
 				vsz.AddSpacer(10)
+
+			vsz.AddSpacer(10)
 
 		self.cbSaveLogs = wx.CheckBox(self, wx.ID_ANY, "Save log/output files")
 		self.cbSaveLogs.SetValue(self.parent.settings.dispatcher.prechecksavelogs)
@@ -4488,15 +4525,13 @@ class ExitDlg (wx.Dialog):
 
 	def onSaveLocos(self, _):
 		self.parent.SaveLocos()
-		
-	def onSnapshot(self, _):
-		self.parent.TakeSnapshot()
-		
+
 	def GetResults(self):
+		rvSnap = self.hasSnapshot and self.cbSnapshot.GetValue()
 		if self.isDispatcher:
-			return self.cbKillServer.GetValue(), self.cbSaveLogs.GetValue()
+			return self.cbKillServer.GetValue(), rvSnap, self.cbSaveLogs.GetValue()
 		else:
-			return False, self.cbSaveLogs.GetValue()
+			return False, rvSnap, self.cbSaveLogs.GetValue()
 
 	def onCancel(self, _):
 		self.EndModal(wx.ID_CANCEL)

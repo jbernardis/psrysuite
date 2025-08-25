@@ -155,7 +155,6 @@ class ActiveTrainsDlg(wx.Dialog):
 		
 		self.resized = False
 		self.shiftKey = False
-		self.clickLeft = False
 
 		self.dlgExit = dlgExit
 
@@ -215,17 +214,13 @@ class ActiveTrainsDlg(wx.Dialog):
 		hsz.AddSpacer(20)
 
 		self.trCtl = TrainListCtrl(self, self.dccSnifferEnabled)
-		self.trCtl.SetToolTipString("Click/D-Click  to Edit,\nR-Click  to Route,\nShift-R-Click  to Locate")
+		self.trCtl.SetToolTip("Click  to Edit,\nR-Click  to Show Route List,\nShift-Click  to Hilite Route,\nShift-R-Click  to Locate")
 		tip = self.trCtl.GetToolTip()
 		tip.SetAutoPop(10000)
 		hsz.Add(self.trCtl)
-		self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.DoubleClickTrain, self.trCtl)
-		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ClickTrain, self.trCtl)
-		self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.RClickTrain, self.trCtl)
 		self.trCtl.Bind(wx.EVT_LEFT_DOWN, self.ClickLeft)
 		self.trCtl.Bind(wx.EVT_RIGHT_DOWN, self.ClickRight)
-		self.clickleft = True
-		
+
 		hsz.AddSpacer(20)
 		
 		vsz.Add(hsz)
@@ -248,46 +243,54 @@ class ActiveTrainsDlg(wx.Dialog):
 		return self.trCtl.GetTrainListControl()
 		
 	def ClickLeft(self, evt):
-		self.clickLeft = True
+		pos = evt.GetPosition()
+		idxitem = self.trCtl.HitTest(pos)
+		if idxitem == wx.NOT_FOUND:
+			evt.Skip()
+			return
+
+		idx = idxitem[0]
+		if wx.GetKeyState(wx.WXK_SHIFT):
+			self.HiliteRoute(idx)
+		else:
+			self.EditTrain(idx)
 		evt.Skip()
 		
 	def ClickRight(self, evt):
-		self.clickLeft = False
+		pos = evt.GetPosition()
+		idxitem = self.trCtl.HitTest(pos)
+		if idxitem == wx.NOT_FOUND:
+			evt.Skip()
+			return
+
+		idx = idxitem[0]
+		if wx.GetKeyState(wx.WXK_SHIFT):
+			self.LocateTrain(idx)
+		else:
+			self.RouteTrain(idx)
 		evt.Skip()
 		
-	def ClickTrain(self, evt):
-		idx = evt.Index
-		if self.clickLeft:
-			self.EditTrain(idx)
-		else:
-			if wx.GetKeyState(wx.WXK_SHIFT):
-				self.LocateTrain(evt.Index)
-			else:
-				self.RouteTrain(idx)
-
-	def RClickTrain(self, evt):
-		if wx.GetKeyState(wx.WXK_SHIFT):
-			self.LocateTrain(evt.Index)
-		else:
-			self.RouteTrain(evt.Index)
-
 	def LocateTrain(self, idx):
 		tr = self.trCtl.GetActiveTrain(idx)
 		if tr.SetHilite(True):
 			self.parent.AddHilitedTrain(tr)
 
-	def DoubleClickTrain(self, evt):
-		self.EditTrain(evt.Index)
-
 	def EditTrain(self, idx):
 		tr = self.trCtl.GetActiveTrain(idx)
 		blk = tr.FrontBlock()
 		self.parent.EditTrain(tr, blk)
-		
+
+	def HiliteRoute(self, idx):
+		tr = self.trCtl.GetActiveTrain(idx)
+		self.parent.ShowHilitedRoute(tr.GetName())
+
 	def RouteTrain(self, idx):
 		tr = self.trCtl.GetActiveTrain(idx)
-		if tr.GetName() in self.parent.trainList:
+		trid = tr.GetName()
+		if trid in self.parent.trainList:
 			self.parent.RouteTrain(tr)
+		else:
+			self.parent.PopupEvent("Train %s has no block sequence defined" % trid)
 		
 	def GetLocoInfo(self, loco):
 		return self.parent.GetLocoInfo(loco)
