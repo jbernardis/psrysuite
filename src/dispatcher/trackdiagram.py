@@ -153,8 +153,8 @@ class TrackDiagram(wx.Panel):
 		del(self.text[textKey])
 		self.Refresh()
 
-	def DrawTrain(self, x, y, offset, trainID, locoID, stopRelay, atc, ar, hilite):
-		self.trains[(x*16+offset, y*16)] = [trainID, locoID, stopRelay, atc, ar, hilite]
+	def DrawTrain(self, x, y, offset, trainID, locoID, stopRelay, atc, ar, hilite, misrouted):
+		self.trains[(x*16+offset, y*16)] = [trainID, locoID, stopRelay, atc, ar, hilite, misrouted]
 		self.Refresh()
 
 	def SetHighlitedRoute(self, tiles):
@@ -192,13 +192,23 @@ class TrackDiagram(wx.Panel):
 			x = bx[0]
 			y = bx[1]
 			hilite = tinfo[5]
+			misrouted = tinfo[6]
+			ht = int(dc.GetTextExtent("0")[1]/2.0)
+
+			if misrouted:
+				dc.SetTextForeground(wx.Colour(236, 56, 255))
+				dc.SetTextBackground(wx.Colour(236, 56, 255))
+				txt = "  "
+				dc.DrawText(txt, x, y)
+				x += dc.GetTextExtent(txt)[0]
+
 			if tinfo[2]:
 				dc.SetTextForeground(wx.Colour(255, 255, 255))
 				dc.SetTextBackground(wx.Colour(255, 0, 0))
 				txt = "* "
 				dc.DrawText(txt, x, y)
 				x += dc.GetTextExtent(txt)[0]
-				
+
 			if tinfo[3] or tinfo[4]:
 				dc.SetTextForeground(wx.Colour(255, 255, 0))
 				dc.SetTextBackground(wx.Colour(0, 0, 0))
@@ -219,10 +229,19 @@ class TrackDiagram(wx.Panel):
 			dc.SetTextForeground(wx.Colour(255, 255, 255))
 			dc.SetTextBackground(wx.Colour(255, 0, 0))
 			dc.DrawText(tinfo[1], x, y)
+			x += dc.GetTextExtent(tinfo[1])[0]
+
+			if misrouted:
+				dc.SetTextForeground(wx.Colour(236, 56, 255))
+				dc.SetTextBackground(wx.Colour(236, 56, 255))
+				txt = "  "
+				dc.DrawText(txt, x, y)
+				x += dc.GetTextExtent(txt)[0]
+
 
 			if hilite:
 				dc.SetPen(wx.Pen(wx.GREEN, width=10, style=wx.PENSTYLE_SOLID))
-				dc.SetBrush(wx.Brush(wx.GREEN, wx.TRANSPARENT))
+				dc.SetBrush(wx.Brush(wx.GREEN, wx.TRANSPARENT_BRUSH))
 				dc.DrawCircle(x, y, 50)
 
 		if len(self.highlitedRoute) > 0 and self.hilitebmp is not None:

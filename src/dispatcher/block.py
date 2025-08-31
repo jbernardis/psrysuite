@@ -237,11 +237,13 @@ class Block:
 			atc = False
 			ar = False
 			sbActive = False
+			misrouted = False
 		else:
 			trainID, locoID = self.train.GetNameAndLoco()
 			sbActive = self.train.GetSBActive()
 			atc = self.train.IsOnATC()
 			ar = self.train.IsOnAR()
+			misrouted = self.train.misrouted
 
 		anyOccupied = self.occupied
 		if self.sbEast and self.sbEast.IsOccupied():
@@ -258,8 +260,8 @@ class Block:
 					drawTrain = False  # the current route through this OS is not in the list
 					
 			if anyOccupied and drawTrain:
-				self.frame.DrawTrain(screen, loc, trainID, locoID, sbActive, atc, ar, hilite)
-			elif drawTrain:  # don't clear trains from alternate routes that are not surrently set
+				self.frame.DrawTrain(screen, loc, trainID, locoID, sbActive, atc, ar, hilite, misrouted)
+			elif drawTrain:  # don't clear trains from alternate routes that are not currently set
 				self.frame.ClearTrain(screen, loc)
 
 	def StoppingRelayActivated(self):

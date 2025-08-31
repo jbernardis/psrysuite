@@ -1362,6 +1362,7 @@ class MainFrame(wx.Frame):
 					if tr is None:
 						logging.error("Block %s is occupied, but get train returned None" % blk.GetName())
 						#blk.SetOccupied(occupied=False, refresh=True)
+						self.PopupEvent("Block %s is occupied, but get train returned None" % blk.GetName())
 						return
 
 					if shift and not right:
@@ -1432,6 +1433,7 @@ class MainFrame(wx.Frame):
 								self.RouteTrain(self.menuTrain)
 							else:
 								self.PopupEvent("Train %s has no block sequence defined" % trid)
+
 				return
 
 		if self.CTCManager is not None:
@@ -2034,9 +2036,10 @@ class MainFrame(wx.Frame):
 		offset = self.diagrams[screen].offset
 		self.panels[screen].ClearText(pos[0], pos[1], offset)
 
-	def DrawTrain(self, screen, pos, trainID, locoID, stopRelay, atc, ar, hilite):
+	def DrawTrain(self, screen, pos, trainID, locoID, stopRelay, atc, ar, hilite, misrouted):
 		offset = self.diagrams[screen].offset
-		self.panels[screen].DrawTrain(pos[0], pos[1], offset, trainID, locoID, stopRelay, atc, ar, hilite)
+		mflag = misrouted if self.IsDispatcherOrSatellite() else False
+		self.panels[screen].DrawTrain(pos[0], pos[1], offset, trainID, locoID, stopRelay, atc, ar, hilite, mflag)
 
 	def ClearTrain(self, screen, pos):
 		offset = self.diagrams[screen].offset
@@ -2076,7 +2079,9 @@ class MainFrame(wx.Frame):
 		for trid, tr in self.trains.items():
 			if tr.FrontInBlock(blkNm):
 				# we found a train
-				self.CheckForIncorrectRoute(tr, sig)
+				ir, cr = self.CheckForIncorrectRoute(tr, sig)
+				if cr is not None:
+					tr.SetMisrouted(ir is not None)
 				tr.SetSignal(sig)
 				self.activeTrains.UpdateTrain(trid)
 				req = {"trainsignal": { "train": trid, "block": blkNm, "signal": sig.GetName(), "aspect": sig.GetAspect()}}
@@ -3120,7 +3125,9 @@ class MainFrame(wx.Frame):
 			logging.error("Unknown signal %s" % signm)
 			return
 
-		self.CheckForIncorrectRoute(tr, sig)
+		ir, cr = self.CheckForIncorrectRoute(tr, sig)
+		if cr is not None:
+			tr.SetMisrouted(ir is not None)
 		tr.SetSignal(sig)
 		self.activeTrains.UpdateTrain(trid)
 
@@ -3173,9 +3180,6 @@ class MainFrame(wx.Frame):
 		if nb.GetBlockType() != OVERSWITCH:
 			return None, None
 
-		if nb.GetRoute() is None:
-			return None, None
-
 		rt = nb.GetRoute()
 		if rt is None:
 			return None, None
@@ -3223,7 +3227,8 @@ class MainFrame(wx.Frame):
 				self.PopupAdvice("The correct route is %s" % correctRoute)
 
 			return incorrectRoute, correctRoute
-		return None, None
+
+		return None, rtnm
 
 	def DoCmdDeleteTrain(self, parms):
 		try:
@@ -3448,6 +3453,7 @@ class MainFrame(wx.Frame):
 					blist = [sb] + [s["block"] for s in seq] + [formatRouteDesignator(s["route"]) for s in seq]
 					bdesig = blk.GetRouteDesignator()
 					if bdesig not in blist:
+						tr.SetMisrouted(True)
 						self.PopupEvent("Train %s not expected in block %s" % (name, bdesig))
 
 			if action == REPLACE:
@@ -4203,9 +4209,11 @@ class MainFrame(wx.Frame):
 			if sig is None:
 				continue
 
-			corRt, incRt = self.CheckForIncorrectRoute(tr, sig, ignoreunchangedsignal=True, silent=True)
-			if corRt is not None:
-				results[trid] = [corRt, incRt]
+			incRt, corRt = self.CheckForIncorrectRoute(tr, sig, ignoreunchangedsignal=True, silent=True)
+			if incRt is not None:
+				results[trid] = [incRt, corRt]
+
+				tr.SetMisrouted(incRt is not None)
 
 		n = len(results)
 		if n == 0:

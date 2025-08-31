@@ -66,10 +66,18 @@ class Train:
 		self.time = None
 		self.chosenRoute = None
 		self.hilite = False
+		self.misrouted = False
 		
 	def SetTime(self, t):
 		self.time = t
-		
+
+	def SetMisrouted(self, flag):
+		if flag == self.misrouted:
+			return
+
+		self.misrouted = flag
+		self.Draw()
+
 	def AddTime(self, delta=1):
 		if self.time is not None:
 			self.time += delta
@@ -263,7 +271,7 @@ class Train:
 			self.blockOrder.insert(0, bn)
 		else:
 			self.blockOrder.append(bn)
-		logging.debug("Added block %s to %s of train %s, new block list = %s" % (action, bn, self.name, str(self.blockOrder)))
+		logging.debug("Added block %s to %s of train %s, new block list = %s" % (bn, "rear" if action == REAR else "front", self.name, str(self.blockOrder)))
 
 	def RemoveFromBlock(self, blk):
 		bn = blk.GetName()

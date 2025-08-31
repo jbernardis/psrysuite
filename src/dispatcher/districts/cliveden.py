@@ -25,6 +25,7 @@ class Cliveden (District):
 	def DoBlockAction(self, blk, blockend, state):
 		blknm = blk.GetName()
 		controlOpt = self.frame.cliffControl
+		dispatcher = self.frame.IsDispatcherOrSatellite()
 		c13auto = self.frame.c13auto
 
 		# we need to know the east/west direction both before and after the block command is applied.  Before is
@@ -34,7 +35,7 @@ class Cliveden (District):
 		District.DoBlockAction(self, blk, blockend, state)
 		blkEastAfter = blk.GetEast()
 
-		if controlOpt != 0 and c13auto:
+		if dispatcher and controlOpt != 0 and c13auto:
 			# we are in either dispatcher all or dispatcher bank/cliveden mode
 			if not blkEastAfter and blknm in ["C23", "C12"] and blockend is None and state == OCCUPIED:
 				rtname = "CRtC13" + blknm
