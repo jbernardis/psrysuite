@@ -238,11 +238,10 @@ class TrackDiagram(wx.Panel):
 				dc.DrawText(txt, x, y)
 				x += dc.GetTextExtent(txt)[0]
 
-
 			if hilite:
 				dc.SetPen(wx.Pen(wx.GREEN, width=10, style=wx.PENSTYLE_SOLID))
-				dc.SetBrush(wx.Brush(wx.GREEN, wx.TRANSPARENT_BRUSH))
-				dc.DrawCircle(x, y, 50)
+				dc.SetBrush(wx.Brush(wx.GREEN, wx.TRANSPARENT))
+				dc.DrawCircle(bx[0] + int((x - bx[0]) / 2.0), y + ht, 50)
 
 		if len(self.highlitedRoute) > 0 and self.hilitebmp is not None:
 			for hx, hy in self.highlitedRoute:

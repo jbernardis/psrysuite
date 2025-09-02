@@ -1372,10 +1372,11 @@ class MainFrame(wx.Frame):
 									or (tr.GetChosenRoute() is not None))
 						except:
 							hasSequence = False
+
 						if not hasSequence:
 							self.PopupEvent("Train %s has no block sequence defined"  % trid)
 						else:
-							self.ShowHilitedRoute(trid)
+							self.ShowHilitedRoute(tr, trid)
 
 					elif shift and right:
 						#self.PopupEvent("Right Shift on a train %s in %s" % (tr.GetName(), blk.GetName()))
@@ -1439,12 +1440,20 @@ class MainFrame(wx.Frame):
 		if self.CTCManager is not None:
 			self.CTCManager.CheckHotSpots(self.currentScreen, rawpos[0], rawpos[1])
 
-	def ShowHilitedRoute(self, trid):
+	def ShowHilitedRoute(self, tr, trid):
 		try:
 			trinfo = self.trainList[trid]
 		except KeyError:
-			self.PopupEvent("Train %s has no block sequence defined" % trid)
-			return
+			rte = tr.GetChosenRoute()
+			if rte is None:
+				self.PopupEvent("Train %s has no block sequence defined" % trid)
+				return
+
+			try:
+				trinfo = self.trainList[rte]
+			except KeyError:
+				self.PopupEvent("Base train %s has no block sequence defined" % rte)
+				return
 
 		routeTiles = self.EnumerateBlockTiles(trinfo["startblock"])
 		for step in trinfo["sequence"]:
@@ -1485,10 +1494,13 @@ class MainFrame(wx.Frame):
 					trinfo = self.trainList[rtName]
 			except (IndexError, KeyError):
 				rtName = tr.GetChosenRoute()
-				trinfo = self.trainList[rtName]
+				try:
+					trinfo = self.trainList[rtName]
+				except KeyError:
+					trinfo = None
 
 			# noinspection PyTypeChecker
-			if "sequence" not in trinfo or len(trinfo["sequence"]) == 0:
+			if trinfo is None or "sequence" not in trinfo or len(trinfo["sequence"]) == 0:
 				dlg = wx.MessageDialog(self, "Train does not have a block sequence defined",
 						"No Sequence Defined", wx.OK | wx.ICON_INFORMATION)
 				dlg.ShowModal()

@@ -282,15 +282,16 @@ class ActiveTrainsDlg(wx.Dialog):
 
 	def HiliteRoute(self, idx):
 		tr = self.trCtl.GetActiveTrain(idx)
-		self.parent.ShowHilitedRoute(tr.GetName())
+		self.parent.ShowHilitedRoute(tr, tr.GetName())
 
 	def RouteTrain(self, idx):
 		tr = self.trCtl.GetActiveTrain(idx)
 		trid = tr.GetName()
-		if trid in self.parent.trainList:
-			self.parent.RouteTrain(tr)
-		else:
-			self.parent.PopupEvent("Train %s has no block sequence defined" % trid)
+		self.parent.RouteTrain(tr)
+		# if trid in self.parent.trainList:
+		# 	self.parent.RouteTrain(tr)
+		# else:
+		# 	self.parent.PopupEvent("Train %s has no block sequence defined" % trid)
 		
 	def GetLocoInfo(self, loco):
 		return self.parent.GetLocoInfo(loco)
