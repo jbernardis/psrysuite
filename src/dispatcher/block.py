@@ -560,9 +560,33 @@ class Block:
 
 	def EvaluateStoppingSections(self):
 		if self.east and self.sbEast:
+			if self.sbWest:
+				self.sbWest.Activate(False, silent=True)
 			self.sbEast.EvaluateStoppingSection()
 		elif (not self.east) and self.sbWest:
+			if self.sbEast:
+				self.sbEast.Activate(False, silent=True)
 			self.sbWest.EvaluateStoppingSection()
+
+	def IsStopped(self):
+		if self.sbEast and self.sbEast.IsActive():
+			return True
+		if self.sbWest and self.sbWest.IsActive():
+			return True
+
+		return False
+
+	def DumpStoppingSections(self):
+		if self.east and self.sbEast:
+			self.sbEast.DumpStoppingSection()
+		elif (not self.east) and self.sbWest:
+			self.sbWest.DumpStoppingSection()
+
+	def ClearStoppingSections(self):
+		if self.sbEast:
+			self.sbEast.Activate(False, silent=True)
+		if self.sbWest:
+			self.sbWest.Activate(False, silent=True)
 
 	def IdentifyTrain(self, cleared):
 		"""
@@ -822,9 +846,14 @@ class StoppingBlock:  # (Block):
 		self.lastSignalGreen = False
 		self.lastBlockEmpty = False
 
+	def DumpStoppingSection(self):
+		logging.debug("Stopping section %s occupied: %s  cleared: %s" % (self.GetName(), self.occupied, self.cleared))
+
 	def EvaluateStoppingSection(self):
+		logging.debug("Evaluating stopping section %s" % self.block.GetName())
 		if (self.block.east and (not self.eastend)) or ((not self.block.east) and self.eastend):
 			# wrong end of the block - assert stopping section is inactive
+			logging.debug("wrong end of block - assert False")
 			self.Activate(False)
 			return
 		
@@ -840,7 +869,6 @@ class StoppingBlock:  # (Block):
 
 		blk = self.block.blkEast if self.block.east else self.block.blkWest
 		if blk is None:
-			logging.debug("no known exit block from %s" % mainBlk.GetName())
 			# we don't know the exit block - this means the OS is set to a different
 			# route and the signal should be red - assert that stopping block is active
 			logging.debug("===activating stopping relay for block %s %s because unable to identify next block" % (bname, direction))
@@ -859,9 +887,7 @@ class StoppingBlock:  # (Block):
 		if tr is None:
 			logging.debug("no train identified in current block %s" % self.block.GetName())
 			return
-		
-		logging.debug("train %s" % tr.GetName())
-		
+
 		# identify the train that is in the next block
 		trnext = blk.GetTrain()
 		
@@ -871,13 +897,13 @@ class StoppingBlock:  # (Block):
 		if trnext and tr.GetName() == trnext.GetName():
 			# the same train is in the stopping section and the exit block - this is normal Condition
 			# and the stopping section is irrelevant - assert that it's inactive
+			logging.debug("Same train - false")
 			self.Activate(False)
 			return
 		
 		elif trnext is not None:
 			# there is some other train in the next block - the signal should be red
 			logging.debug("===activating stopping relay for block %s %s because train ahead = %s and this train = %s" % (bname, direction, tr.GetName(), trnext.GetName()))
-			logging.debug("blocks for train %s = %s" % (tr.GetName(), ",".join(tr.GetBlockNameList())))
 			self.Activate(True)
 			return
 		
@@ -887,10 +913,11 @@ class StoppingBlock:  # (Block):
 		# activate the stopping block if the signal is red, deactivate if not
 		if sv == 0:
 			logging.debug("===activating stopping relay for block %s %s because signal aspect = %x" % (bname, direction, sv))
-			logging.debug("blocks for train %s = %s" % (tr.GetName(), ",".join(tr.GetBlockNameList())))
 		self.Activate(sv == 0)
 
-	def Activate(self, flag=True):
+	def Activate(self, flag=True, silent=False):
+		logging.debug("In stopping block %s Activate %s" % (self.GetName(), flag))
+
 		if flag == self.active:
 			return
 
@@ -906,7 +933,7 @@ class StoppingBlock:  # (Block):
 
 		self.active = flag
 
-		self.frame.Request({"relay": {"block": self.block.GetName(), "state": 1 if flag else 0, "direction": direction, "train": tname}})
+		self.frame.Request({"relay": {"block": self.block.GetName(), "state": 1 if flag else 0, "silent": 1 if silent else 0, "direction": direction, "train": tname}})
 
 		if tr is None:
 			self.block.DrawTrain()
@@ -1139,6 +1166,9 @@ class OverSwitch (Block):
 		self.Draw()
 
 	def EvaluateStoppingSections(self):
+		return
+
+	def ClearStoppingSections(self):
 		return
 
 	def SendRouteRequest(self):

@@ -336,7 +336,7 @@ class ChooseBlocksDlg(wx.Dialog):
         
 
 class ChooseTrainDlg(wx.Dialog):
-    def __init__(self, parent, tid, trainlist):
+    def __init__(self, parent, tid, trainlist, merge=True):
         wx.Dialog.__init__(self, parent, wx.ID_ANY, "")
         self.Bind(wx.EVT_CLOSE, self.OnCancel)
         self.SetTitle("Choose train")
@@ -344,7 +344,8 @@ class ChooseTrainDlg(wx.Dialog):
         vszr = wx.BoxSizer(wx.VERTICAL)
         vszr.AddSpacer(20)
         
-        st = wx.StaticText(self, wx.ID_ANY, "Choose train to merge with %s" % tid)
+        action = "merge" if merge else "swap"
+        st = wx.StaticText(self, wx.ID_ANY, "Choose train to %s with %s" % (action, tid))
         vszr.Add(st, 0, wx.ALIGN_CENTER_HORIZONTAL)
         vszr.AddSpacer(10)
 

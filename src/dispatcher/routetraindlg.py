@@ -104,12 +104,6 @@ class RouteTrainDlg(wx.Dialog):
 
 		hsz.AddSpacer(30)
 
-		self.bLocate = wx.Button(self, wx.ID_ANY, "Locate", size=BUTTONSIZE)
-		self.Bind(wx.EVT_BUTTON, self.OnBLocate, self.bLocate)
-		hsz.Add(self.bLocate)
-
-		hsz.AddSpacer(30)
-
 		self.bHilite = wx.Button(self, wx.ID_ANY, HILITEON, size=BUTTONSIZE)
 		self.Bind(wx.EVT_BUTTON, self.OnBHiLite, self.bHilite)
 		hsz.Add(self.bHilite)
@@ -175,10 +169,6 @@ class RouteTrainDlg(wx.Dialog):
 		
 		if not rc or (rc and msg is not None):
 			self.parent.PopupEvent(msg)
-
-	def OnBLocate(self, _):
-		if self.train.SetHilite(True):
-			self.parent.AddHilitedTrain(self.train)
 
 	def OnBHiLite(self, _):
 		if self.hilited:

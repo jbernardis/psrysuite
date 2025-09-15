@@ -197,6 +197,25 @@ class Train:
 
 		return bnl
 
+	def ValidateStoppingSections(self):
+		if len(self.blockOrder) < 1:
+			return
+
+		rbn = list(reversed(self.blockOrder))
+
+		startbn = rbn[0]
+		blk = self.blocks[startbn]
+		blk.ClearStoppingSections()
+		blk.EvaluateStoppingSections()
+		self.SetSBActive(blk.IsStopped())
+
+		if len(rbn) == 1:
+			return
+
+		for bn in rbn[1:]:
+			blk = self.blocks[bn]
+			blk.ClearStoppingSections()
+
 	def GetSetTrainCommand(self):
 		stParams = {"blocks": self.blockOrder, "name": self.name, "loco": self.loco, "atc": self.atc, "east": self.east}
 		if self.chosenRoute is not None:
@@ -227,7 +246,6 @@ class Train:
 
 	def SetBlockOrder(self, order):
 		self.blockOrder = [b for b in order if b in self.blocks]
-		logging.debug("Setting block order of train %s = %s" % (self.name, str(self.blockOrder)))
 
 	def GetBlockCount(self):
 		return len(self.blocks)
@@ -271,6 +289,7 @@ class Train:
 			self.blockOrder.insert(0, bn)
 		else:
 			self.blockOrder.append(bn)
+
 		logging.debug("Added block %s to %s of train %s, new block list = %s" % (bn, "rear" if action == REAR else "front", self.name, str(self.blockOrder)))
 
 	def RemoveFromBlock(self, blk):

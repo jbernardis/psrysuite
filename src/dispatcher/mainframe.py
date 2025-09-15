@@ -15,7 +15,7 @@ from dispatcher.constants import BLOCK
 from dispatcher.district import Districts, CrossingEastWestBoundary
 from dispatcher.tile import loadTiles
 from dispatcher.train import Train, CopyTrainReferences
-from dispatcher.trainlist import ActiveTrainList, YardBlocks
+from dispatcher.trainlist import ActiveTrainList, YardBlocks, LadderBlocks
 from dispatcher.losttrains import LostTrains, LostTrainsRecoveryDlg
 from dispatcher.trainhistory import TrainHistory
 from dispatcher.preload import PreLoadedTrains
@@ -32,7 +32,7 @@ from dispatcher.block import formatRouteDesignator
 from dispatcher.node import Node
 
 from dispatcher.constants import HyYdPt, LaKr, NaCl, EMPTY, OCCUPIED, NORMAL, REVERSE, \
-		OVERSWITCH, SLIPSWITCH, turnoutstate, REPLACE
+		OVERSWITCH, SLIPSWITCH, turnoutstate, REPLACE, REAR
 from dispatcher.listener import Listener
 from dispatcher.rrserver import RRServer
 
@@ -40,12 +40,20 @@ from dispatcher.edittraindlg import EditTrainDlg, SortTrainBlocksDlg
 from dispatcher.choicedlgs import ChooseItemDlg, ChooseBlocksDlg, ChooseSnapshotActionDlg, ChooseTrainDlg, ChooseSnapshotDlg
 from traineditor.preloaded.managepreloaded import ManagePreloadedDlg
 
-MENU_ATC_REMOVE  = 900
-MENU_ATC_STOP    = 901
-MENU_ATC_ADD     = 902
-MENU_AR_ADD      = 903
-MENU_AR_REMOVE   = 904
-MENU_TRAIN_ROUTE = 910
+MENU_ATC_REMOVE    = 900
+MENU_ATC_STOP      = 901
+MENU_ATC_ADD       = 902
+MENU_AR_ADD        = 903
+MENU_AR_REMOVE     = 904
+MENU_TRAIN_EDIT    = 910
+MENU_TRAIN_ROUTE   = 911
+MENU_TRAIN_SPLIT   = 912
+MENU_TRAIN_MERGE   = 913
+MENU_TRAIN_SWAP    = 914
+MENU_TRAIN_REVERSE = 915
+MENU_TRAIN_REORDER = 916
+MENU_TRAIN_LOCATE  = 917
+MENU_TRAIN_HILITE  = 918
 
 (DeliveryEvent, EVT_DELIVERY) = wx.lib.newevent.NewEvent() 
 (DisconnectEvent, EVT_DISCONNECT) = wx.lib.newevent.NewEvent() 
@@ -59,6 +67,9 @@ wildcardLoco = "locomotive files (*.loco)|*.loco|"	 \
 			"All files (*.*)|*.*"
 			
 SidingSwitches = [ "LSw11", "LSw13", "DSw9", "SSw1", "CSw3", "CSw11", "CSw15", "CSw19", "Csw21a", "CSw21b" ]
+
+# blocks to consider valid for all routes
+ValidBlocks = YardBlocks + LadderBlocks
 
 
 class ScreenDiagram:
@@ -130,6 +141,8 @@ class MainFrame(wx.Frame):
 		self.cbOSSLocks = None
 		self.cbSidingsUnlocked = None
 		self.menuTrain = None
+		self.menuTrainID = None
+		self.menuBlock = None
 
 		self.events = None
 		self.advice = None
@@ -195,6 +208,7 @@ class MainFrame(wx.Frame):
 		self.delayedRequests = DelayedRequests()
 		self.delayedSignals = DelayedSignals()
 		self.C13Queue = TrainQueue()
+		self.menuFont = wx.Font(wx.Font(14, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Arial"))
 
 	def OnKeyDown(self, evt):
 		kcd = evt.GetKeyCode()
@@ -1361,84 +1375,409 @@ class MainFrame(wx.Frame):
 					tr = blk.GetTrain()
 					if tr is None:
 						logging.error("Block %s is occupied, but get train returned None" % blk.GetName())
-						#blk.SetOccupied(occupied=False, refresh=True)
-						self.PopupEvent("Block %s is occupied, but get train returned None" % blk.GetName())
 						return
 
-					if shift and not right:
-						trid = tr.GetName()
-						try:
-							hasSequence = ((trid in self.trainList and len(self.trainList[trid]["sequence"]) > 0)
-									or (tr.GetChosenRoute() is not None))
-						except:
-							hasSequence = False
-
-						if not hasSequence:
-							self.PopupEvent("Train %s has no block sequence defined"  % trid)
-						else:
-							self.ShowHilitedRoute(tr, trid)
-
-					elif shift and right:
-						#self.PopupEvent("Right Shift on a train %s in %s" % (tr.GetName(), blk.GetName()))
-						pass
-
-					elif not right:
+					if not right:
 						self.EditTrain(tr, blk)
 
-					else:
-						addedMenuItem = False
-						
-						menu = wx.Menu()
-						self.menuTrain = tr
-						
-						self.Bind(wx.EVT_MENU, self.OnTrainRouting, id=MENU_TRAIN_ROUTE)
-						if self.IsDispatcher():
-							if self.ATCEnabled:
-								if tr.IsOnATC():
-									menu.Append( MENU_ATC_REMOVE, "Remove from ATC" )
-									self.Bind(wx.EVT_MENU, self.OnATCRemove, id=MENU_ATC_REMOVE)
-									menu.Append( MENU_ATC_STOP, "ATC Stop/Resume Train" )
-									self.Bind(wx.EVT_MENU, self.OnATCStop, id=MENU_ATC_STOP)
-									addedMenuItem = True
-								else:
-									loco = tr.GetLoco()
-									if loco != "??":
-										menu.Append( MENU_ATC_ADD, "Add to ATC")
-										self.Bind(wx.EVT_MENU, self.OnATCAdd, id=MENU_ATC_ADD)
-										addedMenuItem = True
-								
-							if self.AREnabled:
-								if tr.IsOnAR():
-									menu.Append( MENU_AR_REMOVE, "Remove from Auto Router")
-									self.Bind(wx.EVT_MENU, self.OnARRemove, id=MENU_AR_REMOVE)
-								else:
-									menu.Append( MENU_AR_ADD, "Add to Auto Router")
-									self.Bind(wx.EVT_MENU, self.OnARAdd, id=MENU_AR_ADD)
-								addedMenuItem = True
-
-						trid = self.menuTrain.GetName()
-						# noinspection PyTypeChecker
-						hasSequence = ((trid in self.trainList and len(self.trainList[trid]["sequence"]) > 0)
-									or (self.menuTrain.GetChosenRoute() is not None))
-
-						if addedMenuItem:
-							if hasSequence:
-								menu.Append( MENU_TRAIN_ROUTE, "Train Routing" )
-
-							self.PopupMenu( menu, (screenpos[0], screenpos[1]+50) )
-							
-							menu.Destroy()
-						else:
-							menu.Destroy()
-							if hasSequence:
-								self.RouteTrain(self.menuTrain)
-							else:
-								self.PopupEvent("Train %s has no block sequence defined" % trid)
+					else: # pop-up menu
+						menuPos = (screenpos[0], screenpos[1] + 90)
+						self.PopupTrainMenu(self, tr, blk, menuPos)
 
 				return
 
 		if self.CTCManager is not None:
 			self.CTCManager.CheckHotSpots(self.currentScreen, rawpos[0], rawpos[1])
+
+	def PopupTrainMenu(self, owner, tr, blk, menuPos):
+		if owner != self:
+			dpos = owner.GetPosition()  # this is the position of the dialog box that invoked the menu
+			wpos = self.GetPosition()   # this is the position of the main window
+			pos = [menuPos[i] + dpos[i] - wpos[i] for i in range(2)]
+			pos[1] += 30
+
+		else:
+			pos = [x for x in menuPos]
+
+		trid = tr.GetName()
+		try:
+			hasSequence = ((trid in self.trainList and len(self.trainList[trid]["sequence"]) > 0)
+						   or (tr.GetChosenRoute() is not None))
+		except:
+			hasSequence = False
+
+		menu = wx.Menu()
+		self.menuTrain = tr
+		self.menuTrainID = trid
+		self.menuBlock = tr.FrontBlock() if blk is None else blk
+
+		itm = wx.MenuItem(menu, MENU_TRAIN_EDIT, "Edit train name/loco/engineer")
+		itm.SetFont(self.menuFont)
+		menu.Append(itm)
+		self.Bind(wx.EVT_MENU, self.OnTrainEdit, id=MENU_TRAIN_EDIT)
+
+		if hasSequence:
+			itm = wx.MenuItem(menu, MENU_TRAIN_ROUTE, "Route Train")
+			itm.SetFont(self.menuFont)
+			menu.Append(itm)
+			self.Bind(wx.EVT_MENU, self.OnTrainRoute, id=MENU_TRAIN_ROUTE)
+
+		menu.AppendSeparator()
+
+		itm = wx.MenuItem(menu, MENU_TRAIN_SPLIT, "Split train into two trains")
+		itm.SetFont(self.menuFont)
+		menu.Append(itm)
+		self.Bind(wx.EVT_MENU, self.OnTrainSplit, id=MENU_TRAIN_SPLIT)
+
+		itm = wx.MenuItem(menu, MENU_TRAIN_MERGE, "Merge two trains into 1")
+		itm.SetFont(self.menuFont)
+		menu.Append(itm)
+		self.Bind(wx.EVT_MENU, self.OnTrainMerge, id=MENU_TRAIN_MERGE)
+
+		menu.AppendSeparator()
+
+		itm = wx.MenuItem(menu, MENU_TRAIN_SWAP, "Swap train name with another train")
+		itm.SetFont(self.menuFont)
+		menu.Append(itm)
+		self.Bind(wx.EVT_MENU, self.OnTrainSwap, id=MENU_TRAIN_SWAP)
+
+		itm = wx.MenuItem(menu, MENU_TRAIN_REVERSE, "Reverse the train direction")
+		itm.SetFont(self.menuFont)
+		menu.Append(itm)
+		self.Bind(wx.EVT_MENU, self.OnTrainReverse, id=MENU_TRAIN_REVERSE)
+
+		itm = wx.MenuItem(menu, MENU_TRAIN_REORDER, "Reorder train blocks")
+		itm.SetFont(self.menuFont)
+		menu.Append(itm)
+		self.Bind(wx.EVT_MENU, self.OnTrainReorder, id=MENU_TRAIN_REORDER)
+
+		menu.AppendSeparator()
+
+		if hasSequence:
+			itm = wx.MenuItem(menu, MENU_TRAIN_HILITE, "Highlight Train Route")
+			itm.SetFont(self.menuFont)
+			menu.Append(itm)
+			self.Bind(wx.EVT_MENU, self.OnTrainHilite, id=MENU_TRAIN_HILITE)
+
+		itm = wx.MenuItem(menu, MENU_TRAIN_LOCATE, "Locate Train")
+		itm.SetFont(self.menuFont)
+		menu.Append(itm)
+		self.Bind(wx.EVT_MENU, self.OnTrainLocate, id=MENU_TRAIN_LOCATE)
+
+		if self.IsDispatcher():
+			if self.ATCEnabled:
+				if tr.IsOnATC():
+					menu.AppendSeparator()
+
+					itm = wx.MenuItem(menu, MENU_ATC_REMOVE, "Remove from ATC")
+					itm.SetFont(self.menuFont)
+					menu.Append(itm)
+					self.Bind(wx.EVT_MENU, self.OnATCRemove, id=MENU_ATC_REMOVE)
+					itm = wx.MenuItem(menu, MENU_ATC_STOP, "ATC Stop/Resume Train")
+					itm.SetFont(self.menuFont)
+					menu.Append(itm)
+					self.Bind(wx.EVT_MENU, self.OnATCStop, id=MENU_ATC_STOP)
+				else:
+					loco = tr.GetLoco()
+					if loco != "??":
+						menu.AppendSeparator()
+
+						itm = wx.MenuItem(menu, MENU_ATC_ADD, "Add to ATC")
+						itm.SetFont(self.menuFont)
+						menu.Append(itm)
+						self.Bind(wx.EVT_MENU, self.OnATCAdd, id=MENU_ATC_ADD)
+
+			if self.AREnabled:
+				menu.AppendSeparator()
+
+				if tr.IsOnAR():
+					itm = wx.MenuItem(menu, MENU_AR_REMOVE, "Remove from Auto Router")
+					itm.SetFont(self.menuFont)
+					menu.Append(itm)
+					self.Bind(wx.EVT_MENU, self.OnARRemove, id=MENU_AR_REMOVE)
+				else:
+					itm = wx.MenuItem(menu, MENU_AR_ADD, "Add to Auto Router")
+					itm.SetFont(self.menuFont)
+					menu.Append(itm)
+					self.Bind(wx.EVT_MENU, self.OnARAdd, id=MENU_AR_ADD)
+
+		self.PopupMenu(menu, pos)
+
+		menu.Destroy()
+
+	def OnTrainEdit(self, _):
+		self.EditTrain(self.menuTrain, self.menuBlock)
+
+	def OnTrainRoute(self, _):
+		self.RouteTrain(self.menuTrain)
+
+	def OnTrainHilite(self, _):
+		self.ShowHilitedRoute(self.menuTrain, self.menuTrainID)
+
+	def OnTrainLocate(self, _):
+		if self.menuTrain.SetHilite(True):
+			self.AddHilitedTrain(self.menuTrain)
+
+	def OnTrainSplit(self, _):
+		blockDict = self.menuTrain.GetBlockList()
+		blockOrder = self.menuTrain.GetBlockOrderList()
+		blockList = list(reversed([blockDict[b].GetRouteDesignator() for b in blockOrder]))
+		routeMap = {blockDict[b].GetRouteDesignator(): b for b in blockOrder}
+		if len(blockList) == 1:
+			dlg = wx.MessageDialog(self, "Train occupies only 1 block", "Unable to split train",
+								   wx.OK | wx.ICON_INFORMATION)
+			dlg.ShowModal()
+			dlg.Destroy()
+			return
+
+		blist = []
+		dlg = ChooseBlocksDlg(self, self.menuTrainID, blockList)
+		dlg.CenterOnScreen()
+		lrc = dlg.ShowModal()
+		if lrc == wx.ID_OK:
+			blist = list(reversed(dlg.GetResults()))
+		dlg.Destroy()
+
+		if lrc != wx.ID_OK:
+			return
+
+		logging.info("Splitting following blocks from train %s: %s" % (self.menuTrainID, str(blist)))
+
+		newTr = Train()
+		east = self.menuTrain.GetEast()
+		newTr.SetEast(east)
+		newName = newTr.GetName()
+		newLoco = newTr.GetLoco()
+
+		newTr.SetBeingEdited(True)
+
+		for rn in blist:
+			bn = routeMap[rn]
+			b = blockDict[bn]
+			self.menuTrain.RemoveFromBlock(b)
+			newTr.AddToBlock(b, 'front')
+			b.SetTrain(newTr)
+			b.SetEast(east)
+			self.CheckTrainsInBlock(b.GetName(), None)
+
+		self.Request({"settrain": {"blocks": blist}})
+		self.Request(
+			{"settrain": {"blocks": blist, "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
+
+		self.trains[newName] = newTr
+
+		self.SendTrainBlockOrder(self.menuTrain)
+		self.SendTrainBlockOrder(newTr)
+
+		self.menuTrain.ValidateStoppingSections()
+		newTr.ValidateStoppingSections()
+
+		self.activeTrains.AddTrain(newTr)
+		self.activeTrains.UpdateTrain(self.menuTrain)
+
+		if self.menuTrain.IsInNoBlocks():
+			try:
+				self.activeTrains.RemoveTrain(self.menuTrainID)
+			except:
+				logging.warning("can't delete train %s from active train list" % self.menuTrainID)
+			try:
+				del self.trains[self.menuTrainID]
+			except:
+				logging.warning("can't delete train %s from train list" % self.menuTrainID)
+
+		else:
+			self.menuTrain.Draw()
+
+		newTr.Draw()
+
+	def OnTrainMerge(self, _):
+		trList = [t for t in self.trains.keys() if t != self.menuTrainID]
+		if len(trList) == 0:
+			dlg = wx.MessageDialog(self, "No other trains to merge with", "Unable to merge train",
+								   wx.OK | wx.ICON_INFORMATION)
+			dlg.ShowModal()
+			dlg.Destroy()
+			return
+
+		dlg = ChooseTrainDlg(self, self.menuTrainID, trList)
+		dlg.CenterOnScreen()
+		lrc = dlg.ShowModal()
+		if lrc == wx.ID_OK:
+			trxid = dlg.GetResults()
+		else:
+			trxid = None
+		dlg.Destroy()
+		if lrc != wx.ID_OK:
+			return
+
+		if trxid is None:
+			self.PopupEvent("No train chosen for merge operation - ignoring request")
+			return
+
+		trx = self.trains[trxid]
+
+		east = self.menuTrain.GetEast()  # assume the direction of the surviving train
+
+		blist = [x for x in trx.GetBlockOrderList()]
+		for blkNm in blist:
+			blk = self.blocks[blkNm]
+			trx.RemoveFromBlock(blk)
+			self.menuTrain.AddToBlock(blk, REAR)
+			blk.SetTrain(self.menuTrain)
+			blk.SetEast(east)
+			self.CheckTrainsInBlock(blk.GetName(), None)
+
+		# set the block list for the surviving train
+		blist = [x for x in self.menuTrain.GetBlockOrderList()]
+		self.Request(
+			{"settrain": {"blocks": blist, "name": self.menuTrainID, "loco": self.menuTrain.GetLoco(), "east": "1" if east else "0"}})
+
+		self.SendTrainBlockOrder(self.menuTrain)
+		self.menuTrain.ValidateStoppingSections()
+		self.activeTrains.UpdateTrain(self.menuTrainID)
+
+		self.Request({"deletetrain": {"name": trxid}})
+
+		self.menuTrain.Draw()
+
+	def OnTrainReverse(self, _):
+		nd = not self.menuTrain.GetEast()
+		self.menuTrain.SetEast(nd)
+		self.menuTrain.SetBlocksDirection()
+		self.menuTrain.ReverseBlockOrder()
+		blk = self.menuTrain.FrontBlock()
+
+		self.menuTrain.ValidateStoppingSections()
+
+		if blk is not None:
+			self.CheckTrainsInBlock(blk.GetName(), None)
+
+		self.activeTrains.RefreshTrain(self.menuTrainID)
+		self.SendTrainBlockOrder(self.menuTrain)
+
+	def OnTrainReorder(self, _):
+		if len(self.menuTrain.GetBlockOrderList()) <= 1:
+			dlg = wx.MessageDialog(self, "Train occupies < 2 blocks", "Unable to reorder blocks", wx.OK | wx.ICON_INFORMATION)
+			dlg.ShowModal()
+			dlg.Destroy()
+			return
+
+		dlg = SortTrainBlocksDlg(self, self.menuTrain)
+		dlg.CenterOnScreen()
+		lrc = dlg.ShowModal()
+		neworder = []
+		if lrc == wx.ID_OK:
+			neworder = dlg.GetResults()
+
+		dlg.Destroy()
+		if lrc != wx.ID_OK:
+			return
+
+		self.menuTrain.SetBlockOrder(neworder)
+		blk = self.menuTrain.FrontBlock()
+		if blk is not None:
+			self.CheckTrainsInBlock(blk.GetName(), None)
+
+		self.activeTrains.RefreshTrain(self.menuTrainID)
+		self.SendTrainBlockOrder(self.menuTrain)
+
+	def OnTrainSwap(self, _):
+		trList = [t for t in self.trains.keys() if t != self.menuTrainID]
+		if len(trList) == 0:
+			dlg = wx.MessageDialog(self, "No other trains to swap with", "Unable to swap trains",
+								   wx.OK | wx.ICON_INFORMATION)
+			dlg.ShowModal()
+			dlg.Destroy()
+			return
+
+		dlg = ChooseTrainDlg(self, self.menuTrainID, trList, merge=False)
+		dlg.CenterOnScreen()
+		lrc = dlg.ShowModal()
+		if lrc == wx.ID_OK:
+			trxid = dlg.GetResults()
+		else:
+			trxid = None
+		dlg.Destroy()
+		if lrc != wx.ID_OK:
+			return
+
+		if trxid is None:
+			self.PopupEvent("No train chosen for swap operation - ignoring request")
+			return
+
+		trx = self.trains[trxid]
+		newLoco = trx.GetLoco()
+		logging.debug("swapping trains %s and %s" % (self.menuTrainID, trxid))
+		blockDictA = self.menuTrain.GetBlockList().copy()
+		blockOrderA = [x for x in self.menuTrain.GetBlockOrderList()]
+		blockListA = list(reversed([blockDictA[b].GetRouteDesignator() for b in blockOrderA]))
+		routeMapA = {blockDictA[b].GetRouteDesignator(): b for b in blockOrderA}
+
+		blockDictB = trx.GetBlockList().copy()
+		blockOrderB = [x for x in trx.GetBlockOrderList()]
+		blockListB = list(reversed([blockDictB[b].GetRouteDesignator() for b in blockOrderB]))
+		routeMapB = {blockDictB[b].GetRouteDesignator(): b for b in blockOrderB}
+
+		blkx = self.blocks["S10"]
+
+		# remove train A from all of it's blocks
+		for rn in blockListA:
+			bn = routeMapA[rn]
+			b = blockDictA[bn]
+			self.menuTrain.RemoveFromBlock(b)
+
+		# remove train B from all of it's blocks
+		for rn in blockListB:
+			bn = routeMapB[rn]
+			b = blockDictB[bn]
+			trx.RemoveFromBlock(b)
+
+		eastA = self.menuTrain.GetEast()
+		eastB = trx.GetEast()
+		self.menuTrain.SetEast(eastB)
+		trx.SetEast(eastA)
+
+		sbaA = self.menuTrain.GetSBActive()
+		sbaB = trx.GetSBActive()
+
+		# add train A to all of train B's blocks
+		for rn in blockListB:
+			bn = routeMapB[rn]
+			b = blockDictB[bn]
+			self.menuTrain.AddToBlock(b, REAR)
+			b.SetTrain(self.menuTrain)
+			self.CheckTrainsInBlock(b.GetName(), None)
+
+		# add train B to all of train A's blocks
+		for rn in blockListA:
+			bn = routeMapA[rn]
+			b = blockDictA[bn]
+			trx.AddToBlock(b, REAR)
+			b.SetTrain(trx)
+			self.CheckTrainsInBlock(b.GetName(), None)
+
+		blist = [bn if bn not in routeMapA else routeMapA[bn] for bn in reversed(blockListA)]
+		self.Request({"settrain": { "blocks": blist}})
+		self.Request({"settrain": { "blocks": blist, "name": trxid, "loco": self.menuTrain.GetLoco(), "east": "1" if eastA else "0"}})
+
+		blist = [bn if bn not in routeMapB else routeMapB[bn] for bn in reversed(blockListB)]
+		self.Request({"settrain": { "blocks": blist}})
+		self.Request({"settrain": { "blocks": blist, "name": self.menuTrainID, "loco": newLoco, "east": "1" if eastB else "0"}})
+
+		self.SendTrainBlockOrder(self.menuTrain)
+		self.SendTrainBlockOrder(trx)
+
+		self.menuTrain.ValidateStoppingSections()
+		trx.ValidateStoppingSections()
+
+		self.menuTrain.SetSBActive(sbaB)
+		trx.SetSBActive(sbaA)
+
+		self.menuTrain.Draw()
+		trx.Draw()
+
+		self.activeTrains.UpdateTrain(self.menuTrainID)
+		self.activeTrains.UpdateTrain(trxid)
 
 	def ShowHilitedRoute(self, tr, trid):
 		try:
@@ -1672,7 +2011,6 @@ class MainFrame(wx.Frame):
 		if rc == wx.ID_YES:
 			trainid, locoid, engineer, east, _, chosenRoute = bl
 			self.lostTrains.ClearBranchLine(trainid)
-			rc = wx.ID_OK
 			atc = False
 			ar = False
 
@@ -1690,164 +2028,9 @@ class MainFrame(wx.Frame):
 				trainid, locoid, engineer, atc, ar, east, chosenRoute = dlg.GetResults()
 
 			dlg.Destroy()
-		
-		if rc == wx.ID_CUT:	 # split train in 2
-			blockDict = tr.GetBlockList()
-			blockOrder = tr.GetBlockOrderList()
-			blockList = list(reversed([blockDict[b].GetRouteDesignator() for b in blockOrder]))
-			routeMap = {blockDict[b].GetRouteDesignator(): b for b in blockOrder}
-			if len(blockList) == 1:
-				dlg = wx.MessageDialog(self, "Train occupies only 1 block", "Unable to split train", wx.OK | wx.ICON_INFORMATION)
-				dlg.ShowModal()
-				dlg.Destroy()
-				return 
-			
-			dlg = ChooseBlocksDlg(self, oldName, blockList)
-			dlg.CenterOnScreen()
-			lrc = dlg.ShowModal()
-			if lrc == wx.ID_OK:
-				blist = list(reversed(dlg.GetResults()))
-			dlg.Destroy()
-			
-			if lrc != wx.ID_OK:
-				return	
-			
-			logging.info("Splitting following blocks from train %s: %s" % (oldName, str(blist)))			
 
-			newTr = Train()
-			east = tr.GetEast()
-			newTr.SetEast(east)
-			newName = newTr.GetName()
-			newLoco = newTr.GetLoco()
-			
-			newTr.SetBeingEdited(True)
-			
-			for rn in blist:
-				bn = routeMap[rn]
-				b = blockDict[bn]
-				tr.RemoveFromBlock(b)
-				newTr.AddToBlock(b, 'front')
-				b.SetTrain(newTr)
-				b.SetEast(east)
-				self.CheckTrainsInBlock(b.GetName(), None)
-
-			self.Request({"settrain": { "blocks": blist}})
-			self.Request({"settrain": { "blocks": blist, "name": newName, "loco": newLoco, "east": "1" if east else "0"}})
-
-			self.trains[newName] = newTr
-
-			self.SendTrainBlockOrder(tr)
-			self.SendTrainBlockOrder(newTr)
-
-			self.activeTrains.AddTrain(newTr)
-			self.activeTrains.UpdateTrain(oldName)
-			
-			if tr.IsInNoBlocks():
-				trid = tr.GetName()
-				try:
-					self.activeTrains.RemoveTrain(trid)
-				except:
-					logging.warning("can't delete train %s from active train list" % trid)
-				try:
-					del self.trains[trid]
-				except:
-					logging.warning("can't delete train %s from train list" % trid)
-
-			else:
-				tr.Draw()
-				
-			newTr.Draw()
-			return 
-		
-		if rc == wx.ID_PASTE: # merge trains together
-			trList = [t for t in self.trains.keys() if t != oldName]
-			if len(trList) == 0:
-				dlg = wx.MessageDialog(self, "No other trains to merge with", "Unable to merge train", wx.OK | wx.ICON_INFORMATION)
-				dlg.ShowModal()
-				dlg.Destroy()
+			if rc != wx.ID_OK:
 				return
-			
-			dlg = ChooseTrainDlg(self, oldName, trList)
-			dlg.CenterOnScreen()
-			lrc = dlg.ShowModal()
-			if lrc == wx.ID_OK:
-				trxid = dlg.GetResults()
-			else:
-				trxid = None
-			dlg.Destroy()
-			if lrc != wx.ID_OK:
-				return 
-			
-			if trxid is None:
-				self.PopupEvent("No train chosen for merge operation - ignoring request")
-				return 
-			
-			trx = self.trains[trxid]
-
-			east = tr.GetEast()  # assume the direction of the surviving train
-
-			blist = [x for x in trx.GetBlockList()]
-			for blkNm in blist:
-				blk = self.blocks[blkNm]
-				trx.RemoveFromBlock(blk)
-				tr.AddToBlock(blk, 'front')
-				blk.SetTrain(tr)
-				blk.SetEast(east)
-				self.CheckTrainsInBlock(blk.GetName(), None)
-			# self.Request({"settrain": { "blocks": blist}})
-
-			# set the block list for the surviving train
-			blist = [x for x in tr.GetBlockList()]
-			self.Request({"settrain": { "blocks": blist, "name": oldName, "loco": oldLoco, "east": "1" if east else "0"}})
-
-			self.SendTrainBlockOrder(tr)
-			self.activeTrains.UpdateTrain(oldName)
-
-			self.Request({"deletetrain": {"name": trxid}})
-
-			tr.Draw()
-			return
-		
-		if rc == wx.ID_BACKWARD:
-			nd = not tr.GetEast()
-			tr.SetEast(nd)
-			tr.SetBlocksDirection()
-			tr.ReverseBlockOrder()
-			blk = tr.FrontBlock()
-			if blk is not None:
-				self.CheckTrainsInBlock(blk.GetName(), None)
-
-			self.activeTrains.RefreshTrain(tr.GetName())
-			self.SendTrainBlockOrder(tr)
-			return
-
-		if rc == wx.ID_SORT_ASCENDING:
-			if len(tr.GetBlockOrderList()) <= 1:
-				dlg = wx.MessageDialog(self, "Train occupies < 2 blocks", "Unable to reorder blocks", wx.OK | wx.ICON_INFORMATION)
-				dlg.ShowModal()
-				dlg.Destroy()
-				return
-
-			dlg = SortTrainBlocksDlg(self, tr)
-			dlg.CenterOnScreen()
-			lrc = dlg.ShowModal()
-			if lrc == wx.ID_OK:
-				neworder = dlg.GetResults()
-
-			dlg.Destroy()
-			if lrc != wx.ID_OK:
-				return
-
-			tr.SetBlockOrder(neworder)
-			blk = tr.FrontBlock()
-			if blk is not None:
-				self.CheckTrainsInBlock(blk.GetName(), None)
-
-			self.activeTrains.RefreshTrain(tr.GetName())
-			self.SendTrainBlockOrder(tr)
-
-		if rc != wx.ID_OK:
-			return
 
 		oldChosenRoute = tr.GetChosenRoute()
 		tr.SetEast(east)  # take on the direction returned by edit dlg
@@ -2664,7 +2847,7 @@ class MainFrame(wx.Frame):
 			try:
 				direction = p["direction"]
 			except KeyError:
-				direction = "unknown"
+				direction = None
 			try:
 				train = p["train"]
 			except KeyError:
@@ -2674,27 +2857,37 @@ class MainFrame(wx.Frame):
 			except (KeyError, ValueError):
 				state = 0
 			state = True if state != 0 else False
-			if state:
-				sigmessage = ""
-				if rname.endswith(".srel"):
-					rname = rname[:-5]
+			try:
+				silent = int(p["silent"])
+			except (KeyError, ValueError):
+				silent = 0
+			silent = True if silent != 0 else False
 
+			if rname.endswith(".srel"):
+				rname = rname[:-5]
+
+			sigmessage = ""
+			try:
+				blk = self.blocks[rname]
+			except KeyError:
+				blk = None
+
+			if blk is not None:
+				signm = blk.GetDirectionSignal()
 				try:
-					blk = self.blocks[rname]
+					sig = self.signals[signm]
 				except KeyError:
-					blk = None
+					sig = None
+				if sig is not None:
+					sigmessage = " Signal %s" % sig.GetName()
+				else:
+					sigmessage = ""
 
-				if blk is not None:
-					signm = blk.GetDirectionSignal()
-					try:
-						sig = self.signals[signm]
-					except KeyError:
-						sig = None
-					if sig is not None:
-						sigmessage = " Signal %s" % sig.GetName()
-					else:
-						sigmessage = ""
-				self.PopupEvent("Stop Relay: Block %s %s%s Train %s" % (rname, direction, sigmessage, train))
+			if direction is not None and not silent:
+				if state:
+					self.PopupEvent("Stop Relay: Block %s %s%s Train %s" % (rname, direction, sigmessage, train))
+				else:
+					self.PopupEvent("Stop Relay: Block %s %s%s cleared" % (rname, direction, sigmessage))
 
 	def DoCmdTurnoutLock(self, parms):
 		if self.CTCManager is not None:
@@ -3114,6 +3307,10 @@ class MainFrame(wx.Frame):
 			signm = parms["signal"]
 		except KeyError:
 			signm = None
+		try:
+			blknm = parms["block"]
+		except KeyError:
+			blknm = None
 
 		if trid is None or signm is None:
 			logging.error("Train signal command without train and/or signal command")
@@ -3129,6 +3326,11 @@ class MainFrame(wx.Frame):
 		except:
 			sig  = None
 
+		try:
+			blk = self.blocks[blknm]
+		except:
+			blk  = None
+
 		if tr is None:
 			logging.error("Unknown train: %s" % trid)
 			return
@@ -3136,6 +3338,15 @@ class MainFrame(wx.Frame):
 		if sig is None:
 			logging.error("Unknown signal %s" % signm)
 			return
+
+		curSig = tr.GetSignal()[0]
+		if curSig is not None:
+			curSigNm = curSig.GetName()
+			if curSigNm is not None and curSigNm != signm:
+				# we are changing the signal on the train - clear out the stopping sections on the old signal
+				blk = curSig.GetGuardBlock()
+				if blk is not None:
+					blk.ClearStoppingSections()
 
 		ir, cr = self.CheckForIncorrectRoute(tr, sig)
 		if cr is not None:
@@ -3197,12 +3408,12 @@ class MainFrame(wx.Frame):
 			return None, None
 
 		nextBlk = rt.GetExitBlock()
-		if nextBlk is not None and nextBlk in YardBlocks:
+		if nextBlk is not None and nextBlk in ValidBlocks:
 			"""
 			possibility here - if we do not want to check for incorrect block entry when we are coming into a yerd
-			then we should return None, None here
+			then we should return None, None here, otherwise pass
 			"""
-			pass
+			return None, None
 
 		rtnm = nb.GetRouteName()
 		if rtnm is None:
@@ -3439,12 +3650,12 @@ class MainFrame(wx.Frame):
 			check to see if the train is in an unexpected block unless:
 			- we are not the dispatcher or a satellite
 			- the option to do this check is turned off
-			- this block is inside a yard - to allow the yard operator flexibility
+			- this block is inside a yard or ladder track - to allow the yard operator flexibility
 			
 			note that this check is bypassed later if the train does not have a defined block sequence
 			"""
 
-			if self.IsDispatcherOrSatellite() and self.settings.dispatcher.notifyinvalidblocks and block not in YardBlocks:
+			if self.IsDispatcherOrSatellite() and self.settings.dispatcher.notifyinvalidblocks and block not in ValidBlocks:
 				try:
 					seq = self.trainList[name]["sequence"]
 					sb = self.trainList[name]["startblock"]
@@ -3494,6 +3705,7 @@ class MainFrame(wx.Frame):
 
 		for trid, tr in blkorderMap.items():
 			if trid in self.trains:
+				tr.ValidateStoppingSections()
 				self.AssertBlockDirections(tr)
 				self.SendTrainBlockOrder(tr)
 				self.activeTrains.UpdateTrain(trid)
@@ -3738,6 +3950,7 @@ class MainFrame(wx.Frame):
 			if tr is not None:
 				tr.SetEast(east)
 				tr.SetBlockOrder(blocks)
+				tr.ValidateStoppingSections()
 				self.activeTrains.UpdateTrain(trid)
 
 	def DoCmdTrainTimesRequest(self, parms):

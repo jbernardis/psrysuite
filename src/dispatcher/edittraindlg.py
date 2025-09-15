@@ -214,52 +214,17 @@ class EditTrainDlg(wx.Dialog):
 		self.bOK = wx.Button(self, wx.ID_ANY, "OK", size=BUTTONSIZE)
 		self.bOK.SetDefault()
 		self.bCancel = wx.Button(self, wx.ID_ANY, "Cancel", size=BUTTONSIZE)
-		self.bLocate = wx.Button(self, wx.ID_ANY, "Locate", size=BUTTONSIZE)
-		if dispatcherFlag:
-			self.bSever = wx.Button(self, wx.ID_ANY, "Split", size=BUTTONSIZE)
-			self.bSever.SetToolTip("Split this train into 2 sections")
-			self.bMerge = wx.Button(self, wx.ID_ANY, "Merge", size=BUTTONSIZE)
-			self.bMerge.SetToolTip("Merge this train with another")
-			self.bReverse = wx.Button(self, wx.ID_ANY, "Reverse", size=BUTTONSIZE)
-			self.bReverse.SetToolTip("Reverse Direction on this train and reverse the order of its blocks")
-			self.bSort = wx.Button(self, wx.ID_ANY, "Reorder Blocks", size=BUTTONSIZE)
-			self.bSort.SetToolTip("Rearracge the order of blocks occupied by this train")
 
 		bsz = wx.BoxSizer(wx.HORIZONTAL)
 		bsz.Add(self.bOK)
 		bsz.AddSpacer(30)
 		bsz.Add(self.bCancel)
-		if not dispatcherFlag:
-			bsz.AddSpacer(30)
-			bsz.Add(self.bLocate)
 
 		self.Bind(wx.EVT_BUTTON, self.onOK, self.bOK)
 		self.Bind(wx.EVT_BUTTON, self.onCancel, self.bCancel)
 		vsz.Add(bsz, 0, wx.ALIGN_CENTER)
 
 		vsz.AddSpacer(20)
-
-		if dispatcherFlag:
-			bsz = wx.BoxSizer(wx.HORIZONTAL)
-			bsz.Add(self.bSever)
-			bsz.AddSpacer(30)
-			bsz.Add(self.bMerge)
-			bsz.AddSpacer(30)
-			bsz.Add(self.bReverse)
-			bsz.AddSpacer(30)
-			bsz.Add(self.bSort)
-			bsz.AddSpacer(30)
-			bsz.Add(self.bLocate)
-
-			self.Bind(wx.EVT_BUTTON, self.onSever, self.bSever)
-			self.Bind(wx.EVT_BUTTON, self.onMerge, self.bMerge)
-			self.Bind(wx.EVT_BUTTON, self.onReverse, self.bReverse)
-			self.Bind(wx.EVT_BUTTON, self.onSort, self.bSort)
-			vsz.Add(bsz, 0, wx.ALIGN_CENTER)
-
-			vsz.AddSpacer(20)
-
-		self.Bind(wx.EVT_BUTTON, self.onLocate, self.bLocate)
 
 		hsz = wx.BoxSizer(wx.HORIZONTAL)
 		hsz.AddSpacer(20)
@@ -560,18 +525,6 @@ class EditTrainDlg(wx.Dialog):
 
 		self.lostTrains.Remove(self.chosenTrain)
 		self.EndModal(wx.ID_OK)
-		
-	def onSever(self, _):
-		self.EndModal(wx.ID_CUT)
-		
-	def onMerge(self, _):
-		self.EndModal(wx.ID_PASTE)
-		
-	def onReverse(self, _):
-		self.EndModal(wx.ID_BACKWARD)
-
-	def onSort(self, _):
-		self.EndModal(wx.ID_SORT_ASCENDING)
 
 	def GetResults(self):
 		t = self.chosenTrain
@@ -597,7 +550,7 @@ class SortTrainBlocksDlg(wx.Dialog):
 		self.Bind(wx.EVT_CLOSE, self.onCancel)
 
 		self.modified = False
-		self.titleText = "Reorder Train Blocks"
+		self.titleText = "Reorder Blocks for Train %s" % tr.GetName()
 		self.SetTitleText()
 
 		textFont = wx.Font(wx.Font(12, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial"))

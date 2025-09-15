@@ -8,6 +8,14 @@ YardBlocks = [
 	"P1", "P2", "P3", "P4", "P5", "P6", "P7",
 	"Y50", "Y51", "Y52", "Y53", "Y81", "Y82", "Y83", "Y84" ]
 
+LadderBlocks = [
+	"COSSHE", "COSSHW",
+	"HOSEE", "HOSEW", "HOSWE", "HOSWW",
+	"YOSWYE", "YOSWYW",
+	"YOSKL1", "YOSKL2", "YOSKL3", "YOSKL4",
+	"POSSP1", "POSSP2", "POSSP3", "POSSP4", "POSSP5"
+]
+
 profileIndex = ["stop", "slow", "medium", "fast"]
 
 
@@ -214,9 +222,6 @@ class ActiveTrainsDlg(wx.Dialog):
 		hsz.AddSpacer(20)
 
 		self.trCtl = TrainListCtrl(self, self.dccSnifferEnabled)
-		self.trCtl.SetToolTip("Click  to Edit,\nR-Click  to Show Route List,\nShift-Click  to Hilite Route,\nShift-R-Click  to Locate")
-		tip = self.trCtl.GetToolTip()
-		tip.SetAutoPop(10000)
 		hsz.Add(self.trCtl)
 		self.trCtl.Bind(wx.EVT_LEFT_DOWN, self.ClickLeft)
 		self.trCtl.Bind(wx.EVT_RIGHT_DOWN, self.ClickRight)
@@ -250,10 +255,7 @@ class ActiveTrainsDlg(wx.Dialog):
 			return
 
 		idx = idxitem[0]
-		if wx.GetKeyState(wx.WXK_SHIFT):
-			self.HiliteRoute(idx)
-		else:
-			self.EditTrain(idx)
+		self.EditTrain(idx)
 		evt.Skip()
 		
 	def ClickRight(self, evt):
@@ -264,35 +266,15 @@ class ActiveTrainsDlg(wx.Dialog):
 			return
 
 		idx = idxitem[0]
-		if wx.GetKeyState(wx.WXK_SHIFT):
-			self.LocateTrain(idx)
-		else:
-			self.RouteTrain(idx)
+		tr = self.trCtl.GetActiveTrain(idx)
+		self.parent.PopupTrainMenu(self, tr, None, pos)
 		evt.Skip()
 		
-	def LocateTrain(self, idx):
-		tr = self.trCtl.GetActiveTrain(idx)
-		if tr.SetHilite(True):
-			self.parent.AddHilitedTrain(tr)
-
 	def EditTrain(self, idx):
 		tr = self.trCtl.GetActiveTrain(idx)
 		blk = tr.FrontBlock()
 		self.parent.EditTrain(tr, blk)
 
-	def HiliteRoute(self, idx):
-		tr = self.trCtl.GetActiveTrain(idx)
-		self.parent.ShowHilitedRoute(tr, tr.GetName())
-
-	def RouteTrain(self, idx):
-		tr = self.trCtl.GetActiveTrain(idx)
-		trid = tr.GetName()
-		self.parent.RouteTrain(tr)
-		# if trid in self.parent.trainList:
-		# 	self.parent.RouteTrain(tr)
-		# else:
-		# 	self.parent.PopupEvent("Train %s has no block sequence defined" % trid)
-		
 	def GetLocoInfo(self, loco):
 		return self.parent.GetLocoInfo(loco)
 		
