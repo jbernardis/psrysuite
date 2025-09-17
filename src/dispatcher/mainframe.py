@@ -1681,8 +1681,16 @@ class MainFrame(wx.Frame):
 		self.activeTrains.RefreshTrain(self.menuTrainID)
 		self.SendTrainBlockOrder(self.menuTrain)
 
+	@staticmethod
+	def BuildTrainKey(trid):
+		if trid.startswith("??"):
+			return "ZZ%s" % trid
+		else:
+			return "AA%s" % trid
+
 	def OnTrainSwap(self, _):
-		trList = [t for t in self.trains.keys() if t != self.menuTrainID]
+		trList = sorted([t for t in self.trains.keys() if t != self.menuTrainID], key=self.BuildTrainKey)
+
 		if len(trList) == 0:
 			dlg = wx.MessageDialog(self, "No other trains to swap with", "Unable to swap trains",
 								   wx.OK | wx.ICON_INFORMATION)
@@ -1718,7 +1726,8 @@ class MainFrame(wx.Frame):
 		blockListB = list(reversed([blockDictB[b].GetRouteDesignator() for b in blockOrderB]))
 		routeMapB = {blockDictB[b].GetRouteDesignator(): b for b in blockOrderB}
 
-		blkx = self.blocks["S10"]
+		rtA = self.menuTrain.GetChosenRoute()
+		rtB = trx.GetChosenRoute()
 
 		# remove train A from all of it's blocks
 		for rn in blockListA:
@@ -1734,6 +1743,18 @@ class MainFrame(wx.Frame):
 
 		eastA = self.menuTrain.GetEast()
 		eastB = trx.GetEast()
+		try:
+			normalEastA = self.trainList[self.menuTrainID]["eastbound"]
+			eastB = normalEastA
+		except KeyError:
+			pass
+
+		try:
+			normalEastB = self.trainList[trxid]["eastbound"]
+			eastA = normalEastB
+		except KeyError:
+			pass
+
 		self.menuTrain.SetEast(eastB)
 		trx.SetEast(eastA)
 

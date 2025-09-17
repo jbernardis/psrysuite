@@ -543,7 +543,6 @@ class TrainListCtrl(wx.ListCtrl):
 		else:
 			return "AA%s" % trid
 
-				
 	def suppressed(self, trid):
 		tr = self.trains[trid]
 		if self.suppressYards:

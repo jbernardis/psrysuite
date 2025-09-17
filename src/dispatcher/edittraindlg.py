@@ -1,4 +1,5 @@
 import wx
+import logging
 
 from dispatcher.losttrains import LostTrainsDlg
 from dispatcher.trainhistory import TrainHistoryDlg
@@ -41,7 +42,7 @@ class EditTrainDlg(wx.Dialog):
 		
 		locoList  = sorted(list(locos.keys()), key=self.BuildLocoKey)
 		self.trainList = sorted(list(trains.keys()))
-		self.trainsWithSeq = [k for k in self.trainList if "sequence" in self.trains[k] and len(self.trains[k]["sequence"]) > 0]
+		self.trainsWithSeq = [k for k in self.trainList if "sequence" in self.trains[k] and len(self.trains[k]["sequence"]) > 0 and self.trains[k]["route"] is None]
 
 		font = wx.Font(wx.Font(16, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Monospace"))
 
@@ -475,10 +476,6 @@ class EditTrainDlg(wx.Dialog):
 			else:
 				self.stTrainInfo[lx].SetLabel(
 					"%-12.12s  %-4.4s  %s" % (track[lx][0], "(%d)" % track[lx][2], track[lx][1]))
-
-	def onLocate(self, _):
-		if self.train.SetHilite(True):
-			self.parent.AddHilitedTrain(self.train)
 
 	def onCancel(self, _):
 		self.EndModal(wx.ID_CANCEL)
