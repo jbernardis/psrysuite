@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from zipfile import ZipFile
 import wx
-from win32com.client import tlbrowse
+
 
 def saveFiles():
     result = []
@@ -46,6 +46,7 @@ def saveFiles():
     result.append("Output File: %s" % fqn) 
     return result
 
+
 class MainFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, style=wx.DEFAULT_FRAME_STYLE)
@@ -71,7 +72,6 @@ class MainFrame(wx.Frame):
         
     def OnClose(self, _):
         self.Destroy()
-        
          
 
 class App(wx.App):
