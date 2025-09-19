@@ -2908,7 +2908,7 @@ class MainFrame(wx.Frame):
 				if state:
 					self.PopupEvent("Stop Relay: Block %s %s%s Train %s" % (rname, direction, sigmessage, train))
 				else:
-					self.PopupEvent("Stop Relay: Block %s %s%s cleared" % (rname, direction, sigmessage))
+					pass  # self.PopupEvent("Stop Relay: Block %s %s%s cleared" % (rname, direction, sigmessage))
 
 	def DoCmdTurnoutLock(self, parms):
 		if self.CTCManager is not None:

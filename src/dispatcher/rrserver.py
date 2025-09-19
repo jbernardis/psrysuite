@@ -15,7 +15,8 @@ class RRServer(object):
 		for cmd, parms in req.items():
 			try:
 				# self.rrSession.get(self.ipAddr + "/" + cmd, params=parms, timeout=0.5)
-				requests.get(self.ipAddr + "/" + cmd, params=parms, timeout=0.7)
+				r = requests.get(self.ipAddr + "/" + cmd, params=parms, timeout=0.7)
+				# logging.debug("URL: %s" % str(r.url))
 			except requests.exceptions.ConnectionError:
 				logging.error("Unable to send request  is rr server running?")
 				
