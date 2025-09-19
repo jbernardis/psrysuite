@@ -652,12 +652,17 @@ class ServerMain:
 			direction = "unknown"
 
 		try:
+			silent = int(cmd["silent"][0])
+		except KeyError:
+			silent = 0
+
+		try:
 			train = cmd["train"][0]
 		except KeyError:
 			train = "??"
 
 		relay = block + ".srel"
-		resp = {"relay": [{ "name": relay, "state": status, "direction": direction, "train": train}]}
+		resp = {"relay": [{ "name": relay, "state": status, "direction": direction, "train": train, "silent": silent}]}
 		self.socketServer.sendToAll(resp)
 
 		self.rr.SetRelay(relay, status)

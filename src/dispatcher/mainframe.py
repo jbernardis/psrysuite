@@ -1767,7 +1767,7 @@ class MainFrame(wx.Frame):
 			b = blockDictB[bn]
 			self.menuTrain.AddToBlock(b, REAR)
 			b.SetTrain(self.menuTrain)
-			self.CheckTrainsInBlock(b.GetName(), None)
+			#  self.CheckTrainsInBlock(b.GetName(), None)
 
 		# add train B to all of train A's blocks
 		for rn in blockListA:
@@ -1775,7 +1775,7 @@ class MainFrame(wx.Frame):
 			b = blockDictA[bn]
 			trx.AddToBlock(b, REAR)
 			b.SetTrain(trx)
-			self.CheckTrainsInBlock(b.GetName(), None)
+			#  self.CheckTrainsInBlock(b.GetName(), None)
 
 		blist = [bn if bn not in routeMapA else routeMapA[bn] for bn in reversed(blockListA)]
 		self.Request({"settrain": { "blocks": blist}})
@@ -2882,6 +2882,7 @@ class MainFrame(wx.Frame):
 				silent = int(p["silent"])
 			except (KeyError, ValueError):
 				silent = 0
+
 			silent = True if silent != 0 else False
 
 			if rname.endswith(".srel"):
@@ -2908,7 +2909,7 @@ class MainFrame(wx.Frame):
 				if state:
 					self.PopupEvent("Stop Relay: Block %s %s%s Train %s" % (rname, direction, sigmessage, train))
 				else:
-					pass  # self.PopupEvent("Stop Relay: Block %s %s%s cleared" % (rname, direction, sigmessage))
+					pass #  self.PopupEvent("Stop Relay: Block %s %s%s cleared" % (rname, direction, sigmessage))
 
 	def DoCmdTurnoutLock(self, parms):
 		if self.CTCManager is not None:
@@ -3552,8 +3553,8 @@ class MainFrame(wx.Frame):
 			if name is None: # the block is to be dis-associated with any train
 				if tr:
 					tr.RemoveFromBlock(blk)
-					if self.IsDispatcher():
-						self.SendTrainBlockOrder(tr)
+					#  if self.IsDispatcher():
+						#  self.SendTrainBlockOrder(tr)
 					trid = tr.GetName()
 					self.activeTrains.UpdateTrain(trid)
 					self.UpdateRouteDialog(trid)
@@ -3704,8 +3705,7 @@ class MainFrame(wx.Frame):
 				tr.SetBlockOrder(blocks)
 
 			blk.SetTrain(tr)
-			if self.IsDispatcher():
-				blkorderMap[name] = tr
+			blkorderMap[name] = tr
 
 			if self.IsDispatcher() and not nameonly:
 				self.CheckTrainsInBlock(block, None)
@@ -3720,7 +3720,7 @@ class MainFrame(wx.Frame):
 
 			self.trainHistory.Update(tr)
 
-			blk.EvaluateStoppingSections()
+			#  blk.EvaluateStoppingSections()
 			blk.Draw()   # this will redraw the train in this block only
 			tr.Draw() # necessary if this train appears in other blocks too
 
@@ -3728,7 +3728,8 @@ class MainFrame(wx.Frame):
 			if trid in self.trains:
 				tr.ValidateStoppingSections()
 				self.AssertBlockDirections(tr)
-				self.SendTrainBlockOrder(tr)
+				if self.IsDispatcher():
+					self.SendTrainBlockOrder(tr)
 				self.activeTrains.UpdateTrain(trid)
 
 	def AssertBlockDirections(self, tr):
