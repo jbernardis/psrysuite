@@ -2558,6 +2558,9 @@ class MainFrame(wx.Frame):
 
 			try:
 				rte = trinfo["route"]
+				if rte is not None and rte not in self.trains:
+					logging.debug("Route %s for train %s from snapshot %s does not exist" % (rte, trid, snapFile))
+					rte = None
 			except KeyError:
 				rte = None
 
@@ -2578,7 +2581,7 @@ class MainFrame(wx.Frame):
 			self.Request({"settrain": { "blocks": blist, "silent": "1"}})
 			self.Request({"settrain": { "blocks": blist, "name": trid, "loco": trinfo["loco"], "east": "1" if trinfo["east"] else "0", "route": rte}})
 
-			ntr = self.trains[trid]
+			# ntr = self.trains[trid]
 			self.SendTrainBlockOrder(ntr)
 
 		unknownBlocks = [b for b in blkNames if b not in foundTrainBlocks]

@@ -36,7 +36,11 @@ def CopyTrainReferences(tl):
 
 		if route is not None:
 			logging.debug("Train %s references route %s" % (trid, route))
-			copylist.append([trid, route])
+			if route not in tl:
+				logging.debug("removing train %s as the base route for train %s" % (route, trid))
+				tl[trid]["route"] = None
+			else:
+				copylist.append([trid, route])
 
 	for trid, route in copylist:
 		tl[trid] = copy.deepcopy(tl[route])

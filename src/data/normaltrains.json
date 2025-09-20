@@ -1,4 +1,185 @@
 {
+  "CFYD": {
+    "block": null,
+    "cutoff": false,
+    "desc": "Westbound Freight",
+    "eastbound": false,
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "CF",
+      "track": null
+    },
+    "sequence": [
+      {
+        "block": "C23",
+        "os": "COSCLEW",
+        "route": "CRtC23C22",
+        "signal": "C10R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C13",
+        "os": "COSCLW",
+        "route": "CRtC13C23",
+        "signal": "C14RB",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "B11",
+        "os": "BOSE",
+        "route": "BRtB11C13",
+        "signal": "C18R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "B10",
+        "os": "BOSWW",
+        "route": "BRtB10B11",
+        "signal": "C22R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "N12",
+        "os": "NEOSW",
+        "route": "NRtB10N12",
+        "signal": "N26L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "N11",
+        "os": "NWOSW",
+        "route": "NRtN11N12",
+        "signal": "N16L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "N10",
+        "os": "KOSW",
+        "route": "KRtN10N11",
+        "signal": "K8LB",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "S11",
+        "os": "KOSN10S11",
+        "route": "KRtN10S11",
+        "signal": "N10W",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "S10",
+        "os": "SOSW",
+        "route": "SRtS10S11",
+        "signal": "S12LA",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "D11",
+        "os": "DOSFOW",
+        "route": "DRtD11S10",
+        "signal": "D12L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "D10",
+        "os": "DOSVJW",
+        "route": "DRtD10D11",
+        "signal": "D6L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "L11",
+        "os": "LOSCAW",
+        "route": "LRtL11D10",
+        "signal": "L18L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "L10",
+        "os": "LOSLAW",
+        "route": "LRtL10L11",
+        "signal": "L8L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "Y11",
+        "os": "YOSCJW",
+        "route": "YRtY11L10",
+        "signal": "Y2R",
+        "time": 5000,
+        "trigger": "Front"
+      }
+    ],
+    "startblock": "C22",
+    "startsubblock": null,
+    "terminus": {
+      "loc": "YD",
+      "track": "Y87"
+    },
+    "time": 5000,
+    "tracker": [
+      [
+        "CLIFF",
+        "Sheffield Yd / C41-C44",
+        11
+      ],
+      [
+        "BANK",
+        "(sig) Martinsville",
+        3
+      ],
+      [
+        "NASSAU",
+        "(sig) Wilson City / Track N22",
+        23
+      ],
+      [
+        null,
+        "(sig) Krulish Jct",
+        19
+      ],
+      [
+        "SHORE",
+        "(sig) River jct",
+        5
+      ],
+      [
+        "DELL",
+        "(sig) LaPorte",
+        21
+      ],
+      [
+        "LATHAM",
+        "(sig) Latham Jct",
+        10
+      ],
+      [
+        null,
+        "(sig) Cornell",
+        7
+      ],
+      [
+        "YARD",
+        "Waterman Yd / Track Y87",
+        1
+      ]
+    ],
+    "route": null
+  },
   "20Y": {
     "block": null,
     "cutoff": false,
@@ -646,6 +827,211 @@
       [
         "HYDE E",
         "Hidden / Track H32 (X)",
+        11
+      ]
+    ],
+    "route": null
+  },
+  "YDCF": {
+    "block": null,
+    "cutoff": false,
+    "desc": "Eastbound Freight",
+    "eastbound": true,
+    "loco": null,
+    "normalloco": null,
+    "origin": {
+      "loc": "YD",
+      "track": "Y20"
+    },
+    "sequence": [
+      {
+        "block": "Y21",
+        "os": "YOSEJE",
+        "route": "YRtY20Y21",
+        "signal": "Y10L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "L20",
+        "os": "YOSCJE",
+        "route": "YRtY21L20",
+        "signal": "Y4L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "L21",
+        "os": "LOSLAM",
+        "route": "LRtL20L21",
+        "signal": "L6RA",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "D20",
+        "os": "LOSCAM",
+        "route": "LRtL21D20",
+        "signal": "L16R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "D21",
+        "os": "DOSVJE",
+        "route": "DRtD20D21",
+        "signal": "D4RA",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "S20",
+        "os": "DOSFOE",
+        "route": "DRtD21S20",
+        "signal": "D10R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "S21",
+        "os": "SOSE",
+        "route": "SRtS20S21",
+        "signal": "S4R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "N20",
+        "os": "KOSN20S21",
+        "route": "KRtN20S21",
+        "signal": "S21E",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "N21",
+        "os": "KOSE",
+        "route": "KRtN20N21",
+        "signal": "K2R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "N22",
+        "os": "NWOSE",
+        "route": "NRtN21N22",
+        "signal": "N14R",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "B20",
+        "os": "NEOSE",
+        "route": "NRtB20N22",
+        "signal": "N24RA",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "B21",
+        "os": "BOSWE",
+        "route": "BRtB20B21",
+        "signal": "C24L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C13",
+        "os": "BOSE",
+        "route": "BRtB21C13",
+        "signal": "C18LB",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C12",
+        "os": "COSCLW",
+        "route": "CRtC13C12",
+        "signal": "C14L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C11",
+        "os": "COSCLEE",
+        "route": "CRtC12C11",
+        "signal": "C12L",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C10",
+        "signal": "C4L",
+        "os": "COSGMW",
+        "route": "CRtC11C10",
+        "time": 5000,
+        "trigger": "Front"
+      },
+      {
+        "block": "C20",
+        "signal": "C2LB",
+        "os": "COSGME",
+        "route": "CRtC10C20",
+        "time": 5000,
+        "trigger": "Front"
+      }
+    ],
+    "startblock": "Y20",
+    "startsubblock": null,
+    "terminus": {
+      "loc": "CF",
+      "track": null
+    },
+    "time": 5000,
+    "tracker": [
+      [
+        "YARD",
+        "Koehlstadt / Track Y70",
+        1
+      ],
+      [
+        "",
+        "(sig) Cornell",
+        8
+      ],
+      [
+        "LATHAM",
+        "(sig) Latham Jct",
+        10
+      ],
+      [
+        "DELL",
+        "(sig) LaPorte",
+        21
+      ],
+      [
+        "SHORE",
+        "River jct",
+        5
+      ],
+      [
+        null,
+        "(sig) Krulish Jct",
+        19
+      ],
+      [
+        "NASSAU",
+        "(sig) Wilson City / Track N22",
+        23
+      ],
+      [
+        "BANK",
+        "(sig) Martinsville",
+        3
+      ],
+      [
+        "CLIFF",
+        "Sheffield Yd / C41-C44",
         11
       ]
     ],
