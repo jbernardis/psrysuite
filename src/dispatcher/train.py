@@ -209,7 +209,7 @@ class Train:
 
 		startbn = rbn[0]
 		blk = self.blocks[startbn]
-		blk.ClearStoppingSections()
+		#  blk.ClearStoppingSections()
 		blk.EvaluateStoppingSections()
 		self.SetSBActive(blk.IsStopped())
 

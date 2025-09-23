@@ -933,7 +933,8 @@ class StoppingBlock:  # (Block):
 
 		self.active = flag
 
-		self.frame.Request({"relay": {"block": self.block.GetName(), "state": 1 if flag else 0, "silent": 1 if silent else 0, "direction": direction, "train": tname}})
+		msg = {"relay": {"block": self.block.GetName(), "state": 1 if flag else 0, "silent": 1 if silent else 0, "direction": direction, "train": tname}}
+		self.frame.Request(msg)
 
 		if tr is None:
 			self.block.DrawTrain()

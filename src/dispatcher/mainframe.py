@@ -2912,7 +2912,7 @@ class MainFrame(wx.Frame):
 				if state:
 					self.PopupEvent("Stop Relay: Block %s %s%s Train %s" % (rname, direction, sigmessage, train))
 				else:
-					pass #  self.PopupEvent("Stop Relay: Block %s %s%s cleared" % (rname, direction, sigmessage))
+					self.PopupEvent("Stop Relay: Block %s %s%s cleared" % (rname, direction, sigmessage))
 
 	def DoCmdTurnoutLock(self, parms):
 		if self.CTCManager is not None:
@@ -3340,7 +3340,7 @@ class MainFrame(wx.Frame):
 		if trid is None or signm is None:
 			logging.error("Train signal command without train and/or signal command")
 			return
-		
+
 		try:
 			tr = self.trains[trid]
 		except:
