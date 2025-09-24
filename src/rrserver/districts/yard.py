@@ -4,6 +4,7 @@ from rrserver.district import District
 from rrserver.constants import YARD, KALE, EASTJCT, CORNELL, YARDSW
 from rrserver.node import Node
 
+
 class Yard(District):
 	def __init__(self, rr, name, settings):
 		District.__init__(self, rr, name, settings)
@@ -251,14 +252,6 @@ class Yard(District):
 				"Y84E": [ ["YSw131", "N"], ["YSw132","N"], ["YSw134", "R"] ],
 		}
 	
-	def VerifyAspect(self, signame, aspect):
-		if signame == "Y22R":
-			b0 = 1 if aspect == 0b101 else 0  # Approach
-			b1 = 2 if aspect == 0b100 else 0  # Restricting ?? 0b001
-			return b0+b1
-			
-		return aspect
-
 	def PressButton(self, btn):
 		try:
 			rtnm = self.buttonMap[btn.name]

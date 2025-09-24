@@ -6,7 +6,7 @@ from dispatcher.signal import Signal
 from dispatcher.button import Button
 from dispatcher.indicator import Indicator
 
-from dispatcher.constants import RESTRICTING, MAIN, DIVERGING, SLOW, NORMAL, REVERSE, EMPTY, SLIPSWITCH, RegAspects, AdvAspects, RegSloAspects
+from dispatcher.constants import RESTRICTING, MAIN, DIVERGING, SLOW, NORMAL, REVERSE, EMPTY, SLIPSWITCH, RegAspects, AdvAspects, SloAspects
 
 CJBlocks = ["YOSCJE", "YOSCJW"]
 EEBlocks = ["YOSEJE", "YOSEJW"]
@@ -693,7 +693,7 @@ class Yard (District):
 			["Y10R", RegAspects, False,   "left",  (121, 12)],
 
 			["Y22L",  RegAspects, True,   "right", (95, 6)],
-			["Y22R",  RegSloAspects, False,  "leftlong",  (106, 10)],
+			["Y22R",  SloAspects, False,  "leftlong",  (106, 10)],
 			["Y24LA", RegAspects, True,   "right", (95, 10)],
 			["Y24LB", RegAspects, True,   "right", (95, 8)],
 			

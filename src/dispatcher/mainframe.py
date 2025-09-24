@@ -4425,7 +4425,7 @@ class MainFrame(wx.Frame):
 						sb = None
 
 				if seq is not None:
-					expectedlist = [sb] + [s["block"] for s in seq] + [formatRouteDesignator(s["route"]) for s in seq]
+					expectedlist = [sb] + [s["block"] for s in seq] + [formatRouteDesignator(s["route"]) for s in seq] + ValidBlocks
 					trList = [blk.GetRouteDesignator() for blk in tr.GetBlockList().values()]
 					unexpected = [bn for bn in trList if bn not in expectedlist]
 					if len(unexpected) != 0:
