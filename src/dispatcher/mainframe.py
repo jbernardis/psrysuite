@@ -1714,85 +1714,13 @@ class MainFrame(wx.Frame):
 			return
 
 		trx = self.trains[trxid]
-		newLoco = trx.GetLoco()
-		logging.debug("swapping trains %s and %s" % (self.menuTrainID, trxid))
-		blockDictA = self.menuTrain.GetBlockList().copy()
-		blockOrderA = [x for x in self.menuTrain.GetBlockOrderList()]
-		blockListA = list(reversed([blockDictA[b].GetRouteDesignator() for b in blockOrderA]))
-		routeMapA = {blockDictA[b].GetRouteDesignator(): b for b in blockOrderA}
+		menuRoute = self.menuTrain.GetChosenRoute()
+		trxRoute = trx.GetChosenRoute()
 
-		blockDictB = trx.GetBlockList().copy()
-		blockOrderB = [x for x in trx.GetBlockOrderList()]
-		blockListB = list(reversed([blockDictB[b].GetRouteDesignator() for b in blockOrderB]))
-		routeMapB = {blockDictB[b].GetRouteDesignator(): b for b in blockOrderB}
-
-		rtA = self.menuTrain.GetChosenRoute()
-		rtB = trx.GetChosenRoute()
-
-		# remove train A from all of it's blocks
-		for rn in blockListA:
-			bn = routeMapA[rn]
-			b = blockDictA[bn]
-			self.menuTrain.RemoveFromBlock(b)
-
-		# remove train B from all of it's blocks
-		for rn in blockListB:
-			bn = routeMapB[rn]
-			b = blockDictB[bn]
-			trx.RemoveFromBlock(b)
-
-		eastA = self.menuTrain.GetEast()
-		eastB = trx.GetEast()
-		try:
-			normalEastA = self.trainList[self.menuTrainID]["eastbound"]
-			eastB = normalEastA
-		except KeyError:
-			pass
-
-		try:
-			normalEastB = self.trainList[trxid]["eastbound"]
-			eastA = normalEastB
-		except KeyError:
-			pass
-
-		self.menuTrain.SetEast(eastB)
-		trx.SetEast(eastA)
-
-		sbaA = self.menuTrain.GetSBActive()
-		sbaB = trx.GetSBActive()
-
-		# add train A to all of train B's blocks
-		for rn in blockListB:
-			bn = routeMapB[rn]
-			b = blockDictB[bn]
-			self.menuTrain.AddToBlock(b, REAR)
-			b.SetTrain(self.menuTrain)
-			#  self.CheckTrainsInBlock(b.GetName(), None)
-
-		# add train B to all of train A's blocks
-		for rn in blockListA:
-			bn = routeMapA[rn]
-			b = blockDictA[bn]
-			trx.AddToBlock(b, REAR)
-			b.SetTrain(trx)
-			#  self.CheckTrainsInBlock(b.GetName(), None)
-
-		blist = [bn if bn not in routeMapA else routeMapA[bn] for bn in reversed(blockListA)]
-		self.Request({"settrain": { "blocks": blist}})
-		self.Request({"settrain": { "blocks": blist, "name": trxid, "loco": self.menuTrain.GetLoco(), "east": "1" if eastA else "0"}})
-
-		blist = [bn if bn not in routeMapB else routeMapB[bn] for bn in reversed(blockListB)]
-		self.Request({"settrain": { "blocks": blist}})
-		self.Request({"settrain": { "blocks": blist, "name": self.menuTrainID, "loco": newLoco, "east": "1" if eastB else "0"}})
-
-		self.SendTrainBlockOrder(self.menuTrain)
-		self.SendTrainBlockOrder(trx)
-
-		self.menuTrain.ValidateStoppingSections()
-		trx.ValidateStoppingSections()
-
-		self.menuTrain.SetSBActive(sbaB)
-		trx.SetSBActive(sbaA)
+		tempName = Train.NextName()
+		self.Request({"renametrain": {"oldname": self.menuTrainID, "newname": tempName, "context": "rename"}})
+		self.Request({"renametrain": {"oldname": trxid, "newname": self.menuTrainID, "newroute": menuRoute, "context": "rename"}})
+		self.Request({"renametrain": {"oldname": tempName, "newname": trxid, "newroute": trxRoute, "context": "rename"}})
 
 		self.menuTrain.Draw()
 		trx.Draw()

@@ -174,7 +174,8 @@ class TrainList:
 				logging.error("Trying to change parameters on a non-existant train: %s" % nname)
 				return False
 
-		self.trains[nname]["route"] = nroute
+		if nroute is not None:
+			self.trains[nname]["route"] = nroute
 
 		if nloco is not None:
 			self.trains[nname]["loco"] = nloco
