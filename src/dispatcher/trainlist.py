@@ -412,7 +412,8 @@ class TrainListCtrl(wx.ListCtrl):
 
 		self.filterTrains()	
 		self.SetItemCount(len(self.filtered))	
-		self.RefreshItems(0, len(self.filtered)-1)
+		if len(self.filtered) > 0:
+			self.RefreshItems(0, len(self.filtered)-1)
 
 	def GetTrainListControl(self):
 		return {
@@ -440,7 +441,8 @@ class TrainListCtrl(wx.ListCtrl):
 		
 		self.filterTrains()	
 		self.SetItemCount(len(self.filtered))	
-		self.RefreshItems(0, len(self.filtered)-1)
+		if len(self.filtered) > 0:
+			self.RefreshItems(0, len(self.filtered)-1)
 		
 	def UpdateTrain(self, trid):
 		try:
@@ -454,12 +456,14 @@ class TrainListCtrl(wx.ListCtrl):
 		else:
 			self.filterTrains()	
 			self.SetItemCount(len(self.filtered))	
-			self.RefreshItems(0, len(self.filtered)-1)
+			if len(self.filtered) > 0:
+				self.RefreshItems(0, len(self.filtered)-1)
 			
 	def RefreshAll(self):
 		self.filterTrains()	
 		self.SetItemCount(len(self.filtered))	
-		self.RefreshItems(0, len(self.filtered)-1)
+		if len(self.filtered) > 0:
+			self.RefreshItems(0, len(self.filtered)-1)
 		
 	def RemoveTrain(self, trid):
 		try:
@@ -472,7 +476,8 @@ class TrainListCtrl(wx.ListCtrl):
 
 		self.filterTrains()	
 		self.SetItemCount(len(self.filtered))	
-		self.RefreshItems(0, len(self.filtered)-1)
+		if len(self.filtered) > 0:
+			self.RefreshItems(0, len(self.filtered)-1)
 		
 	def RemoveAllTrains(self):
 		self.trains = {}
@@ -484,8 +489,9 @@ class TrainListCtrl(wx.ListCtrl):
 		self.suppressYards = flag
 
 		self.filterTrains()	
-		self.SetItemCount(len(self.filtered))	
-		self.RefreshItems(0, len(self.filtered)-1)
+		self.SetItemCount(len(self.filtered))
+		if len(self.filtered) > 0:
+			self.RefreshItems(0, len(self.filtered)-1)
 		
 	def SetSuppressUnknown(self, flag):
 		self.suppressUnknown = flag
@@ -496,7 +502,8 @@ class TrainListCtrl(wx.ListCtrl):
 
 		self.filterTrains()	
 		self.SetItemCount(len(self.filtered))	
-		self.RefreshItems(0, len(self.filtered)-1)
+		if len(self.filtered) > 0:
+			self.RefreshItems(0, len(self.filtered)-1)
 		
 	def SetSuppressNonATC(self, flag):
 		self.suppressNonATC = flag
@@ -507,7 +514,8 @@ class TrainListCtrl(wx.ListCtrl):
 
 		self.filterTrains()	
 		self.SetItemCount(len(self.filtered))	
-		self.RefreshItems(0, len(self.filtered)-1)
+		if len(self.filtered) > 0:
+			self.RefreshItems(0, len(self.filtered)-1)
 		
 	def SetSuppressNonAssigned(self, flag):
 		self.suppressNonAssigned = flag
@@ -517,8 +525,9 @@ class TrainListCtrl(wx.ListCtrl):
 			self.suppressNonAssignedAndKnown = False
 
 		self.filterTrains()	
-		self.SetItemCount(len(self.filtered))	
-		self.RefreshItems(0, len(self.filtered)-1)
+		self.SetItemCount(len(self.filtered))
+		if len(self.filtered) > 0:
+			self.RefreshItems(0, len(self.filtered)-1)
 
 	def SetSuppressNonAssignedAndKnown(self, flag):
 		self.suppressNonAssignedAndKnown = flag
@@ -529,7 +538,8 @@ class TrainListCtrl(wx.ListCtrl):
 
 		self.filterTrains()	
 		self.SetItemCount(len(self.filtered))	
-		self.RefreshItems(0, len(self.filtered)-1)
+		if len(self.filtered) > 0:
+			self.RefreshItems(0, len(self.filtered)-1)
 			
 	def filterTrains(self):
 		self.filtered = []

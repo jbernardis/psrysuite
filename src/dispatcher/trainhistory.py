@@ -208,7 +208,8 @@ class TrainHistoryCtrl(wx.ListCtrl):
 		self.SetItemCount(0)
 		n = len(self.trainOrder)
 		self.SetItemCount(n)
-		self.RefreshItems(0, n-1)
+		if n > 0:
+			self.RefreshItems(0, n-1)
 
 	def sortTrainOrder(self):
 		if self.showUnknown:

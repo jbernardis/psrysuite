@@ -332,7 +332,8 @@ class LocoList(wx.ListCtrl):
 		self.locos[lid]["prof"] = {k: defaultProfile[k] for k in defaultProfile.keys()}
 		ct = len(self.locoOrder)
 		self.SetItemCount(ct)
-		self.RefreshItems(0, ct-1)
+		if ct > 0:
+			self.RefreshItems(0, ct-1)
 		self.EnsureVisible(lx)
 		return self.locos[lid]
 		

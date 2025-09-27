@@ -116,7 +116,8 @@ class ATCListCtrl(wx.ListCtrl):
 		self.trainNames.remove(nm)
 		ct = len(self.trainNames)
 		self.SetItemCount(ct)
-		self.RefreshItems(0, ct-1)
+		if ct > 0:
+			self.RefreshItems(0, ct-1)
 		return True
 	
 	def UpdateTrainName(self, tr, oldName):
