@@ -1,5 +1,8 @@
 import logging
 import re
+import os
+import json
+from datetime import datetime
 
 from rrserver.districts.yard import Yard
 from rrserver.districts.latham import Latham
@@ -14,7 +17,7 @@ from rrserver.districts.hyde import Hyde
 from rrserver.districts.port import Port
 
 from rrserver.constants import INPUT_BLOCK, INPUT_TURNOUTPOS, INPUT_BREAKER, INPUT_SIGNALLEVER, \
-	INPUT_HANDSWITCH, INPUT_ROUTEIN, nodeNames
+	INPUT_HANDSWITCH, INPUT_ROUTEIN, nodeNames, CLIFF
 
 from rrserver.rrobjects import Block, StopRelay, Signal, SignalLever, RouteIn, Turnout, \
 			OutNXButton, Handswitch, Breaker, Indicator, ODevice, Lock
@@ -27,6 +30,7 @@ class Railroad:
 		self.settings = settings
 		self.districts = {}
 		self.nodes = {}
+		self.tallyOutIn = 10  # delay for this many cycles before recording breakers
 
 		self.districtList = [
 			[ Yard, "Yard" ],
@@ -90,6 +94,8 @@ class Railroad:
 			self.districts[name] = dclass(self, name, self.settings)
 			self.nodes[name] = self.districts[name].GetNodes()
 			self.addrList.extend([[addr, self.districts[name], node] for addr, node, in self.districts[name].GetNodes().items()])
+
+		self.RecordBreakerTrip(None)
 
 	def GetNodeStatuses(self):
 		retval = []
@@ -1046,6 +1052,9 @@ class Railroad:
 			district.OutIn()
 					
 		self.ExamineInputs()
+
+		if self.tallyOutIn > 0:
+			self.tallyOutIn -= 1
 		
 	def UpdateDistrictTurnoutLocksByNode(self, districtName, released, addressList):
 		for t in self.turnouts.values():
@@ -1128,6 +1137,7 @@ class Railroad:
 						
 				elif objType == INPUT_BREAKER:
 					if obj.SetStatus(newval == 1):
+						self.RecordBreakerTrip(obj)
 						if obj.HasProxy():
 							# use the proxy to show updated breaker status
 							obj.district.ShowBreakerState(obj)
@@ -1232,6 +1242,24 @@ class Railroad:
 
 	def RailroadEvent(self, event):
 		self.cbEvent(event)
+
+	def RecordBreakerTrip(self, brkr):
+		ofn = os.path.join(os.getcwd(), "output", "breaker.jtxt")
+		if brkr is None:
+			with open(ofn, "w") as ofp:
+				pass
+			return
+
+		if self.tallyOutIn > 0:
+			return
+
+		with open(ofn, "a") as ofp:
+			brkr = {"breaker": brkr.Name()}
+			n = datetime.now()
+			ts = "%4d%02d%02d-%02d%02d%02d" % (n.year, n.month, n.day, n.hour, n.minute, n.second)
+			brkr["timestamp"] = ts
+			brkr["trains"] = self.parent.GetTrainList()
+			ofp.write("%s\n\n" % json.dumps(brkr, indent=2))
 
 
 class PendingDetectionLoss:

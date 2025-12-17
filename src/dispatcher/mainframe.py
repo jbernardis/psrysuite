@@ -2074,6 +2074,11 @@ class MainFrame(wx.Frame):
 			torecover = dlg.GetResult()
 
 		dlg.Destroy()
+
+		if rc == wx.ID_CLEAR:
+			self.lostTrains.Clear()
+			return
+
 		if rc != wx.ID_OK:
 			return 
 		
