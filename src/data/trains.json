@@ -1,6 +1,5 @@
 {
   "CFYD": {
-    "block": null,
     "cutoff": false,
     "desc": "Westbound Freight",
     "eastbound": false,
@@ -15,122 +14,93 @@
         "block": "C23",
         "os": "COSCLEW",
         "route": "CRtC23C22",
-        "signal": "C10R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C10R"
       },
       {
         "block": "C13",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "signal": "C14RB",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14RB"
       },
       {
         "block": "B11",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "signal": "C18R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18R"
       },
       {
         "block": "B10",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "signal": "C22R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C22R"
       },
       {
         "block": "N12",
         "os": "NEOSW",
         "route": "NRtB10N12",
-        "signal": "N26L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N26L"
       },
       {
         "block": "N11",
         "os": "NWOSW",
         "route": "NRtN11N12",
-        "signal": "N16L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N16L"
       },
       {
         "block": "N10",
         "os": "KOSW",
         "route": "KRtN10N11",
-        "signal": "K8LB",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K8LB"
       },
       {
         "block": "S11",
         "os": "KOSN10S11",
         "route": "KRtN10S11",
-        "signal": "N10W",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N10W"
       },
       {
         "block": "S10",
         "os": "SOSW",
         "route": "SRtS10S11",
-        "signal": "S12LA",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LA"
       },
       {
         "block": "D11",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "signal": "D12L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "D10",
         "os": "DOSVJW",
         "route": "DRtD10D11",
-        "signal": "D6L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       },
       {
         "block": "L11",
         "os": "LOSCAW",
         "route": "LRtL11D10",
-        "signal": "L18L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L18L"
       },
       {
         "block": "L10",
         "os": "LOSLAW",
         "route": "LRtL10L11",
-        "signal": "L8L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L8L"
       },
       {
         "block": "Y11",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "signal": "Y2R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y2R"
       }
     ],
     "startblock": "C22",
     "startsubblock": null,
     "terminus": {
       "loc": "YD",
-      "track": "Y87"
+      "track": null
     },
-    "time": 5000,
     "tracker": [
       [
         "CLIFF",
@@ -181,12 +151,11 @@
     "route": null
   },
   "HEX": {
-    "block": null,
     "cutoff": false,
     "desc": "Empty Coal Hoppers",
     "eastbound": true,
-    "loco": "7600",
-    "normalloco": "7600",
+    "loco": "185",
+    "normalloco": "185",
     "origin": {
       "loc": "HY",
       "track": "H40"
@@ -196,41 +165,31 @@
         "block": "H23",
         "os": "HOSEE",
         "route": "HRtH23H40",
-        "signal": "H10RE",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "H10RE"
       },
       {
         "block": "D21",
         "os": "DOSVJE",
         "route": "DRtH23D21",
-        "signal": "D4RB",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D4RB"
       },
       {
         "block": "S20",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "signal": "D10R",
-        "time": 4000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "H20",
         "os": "SOSE",
         "route": "SRtS20H20",
-        "signal": "S4R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "H40",
         "os": "SOSHJM",
         "route": "SRtH20H40",
-        "signal": "S18R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S18R"
       }
     ],
     "startblock": "H40",
@@ -239,7 +198,6 @@
       "loc": "HY",
       "track": "H40"
     },
-    "time": 5000,
     "tracker": [
       [
         "HYDE E",
@@ -265,7 +223,6 @@
     "route": null
   },
   "HWX": {
-    "block": null,
     "cutoff": false,
     "desc": "Loaded Coal Hoppers",
     "eastbound": false,
@@ -273,57 +230,46 @@
     "normalloco": "5304",
     "origin": {
       "loc": "HY",
-      "track": "H32"
+      "track": "H30"
     },
     "sequence": [
       {
         "block": "S10",
         "os": "SOSW",
         "route": "SRtS10H30",
-        "signal": "S12LB",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LB"
       },
       {
         "block": "D11",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "signal": "D12L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "H13",
         "os": "DOSVJW",
         "route": "DRtH13D11",
-        "signal": "D6L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       },
       {
         "block": "H31",
         "os": "HOSEW",
         "route": "HRtH13H31",
-        "signal": "H12L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "H12L"
       },
       {
         "block": "H30",
         "os": "HOSWW2",
         "route": "HRtH30H31",
-        "signal": "H8L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "H8L"
       }
     ],
     "startblock": "H30",
     "startsubblock": "H30A",
     "terminus": {
       "loc": "HY",
-      "track": "H32"
+      "track": "H30"
     },
-    "time": 7500,
     "tracker": [
       [
         "HYDE W",
@@ -349,7 +295,6 @@
     "route": null
   },
   "PBCX": {
-    "block": null,
     "cutoff": false,
     "desc": "Pate Brothers Circus",
     "eastbound": false,
@@ -364,49 +309,37 @@
         "block": "H11",
         "os": "HOSWW",
         "route": "HRtH11H32",
-        "signal": "H6LA",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "H6LA"
       },
       {
         "block": "H10",
         "os": "SOSHJW",
         "route": "SRtH10H11",
-        "signal": "S20L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S20L"
       },
       {
         "block": "S10",
         "os": "SOSW",
         "route": "SRtS10H10",
-        "signal": "S12LC",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LC"
       },
       {
         "block": "D11",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "signal": "D12L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "H13",
         "os": "DOSVJW",
         "route": "DRtH13D11",
-        "signal": "D6L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       },
       {
         "block": "H32",
         "os": "HOSEW",
         "route": "HRtH13H32",
-        "signal": "H12L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "H12L"
       }
     ],
     "startblock": "H32",
@@ -415,7 +348,6 @@
       "loc": "HY",
       "track": "H32"
     },
-    "time": 5000,
     "tracker": [
       [
         "HYDE W",
@@ -441,7 +373,6 @@
     "route": null
   },
   "YDCF": {
-    "block": null,
     "cutoff": false,
     "desc": "Eastbound Freight",
     "eastbound": true,
@@ -456,137 +387,103 @@
         "block": "Y21",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "signal": "Y10L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y10L"
       },
       {
         "block": "L20",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "signal": "Y4L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y4L"
       },
       {
         "block": "L21",
         "os": "LOSLAM",
         "route": "LRtL20L21",
-        "signal": "L6RA",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L6RA"
       },
       {
         "block": "D20",
         "os": "LOSCAM",
         "route": "LRtL21D20",
-        "signal": "L16R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L16R"
       },
       {
         "block": "D21",
         "os": "DOSVJE",
         "route": "DRtD20D21",
-        "signal": "D4RA",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D4RA"
       },
       {
         "block": "S20",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "signal": "D10R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "S21",
         "os": "SOSE",
         "route": "SRtS20S21",
-        "signal": "S4R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "N20",
         "os": "KOSN20S21",
         "route": "KRtN20S21",
-        "signal": "S21E",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S21E"
       },
       {
         "block": "N21",
         "os": "KOSE",
         "route": "KRtN20N21",
-        "signal": "K2R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K2R"
       },
       {
         "block": "N22",
         "os": "NWOSE",
         "route": "NRtN21N22",
-        "signal": "N14R",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N14R"
       },
       {
         "block": "B20",
         "os": "NEOSE",
         "route": "NRtB20N22",
-        "signal": "N24RA",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N24RA"
       },
       {
         "block": "B21",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "signal": "C24L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C24L"
       },
       {
         "block": "C13",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "signal": "C18LB",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18LB"
       },
       {
         "block": "C12",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "signal": "C14L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14L"
       },
       {
         "block": "C11",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "signal": "C12L",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C12L"
       },
       {
         "block": "C10",
-        "signal": "C4L",
         "os": "COSGMW",
         "route": "CRtC11C10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C4L"
       },
       {
         "block": "C20",
-        "signal": "C2LB",
         "os": "COSGME",
         "route": "CRtC10C20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C2LB"
       }
     ],
     "startblock": "Y20",
@@ -595,7 +492,6 @@
       "loc": "CF",
       "track": null
     },
-    "time": 5000,
     "tracker": [
       [
         "YARD",
@@ -649,104 +545,79 @@
     "sequence": [
       {
         "block": "L20",
-        "signal": "Y4L",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y4L"
       },
       {
         "block": "L21",
-        "signal": "L6RA",
         "os": "LOSLAM",
         "route": "LRtL20L21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L6RA"
       },
       {
         "block": "D20",
-        "signal": "L16R",
         "os": "LOSCAM",
         "route": "LRtL21D20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L16R"
       },
       {
         "block": "D21",
-        "signal": "D4RA",
         "os": "DOSVJE",
         "route": "DRtD20D21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D4RA"
       },
       {
         "block": "S20",
-        "signal": "D10R",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "S21",
-        "signal": "S4R",
         "os": "SOSE",
         "route": "SRtS20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "N20",
-        "signal": "S21E",
         "os": "KOSN20S21",
         "route": "KRtN20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S21E"
       },
       {
         "block": "N21",
-        "signal": "K2R",
         "os": "KOSE",
         "route": "KRtN20N21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K2R"
       },
       {
         "block": "N41",
-        "signal": "N14R",
         "os": "NWOSE",
         "route": "NRtN21N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N14R"
       },
       {
         "block": "R10",
-        "signal": "N24RB",
         "os": "NEOSRH",
         "route": "NRtR10N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N24RB"
       },
       {
         "block": "F10",
-        "signal": null,
         "os": null,
         "route": null,
-        "time": 5000,
-        "trigger": "Front"
+        "signal": null
       },
       {
         "block": "F11",
-        "signal": "S8R",
         "os": "SOSHF",
         "route": "SRtF10F11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S8R"
       }
     ],
     "startblock": "Y21",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Eastbound Local Passenger",
     "loco": null,
@@ -802,7 +673,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -810,56 +680,43 @@
     "sequence": [
       {
         "block": "H10",
-        "signal": "S20L",
         "os": "SOSHJW",
         "route": "SRtH10H11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S20L"
       },
       {
         "block": "S10",
-        "signal": "S12LC",
         "os": "SOSW",
         "route": "SRtS10H10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LC"
       },
       {
         "block": "D11",
-        "signal": "D12L",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "D10",
-        "signal": "D6L",
         "os": "DOSVJW",
         "route": "DRtD10D11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       },
       {
         "block": "L11",
-        "signal": "L18L",
         "os": "LOSCAW",
         "route": "LRtL11D10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L18L"
       },
       {
         "block": "P11",
-        "signal": "L8L",
         "os": "LOSLAM",
         "route": "LRtP11L11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L8L"
       }
     ],
     "startblock": "H11",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Westbound Express Passenger",
     "loco": null,
@@ -900,7 +757,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -908,16 +764,13 @@
     "sequence": [
       {
         "block": "P50",
-        "signal": "Y4L",
         "os": "YOSCJE",
         "route": "YRtY21P50",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y4L"
       }
     ],
     "startblock": "Y21",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Eastbound Local Passenger (RDC)",
     "loco": null,
@@ -943,7 +796,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -951,64 +803,49 @@
     "sequence": [
       {
         "block": "H10",
-        "signal": "S20L",
         "os": "SOSHJW",
         "route": "SRtH10H11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S20L"
       },
       {
         "block": "S10",
-        "signal": "S12LC",
         "os": "SOSW",
         "route": "SRtS10H10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LC"
       },
       {
         "block": "D11",
-        "signal": "D12L",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "D10",
-        "signal": "D6L",
         "os": "DOSVJW",
         "route": "DRtD10D11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       },
       {
         "block": "L11",
-        "signal": "L18L",
         "os": "LOSCAW",
         "route": "LRtL11D10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L18L"
       },
       {
         "block": "L10",
-        "signal": "L8L",
         "os": "LOSLAW",
         "route": "LRtL10L11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L8L"
       },
       {
         "block": "Y11",
-        "signal": "Y2R",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y2R"
       }
     ],
     "startblock": "H11",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Westbound Unit Freight",
     "loco": null,
@@ -1016,7 +853,7 @@
     "cutoff": false,
     "origin": {
       "loc": "HY",
-      "track": "H33"
+      "track": null
     },
     "terminus": {
       "loc": "YD",
@@ -1049,7 +886,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -1057,64 +893,49 @@
     "sequence": [
       {
         "block": "N11",
-        "signal": "N18LB",
         "os": "NWOSW",
         "route": "NRtN11N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N18LB"
       },
       {
         "block": "N25",
-        "signal": "K8LB",
         "os": "KOSM",
         "route": "KRtN25N11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K8LB"
       },
       {
         "block": "P42",
-        "signal": "S16L",
         "os": "SOSHJE",
         "route": "SRtP42N25",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S16L"
       },
       {
         "block": "P31",
-        "signal": "PB14L",
         "os": "POSCJ1",
         "route": "PRtP31P42",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "PB14L"
       },
       {
         "block": "P30",
-        "signal": "PB4L",
         "os": "POSSJ1",
         "route": "PRtP30P31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "PB4L"
       },
       {
         "block": "P50",
-        "signal": "PA32RB",
         "os": "POSPJ2",
         "route": "PRtP30P50",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "PA32RB"
       },
       {
         "block": "Y11",
-        "signal": "Y4RA",
         "os": "YOSCJW",
         "route": "YRtY11P50",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y4RA"
       }
     ],
     "startblock": "N31",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Westbound Local Passenger (RDC)",
     "loco": null,
@@ -1122,7 +943,7 @@
     "cutoff": true,
     "origin": {
       "loc": "NA",
-      "track": null
+      "track": "Coach"
     },
     "terminus": {
       "loc": "PT",
@@ -1155,7 +976,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -1163,56 +983,43 @@
     "sequence": [
       {
         "block": "C11",
-        "signal": "C4RA",
         "os": "COSGMW",
         "route": "CRtC11C31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C4RA"
       },
       {
         "block": "C23",
-        "signal": "C12R",
         "os": "COSCLEE",
         "route": "CRtC23C11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C12R"
       },
       {
         "block": "C13",
-        "signal": "C14RB",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14RB"
       },
       {
         "block": "B11",
-        "signal": "C18R",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18R"
       },
       {
         "block": "B10",
-        "signal": "C22R",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C22R"
       },
       {
         "block": "N31",
-        "signal": "N26L",
         "os": "NEOSW",
         "route": "NRtB10N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N26L"
       }
     ],
     "startblock": "C31",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Westbound Local Passenger",
     "loco": null,
@@ -1224,7 +1031,7 @@
     },
     "terminus": {
       "loc": "NA",
-      "track": null
+      "track": "N32"
     },
     "tracker": [
       [
@@ -1258,7 +1065,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -1266,40 +1072,31 @@
     "sequence": [
       {
         "block": "H10",
-        "signal": "S20L",
         "os": "SOSHJW",
         "route": "SRtH10H11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S20L"
       },
       {
         "block": "S10",
-        "signal": "S12LC",
         "os": "SOSW",
         "route": "SRtS10H10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LC"
       },
       {
         "block": "D11",
-        "signal": "D12L",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "H13",
-        "signal": "D6L",
         "os": "DOSVJW",
         "route": "DRtH13D11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       }
     ],
     "startblock": "H11",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Westbound Loop Passenger",
     "loco": null,
@@ -1307,11 +1104,11 @@
     "cutoff": false,
     "origin": {
       "loc": "HY",
-      "track": null
+      "track": "H12"
     },
     "terminus": {
       "loc": "HY",
-      "track": null
+      "track": "H34"
     },
     "tracker": [
       [
@@ -1335,7 +1132,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -1343,56 +1139,43 @@
     "sequence": [
       {
         "block": "B20",
-        "signal": "N24RC",
         "os": "NEOSE",
         "route": "NRtB20N42",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N24RC"
       },
       {
         "block": "B21",
-        "signal": "C24L",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C24L"
       },
       {
         "block": "C13",
-        "signal": "C18LB",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18LB"
       },
       {
         "block": "C12",
-        "signal": "C14L",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14L"
       },
       {
         "block": "C11",
-        "signal": "C12L",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C12L"
       },
       {
         "block": "C31",
-        "signal": "C4L",
         "os": "COSGMW",
         "route": "CRtC11C31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C4L"
       }
     ],
     "startblock": "N42",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Eastbound Local Passenger",
     "loco": null,
@@ -1400,7 +1183,7 @@
     "cutoff": false,
     "origin": {
       "loc": "NA",
-      "track": null
+      "track": "N42"
     },
     "terminus": {
       "loc": "GM",
@@ -1438,7 +1221,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -1446,88 +1228,67 @@
     "sequence": [
       {
         "block": "C13",
-        "signal": "C14RB",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14RB"
       },
       {
         "block": "B11",
-        "signal": "C18R",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18R"
       },
       {
         "block": "B10",
-        "signal": "C22R",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C22R"
       },
       {
         "block": "N31",
-        "signal": "N26L",
         "os": "NEOSW",
         "route": "NRtB10N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N26L"
       },
       {
         "block": "N11",
-        "signal": "N18LB",
         "os": "NWOSW",
         "route": "NRtN11N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N18LB"
       },
       {
         "block": "N10",
-        "signal": "K8LB",
         "os": "KOSW",
         "route": "KRtN10N11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K8LB"
       },
       {
         "block": "S11",
-        "signal": "N10W",
         "os": "KOSN10S11",
         "route": "KRtN10S11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N10W"
       },
       {
         "block": "S10",
-        "signal": "S12LA",
         "os": "SOSW",
         "route": "SRtS10S11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LA"
       },
       {
         "block": "D11",
-        "signal": "D12L",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "H13",
-        "signal": "D6L",
         "os": "DOSVJW",
         "route": "DRtH13D11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       }
     ],
     "startblock": "C23",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Westbound Express Passenger ",
     "loco": null,
@@ -1539,7 +1300,7 @@
     },
     "terminus": {
       "loc": "HY",
-      "track": null
+      "track": "H12"
     },
     "tracker": [
       [
@@ -1573,7 +1334,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -1581,88 +1341,67 @@
     "sequence": [
       {
         "block": "C13",
-        "signal": "C14RB",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14RB"
       },
       {
         "block": "B11",
-        "signal": "C18R",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18R"
       },
       {
         "block": "B10",
-        "signal": "C22R",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C22R"
       },
       {
         "block": "N12",
-        "signal": "N26L",
         "os": "NEOSW",
         "route": "NRtB10N12",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N26L"
       },
       {
         "block": "N11",
-        "signal": "N16L",
         "os": "NWOSW",
         "route": "NRtN11N12",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N16L"
       },
       {
         "block": "N10",
-        "signal": "K8LB",
         "os": "KOSW",
         "route": "KRtN10N11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K8LB"
       },
       {
         "block": "S11",
-        "signal": "N10W",
         "os": "KOSN10S11",
         "route": "KRtN10S11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N10W"
       },
       {
         "block": "S10",
-        "signal": "S12LA",
         "os": "SOSW",
         "route": "SRtS10S11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LA"
       },
       {
         "block": "D11",
-        "signal": "D12L",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "H13",
-        "signal": "D6L",
         "os": "DOSVJW",
         "route": "DRtH13D11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       }
     ],
     "startblock": "C23",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Westbound Unit Freight",
     "loco": null,
@@ -1708,7 +1447,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -1716,96 +1454,73 @@
     "sequence": [
       {
         "block": "D21",
-        "signal": "D4RB",
         "os": "DOSVJE",
         "route": "DRtH23D21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D4RB"
       },
       {
         "block": "S20",
-        "signal": "D10R",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "S21",
-        "signal": "S4R",
         "os": "SOSE",
         "route": "SRtS20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "N20",
-        "signal": "S21E",
         "os": "KOSN20S21",
         "route": "KRtN20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S21E"
       },
       {
         "block": "N21",
-        "signal": "K2R",
         "os": "KOSE",
         "route": "KRtN20N21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K2R"
       },
       {
         "block": "N41",
-        "signal": "N14R",
         "os": "NWOSE",
         "route": "NRtN21N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N14R"
       },
       {
         "block": "B20",
-        "signal": "N24RB",
         "os": "NEOSE",
         "route": "NRtB20N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N24RB"
       },
       {
         "block": "B21",
-        "signal": "C24L",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C24L"
       },
       {
         "block": "C13",
-        "signal": "C18LB",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18LB"
       },
       {
         "block": "C12",
-        "signal": "C14L",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14L"
       },
       {
         "block": "C11",
-        "signal": "C12L",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C12L"
       }
     ],
     "startblock": "H23",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Eastbound Express Passenger",
     "loco": null,
@@ -1813,10 +1528,10 @@
     "cutoff": false,
     "origin": {
       "loc": "HY",
-      "track": null
+      "track": "H42"
     },
     "terminus": {
-      "loc": "GM",
+      "loc": "CF",
       "track": null
     },
     "tracker": [
@@ -1851,7 +1566,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -1859,112 +1573,85 @@
     "sequence": [
       {
         "block": "C13",
-        "signal": "C14RB",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14RB"
       },
       {
         "block": "B11",
-        "signal": "C18R",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18R"
       },
       {
         "block": "B10",
-        "signal": "C22R",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C22R"
       },
       {
         "block": "N31",
-        "signal": "N26L",
         "os": "NEOSW",
         "route": "NRtB10N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N26L"
       },
       {
         "block": "N11",
-        "signal": "N18LB",
         "os": "NWOSW",
         "route": "NRtN11N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N18LB"
       },
       {
         "block": "N10",
-        "signal": "K8LB",
         "os": "KOSW",
         "route": "KRtN10N11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K8LB"
       },
       {
         "block": "S11",
-        "signal": "N10W",
         "os": "KOSN10S11",
         "route": "KRtN10S11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N10W"
       },
       {
         "block": "S10",
-        "signal": "S12LA",
         "os": "SOSW",
         "route": "SRtS10S11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LA"
       },
       {
         "block": "D11",
-        "signal": "D12L",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "D10",
-        "signal": "D6L",
         "os": "DOSVJW",
         "route": "DRtD10D11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       },
       {
         "block": "L11",
-        "signal": "L18L",
         "os": "LOSCAW",
         "route": "LRtL11D10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L18L"
       },
       {
         "block": "L10",
-        "signal": "L8L",
         "os": "LOSLAW",
         "route": "LRtL10L11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L8L"
       },
       {
         "block": "Y11",
-        "signal": "Y2R",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y2R"
       }
     ],
     "startblock": "C23",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Westbound Express Passenger",
     "loco": null,
@@ -1976,7 +1663,7 @@
     },
     "terminus": {
       "loc": "YD",
-      "track": null
+      "track": "Y51"
     },
     "tracker": [
       [
@@ -2015,7 +1702,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -2023,128 +1709,97 @@
     "sequence": [
       {
         "block": "Y21",
-        "signal": "Y10L",
         "os": "YOSEJE",
         "route": "YRtY20Y21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y10L"
       },
       {
         "block": "L20",
-        "signal": "Y4L",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y4L"
       },
       {
         "block": "L21",
-        "signal": "L6RA",
         "os": "LOSLAM",
         "route": "LRtL20L21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L6RA"
       },
       {
         "block": "D20",
-        "signal": "L16R",
         "os": "LOSCAM",
         "route": "LRtL21D20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L16R"
       },
       {
         "block": "D21",
-        "signal": "D4RA",
         "os": "DOSVJE",
         "route": "DRtD20D21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D4RA"
       },
       {
         "block": "S20",
-        "signal": "D10R",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "S21",
-        "signal": "S4R",
         "os": "SOSE",
         "route": "SRtS20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "N20",
-        "signal": "S21E",
         "os": "KOSN20S21",
         "route": "KRtN20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S21E"
       },
       {
         "block": "N21",
-        "signal": "K2R",
         "os": "KOSE",
         "route": "KRtN20N21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K2R"
       },
       {
         "block": "N41",
-        "signal": "N14R",
         "os": "NWOSE",
         "route": "NRtN21N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N14R"
       },
       {
         "block": "B20",
-        "signal": "N24RB",
         "os": "NEOSE",
         "route": "NRtB20N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N24RB"
       },
       {
         "block": "B21",
-        "signal": "C24L",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C24L"
       },
       {
         "block": "C13",
-        "signal": "C18LB",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18LB"
       },
       {
         "block": "C12",
-        "signal": "C14L",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14L"
       },
       {
         "block": "C11",
-        "signal": "C12L",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C12L"
       }
     ],
     "startblock": "Y20",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Eastbound Express Passenger",
     "loco": null,
@@ -2152,7 +1807,7 @@
     "cutoff": false,
     "origin": {
       "loc": "YD",
-      "track": null
+      "track": "Y51"
     },
     "terminus": {
       "loc": "CF",
@@ -2195,7 +1850,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -2203,96 +1857,73 @@
     "sequence": [
       {
         "block": "D21",
-        "signal": "D4RB",
         "os": "DOSVJE",
         "route": "DRtH23D21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D4RB"
       },
       {
         "block": "S20",
-        "signal": "D10R",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "S21",
-        "signal": "S4R",
         "os": "SOSE",
         "route": "SRtS20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "N20",
-        "signal": "S21E",
         "os": "KOSN20S21",
         "route": "KRtN20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S21E"
       },
       {
         "block": "N21",
-        "signal": "K2R",
         "os": "KOSE",
         "route": "KRtN20N21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K2R"
       },
       {
         "block": "N22",
-        "signal": "N14R",
         "os": "NWOSE",
         "route": "NRtN21N22",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N14R"
       },
       {
         "block": "B20",
-        "signal": "N24RA",
         "os": "NEOSE",
         "route": "NRtB20N22",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N24RA"
       },
       {
         "block": "B21",
-        "signal": "C24L",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C24L"
       },
       {
         "block": "C13",
-        "signal": "C18LB",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18LB"
       },
       {
         "block": "C12",
-        "signal": "C14L",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14L"
       },
       {
         "block": "C11",
-        "signal": "C12L",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C12L"
       }
     ],
     "startblock": "H23",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Eastbound Unit Freight",
     "loco": null,
@@ -2343,7 +1974,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -2351,72 +1981,55 @@
     "sequence": [
       {
         "block": "L21",
-        "signal": "L4R",
         "os": "LOSLAE",
         "route": "LRtP21L21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L4R"
       },
       {
         "block": "D20",
-        "signal": "L16R",
         "os": "LOSCAM",
         "route": "LRtL21D20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L16R"
       },
       {
         "block": "D21",
-        "signal": "D4RA",
         "os": "DOSVJE",
         "route": "DRtD20D21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D4RA"
       },
       {
         "block": "S20",
-        "signal": "D10R",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "S21",
-        "signal": "S4R",
         "os": "SOSE",
         "route": "SRtS20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "N20",
-        "signal": "S21E",
         "os": "KOSN20S21",
         "route": "KRtN20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S21E"
       },
       {
         "block": "N21",
-        "signal": "K2R",
         "os": "KOSE",
         "route": "KRtN20N21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K2R"
       },
       {
         "block": "N42",
-        "signal": "N14R",
         "os": "NWOSE",
         "route": "NRtN21N42",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N14R"
       }
     ],
     "startblock": "P21",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Eastbound Local Passenger",
     "loco": null,
@@ -2428,7 +2041,7 @@
     },
     "terminus": {
       "loc": "NA",
-      "track": null
+      "track": "N42"
     },
     "tracker": [
       [
@@ -2467,7 +2080,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -2475,104 +2087,79 @@
     "sequence": [
       {
         "block": "F10",
-        "signal": "S8L",
         "os": "SOSHF",
         "route": "SRtF10F11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S8L"
       },
       {
         "block": "R10",
-        "signal": null,
         "os": null,
         "route": null,
-        "time": 5000,
-        "trigger": "Front"
+        "signal": null
       },
       {
         "block": "N31",
-        "signal": "N28L",
         "os": "NEOSRH",
         "route": "NRtR10N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N28L"
       },
       {
         "block": "N11",
-        "signal": "N18LB",
         "os": "NWOSW",
         "route": "NRtN11N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N18LB"
       },
       {
         "block": "N10",
-        "signal": "K8LB",
         "os": "KOSW",
         "route": "KRtN10N11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K8LB"
       },
       {
         "block": "S11",
-        "signal": "N10W",
         "os": "KOSN10S11",
         "route": "KRtN10S11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N10W"
       },
       {
         "block": "S10",
-        "signal": "S12LA",
         "os": "SOSW",
         "route": "SRtS10S11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LA"
       },
       {
         "block": "D11",
-        "signal": "D12L",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "D10",
-        "signal": "D6L",
         "os": "DOSVJW",
         "route": "DRtD10D11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       },
       {
         "block": "L11",
-        "signal": "L18L",
         "os": "LOSCAW",
         "route": "LRtL11D10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L18L"
       },
       {
         "block": "L10",
-        "signal": "L8L",
         "os": "LOSLAW",
         "route": "LRtL10L11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L8L"
       },
       {
         "block": "Y11",
-        "signal": "Y2R",
         "os": "YOSCJW",
         "route": "YRtY11L10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y2R"
       }
     ],
     "startblock": "F11",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Westbound Local Passenger",
     "loco": null,
@@ -2584,7 +2171,7 @@
     },
     "terminus": {
       "loc": "YD",
-      "track": null
+      "track": "Y53"
     },
     "tracker": [
       [
@@ -2628,7 +2215,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -2636,40 +2222,31 @@
     "sequence": [
       {
         "block": "D21",
-        "signal": "D4RB",
         "os": "DOSVJE",
         "route": "DRtH23D21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D4RB"
       },
       {
         "block": "S20",
-        "signal": "D10R",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "H20",
-        "signal": "S4R",
         "os": "SOSE",
         "route": "SRtS20H20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "H21",
-        "signal": "S18R",
         "os": "SOSHJM",
         "route": "SRtH20H21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S18R"
       }
     ],
     "startblock": "H23",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Eastbound Loop Passenger",
     "loco": null,
@@ -2677,11 +2254,11 @@
     "cutoff": false,
     "origin": {
       "loc": "HY",
-      "track": null
+      "track": "H43"
     },
     "terminus": {
       "loc": "HY",
-      "track": null
+      "track": "H42"
     },
     "tracker": [
       [
@@ -2705,7 +2282,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -2713,56 +2289,43 @@
     "sequence": [
       {
         "block": "L21",
-        "signal": "L4R",
         "os": "LOSLAE",
         "route": "LRtP21L21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L4R"
       },
       {
         "block": "D10",
-        "signal": "L16R",
         "os": "LOSCAM",
         "route": "LRtL21D10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L16R"
       },
       {
         "block": "D21",
-        "signal": "D6RB",
         "os": "DOSVJE",
         "route": "DRtD10D21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6RB"
       },
       {
         "block": "S20",
-        "signal": "D10R",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "H20",
-        "signal": "S4R",
         "os": "SOSE",
         "route": "SRtS20H20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "H21",
-        "signal": "S18R",
         "os": "SOSHJM",
         "route": "SRtH20H21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S18R"
       }
     ],
     "startblock": "P21",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Eastbound Express Passenger",
     "loco": null,
@@ -2774,7 +2337,7 @@
     },
     "terminus": {
       "loc": "HY",
-      "track": null
+      "track": "H43"
     },
     "tracker": [
       [
@@ -2803,7 +2366,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -2811,16 +2373,13 @@
     "sequence": [
       {
         "block": "Y11",
-        "signal": "Y4RA",
         "os": "YOSCJW",
         "route": "YRtY11P50",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y4RA"
       }
     ],
     "startblock": "P50",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Westbound Local Passenger (RDC)",
     "loco": null,
@@ -2832,7 +2391,7 @@
     },
     "terminus": {
       "loc": "YD",
-      "track": null
+      "track": "Y52"
     },
     "tracker": [
       [
@@ -2846,7 +2405,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -2854,64 +2412,49 @@
     "sequence": [
       {
         "block": "L20",
-        "signal": "Y4L",
         "os": "YOSCJE",
         "route": "YRtY21L20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y4L"
       },
       {
         "block": "L21",
-        "signal": "L6RA",
         "os": "LOSLAM",
         "route": "LRtL20L21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L6RA"
       },
       {
         "block": "D20",
-        "signal": "L16R",
         "os": "LOSCAM",
         "route": "LRtL21D20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L16R"
       },
       {
         "block": "D21",
-        "signal": "D4RA",
         "os": "DOSVJE",
         "route": "DRtD20D21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D4RA"
       },
       {
         "block": "S20",
-        "signal": "D10R",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "H20",
-        "signal": "S4R",
         "os": "SOSE",
         "route": "SRtS20H20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "H21",
-        "signal": "S18R",
         "os": "SOSHJM",
         "route": "SRtH20H21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S18R"
       }
     ],
     "startblock": "Y21",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Eastbound Unit Freight",
     "loco": null,
@@ -2952,7 +2495,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -2960,96 +2502,73 @@
     "sequence": [
       {
         "block": "L21",
-        "signal": "L4R",
         "os": "LOSLAE",
         "route": "LRtP21L21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L4R"
       },
       {
         "block": "D20",
-        "signal": "L16R",
         "os": "LOSCAM",
         "route": "LRtL21D20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L16R"
       },
       {
         "block": "D21",
-        "signal": "D4RA",
         "os": "DOSVJE",
         "route": "DRtD20D21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D4RA"
       },
       {
         "block": "S20",
-        "signal": "D10R",
         "os": "DOSFOE",
         "route": "DRtD21S20",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D10R"
       },
       {
         "block": "S21",
-        "signal": "S4R",
         "os": "SOSE",
         "route": "SRtS20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S4R"
       },
       {
         "block": "N20",
-        "signal": "S21E",
         "os": "KOSN20S21",
         "route": "KRtN20S21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S21E"
       },
       {
         "block": "N21",
-        "signal": "K2R",
         "os": "KOSE",
         "route": "KRtN20N21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K2R"
       },
       {
         "block": "N41",
-        "signal": "N14R",
         "os": "NWOSE",
         "route": "NRtN21N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N14R"
       },
       {
         "block": "R10",
-        "signal": "N24RB",
         "os": "NEOSRH",
         "route": "NRtR10N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N24RB"
       },
       {
         "block": "F10",
-        "signal": null,
         "os": null,
         "route": null,
-        "time": 5000,
-        "trigger": "Front"
+        "signal": null
       },
       {
         "block": "F11",
-        "signal": "S8R",
         "os": "SOSHF",
         "route": "SRtF10F11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S8R"
       }
     ],
     "startblock": "P21",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Eastbound Express Passenger",
     "loco": null,
@@ -3085,7 +2604,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -3093,40 +2611,31 @@
     "sequence": [
       {
         "block": "P42",
-        "signal": "PB12R",
         "os": "POSCJ2",
         "route": "PRtP41P42",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "PB12R"
       },
       {
         "block": "N25",
-        "signal": "S16R",
         "os": "SOSHJE",
         "route": "SRtP42N25",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S16R"
       },
       {
         "block": "N21",
-        "signal": "K4R",
         "os": "KOSM",
         "route": "KRtN25N21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K4R"
       },
       {
         "block": "N41",
-        "signal": "N14R",
         "os": "NWOSE",
         "route": "NRtN21N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N14R"
       }
     ],
     "startblock": "P41",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Eastbound Local Passenger",
     "loco": null,
@@ -3138,7 +2647,7 @@
     },
     "terminus": {
       "loc": "NA",
-      "track": null
+      "track": "Coach"
     },
     "tracker": [
       [
@@ -3167,7 +2676,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -3175,96 +2683,73 @@
     "sequence": [
       {
         "block": "C13",
-        "signal": "C14RB",
         "os": "COSCLW",
         "route": "CRtC13C23",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14RB"
       },
       {
         "block": "B11",
-        "signal": "C18R",
         "os": "BOSE",
         "route": "BRtB11C13",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18R"
       },
       {
         "block": "B10",
-        "signal": "C22R",
         "os": "BOSWW",
         "route": "BRtB10B11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C22R"
       },
       {
         "block": "N31",
-        "signal": "N26L",
         "os": "NEOSW",
         "route": "NRtB10N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N26L"
       },
       {
         "block": "N11",
-        "signal": "N18LB",
         "os": "NWOSW",
         "route": "NRtN11N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N18LB"
       },
       {
         "block": "N25",
-        "signal": "K8LB",
         "os": "KOSM",
         "route": "KRtN25N11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K8LB"
       },
       {
         "block": "P42",
-        "signal": "S16L",
         "os": "SOSHJE",
         "route": "SRtP42N25",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S16L"
       },
       {
         "block": "P31",
-        "signal": "PB14L",
         "os": "POSCJ1",
         "route": "PRtP31P42",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "PB14L"
       },
       {
         "block": "P30",
-        "signal": "PB4L",
         "os": "POSSJ1",
         "route": "PRtP30P31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "PB4L"
       },
       {
         "block": "P50",
-        "signal": "PA32RB",
         "os": "POSPJ2",
         "route": "PRtP30P50",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "PA32RB"
       },
       {
-        "block": "V11",
-        "signal": "PA34LA",
-        "os": "POSPJ1",
-        "route": "PRtV11P50",
-        "time": 5000,
-        "trigger": "Front"
+        "block": "Y11",
+        "os": "YOSCJW",
+        "route": "YRtY11P50",
+        "signal": "Y4RA"
       }
     ],
     "startblock": "C23",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Westbound Express Passenger",
     "loco": null,
@@ -3276,7 +2761,7 @@
     },
     "terminus": {
       "loc": "YD",
-      "track": null
+      "track": "Y50"
     },
     "tracker": [
       [
@@ -3310,7 +2795,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -3318,104 +2802,79 @@
     "sequence": [
       {
         "block": "P50",
-        "signal": "Y4L",
         "os": "YOSCJE",
         "route": "YRtY21P50",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "Y4L"
       },
       {
         "block": "P30",
-        "signal": "PA34LA",
         "os": "POSPJ2",
         "route": "PRtP30P50",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "PA34LA"
       },
       {
         "block": "P41",
-        "signal": "PB2R",
         "os": "POSSJ1",
         "route": "PRtP30P41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "PB2R"
       },
       {
         "block": "P42",
-        "signal": "PB12R",
         "os": "POSCJ2",
         "route": "PRtP41P42",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "PB12R"
       },
       {
         "block": "N25",
-        "signal": "S16R",
         "os": "SOSHJE",
         "route": "SRtP42N25",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S16R"
       },
       {
         "block": "N21",
-        "signal": "K4R",
         "os": "KOSM",
         "route": "KRtN25N21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K4R"
       },
       {
         "block": "N41",
-        "signal": "N14R",
         "os": "NWOSE",
         "route": "NRtN21N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N14R"
       },
       {
         "block": "B20",
-        "signal": "N24RB",
         "os": "NEOSE",
         "route": "NRtB20N41",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N24RB"
       },
       {
         "block": "B21",
-        "signal": "C24L",
         "os": "BOSWE",
         "route": "BRtB20B21",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C24L"
       },
       {
         "block": "C13",
-        "signal": "C18LB",
         "os": "BOSE",
         "route": "BRtB21C13",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C18LB"
       },
       {
         "block": "C12",
-        "signal": "C14L",
         "os": "COSCLW",
         "route": "CRtC13C12",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C14L"
       },
       {
         "block": "C11",
-        "signal": "C12L",
         "os": "COSCLEE",
         "route": "CRtC12C11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "C12L"
       }
     ],
     "startblock": "Y21",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Eastbound Express Passenger",
     "loco": null,
@@ -3423,7 +2882,7 @@
     "cutoff": true,
     "origin": {
       "loc": "YD",
-      "track": null
+      "track": "Y50"
     },
     "terminus": {
       "loc": "CF",
@@ -3461,7 +2920,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": true,
     "route": null
   },
@@ -3469,80 +2927,61 @@
     "sequence": [
       {
         "block": "N31",
-        "signal": "N26L",
         "os": "NEOSW",
         "route": "NRtB10N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N26L"
       },
       {
         "block": "N11",
-        "signal": "N18LB",
         "os": "NWOSW",
         "route": "NRtN11N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N18LB"
       },
       {
         "block": "N10",
-        "signal": "K8LB",
         "os": "KOSW",
         "route": "KRtN10N11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K8LB"
       },
       {
         "block": "S11",
-        "signal": "N10W",
         "os": "KOSN10S11",
         "route": "KRtN10S11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N10W"
       },
       {
         "block": "S10",
-        "signal": "S12LA",
         "os": "SOSW",
         "route": "SRtS10S11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S12LA"
       },
       {
         "block": "D11",
-        "signal": "D12L",
         "os": "DOSFOW",
         "route": "DRtD11S10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D12L"
       },
       {
         "block": "D10",
-        "signal": "D6L",
         "os": "DOSVJW",
         "route": "DRtD10D11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "D6L"
       },
       {
         "block": "L11",
-        "signal": "L18L",
         "os": "LOSCAW",
         "route": "LRtL11D10",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L18L"
       },
       {
         "block": "P11",
-        "signal": "L8L",
         "os": "LOSLAM",
         "route": "LRtP11L11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "L8L"
       }
     ],
     "startblock": "B10",
     "startsubblock": null,
-    "time": 5000,
     "dir": "East",
     "desc": "Westbound Local Passenger",
     "loco": null,
@@ -3550,7 +2989,7 @@
     "cutoff": false,
     "origin": {
       "loc": "NA",
-      "track": null
+      "track": "N32"
     },
     "terminus": {
       "loc": "PT",
@@ -3598,7 +3037,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   },
@@ -3606,56 +3044,43 @@
     "sequence": [
       {
         "block": "F10",
-        "signal": "S8L",
         "os": "SOSHF",
         "route": "SRtF10F11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S8L"
       },
       {
         "block": "R10",
-        "signal": null,
         "os": null,
         "route": null,
-        "time": 5000,
-        "trigger": "Front"
+        "signal": null
       },
       {
         "block": "N31",
-        "signal": "N28L",
         "os": "NEOSRH",
         "route": "NRtR10N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N28L"
       },
       {
         "block": "N11",
-        "signal": "N18LB",
         "os": "NWOSW",
         "route": "NRtN11N31",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "N18LB"
       },
       {
         "block": "N25",
-        "signal": "K8LB",
         "os": "KOSM",
         "route": "KRtN25N11",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "K8LB"
       },
       {
         "block": "P42",
-        "signal": "S16L",
         "os": "SOSHJE",
         "route": "SRtP42N25",
-        "time": 5000,
-        "trigger": "Front"
+        "signal": "S16L"
       }
     ],
     "startblock": "F11",
     "startsubblock": null,
-    "time": 5000,
     "dir": "West",
     "desc": "Westbound Express Passenger",
     "loco": null,
@@ -3706,7 +3131,6 @@
         0
       ]
     ],
-    "block": null,
     "eastbound": false,
     "route": null
   }

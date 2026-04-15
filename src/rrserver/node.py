@@ -19,6 +19,7 @@ def getBit(ibyte, ibit):
 	b = int(bytes([ibyte]).hex(), 16)
 	return 1 if b & mask != 0 else 0
 
+
 class Node:
 	def __init__(self, district, rr, address, bcount, settings, incount=None):
 		self.district = district
@@ -58,7 +59,10 @@ class Node:
 	
 	def AddInputToMap(self, bytebit, o):
 		self.inputMap[bytebit] = o
-	
+
+	def GetName(self):
+		return nodeNames[self.address]
+
 	def GetInputBits(self, bits):
 		rv = []
 		for bt in bits:

@@ -1080,12 +1080,18 @@ class Railroad:
 		for addr, district, node in self.addrList:
 			skiplist, resumelist = district.GetControlOption()
 			changedBits = node.GetChangedInputs()
+			ndName = node.GetName()
+			dbg = ndName in ["Bank", "Cliveden", "Green Mtn", "Cliff", "Sheffield"]
 			for node, vbyte, vbit, objparms, newval in changedBits:
+				logging.debug("Input from Node = %s" % node.GetName())
 				obj = objparms[0]
 				objType = obj.InputType()
 				objName = obj.Name()
 
 				if objType == INPUT_BLOCK:
+					if dbg:
+						logging.debug("BLOCK input from node %s: %s (%s)" % (ndName, objName, newval))
+
 					if objName.split(".")[0] in self.ignoredBlocks:
 						logging.info("Ignoring block %s as per ignore list" % objName)
 					else:
@@ -1108,6 +1114,8 @@ class Railroad:
 									obj.UpdateIndicators()
 
 				elif objType == INPUT_TURNOUTPOS:
+					if dbg:
+						logging.debug("TURNOUT_POSITION input from node %s: %s (%s)" % (ndName, objName, newval))
 					pos = obj.Position()
 					if pos:
 						bits, district, node, address = pos
@@ -1136,6 +1144,8 @@ class Railroad:
 								obj.district.TurnoutLeverChange(obj)
 						
 				elif objType == INPUT_BREAKER:
+					if dbg:
+						logging.debug("BREAKER input from node %s: %s (%s)" % (ndName, objName, newval))
 					if obj.SetStatus(newval == 1):
 						self.RecordBreakerTrip(obj)
 						if obj.HasProxy():
@@ -1146,6 +1156,8 @@ class Railroad:
 							self.RailroadEvent(obj.GetEventMessage())
 	
 				elif objType == INPUT_SIGNALLEVER:
+					if dbg:
+						logging.debug("SIGNALLEVER input from node %s: %s (%s)" % (ndName, objName, newval))
 					if obj.Name() not in skiplist: # bypass levers that are skipped because of control option
 						bt = obj.Bits()
 						if len(bt) > 0:
@@ -1155,6 +1167,8 @@ class Railroad:
 								obj.UpdateLed()
 
 				elif objType == INPUT_HANDSWITCH:
+					if dbg:
+						logging.debug("HANDSWITCH input from node %s: %s (%s)" % (ndName, objName, newval))
 					dataType = objparms[1]
 					if dataType == "L":
 						objnm = obj.Name()
@@ -1192,11 +1206,16 @@ class Railroad:
 										self.RailroadEvent(obj.GetEventMessage())
 		
 				elif objType == INPUT_ROUTEIN:
+					if dbg:
+						logging.debug("ROUTEIN input from node %s: %s (%s)" % (ndName, objName, newval))
 					bt = obj.Bits()
 					if len(bt) > 0:
 						stat = node.GetInputBit(bt[0][0], bt[0][1])
 						obj.district.RouteIn(obj, stat)
-						
+
+				else:
+					logging.debug("UNKNOWN input type %s from node %s: %s (%s)" % (objType, ndName, objName, newval))
+
 			'''
 			The resume list is a list of objects - signal levers, or handswitch unlocks - that have been ignored because of the
 			control setting for this district, but now need to be considered because the control value has changed.  We need to 

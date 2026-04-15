@@ -427,6 +427,7 @@ class Cliff(District):
 						
 		dispatchList = self.fleetedSignalsCliff[self.control]
 		if optFleet != self.optFleet:
+			logging.debug("CLIFF fleet changed from %s to %s" % (self.optFleet, optFleet))
 			self.optFleet = optFleet
 			self.nodes[CLIFF].SetOutputBit(2, 5, 1-optFleet)   # fleet indicator
 			self.nodes[CLIFF].SetOutputBit(2, 6, optFleet)   # fleet indicator
